@@ -70,7 +70,7 @@ export class RrDetailComponent {
     isTerminal(): boolean { return TERMINAL_STATUSES.includes(this.data?.documentStatus?.status || ''); }
     isEditable(): boolean {
         const s = this.data?.documentStatus?.status || '';
-        return s === 'Document Created' || s === 'For Revision';
+        return s === 'Document Created' || s === 'Returned to Creator';
     }
 
     processWorkflow(): void {

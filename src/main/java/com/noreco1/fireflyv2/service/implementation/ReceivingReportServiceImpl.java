@@ -450,9 +450,10 @@ public class ReceivingReportServiceImpl implements ReceivingReportService, Print
         if (receivingReport != null) {
             rr.put("id", receivingReport.getId());
             rr.put("code", receivingReport.getCode());
+            rr.put("transId", receivingReport.getTransaction().getId());
             rr.put("deliveryDate", receivingReport.getDeliveryDate());
             rr.put("deliveryNumber", receivingReport.getDeliveryNumber());
-            rr.put("invoiceDate", receivingReport.getDeliveryDate());
+            rr.put("invoiceDate", receivingReport.getInvoiceDate());
             rr.put("invoiceNumber", receivingReport.getInvoiceNumber());
             rr.put("remarks", receivingReport.getRemarks());
             rr.put("documentStatus", receivingReport.getDocumentStatus());
@@ -701,7 +702,7 @@ public class ReceivingReportServiceImpl implements ReceivingReportService, Print
                 documentLoggerFacade.log(receivingReport.getTransaction(), authenticationFacade.getLoggedIn(), oldRrMap, newRrMap);
 
                 // insert to itemstock & stocktrans tables
-                if(postData.getWorkflowActionsDto().getActionId() == com.noreco1.fireflyv2.model.enums.DocumentStatus.FOR_APPROVAL.getId()) {
+                if(afterActionDocumentStatus.getId() == com.noreco1.fireflyv2.model.enums.DocumentStatus.FOR_APPROVAL.getId()) {
 
                     if (!Checker.collectionIsEmpty(reportDetails)) {
 
@@ -709,6 +710,8 @@ public class ReceivingReportServiceImpl implements ReceivingReportService, Print
                         StockTransaction stockTransaction = new StockTransaction();
                         stockTransaction.setTransaction(receivingReport.getTransaction());
                         stockTransaction.setCreatedBy(processedBy);
+                        stockTransaction.setCreatedAt(new Date());
+                        stockTransaction.setUpdatedAt(new Date());
                         stockTransaction = stockTransactionRepo.save(stockTransaction);
 
                         for (ReceivingReportDetail rrd : reportDetails) {
@@ -726,6 +729,8 @@ public class ReceivingReportServiceImpl implements ReceivingReportService, Print
                                 itemStock.setInventoryLocation(receivingReport.getInventoryLocation());
                                 itemStock.setTotalQuantity(rrd.getQuantityReceived());
                                 itemStock.setTotalItemCost(rrd.getAmount().add(rrd.getAdjustment()));
+                                itemStock.setCreatedAt(new java.sql.Date(System.currentTimeMillis()));
+                                itemStock.setUpdatedAt(new java.sql.Date(System.currentTimeMillis()));
                             }
 
                             ItemStock newItemStock = itemStockRepo.save(itemStock);
