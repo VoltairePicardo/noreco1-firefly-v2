@@ -1,0 +1,108 @@
+<div class="container-fluid">
+    <app-page-title [title]="'Accounting Reports'" [subTitle]="module" [menuLink]="menuLink" [useSubtitleAsTitle]="true"/>
+</div>
+<div class="container-fluid">
+    <div class="card">
+        <div class="card-body">
+            <div class="row g-2 align-items-end mb-3">
+                <div class="col-md-2">
+                    <label class="form-label fw-bold mb-1">Status</label>
+                    <select class="form-select" [(ngModel)]="fsType">
+                        @for (t of fsTypeOptions; track t) {
+                            <option [value]="t">{{ t }}</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label fw-bold mb-1">As-of Date</label>
+                    <input type="text" mwlFlatpickr [options]="flatpickrOptions"
+                           class="form-control" [(ngModel)]="asOfDate" placeholder="As-of date"/>
+                </div>
+
+                <div class="col-md-2">
+                    <button type="button" class="btn btn-success fw-bold" (click)="search()">
+                        <ng-icon name="tablerSearch" class="fw-bold me-1"></ng-icon>Search
+                    </button>
+                </div>
+
+                <div class="col-md-auto ms-auto">
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-success fw-bold" (click)="export('pdf')">
+                            <ng-icon name="tablerFileTypePdf" class="fw-bold me-1"></ng-icon>Export PDF
+                        </button>
+                        <button type="button" class="btn btn-success fw-bold" (click)="export('xls')">
+                            <ng-icon name="tablerFileTypeXls" class="fw-bold me-1"></ng-icon>Export Excel
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            @if (isLoading()) {
+                <div class="text-center text-muted py-3">
+                    <span class="spinner-border spinner-border-sm me-2"></span>Loading...
+                </div>
+            } @else if (rows().length > 0) {
+                <div class="row mt-2">
+                    <div class="col-md-6 pe-0">
+                        <div class="table-responsive">
+                            <table class="table table-custom table-hover w-100 mb-0 small">
+                                <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                                    <tr class="text-uppercase fs-xxs">
+                                        <th colspan="2">Assets and Other Debits</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @for (row of leftRows(); track $index) {
+                                        <tr [class.fw-bold]="row.total || row.header">
+                                            <td>{{ row.item }}</td>
+                                            <td class="text-end" [class.text-danger]="row.amount < 0">
+                                                {{ row.amount < 0 ? '(' : '' }}{{ (row.amount < 0 ? -row.amount : row.amount) | number:'1.2-2' }}{{ row.amount < 0 ? ')' : '' }}
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="col-md-6 ps-0">
+                        <div class="table-responsive">
+                            <table class="table table-custom table-hover w-100 mb-0 small">
+                                <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                                    <tr class="text-uppercase fs-xxs">
+                                        <th colspan="2">Liabilities and Other Credits</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @for (row of rightRows(); track $index) {
+                                        <tr [class.fw-bold]="row.total || row.header">
+                                            <td>{{ row.item }}</td>
+                                            <td class="text-end" [class.text-danger]="row.amount < 0">
+                                                {{ row.amount < 0 ? '(' : '' }}{{ (row.amount < 0 ? -row.amount : row.amount) | number:'1.2-2' }}{{ row.amount < 0 ? ')' : '' }}
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <table class="table table-bordered mt-0 small">
+                    <tbody>
+                        <tr class="fw-bold bg-light">
+                            <td class="w-50">
+                                Total Assets and Other Debits
+                                <span class="float-end">{{ totalLeft() | number:'1.2-2' }}</span>
+                            </td>
+                            <td class="w-50">
+                                Total Liabilities and Other Credits
+                                <span class="float-end">{{ totalRight() | number:'1.2-2' }}</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            } @else {
+                <div class="text-center text-muted py-3 small">No records found.</div>
+            }
+        </div>
+    </div>
+</div>

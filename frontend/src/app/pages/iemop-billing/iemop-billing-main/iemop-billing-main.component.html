@@ -1,0 +1,107 @@
+<div class="container-fluid">
+    <app-page-title [title]="module" [subTitle]="subModule" [menuLink]="menuLink"/>
+</div>
+
+<div class="card">
+    <div class="row">
+        <div class="col-xl-12">
+            <div class="card-body">
+
+                <!-- Filters -->
+                <div class="row mb-3 align-items-end g-2">
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold mb-1 fs-xs text-uppercase">Search</label>
+                        <input type="text" class="form-control" [(ngModel)]="searchQuery"
+                               placeholder="STL ID, billing ID, reference number..."
+                               (keyup.enter)="search()"/>
+                    </div>
+                    <div class="col-auto d-flex gap-2">
+                        <button type="button" class="btn btn-success fw-bold" (click)="search()">
+                            <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Search
+                        </button>
+                        <button type="button" class="btn btn-danger fw-bold" (click)="reset()">
+                            <ng-icon name="tablerRefresh" class="ps-0 pe-3 fw-bold"></ng-icon>Reset
+                        </button>
+                    </div>
+                    <div class="col-md-auto ms-auto">
+                        <a class="btn btn-primary fw-bold" [routerLink]="['/' + menuLink + '/upload']">
+                            <ng-icon name="tablerUpload" class="ps-0 pe-3 fw-bold"></ng-icon>Upload IEMOP
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Table -->
+                <div class="row">
+                    <div class="table-responsive">
+                        <table class="table table-custom table-centered table-select table-hover w-100 mb-0">
+                            <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                                <tr class="text-uppercase fs-xxs">
+                                    <th>Supplier</th>
+                                    <th>STL ID</th>
+                                    <th>Billing ID</th>
+                                    <th>Reference Number</th>
+                                    <th>Date</th>
+                                    <th>Facility Type</th>
+                                    <th>WHT Agent</th>
+                                    <th>ITH</th>
+                                    <th>Non-Vatable</th>
+                                    <th>Zero-Rated</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (records().length > 0) {
+                                    @for (rec of records(); track rec.id) {
+                                        <tr>
+                                            <td>{{ rec.subSupplier?.supplier?.name || '—' }}</td>
+                                            <td class="fw-bold">{{ rec.stlId }}</td>
+                                            <td>{{ rec.billingId }}</td>
+                                            <td>{{ rec.referenceNumber }}</td>
+                                            <td>{{ rec.transDate | date:'MM/dd/yyyy' }}</td>
+                                            <td>{{ rec.facilityType }}</td>
+                                            <td>{{ rec.whtAgent ? 'Yes' : 'No' }}</td>
+                                            <td>{{ rec.ithTag ? 'Yes' : 'No' }}</td>
+                                            <td>{{ rec.nonVatable ? 'Yes' : 'No' }}</td>
+                                            <td>{{ rec.zeroRated ? 'Yes' : 'No' }}</td>
+                                            <td class="text-nowrap">
+                                                <div class="d-flex justify-content-end gap-1">
+                                                    <a class="btn btn-light btn-icon btn-sm rounded-circle"
+                                                       [routerLink]="['/' + menuLink, rec.id, 'details']"
+                                                       ngbTooltip="View">
+                                                        <ng-icon name="tablerEye"></ng-icon>
+                                                    </a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                } @else {
+                                    <tr class="no-results">
+                                        <td colspan="11" class="text-center text-muted py-3">
+                                            @if (isLoading()) {
+                                                <span class="spinner-border spinner-border-sm me-2" role="status"></span>Loading...
+                                            } @else { Nothing found. }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Pagination -->
+                @if (totalElements() > pageSize) {
+                    <div class="d-flex justify-content-center mt-3">
+                        <ngb-pagination
+                            [collectionSize]="totalElements()"
+                            [page]="pageNumber() + 1"
+                            [pageSize]="pageSize"
+                            [maxSize]="5"
+                            (pageChange)="onPageChange($event)">
+                        </ngb-pagination>
+                    </div>
+                }
+
+            </div>
+        </div>
+    </div>
+</div>

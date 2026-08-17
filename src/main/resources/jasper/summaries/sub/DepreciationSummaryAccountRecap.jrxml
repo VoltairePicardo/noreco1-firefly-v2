@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="DepreciationSummaryAccountRecap" pageWidth="612" pageHeight="792" columnWidth="598" leftMargin="14" rightMargin="0" topMargin="0" bottomMargin="0" isFloatColumnFooter="true" uuid="0b948967-77e7-4031-abf0-493559410c46">
+	<property name="ireport.zoom" value="1.2396694214876032"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["D:\\accounting\\src\\inventory\\reports\\"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="RANGE" class="java.lang.String"/>
+	<parameter name="REPORT_TITLE" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[]]>
+	</queryString>
+	<field name="accountTitle" class="java.lang.String">
+		<fieldDescription><![CDATA[accountTitle]]></fieldDescription>
+	</field>
+	<field name="accountCode" class="java.lang.String">
+		<fieldDescription><![CDATA[accountCode]]></fieldDescription>
+	</field>
+	<field name="glDebitAmount" class="java.math.BigDecimal">
+		<fieldDescription><![CDATA[glDebitAmount]]></fieldDescription>
+	</field>
+	<field name="glCreditAmount" class="java.math.BigDecimal">
+		<fieldDescription><![CDATA[glCreditAmount]]></fieldDescription>
+	</field>
+	<field name="slDebitAmount" class="java.math.BigDecimal">
+		<fieldDescription><![CDATA[glDebitAmount]]></fieldDescription>
+	</field>
+	<field name="slCreditAmount" class="java.math.BigDecimal">
+		<fieldDescription><![CDATA[slCreditAmount]]></fieldDescription>
+	</field>
+	<variable name="glDebitAmount_1" class="java.math.BigDecimal" resetType="Column" calculation="Sum">
+		<variableExpression><![CDATA[$F{glDebitAmount}]]></variableExpression>
+	</variable>
+	<variable name="glCreditAmount_1" class="java.math.BigDecimal" resetType="Column" calculation="Sum">
+		<variableExpression><![CDATA[$F{glCreditAmount}]]></variableExpression>
+	</variable>
+	<columnHeader>
+		<band height="15">
+			<staticText>
+				<reportElement uuid="688d0122-d99c-4306-93dc-9bc5fd9031c9" x="89" y="0" width="76" height="15"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Account]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="cc5627fe-e121-44af-b3ec-4d09a3037624" x="316" y="0" width="100" height="15"/>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Debit]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="c9554efd-76de-4f50-9e60-8875d0bb2347" x="416" y="0" width="100" height="15"/>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Credit]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="a200961a-6c19-4e6b-b66a-a0361deb3529" x="0" y="0" width="76" height="15"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Code]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="13" splitType="Stretch">
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="d434d724-954e-4c6b-a17a-89e72039366b" x="89" y="0" width="227" height="12"/>
+				<box leftPadding="0"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{accountTitle}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern=" #,##0.00" isBlankWhenNull="true">
+				<reportElement uuid="f1102ced-e4ca-43d9-be19-327e4addd63f" x="316" y="0" width="100" height="12"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[($F{glDebitAmount}.compareTo(new java.math.BigDecimal(0)) ==0 ? null:$F{glDebitAmount})]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern=" #,##0.00" isBlankWhenNull="true">
+				<reportElement uuid="c7054397-9e39-4305-8d4b-dc0c3706f257" x="416" y="0" width="100" height="12"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[($F{glCreditAmount}.compareTo(new java.math.BigDecimal(0)) ==0 ? null:$F{glCreditAmount})]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="ceefa4b9-2894-4898-9c12-a9e8bc0322db" x="0" y="0" width="89" height="12"/>
+				<box leftPadding="0"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{accountCode}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="15">
+			<textField pattern=" #,##0.00" isBlankWhenNull="true">
+				<reportElement uuid="36b7835e-a7f8-4aa1-ab53-876943d4a223" mode="Transparent" x="316" y="1" width="100" height="14" forecolor="#000000" backcolor="#FFFFFF"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="Arial" size="9" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{glDebitAmount_1}]]></textFieldExpression>
+			</textField>
+			<textField pattern=" #,##0.00" isBlankWhenNull="true">
+				<reportElement uuid="f970a570-bfc4-4e70-b44f-10de88319f16" mode="Transparent" x="416" y="1" width="100" height="14" forecolor="#000000" backcolor="#FFFFFF"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="Arial" size="9" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{glCreditAmount_1}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement uuid="402e7495-dcff-4d98-9923-f8427b367c39" x="0" y="0" width="516" height="1"/>
+			</line>
+		</band>
+	</columnFooter>
+	<lastPageFooter>
+		<band height="15"/>
+	</lastPageFooter>
+</jasperReport>

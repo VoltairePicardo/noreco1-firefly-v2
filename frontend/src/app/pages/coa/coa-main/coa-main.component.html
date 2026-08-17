@@ -1,0 +1,139 @@
+<div class="container-fluid">
+    <app-page-title [title]="module" [subTitle]="subModule" [menuLink]="menuLink"/>
+</div>
+
+<div class="card">
+    <div class="row">
+        <div class="col-xl-12">
+            <div class="card-body">
+
+                <div class="row mb-2 align-items-center">
+                    <!-- Search input -->
+                    <div class="col-md-3 mt-2">
+                        <div class="app-search">
+                            <input type="text" class="form-control my-1 my-md-0"
+                                   placeholder="Search by code or title..."
+                                   [(ngModel)]="searchText"
+                                   (keyup.enter)="search()"
+                                   [ngModelOptions]="{ standalone: true }"/>
+                            <ng-icon name="tablerSearch" class="app-search-icon text-muted"></ng-icon>
+                        </div>
+                    </div>
+                    <!-- Search / Reset buttons -->
+                    <div class="col-md-2 mt-2 d-flex gap-2">
+                        <div class="app-search flex-grow-1">
+                            <button type="button" class="btn btn-success w-100 fw-bold" (click)="search()">
+                                <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Search
+                            </button>
+                        </div>
+                        <div class="app-search flex-grow-1">
+                            <button type="button" class="btn btn-danger w-100 fw-bold" (click)="clearSearch()">
+                                <ng-icon name="tablerRefresh" class="ps-0 pe-3 fw-bold"></ng-icon>Reset
+                            </button>
+                        </div>
+                    </div>
+                    <!-- Expand/Collapse + Create + Print -->
+                    <div class="col-md-7 d-flex justify-content-end gap-2 mt-2 flex-wrap">
+                        <button type="button" class="btn btn-success fw-bold" (click)="printCoa()">
+                            <ng-icon name="tablerPrinter" class="ps-0 pe-3 fw-bold"></ng-icon>Print
+                        </button>
+                        @if (!isSearchMode) {
+                            <button type="button" class="btn btn-primary fw-bold" (click)="expandAll()">
+                                <ng-icon name="tablerLayoutList" class="ps-0 pe-3 fw-bold"></ng-icon>Expand All
+                            </button>
+                            <button type="button" class="btn btn-primary fw-bold" (click)="collapseAll()">
+                                <ng-icon name="tablerLayoutRows" class="ps-0 pe-3 fw-bold"></ng-icon>Collapse All
+                            </button>
+                        }
+                        <button type="button" class="btn btn-primary fw-bold d-flex align-items-center gap-2"
+                                [routerLink]="['/' + menuLink + '/create']">
+                            <ng-icon name="tablerPlus" class="fw-bold"></ng-icon>
+                            Create Account
+                        </button>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="table-responsive">
+                        <table class="table table-custom table-centered table-select table-hover w-100 mb-0">
+                            <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                                <tr class="text-uppercase fs-xxs">
+                                    <th>Code / Title</th>
+                                    <th>Classification</th>
+                                    <th>Account Type</th>
+                                    <th>Normal Balance</th>
+                                    <th>Status</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (filtered().length > 0) {
+                                    @for (data of filtered(); track data.id) {
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center"
+                                                     [style.paddingLeft]="(depthMap.get(data.id) ?? 0) * 18 + 'px'">
+                                                    @if (!isSearchMode && hasChildrenMap.get(data.id)) {
+                                                        <button type="button"
+                                                                class="btn btn-link btn-sm p-0 me-1 text-muted lh-1"
+                                                                style="min-width:16px; font-size:11px"
+                                                                (click)="toggleNode(data, $event)">
+                                                            {{ collapsedIds().has(data.id) ? '▶' : '▼' }}
+                                                        </button>
+                                                    } @else {
+                                                        <span class="me-1" style="min-width:16px; display:inline-block"></span>
+                                                    }
+                                                    <div>
+                                                        <div class="fw-bold font-monospace small">{{ data.code || '—' }}</div>
+                                                        <div class="text-muted small">{{ data.title || '—' }}</div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="small">{{ data.classification || '—' }}</td>
+                                            <td class="small">{{ data.accountType?.description || '—' }}</td>
+                                            <td class="small">{{ normalBalanceLabel(data.normalBalance) }}</td>
+                                            <td>
+                                                @if (data.isActive) {
+                                                    <span class="badge bg-success">Active</span>
+                                                } @else {
+                                                    <span class="badge bg-secondary">Inactive</span>
+                                                }
+                                            </td>
+                                            <td class="text-nowrap">
+                                                <div class="d-flex justify-content-end gap-1">
+                                                    <a href="javascript:void(0)" ngbTooltip="View"
+                                                       [routerLink]="['/' + menuLink, data.id, 'detail']"
+                                                       class="btn btn-light btn-icon btn-sm rounded-circle">
+                                                        <ng-icon name="tablerEye" class="fs-lg"></ng-icon>
+                                                    </a>
+                                                    <a href="javascript:void(0)" ngbTooltip="Edit"
+                                                       [routerLink]="['/' + menuLink, data.id, 'edit']"
+                                                       class="btn btn-light btn-icon btn-sm rounded-circle">
+                                                        <ng-icon name="tablerEdit" class="fs-lg"></ng-icon>
+                                                    </a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                } @else {
+                                    <tr class="no-results">
+                                        <td colspan="6" class="text-center text-muted py-3">
+                                            @if (isLoading()) {
+                                                <span class="spinner-border spinner-border-sm me-2" role="status"></span>Loading...
+                                            } @else { Nothing found. }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="mt-2">
+                    <small class="text-muted">Total: {{ filtered().length }} record(s)</small>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,393 @@
+<div class="container-fluid">
+    <app-page-title [title]="module" [subTitle]="subModule" [menuLink]="menuLink"/>
+</div>
+
+<div class="container-fluid">
+    @if (isLoading() && !data.id) {
+        <div class="d-flex align-items-center gap-2 text-muted py-4">
+            <span class="spinner-border spinner-border-sm" role="status"></span> Loading...
+        </div>
+    } @else {
+    <div class="row g-3">
+
+        <!-- CPR Info Card -->
+        <div class="col-xl-12">
+            <app-ui-card title="Asset Information">
+                <div class="col-xl-12 p-3" card-body>
+                    <div class="row g-3">
+                        <div class="col-md-2">
+                            <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Ref No / Code</div>
+                            <div class="fw-bold">{{ data.refNo || data.localCode || '—' }}</div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Description</div>
+                            <div>{{ data.description || '—' }}</div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Asset Type</div>
+                            <div>{{ data.assetType?.description || '—' }}</div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Total Value</div>
+                            <div>{{ data.totalValue | number:'1.2-2' }}</div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Dep. Months</div>
+                            <div>{{ data.depreciationMonths }}</div>
+                        </div>
+                    </div>
+                </div>
+            </app-ui-card>
+        </div>
+
+        <!-- Link Voucher Form -->
+        <div class="col-xl-12">
+            <app-ui-card title="Link Voucher">
+                <div class="col-xl-12 p-3" card-body>
+
+                    <!-- Voucher Browse -->
+                    <div class="row g-3">
+                        <div class="col-md-5">
+                            <label class="form-label fw-bold">Voucher Transaction</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" readonly
+                                       [value]="selectedVoucher ? ((selectedVoucher.code || selectedVoucher.transactionId) + (selectedVoucher.date ? ' — ' + (selectedVoucher.date | date:'MMM dd, yyyy') : '')) : ''"
+                                       placeholder="Browse voucher..."/>
+                                <button type="button" class="btn btn-success fw-bold" (click)="browseVoucher()">
+                                    <ng-icon name="tablerSearch" class="fw-bold"></ng-icon>
+                                </button>
+                                @if (selectedVoucher) {
+                                    <button type="button" class="btn btn-light" (click)="clearVoucher()">
+                                        <ng-icon name="tablerX" class="fw-bold"></ng-icon>
+                                    </button>
+                                }
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold">Transaction Type <span class="text-danger">*</span></label>
+                            <select class="form-select"
+                                    [(ngModel)]="selectedLinkType" [ngModelOptions]="{ standalone: true }"
+                                    (ngModelChange)="onLinkTypeChange()"
+                                    [disabled]="!selectedVoucher">
+                                <option [ngValue]="null">— Select Type —</option>
+                                @for (lt of linkTypes(); track lt.id) {
+                                    <option [ngValue]="lt">{{ lt.description || lt.name || lt }}</option>
+                                }
+                            </select>
+                        </div>
+                        @if (isAdjustment) {
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold">Adjustment Type <span class="text-danger">*</span></label>
+                                <select class="form-select"
+                                        [(ngModel)]="selectedAdjustmentType" [ngModelOptions]="{ standalone: true }">
+                                    <option [ngValue]="null">— Select Type —</option>
+                                    @for (at of adjustmentTypes; track at.id) {
+                                        <option [ngValue]="at">{{ at.description }}</option>
+                                    }
+                                </select>
+                            </div>
+                        }
+                    </div>
+
+                    <!-- Voucher Details (show when selected) -->
+                    @if (selectedVoucher) {
+                        <div class="row g-3 mt-1 p-3 border rounded bg-light">
+                            <div class="col-md-2">
+                                <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Transaction Id</div>
+                                <div class="fw-bold">{{ selectedVoucher.transactionId || '—' }}</div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Code</div>
+                                <div class="fw-bold">{{ selectedVoucher.code || '—' }}</div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Date</div>
+                                <div>{{ selectedVoucher.date | date:'MMMM d, yyyy' }}</div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Particulars</div>
+                                <div>{{ selectedVoucher.particulars || '—' }}</div>
+                            </div>
+                        </div>
+                    }
+
+                    <!-- Extended Section: majorRepair | adjustment | acquisition | retirement -->
+                    @if (showExtended) {
+                        @if (isLoading()) {
+                            <div class="d-flex align-items-center gap-2 text-muted py-3">
+                                <span class="spinner-border spinner-border-sm" role="status"></span> Loading...
+                            </div>
+                        } @else {
+
+                        <hr class="mt-4"/>
+
+                        <!-- Asset Totals -->
+                        <div class="row g-3 mt-1">
+                            <div class="col-12">
+                                <h6 class="fw-semibold text-uppercase fs-xs">Asset Values</h6>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Total Value</div>
+                                <div>{{ totalValue | number:'1.2-2' }}</div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Total Remaining Value</div>
+                                <div>{{ totalRemainingValue | number:'1.2-2' }}</div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Total Monthly Depreciation</div>
+                                <div>{{ totalMonthlyDep | number:'1.2-2' }}</div>
+                            </div>
+                        </div>
+
+                        <!-- Depreciation Fields -->
+                        <div class="row g-3 mt-1">
+                            <div class="col-md-2">
+                                <label class="form-label fw-bold">Dep. Years</label>
+                                <input type="number" class="form-control"
+                                       [(ngModel)]="depYears" [ngModelOptions]="{ standalone: true }"
+                                       (ngModelChange)="onDepYearsChange()"
+                                       min="0" step="1"/>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label fw-bold">Dep. Months</label>
+                                <input type="number" class="form-control"
+                                       [(ngModel)]="depMonths" [ngModelOptions]="{ standalone: true }"
+                                       (ngModelChange)="onDepMonthsChange()"
+                                       min="0" step="1"/>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label fw-bold">End Year</label>
+                                <input type="number" class="form-control" [ngModel]="endYear" readonly [ngModelOptions]="{ standalone: true }"/>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label fw-bold">End Month</label>
+                                <input type="text" class="form-control" [ngModel]="endMonth" readonly [ngModelOptions]="{ standalone: true }"/>
+                            </div>
+                        </div>
+
+                        <!-- Depreciation Schedule -->
+                        @if (schedule.length > 0) {
+                            <div class="row g-3 mt-1">
+                                <div class="col-12">
+                                    <h6 class="fw-semibold text-uppercase fs-xs">Depreciation Schedule</h6>
+                                    <div class="table-responsive" style="max-height:200px; overflow-y:auto">
+                                        <table class="table table-custom table-centered table-hover w-100 mb-0">
+                                            <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                                                <tr class="text-uppercase fs-xxs">
+                                                    <th>Month</th>
+                                                    <th>Year</th>
+                                                    <th class="text-end">Value</th>
+                                                    <th>Deducted</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @for (sched of schedule; track $index) {
+                                                    <tr>
+                                                        <td>{{ monthName(sched.month) }}</td>
+                                                        <td>{{ sched.year }}</td>
+                                                        <td class="text-end">{{ sched.totalDepreciationAmount | number:'1.2-2' }}</td>
+                                                        <td>{{ sched.deducted ? 'Yes' : 'No' }}</td>
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+
+                        <!-- Account Detail Table -->
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <div class="d-flex align-items-center justify-content-between mb-2">
+                                    <h6 class="fw-semibold text-uppercase fs-xs mb-0">Account Detail</h6>
+                                    @if (isEditable) {
+                                        <button type="button" class="btn btn-success fw-bold" (click)="addRow()">
+                                            <ng-icon name="tablerPlus" class="ps-0 pe-2 fw-bold"></ng-icon>Add Row
+                                        </button>
+                                    }
+                                </div>
+                                <div class="table-responsive">
+                                    <table class="table table-custom table-centered table-hover w-100 mb-0">
+                                        <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                                            <tr class="text-uppercase fs-xxs">
+                                                <th style="min-width:200px">Asset Account</th>
+                                                <th style="min-width:200px">Expense Account</th>
+                                                <th style="min-width:200px">Accum. Dep. Account</th>
+                                                <th style="width:110px" class="text-end">Value</th>
+                                                <th style="width:110px" class="text-end">Dep. Value</th>
+                                                <th style="width:110px" class="text-end">Monthly Dep.</th>
+                                                <th style="width:110px" class="text-end">Remaining Value</th>
+                                                @if (!isEditable) {
+                                                    <th style="width:110px" class="text-end">Debit Entry</th>
+                                                } @else {
+                                                    <th style="width:50px"></th>
+                                                }
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @for (row of assetDetails; track $index; let i = $index) {
+                                                <tr>
+                                                    <!-- Asset Account -->
+                                                    <td>
+                                                        @if (isEditable) {
+                                                            <div class="input-group input-group-sm">
+                                                                <input type="text" class="form-control" readonly
+                                                                       [value]="accountLabel(row.assetAccount)"
+                                                                       placeholder="Browse account..."/>
+                                                                <button type="button" class="btn btn-success fw-bold"
+                                                                        (click)="browseAccount('asset', i)">
+                                                                    <ng-icon name="tablerSearch" class="fw-bold"></ng-icon>
+                                                                </button>
+                                                                @if (row.assetAccount) {
+                                                                    <button type="button" class="btn btn-light"
+                                                                            (click)="clearAccount('asset', i)">
+                                                                        <ng-icon name="tablerX" class="fw-bold"></ng-icon>
+                                                                    </button>
+                                                                }
+                                                            </div>
+                                                        } @else {
+                                                            <div class="fw-bold fs-xs">{{ row.assetAccount?.code || row.assetAccount?.accountCode || '—' }}</div>
+                                                            <div class="text-muted fs-xs">{{ row.assetAccount?.title || row.assetAccount?.accountTitle || '' }}</div>
+                                                        }
+                                                    </td>
+                                                    <!-- Expense Account -->
+                                                    <td>
+                                                        @if (isEditable || row.newRow) {
+                                                            <div class="input-group input-group-sm">
+                                                                <input type="text" class="form-control" readonly
+                                                                       [value]="accountLabel(row.expenseAccount)"
+                                                                       placeholder="Browse account..."/>
+                                                                <button type="button" class="btn btn-success fw-bold"
+                                                                        (click)="browseAccount('expense', i)">
+                                                                    <ng-icon name="tablerSearch" class="fw-bold"></ng-icon>
+                                                                </button>
+                                                                @if (row.expenseAccount) {
+                                                                    <button type="button" class="btn btn-light"
+                                                                            (click)="clearAccount('expense', i)">
+                                                                        <ng-icon name="tablerX" class="fw-bold"></ng-icon>
+                                                                    </button>
+                                                                }
+                                                            </div>
+                                                        } @else {
+                                                            <div class="fw-bold fs-xs">{{ row.expenseAccount?.code || row.expenseAccount?.accountCode || '—' }}</div>
+                                                            <div class="text-muted fs-xs">{{ row.expenseAccount?.title || row.expenseAccount?.accountTitle || '' }}</div>
+                                                        }
+                                                    </td>
+                                                    <!-- Accum. Dep. Account -->
+                                                    <td>
+                                                        @if (isEditable || row.newRow) {
+                                                            <div class="input-group input-group-sm">
+                                                                <input type="text" class="form-control" readonly
+                                                                       [value]="accountLabel(row.accumDepAccount)"
+                                                                       placeholder="Browse account..."/>
+                                                                <button type="button" class="btn btn-success fw-bold"
+                                                                        (click)="browseAccount('accumDep', i)">
+                                                                    <ng-icon name="tablerSearch" class="fw-bold"></ng-icon>
+                                                                </button>
+                                                                @if (row.accumDepAccount) {
+                                                                    <button type="button" class="btn btn-light"
+                                                                            (click)="clearAccount('accumDep', i)">
+                                                                        <ng-icon name="tablerX" class="fw-bold"></ng-icon>
+                                                                    </button>
+                                                                }
+                                                            </div>
+                                                        } @else {
+                                                            <div class="fw-bold fs-xs">{{ row.accumDepAccount?.code || row.accumDepAccount?.accountCode || '—' }}</div>
+                                                            <div class="text-muted fs-xs">{{ row.accumDepAccount?.title || row.accumDepAccount?.accountTitle || '' }}</div>
+                                                        }
+                                                    </td>
+                                                    <!-- Value -->
+                                                    <td>
+                                                        @if (isEditable) {
+                                                            <input type="number" class="form-control form-control-sm text-end"
+                                                                   [(ngModel)]="row.value"
+                                                                   [ngModelOptions]="{ standalone: true }"
+                                                                   (ngModelChange)="onRowValueChange(row)"
+                                                                   min="0" step="0.01"/>
+                                                        } @else {
+                                                            <span class="d-block text-end">{{ row.value | number:'1.2-2' }}</span>
+                                                        }
+                                                    </td>
+                                                    <!-- Dep. Value -->
+                                                    <td>
+                                                        @if (isEditable) {
+                                                            <input type="number" class="form-control form-control-sm text-end"
+                                                                   [(ngModel)]="row.depreciatedValue"
+                                                                   [ngModelOptions]="{ standalone: true }"
+                                                                   (ngModelChange)="onRowDepChange(row)"
+                                                                   min="0" step="0.01"/>
+                                                        } @else {
+                                                            <span class="d-block text-end">{{ row.depreciatedValue | number:'1.2-2' }}</span>
+                                                        }
+                                                    </td>
+                                                    <!-- Monthly Dep (always readonly) -->
+                                                    <td class="text-end">{{ row.monthlyDepreciation | number:'1.2-2' }}</td>
+                                                    <!-- Remaining Value (always readonly) -->
+                                                    <td class="text-end">{{ row.remainingValue | number:'1.2-2' }}</td>
+                                                    <!-- Last col: debit or remove -->
+                                                    @if (!isEditable) {
+                                                        <td class="text-end">{{ row.debit | number:'1.2-2' }}</td>
+                                                    } @else {
+                                                        <td class="text-center">
+                                                            <button type="button"
+                                                                    class="btn btn-danger btn-icon btn-sm rounded-circle"
+                                                                    (click)="removeRow(i)"
+                                                                    ngbTooltip="Remove">
+                                                                <ng-icon name="tablerTrash" class="fs-sm"></ng-icon>
+                                                            </button>
+                                                        </td>
+                                                    }
+                                                </tr>
+                                            }
+                                            @if (assetDetails.length === 0) {
+                                                <tr>
+                                                    <td colspan="8" class="text-center text-muted py-3">No account details.</td>
+                                                </tr>
+                                            }
+                                            @if (assetDetails.length > 0) {
+                                                <tr class="fw-bold bg-light">
+                                                    <td colspan="3" class="text-end fw-bold text-uppercase fs-xs">Totals</td>
+                                                    <td class="text-end">{{ totalValue | number:'1.2-2' }}</td>
+                                                    <td class="text-end">{{ totalDepreciatedValue | number:'1.2-2' }}</td>
+                                                    <td class="text-end">{{ totalMonthlyDep | number:'1.2-2' }}</td>
+                                                    <td class="text-end">{{ totalRemainingValue | number:'1.2-2' }}</td>
+                                                    @if (!isEditable) {
+                                                        <td class="text-end">{{ totalDebit | number:'1.2-2' }}</td>
+                                                    } @else {
+                                                        <td></td>
+                                                    }
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        } <!-- /isLoading extended -->
+                    } <!-- /showExtended -->
+
+                    <hr/>
+
+                    <!-- Footer actions -->
+                    <div class="d-flex gap-2 justify-content-end align-items-center mt-2">
+                        <button type="button" class="btn btn-light fw-bold" (click)="goBack()">
+                            <ng-icon name="tablerArrowLeft" class="ps-0 pe-2 fw-bold"></ng-icon>Back
+                        </button>
+                        <button type="button" class="btn btn-primary fw-bold"
+                                [disabled]="formSubmit || !selectedVoucher" (click)="save()">
+                            <span *ngIf="formSubmit" class="spinner-border spinner-border-sm me-2" role="status"></span>
+                            <ng-icon *ngIf="!formSubmit" name="tablerCheck" class="ps-0 pe-2 fw-bold"></ng-icon>
+                            {{ formSubmit ? 'Saving...' : 'Save' }}
+                        </button>
+                    </div>
+
+                </div>
+            </app-ui-card>
+        </div>
+
+    </div>
+    }
+</div>

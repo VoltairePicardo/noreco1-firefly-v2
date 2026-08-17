@@ -1,0 +1,349 @@
+<div class="container-fluid">
+    <app-page-title [title]="module" [subTitle]="subModule" [menuLink]="menuLink"/>
+</div>
+
+@if (isLoading()) {
+    <div class="card"><div class="card-body text-center py-4">
+        <span class="spinner-border spinner-border-sm me-2" role="status"></span>Loading...
+    </div></div>
+} @else {
+
+<div class="card mb-3">
+    <div class="card-body">
+
+        <div class="row">
+            <!-- Footer Actions -->
+            <div class="d-flex gap-2 justify-content-end align-items-center pt-3 border-top mt-3">
+                <a [routerLink]="['/' + menuLink]" class="btn btn-light fw-bold">
+                    <ng-icon name="tablerArrowLeft" class="ps-0 pe-3 fw-bold"></ng-icon>Back
+                </a>
+                <button type="button" class="btn btn-success fw-bold" (click)="print()">
+                    <ng-icon name="tablerPrinter" class="ps-0 pe-3 fw-bold"></ng-icon>Print
+                </button>
+                @if (isEditable()) {
+                    <a [routerLink]="['/' + menuLink, data.id, 'edit']" class="btn btn-primary fw-bold">
+                        <ng-icon name="tablerEdit" class="ps-0 pe-3 fw-bold"></ng-icon>Edit
+                    </a>
+                }
+            </div>
+        </div>
+
+        @if (workflowActions.length > 0) {
+            <hr class="my-3"/>
+            <div class="fs-xs text-uppercase fw-semibold text-muted mb-2">Process Document</div>
+            <div class="row g-3 align-items-end">
+                <div class="col-md-3">
+                    <label class="form-label fw-bold">Action</label>
+                    <select class="form-select" [(ngModel)]="selectedAction">
+                        <option [ngValue]="null">— Select Action —</option>
+                        @for (a of workflowActions; track a.id) {
+                            <option [ngValue]="a">{{ a.action }}</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-bold">Remarks <span class="text-muted fw-normal">(optional)</span></label>
+                    <textarea id="remarks" rows="1" class="form-control" [(ngModel)]="remarks" placeholder="Enter remarks"></textarea>
+                    <div class="invalid-feedback">Please provide a purpose.</div>
+                </div>
+                <div class="col-md-2">
+                    <button type="button" class="btn btn-primary fw-bold"
+                            (click)="processWorkflow()"
+                            [disabled]="!selectedAction || processingWorkflow">
+                        @if (processingWorkflow) {
+                            <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                        } @else {
+                            <ng-icon name="tablerCheck" class="ps-0 pe-3 fw-bold"></ng-icon>
+                        }
+                        Process
+                    </button>
+                </div>
+            </div>
+        }
+
+        <hr class="my-3"/>
+
+        <!-- Header Info -->
+        <div class="row g-3">
+            <div class="col-md-3">
+                <div class="fs-xs text-uppercase fw-bold text-muted mb-1">RV No.</div>
+                <div class="fw-bold fs-5">{{ data.localCode || '—' }}</div>
+            </div>
+            <div class="col-md-3">
+                <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Type</div>
+                <span class="badge bg-light text-dark border fs-xs">{{ data.rvType || '—' }}</span>
+            </div>
+            <div class="col-md-3">
+                <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Voucher Date</div>
+                <div>{{ data.voucherDate | date:'MMMM d, yyyy' }}</div>
+            </div>
+            <div class="col-md-3">
+                <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Status</div>
+                <span class="badge bg-secondary bg-opacity-25 text-dark border">{{ data.documentStatus?.status || '—' }}</span>
+            </div>
+        </div>
+        <div class="row g-3 mt-1">
+            <div class="col-md-3">
+                <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Delivery Date</div>
+                <div>{{ (data.deliveryDate | date:'MMMM d, yyyy') || '—' }}</div>
+            </div>
+            <div class="col-md-3">
+                <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Prepared By</div>
+                <div>{{ data.createdBy?.name || '—' }}</div>
+            </div>
+            <div class="col-md-3">
+                <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Department</div>
+                <div>{{ data.department?.name || '—' }}</div>
+            </div>
+            <div class="col-md-3">
+                <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Last Updated</div>
+                <div>{{ data.lastUpdated | date:'MM/dd/yyyy hh:mm a' }}</div>
+            </div>
+        </div>
+        <div class="row g-3 mt-1">
+            <div class="col-md-8">
+                <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Purpose</div>
+                <div>{{ data.purpose || '—' }}</div>
+            </div>
+            <div class="col-md-2">
+                <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Estimated Amount</div>
+                <div class="fw-bold">{{ data.estimatedAmount ? (data.estimatedAmount | number:'1.2-2') : '—' }}</div>
+            </div>
+            @if (data.emergencyPurchase) {
+                <div class="col-md-2">
+                    <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Emergency Purchase</div>
+                    <span class="badge bg-warning text-dark">YES</span>
+                </div>
+            }
+        </div>
+
+        <!-- Related Info -->
+        @if (data.budgetLineItemDetail || data.budgetSubItem || data.modeOfProcurement || data.costEstimate || data.workOrder || data.vehicle || data.office || data.rvItType || data.durationStart) {
+            <hr class="my-3"/>
+            <div class="fs-xs text-uppercase fw-semibold text-muted mb-2">Additional Info</div>
+            <div class="row g-3">
+                @if (data.budgetLineItemDetail) {
+                    <div class="col-md-6">
+                        <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Budget Line Item</div>
+                        <div>{{ data.budgetLineItemDetail.code }} – {{ data.budgetLineItemDetail.title }}</div>
+                    </div>
+                }
+                @if (data.budgetSubItem) {
+                    <div class="col-md-6">
+                        <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Budget Sub Item</div>
+                        <div>{{ data.budgetSubItem.description }}</div>
+                    </div>
+                }
+                @if (data.modeOfProcurement) {
+                    <div class="col-md-4">
+                        <div class="fs-xs text-uppercase fw-bold text-muted mb-1"> curement</div>
+                        <div>{{ data.modeOfProcurement.description || data.modeOfProcurement }}</div>
+                    </div>
+                }
+                @if (data.costEstimate) {
+                    <div class="col-md-4">
+                        <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Cost Estimate</div>
+                        <div>{{ data.costEstimate.code }}</div>
+                    </div>
+                }
+                @if (data.workOrder) {
+                    <div class="col-md-4">
+                        <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Work Order</div>
+                        <div>{{ data.workOrder.code }}</div>
+                    </div>
+                }
+                @if (data.vehicle) {
+                    <div class="col-md-4">
+                        <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Vehicle</div>
+                        <div>{{ data.vehicle.plateNumber }} {{ data.vehicle.description }}</div>
+                    </div>
+                }
+                @if (data.office) {
+                    <div class="col-md-4">
+                        <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Office</div>
+                        <div>{{ data.office.name }}</div>
+                    </div>
+                }
+                @if (data.rvItType) {
+                    <div class="col-md-4">
+                        <div class="fs-xs text-uppercase fw-bold text-muted mb-1">IT Type</div>
+                        <div>{{ data.rvItType }}</div>
+                    </div>
+                }
+                @if (data.durationStart) {
+                    <div class="col-md-4">
+                        <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Duration Start</div>
+                        <div>{{ data.durationStart | date:'MMMM d, yyyy' }}</div>
+                    </div>
+                }
+                @if (data.durationEnd) {
+                    <div class="col-md-4">
+                        <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Duration End</div>
+                        <div>{{ data.durationEnd | date:'MMMM d, yyyy' }}</div>
+                    </div>
+                }
+            </div>
+        }
+
+        <!-- Signatories -->
+        <hr class="my-3"/>
+        <div class="fs-xs text-uppercase fw-semibold text-muted mb-2">Signatories</div>
+        <div class="row g-3">
+            @if (data.approvedBy) {
+                <div class="col-md-4">
+                    <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Approving Officer</div>
+                    <div>{{ data.approvedBy.name }}</div>
+                </div>
+            }
+            @if (data.reviewedAcceptedBy) {
+                <div class="col-md-4">
+                    <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Reviewed / Accepted By</div>
+                    <div>{{ data.reviewedAcceptedBy.name }}</div>
+                </div>
+            }
+            @if (data.inventoryCheckedBy) {
+                <div class="col-md-4">
+                    <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Inventory Checked By</div>
+                    <div>{{ data.inventoryCheckedBy.name }}</div>
+                </div>
+            }
+            @if (data.recAppBy) {
+                <div class="col-md-4">
+                    <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Rec. Approval Officer</div>
+                    <div>{{ data.recAppBy.name }}</div>
+                </div>
+            }
+            @if (data.bacRepresentative) {
+                <div class="col-md-4">
+                    <div class="fs-xs text-uppercase fw-bold text-muted mb-1">BAC Representative</div>
+                    <div>{{ data.bacRepresentative.name }}</div>
+                </div>
+            }
+            @if (data.budgetOfficer) {
+                <div class="col-md-4">
+                    <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Budget Officer</div>
+                    <div>{{ data.budgetOfficer.name }}</div>
+                </div>
+            }
+            @if (data.employee) {
+                <div class="col-md-4">
+                    <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Employee</div>
+                    <div>{{ data.employee.name }}</div>
+                </div>
+            }
+        </div>
+
+        <!-- Items -->
+        <hr class="my-3"/>
+        <div class="fs-xs text-uppercase fw-semibold text-muted mb-2">Items to be Requested</div>
+        <div class="table-responsive">
+            <table class="table table-custom table-centered table-hover w-100 mb-0">
+                <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                    <tr class="text-uppercase fs-xxs">
+                        <th>#</th>
+                        <th>Item No.</th>
+                        <th>Unit</th>
+                        <th>Description</th>
+                        <th class="text-center">Qty</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (lineItems.length > 0) {
+                        @for (li of lineItems; track li.id; let i = $index) {
+                            <tr>
+                                <td class="text-muted">{{ i + 1 }}</td>
+                                <td class="fw-bold">{{ li.itemCode || '—' }}</td>
+                                <td>{{ li.unitCode || '—' }}</td>
+                                <td>{{ li.itemDescription || li.joDescription || '—' }}</td>
+                                <td class="text-center fw-bold">{{ li.quantity }}</td>
+                            </tr>
+                        }
+                    } @else {
+                        <tr>
+                            <td colspan="5" class="text-center text-muted py-3">No line items.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Mode of Procurement Selection -->
+        @if (showMopSelection() && modesOfProcurement.length > 0) {
+            <hr class="my-3"/>
+            <div class="fs-xs text-uppercase fw-semibold text-muted mb-2">Set Mode of Procurement</div>
+            <div class="row g-3 align-items-end">
+                <div class="col-md-5">
+                    <label class="form-label fw-bold">Mode of Procurement <span class="text-danger">*</span></label>
+                    <select class="form-select" [(ngModel)]="selectedMop">
+                        <option [ngValue]="null">— Select Mode of Procurement —</option>
+                        @for (m of modesOfProcurement; track m.id) {
+                            <option [ngValue]="m">{{ m.name }}</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-auto">
+                    <button type="button" class="btn btn-primary fw-bold"
+                            (click)="confirmModeOfProcurement()"
+                            [disabled]="!selectedMop || settingMop">
+                        @if (settingMop) {
+                            <span class="spinner-border spinner-border-sm me-1" role="status"></span>Saving...
+                        } @else {
+                            <ng-icon name="tablerCheck" class="ps-0 pe-2 fw-bold"></ng-icon>Confirm Mode of Procurement
+                        }
+                    </button>
+                </div>
+            </div>
+        }
+
+    </div>
+</div>
+
+<!-- Document Logs -->
+<div class="mt-3">
+    <button type="button" class="btn btn-light fw-bold" (click)="toggleLogs()">
+        <ng-icon [name]="showLogs ? 'tablerEyeOff' : 'tablerEye'" class="ps-0 pe-3 fw-bold"></ng-icon>
+        {{ showLogs ? 'Hide' : 'Show' }} Document Logs
+    </button>
+    @if (showLogs) {
+        <div class="card mt-2">
+            <div class="card-body">
+                @if (logsLoading) {
+                    <div class="text-center py-3">
+                        <span class="spinner-border spinner-border-sm me-2"></span>Loading logs...
+                    </div>
+                } @else if (logs.length === 0) {
+                    <p class="text-muted mb-0">No logs found.</p>
+                } @else {
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover w-100 mb-0">
+                            <thead class="bg-light bg-opacity-50">
+                                <tr class="text-uppercase fs-xxs text-muted">
+                                    <th class="text-nowrap">Date</th>
+                                    <th class="text-nowrap">By</th>
+                                    <th class="text-nowrap">Status</th>
+                                    <th>Remarks</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @for (log of logs; track log.id) {
+                                    <tr class="align-middle">
+                                        <td class="text-nowrap text-muted fs-xs">{{ log.createdAt | date:'MM/dd/yyyy hh:mm a' }}</td>
+                                        <td class="text-nowrap">{{ log.loggedBy?.fullName || log.loggedBy?.name || '—' }}</td>
+                                        <td class="text-nowrap">
+                                            <span class="badge bg-secondary bg-opacity-25 text-dark border">
+                                                {{ getLogField(log.newValue, 'documentStatus') }}
+                                            </span>
+                                        </td>
+                                        <td>{{ getLogField(log.newValue, 'remarks') }}</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</div>
+
+} <!-- end !isLoading -->

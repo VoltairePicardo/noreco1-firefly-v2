@@ -1,0 +1,40 @@
+<!-- Modal Header -->
+<div class="modal-header">
+    <h4 class="modal-title">{{ title }}</h4>
+    <button type="button" class="btn-close" (click)="onClose()"></button>
+</div>
+
+<!-- Modal Body -->
+<div class="card card-default p-3">
+    <div class="row align-items-end justify-content-center">
+        <!-- Due Date Input -->
+        <div class="col-md-5">
+            <div class="app-search">
+                <input
+                    id="dueDate"
+                    type="text"
+                    mwlFlatpickr
+                    [options]="{ dateFormat: 'F j, Y', static: true }"
+                    class="form-control flex-grow-1"
+                    [(ngModel)]="newDueDate"
+                    [ngModelOptions]="{ standalone: true }"
+                    required
+                />
+                <ng-icon name="tablerCalendar" class="app-search-icon text-muted"></ng-icon>
+            </div>
+        </div>
+
+        <!-- Ok Button -->
+        <div class="col-md-3">
+            <button
+                type="button"
+                class="btn btn-primary w-100 fw-bold"
+                (click)="onSend()"
+                [disabled]="!newDueDate"
+            >
+                <ng-icon name="tablerAdjustmentsCog" class="ps-0 pe-3 fw-bold"></ng-icon>
+                Process
+            </button>
+        </div>
+    </div>
+</div>

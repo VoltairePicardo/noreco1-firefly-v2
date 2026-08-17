@@ -1,0 +1,151 @@
+<div class="container-fluid">
+    <app-page-title [title]="module" [subTitle]="subModule" [menuLink]="menuLink"/>
+</div>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-xl-12">
+            <app-ui-card [title]="module + ' Form'">
+                <div class="col-xl-12 p-3" card-body>
+
+                    @if (isLoading()) {
+                        <div class="d-flex align-items-center gap-2 text-muted py-2">
+                            <span class="spinner-border spinner-border-sm" role="status"></span>
+                            Loading...
+                        </div>
+                    } @else {
+
+                    <!-- Inventory Document -->
+                    <div class="row g-3">
+                        <div class="col-md-8">
+                            <label class="form-label fw-bold">Inventory Document <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <input type="text" class="form-control"
+                                       [value]="selectedInventoryDoc ? ((selectedInventoryDoc.localCode || selectedInventoryDoc.code) + (selectedInventoryDoc.purpose ? ' — ' + selectedInventoryDoc.purpose : '')) : ''"
+                                       readonly placeholder="Select inventory document..."/>
+                                <button type="button" class="btn btn-success fw-bold"
+                                        (click)="openInvDocBrowse()">
+                                    <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
+                                </button>
+                                @if (selectedInventoryDoc) {
+                                    <button type="button" class="btn btn-light" (click)="clearInventoryDoc()">
+                                        <ng-icon name="tablerX" class="fw-bold"></ng-icon>
+                                    </button>
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Inventory Doc Items -->
+                    @if (inventoryDocItems.length > 0) {
+                        <div class="row mt-3">
+                            <div class="col-12">
+                                <h6 class="fw-semibold text-uppercase fs-xs mb-2">List of Items ({{ inventoryDocItems.length }})</h6>
+                                <div class="table-responsive" style="max-height:300px; overflow:auto">
+                                    <table class="table table-custom table-centered table-hover w-100 mb-0">
+                                        <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                                            <tr class="text-uppercase fs-xxs">
+                                                <th>Code</th>
+                                                <th>Description</th>
+                                                <th class="text-end">Qty</th>
+                                                <th class="text-end">Unit Cost</th>
+                                                <th class="text-end">Total</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @for (item of inventoryDocItems; track $index) {
+                                                <tr>
+                                                    <td class="fw-bold">{{ item.itemCode || item.item?.itemCode || '—' }}</td>
+                                                    <td>{{ item.description || item.itemDescription || item.item?.description || '—' }}</td>
+                                                    <td class="text-end">{{ item.quantity | number:'1.2-2' }}</td>
+                                                    <td class="text-end">{{ item.unitCost | number:'1.2-2' }}</td>
+                                                    <td class="text-end">{{ (item.totalCost || (item.quantity * item.unitCost)) | number:'1.2-2' }}</td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    }
+
+                    <!-- Basic Fields -->
+                    <div class="row g-3 mt-1">
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold">Voucher Date <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" mwlFlatpickr [options]="flatpickrOptions"
+                                   [(ngModel)]="voucherDate" [ngModelOptions]="{ standalone: true }"
+                                   placeholder="Select date"/>
+                        </div>
+                        <div class="col-md-9">
+                            <label class="form-label fw-bold">Particulars</label>
+                            <textarea class="form-control"
+                                      [(ngModel)]="particulars" [ngModelOptions]="{ standalone: true }"
+                                      placeholder="Enter particulars..."
+                                      maxlength="1024"
+                                      rows="3"></textarea>
+                        </div>
+                    </div>
+
+                    <hr class="mt-4"/>
+
+                    <!-- Journal Entries -->
+                    <div class="row mt-3">
+                        <div class="col-12">
+                            <app-journal-entries-form [entries]="journalEntries"/>
+                            @if (journalEntries.length > 0 && !isBalanced) {
+                                <div class="text-danger text-center fs-xs fw-bold py-1 mt-1">
+                                    Debit and credit totals must be equal.
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    <hr class="mt-4"/>
+
+                    <!-- Signatories -->
+                    <div class="row mt-3">
+                        <div class="col-12 mb-2">
+                            <h6 class="fw-semibold text-uppercase fs-xs mb-0">Signatories</h6>
+                        </div>
+                        @for (key of signatoryKeys; track key) {
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label fw-bold">{{ signatoryLabels[key] }}</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control"
+                                           [value]="signatories[key] ? (signatories[key].name || signatories[key].fullName || '') : ''"
+                                           readonly placeholder="Select person..."/>
+                                    <button type="button" class="btn btn-success fw-bold"
+                                            (click)="openEntityBrowse(key)">
+                                        <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
+                                    </button>
+                                    @if (signatories[key]) {
+                                        <button type="button" class="btn btn-light" (click)="clearSignatory(key)">
+                                            <ng-icon name="tablerX" class="fw-bold"></ng-icon>
+                                        </button>
+                                    }
+                                </div>
+                                @if (signatories[key]?.position) {
+                                    <small class="text-muted">{{ signatories[key].position }}</small>
+                                }
+                            </div>
+                        }
+                    </div>
+
+                    <div class="d-flex gap-2 justify-content-end align-items-center pt-3 border-top mt-3">
+                        <a [routerLink]="['/' + menuLink]" class="btn btn-light fw-bold">
+                            <ng-icon name="tablerArrowLeft" class="ps-0 pe-3 fw-bold"></ng-icon>Back
+                        </a>
+                        <button type="button" class="btn btn-primary fw-bold"
+                                [disabled]="formSubmit" (click)="save()">
+                            <ng-icon name="tablerCheck" class="ps-0 pe-3 fw-bold"></ng-icon>
+                            {{ editMode ? 'Update' : 'Save' }}
+                        </button>
+                    </div>
+
+                    }
+                </div>
+            </app-ui-card>
+        </div>
+    </div>
+</div>

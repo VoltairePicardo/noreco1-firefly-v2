@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="CheckForPrint" pageWidth="612" pageHeight="792" whenNoDataType="AllSectionsNoDetail" columnWidth="612" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="640f393c-0cb7-4ec8-9cb4-c83c85fbb354">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="DATE" class="java.lang.String"/>
+	<parameter name="PAYEE" class="java.lang.String"/>
+	<parameter name="AMOUNT" class="java.lang.String"/>
+	<parameter name="AMOUNT_IN_WORDS" class="java.lang.String"/>
+	<parameter name="SIGN1" class="java.lang.String"/>
+	<parameter name="SIGN2" class="java.lang.String"/>
+	<parameter name="CHECK_NO" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[SELECT NOW() as ngayon]]>
+	</queryString>
+	<field name="ngayon" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<summary>
+		<band height="331" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="a70e574c-c944-4105-859f-e22fef23a1fe" x="26" y="90" width="179" height="20"/>
+				<textElement/>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="a37e80f0-05c6-45c2-ae64-100ac73857a5" x="186" y="90" width="179" height="20"/>
+				<textElement/>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="ac944b0d-1d3c-4283-97a0-4027b68889c2" x="356" y="0" width="140" height="20"/>
+				<textElement>
+					<font fontName="Times New Roman"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{DATE}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="d5bfddc6-c053-4b18-bc0b-a7d1294b2bcc" x="26" y="20" width="300" height="20" isPrintWhenDetailOverflows="true"/>
+				<textElement>
+					<font fontName="Times New Roman"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{PAYEE}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement uuid="9d30fb40-a003-4560-820c-547b9d44fcec" x="326" y="20" width="200" height="20"/>
+				<textElement>
+					<font fontName="Times New Roman"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{AMOUNT}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="f6d6dd14-64a9-4d74-9a59-e1da36e79d2e" x="26" y="50" width="400" height="20" isPrintWhenDetailOverflows="true"/>
+				<textElement>
+					<font fontName="Times New Roman"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{AMOUNT_IN_WORDS}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="f0b1be60-d3ff-4b71-8de0-dbb831bd5bff" x="26" y="90" width="200" height="20" isPrintWhenDetailOverflows="true"/>
+				<textElement markup="html">
+					<font fontName="Times New Roman"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{SIGN1}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="797199e7-4b67-410a-85cc-70c4c1902feb" x="186" y="90" width="200" height="20" isPrintWhenDetailOverflows="true"/>
+				<textElement markup="html">
+					<font fontName="Times New Roman"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{SIGN2}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="4f60ccbe-d5ed-4479-b5e5-dac96b643410" mode="Transparent" x="226" y="0" width="100" height="20" forecolor="#000000" backcolor="#FFFFFF"/>
+				<textElement textAlignment="Left" verticalAlignment="Top" rotation="None" markup="none">
+					<font fontName="Times New Roman" size="10" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{CHECK_NO}]]></textFieldExpression>
+			</textField>
+		</band>
+	</summary>
+</jasperReport>

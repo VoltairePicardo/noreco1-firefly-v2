@@ -1,0 +1,189 @@
+<div class="container-fluid">
+    <app-page-title [title]="module" [subTitle]="subModule" [menuLink]="menuLink"/>
+</div>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-xl-12">
+            <app-ui-card [title]="module + ' Form'">
+                <div class="col-xl-12 p-3" card-body>
+
+                    @if (isLoading()) {
+                        <div class="d-flex align-items-center gap-2 text-muted py-2">
+                            <span class="spinner-border spinner-border-sm" role="status"></span>Loading...
+                        </div>
+                    } @else {
+
+                    @if (!editMode) {
+                    <div class="border rounded p-3 mb-4 bg-light">
+                        <h6 class="fw-semibold text-uppercase fs-xs mb-3">Upload Deposits</h6>
+
+                        <input #uploadFileInput type="file"
+                               style="display:none" (change)="onUploadFileSelect($event)"/>
+
+                        <div class="input-group input-group-sm" style="max-width:400px">
+                            <input type="text" class="form-control"
+                                   [value]="uploadFile ? uploadFile.name : ''"
+                                   readonly placeholder="No file chosen..."/>
+                            <button type="button" class="btn fw-bold"
+                                    [class.btn-success]="!uploadFile"
+                                    [class.btn-primary]="!!uploadFile"
+                                    [disabled]="uploading"
+                                    (click)="uploadFile ? doUpload() : openUploadFilePicker()">
+                                @if (uploading) {
+                                    <span class="spinner-border spinner-border-sm me-1" role="status"></span>
+                                } @else if (uploadFile) {
+                                    <ng-icon name="tablerUpload" class="ps-0 pe-2 fw-bold"></ng-icon>
+                                } @else {
+                                    <ng-icon name="tablerPaperclip" class="ps-0 pe-2 fw-bold"></ng-icon>
+                                }
+                                {{ uploading ? 'Uploading...' : (uploadFile ? 'Upload' : 'Choose') }}
+                            </button>
+                            @if (uploadFile && !uploading) {
+                                <button type="button" class="btn btn-light" (click)="uploadFile = null; uploadMessage = ''; uploadSuccess = null">
+                                    <ng-icon name="tablerX" class="fw-bold"></ng-icon>
+                                </button>
+                            }
+                        </div>
+                        @if (uploadMessage) {
+                            <div class="mt-2 fs-xs fw-bold"
+                                 [class.text-success]="uploadSuccess === true"
+                                 [class.text-danger]="uploadSuccess === false">
+                                {{ uploadMessage }}
+                            </div>
+                        }
+                    </div>
+                    <hr class="mb-4"/>
+                    }
+
+                    <div class="row g-3">
+
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">Deposit Date <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" mwlFlatpickr [options]="flatpickrOptions"
+                                   [(ngModel)]="depositDate" [ngModelOptions]="{ standalone: true }"
+                                   placeholder="Select date"/>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">Posting Date</label>
+                            <input type="text" class="form-control" mwlFlatpickr [options]="flatpickrOptions"
+                                   [(ngModel)]="postingDate" [ngModelOptions]="{ standalone: true }"
+                                   placeholder="Select date"/>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">Collection Date</label>
+                            <input type="text" class="form-control" mwlFlatpickr [options]="flatpickrOptions"
+                                   [(ngModel)]="collectionDate" [ngModelOptions]="{ standalone: true }"
+                                   placeholder="Select date"/>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">Bank Account <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <input type="text" class="form-control"
+                                       [value]="bankAccount ? (bankAccount.accountName || bankAccount.name || '') : ''"
+                                       readonly placeholder="Select bank account..."/>
+                                <button type="button" class="btn btn-success fw-bold"
+                                        (click)="openBankBrowse()">
+                                    <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
+                                </button>
+                                @if (bankAccount) {
+                                    <button type="button" class="btn btn-light" (click)="bankAccount = null">
+                                        <ng-icon name="tablerX" class="fw-bold"></ng-icon>
+                                    </button>
+                                }
+                            </div>
+                            @if (bankAccount?.accountNumber) {
+                                <small class="text-muted">Account No: {{ bankAccount.accountNumber }}</small>
+                            }
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">Reference Number</label>
+                            <input type="text" class="form-control"
+                                   [(ngModel)]="referenceNumber" [ngModelOptions]="{ standalone: true }"
+                                   placeholder="Enter reference number..."/>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">Collector</label>
+                            <input type="text" class="form-control"
+                                   [(ngModel)]="collector" [ngModelOptions]="{ standalone: true }"
+                                   placeholder="Enter collector name..."/>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">Cash Amount</label>
+                            <input type="number" class="form-control text-end"
+                                   [(ngModel)]="cashAmount" [ngModelOptions]="{ standalone: true }"
+                                   min="0" step="0.01" placeholder="0.00"/>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">Check Amount</label>
+                            <input type="number" class="form-control text-end"
+                                   [(ngModel)]="checkAmount" [ngModelOptions]="{ standalone: true }"
+                                   min="0" step="0.01" placeholder="0.00"/>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">Total Amount</label>
+                            <input type="text" class="form-control text-end fw-bold" readonly
+                                   [value]="totalAmount | number:'1.2-2'"/>
+                        </div>
+
+                    </div>
+
+                    <hr class="mt-4"/>
+
+                    <!-- Attachments -->
+                    <div class="row mt-3">
+                        <div class="col-12">
+                            <div class="d-flex align-items-center gap-3 mb-2">
+                                <h6 class="fw-semibold text-uppercase fs-xs mb-0">Attachments</h6>
+                                <button type="button" class="btn btn-success fw-bold btn-sm"
+                                        [disabled]="uploadingFiles" (click)="openFilePicker()">
+                                    <ng-icon name="tablerPaperclip" class="ps-0 pe-2 fw-bold"></ng-icon>Attach Files
+                                </button>
+                                <small class="text-muted">JPG, PNG, PDF only</small>
+                            </div>
+                            <input #fileInput type="file" multiple accept=".jpg,.jpeg,.png,.pdf"
+                                   style="display:none" (change)="onFileSelect($event)"/>
+                            @if (stagedFiles.length > 0) {
+                                <div class="d-flex flex-wrap gap-2">
+                                    @for (f of stagedFiles; track $index; let i = $index) {
+                                        <div class="d-flex align-items-center gap-2 border rounded px-3 py-2 bg-light">
+                                            @if (isImage(f)) {
+                                                <ng-icon name="tablerPhoto" class="text-primary fs-sm"></ng-icon>
+                                            } @else {
+                                                <ng-icon name="tablerFile" class="text-muted fs-sm"></ng-icon>
+                                            }
+                                            <span class="fs-xs text-truncate" style="max-width:200px" [title]="f.name">{{ f.name }}</span>
+                                            <button type="button" class="btn btn-link p-0 text-danger ms-1"
+                                                    (click)="removeStagedFile(i)">
+                                                <ng-icon name="tablerTrash" class="fs-sm"></ng-icon>
+                                            </button>
+                                        </div>
+                                    }
+                                </div>
+                            } @else {
+                                <p class="text-muted mb-0 fs-sm">No files attached.</p>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-2 justify-content-end align-items-center pt-3 border-top mt-3">
+                        <a [routerLink]="['/' + menuLink]" class="btn btn-light fw-bold">
+                            <ng-icon name="tablerArrowLeft" class="ps-0 pe-3 fw-bold"></ng-icon>Back
+                        </a>
+                        <button type="button" class="btn btn-primary fw-bold"
+                                [disabled]="formSubmit" (click)="save()">
+                            <ng-icon name="tablerCheck" class="ps-0 pe-3 fw-bold"></ng-icon>
+                            {{ editMode ? 'Update' : 'Save' }}
+                        </button>
+                    </div>
+
+                    }
+                </div>
+            </app-ui-card>
+        </div>
+    </div>
+</div>

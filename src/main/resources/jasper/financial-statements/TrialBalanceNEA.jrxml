@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="TrialBalanceNEA" pageWidth="612" pageHeight="792" whenNoDataType="NoDataSection" columnWidth="572" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isFloatColumnFooter="true" uuid="b29c3ba6-1020-4625-9bd3-1937355162ed">
+	<property name="ireport.zoom" value="1.098075000000001"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<style name="titleStyle" hAlign="Center" vAlign="Top" fontName="Arial" fontSize="14" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+	<style name="detailStyle" hAlign="Left" vAlign="Top" fontSize="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+	<style name="amountStyle" style="detailStyle" hAlign="Right" vAlign="Top" pattern="#,##0.00;(#,##0.00)" fontSize="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false">
+		<box rightPadding="2"/>
+	</style>
+	<style name="columnHeaderStyle" hAlign="Center" vAlign="Bottom" fontSize="8" isItalic="false" isUnderline="false" isStrikeThrough="false">
+		<box>
+			<bottomPen lineWidth="1.0"/>
+		</box>
+	</style>
+	<style name="subTitleStyle" style="titleStyle" fontSize="10" isBold="false"/>
+	<parameter name="COMP_ADDR" class="java.lang.String"/>
+	<parameter name="COMP_NAME" class="java.lang.String"/>
+	<parameter name="COMP_CONTACT" class="java.lang.String"/>
+	<parameter name="LOGO_PATH" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["Q:\\Develop\\Noreco 1\\accounting-no1\\src\\no1\\img\\No1-Logo.jpg"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="RANGE" class="java.lang.String"/>
+	<parameter name="PREPARAR" class="java.lang.String"/>
+	<parameter name="PREPARAR_POS" class="java.lang.String"/>
+	<parameter name="BEG_DATE" class="java.util.Date"/>
+	<parameter name="END_DATE" class="java.util.Date"/>
+	<queryString>
+		<![CDATA[select now()]]>
+	</queryString>
+	<field name="code" class="java.lang.String"/>
+	<field name="title" class="java.lang.String"/>
+	<field name="totalAmount" class="java.math.BigDecimal"/>
+	<field name="totalAsset" class="java.math.BigDecimal"/>
+	<field name="totalLiabAndEqui" class="java.math.BigDecimal"/>
+	<field name="totalRevenue" class="java.math.BigDecimal"/>
+	<field name="totalCostAndExp" class="java.math.BigDecimal"/>
+	<field name="begAmount" class="java.math.BigDecimal"/>
+	<field name="transAmount" class="java.math.BigDecimal"/>
+	<variable name="totalAsset_1" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{totalAsset}]]></variableExpression>
+	</variable>
+	<variable name="totalLiabAndEqui_1" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{totalLiabAndEqui}]]></variableExpression>
+	</variable>
+	<variable name="totalRevenue_1" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{totalRevenue}]]></variableExpression>
+	</variable>
+	<variable name="totalCostAndExp_1" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{totalCostAndExp}]]></variableExpression>
+	</variable>
+	<variable name="variance" class="java.math.BigDecimal">
+		<variableExpression><![CDATA[$V{totalAsset_1}.subtract($V{liaEqui})]]></variableExpression>
+	</variable>
+	<variable name="liaEqui" class="java.math.BigDecimal">
+		<variableExpression><![CDATA[$V{totalLiabAndEqui_1}.add($V{totalRevenue_1}.subtract($V{totalCostAndExp_1}))]]></variableExpression>
+	</variable>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="112" splitType="Stretch">
+			<image isLazy="true" onErrorType="Icon">
+				<reportElement x="64" y="14" width="60" height="52" uuid="a572ebb6-75d3-4cc5-adf8-83c0b47be5b6"/>
+				<imageExpression><![CDATA[$P{LOGO_PATH}]]></imageExpression>
+			</image>
+			<staticText>
+				<reportElement mode="Transparent" x="1" y="43" width="571" height="24" forecolor="#000000" backcolor="#FFFFFF" uuid="97a850ee-d8e0-445e-89de-0f623269d28a"/>
+				<textElement textAlignment="Center" verticalAlignment="Top" rotation="None" markup="none">
+					<font fontName="Calibri" size="18" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[TRIAL BALANCE]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="1" y="17" width="571" height="12" uuid="8dc03b87-ce0f-42e3-84cc-ff569c6fde86"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{COMP_ADDR}]]></textFieldExpression>
+			</textField>
+			<textField pattern="MM/dd/yyyy hh:mm a">
+				<reportElement x="486" y="0" width="86" height="14" uuid="f50810b0-83ee-4d20-9622-690449fae3c6"/>
+				<textElement>
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement style="titleStyle" x="1" y="0" width="571" height="15" uuid="ae3d854d-6819-4ef4-9f26-69fb77969167"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="13" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{COMP_NAME}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="1" y="66" width="571" height="36" uuid="3ae1aa15-ff4f-4986-8516-b17c621d9df3"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{RANGE}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<columnHeader>
+		<band height="20">
+			<staticText>
+				<reportElement x="1" y="0" width="90" height="20" uuid="d34af76e-267d-4271-bf45-c0839667b928"/>
+				<box>
+					<bottomPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Bottom"/>
+				<text><![CDATA[Account Code]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="91" y="0" width="211" height="20" uuid="8abfe375-f33a-4e76-b8b3-5f59a5cbbcbb"/>
+				<box>
+					<bottomPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Bottom"/>
+				<text><![CDATA[Account Title
+]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="482" y="0" width="90" height="13" uuid="29d6f427-7a7e-4cd8-9731-e8ae9e0d2f44"/>
+				<box>
+					<bottomPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Top"/>
+				<text><![CDATA[Ending Balance]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="392" y="0" width="90" height="20" uuid="290ab450-4742-47dd-9615-4f68c2b04387"/>
+				<box>
+					<bottomPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Bottom"/>
+				<text><![CDATA[Transactions]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="302" y="0" width="90" height="13" uuid="61f4f45d-01e9-4037-be1b-b3a0442027b2"/>
+				<textElement textAlignment="Right" verticalAlignment="Top" markup="none"/>
+				<text><![CDATA[Beginning Balance]]></text>
+			</staticText>
+			<textField pattern="MM/dd/yyyy">
+				<reportElement x="302" y="13" width="90" height="7" uuid="ec9d1418-4432-4090-8098-f56e7921bf46"/>
+				<box>
+					<bottomPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font size="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{BEG_DATE}]]></textFieldExpression>
+			</textField>
+			<textField pattern="MM/dd/yyyy">
+				<reportElement x="482" y="13" width="90" height="7" uuid="56ad0e9d-5149-4ae5-96ff-5e1a41770e20"/>
+				<box>
+					<bottomPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font size="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{END_DATE}]]></textFieldExpression>
+			</textField>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="12" splitType="Stretch">
+			<textField>
+				<reportElement x="1" y="0" width="90" height="12" uuid="ba92165c-0b15-4ab3-92c0-9d77ffb49dd9"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{code}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="91" y="0" width="211" height="12" uuid="ff3c7270-705e-4842-9c56-982d0f5d7574"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{title}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;(#,##0.00)" isBlankWhenNull="true">
+				<reportElement x="392" y="0" width="90" height="12" uuid="3a61fd69-7408-4e55-a982-96b54a007d4b"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{transAmount}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;(#,##0.00)" isBlankWhenNull="true">
+				<reportElement x="482" y="0" width="90" height="12" uuid="d14bd0b1-57e7-418d-9b7f-0e59fc3f3e6b"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{totalAmount}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;(#,##0.00)" isBlankWhenNull="true">
+				<reportElement x="302" y="0" width="90" height="12" uuid="62e8b937-3d46-497a-adc6-d8297abc01f9"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{begAmount}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<summary>
+		<band height="151">
+			<line>
+				<reportElement x="0" y="0" width="572" height="1" uuid="999b0e37-e3e3-4f9c-ab8b-d0ef54b39868"/>
+			</line>
+			<staticText>
+				<reportElement x="1" y="80" width="100" height="20" uuid="4a8fd3f2-f51c-4241-8dae-6fc08a30cddd"/>
+				<text><![CDATA[Prepared By:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="24" y="100" width="147" height="20" uuid="b5f83acd-4fc6-4d1d-9b6b-ab95995a8499"/>
+				<box>
+					<bottomPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Bottom"/>
+				<textFieldExpression><![CDATA[$P{PREPARAR}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="24" y="120" width="147" height="20" uuid="cb183062-5237-4206-9a99-1fd84f7705af"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA[$P{PREPARAR_POS}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="312" y="1" width="100" height="20" uuid="bf44d35d-247e-4266-a98b-5679d0b46805"/>
+				<textElement textAlignment="Right" verticalAlignment="Bottom"/>
+				<text><![CDATA[ASSET TOTALS:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="245" y="21" width="167" height="20" uuid="5c0197df-022e-429d-afc7-81b38eb8abcb"/>
+				<textElement textAlignment="Right" verticalAlignment="Bottom"/>
+				<text><![CDATA[LIABILITIES & EQUITIES TOTALS:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="245" y="41" width="167" height="20" uuid="70159673-809c-4285-a58f-7f1e5bc73fe0"/>
+				<textElement textAlignment="Right" verticalAlignment="Bottom"/>
+				<text><![CDATA[VARIANCE:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="245" y="61" width="167" height="20" uuid="f3a3ac4a-f86c-49ad-b8e4-d977789a27ac"/>
+				<textElement textAlignment="Right" verticalAlignment="Bottom"/>
+				<text><![CDATA[NET INCOME:]]></text>
+			</staticText>
+			<textField pattern="#,##0.00;(#,##0.00)" isBlankWhenNull="true">
+				<reportElement x="412" y="1" width="160" height="20" uuid="f8936a96-166c-43c3-bf61-31bc0bb5d16a"/>
+				<textElement textAlignment="Right" verticalAlignment="Bottom"/>
+				<textFieldExpression><![CDATA[$V{totalAsset_1}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;(#,##0.00)" isBlankWhenNull="true">
+				<reportElement x="412" y="21" width="160" height="20" uuid="e0573503-d50b-4dad-b277-6c0c69e81874"/>
+				<textElement textAlignment="Right" verticalAlignment="Bottom"/>
+				<textFieldExpression><![CDATA[$V{liaEqui}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;(#,##0.00)" isBlankWhenNull="true">
+				<reportElement x="412" y="41" width="160" height="20" uuid="8859d341-bc94-47ad-bd73-ad5fa931a810"/>
+				<textElement textAlignment="Right" verticalAlignment="Bottom"/>
+				<textFieldExpression><![CDATA[$V{variance}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;(#,##0.00)" isBlankWhenNull="true">
+				<reportElement x="412" y="61" width="160" height="20" uuid="5cc1f3d2-0fb4-462d-a133-5970f14c0d1d"/>
+				<textElement textAlignment="Right" verticalAlignment="Bottom"/>
+				<textFieldExpression><![CDATA[$V{totalRevenue_1}.subtract($V{totalCostAndExp_1})]]></textFieldExpression>
+			</textField>
+		</band>
+	</summary>
+</jasperReport>

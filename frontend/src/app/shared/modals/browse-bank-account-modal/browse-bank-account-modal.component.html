@@ -1,0 +1,42 @@
+<div class="modal-header">
+    <h4 class="modal-title">Browse Bank Accounts</h4>
+    <button type="button" class="btn-close" (click)="activeModal.dismiss()"></button>
+</div>
+
+<div class="modal-body">
+    <div class="table-responsive">
+        <table class="table table-custom table-centered table-select table-hover w-100 mb-0">
+            <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                <tr class="text-uppercase fs-xxs">
+                    <th>Account Name</th>
+                    <th>Account Number</th>
+                    <th>Bank</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (loading) {
+                    <tr>
+                        <td colspan="3" class="text-center py-4">
+                            <div class="d-flex justify-content-center align-items-center gap-2 py-2 text-muted">
+                                <span class="spinner-border spinner-border-sm"></span>
+                                <span>Loading...</span>
+                            </div>
+                        </td>
+                    </tr>
+                } @else if (items.length > 0) {
+                    @for (item of items; track item.id) {
+                        <tr style="cursor: pointer" (click)="select(item)">
+                            <td class="fw-bold">{{ item.accountName || item.name }}</td>
+                            <td>{{ item.accountNumber }}</td>
+                            <td>{{ item.bank?.name || item.bankName || '—' }}</td>
+                        </tr>
+                    }
+                } @else {
+                    <tr class="no-results">
+                        <td colspan="3" class="text-center text-muted py-3">No bank accounts found.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

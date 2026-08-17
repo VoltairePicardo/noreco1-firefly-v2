@@ -1,0 +1,116 @@
+<div class="modal-header">
+    <h5 class="modal-title fw-semibold">Account Settings</h5>
+    <button type="button" class="btn-close" (click)="dismiss()"></button>
+</div>
+
+<div class="modal-body">
+
+    <!-- Account info -->
+    <div class="p-2 bg-light rounded border mb-3">
+        <div class="text-muted fs-xxs text-uppercase fw-semibold mb-1">Account</div>
+        <div class="fw-bold">{{ accountLabel() }}</div>
+        <div class="d-flex gap-4 mt-1">
+            @if (entry.debit) {
+                <div>
+                    <span class="text-muted fs-xxs text-uppercase">Debit</span>
+                    <div class="fw-bold">{{ entry.debit | number:'1.2-2' }}</div>
+                </div>
+            }
+            @if (entry.credit) {
+                <div>
+                    <span class="text-muted fs-xxs text-uppercase">Credit</span>
+                    <div class="fw-bold">{{ entry.credit | number:'1.2-2' }}</div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- ── Apply Allocation ─────────────────────────────────── -->
+    <div class="border rounded p-3 mb-3">
+        <div class="form-check mb-0">
+            <input type="checkbox" class="form-check-input" id="applyAllocationCheck"
+                   [(ngModel)]="applyAllocation" [ngModelOptions]="{ standalone: true }"/>
+            <label class="form-check-label fw-semibold" for="applyAllocationCheck">
+                Apply Allocation
+            </label>
+        </div>
+
+        @if (applyAllocation) {
+            <div class="row g-2 mt-2">
+                <div class="col-md-4">
+                    <label class="form-label fw-bold fs-xs text-uppercase mb-1">Distribution %</label>
+                    <div class="input-group input-group-sm">
+                        <input type="number" class="form-control form-control-sm text-end"
+                               [(ngModel)]="allocationPct"
+                               [ngModelOptions]="{ standalone: true }"
+                               min="0" max="100" step="0.01" placeholder="0.00"/>
+                        <span class="input-group-text">%</span>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <!-- ── Withholding Tax ───────────────────────────────────── -->
+    <div class="border rounded p-3">
+        <div class="form-check mb-2">
+            <input type="checkbox" class="form-check-input" id="applyWhtCheck"
+                   [(ngModel)]="applyWht" [ngModelOptions]="{ standalone: true }"/>
+            <label class="form-check-label fw-semibold" for="applyWhtCheck">
+                Apply Withholding Tax
+            </label>
+        </div>
+
+        @if (applyWht) {
+            <div class="row g-2">
+                <div class="col-md-5">
+                    <label class="form-label fw-bold fs-xs text-uppercase mb-1">ATC</label>
+                    <select class="form-select form-select-sm"
+                            [(ngModel)]="selectedAtc"
+                            [ngModelOptions]="{ standalone: true }"
+                            (ngModelChange)="onAtcChange()">
+                        <option [ngValue]="null">— Select ATC —</option>
+                        @for (atc of atcList; track atc.id) {
+                            <option [ngValue]="atc">{{ atc.code }} — {{ atc.description }}</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-7">
+                    <label class="form-label fw-bold fs-xs text-uppercase mb-1">Nature of Income Payment</label>
+                    <input type="text" class="form-control form-control-sm"
+                           [value]="whtNature" readonly placeholder="Auto-filled from ATC"/>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-bold fs-xs text-uppercase mb-1">Tax Rate</label>
+                    <div class="input-group input-group-sm">
+                        <input type="number" class="form-control form-control-sm text-end"
+                               [value]="whtRate ?? ''" readonly placeholder="0.00"/>
+                        <span class="input-group-text">%</span>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-bold fs-xs text-uppercase mb-1">Tax Base</label>
+                    <input type="text" class="form-control form-control-sm text-end"
+                           [value]="taxBase | number:'1.2-2'" readonly/>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-bold fs-xs text-uppercase mb-1">Tax Amount</label>
+                    <input type="number" class="form-control form-control-sm text-end"
+                           [(ngModel)]="whtAmount"
+                           [ngModelOptions]="{ standalone: true }"
+                           min="0" step="0.01" placeholder="0.00"/>
+                </div>
+            </div>
+        }
+    </div>
+
+</div>
+
+<div class="modal-footer">
+    <button type="button" class="btn btn-light fw-bold" (click)="dismiss()">
+        <ng-icon name="tablerX" class="ps-0 pe-2 fw-bold"></ng-icon>Cancel
+    </button>
+    <button type="button" class="btn btn-primary fw-bold" (click)="save()">
+        <ng-icon name="tablerCheck" class="ps-0 pe-2 fw-bold"></ng-icon>Save Settings
+    </button>
+</div>

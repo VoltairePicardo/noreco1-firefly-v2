@@ -1,0 +1,280 @@
+<div class="container-fluid">
+    <app-page-title [title]="module" [subTitle]="subModule" [menuLink]="menuLink"/>
+</div>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-xl-12">
+            <app-ui-card [title]="module + ' Form'">
+                <div class="col-xl-12 p-3" card-body>
+
+                    @if (isLoading()) {
+                        <div class="d-flex align-items-center gap-2 text-muted py-2">
+                            <span class="spinner-border spinner-border-sm" role="status"></span>
+                            Loading...
+                        </div>
+                    } @else {
+
+                    <!-- Dates row -->
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold">Voucher Date <span class="text-danger">*</span></label>
+                            <input type="text"
+                                   class="form-control"
+                                   mwlFlatpickr
+                                   [options]="flatpickrOptions"
+                                   [(ngModel)]="voucherDate"
+                                   [ngModelOptions]="{ standalone: true }"
+                                   placeholder="Select date"/>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold">Invoice Date</label>
+                            <input type="text"
+                                   class="form-control"
+                                   mwlFlatpickr
+                                   [options]="flatpickrOptions"
+                                   [(ngModel)]="invoiceDate"
+                                   [ngModelOptions]="{ standalone: true }"
+                                   placeholder="Select date"/>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold">Due Date</label>
+                            <input type="text"
+                                   class="form-control"
+                                   mwlFlatpickr
+                                   [options]="flatpickrOptions"
+                                   [(ngModel)]="dueDate"
+                                   [ngModelOptions]="{ standalone: true }"
+                                   placeholder="Select date"/>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold">Payment Term (days)</label>
+                            <input type="number"
+                                   class="form-control"
+                                   [(ngModel)]="paymentTerm"
+                                   [ngModelOptions]="{ standalone: true }"
+                                   min="0"
+                                   placeholder="e.g. 30"/>
+                        </div>
+                    </div>
+
+                    <!-- Vendor row -->
+                    <div class="row g-3 mt-1">
+                        <div class="col-md-8">
+                            <label class="form-label fw-bold">Vendor / Supplier <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <input type="text"
+                                       class="form-control"
+                                       [value]="vendor ? vendor.name : ''"
+                                       readonly
+                                       placeholder="Select vendor..."/>
+                                <button type="button"
+                                        class="btn btn-success fw-bold"
+                                        (click)="openVendorBrowse()">
+                                    <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
+                                </button>
+                                @if (vendor) {
+                                    <button type="button" class="btn btn-danger fw-bold" (click)="clearVendor()">
+                                        <ng-icon name="tablerX" class="ps-0 pe-0 fw-bold"></ng-icon>
+                                    </button>
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Particulars row -->
+                    <div class="row g-3 mt-1">
+                        <div class="col-md-12">
+                            <label class="form-label fw-bold">Particulars</label>
+                            <textarea class="form-control"
+                                      [(ngModel)]="particulars"
+                                      [ngModelOptions]="{ standalone: true }"
+                                      rows="2"
+                                      placeholder="Enter particulars..."></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Installment row -->
+                    <div class="row g-3 mt-1">
+                        <div class="col-md-4 d-flex align-items-center gap-2">
+                            <div class="form-check">
+                                <input type="checkbox"
+                                       class="form-check-input"
+                                       id="forInstallmentCheck"
+                                       [(ngModel)]="forInstallment"
+                                       [ngModelOptions]="{ standalone: true }"/>
+                                <label class="form-check-label fw-bold" for="forInstallmentCheck">
+                                    For Installment
+                                </label>
+                            </div>
+                        </div>
+                        @if (forInstallment) {
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold">Number of Payments</label>
+                                <input type="number"
+                                       class="form-control"
+                                       [(ngModel)]="numberOfPayments"
+                                       [ngModelOptions]="{ standalone: true }"
+                                       min="1"
+                                       placeholder="e.g. 3"/>
+                            </div>
+                        }
+                    </div>
+
+                    <!-- Signatories -->
+                    <div class="row g-3 mt-1">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Checked By</label>
+                            <div class="input-group">
+                                <input type="text"
+                                       class="form-control"
+                                       [value]="checker ? (checker.name || checker.fullName || '') : ''"
+                                       readonly
+                                       placeholder="Select checker..."/>
+                                <button type="button"
+                                        class="btn btn-success fw-bold"
+                                        (click)="openSignatoryBrowse('checker')">
+                                    <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
+                                </button>
+                                @if (checker) {
+                                    <button type="button" class="btn btn-danger fw-bold" (click)="clearSignatory('checker')">
+                                        <ng-icon name="tablerX" class="ps-0 pe-0 fw-bold"></ng-icon>
+                                    </button>
+                                }
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Approving Officer</label>
+                            <div class="input-group">
+                                <input type="text"
+                                       class="form-control"
+                                       [value]="approvingOfficer ? (approvingOfficer.name || approvingOfficer.fullName || '') : ''"
+                                       readonly
+                                       placeholder="Select approving officer..."/>
+                                <button type="button"
+                                        class="btn btn-success fw-bold"
+                                        (click)="openSignatoryBrowse('approvingOfficer')">
+                                    <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
+                                </button>
+                                @if (approvingOfficer) {
+                                    <button type="button" class="btn btn-danger fw-bold" (click)="clearSignatory('approvingOfficer')">
+                                        <ng-icon name="tablerX" class="ps-0 pe-0 fw-bold"></ng-icon>
+                                    </button>
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- IEMOP Billings section -->
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                <h6 class="fw-semibold text-uppercase fs-xs mb-0">IEMOP Billings</h6>
+                                <button type="button"
+                                        class="btn btn-success fw-bold"
+                                        (click)="openIemopBrowse()">
+                                    <ng-icon name="tablerPlus" class="ps-0 pe-2 fw-bold"></ng-icon>Browse IEMOP
+                                </button>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-custom table-centered table-hover w-100 mb-0">
+                                    <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                                        <tr class="text-uppercase fs-xxs">
+                                            <th style="width:80px">STL ID</th>
+                                            <th>Reference Number</th>
+                                            <th>Date</th>
+                                            <th>Sub-Supplier</th>
+                                            <th class="text-end">Base Amount</th>
+                                            <th class="text-end">WTax</th>
+                                            <th style="width:60px"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @for (bill of iemopBillings; track bill.id; let i = $index) {
+                                            <tr>
+                                                <td class="fw-bold">{{ bill.stlId || '—' }}</td>
+                                                <td class="fw-bold">{{ bill.referenceNumber || '—' }}</td>
+                                                <td>{{ bill.transDate | date:'MMM d, yyyy' }}</td>
+                                                <td>{{ bill.subSupplier?.tradeName || '—' }}</td>
+                                                <td class="text-end">{{ ((bill.vatablePurchases || 0) + (bill.zeroRatedEcoPurchases || 0)) | number:'1.2-2' }}</td>
+                                                <td class="text-end">{{ (bill.ewtPurchases || 0) | number:'1.2-2' }}</td>
+                                                <td class="text-center">
+                                                    <button type="button"
+                                                            class="btn btn-danger btn-icon btn-sm rounded-circle"
+                                                            (click)="removeIemop(i)"
+                                                            ngbTooltip="Remove">
+                                                        <ng-icon name="tablerTrash" class="fs-sm"></ng-icon>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        }
+                                        @if (iemopBillings.length === 0) {
+                                            <tr>
+                                                <td colspan="7" class="text-center text-muted py-3">
+                                                    No IEMOP billings linked. Click "Browse IEMOP" to add.
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Journal Entries section -->
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <app-journal-entries-form [entries]="journalEntries"></app-journal-entries-form>
+                        </div>
+                    </div>
+
+                    <!-- Attachments section -->
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                <h6 class="fw-semibold text-uppercase fs-xs mb-0">Attachments</h6>
+                                <label class="btn btn-success fw-bold mb-0" style="cursor:pointer">
+                                    <ng-icon name="tablerPaperclip" class="ps-0 pe-2 fw-bold"></ng-icon>Attach File
+                                    <input type="file" multiple class="d-none" (change)="onFileChange($event)"/>
+                                </label>
+                            </div>
+                            @if (newFiles.length > 0) {
+                                <ul class="list-group list-group-flush">
+                                    @for (file of newFiles; track $index; let i = $index) {
+                                        <li class="list-group-item d-flex align-items-center justify-content-between px-0 py-1">
+                                            <span class="text-muted fs-sm">
+                                                <ng-icon name="tablerPaperclip" class="me-1"></ng-icon>
+                                                {{ file.name }}
+                                            </span>
+                                            <button type="button"
+                                                    class="btn btn-danger btn-icon btn-sm rounded-circle"
+                                                    (click)="removeFile(i)"
+                                                    ngbTooltip="Remove">
+                                                <ng-icon name="tablerTrash" class="fs-sm"></ng-icon>
+                                            </button>
+                                        </li>
+                                    }
+                                </ul>
+                            } @else {
+                                <p class="text-muted fs-sm mb-0">No files attached.</p>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-2 justify-content-end align-items-center pt-3 border-top mt-3">
+                        <a [routerLink]="['/' + menuLink]" class="btn btn-light fw-bold">
+                            <ng-icon name="tablerArrowLeft" class="ps-0 pe-3 fw-bold"></ng-icon>Back
+                        </a>
+                        <button type="button" class="btn btn-primary fw-bold"
+                                [disabled]="formSubmit" (click)="save()">
+                            <ng-icon name="tablerCheck" class="ps-0 pe-3 fw-bold"></ng-icon>
+                            {{ editMode ? 'Update' : 'Save' }}
+                        </button>
+                    </div>
+
+                    }
+                </div>
+            </app-ui-card>
+        </div>
+    </div>
+</div>

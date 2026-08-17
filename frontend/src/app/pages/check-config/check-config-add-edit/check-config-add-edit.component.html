@@ -1,0 +1,176 @@
+<div class="container-fluid">
+    <app-page-title [title]="module" [subTitle]="subModule" [menuLink]="menuLink"/>
+</div>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-xl-12">
+            <app-ui-card [title]="module + ' Details'">
+                <div class="col-xl-12 p-3" card-body>
+                    @if (isLoading()) {
+                        <div class="d-flex align-items-center gap-2 text-muted py-2">
+                            <span class="spinner-border spinner-border-sm" role="status"></span>
+                            Loading...
+                        </div>
+                    } @else if (validationForm) {
+                    <form class="needs-validation" novalidate
+                          (ngSubmit)="validSubmit()" [formGroup]="validationForm">
+
+                        <!-- Basic Info -->
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-3">
+                                <label for="code" class="form-label fw-bold">Code <span class="text-danger">*</span></label>
+                                <input id="code" type="text" class="form-control" maxlength="10"
+                                       placeholder="Enter check code" formControlName="code"
+                                       [class]="submit && !form.get('code')?.errors ? 'is-valid'
+                                              : submit &&  form.get('code')?.errors ? 'is-invalid' : ''"
+                                       required/>
+                                <div class="invalid-feedback">Please provide a code.</div>
+                            </div>
+                            <div class="col-md-5">
+                                <label class="form-label fw-bold">Bank Account <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" readonly
+                                           [value]="getBankAccountLabel()"
+                                           placeholder="Browse bank account..."
+                                           [class]="submit && form.get('bankAccountId')?.errors ? 'is-invalid'
+                                                  : submit && !form.get('bankAccountId')?.errors ? 'is-valid' : ''"/>
+                                    <button type="button" class="btn btn-success fw-bold" (click)="openBankAccountBrowse()">
+                                        <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
+                                    </button>
+                                </div>
+                                <div class="text-danger small mt-1"
+                                     *ngIf="submit && form.get('bankAccountId')?.errors">
+                                    Please select a bank account.
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <label for="checkNoPrefix" class="form-label fw-bold">Check No. Prefix</label>
+                                <input id="checkNoPrefix" type="text" class="form-control"
+                                       placeholder="Prefix" formControlName="checkNoPrefix"/>
+                            </div>
+                        </div>
+
+                        <hr class="my-3"/>
+
+                        <!-- Checkboxes -->
+                        <div class="row g-3 mb-3">
+                            <div class="col-auto">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="withSigner" formControlName="withSigner"/>
+                                    <label class="form-check-label fw-bold" for="withSigner">With Signer</label>
+                                </div>
+                            </div>
+                            <div class="col-auto">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="showDesignation" formControlName="showDesignation"/>
+                                    <label class="form-check-label fw-bold" for="showDesignation">Show Designation</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr class="my-3"/>
+
+                        <!-- Field Positions Grid -->
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-centered w-100 mb-0">
+                                <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                                    <tr class="text-uppercase fs-xxs">
+                                        <th style="width: 14%">Fields</th>
+                                        <th style="width: 11%">Left</th>
+                                        <th style="width: 11%">Top</th>
+                                        <th style="width: 11%">Width</th>
+                                        <th style="width: 11%">Line Spacing</th>
+                                        <th style="width: 14%">Format</th>
+                                        <th style="width: 13%">Char Adjust</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="fw-bold align-middle">Check Number</td>
+                                        <td><input type="number" class="form-control form-control-sm" min="0" placeholder="0" formControlName="checkNoX"/></td>
+                                        <td><input type="number" class="form-control form-control-sm" min="0" placeholder="0" formControlName="checkNoY"/></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="fw-bold align-middle">Date</td>
+                                        <td><input type="number" class="form-control form-control-sm" min="0" placeholder="0" formControlName="dateX"/></td>
+                                        <td><input type="number" class="form-control form-control-sm" min="0" placeholder="0" formControlName="dateY"/></td>
+                                        <td></td>
+                                        <td><input type="number" class="form-control form-control-sm" placeholder="0" formControlName="dateLineSpacing"/></td>
+                                        <td><input type="text" class="form-control form-control-sm" placeholder="e.g. MM/dd/yyyy" formControlName="dateFormat"/></td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="fw-bold align-middle">Payee</td>
+                                        <td><input type="number" class="form-control form-control-sm" min="0" placeholder="0" formControlName="payeeX"/></td>
+                                        <td><input type="number" class="form-control form-control-sm" min="0" placeholder="0" formControlName="payeeY"/></td>
+                                        <td><input type="number" class="form-control form-control-sm" min="0" placeholder="0" formControlName="payeeW"/></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td><input type="number" class="form-control form-control-sm" placeholder="0" formControlName="nameNoOfCharToAdjust"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="fw-bold align-middle">Amount</td>
+                                        <td><input type="number" class="form-control form-control-sm" min="0" placeholder="0" formControlName="numericAmountX"/></td>
+                                        <td><input type="number" class="form-control form-control-sm" min="0" placeholder="0" formControlName="numericAmountY"/></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="fw-bold align-middle">Amount in Words</td>
+                                        <td><input type="number" class="form-control form-control-sm" min="0" placeholder="0" formControlName="alphaAmountX"/></td>
+                                        <td><input type="number" class="form-control form-control-sm" min="0" placeholder="0" formControlName="alphaAmountY"/></td>
+                                        <td><input type="number" class="form-control form-control-sm" min="0" placeholder="0" formControlName="alphaAmountW"/></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td><input type="number" class="form-control form-control-sm" placeholder="0" formControlName="amountNoOfCharToAdjust"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="fw-bold align-middle">First Signature</td>
+                                        <td><input type="number" class="form-control form-control-sm" min="0" placeholder="0" formControlName="sig1X"/></td>
+                                        <td><input type="number" class="form-control form-control-sm" min="0" placeholder="0" formControlName="sig1Y"/></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="fw-bold align-middle">Second Signature</td>
+                                        <td><input type="number" class="form-control form-control-sm" min="0" placeholder="0" formControlName="sig2X"/></td>
+                                        <td><input type="number" class="form-control form-control-sm" min="0" placeholder="0" formControlName="sig2Y"/></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="d-flex gap-2 justify-content-end align-items-center pt-3 border-top mt-3">
+                            <a [routerLink]="['/' + menuLink]" class="btn btn-light fw-bold">
+                                <ng-icon name="tablerArrowLeft" class="ps-0 pe-3 fw-bold"></ng-icon>Back
+                            </a>
+                            <button type="submit" class="btn btn-primary fw-bold" [disabled]="formSubmit">
+                                @if (formSubmit) {
+                                    <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                                    {{ editMode ? 'Updating...' : 'Saving...' }}
+                                } @else {
+                                    <ng-icon name="tablerCheck" class="ps-0 pe-3 fw-bold"></ng-icon>
+                                    {{ editMode ? 'Update' : + module  }}
+                                }
+                            </button>
+                        </div>
+                    </form>
+                    }
+                </div>
+            </app-ui-card>
+        </div>
+    </div>
+</div>

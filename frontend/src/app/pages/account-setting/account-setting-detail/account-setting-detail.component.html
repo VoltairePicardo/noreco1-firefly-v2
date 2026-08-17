@@ -1,0 +1,148 @@
+<div class="container-fluid">
+    <app-page-title [title]="module" [subTitle]="'Detail'" [menuLink]="menuLink"/>
+</div>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-xl-12">
+            <app-ui-card [title]="module + ' Details'">
+                <div class="col-xl-12 p-3" card-body>
+
+                    @if (isLoading()) {
+                        <div class="d-flex align-items-center gap-2 text-muted py-2">
+                            <span class="spinner-border spinner-border-sm" role="status"></span>Loading...
+                        </div>
+                    } @else if (header) {
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold text-uppercase fs-xs">Date</label>
+                            <p class="mb-0">{{ header.date | date:'MMMM d, yyyy' }}</p>
+                        </div>
+                        <div class="col-md-9">
+                            <label class="form-label fw-bold text-uppercase fs-xs">Remarks</label>
+                            <p class="mb-0">{{ header.remarks || '—' }}</p>
+                        </div>
+                    </div>
+
+                    @if (getLinkedDoc(); as doc) {
+                        <div class="card bg-light border-0 mb-3">
+                            <div class="card-body py-2 px-3">
+                                <div class="row g-2 align-items-start">
+                                    <div class="col-auto">
+                                        <span class="badge bg-secondary text-uppercase">{{ doc.typeLabel }}</span>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <small class="text-muted d-block">Code</small>
+                                        <span class="fw-bold">{{ doc.localCode || doc.code || '—' }}</span>
+                                    </div>
+                                    @if (doc.netAmount != null) {
+                                        <div class="col-md-2">
+                                            <small class="text-muted d-block">Amount</small>
+                                            <span>{{ doc.netAmount | number:'1.2-2' }}</span>
+                                        </div>
+                                    }
+                                    @if (doc.quantity != null) {
+                                        <div class="col-md-2">
+                                            <small class="text-muted d-block">Quantity</small>
+                                            <span>{{ doc.quantity | number:'1.2-2' }}</span>
+                                        </div>
+                                    }
+                                    @if (doc.particulars) {
+                                        <div class="col-md-3">
+                                            <small class="text-muted d-block">Particulars</small>
+                                            <span>{{ doc.particulars }}</span>
+                                        </div>
+                                    }
+                                    @if (doc.voucherDate) {
+                                        <div class="col-md-2">
+                                            <small class="text-muted d-block">Date</small>
+                                            <span>{{ doc.voucherDate | date:'MMM d, yyyy' }}</span>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    }
+
+                    @if (rrLinkedData) {
+                        <hr/>
+                        <h6 class="fw-semibold text-uppercase fs-xs mb-3">RR Linked Information</h6>
+                        <div class="row g-2 mb-3">
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold text-uppercase fs-xs">CV Code</label>
+                                <p class="mb-0">{{ rrLinkedData.cvCode || '—' }}</p>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold text-uppercase fs-xs">CV Amount</label>
+                                <p class="mb-0">{{ rrLinkedData.cvAmount | number:'1.2-2' }}</p>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold text-uppercase fs-xs">CA Liquidation</label>
+                                <p class="mb-0">{{ rrLinkedData.calCode || '—' }}</p>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold text-uppercase fs-xs">CA Code</label>
+                                <p class="mb-0">{{ rrLinkedData.caCode || '—' }}</p>
+                            </div>
+                            @if (rrLinkedData.amount != null) {
+                                <div class="col-md-3">
+                                    <label class="form-label fw-bold text-uppercase fs-xs">CAL Amount</label>
+                                    <p class="mb-0">{{ rrLinkedData.amount | number:'1.2-2' }}</p>
+                                </div>
+                            }
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold text-uppercase fs-xs">Use Credit Card</label>
+                                <p class="mb-0">{{ rrLinkedData.useCreditCard ? 'YES' : 'NO' }}</p>
+                            </div>
+                        </div>
+                    }
+
+                    @if (details.length > 0) {
+                        <hr/>
+                        <h6 class="fw-semibold text-uppercase fs-xs mb-3">Account Setting Details</h6>
+                        <div class="table-responsive mb-3">
+                            <table class="table table-custom table-centered table-hover w-100 mb-0">
+                                <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                                    <tr class="text-uppercase fs-xxs">
+                                        <th>Item No.</th>
+                                        <th>Unit</th>
+                                        <th>Description</th>
+                                        <th>Debit Account</th>
+                                        <th>Credit Account</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @for (item of details; track $index) {
+                                        <tr>
+                                            <td class="fw-bold">{{ item.itemCode }}</td>
+                                            <td>{{ item.unitCode }}</td>
+                                            <td>{{ item.itemDescription }}</td>
+                                            <td>{{ item.debitAccount ? (item.debitAccount.code + ' — ' + item.debitAccount.title) : '—' }}</td>
+                                            <td>{{ item.creditAccount ? (item.creditAccount.code + ' — ' + item.creditAccount.title) : '—' }}</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+
+                    <hr/>
+
+                    <div class="d-flex gap-2 justify-content-between">
+                        <button type="button" class="btn btn-light fw-bold"
+                                [routerLink]="['/' + menuLink]">
+                            <ng-icon name="tablerArrowLeft" class="ps-0 pe-2 fw-bold"></ng-icon>Back
+                        </button>
+                        <a class="btn btn-primary fw-bold"
+                           [routerLink]="['/' + menuLink, id, 'edit']">
+                            <ng-icon name="tablerEdit" class="ps-0 pe-2 fw-bold"></ng-icon>Edit
+                        </a>
+                    </div>
+
+                    }
+                </div>
+            </app-ui-card>
+        </div>
+    </div>
+</div>

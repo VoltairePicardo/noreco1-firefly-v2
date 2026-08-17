@@ -1,0 +1,34 @@
+<div class="modal-header">
+    <h4 class="modal-title">{{ title }}</h4>
+    <button type="button" class="btn-close" (click)="close()"></button>
+</div>
+
+<div class="modal-body">
+    <div class="card-header border-light justify-content-between">
+    </div>
+
+    <div class="table-responsive">
+        <div class="camera-wrapper d-flex justify-content-center pagination-boxed align-items-center">
+            <div *ngIf="cameraError" class="camera-error d-flex flex-column align-items-center justify-content-center text-danger p-4 text-center">
+                <i class="ti ti-camera-off fs-1 mb-2"></i>
+                <span>{{ cameraError }}</span>
+            </div>
+
+            <div *ngIf="!cameraError && !capturedImage" class="camera-container">
+                <video #video autoplay playsinline></video>
+            </div>
+
+            <canvas #canvas hidden></canvas>
+
+            <div *ngIf="!cameraError && capturedImage">
+                <img [src]="capturedImage" class="preview">
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal-footer">
+    <button *ngIf="!cameraError && !capturedImage" class="btn btn-primary" (click)="capture()">Take Picture</button>
+    <button *ngIf="!cameraError && capturedImage" class="btn btn-primary" (click)="confirmImage()">Confirm</button>
+    <button *ngIf="capturedImage || cameraError" class="btn btn-light" (click)="startCamera()">Retake</button>
+</div>

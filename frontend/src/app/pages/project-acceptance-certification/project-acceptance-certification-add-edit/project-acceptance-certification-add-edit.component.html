@@ -1,0 +1,117 @@
+<div class="container-fluid">
+    <app-page-title [title]="module" [subTitle]="subModule" [menuLink]="menuLink"/>
+</div>
+
+<div class="container-fluid">
+    @if (isLoading() && editMode) {
+        <div class="d-flex align-items-center gap-2 text-muted py-4">
+            <span class="spinner-border spinner-border-sm" role="status"></span> Loading...
+        </div>
+    } @else {
+    <form (ngSubmit)="save()" #f="ngForm">
+        <div class="row g-3">
+
+            <div class="col-xl-12">
+                <app-ui-card title="Project Acceptance Certification">
+                    <div class="col-xl-12 p-3" card-body>
+                        <div class="row g-3">
+
+                            <!-- Project -->
+                            <div class="col-md-12">
+                                <label class="form-label fw-bold">Project <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" readonly
+                                           [value]="project ? (project.code + ' — ' + project.name) : ''"
+                                           placeholder="No project selected"/>
+                                    <button type="button" class="btn btn-success fw-bold" (click)="browseProject()">
+                                        <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
+                                    </button>
+                                </div>
+                            </div>
+
+                            @if (project) {
+                                <div class="col-md-12">
+                                    <div class="border rounded p-3 bg-light">
+                                        <div class="fs-xs text-uppercase fw-bold text-muted mb-2">Project Details</div>
+                                        <div class="row g-2">
+                                            <div class="col-md-4">
+                                                <div class="fs-xs text-muted">Name</div>
+                                                <div>{{ project.name }}</div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="fs-xs text-muted">Location</div>
+                                                <div>{{ project.location || '—' }}</div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="fs-xs text-muted">Purpose</div>
+                                                <div>{{ project.purpose || '—' }}</div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="fs-xs text-muted">Date</div>
+                                                <div>{{ project.date | date:'MMMM d, yyyy' }}</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+
+                            <hr/>
+
+                            <!-- Signatories -->
+                            <div class="col-md-12">
+                                <div class="fs-xs text-uppercase fw-semibold text-muted mb-2">Signatories</div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Recommending Officer</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" readonly
+                                           [value]="recommendedBy ? (recommendedBy.fullName || recommendedBy.name) : ''"
+                                           placeholder="Select recommending officer"/>
+                                    <button type="button" class="btn btn-success fw-bold" (click)="browseSignatory('recommendedBy')">
+                                        <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Approving Officer</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" readonly
+                                           [value]="approvedBy ? (approvedBy.fullName || approvedBy.name) : ''"
+                                           placeholder="Select approving officer"/>
+                                    <button type="button" class="btn btn-success fw-bold" (click)="browseSignatory('approvedBy')">
+                                        <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
+                                    </button>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="row">
+                            <div class="col-xl-12">
+                                <div class="d-flex gap-2 justify-content-end align-items-center pt-3 border-top mt-3">
+                                    <a [routerLink]="['/' + menuLink]" class="btn btn-light fw-bold">
+                                        <ng-icon name="tablerArrowLeft" class="ps-0 pe-3 fw-bold"></ng-icon>Back
+                                    </a>
+                                    <button type="submit" class="btn btn-primary fw-bold" [disabled]="isLoading()">
+                                        @if (isLoading()) {
+                                            <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                                            {{ editMode ? 'Updating...' : 'Saving...' }}
+                                        } @else {
+                                            <ng-icon name="tablerCheck" class="ps-0 pe-3 fw-bold"></ng-icon>
+                                            {{ editMode ? 'Update' : 'Save ' + module}}
+                                        }
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </app-ui-card>
+            </div>
+
+        </div>
+    </form>
+    }
+</div>

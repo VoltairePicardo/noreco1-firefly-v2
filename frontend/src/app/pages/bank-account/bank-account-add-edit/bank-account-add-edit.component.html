@@ -1,0 +1,91 @@
+<div class="container-fluid">
+    <app-page-title [title]="module" [subTitle]="subModule" [menuLink]="menuLink"/>
+</div>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-xl-12">
+            <app-ui-card [title]="module + ' Details'">
+                <div class="col-xl-12 p-3" card-body>
+                    @if (isLoading()) {
+                        <div class="d-flex align-items-center gap-2 text-muted py-2">
+                            <span class="spinner-border spinner-border-sm" role="status"></span>
+                            Loading...
+                        </div>
+                    } @else if (validationForm) {
+                    <form class="row g-3 needs-validation" novalidate
+                          (ngSubmit)="validSubmit()" [formGroup]="validationForm">
+
+                        <div class="row">
+                            <div class="col-md-4 mt-2">
+                                <label for="bankId" class="form-label fw-bold">Bank <span class="text-danger">*</span></label>
+                                <select id="bankId" class="form-select" formControlName="bankId"
+                                        [class]="submit && !form.get('bankId')?.errors ? 'is-valid'
+                                               : submit &&  form.get('bankId')?.errors ? 'is-invalid' : ''"
+                                        required>
+                                    <option [ngValue]="null">-- Select Bank --</option>
+                                    @for (bank of banks(); track bank.id) {
+                                        <option [ngValue]="bank.id">{{ bank.name }}</option>
+                                    }
+                                </select>
+                                <div class="invalid-feedback">Please select a bank.</div>
+                            </div>
+                            <div class="col-md-4 mt-2">
+                                <label for="accountNumber" class="form-label fw-bold">Account Number <span class="text-danger">*</span></label>
+                                <input id="accountNumber" type="text" class="form-control"
+                                       placeholder="Enter account number" formControlName="accountNumber"
+                                       [class]="submit && !form.get('accountNumber')?.errors ? 'is-valid'
+                                              : submit &&  form.get('accountNumber')?.errors ? 'is-invalid' : ''"
+                                       required/>
+                                <div class="invalid-feedback">Please provide an account number.</div>
+                            </div>
+                            <div class="col-md-4 mt-2">
+                                <label for="bankTransactionTypeId" class="form-label fw-bold">Transaction Type</label>
+                                <select id="bankTransactionTypeId" class="form-select" formControlName="bankTransactionTypeId">
+                                    <option [ngValue]="null">-- Select Type --</option>
+                                    @for (tt of transactionTypes(); track tt.id) {
+                                        <option [ngValue]="tt.id">{{ tt.description }}</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4 mt-2">
+                                <label for="description" class="form-label fw-bold">Description <span class="text-danger">*</span></label>
+                                <input id="description" type="text" class="form-control"
+                                       placeholder="Enter description" formControlName="description"
+                                       [class]="submit && !form.get('description')?.errors ? 'is-valid'
+                                              : submit &&  form.get('description')?.errors ? 'is-invalid' : ''"
+                                       required/>
+                                <div class="invalid-feedback">Please provide a description.</div>
+                            </div>
+                            <div class="col-md-6 mt-2">
+                                <label class="form-label fw-bold">Account</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" readonly
+                                           [value]="getAccountLabel()"
+                                           placeholder="Browse an account..."/>
+                                    <button type="button" class="btn btn-success fw-bold" (click)="openAccountBrowse()">
+                                        <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex gap-2 justify-content-end align-items-center pt-3 border-top mt-3">
+                            <a [routerLink]="['/' + menuLink]" class="btn btn-light fw-bold">
+                                <ng-icon name="tablerArrowLeft" class="ps-0 pe-3 fw-bold"></ng-icon>Back
+                            </a>
+                            <button type="submit" class="btn btn-primary fw-bold" [disabled]="formSubmit">
+                                <ng-icon name="tablerCheck" class="ps-0 pe-3 fw-bold"></ng-icon>
+                                {{ editMode ? 'Update' : 'Save' }}
+                            </button>
+                        </div>
+                    </form>
+                    }
+                </div>
+            </app-ui-card>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,180 @@
+<div class="container-fluid">
+    <app-page-title [title]="module" [subTitle]="subModule" [menuLink]="menuLink"/>
+</div>
+
+<div class="container-fluid">
+    <div class="row g-3">
+
+        <!-- Browse Work Order -->
+        <div class="col-xl-12">
+            <app-ui-card title="Work Order">
+                <div class="col-xl-12 p-3" card-body>
+                    <div class="d-flex gap-2 align-items-center mb-3">
+                        <button type="button" class="btn btn-success fw-bold" (click)="browseWorkOrder()">
+                            <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse Work Orders
+                        </button>
+                    </div>
+
+                    @if (workOrder) {
+                        <div class="row g-2">
+                            <div class="col-md-3">
+                                <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Code</div>
+                                <div class="fw-bold">{{ workOrder.code }}</div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Account No</div>
+                                <div>{{ workOrder.accountNumber || '—' }}</div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Date</div>
+                                <div>{{ workOrder.date | date:'MMMM d, yyyy' }}</div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Status</div>
+                                <span class="badge bg-secondary bg-opacity-25 text-dark border">
+                                    {{ workOrder.isClosed ? 'Closed' : 'Open' }}
+                                </span>
+                            </div>
+                            @if (workOrder.description) {
+                                <div class="col-md-12">
+                                    <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Description</div>
+                                    <div>{{ workOrder.description }}</div>
+                                </div>
+                            }
+                            <div class="col-md-4">
+                                <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Created By</div>
+                                <div>{{ workOrder.createdBy?.fullName || '—' }}</div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Date Created</div>
+                                <div>{{ workOrder.createdAt | date:'MMMM d, yyyy' }}</div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </app-ui-card>
+        </div>
+
+        @if (workOrder) {
+        <!-- Browse Voucher -->
+        <div class="col-xl-12">
+            <app-ui-card title="Voucher">
+                <div class="col-xl-12 p-3" card-body>
+                    <div class="d-flex gap-2 align-items-center mb-3">
+                        <button type="button" class="btn btn-success fw-bold" (click)="browseVoucher()">
+                            <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse Vouchers
+                        </button>
+                    </div>
+
+                    @if (voucher) {
+                        <div class="row g-2">
+                            <div class="col-md-3">
+                                <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Voucher Code</div>
+                                <div class="fw-bold">{{ voucher.code }}</div>
+                            </div>
+                            <div class="col-md-5">
+                                <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Description</div>
+                                <div>{{ voucher.particulars || voucher.description || '—' }}</div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Amount</div>
+                                <div class="fw-semibold">{{ voucher.amount | number:'1.2-2' }}</div>
+                            </div>
+                        </div>
+
+                        <hr class="my-3"/>
+
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold">Materials</label>
+                                <div class="input-group">
+                                    <input type="number" min="0" step="0.01" class="form-control text-end"
+                                           [(ngModel)]="detail.materials"
+                                           (ngModelChange)="recalculate()"
+                                           placeholder="Enter amount"/>
+                                </div>
+                                <div class="mt-1">
+                                    <label class="d-flex align-items-center gap-2 fw-normal">
+                                        <input type="checkbox" [(ngModel)]="calMaterialsTax" (ngModelChange)="recalculate()"/>
+                                        Calculate input tax
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold">Labor</label>
+                                <div class="input-group">
+                                    <input type="number" min="0" step="0.01" class="form-control text-end"
+                                           [(ngModel)]="detail.labor"
+                                           (ngModelChange)="recalculate()"
+                                           placeholder="Enter amount"/>
+                                </div>
+                                <div class="mt-1">
+                                    <label class="d-flex align-items-center gap-2 fw-normal">
+                                        <input type="checkbox" [(ngModel)]="calLaborTax" (ngModelChange)="recalculate()"/>
+                                        Calculate input tax
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold">Overhead</label>
+                                <div class="input-group">
+                                    <input type="number" min="0" step="0.01" class="form-control text-end"
+                                           [(ngModel)]="detail.overhead"
+                                           (ngModelChange)="recalculate()"
+                                           placeholder="Enter amount"/>
+                                </div>
+                                <div class="mt-1">
+                                    <label class="d-flex align-items-center gap-2 fw-normal">
+                                        <input type="checkbox" [(ngModel)]="calOverheadTax" (ngModelChange)="recalculate()"/>
+                                        Calculate input tax
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold">House Connection</label>
+                                <input type="number" min="0" step="0.01" class="form-control text-end"
+                                       [(ngModel)]="detail.houseConnection"
+                                       (ngModelChange)="recalculate()"
+                                       placeholder="Enter amount"/>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold">Total Charge</label>
+                                <div class="form-control bg-light text-end fw-semibold">
+                                    {{ totalCharge | number:'1.2-2' }}
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold">Input Tax</label>
+                                <input type="text" class="form-control text-end bg-light" readonly
+                                       [value]="inputTax | number:'1.2-2'"/>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </app-ui-card>
+        </div>
+        }
+
+        <!-- Footer -->
+        @if (workOrder && voucher) {
+        <div class="col-xl-12">
+            <div class="d-flex gap-2 justify-content-end align-items-center pt-3 border-top mt-3">
+                <a [routerLink]="['/' + menuLink]" class="btn btn-light fw-bold">
+                    <ng-icon name="tablerArrowLeft" class="ps-0 pe-3 fw-bold"></ng-icon>Back
+                </a>
+                <button type="button" class="btn btn-primary fw-bold"
+                        [ladda]="isLoading()" [disabled]="isLoading()"
+                        (click)="save()">
+                    <ng-icon name="tablerCheck" class="ps-0 pe-3 fw-bold"></ng-icon>Save
+                </button>
+            </div>
+        </div>
+        }
+
+    </div>
+</div>

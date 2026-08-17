@@ -1,0 +1,112 @@
+<div class="container-fluid">
+    <app-page-title [title]="module" [subTitle]="subModule" [menuLink]="menuLink"/>
+</div>
+
+<app-ui-card [title]="module + ' Details'">
+    <div class="col-xl-12 p-3" card-body>
+        @if (isLoading()) {
+            <div class="d-flex align-items-center gap-2 text-muted py-2">
+                <span class="spinner-border spinner-border-sm" role="status"></span>
+                Loading...
+            </div>
+        } @else {
+
+        <!-- Account Info -->
+        <div class="row">
+            <div class="col-sm-6">
+                <dl class="row mb-0">
+                    <dt class="col-sm-5 fw-normal text-muted">Account Code</dt>
+                    <dd class="col-sm-7 fw-bold font-monospace">{{ data.code || '—' }}</dd>
+                    <dt class="col-sm-5 fw-normal text-muted">Title</dt>
+                    <dd class="col-sm-7 fw-bold">{{ data.title || '—' }}</dd>
+                    <dt class="col-sm-5 fw-normal text-muted">Classification</dt>
+                    <dd class="col-sm-7 fw-bold">{{ data.classification || '—' }}</dd>
+                    <dt class="col-sm-5 fw-normal text-muted">Account Group</dt>
+                    <dd class="col-sm-7 fw-bold">{{ data.accountGroup?.description || '—' }}</dd>
+                    <dt class="col-sm-5 fw-normal text-muted">Account Type</dt>
+                    <dd class="col-sm-7 fw-bold">{{ data.accountType?.description || '—' }}</dd>
+                    <dt class="col-sm-5 fw-normal text-muted">Normal Balance</dt>
+                    <dd class="col-sm-7 fw-bold">{{ normalBalanceLabel(data.normalBalance) }}</dd>
+                    <dt class="col-sm-5 fw-normal text-muted">Level</dt>
+                    <dd class="col-sm-7 fw-bold">{{ data.level ?? '—' }}</dd>
+                </dl>
+            </div>
+            <div class="col-sm-6">
+                <dl class="row mb-0">
+                    <dt class="col-sm-5 fw-normal text-muted">GL Account</dt>
+                    <dd class="col-sm-7 fw-bold font-monospace">{{ data.GLAccount || '—' }}</dd>
+                    <dt class="col-sm-5 fw-normal text-muted">SL Account</dt>
+                    <dd class="col-sm-7 fw-bold font-monospace">{{ data.SLAccount || '—' }}</dd>
+                    <dt class="col-sm-5 fw-normal text-muted">Aux Account</dt>
+                    <dd class="col-sm-7 fw-bold font-monospace">{{ data.auxAccount || '—' }}</dd>
+                    <dt class="col-sm-5 fw-normal text-muted">Parent Account</dt>
+                    <dd class="col-sm-7 fw-bold">
+                        @if (data.parentAccount) {
+                            {{ data.parentAccount.code }} – {{ data.parentAccount.title }}
+                        } @else { — }
+                    </dd>
+                    <dt class="col-sm-5 fw-normal text-muted">Header Account</dt>
+                    <dd class="col-sm-7 fw-bold">{{ data.isHeader ? 'Yes' : 'No' }}</dd>
+                    <dt class="col-sm-5 fw-normal text-muted">Has SL</dt>
+                    <dd class="col-sm-7 fw-bold">{{ data.hasSL ? 'Yes' : 'No' }}</dd>
+                    <dt class="col-sm-5 fw-normal text-muted">Status</dt>
+                    <dd class="col-sm-7 fw-bold">
+                        @if (data.isActive) {
+                            <span class="badge bg-success">Active</span>
+                        } @else {
+                            <span class="badge bg-secondary">Inactive</span>
+                        }
+                    </dd>
+                </dl>
+            </div>
+        </div>
+
+        <!-- Allocation Factor Distributions -->
+        @if (data.factor) {
+            <hr/>
+            <div class="mb-2">
+                <span class="fw-semibold text-uppercase fs-xs text-muted">Allocation Factor</span>
+                <span class="ms-2 fw-bold">{{ data.factor.code }} — {{ data.factor.description }}</span>
+            </div>
+
+            @for (entry of validityEntries(); track entry[0]) {
+                <div class="mb-3">
+                    <div class="text-muted small fw-semibold mb-1">Validity: {{ entry[0] }}</div>
+                    <div class="table-responsive">
+                        <table class="table table-custom table-centered table-hover w-100 mb-0">
+                            <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                                <tr class="text-uppercase fs-xxs">
+                                    <th>Business Segment</th>
+                                    <th class="text-end">Percentage</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @for (row of entry[1]; track row.id) {
+                                    <tr>
+                                        <td>{{ row.businessSegment?.description || '—' }}</td>
+                                        <td class="text-end fw-bold">{{ (row.percentage * 100) | number:'1.2-2' }}%</td>
+                                    </tr>
+                                }
+                            </tbody>
+                            <tfoot>
+                                <tr class="fw-bold">
+                                    <td class="text-end text-uppercase fs-xxs text-muted">Total</td>
+                                    <td class="text-end">{{ segmentTotal(entry[1]) | number:'1.2-2' }}%</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            }
+        }
+
+        }
+        <hr/>
+        <div class="d-flex justify-content-end gap-2">
+            <button type="button" class="btn btn-primary fw-bold"
+                    [routerLink]="['/' + menuLink, data.id, 'edit']">
+                <ng-icon name="tablerPencil" class="ps-0 pe-3 fw-bold"></ng-icon>Edit
+            </button>
+        </div>
+    </div>
+</app-ui-card>

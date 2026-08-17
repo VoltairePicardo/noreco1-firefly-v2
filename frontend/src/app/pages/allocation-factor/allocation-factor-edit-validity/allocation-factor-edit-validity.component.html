@@ -1,0 +1,79 @@
+<div class="container-fluid">
+    <app-page-title [title]="module" [subTitle]="subModule" [menuLink]="menuLink"/>
+</div>
+
+@if (isLoading()) {
+    <div class="card">
+        <div class="card-body text-center py-5 text-muted">
+            <span class="spinner-border spinner-border-sm me-2" role="status"></span>Loading...
+        </div>
+    </div>
+} @else if (factor) {
+<div class="card">
+    <div class="card-body">
+
+        <div class="row mb-3">
+            <div class="col-md-auto">
+                <label class="form-label fw-bold">Factor</label>
+                <p class="mb-0">
+                    <span class="fw-bold font-monospace">{{ factor.code }}</span> — {{ factor.description }}
+                </p>
+            </div>
+            <div class="col-md-auto">
+                <label class="form-label fw-bold">Validity Period</label>
+                <p class="mb-0 fw-bold text-primary">{{ factor.validityDate?.description }}</p>
+            </div>
+        </div>
+
+        <hr/>
+        <h6 class="fw-semibold text-uppercase mb-3">Percentage Distribution</h6>
+
+        <div class="table-responsive">
+            <table class="table table-custom table-centered table-hover w-100 mb-0">
+                <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                    <tr class="text-uppercase fs-xxs">
+                        <th>Business Segment</th>
+                        <th style="width: 180px">Percentage (%)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (row of segmentRows; track row.segmentId; let i = $index) {
+                        <tr>
+                            <td>{{ row.description }}</td>
+                            <td>
+                                <input type="number" class="form-control form-control-sm"
+                                       min="0" max="100" step="0.01"
+                                       [(ngModel)]="segmentRows[i].value"
+                                       [ngModelOptions]="{ standalone: true }"/>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+                @if (segmentRows.length > 0) {
+                    <tfoot>
+                        <tr class="fw-bold">
+                            <td class="text-end">Total</td>
+                            <td [class.text-danger]="total !== 100" [class.text-success]="total === 100">
+                                {{ total }}%
+                                @if (total !== 100) {
+                                    <small class="ms-1 text-danger">(must be 100%)</small>
+                                }
+                            </td>
+                        </tr>
+                    </tfoot>
+                }
+            </table>
+        </div>
+
+    </div>
+    <div class="card-footer d-flex justify-content-end gap-2">
+        <button type="button" class="btn btn-light fw-bold"
+                [routerLink]="['/' + menuLink, factorId, 'detail']">
+            <ng-icon name="tablerArrowLeft" class="ps-0 pe-3 fw-bold"></ng-icon>Cancel
+        </button>
+        <button type="button" class="btn btn-primary fw-bold" (click)="validSubmit()" [ladda]="formSubmit">
+            <ng-icon name="tablerDeviceFloppy" class="ps-0 pe-3 fw-bold"></ng-icon>Save
+        </button>
+    </div>
+</div>
+}

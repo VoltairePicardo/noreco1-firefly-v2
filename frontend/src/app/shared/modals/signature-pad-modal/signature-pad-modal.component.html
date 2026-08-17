@@ -1,0 +1,22 @@
+<div class="modal-header">
+    <h4 class="modal-title">{{ title }}</h4>
+    <button type="button" class="btn-close" (click)="close()"></button>
+</div>
+
+<div class="modal-body">
+    <div class="d-flex align-items-center mb-2 gap-1">
+        <i [class]="deviceStatus().icon + ' ' + deviceStatus().cssClass" aria-hidden="true"></i>
+        <span [class]="'small fw-medium ' + deviceStatus().cssClass">{{ deviceStatus().label }}</span>
+    </div>
+
+    <div class="camera-wrapper d-flex justify-content-center align-items-center">
+        <div class="signature-container w-100">
+            <canvas #canvas class="signature-canvas" aria-label="Signature drawing area" role="img"></canvas>
+        </div>
+    </div>
+</div>
+
+<div class="modal-footer">
+    <button class="btn btn-primary" (click)="confirmSignature()">Confirm</button>
+    <button class="btn btn-light" (click)="clear()">Clear</button>
+</div>

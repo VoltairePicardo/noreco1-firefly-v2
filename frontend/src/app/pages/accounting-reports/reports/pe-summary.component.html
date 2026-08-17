@@ -1,0 +1,87 @@
+<div class="container-fluid">
+    <app-page-title [title]="'Accounting Reports'" [subTitle]="module" [menuLink]="menuLink" [useSubtitleAsTitle]="true"/>
+</div>
+<div class="container-fluid">
+    <div class="card">
+        <div class="card-body">
+            <div class="row g-2 align-items-end mb-3">
+                <div class="col-md-auto">
+                    <label class="form-label fw-bold mb-1">Month</label>
+                    <select class="form-select" [(ngModel)]="selectedMonth">
+                        @for (m of months; track m.id) {
+                            <option [ngValue]="m.id">{{ m.name }}</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-auto">
+                    <label class="form-label fw-bold mb-1">Year</label>
+                    <select class="form-select" [(ngModel)]="selectedYear">
+                        @for (y of years; track y) {
+                            <option [ngValue]="y">{{ y }}</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="button" class="btn btn-success fw-bold" (click)="search()">
+                        <ng-icon name="tablerSearch" class="fw-bold me-1"></ng-icon>Search
+                    </button>
+                </div>
+                <div class="col-md-auto ms-auto">
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-success fw-bold" (click)="export('pdf')">
+                            <ng-icon name="tablerFileTypePdf" class="fw-bold me-1"></ng-icon>Export PDF
+                        </button>
+                        <button type="button" class="btn btn-success fw-bold" (click)="export('xls')">
+                            <ng-icon name="tablerFileTypeXls" class="fw-bold me-1"></ng-icon>Export Excel
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-responsive mt-2">
+                <table class="table table-custom table-centered table-hover w-100 mb-0">
+                    <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                        <tr class="text-uppercase fs-xxs">
+                            <th>Reference</th>
+                            <th>Description</th>
+                            <th class="text-center">No. of Months</th>
+                            <th class="text-end">Amount</th>
+                            <th class="text-end">Balance</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (isLoading()) {
+                            <tr><td colspan="5" class="text-center text-muted py-3">
+                                <span class="spinner-border spinner-border-sm me-2"></span>Loading...
+                            </td></tr>
+                        } @else if (rows().length === 0) {
+                            <tr><td colspan="5" class="text-center text-muted py-3">No records found.</td></tr>
+                        } @else {
+                            @for (row of rows(); track $index) {
+                                <tr>
+                                    <td class="fw-bold">{{ row.reference }}</td>
+                                    <td>{{ row.particulars }}</td>
+                                    <td class="text-center">{{ row.noOfMonths }}</td>
+                                    <td class="text-end">{{ row.amount | number:'1.2-2' }}</td>
+                                    <td class="text-end">{{ row.balance | number:'1.2-2' }}</td>
+                                </tr>
+                            }
+                            <tr class="fw-bold border-top">
+                                <td colspan="3" class="text-end text-primary">Total No. of Vouchers:</td>
+                                <td colspan="2" class="fw-bold">{{ totalVouchers() }}</td>
+                            </tr>
+                            <tr class="fw-bold">
+                                <td colspan="4" class="text-end text-primary">Total Amount:</td>
+                                <td class="text-end fw-bold">{{ totalAmount() | number:'1.2-2' }}</td>
+                            </tr>
+                            <tr class="fw-bold">
+                                <td colspan="4" class="text-end text-primary">Total Balance:</td>
+                                <td class="text-end fw-bold">{{ totalBalance() | number:'1.2-2' }}</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

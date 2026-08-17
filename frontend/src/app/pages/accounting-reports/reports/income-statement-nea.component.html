@@ -1,0 +1,89 @@
+<div class="container-fluid">
+    <app-page-title [title]="'Accounting Reports'" [subTitle]="module" [menuLink]="menuLink" [useSubtitleAsTitle]="true"/>
+</div>
+<div class="container-fluid">
+    <div class="card">
+        <div class="card-body">
+            <div class="row g-2 align-items-end mb-3">
+                <div class="col-md-2">
+                    <label class="form-label fw-bold mb-1">Status</label>
+                    <select class="form-select" [(ngModel)]="fsType">
+                        @for (t of fsTypeOptions; track t) {
+                            <option [value]="t">{{ t }}</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label fw-bold mb-1">From</label>
+                    <input type="text" mwlFlatpickr [options]="flatpickrOptions"
+                           class="form-control" [(ngModel)]="fromDate" placeholder="From date"/>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label fw-bold mb-1">To</label>
+                    <input type="text" mwlFlatpickr [options]="flatpickrOptions"
+                           class="form-control" [(ngModel)]="toDate" placeholder="To date"/>
+                </div>
+                <div class="col-md-2">
+                    <button type="button" class="btn btn-success fw-bold" (click)="search()">
+                        <ng-icon name="tablerSearch" class="fw-bold me-1"></ng-icon>Search
+                    </button>
+                </div>
+                <div class="col-md-auto ms-auto">
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-success fw-bold" (click)="export('pdf')">
+                            <ng-icon name="tablerFileTypePdf" class="fw-bold me-1"></ng-icon>Export PDF
+                        </button>
+                        <button type="button" class="btn btn-success fw-bold" (click)="export('xls')">
+                            <ng-icon name="tablerFileTypeXls" class="fw-bold me-1"></ng-icon>Export Excel
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-responsive mt-2">
+                <table class="table table-custom table-centered table-hover w-100 mb-0 small">
+                    <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                        <tr class="text-uppercase fs-xxs">
+                            <th>Items</th>
+                            <th class="text-end">This Month</th>
+                            <th class="text-end">Last Month</th>
+                            <th class="text-end">Actual</th>
+                            <th class="text-end">Budget</th>
+                            <th class="text-end">Variance</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (isLoading()) {
+                            <tr><td colspan="6" class="text-center text-muted py-3">
+                                <span class="spinner-border spinner-border-sm me-2"></span>Loading...
+                            </td></tr>
+                        } @else if (rows().length === 0) {
+                            <tr><td colspan="6" class="text-center text-muted py-3">No records found.</td></tr>
+                        } @else {
+                            @for (row of rows(); track $index) {
+                                <tr [class.fw-bold]="row.total">
+                                    <td>{{ row.item }}</td>
+                                    <td class="text-end" [class.text-danger]="row.thisMonth < 0">
+                                        {{ row.thisMonth < 0 ? '(' : '' }}{{ (row.thisMonth < 0 ? -row.thisMonth : row.thisMonth) | number:'1.2-2' }}{{ row.thisMonth < 0 ? ')' : '' }}
+                                    </td>
+                                    <td class="text-end" [class.text-danger]="row.lastMonth < 0">
+                                        {{ row.lastMonth < 0 ? '(' : '' }}{{ (row.lastMonth < 0 ? -row.lastMonth : row.lastMonth) | number:'1.2-2' }}{{ row.lastMonth < 0 ? ')' : '' }}
+                                    </td>
+                                    <td class="text-end" [class.text-danger]="row.actual < 0">
+                                        {{ row.actual < 0 ? '(' : '' }}{{ (row.actual < 0 ? -row.actual : row.actual) | number:'1.2-2' }}{{ row.actual < 0 ? ')' : '' }}
+                                    </td>
+                                    <td class="text-end" [class.text-danger]="row.budget < 0">
+                                        {{ row.budget < 0 ? '(' : '' }}{{ (row.budget < 0 ? -row.budget : row.budget) | number:'1.2-2' }}{{ row.budget < 0 ? ')' : '' }}
+                                    </td>
+                                    <td class="text-end" [class.text-danger]="row.variance < 0">
+                                        {{ row.variance < 0 ? '(' : '' }}{{ (row.variance < 0 ? -row.variance : row.variance) | number:'1.2-2' }}{{ row.variance < 0 ? ')' : '' }}
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

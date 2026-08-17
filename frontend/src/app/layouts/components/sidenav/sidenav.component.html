@@ -1,0 +1,32 @@
+<div class="sidenav-menu">
+
+    <a routerLink="/" class="logo" style="text-align: center; display: block; margin-top: 8px; margin-bottom: 8px;">
+        <span class="logo logo-light">
+          <span class="logo-lg"><img src="noreco1_logo.png" alt="logo" style="height: 48px; width: auto;"></span>
+          <span class="logo-sm"><img src="noreco1_logo.png" alt="small logo" style="height: 48px; width: auto;"></span>
+        </span>
+
+        <span class="logo logo-dark">
+          <span class="logo-lg"><img src="noreco1_logo.png" alt="dark logo" style="height: 48px; width: auto;"></span>
+          <span class="logo-sm"><img src="noreco1_logo.png" alt="small logo" style="height: 48px; width: auto;"></span>
+        </span>
+    </a>
+
+    <!-- Sidebar Hover Menu Toggle Button -->
+    <button (click)="hoverSidebar()" class="button-on-hover">
+        <ng-icon name="tablerMenu4" size="22" class="align-middle"/>
+    </button>
+
+    <!-- Offcanvas Sidebar Menu Close Button -->
+    <button (click)="closeSidebar()" class="button-close-offcanvas">
+        <ng-icon name="tablerX" class="align-middle"/>
+    </button>
+
+    <ngx-simplebar id="sidenav" class="scrollbar">
+        <!-- User -->
+        <app-user-profile *ngIf="layout.sidenavUser"/>
+
+        <!--- Sidenav Menu -->
+        <app-menu/>
+    </ngx-simplebar>
+</div>

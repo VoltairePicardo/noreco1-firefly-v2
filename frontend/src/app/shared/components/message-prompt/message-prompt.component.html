@@ -1,0 +1,30 @@
+<ng-container *ngIf="message">
+    <div
+        class="message-wrapper"
+        [ngClass]="type"
+    >
+        <div class="message-card">
+
+            <ng-icon
+                [name]="icon"
+                class="message-icon"
+            ></ng-icon>
+
+            <h2 class="message-title">
+                {{ title }}
+            </h2>
+
+            <p class="message-text" [innerHTML]="message"></p>
+
+            <button
+                *ngIf="dismissible"
+                class="btn btn-sm"
+                [ngClass]="buttonClass"
+                (click)="dismiss()"
+            >
+                Dismiss
+            </button>
+
+        </div>
+    </div>
+</ng-container>

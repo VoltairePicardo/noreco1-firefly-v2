@@ -1,0 +1,165 @@
+<div class="container-fluid">
+    <app-page-title [title]="module" [subTitle]="subModule" [menuLink]="menuLink"/>
+</div>
+
+<div class="container-fluid">
+    @if (isLoading() && editMode) {
+        <div class="d-flex align-items-center gap-2 text-muted py-4">
+            <span class="spinner-border spinner-border-sm" role="status"></span> Loading...
+        </div>
+    } @else {
+    <form (ngSubmit)="save()" #f="ngForm">
+        <app-ui-card title="Inspection Information">
+            <div class="p-3" card-body>
+
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold">Inspection Date <span class="text-danger">*</span></label>
+                        <input type="text" mwlFlatpickr [options]="flatpickrOptions"
+                               class="form-control" [(ngModel)]="date"
+                               name="date" placeholder="Select date" required/>
+                    </div>
+
+                    <div class="col-md-9">
+                        <label class="form-label fw-bold">Project</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" readonly
+                                   [value]="project ? (project.code + ' — ' + project.name) : ''"
+                                   placeholder="No project selected"/>
+                            <button type="button" class="btn btn-success fw-bold" (click)="browseProject()">
+                                <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold">Concurred By</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" readonly
+                                   [value]="concurredBy ? (concurredBy.fullName || concurredBy.name) : ''"
+                                   placeholder="No signatory selected"/>
+                            <button type="button" class="btn btn-success fw-bold" (click)="browseSignatory('concurredBy')">
+                                <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold">Recommended By</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" readonly
+                                   [value]="recommendedBy ? (recommendedBy.fullName || recommendedBy.name) : ''"
+                                   placeholder="No signatory selected"/>
+                            <button type="button" class="btn btn-success fw-bold" (click)="browseSignatory('recommendedBy')">
+                                <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold">Approved By</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" readonly
+                                   [value]="approvedBy ? (approvedBy.fullName || approvedBy.name) : ''"
+                                   placeholder="No signatory selected"/>
+                            <button type="button" class="btn btn-success fw-bold" (click)="browseSignatory('approvedBy')">
+                                <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Findings -->
+                <hr/>
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <p class="fs-xs text-uppercase fw-semibold text-muted mb-0">Findings</p>
+                    <button type="button" class="btn btn-success fw-bold btn-sm" (click)="addFinding()">
+                        <ng-icon name="tablerPlus" class="ps-0 pe-2 fw-bold"></ng-icon>Add Finding
+                    </button>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-custom table-centered table-hover w-100 mb-0">
+                        <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                            <tr class="text-uppercase fs-xxs">
+                                <th style="width:40px">#</th>
+                                <th>Description / Finding</th>
+                                <th>Recommendation / Remarks</th>
+                                <th style="width:60px"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (f of findings; track $index; let i = $index) {
+                                <tr>
+                                    <td>{{ i + 1 }}</td>
+                                    <td>
+                                        <input type="text" class="form-control form-control-sm"
+                                               [(ngModel)]="f.description" [name]="'fDesc_' + i"
+                                               placeholder="Describe the finding"/>
+                                    </td>
+                                    <td>
+                                        <input type="text" class="form-control form-control-sm"
+                                               [(ngModel)]="f.remarks" [name]="'fRem_' + i"
+                                               placeholder="Recommendation / remarks"/>
+                                    </td>
+                                    <td class="text-center">
+                                        <button type="button"
+                                                class="btn btn-light btn-icon btn-sm rounded-circle"
+                                                (click)="removeFinding(i)"
+                                                [disabled]="findings.length === 1">
+                                            <ng-icon name="tablerTrash" class="fs-lg text-danger"></ng-icon>
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- As Built Staking Sheet -->
+                <hr/>
+                <p class="fs-xs text-uppercase fw-semibold text-muted mb-3">As Built Staking Sheet</p>
+                <div class="mb-3">
+                    <button type="button" class="btn btn-success fw-bold" (click)="openFilePicker()">
+                        <ng-icon name="tablerPaperclip" class="ps-0 pe-2 fw-bold"></ng-icon>Attach Files
+                    </button>
+                    <input #fileInput type="file" multiple accept=".jpg,.jpeg,.png,.pdf"
+                           style="display:none" (change)="onFileSelect($event)"/>
+                    <small class="text-muted ms-2">Accepted: JPG, PNG, PDF</small>
+                </div>
+                @if (attachments.length > 0) {
+                    <div class="row g-2">
+                        @for (att of attachments; track $index; let i = $index) {
+                            <div class="col-md-3">
+                                <div class="border rounded p-2 d-flex align-items-center gap-2">
+                                    <ng-icon name="tablerFile" class="text-muted flex-shrink-0"></ng-icon>
+                                    <span class="text-truncate small flex-grow-1" [title]="att.name">{{ att.name }}</span>
+                                    <button type="button" class="btn btn-light btn-icon btn-sm rounded-circle flex-shrink-0"
+                                            (click)="removeAttachment(i)">
+                                        <ng-icon name="tablerX" class="text-danger"></ng-icon>
+                                    </button>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+
+                <div class="d-flex gap-2 justify-content-end align-items-center pt-3 border-top mt-3">
+                    <a [routerLink]="['/' + menuLink]" class="btn btn-light fw-bold">
+                        <ng-icon name="tablerArrowLeft" class="ps-0 pe-3 fw-bold"></ng-icon>Back
+                    </a>
+                    <button type="submit" class="btn btn-primary fw-bold" [disabled]="isLoading()">
+                        @if (isLoading()) {
+                            <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                            {{ editMode ? 'Updating...' : 'Saving...' }}
+                        } @else {
+                            <ng-icon name="tablerCheck" class="ps-0 pe-3 fw-bold"></ng-icon>
+                            {{ editMode ? 'Update' : 'Save ' + module}}
+                        }
+                    </button>
+                </div>
+
+            </div>
+        </app-ui-card>
+    </form>
+    }
+</div>

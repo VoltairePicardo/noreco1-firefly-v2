@@ -1,0 +1,123 @@
+<div class="container-fluid">
+    <app-page-title [title]="module" [subTitle]="subModule" [menuLink]="menuLink"/>
+</div>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-xl-12">
+            <app-ui-card [title]="module + ' Form'">
+                <div class="col-xl-12 p-3" card-body>
+
+                    @if (isLoading()) {
+                        <div class="d-flex align-items-center gap-2 text-muted py-2">
+                            <span class="spinner-border spinner-border-sm" role="status"></span>
+                            Loading...
+                        </div>
+                    } @else {
+
+                    <!-- Basic Info -->
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold">Year <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control"
+                                   [(ngModel)]="year" [ngModelOptions]="{ standalone: true }"
+                                   placeholder="e.g. 2025" min="2000" max="2100"/>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold">Total Amount</label>
+                            <input type="text" class="form-control text-end fw-bold"
+                                   [value]="totalAmount | number:'1.2-2'" readonly/>
+                        </div>
+                    </div>
+
+                    <!-- Budget Details -->
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                <h6 class="fw-semibold text-uppercase fs-xs mb-0">Budget Details</h6>
+                                <button type="button" class="btn btn-success fw-bold" (click)="addDetail()">
+                                    <ng-icon name="tablerPlus" class="ps-0 pe-3 fw-bold"></ng-icon>Add Detail
+                                </button>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-custom table-centered table-hover w-100 mb-0">
+                                    <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                                        <tr class="text-uppercase fs-xxs">
+                                            <th style="width:40px">#</th>
+                                            <th>Cashflow Item <span class="text-danger">*</span></th>
+                                            <th>Cashflow Type</th>
+                                            <th style="width:200px" class="text-end">Amount <span class="text-danger">*</span></th>
+                                            <th style="width:60px"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @for (detail of budgetDetails; track trackByIndex($index); let i = $index) {
+                                            <tr>
+                                                <td>{{ i + 1 }}</td>
+                                                <td>
+                                                    <select class="form-select form-select-sm"
+                                                            [(ngModel)]="detail.cashflowItem"
+                                                            [compareWith]="compareFn"
+                                                            [ngModelOptions]="{ standalone: true }">
+                                                        <option [ngValue]="null">— Select Cashflow Item —</option>
+                                                        @for (item of cashflowItems(); track item.id) {
+                                                            <option [ngValue]="item">{{ item.name }}</option>
+                                                        }
+                                                    </select>
+                                                </td>
+                                                <td class="text-muted fs-xs">
+                                                    {{ detail.cashflowItem?.cashflowItemType?.name || detail.cashflowItem?.cashflowItemType || '—' }}
+                                                </td>
+                                                <td>
+                                                    <input type="number" class="form-control form-control-sm text-end"
+                                                           [(ngModel)]="detail.amount"
+                                                           [ngModelOptions]="{ standalone: true }"
+                                                           min="0" step="0.01" placeholder="0.00"/>
+                                                </td>
+                                                <td class="text-center">
+                                                    <button type="button"
+                                                            class="btn btn-danger btn-icon btn-sm rounded-circle"
+                                                            (click)="removeDetail(i)"
+                                                            ngbTooltip="Remove">
+                                                        <ng-icon name="tablerTrash" class="fs-sm"></ng-icon>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        }
+                                        @if (budgetDetails.length === 0) {
+                                            <tr>
+                                                <td colspan="5" class="text-center text-muted py-3">
+                                                    No details. Click "Add Detail" to begin.
+                                                </td>
+                                            </tr>
+                                        }
+                                        @if (budgetDetails.length > 0) {
+                                            <tr class="fw-bold bg-light">
+                                                <td colspan="3" class="text-end fw-bold text-uppercase fs-xs">Total</td>
+                                                <td class="text-end">{{ totalAmount | number:'1.2-2' }}</td>
+                                                <td></td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-2 justify-content-end align-items-center pt-3 border-top mt-3">
+                        <a [routerLink]="['/' + menuLink]" class="btn btn-light fw-bold">
+                            <ng-icon name="tablerArrowLeft" class="ps-0 pe-3 fw-bold"></ng-icon>Back
+                        </a>
+                        <button type="button" class="btn btn-primary fw-bold"
+                                [disabled]="formSubmit" (click)="save()">
+                            <ng-icon name="tablerCheck" class="ps-0 pe-3 fw-bold"></ng-icon>
+                            {{ editMode ? 'Update' : 'Save' }}
+                        </button>
+                    </div>
+
+                    }
+                </div>
+            </app-ui-card>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,142 @@
+<div class="container-fluid">
+    <app-page-title [title]="'Accounting Reports'" [subTitle]="module" [menuLink]="menuLink" [useSubtitleAsTitle]="true"/>
+</div>
+<div class="container-fluid">
+    <div class="card">
+        <div class="card-body">
+            <div class="row g-2 align-items-end mb-3">
+                <div class="col-md-auto">
+                    <label class="form-label fw-bold mb-1">From</label>
+                    <input type="text" mwlFlatpickr [options]="flatpickrOptions"
+                           class="form-control" [(ngModel)]="fromDate" placeholder="From date"/>
+                </div>
+                <div class="col-md-auto">
+                    <label class="form-label fw-bold mb-1">To</label>
+                    <input type="text" mwlFlatpickr [options]="flatpickrOptions"
+                           class="form-control" [(ngModel)]="toDate" placeholder="To date"/>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label fw-bold mb-1">Status</label>
+                    <select class="form-select" [(ngModel)]="selectedStatusId">
+                        @for (s of documentStatuses(); track s.id) {
+                            <option [ngValue]="s.id">{{ s.status }}</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="button" class="btn btn-success fw-bold" (click)="search()">
+                        <ng-icon name="tablerSearch" class="fw-bold me-1"></ng-icon>Search
+                    </button>
+                </div>
+                <div class="col-md-auto ms-auto">
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-success fw-bold" (click)="export('pdf')">
+                            <ng-icon name="tablerFileTypePdf" class="fw-bold me-1"></ng-icon>Export PDF
+                        </button>
+                        <button type="button" class="btn btn-success fw-bold" (click)="export('xls')">
+                            <ng-icon name="tablerFileTypeXls" class="fw-bold me-1"></ng-icon>Export Excel
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <ul class="nav nav-tabs mt-2" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#ajRegisterTab" type="button">Register</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#ajRecapTab" type="button">Recap</button>
+                </li>
+            </ul>
+            <div class="tab-content border border-top-0 rounded-bottom p-0">
+                <div class="tab-pane fade show active" id="ajRegisterTab" role="tabpanel">
+                    <div class="table-responsive">
+                        <table class="table table-custom table-centered table-hover w-100 mb-0 small">
+                            <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                                <tr class="text-uppercase fs-xxs">
+                                    <th>Date</th>
+                                    <th>Reference</th>
+                                    <th>Explanation</th>
+                                    <th>Code</th>
+                                    <th>Account Title</th>
+                                    <th class="text-end">Debit</th>
+                                    <th class="text-end">Credit</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (isLoading()) {
+                                    <tr><td colspan="7" class="text-center text-muted py-3">
+                                        <span class="spinner-border spinner-border-sm me-2"></span>Loading...
+                                    </td></tr>
+                                } @else if (rows().length === 0) {
+                                    <tr><td colspan="7" class="text-center text-muted py-3">No records found.</td></tr>
+                                } @else {
+                                    @for (row of rows(); track $index) {
+                                        <tr>
+                                            <td>{{ row.voucherDate | date:'MMM d, y' }}</td>
+                                            <td>{{ row.reference }}</td>
+                                            <td>{{ row.explanation }}</td>
+                                            <td>{{ row.code }}</td>
+                                            <td>{{ row.title }}</td>
+                                            <td class="text-end">{{ row.debit | number:'1.2-2' }}</td>
+                                            <td class="text-end">{{ row.credit | number:'1.2-2' }}</td>
+                                        </tr>
+                                    }
+                                    <tr class="fw-bold table-light">
+                                        <td colspan="5">TOTAL</td>
+                                        <td class="text-end">{{ totalDebit() | number:'1.2-2' }}</td>
+                                        <td class="text-end">{{ totalCredit() | number:'1.2-2' }}</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="ajRecapTab" role="tabpanel">
+                    <div class="table-responsive">
+                        <table class="table table-custom table-centered table-hover w-100 mb-0 small">
+                            <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                                <tr class="text-uppercase fs-xxs">
+                                    <th>Account Title</th>
+                                    <th>Account Code</th>
+                                    <th class="text-end">Debit</th>
+                                    <th class="text-end">Credit</th>
+                                    <th>Name</th>
+                                    <th>Account Code</th>
+                                    <th class="text-end">Debit</th>
+                                    <th class="text-end">Credit</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (recapRows().length === 0) {
+                                    <tr><td colspan="8" class="text-center text-muted py-3">No records found.</td></tr>
+                                } @else {
+                                    @for (row of recapRows(); track $index) {
+                                        <tr>
+                                            <td>{{ row.glAccountTitle }}</td>
+                                            <td>{{ row.glAccountCode }}</td>
+                                            <td class="text-end">{{ row.glDebit | number:'1.2-2' }}</td>
+                                            <td class="text-end">{{ row.glCredit | number:'1.2-2' }}</td>
+                                            <td>{{ row.slAccountTitle }}</td>
+                                            <td>{{ row.slAccountCode }}</td>
+                                            <td class="text-end">{{ row.slDebit | number:'1.2-2' }}</td>
+                                            <td class="text-end">{{ row.slCredit | number:'1.2-2' }}</td>
+                                        </tr>
+                                    }
+                                    <tr class="fw-bold table-light">
+                                        <td colspan="2">TOTAL</td>
+                                        <td class="text-end">{{ totalGlDebit() | number:'1.2-2' }}</td>
+                                        <td class="text-end">{{ totalGlCredit() | number:'1.2-2' }}</td>
+                                        <td colspan="2"></td>
+                                        <td class="text-end">{{ totalSlDebit() | number:'1.2-2' }}</td>
+                                        <td class="text-end">{{ totalSlCredit() | number:'1.2-2' }}</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

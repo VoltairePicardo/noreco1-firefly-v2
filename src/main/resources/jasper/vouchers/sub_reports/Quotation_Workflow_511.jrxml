@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Quotation_Workflow_511" language="groovy" pageWidth="1008" pageHeight="612" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="1008" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="a917ef69-6d00-458d-af78-89d84af2f4bb">
+	<property name="ireport.zoom" value="0.75"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="PREPARED_BY" class="java.lang.String"/>
+	<parameter name="PREPARED_BY_POS" class="java.lang.String"/>
+	<parameter name="PREPARED_BY_TIME" class="java.sql.Timestamp"/>
+	<parameter name="PREPARED_BY_SIGN" class="java.lang.String"/>
+	<parameter name="APPROVED_BY_PROCUREMENT_OFFICER" class="java.lang.String"/>
+	<parameter name="APPROVED_BY_PROCUREMENT_OFFICER_POS" class="java.lang.String"/>
+	<parameter name="APPROVED_BY_PROCUREMENT_OFFICER_SIGN" class="java.lang.String"/>
+	<parameter name="APPROVED_BY_PROCUREMENT_OFFICER_TIME" class="java.sql.Timestamp"/>
+	<parameter name="APPROVED_BY_FINANCE_MANAGER" class="java.lang.String"/>
+	<parameter name="APPROVED_BY_FINANCE_MANAGER_POS" class="java.lang.String"/>
+	<parameter name="APPROVED_BY_FINANCE_MANAGER_SIGN" class="java.lang.String"/>
+	<parameter name="APPROVED_BY_FINANCE_MANAGER_TIME" class="java.sql.Timestamp"/>
+	<parameter name="APPROVED_BY_GENERAL_MANAGER" class="java.lang.String"/>
+	<parameter name="APPROVED_BY_GENERAL_MANAGER_POS" class="java.lang.String"/>
+	<parameter name="APPROVED_BY_GENERAL_MANAGER_SIGN" class="java.lang.String"/>
+	<parameter name="APPROVED_BY_GENERAL_MANAGER_TIME" class="java.sql.Timestamp"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<summary>
+		<band height="115" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="75" width="200" height="20" uuid="50e7ea1e-dac7-4ba2-b87e-1ddf8a355a95"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$P{PREPARED_BY}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="0" width="100" height="20" uuid="bfd3bc96-4042-4143-8f8a-b6c8c62e115d"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Prepared By:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="0" y="95" width="200" height="20" uuid="c1a7f604-42df-4a99-b064-8e026e143101"/>
+				<box>
+					<topPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$P{PREPARED_BY_POS}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="60" width="200" height="15" uuid="32874a70-8f72-4cb4-a6b8-18f93d9ec664"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$P{PREPARED_BY_TIME}]]></textFieldExpression>
+			</textField>
+			<image hAlign="Center" isLazy="true" onErrorType="Blank">
+				<reportElement x="0" y="20" width="200" height="40" uuid="f9ee5798-f4b9-4fe1-a0fe-1ea727c793f4"/>
+				<imageExpression><![CDATA[$P{PREPARED_BY_SIGN}]]></imageExpression>
+			</image>
+			<textField isBlankWhenNull="true">
+				<reportElement x="245" y="60" width="200" height="15" uuid="de7fa0fc-f478-4fab-95cf-5f22609a2169"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$P{APPROVED_BY_PROCUREMENT_OFFICER_TIME}]]></textFieldExpression>
+			</textField>
+			<image hAlign="Center" isLazy="true" onErrorType="Blank">
+				<reportElement x="245" y="20" width="200" height="40" uuid="b8300555-c367-4a69-bf44-4439c3ff00ef"/>
+				<imageExpression><![CDATA[$P{APPROVED_BY_PROCUREMENT_OFFICER_SIGN}]]></imageExpression>
+			</image>
+			<staticText>
+				<reportElement x="245" y="0" width="100" height="20" uuid="277a6783-fa34-463c-b177-33ad87ec83fe"/>
+				<textElement verticalAlignment="Middle"/>
+				<text><![CDATA[Rec. Approval:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="245" y="95" width="200" height="20" uuid="273afe70-be6b-4ecc-b4e0-f6d0fcef0cae"/>
+				<box>
+					<topPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$P{APPROVED_BY_PROCUREMENT_OFFICER_POS}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="245" y="75" width="200" height="20" uuid="f1be7ebe-e372-4ec1-b31d-635323e976dc"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$P{APPROVED_BY_PROCUREMENT_OFFICER}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="500" y="75" width="200" height="20" uuid="0e6e4c90-411d-44fd-9693-9a899c70afc9"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$P{APPROVED_BY_FINANCE_MANAGER}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="500" y="95" width="200" height="20" uuid="20bb310a-f965-4279-b24b-c8efb85d6389"/>
+				<box>
+					<topPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$P{APPROVED_BY_FINANCE_MANAGER_POS}]]></textFieldExpression>
+			</textField>
+			<image hAlign="Center" isLazy="true" onErrorType="Blank">
+				<reportElement x="500" y="20" width="200" height="40" uuid="36c8cdc6-4a40-43f2-af71-05469f723f0f"/>
+				<imageExpression><![CDATA[$P{APPROVED_BY_FINANCE_MANAGER_SIGN}]]></imageExpression>
+			</image>
+			<staticText>
+				<reportElement x="500" y="0" width="100" height="20" uuid="0745598a-eb2b-45a1-8e56-ba83a8e04ce3"/>
+				<textElement verticalAlignment="Middle"/>
+				<text><![CDATA[Noted By:]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="500" y="60" width="200" height="15" uuid="4865dc4e-f007-49e8-b568-5daabb2d0a0f"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$P{APPROVED_BY_FINANCE_MANAGER_TIME}]]></textFieldExpression>
+			</textField>
+			<image hAlign="Center" isLazy="true" onErrorType="Blank">
+				<reportElement x="756" y="20" width="200" height="40" uuid="95c656f9-509c-46b3-abb0-d275c897b255"/>
+				<imageExpression><![CDATA[$P{APPROVED_BY_GENERAL_MANAGER_SIGN}]]></imageExpression>
+			</image>
+			<textField>
+				<reportElement x="756" y="95" width="200" height="20" uuid="fed4b144-cedd-4ed9-b972-4fcd3d5e1979"/>
+				<box>
+					<topPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$P{APPROVED_BY_GENERAL_MANAGER_POS}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="756" y="60" width="200" height="15" uuid="48e2c101-4d55-4cbe-846a-ef909eea3fe0"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$P{APPROVED_BY_GENERAL_MANAGER_TIME}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="756" y="75" width="200" height="20" uuid="4fb8bfe3-a410-4166-8318-af43abe92f75"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$P{APPROVED_BY_GENERAL_MANAGER}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="756" y="0" width="100" height="20" uuid="5b142db9-103b-465d-8124-b46937166897"/>
+				<textElement verticalAlignment="Middle"/>
+				<text><![CDATA[Approved By:]]></text>
+			</staticText>
+		</band>
+	</summary>
+</jasperReport>

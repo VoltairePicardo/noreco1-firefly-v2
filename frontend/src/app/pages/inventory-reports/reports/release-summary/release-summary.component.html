@@ -1,0 +1,141 @@
+<div class="container-fluid">
+    <app-page-title [title]="'Inventory Reports'" [subTitle]="module" [menuLink]="menuLink" [useSubtitleAsTitle]="true"/>
+</div>
+
+<div class="container-fluid">
+    <div class="card">
+        <div class="card-body">
+
+            <div class="row g-2 align-items-end mb-1">
+                <div class="col-md-12">
+                    <div class="d-flex gap-2 justify-content-end">
+                        <button type="button" class="btn btn-success fw-bold" (click)="export('pdf')">
+                            <ng-icon name="tablerFileTypePdf" class="fw-bold me-1"></ng-icon>Export PDF
+                        </button>
+                        <button type="button" class="btn btn-success fw-bold" (click)="export('xls')">
+                            <ng-icon name="tablerFileTypeXls" class="fw-bold me-1"></ng-icon>Export Excel
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-2 align-items-end mb-3">
+                <div class="col-md-2">
+                    <label class="form-label fw-bold mb-1">From</label>
+                    <input type="text" mwlFlatpickr [options]="flatpickrOptions"
+                           class="form-control" [(ngModel)]="fromDate" placeholder="From date"/>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label fw-bold mb-1">To</label>
+                    <input type="text" mwlFlatpickr [options]="flatpickrOptions"
+                           class="form-control" [(ngModel)]="toDate" placeholder="To date"/>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label fw-bold mb-1">Status</label>
+                    <select class="form-select" [(ngModel)]="statusId">
+                        @for (s of statuses(); track s.id) {
+                            <option [ngValue]="s.id">{{ s.status }}</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-bold mb-1">Document Type</label>
+                    <select class="form-select" [(ngModel)]="docTypeId">
+                        @for (dt of docTypes; track dt.id) {
+                            <option [ngValue]="dt.id">{{ dt.desc }}</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label fw-bold mb-1">Inventory Location</label>
+                    <select class="form-select" [(ngModel)]="locationId">
+                        @for (loc of locations(); track loc.id) {
+                            <option [ngValue]="loc.id">{{ loc.description }}</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-1">
+                    <button type="button" class="btn btn-success fw-bold" (click)="search()">
+                        <ng-icon name="tablerSearch" class="fw-bold me-1"></ng-icon>Search
+                    </button>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-custom table-centered table-hover w-100 mb-0">
+                    <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                        <tr class="text-uppercase fs-xxs">
+                            <th></th>
+                            <th>Date</th>
+                            <th>Stock Release No.</th>
+                            <th>Description</th>
+                            <th>Document Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (isLoading()) {
+                            <tr><td colspan="5" class="text-center text-muted py-3">
+                                <span class="spinner-border spinner-border-sm me-2"></span>Loading...
+                            </td></tr>
+                        } @else if (rows().length === 0) {
+                            <tr><td colspan="5" class="text-center text-muted py-3">No records found.</td></tr>
+                        } @else {
+                            @for (row of rows(); track $index) {
+                                <tr (click)="toggleRow($index, row)" style="cursor:pointer">
+                                    <td class="text-center" style="width:30px">
+                                        <ng-icon [name]="expandedRows.get($index) ? 'tablerChevronDown' : 'tablerChevronRight'"></ng-icon>
+                                    </td>
+                                    <td>{{ row.voucherDate | date:'MMM dd, yyyy' }}</td>
+                                    <td>{{ row.code }}</td>
+                                    <td>{{ row.description }}</td>
+                                    <td>{{ row.documentStatus?.status }}</td>
+                                </tr>
+                                @if (expandedRows.get($index)) {
+                                    <tr>
+                                        <td colspan="5" class="p-0 bg-light bg-opacity-50">
+                                            @if (loadingRowItems.has($index)) {
+                                                <div class="p-3 text-center text-muted">
+                                                    <span class="spinner-border spinner-border-sm me-2"></span>Loading items...
+                                                </div>
+                                            } @else {
+                                                <table class="table table-sm table-bordered mb-0 ms-4" style="width:calc(100% - 2rem)">
+                                                    <thead class="bg-secondary bg-opacity-10">
+                                                        <tr class="text-uppercase fs-xxs">
+                                                            <th>Item Id</th>
+                                                            <th>Item Code</th>
+                                                            <th class="text-end">Quantity</th>
+                                                            <th>Unit</th>
+                                                            <th class="text-end">Qty Released</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        @for (item of rowItems.get($index) || []; track $index) {
+                                                            <tr>
+                                                                <td>{{ item.itemId }}</td>
+                                                                <td>{{ item.itemCode }}</td>
+                                                                <td class="text-end">{{ item.quantity }}</td>
+                                                                <td>{{ item.unitCode }}</td>
+                                                                <td class="text-end">{{ item.quantityReleased }}</td>
+                                                            </tr>
+                                                        }
+                                                        @if ((rowItems.get($index) || []).length === 0) {
+                                                            <tr><td colspan="5" class="text-center text-muted">No items.</td></tr>
+                                                        }
+                                                    </tbody>
+                                                </table>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            <tr class="fw-bold">
+                                <td colspan="5">Number of Stock Releases: {{ rows().length }}</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+</div>

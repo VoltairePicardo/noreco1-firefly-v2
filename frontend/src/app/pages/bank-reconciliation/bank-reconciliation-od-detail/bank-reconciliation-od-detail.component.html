@@ -1,0 +1,67 @@
+<div class="container-fluid">
+    <app-page-title [title]="module" [subTitle]="subModule" [menuLink]="menuLink"/>
+</div>
+
+<div class="container-fluid">
+    @if (isLoading()) {
+        <div class="d-flex align-items-center gap-2 text-muted py-4">
+            <span class="spinner-border spinner-border-sm" role="status"></span> Loading...
+        </div>
+    } @else {
+
+    <div class="row g-3">
+
+        <div class="col-xl-12">
+            <app-ui-card title="Other Deposit Details">
+                <div class="col-xl-12 p-3" card-body>
+
+                    <div class="row g-3">
+
+                        <div class="col-md-4">
+                            <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Reference No.</div>
+                            <div class="fw-bold">{{ data.localCode || '—' }}</div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Voucher Date</div>
+                            <div>{{ data.voucherDate | date:'MMMM d, yyyy' }}</div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Amount</div>
+                            <div class="fw-bold">{{ data.amount | number:'1.2-2' }}</div>
+                        </div>
+
+                        <div class="col-md-12">
+                            <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Account</div>
+                            <div>{{ accountLabel }}</div>
+                        </div>
+
+                        <div class="col-md-12">
+                            <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Description</div>
+                            <div class="text-pre-line">{{ data.particulars || '—' }}</div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Last Updated</div>
+                            <div>{{ data.lastUpdated | date:'MMM dd, yyyy HH:mm' }}</div>
+                        </div>
+
+                    </div>
+
+                    <div class="d-flex gap-2 justify-content-end align-items-center pt-3 border-top mt-3">
+                        <a [routerLink]="['/' + menuLink]" class="btn btn-light fw-bold">
+                            <ng-icon name="tablerArrowLeft" class="ps-0 pe-3 fw-bold"></ng-icon>Back
+                        </a>
+                        <a [routerLink]="['/' + menuLink + '/od', id, 'edit']" class="btn btn-primary fw-bold">
+                            <ng-icon name="tablerEdit" class="ps-0 pe-3 fw-bold"></ng-icon>Edit
+                        </a>
+                    </div>
+
+                </div>
+            </app-ui-card>
+        </div>
+
+    </div>
+    }
+</div>

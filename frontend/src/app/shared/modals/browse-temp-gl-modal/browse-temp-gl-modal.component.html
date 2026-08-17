@@ -1,0 +1,50 @@
+<div class="modal-header">
+    <h4 class="modal-title">Temporary General Ledger Entries</h4>
+    <button type="button" class="btn-close" (click)="close()"></button>
+</div>
+<div class="modal-body">
+    <div class="d-flex gap-2 mb-3">
+        <div class="app-search flex-grow-1">
+            <input ngbAutofocus [(ngModel)]="searchText" type="search" class="form-control"
+                   placeholder="Search by document type or remarks..."/>
+            <ng-icon name="tablerSearch" class="app-search-icon text-muted"/>
+        </div>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-custom table-centered table-select table-hover w-100 mb-0">
+            <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                <tr class="text-uppercase fs-xxs">
+                    <th style="width:120px">Date</th>
+                    <th style="width:180px">Document</th>
+                    <th class="text-end" style="width:120px">Amount</th>
+                    <th>Remarks</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (isLoading()) {
+                    <tr><td colspan="4" class="text-center py-4">
+                        <span class="spinner-border spinner-border-sm me-2"></span>Loading...
+                    </td></tr>
+                } @else if (isSelecting()) {
+                    <tr><td colspan="4" class="text-center py-4">
+                        <span class="spinner-border spinner-border-sm me-2"></span>Loading entries...
+                    </td></tr>
+                } @else if (filtered.length > 0) {
+                    @for (b of filtered; track b.tempBatchId) {
+                        <tr style="cursor:pointer" (click)="select(b)">
+                            <td>{{ b.tempBatchDate | date:'MMM dd, yyyy' }}</td>
+                            <td>{{ b.docTypeDesc || '—' }}</td>
+                            <td class="text-end fw-bold">{{ b.amount | number:'1.2-2' }}</td>
+                            <td>{{ b.remarks || '—' }}</td>
+                        </tr>
+                    }
+                } @else {
+                    <tr><td colspan="4" class="text-center text-muted py-3">No temporary GL entries found.</td></tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-light fw-bold" (click)="close()">Close</button>
+</div>

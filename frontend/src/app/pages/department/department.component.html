@@ -1,0 +1,98 @@
+<div class="container-fluid mt-4">
+
+    <div class="row mb-3">
+        <div class="col-12">
+            <h5 class="fw-semibold mb-1">Departments</h5>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb small">
+                    <li class="breadcrumb-item"><a routerLink="/home">Home</a></li>
+                    <li class="breadcrumb-item active">Departments</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header d-flex align-items-center justify-content-between">
+            <h6 class="mb-0">List of Departments</h6>
+            <button class="btn btn-primary btn-sm" (click)="openCreate(deptModal)">
+                <i class="ti ti-plus me-1"></i> Create New
+            </button>
+        </div>
+        <div class="card-body">
+
+            <div class="row mb-3">
+                <div class="col-md-4">
+                    <div class="input-group input-group-sm">
+                        <input type="text" class="form-control" placeholder="Search..."
+                               [(ngModel)]="searchQuery" (keyup)="applyFilter()">
+                    </div>
+                </div>
+            </div>
+
+            <div *ngIf="loading" class="text-muted small mb-2">Loading...</div>
+
+            <div class="table-responsive">
+                <table class="table table-sm table-striped table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Abbreviation</th>
+                            <th>Name</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let dept of filtered">
+                            <td class="fw-semibold">{{ dept.abbreviation }}</td>
+                            <td>{{ dept.name }}</td>
+                            <td class="text-end" style="width: 120px;">
+                                <button class="btn btn-xs btn-outline-primary me-1"
+                                        (click)="openEdit(dept, deptModal)">Edit</button>
+                                <button class="btn btn-xs btn-outline-danger"
+                                        (click)="confirmDelete(dept)">Delete</button>
+                            </td>
+                        </tr>
+                        <tr *ngIf="filtered.length === 0 && !loading">
+                            <td colspan="3" class="text-center text-muted small">No records found</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- Department Modal -->
+<ng-template #deptModal>
+    <div class="modal-header">
+        <h6 class="modal-title fw-semibold">{{ isEditMode ? 'Edit Department' : 'Create Department' }}</h6>
+        <button type="button" class="btn-close" (click)="activeModal?.dismiss()"></button>
+    </div>
+    <div class="modal-body">
+        <form [formGroup]="form">
+            <div class="mb-3">
+                <label class="form-label form-label-sm">Abbreviation <span class="text-danger">*</span></label>
+                <input type="text" class="form-control form-control-sm"
+                       formControlName="abbreviation" placeholder="Enter abbreviation" maxlength="32">
+                <div *ngIf="form.get('abbreviation')?.invalid && form.get('abbreviation')?.touched"
+                     class="text-danger small mt-1">Abbreviation is required.</div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label form-label-sm">Name <span class="text-danger">*</span></label>
+                <input type="text" class="form-control form-control-sm"
+                       formControlName="name" placeholder="Enter name">
+                <div *ngIf="form.get('name')?.invalid && form.get('name')?.touched"
+                     class="text-danger small mt-1">Name is required.</div>
+            </div>
+        </form>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary btn-sm"
+                (click)="activeModal?.dismiss()">Cancel</button>
+        <button type="button" class="btn btn-primary btn-sm"
+                [disabled]="saving" (click)="save()">
+            {{ saving ? 'Saving...' : 'Save' }}
+        </button>
+    </div>
+</ng-template>

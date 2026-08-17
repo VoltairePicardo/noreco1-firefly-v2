@@ -1,0 +1,151 @@
+<div class="container-fluid">
+    <app-page-title [title]="module" [subTitle]="subModule" [menuLink]="menuLink"/>
+</div>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-xl-12">
+            <app-ui-card [title]="module + ' Form'">
+                <div class="col-xl-12 p-3" card-body>
+
+                    @if (isLoading()) {
+                        <div class="d-flex align-items-center gap-2 text-muted py-2">
+                            <span class="spinner-border spinner-border-sm" role="status"></span>
+                            Loading...
+                        </div>
+                    } @else {
+
+                    @if (hasPpd) {
+                        <div class="alert alert-warning d-flex align-items-center gap-2 mb-3">
+                            <ng-icon name="tablerAlertTriangle" class="fs-lg"></ng-icon>
+                            This prepayment has been processed and cannot be edited.
+                        </div>
+                    }
+
+                    <!-- Row 1: Date Paid, Description -->
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold">Date Paid <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" mwlFlatpickr [options]="flatpickrOptions"
+                                   [(ngModel)]="datePaid" [ngModelOptions]="{ standalone: true }"
+                                   placeholder="Select date" [disabled]="hasPpd"/>
+                        </div>
+                        <div class="col-md-9">
+                            <label class="form-label fw-bold">Description <span class="text-danger">*</span></label>
+                            <textarea class="form-control" rows="3" maxlength="1024"
+                                      [(ngModel)]="description" [ngModelOptions]="{ standalone: true }"
+                                      placeholder="Enter description..." [disabled]="hasPpd"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Row 2: Start Month, Start Year, Total Cost, No. of Months -->
+                    <div class="row g-3 mt-1">
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold">Start Month <span class="text-danger">*</span></label>
+                            <select class="form-select" [(ngModel)]="startMonth" [ngModelOptions]="{ standalone: true }"
+                                    [disabled]="hasPpd">
+                                @for (m of months; track m.value) {
+                                    <option [ngValue]="m.value">{{ m.label }}</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold">Start Year <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control"
+                                   [(ngModel)]="startYear" [ngModelOptions]="{ standalone: true }"
+                                   placeholder="e.g. 2024" [disabled]="hasPpd"/>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold">Total Cost <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control text-end"
+                                   [(ngModel)]="totalCost" [ngModelOptions]="{ standalone: true }"
+                                   min="0" step="0.01" placeholder="0.00"
+                                   (ngModelChange)="onCostChange()" [disabled]="hasPpd"/>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold">No. of Months <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control text-end"
+                                   [(ngModel)]="noOfMonths" [ngModelOptions]="{ standalone: true }"
+                                   min="1" step="1" placeholder="0"
+                                   (ngModelChange)="onCostChange()" [disabled]="hasPpd"/>
+                        </div>
+                    </div>
+
+                    <!-- Row 3: Monthly Cost (readonly), Applied Cost, Balance (readonly) -->
+                    <div class="row g-3 mt-1">
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">Monthly Cost</label>
+                            <input type="number" class="form-control text-end" [value]="monthlyCost"
+                                   readonly placeholder="0.00"/>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">Applied Cost</label>
+                            <input type="number" class="form-control text-end"
+                                   [(ngModel)]="appliedCost" [ngModelOptions]="{ standalone: true }"
+                                   min="0" step="0.01" placeholder="0.00"
+                                   (ngModelChange)="onCostChange()" [disabled]="hasPpd"/>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">Balance</label>
+                            <input type="number" class="form-control text-end" [value]="balance"
+                                   readonly placeholder="0.00"/>
+                        </div>
+                    </div>
+
+                    <!-- Row 4: Prepayment Account, Expense Account -->
+                    <div class="row g-3 mt-1">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Prepayment Account <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <input type="text" class="form-control"
+                                       [value]="prepaymentAccount?.accountTitle || ''"
+                                       readonly placeholder="Select Account"/>
+                                @if (!hasPpd) {
+                                    <button type="button" class="btn btn-success fw-bold"
+                                            (click)="openAccBrowse('prepaymentAccount')">
+                                        <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
+                                    </button>
+                                }
+                            </div>
+                            @if (prepaymentAccount) {
+                                <small class="text-muted">{{ prepaymentAccount.accountCode }}</small>
+                            }
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Expense Account <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <input type="text" class="form-control"
+                                       [value]="expenseAccount?.accountTitle || ''"
+                                       readonly placeholder="Select Account"/>
+                                @if (!hasPpd) {
+                                    <button type="button" class="btn btn-success fw-bold"
+                                            (click)="openAccBrowse('expenseAccount')">
+                                        <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
+                                    </button>
+                                }
+                            </div>
+                            @if (expenseAccount) {
+                                <small class="text-muted">{{ expenseAccount.accountCode }}</small>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-2 justify-content-end align-items-center pt-3 border-top mt-3">
+                        <a [routerLink]="['/' + menuLink]" class="btn btn-light fw-bold">
+                            <ng-icon name="tablerArrowLeft" class="ps-0 pe-3 fw-bold"></ng-icon>Back
+                        </a>
+                        @if (!hasPpd) {
+                            <button type="button" class="btn btn-primary fw-bold"
+                                    [disabled]="formSubmit" (click)="save()">
+                                <ng-icon name="tablerCheck" class="ps-0 pe-3 fw-bold"></ng-icon>
+                                {{ editMode ? 'Update' : 'Save ' + module}}
+                            </button>
+                        }
+                    </div>
+
+                    }
+                </div>
+            </app-ui-card>
+        </div>
+    </div>
+</div>

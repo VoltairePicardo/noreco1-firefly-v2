@@ -1,0 +1,254 @@
+<div class="container-fluid">
+    <app-page-title [title]="module" [subTitle]="subModule" [menuLink]="menuLink"/>
+</div>
+
+<div class="container-fluid">
+    @if (isLoading()) {
+        <div class="d-flex align-items-center gap-2 text-muted py-4">
+            <span class="spinner-border spinner-border-sm" role="status"></span> Loading...
+        </div>
+    } @else {
+    <div class="row g-3">
+
+        <!-- CA Header -->
+        <div class="col-xl-12">
+            <app-ui-card title="Cash Advance Details">
+                <div class="col-xl-12 p-3" card-body>
+                    <div class="row g-3">
+
+                        <div class="col-md-3">
+                            <div class="fw-bold fs-xs text-uppercase text-muted mb-1">CA Number</div>
+                            <div class="fw-bold">{{ data.code || '—' }}</div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Employee</div>
+                            <div>{{ data.employee?.fullName || data.employee || '—' }}</div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Status</div>
+                            <div>
+                                <span class="badge"
+                                      [ngClass]="isEditable() ? 'bg-secondary bg-opacity-25 text-dark border' : 'bg-success bg-opacity-25 text-success border'">
+                                    {{ data.documentStatus?.status || data.status || 'N/A' }}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Office</div>
+                            <div>{{ data.office?.name || data.office || '—' }}</div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Cash Advance Date</div>
+                            <div>{{ data.cashAdvanceDate | date:'MMMM d, yyyy' }}</div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Period Covered</div>
+                            <div>
+                                @if (data.periodCoveredFrom || data.periodCoveredTo) {
+                                    {{ data.periodCoveredFrom | date:'MMM d, yyyy' }} — {{ data.periodCoveredTo | date:'MMM d, yyyy' }}
+                                } @else { — }
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Total Amount</div>
+                            <div class="fw-bold">{{ data.amount | number:'1.2-2' }}</div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Liquidated</div>
+                            <div>{{ data.isLiquidated ? 'Yes' : 'No' }}</div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Purpose</div>
+                            <div>{{ data.purpose || '—' }}</div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Remarks</div>
+                            <div>{{ data.remarks || '—' }}</div>
+                        </div>
+
+                    </div>
+                </div>
+            </app-ui-card>
+        </div>
+
+        <!-- Signatories -->
+        <div class="col-xl-12">
+            <app-ui-card title="Signatories">
+                <div class="col-xl-12 p-3" card-body>
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Prepared By</div>
+                            <div>{{ data.createdBy?.fullName || '—' }}</div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Recommended By</div>
+                            <div>{{ data.recommendedBy?.name || data.recommendedBy?.fullName || '—' }}</div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Budget Officer</div>
+                            <div>{{ data.budgetOfficer?.name || data.budgetOfficer?.fullName || '—' }}</div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Approved By</div>
+                            <div>{{ data.approvingOfficer?.name || data.approvingOfficer?.fullName || '—' }}</div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Created On</div>
+                            <div>{{ data.createdAt | date:'MMMM d, yyyy h:mm a' }}</div>
+                        </div>
+                    </div>
+                </div>
+            </app-ui-card>
+        </div>
+
+        <!-- Particulars -->
+        <div class="col-xl-12">
+            <app-ui-card title="Particulars">
+                <div class="col-xl-12 p-3" card-body>
+                    <div class="table-responsive">
+                        <table class="table table-custom table-centered table-hover w-100 mb-0">
+                            <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                                <tr class="text-uppercase fs-xxs">
+                                    <th>Date</th>
+                                    <th>Description</th>
+                                    <th class="text-end">Quantity</th>
+                                    <th>Unit</th>
+                                    <th class="text-end">Amount</th>
+                                    <th class="text-end">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (particulars.length > 0) {
+                                    @for (p of particulars; track $index) {
+                                        <tr>
+                                            <td>{{ p.date | date:'MMM d, yyyy' }}</td>
+                                            <td>{{ p.particular }}</td>
+                                            <td class="text-end">{{ p.quantity }}</td>
+                                            <td>{{ p.unit?.code || '—' }}</td>
+                                            <td class="text-end">{{ p.amount | number:'1.2-2' }}</td>
+                                            <td class="text-end fw-bold">{{ rowTotal(p) | number:'1.2-2' }}</td>
+                                        </tr>
+                                    }
+                                    <tr class="fw-bold">
+                                        <td colspan="5" class="text-end text-uppercase fs-xs">Total Amount</td>
+                                        <td class="text-end">{{ grandTotal | number:'1.2-2' }}</td>
+                                    </tr>
+                                } @else {
+                                    <tr>
+                                        <td colspan="6" class="text-center text-muted py-3">No particulars found.</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </app-ui-card>
+        </div>
+
+        <!-- Workflow Actions -->
+        @if (workflowActions.length > 0) {
+            <div class="col-xl-12">
+                <app-ui-card title="Process Document">
+                    <div class="col-xl-12 p-3" card-body>
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold">Action</label>
+                                <select class="form-select" [(ngModel)]="selectedAction" [ngModelOptions]="{ standalone: true }">
+                                    <option [ngValue]="null">— Select Action —</option>
+                                    @for (a of workflowActions; track a.actionMapId) {
+                                        <option [ngValue]="a">{{ a.action }}</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Remarks</label>
+                                <input type="text" class="form-control"
+                                       [(ngModel)]="remarks" [ngModelOptions]="{ standalone: true }"
+                                       placeholder="Optional remarks"/>
+                            </div>
+                            <div class="col-md-2 d-flex align-items-end">
+                                <button type="button" class="btn btn-primary fw-bold w-100"
+                                        [disabled]="!selectedAction || formSubmit"
+                                        (click)="processWorkflow()">
+                                    {{ formSubmit ? 'Processing...' : 'Submit' }}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </app-ui-card>
+            </div>
+        }
+
+        <!-- Document Logs -->
+        <div class="col-xl-12">
+            <app-ui-card title="Document Logs">
+                <div class="col-xl-12 p-3" card-body>
+                    @if (!logsLoaded) {
+                        <button type="button" class="btn btn-success btn-sm fw-bold" (click)="loadLogs()">
+                            <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>View Logs
+                        </button>
+                    } @else if (logsLoading) {
+                        <div class="d-flex align-items-center gap-2 text-muted">
+                            <span class="spinner-border spinner-border-sm" role="status"></span> Loading logs...
+                        </div>
+                    } @else {
+                        <div class="table-responsive">
+                            <table class="table table-custom table-centered table-hover w-100 mb-0">
+                                <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                                    <tr class="text-uppercase fs-xxs">
+                                        <th style="width:160px">Timestamp</th>
+                                        <th>Log</th>
+                                        <th style="width:200px">Remarks</th>
+                                        <th style="width:160px">User</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (logs().length > 0) {
+                                        @for (log of logs(); track $index) {
+                                            <tr>
+                                                <td>{{ log.createdAt | date:'yyyy-MM-dd h:mma' }}</td>
+                                                <td>{{ log.newValue || log.description || '—' }}</td>
+                                                <td>{{ log.remarks || '—' }}</td>
+                                                <td>{{ log.loggedBy?.fullName || '—' }}</td>
+                                            </tr>
+                                        }
+                                    } @else {
+                                        <tr>
+                                            <td colspan="4" class="text-center text-muted py-3">No logs found.</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                </div>
+            </app-ui-card>
+        </div>
+
+        <!-- Footer -->
+        <div class="col-xl-12">
+            <div class="d-flex gap-2 justify-content-end align-items-center pt-3 border-top mt-1">
+                <a [routerLink]="['/' + menuLink]" class="btn btn-light fw-bold">
+                    <ng-icon name="tablerArrowLeft" class="ps-0 pe-3 fw-bold"></ng-icon>Back
+                </a>
+                <button type="button" class="btn btn-success fw-bold" (click)="print()">
+                    <ng-icon name="tablerPrinter" class="ps-0 pe-3 fw-bold"></ng-icon>Print
+                </button>
+                @if (canBeSetAsLiquidated()) {
+                    <button type="button" class="btn btn-warning fw-bold" (click)="setAsLiquidated()" [disabled]="formSubmit">
+                        <ng-icon name="tablerCheck" class="ps-0 pe-3 fw-bold"></ng-icon>Set as Liquidated
+                    </button>
+                }
+                @if (isEditable()) {
+                    <a class="btn btn-primary fw-bold" [routerLink]="['/' + menuLink, id, 'edit']">
+                        <ng-icon name="tablerEdit" class="ps-0 pe-3 fw-bold"></ng-icon>Edit
+                    </a>
+                }
+            </div>
+        </div>
+
+    </div>
+    }
+</div>

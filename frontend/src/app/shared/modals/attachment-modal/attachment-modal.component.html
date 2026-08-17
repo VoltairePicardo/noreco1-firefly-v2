@@ -1,0 +1,69 @@
+<div class="attachment-image-modal">
+
+    <div class="modal-header d-flex justify-content-end px-3 py-2 border-bottom">
+        <button type="button" class="btn btn-light btn-sm" ngbTooltip="Close" (click)="closeModal()">
+            <ng-icon name="tablerX"></ng-icon>
+        </button>
+    </div>
+
+    <div class="modal-body position-relative p-0"
+         style="height: 70vh; background: #f8f9fa; overflow: hidden; display: flex; justify-content: center; align-items: center;">
+
+        <div class="image-wrapper position-relative w-100 h-100 d-flex justify-content-center align-items-center"
+             #container
+             [style.cursor]="isDragging ? 'grabbing' : (zoomLevel > 1 ? 'grab' : 'default')">
+
+            <img #img
+                 *ngIf="image; else noImage"
+                 [src]="image"
+                 alt="Attachment Preview"
+                 class="attachment-preview-image"
+                 draggable="false"
+                 (mousedown)="onMouseDown($event)"
+                 (dblclick)="onDoubleClick($event)"
+                 [style.transform]="'translate(' + translateX + 'px, ' + translateY + 'px) rotate(' + rotation + 'deg) scale(' + zoomLevel + ')'"
+                 style="max-width: 100%; max-height: 100%; user-select: none; transition: transform 0.15s ease-out;"
+            />
+
+            <ng-template #noImage>
+                <div class="text-center text-muted w-100 h-100 d-flex justify-content-center align-items-center">
+                    No image available
+                </div>
+            </ng-template>
+
+        </div>
+
+        <div class="image-controls position-absolute bottom-0 start-50 translate-middle-x mb-2 d-flex align-items-center gap-2 bg-light rounded p-2 shadow"
+             style="z-index: 10;">
+
+            <button type="button" class="btn btn-light btn-sm rounded-circle" ngbTooltip="Rotate Left" (click)="rotate(-90)">
+                <ng-icon name="tablerRotate"></ng-icon>
+            </button>
+
+            <button type="button" class="btn btn-light btn-sm rounded-circle" ngbTooltip="Zoom In" (click)="zoomIn()">
+                <ng-icon name="tablerZoomIn"></ng-icon>
+            </button>
+
+            <span class="fw-semibold text-muted" style="min-width: 50px; text-align: center;">
+                {{ zoomLevel * 100 | number:'1.0-0' }}%
+            </span>
+
+            <button type="button" class="btn btn-light btn-sm rounded-circle" ngbTooltip="Zoom Out" (click)="zoomOut()">
+                <ng-icon name="tablerZoomOut"></ng-icon>
+            </button>
+
+            <button type="button" class="btn btn-light btn-sm rounded-circle ms-2" ngbTooltip="Reset"
+                    [disabled]="zoomLevel === 1 && translateX === 0 && translateY === 0 && rotation === 0"
+                    (click)="reset()">
+                <ng-icon name="tablerRefresh"></ng-icon>
+            </button>
+
+            <button type="button" class="btn btn-light btn-sm rounded-circle" ngbTooltip="Rotate Right" (click)="rotate(90)">
+                <ng-icon name="tablerRotateClockwise"></ng-icon>
+            </button>
+
+        </div>
+
+    </div>
+
+</div>

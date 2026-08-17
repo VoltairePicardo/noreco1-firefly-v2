@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name=" IdealQuantityReorderPoint" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="c277f25a-fc9d-4778-989e-fc858f4a886f">
+	<property name="ireport.zoom" value="2.8531167061100087"/>
+	<property name="ireport.x" value="961"/>
+	<property name="ireport.y" value="376"/>
+	<parameter name="INVENTORY_LOCATION" class="java.lang.String" isForPrompting="false"/>
+	<parameter name="REPORT_TITLE" class="java.lang.String"/>
+	<parameter name="LOGO_PATH" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["Q:\\Develop\\Noreco 1\\accounting-no1\\src\\no1\\img\\No1-Logo.jpg"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="COMP_CONTACT" class="java.lang.String"/>
+	<parameter name="COMP_NAME" class="java.lang.String"/>
+	<parameter name="COMP_ADDR" class="java.lang.String"/>
+	<field name="itemId" class="java.lang.Integer"/>
+	<field name="itemCode" class="java.lang.String"/>
+	<field name="description" class="java.lang.String"/>
+	<field name="quantity" class="java.math.BigDecimal"/>
+	<field name="invCat" class="java.lang.Integer"/>
+	<field name="invCatDesc" class="java.lang.String"/>
+	<field name="idealQuantity" class="java.math.BigDecimal"/>
+	<field name="reorderPoint" class="java.math.BigDecimal"/>
+	<group name="Inventory_Category" isStartNewPage="true">
+		<groupExpression><![CDATA[$F{invCat}]]></groupExpression>
+		<groupHeader>
+			<band height="35">
+				<staticText>
+					<reportElement x="131" y="17" width="210" height="17" uuid="523bd53c-c30b-47da-8490-9d551cc72629"/>
+					<box>
+						<topPen lineWidth="1.0"/>
+						<bottomPen lineWidth="1.0"/>
+					</box>
+					<textElement textAlignment="Left" verticalAlignment="Middle">
+						<font fontName="SansSerif" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Description]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="17" width="51" height="17" uuid="5a3ccf88-8a0e-44cd-a147-1d2a1c661686"/>
+					<box>
+						<topPen lineWidth="1.0"/>
+						<bottomPen lineWidth="1.0"/>
+					</box>
+					<textElement textAlignment="Left" verticalAlignment="Middle">
+						<font fontName="SansSerif" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Item ID]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="51" y="17" width="80" height="17" uuid="61342d78-4dc0-4407-ad3b-a191b784f092"/>
+					<box>
+						<topPen lineWidth="1.0"/>
+						<bottomPen lineWidth="1.0"/>
+					</box>
+					<textElement textAlignment="Left" verticalAlignment="Middle">
+						<font fontName="SansSerif" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Item Code]]></text>
+				</staticText>
+				<textField>
+					<reportElement x="0" y="0" width="555" height="17" uuid="78ce27d3-dde0-4360-a64b-221890873862"/>
+					<textElement textAlignment="Center"/>
+					<textFieldExpression><![CDATA[$F{invCatDesc}.toUpperCase()]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="501" y="17" width="54" height="17" uuid="9e430e5d-5d23-4730-9a87-56f2cd803c4e"/>
+					<box>
+						<topPen lineWidth="1.0"/>
+						<bottomPen lineWidth="1.0"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="SansSerif" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Quantity]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="341" y="17" width="80" height="17" uuid="d47fe713-8cfe-45bd-ba67-affcfed296c4"/>
+					<box>
+						<topPen lineWidth="1.0"/>
+						<bottomPen lineWidth="1.0"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font isBold="true"/>
+					</textElement>
+					<text><![CDATA[Ideal Quantity]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="421" y="17" width="80" height="17" uuid="5ee87372-aec2-4e52-83fc-546a520f97b1"/>
+					<box>
+						<topPen lineWidth="1.0"/>
+						<bottomPen lineWidth="1.0"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font isBold="true"/>
+					</textElement>
+					<text><![CDATA[Reorder Point]]></text>
+				</staticText>
+			</band>
+		</groupHeader>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="120" splitType="Stretch">
+			<image isLazy="true" onErrorType="Icon">
+				<reportElement x="71" y="1" width="60" height="52" uuid="165b474e-de35-4e2c-b6e4-0271f3d5aadf"/>
+				<imageExpression><![CDATA[$P{LOGO_PATH}]]></imageExpression>
+			</image>
+			<textField>
+				<reportElement x="0" y="82" width="555" height="17" uuid="5d2bb9c5-4a67-4912-937d-1eb636621cfd"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA[$P{INVENTORY_LOCATION}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="15" width="555" height="20" uuid="5c4d1a1f-3287-4753-9b19-71549a09816a"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{COMP_ADDR}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement mode="Transparent" x="0" y="44" width="555" height="24" forecolor="#000000" backcolor="#FFFFFF" uuid="442ae4ad-e182-44c9-9f05-245dab29b590"/>
+				<textElement textAlignment="Center" verticalAlignment="Top" rotation="None" markup="none">
+					<font fontName="Calibri" size="18" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{REPORT_TITLE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="1" width="555" height="20" uuid="bee4a845-693f-49b1-9fa9-b5a18f47ef95"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{COMP_NAME}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<detail>
+		<band height="17" splitType="Stretch">
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="51" y="0" width="80" height="17" isPrintWhenDetailOverflows="true" uuid="c4a0c0ef-43b7-4f4d-8116-7b1557609bf1"/>
+				<textFieldExpression><![CDATA[$F{itemCode}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="131" y="0" width="210" height="17" isPrintWhenDetailOverflows="true" uuid="1bc48e6b-ea8e-4d45-84c8-efecbb22afb1"/>
+				<textFieldExpression><![CDATA[$F{description}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="0" y="0" width="51" height="17" isPrintWhenDetailOverflows="true" uuid="7fb76d62-49b9-4959-a7b0-cc203e4148fa"/>
+				<textFieldExpression><![CDATA[$F{itemId}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="#,##0.00;(#,##0.00)" isBlankWhenNull="true">
+				<reportElement x="501" y="0" width="54" height="17" isPrintWhenDetailOverflows="true" uuid="d1861395-d4a2-468c-9a43-568170168762"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{quantity}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="341" y="0" width="80" height="17" isPrintWhenDetailOverflows="true" uuid="ed0170c4-3bcf-4e2d-b548-53f577d8cbae"/>
+				<textElement textAlignment="Right" verticalAlignment="Top"/>
+				<textFieldExpression><![CDATA[$F{idealQuantity}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="421" y="0" width="80" height="17" isPrintWhenDetailOverflows="true" uuid="a9e7835d-8216-4135-b5f0-9cfb7cc1c48f"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{reorderPoint}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="45" splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="21" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="280" height="20" uuid="48d24c7d-9573-404c-83a3-c85d1f7d45a6"/>
+				<textElement textAlignment="Right">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of "]]></textFieldExpression>
+			</textField>
+			<textField pattern="MM/dd/yyyy hh:mm a">
+				<reportElement x="455" y="0" width="100" height="20" uuid="16180b57-f39d-40ba-b1fa-3012296560ec"/>
+				<textElement>
+					<font fontName="Calibri Light" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement x="280" y="0" width="100" height="20" uuid="0dcb3acc-b86d-4fa8-8413-b36802180e71"/>
+				<box leftPadding="5"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="42" splitType="Stretch"/>
+	</summary>
+</jasperReport>

@@ -1,0 +1,93 @@
+<!-- Modal Header -->
+<div class="modal-header">
+    <h4 class="modal-title">Check Details</h4>
+    <button type="button" class="btn-close" (click)="onClose()"></button>
+</div>
+
+<!-- Modal Body -->
+<div class="card card-default p-3">
+    <div class="row align-items-end">
+
+        <!-- Check No -->
+        <div class="col-md-3">
+            <label class="form-label">Check No.</label>
+            <input
+                type="text"
+                class="form-control"
+                [(ngModel)]="check.checkNumber"
+                [ngModelOptions]="{ standalone: true }"
+            />
+        </div>
+
+        <!-- Bank -->
+        <div class="col-md-3">
+            <label class="form-label">Bank</label>
+            <input
+                type="text"
+                class="form-control"
+                [(ngModel)]="check.bank"
+                [ngModelOptions]="{ standalone: true }"
+            />
+        </div>
+
+        <!-- Check Amount -->
+        <div class="col-md-3">
+            <label class="form-label">Check Amount</label>
+            <input
+                type="number"
+                min="0"
+                step="1"
+                class="form-control"
+                [(ngModel)]="check.checkAmount"
+                [ngModelOptions]="{ standalone: true }"
+            />
+        </div>
+
+        <!-- Check Date -->
+        <div class="col-md-3">
+            <label class="form-label">Check Date</label>
+            <div class="app-search">
+                <input
+                    type="text"
+                    mwlFlatpickr
+                    [options]="{ dateFormat: 'F j, Y', static: true }"
+                    class="form-control"
+                    [(ngModel)]="check.checkDate"
+                    [ngModelOptions]="{ standalone: true }"
+                />
+                <ng-icon
+                    name="tablerCalendar"
+                    class="app-search-icon text-muted"
+                ></ng-icon>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="row mt-3 justify-content-end">
+        <div class="col-md-2">
+            <button
+                class="btn btn-light w-100 fw-bold"
+                (click)="onClose()"
+            > <ng-icon
+                name="tablerX"
+                class="me-1"
+            ></ng-icon>
+                Cancel
+            </button>
+        </div>
+
+        <div class="col-md-3">
+            <button
+                class="btn btn-primary w-100 fw-bold"
+                (click)="addCheck()"
+            ><ng-icon
+                name="tablerPlus"
+                class="me-1"
+            ></ng-icon>
+                Add Check
+            </button>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,315 @@
+<div class="container-fluid">
+    <app-page-title [title]="module" [subTitle]="subModule" [menuLink]="menuLink"/>
+</div>
+
+<div class="container-fluid">
+    @if (isLoading()) {
+        <div class="d-flex align-items-center gap-2 text-muted py-4">
+            <span class="spinner-border spinner-border-sm" role="status"></span> Loading...
+        </div>
+    } @else {
+    <div class="row g-3">
+
+        <div class="col-xl-12">
+            <app-ui-card title="Petty Cash Voucher">
+                <div class="col-xl-12 p-3" card-body>
+                    <form class="row g-3 needs-validation" novalidate (ngSubmit)="save()">
+
+                        <!-- 1. Voucher Date -->
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">
+                                Voucher Date <span class="text-danger">*</span>
+                            </label>
+                            <input type="text" mwlFlatpickr [options]="flatpickrOptions"
+                                   class="form-control" placeholder="Select date"
+                                   [(ngModel)]="voucherDate" name="voucherDate"
+                                   [class]="submit && !voucherDate ? 'is-invalid' : submit && voucherDate ? 'is-valid' : ''"
+                                   [disabled]="budgetUpdate"
+                                   required/>
+                            <div class="invalid-feedback">Please select a voucher date.</div>
+                        </div>
+
+                        <!-- 2. PCF -->
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">
+                                PCF <span class="text-danger">*</span>
+                            </label>
+                            <select class="form-select" [(ngModel)]="pettyCashFund" name="pettyCashFund"
+                                    [compareWith]="compareFn"
+                                    [class]="submit && !pettyCashFund ? 'is-invalid' : submit && pettyCashFund ? 'is-valid' : ''"
+                                    required>
+                                <option [ngValue]="null">— Select PCF —</option>
+                                @for (pcf of pettyCashFunds; track pcf.id) {
+                                    <option [ngValue]="pcf">{{ pcf.description }}</option>
+                                }
+                            </select>
+                            @if (submit && !pettyCashFund) {
+                                <div class="text-danger fs-xs mt-1">Please select a petty cash fund.</div>
+                            }
+                        </div>
+
+                        <!-- 3. Available Balance -->
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">Available Balance</label>
+                            <input type="text" class="form-control"
+                                   [value]="pettyCashFund ? (pettyCashFund.balance | number:'1.2-2') : ''"
+                                   readonly placeholder="— Select PCF first —"/>
+                        </div>
+
+                        <!-- 4. Request -->
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">Request</label>
+                            <select class="form-select" [(ngModel)]="request" name="request"
+                                    [disabled]="budgetUpdate">
+                                <option value="Reimbursement">Reimbursement</option>
+                                <option value="Advance">Advance</option>
+                                <option value="Emergency">Emergency</option>
+                            </select>
+                        </div>
+
+                        <!-- 5. Payee -->
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">
+                                Payee <span class="text-danger">*</span>
+                            </label>
+                            <input type="text" class="form-control" placeholder="Payee name"
+                                   [(ngModel)]="payee" name="payee"
+                                   [class]="submit && !payee.trim() ? 'is-invalid' : submit && payee.trim() ? 'is-valid' : ''"
+                                   [disabled]="budgetUpdate"
+                                   required/>
+                            <div class="invalid-feedback">Please enter a payee.</div>
+                        </div>
+
+                        <!-- 6. Office -->
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">Office</label>
+                            <select class="form-select" [(ngModel)]="selectedOffice" name="office"
+                                    [compareWith]="compareFn" [disabled]="budgetUpdate">
+                                <option [ngValue]="null">— Select Office —</option>
+                                @for (o of offices; track o.id) {
+                                    <option [ngValue]="o">{{ o.name || o.description }}</option>
+                                }
+                            </select>
+                        </div>
+
+                        <!-- 7. Budget Line Item -->
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Budget Line Item</label>
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="input-group">
+                                    <input type="text" class="form-control"
+                                           [value]="budgetLineItemDetail ? (budgetLineItemDetail.code + ' - ' + budgetLineItemDetail.title) : ''"
+                                           readonly placeholder="Browse budget line item..."/>
+                                    <button type="button" class="btn btn-success fw-bold"
+                                            (click)="openBudgetLineItemBrowse()"
+                                            [disabled]="budgetUpdate">
+                                        <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
+                                    </button>
+                                    @if (budgetLineItemDetail) {
+                                        <button type="button" class="btn btn-danger fw-bold"
+                                                (click)="clearBudgetLineItem()">
+                                            <ng-icon name="tablerX" class="ps-0 pe-0 fw-bold"></ng-icon>
+                                        </button>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Budget balance info (shown when BLI selected) -->
+                        @if (budgetLineItemDetail) {
+                            <div class="col-md-12">
+                                <div class="alert alert-info py-2 mb-0">
+                                    <div class="row g-2">
+                                        <div class="col-md-4">
+                                            <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Budget Amount Balance PCL</div>
+                                            <div class="fw-bold">{{ budgetBalancePCL | number:'1.2-2' }}</div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Amount Balance (PO/JO/RFP/CA/PCV)</div>
+                                            <div class="fw-bold">{{ budgetBalancePOJO | number:'1.2-2' }}</div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Amount Balance (PCV/CV)</div>
+                                            <div class="fw-bold">{{ budgetBalanceCV | number:'1.2-2' }}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+
+                        <hr/>
+                        <div class="col-12 fs-xs text-uppercase fw-semibold text-muted">Petty Cash Items</div>
+
+                        <!-- 8. Petty Cash Items table -->
+                        <div class="col-12">
+                            <div class="d-flex justify-content-end mb-2">
+                                <button type="button" class="btn btn-success btn-sm fw-bold" (click)="addDetail()"
+                                        [disabled]="budgetUpdate">
+                                    <ng-icon name="tablerPlus" class="ps-0 pe-2 fw-bold"></ng-icon>Add Row
+                                </button>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-sm table-bordered mb-0">
+                                    <thead class="bg-light thead-sm">
+                                        <tr class="text-uppercase fs-xxs">
+                                            <th>Particulars</th>
+                                            <th class="text-end" style="width:160px">Amount</th>
+                                            <th style="width:50px"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @for (d of details; track $index) {
+                                            <tr>
+                                                <td>
+                                                    <textarea class="form-control form-control-sm" rows="1"
+                                                              [(ngModel)]="d.remarks"
+                                                              [name]="'remarks_' + $index"
+                                                              maxlength="1024"
+                                                              [disabled]="budgetUpdate"
+                                                              placeholder="Enter Particulars"></textarea>
+                                                </td>
+                                                <td>
+                                                    <input type="number" class="form-control form-control-sm text-end"
+                                                           [(ngModel)]="d.amount"
+                                                           [name]="'amount_' + $index"
+                                                           min="0" step="0.01" placeholder="0.00"
+                                                           [disabled]="budgetUpdate"/>
+                                                </td>
+                                                <td class="text-center">
+                                                    <button type="button" class="btn btn-danger btn-icon btn-sm rounded-circle"
+                                                            (click)="removeDetail($index)"
+                                                            [disabled]="budgetUpdate || details.length === 1">
+                                                        <ng-icon name="tablerTrash"></ng-icon>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        }
+                                        <tr class="fw-bold">
+                                            <td></td>
+                                            <td class="text-end">{{ totalAmount | number:'1.2-2' }}</td>
+                                            <td></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <hr/>
+                        <div class="col-12 fs-xs text-uppercase fw-semibold text-muted">Attachments</div>
+
+                        <!-- 9. Attachments -->
+                        <div class="col-md-12">
+                            <div class="d-flex flex-wrap gap-2 mb-2">
+                                @for (att of attachments; track att.name; let i = $index) {
+                                    <div class="d-flex align-items-center gap-1 border rounded px-2 py-1 bg-light">
+                                        @if (isImage(att)) {
+                                            <ng-icon name="tablerPhoto" class="text-primary"></ng-icon>
+                                        } @else {
+                                            <ng-icon name="tablerFile" class="text-muted"></ng-icon>
+                                        }
+                                        <span class="fs-xs text-truncate" style="max-width:180px"
+                                              [ngbTooltip]="att.name">{{ att.name }}</span>
+                                        <button type="button" class="btn btn-link p-0 text-danger ms-1"
+                                                (click)="removeAttachment(i)">
+                                            <ng-icon name="tablerX" class="fs-sm"></ng-icon>
+                                        </button>
+                                    </div>
+                                }
+                            </div>
+                            <button type="button" class="btn btn-success fw-bold" (click)="openFilePicker()">
+                                <ng-icon name="tablerPaperclip" class="ps-0 pe-3 fw-bold"></ng-icon>Attach Files
+                            </button>
+                            <small class="text-muted ms-2">JPG, PNG, PDF only</small>
+                            <input #fileInput type="file" multiple accept=".jpg,.jpeg,.png,.pdf"
+                                   style="display:none" (change)="onFileSelect($event)"/>
+                        </div>
+
+                        <hr/>
+                        <div class="col-12 fs-xs text-uppercase fw-semibold text-muted">Officers</div>
+
+                        <!-- 10. Approving Officer -->
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">
+                                Approving Officer <span class="text-danger">*</span>
+                            </label>
+                            <div class="input-group">
+                                <input type="text" class="form-control"
+                                       [value]="approvingOfficer ? (approvingOfficer.name || approvingOfficer.fullName || '') : ''"
+                                       readonly placeholder="Browse approving officer..."/>
+                                <button type="button" class="btn btn-success fw-bold"
+                                        (click)="openSignatoryBrowse('approvingOfficer')"
+                                        [disabled]="budgetUpdate">
+                                    <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
+                                </button>
+                                @if (approvingOfficer) {
+                                    <button type="button" class="btn btn-danger fw-bold"
+                                            (click)="clearSignatory('approvingOfficer')">
+                                        <ng-icon name="tablerX" class="ps-0 pe-0 fw-bold"></ng-icon>
+                                    </button>
+                                }
+                            </div>
+                            @if (submit && !approvingOfficer) {
+                                <div class="text-danger fs-xs mt-1">Please select an approving officer.</div>
+                            }
+                        </div>
+
+                        <!-- 11. Checking Officer -->
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">Checking Officer</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control"
+                                       [value]="checker ? (checker.name || checker.fullName || '') : ''"
+                                       readonly placeholder="Browse checking officer..."/>
+                                <button type="button" class="btn btn-success fw-bold"
+                                        (click)="openSignatoryBrowse('checker')"
+                                        [disabled]="budgetUpdate">
+                                    <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
+                                </button>
+                                @if (checker) {
+                                    <button type="button" class="btn btn-danger fw-bold"
+                                            (click)="clearSignatory('checker')">
+                                        <ng-icon name="tablerX" class="ps-0 pe-0 fw-bold"></ng-icon>
+                                    </button>
+                                }
+                            </div>
+                        </div>
+
+                        <!-- 12. Releasing Officer -->
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">Releasing Officer</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control"
+                                       [value]="releasingOfficer ? (releasingOfficer.name || releasingOfficer.fullName || '') : ''"
+                                       readonly placeholder="Browse releasing officer..."/>
+                                <button type="button" class="btn btn-success fw-bold"
+                                        (click)="openSignatoryBrowse('releasingOfficer')"
+                                        [disabled]="budgetUpdate">
+                                    <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
+                                </button>
+                                @if (releasingOfficer) {
+                                    <button type="button" class="btn btn-danger fw-bold"
+                                            (click)="clearSignatory('releasingOfficer')">
+                                        <ng-icon name="tablerX" class="ps-0 pe-0 fw-bold"></ng-icon>
+                                    </button>
+                                }
+                            </div>
+                        </div>
+
+                        <div class="d-flex gap-2 justify-content-end align-items-center pt-3 border-top mt-3">
+                            <a [routerLink]="['/' + menuLink]" class="btn btn-light fw-bold">
+                                <ng-icon name="tablerArrowLeft" class="ps-0 pe-3 fw-bold"></ng-icon>Back
+                            </a>
+                            <button type="submit" class="btn btn-primary fw-bold" [disabled]="formSubmit">
+                                <ng-icon name="tablerCheck" class="ps-0 pe-3 fw-bold"></ng-icon>
+                                {{ editMode ? 'Update' : 'Save ' + module }}
+                            </button>
+                        </div>
+
+                    </form>
+                </div>
+            </app-ui-card>
+        </div>
+
+    </div>
+    }
+</div>

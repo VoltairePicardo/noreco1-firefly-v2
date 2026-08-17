@@ -1,0 +1,269 @@
+<div class="container-fluid">
+    <app-page-title [title]="module" [subTitle]="subModule" [menuLink]="menuLink"/>
+</div>
+
+@if (isLoading()) {
+    <div class="card"><div class="card-body text-center py-4">
+        <span class="spinner-border spinner-border-sm me-2" role="status"></span>Loading...
+    </div></div>
+} @else {
+
+<div class="card">
+    <div class="card-body">
+
+        <!-- Header -->
+        <div class="row g-3">
+            <div class="col-md-3">
+                <label class="form-label fw-bold">Voucher Date <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" mwlFlatpickr
+                       [options]="flatpickrOptions" [(ngModel)]="voucherDate"
+                       [ngModelOptions]="{ standalone: true }" placeholder="Select date"/>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label fw-bold">Invoice / Request Date <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" mwlFlatpickr
+                       [options]="flatpickrOptions" [(ngModel)]="invoiceDate"
+                       [ngModelOptions]="{ standalone: true }" placeholder="Select date"/>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label fw-bold">Due Date <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" mwlFlatpickr
+                       [options]="flatpickrOptions" [(ngModel)]="dueDate"
+                       [ngModelOptions]="{ standalone: true }" placeholder="Select date"/>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label fw-bold">Invoice Number</label>
+                <input type="text" class="form-control" [(ngModel)]="invoiceNumber"
+                       [ngModelOptions]="{ standalone: true }" placeholder="Invoice Number"/>
+            </div>
+            <div class="col-md-8">
+                <label class="form-label fw-bold">Vendor / Payee <span class="text-danger">*</span></label>
+                <div class="input-group">
+                    <input type="text" class="form-control"
+                           [value]="vendor ? (vendor.name || vendor.accountName || '') : ''"
+                           readonly placeholder="Select vendor..."/>
+                    <button type="button" class="btn btn-success fw-bold" (click)="openVendorBrowse()">
+                        <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
+                    </button>
+                    @if (vendor) {
+                        <button type="button" class="btn btn-light fw-bold" (click)="clearVendor()">
+                            <ng-icon name="tablerX" class="ps-0 fw-bold"></ng-icon>
+                        </button>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Payment Details -->
+        <hr class="my-3"/>
+        <div class="d-flex align-items-center justify-content-between mb-2">
+            <div class="fs-xs text-uppercase fw-semibold text-muted">Payment Details</div>
+            <button type="button" class="btn btn-success fw-bold btn-sm" (click)="addLineItem()">
+                <ng-icon name="tablerPlus" class="ps-0 pe-2 fw-bold"></ng-icon>Add Item
+            </button>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-custom table-centered table-hover w-100 mb-0">
+                <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                    <tr class="text-uppercase fs-xxs">
+                        <th style="width:50px">#</th>
+                        <th>Description</th>
+                        <th style="width:180px" class="text-end">Amount</th>
+                        <th style="width:50px"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (item of lineItems; track $index; let i = $index) {
+                        <tr>
+                            <td class="text-center">{{ i + 1 }}</td>
+                            <td>
+                                <input type="text" class="form-control form-control-sm"
+                                       [(ngModel)]="lineItems[i].description"
+                                       [ngModelOptions]="{ standalone: true }"
+                                       placeholder="Description"/>
+                            </td>
+                            <td>
+                                <input type="number" class="form-control form-control-sm text-end"
+                                       [(ngModel)]="lineItems[i].amount"
+                                       [ngModelOptions]="{ standalone: true }"
+                                       placeholder="0.00" step="0.01" min="0"/>
+                            </td>
+                            <td class="text-center">
+                                <button type="button"
+                                        class="btn btn-light btn-icon btn-sm rounded-circle"
+                                        (click)="removeLineItem(i)">
+                                    <ng-icon name="tablerTrash" class="fs-lg"></ng-icon>
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                    @if (lineItems.length === 0) {
+                        <tr>
+                            <td colspan="4" class="text-center text-muted py-3">No items. Click "Add Item" to begin.</td>
+                        </tr>
+                    }
+                    @if (lineItems.length > 0) {
+                        <tr class="fw-bold">
+                            <td colspan="2" class="text-end text-uppercase fs-xs">Total</td>
+                            <td class="text-end">{{ totalAmount | number:'1.2-2' }}</td>
+                            <td></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Budget Line Items -->
+        <hr class="my-3"/>
+        <div class="d-flex align-items-center justify-content-between mb-2">
+            <div class="fs-xs text-uppercase fw-semibold text-muted">Budget Line Item <span class="text-danger">*</span></div>
+            <button type="button" class="btn btn-success fw-bold btn-sm" (click)="openBudgetLineItemBrowse()">
+                <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
+            </button>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-custom table-centered table-hover w-100 mb-0">
+                <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                    <tr class="text-uppercase fs-xxs">
+                        <th>Code</th>
+                        <th>Title</th>
+                        <th style="width:50px"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (budgetLineItemRows.length === 0) {
+                        <tr>
+                            <td colspan="3" class="text-center text-muted py-3">No budget line items. Click "Browse" to add.</td>
+                        </tr>
+                    } @else {
+                        @for (r of budgetLineItemRows; track $index; let i = $index) {
+                            <tr>
+                                <td class="fw-bold">{{ r.code }}</td>
+                                <td>{{ r.title }}</td>
+                                <td class="text-center">
+                                    <button type="button"
+                                            class="btn btn-light btn-icon btn-sm rounded-circle"
+                                            (click)="removeBudgetLineItem(i)">
+                                        <ng-icon name="tablerTrash" class="fs-lg"></ng-icon>
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Budget Sub Items -->
+        <hr class="my-3"/>
+        <div class="d-flex align-items-center justify-content-between mb-2">
+            <div class="fs-xs text-uppercase fw-semibold text-muted">Budget Sub Item</div>
+            <button type="button" class="btn btn-success fw-bold btn-sm" (click)="addBudgetSubItem()">
+                <ng-icon name="tablerPlus" class="ps-0 pe-2 fw-bold"></ng-icon>Add Sub Item
+            </button>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-custom table-centered table-hover w-100 mb-0">
+                <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                    <tr class="text-uppercase fs-xxs">
+                        <th style="width:50px">#</th>
+                        <th>Description</th>
+                        <th style="width:180px" class="text-end">Amount</th>
+                        <th style="width:50px"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (item of budgetSubItemRows; track $index; let i = $index) {
+                        <tr>
+                            <td class="text-center">{{ i + 1 }}</td>
+                            <td>
+                                <input type="text" class="form-control form-control-sm"
+                                       [(ngModel)]="budgetSubItemRows[i].description"
+                                       [ngModelOptions]="{ standalone: true }"
+                                       placeholder="Description"/>
+                            </td>
+                            <td>
+                                <input type="number" class="form-control form-control-sm text-end"
+                                       [(ngModel)]="budgetSubItemRows[i].amount"
+                                       [ngModelOptions]="{ standalone: true }"
+                                       placeholder="0.00" step="0.01" min="0"/>
+                            </td>
+                            <td class="text-center">
+                                <button type="button"
+                                        class="btn btn-light btn-icon btn-sm rounded-circle"
+                                        (click)="removeBudgetSubItem(i)">
+                                    <ng-icon name="tablerTrash" class="fs-lg"></ng-icon>
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                    @if (budgetSubItemRows.length === 0) {
+                        <tr>
+                            <td colspan="4" class="text-center text-muted py-3">No budget sub items.</td>
+                        </tr>
+                    }
+                    @if (budgetSubItemRows.length > 0) {
+                        <tr class="fw-bold">
+                            <td colspan="2" class="text-end text-uppercase fs-xs">Total</td>
+                            <td class="text-end">{{ budgetSubTotal | number:'1.2-2' }}</td>
+                            <td></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Attachments -->
+        <hr class="my-3"/>
+        <div class="d-flex align-items-center gap-3 mb-2">
+            <div class="fs-xs text-uppercase fw-semibold text-muted">Attachments</div>
+            <button type="button" class="btn btn-success fw-bold btn-sm"
+                    [disabled]="uploadingFiles" (click)="openFilePicker()">
+                <ng-icon name="tablerPaperclip" class="ps-0 pe-2 fw-bold"></ng-icon>Attach Files
+            </button>
+            <small class="text-muted">JPG, PNG, PDF only</small>
+        </div>
+        <input #fileInput type="file" multiple accept=".jpg,.jpeg,.png,.pdf"
+               style="display:none" (change)="onFileSelect($event)"/>
+        @if (stagedFiles.length > 0) {
+            <div class="d-flex flex-wrap gap-2">
+                @for (f of stagedFiles; track $index; let i = $index) {
+                    <div class="d-flex align-items-center gap-2 border rounded px-3 py-2 bg-light">
+                        @if (isImage(f)) {
+                            <ng-icon name="tablerPhoto" class="text-primary fs-sm"></ng-icon>
+                        } @else {
+                            <ng-icon name="tablerFile" class="text-muted fs-sm"></ng-icon>
+                        }
+                        <span class="fs-xs text-truncate" style="max-width:200px" [title]="f.name">{{ f.name }}</span>
+                        <button type="button" class="btn btn-link p-0 text-danger ms-1"
+                                (click)="removeStagedFile(i)">
+                            <ng-icon name="tablerTrash" class="fs-sm"></ng-icon>
+                        </button>
+                    </div>
+                }
+            </div>
+        } @else {
+            <p class="text-muted mb-0 fs-sm">No files attached.</p>
+        }
+
+        <!-- Footer -->
+        <div class="d-flex gap-2 justify-content-end align-items-center pt-3 border-top mt-3">
+            <a [routerLink]="['/' + menuLink]" class="btn btn-light fw-bold">
+                <ng-icon name="tablerArrowLeft" class="ps-0 pe-3 fw-bold"></ng-icon>Back
+            </a>
+            <button type="button" class="btn btn-primary fw-bold"
+                    [disabled]="formSubmit" (click)="save()">
+                @if (formSubmit) {
+                    <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                    {{ editMode ? 'Updating...' : 'Saving...' }}
+                } @else {
+                    <ng-icon name="tablerCheck" class="ps-0 pe-3 fw-bold"></ng-icon>
+                    {{ editMode ? 'Update' : 'Save ' + module }}
+                }
+            </button>
+        </div>
+
+    </div>
+</div>
+
+} <!-- end !isLoading -->

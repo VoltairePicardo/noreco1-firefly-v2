@@ -1,0 +1,79 @@
+<div class="modal-header">
+    <h5 class="modal-title fw-bold">Select Users to Assign</h5>
+    <button type="button" class="btn-close" (click)="close()"></button>
+</div>
+
+<div class="modal-body">
+    <div class="row mb-3">
+        <div class="col-md-4">
+            <div class="app-search">
+                <input type="text" class="form-control"
+                       placeholder="Search by name or username..."
+                       [(ngModel)]="searchText"
+                       (keyup.enter)="search()"/>
+                <ng-icon name="tablerSearch" class="app-search-icon text-muted"></ng-icon>
+            </div>
+        </div>
+        <div class="col-md-4 d-flex gap-2">
+            <button class="btn btn-success fw-bold" (click)="search()">
+                <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Search
+            </button>
+            <button class="btn btn-danger fw-bold" (click)="clearSearch()">
+                <ng-icon name="tablerRefresh" class="ps-0 pe-3 fw-bold"></ng-icon>Reset
+            </button>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-custom table-centered table-select table-hover w-100 mb-0">
+            <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                <tr class="text-uppercase fs-xxs">
+                    <th style="width: 40px"></th>
+                    <th>Full Name</th>
+                    <th>Username</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (loading) {
+                    <tr>
+                        <td colspan="3" class="text-center text-muted py-3">
+                            <span class="spinner-border spinner-border-sm me-2" role="status"></span>Loading...
+                        </td>
+                    </tr>
+                } @else if (dataLists.length === 0) {
+                    <tr><td colspan="3" class="text-center text-muted py-3">Nothing found.</td></tr>
+                } @else {
+                    @for (data of dataLists; track data.id) {
+                        <tr>
+                            <td class="text-center">
+                                <input type="checkbox" class="form-check-input"
+                                       [checked]="isSelected(data)"
+                                       (change)="toggle(data, $event)"/>
+                            </td>
+                            <td class="fw-bold">{{ data.fullName || '-' }}</td>
+                            <td class="font-monospace small">{{ data.username || '-' }}</td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+
+    @if (total > 0) {
+        <div class="d-flex justify-content-center mt-3">
+            <ngb-pagination [collectionSize]="total" [(page)]="page" [pageSize]="size"
+                            [maxSize]="10" (pageChange)="onPageChange($event)">
+            </ngb-pagination>
+        </div>
+    }
+</div>
+
+<div class="modal-footer">
+    <button class="btn btn-light fw-bold" (click)="close()">
+        <ng-icon name="tablerX" class="ps-0 pe-3 fw-bold"></ng-icon>Cancel
+    </button>
+    <button class="btn btn-primary fw-bold" (click)="confirm()" [disabled]="selected.length === 0">
+        <ng-icon name="tablerCheck" class="ps-0 pe-3 fw-bold"></ng-icon>
+        Select Users ({{ selected.length }})
+    </button>
+</div>

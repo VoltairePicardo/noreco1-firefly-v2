@@ -1,0 +1,139 @@
+<div class="container-fluid">
+    <app-page-title [title]="module" [subTitle]="subModule" [menuLink]="menuLink"/>
+</div>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-xl-12">
+            <app-ui-card [title]="module + ' Details'">
+                <div class="col-xl-12 p-3" card-body>
+                    @if (isLoading()) {
+                        <div class="d-flex align-items-center gap-2 text-muted py-2">
+                            <span class="spinner-border spinner-border-sm" role="status"></span>
+                            Loading...
+                        </div>
+                    } @else if (validationForm) {
+                    <form class="row g-3 needs-validation" novalidate
+                          (ngSubmit)="validSubmit()" [formGroup]="validationForm">
+
+                        <div class="row">
+                            <div class="col-md-4 mt-2">
+                                <label for="code" class="form-label fw-bold">Code <span class="text-danger">*</span></label>
+                                <input id="code" type="text" class="form-control"
+                                       placeholder="Assembly Unit Code" formControlName="code"
+                                       [class]="submit && !form.get('code')?.errors ? 'is-valid'
+                                              : submit &&  form.get('code')?.errors ? 'is-invalid' : ''"
+                                       required/>
+                                <div class="invalid-feedback">Please provide a code.</div>
+                            </div>
+                            <div class="col-md-8 mt-2">
+                                <label for="description" class="form-label fw-bold">Description <span class="text-danger">*</span></label>
+                                <input id="description" type="text" class="form-control"
+                                       placeholder="Assembly Unit Description" formControlName="description"
+                                       [class]="submit && !form.get('description')?.errors ? 'is-valid'
+                                              : submit &&  form.get('description')?.errors ? 'is-invalid' : ''"
+                                       required/>
+                                <div class="invalid-feedback">Please provide a description.</div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4 mt-2">
+                                <label for="assemblyTypeId" class="form-label fw-bold">Assembly Type <span class="text-danger">*</span></label>
+                                <select id="assemblyTypeId" class="form-select" formControlName="assemblyTypeId"
+                                        [class]="submit && !form.get('assemblyTypeId')?.errors ? 'is-valid'
+                                               : submit &&  form.get('assemblyTypeId')?.errors ? 'is-invalid' : ''"
+                                        required>
+                                    <option [ngValue]="null" disabled>-- Select Assembly Type --</option>
+                                    @for (type of assemblyTypes(); track type.id) {
+                                        <option [ngValue]="type.id">{{ type.description }}</option>
+                                    }
+                                </select>
+                                <div class="invalid-feedback">Please select an assembly type.</div>
+                            </div>
+                            <div class="col-md-3 mt-2">
+                                <label for="laborCost" class="form-label fw-bold">Labor Cost</label>
+                                <input id="laborCost" type="number" class="form-control"
+                                       placeholder="0.00" formControlName="laborCost" step="0.01"/>
+                            </div>
+                        </div>
+
+                        <hr/>
+
+                        <!-- Items Table -->
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="d-flex align-items-center justify-content-between mb-2">
+                                    <h6 class="fw-semibold text-uppercase fs-xs mb-0">Items</h6>
+                                    <button type="button" class="btn btn-success fw-bold"
+                                            (click)="openItemBrowse()">
+                                        <ng-icon name="tablerPlus" class="ps-0 pe-2 fw-bold"></ng-icon>Browse Item
+                                    </button>
+                                </div>
+
+                                <div class="table-responsive">
+                                    <table class="table table-custom table-centered table-hover w-100 mb-0">
+                                        <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                                            <tr class="text-uppercase fs-xxs">
+                                                <th>Code</th>
+                                                <th>Description</th>
+                                                <th>Unit</th>
+                                                <th class="text-end" style="width: 130px">Quantity</th>
+                                                <th style="width: 50px"></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @if (lineItems.length > 0) {
+                                                @for (item of lineItems; track $index) {
+                                                    <tr>
+                                                        <td class="fw-bold">{{ item.code || '—' }}</td>
+                                                        <td>{{ item.description || '—' }}</td>
+                                                        <td>{{ item.unit || '—' }}</td>
+                                                        <td>
+                                                            <input type="number" class="form-control form-control-sm text-end"
+                                                                   [(ngModel)]="item.quantity"
+                                                                   [ngModelOptions]="{ standalone: true }"
+                                                                   min="1" step="1"/>
+                                                        </td>
+                                                        <td class="text-center">
+                                                            <button type="button"
+                                                                    class="btn btn-light btn-icon btn-sm rounded-circle"
+                                                                    ngbTooltip="Remove"
+                                                                    (click)="removeItem($index)">
+                                                                <ng-icon name="tablerTrash" class="fs-lg"></ng-icon>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            } @else {
+                                                <tr>
+                                                    <td colspan="5" class="text-center text-muted py-3">No items added.</td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex gap-2 justify-content-end align-items-center pt-3 border-top mt-3">
+                            <a [routerLink]="['/' + menuLink]" class="btn btn-light fw-bold">
+                                <ng-icon name="tablerArrowLeft" class="ps-0 pe-3 fw-bold"></ng-icon>Back
+                            </a>
+                            <button type="submit" class="btn btn-primary fw-bold" [disabled]="formSubmit">
+                                @if (formSubmit) {
+                                    <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                                    {{ editMode ? 'Updating...' : 'Saving...' }}
+                                } @else {
+                                    <ng-icon name="tablerCheck" class="ps-0 pe-3 fw-bold"></ng-icon>
+                                    {{ editMode ? 'Update' : 'Save ' + module }}
+                                }
+                            </button>
+                        </div>
+                    </form>
+                    }
+                </div>
+            </app-ui-card>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,56 @@
+<div class="modal-header">
+    <h4 class="modal-title">Browse Project</h4>
+    <button type="button" class="btn-close" (click)="activeModal.dismiss()"></button>
+</div>
+
+<div class="modal-body">
+    <div class="d-flex gap-2 mb-3">
+        <div class="app-search flex-grow-1">
+            <input ngbAutofocus [(ngModel)]="searchText" type="search" class="form-control"
+                   placeholder="Search by code or name..."/>
+            <ng-icon name="tablerSearch" class="app-search-icon text-muted"/>
+        </div>
+    </div>
+
+    <div class="table-responsive" style="max-height: 420px; overflow-y: auto;">
+        <table class="table table-custom table-centered table-select table-hover w-100 mb-0">
+            <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                <tr class="text-uppercase fs-xxs">
+                    <th>Code</th>
+                    <th>Name</th>
+                    <th>Location</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (loading) {
+                    <tr>
+                        <td colspan="4" class="text-center py-4">
+                            <div class="d-flex justify-content-center align-items-center gap-2 py-2 text-muted">
+                                <span class="spinner-border spinner-border-sm"></span>
+                                <span>Loading...</span>
+                            </div>
+                        </td>
+                    </tr>
+                } @else if (filtered.length === 0) {
+                    <tr class="no-results">
+                        <td colspan="4" class="text-center text-muted py-3">Nothing found.</td>
+                    </tr>
+                } @else {
+                    @for (p of filtered; track p.id) {
+                        <tr style="cursor: pointer" (click)="select(p)">
+                            <td class="fw-bold">{{ p.code }}</td>
+                            <td>{{ p.name }}</td>
+                            <td>{{ p.location || '—' }}</td>
+                            <td>
+                                <span class="badge bg-secondary bg-opacity-25 text-dark border">
+                                    {{ p.documentStatus?.status || '—' }}
+                                </span>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

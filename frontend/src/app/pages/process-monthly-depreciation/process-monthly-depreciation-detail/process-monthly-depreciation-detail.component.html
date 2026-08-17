@@ -1,0 +1,100 @@
+<div class="container-fluid">
+    <app-page-title [title]="module" [subTitle]="subModule" [menuLink]="menuLink"/>
+</div>
+
+<div class="container-fluid">
+    @if (isLoading()) {
+        <div class="d-flex align-items-center gap-2 text-muted py-4">
+            <span class="spinner-border spinner-border-sm" role="status"></span> Loading...
+        </div>
+    } @else {
+    <div class="row g-3">
+
+        <!-- Header Card -->
+        <div class="col-xl-12">
+            <app-ui-card title="Depreciation Information">
+                <div class="col-xl-12 p-3" card-body>
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Year</div>
+                            <div class="fw-bold">{{ data.year || '—' }}</div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Month</div>
+                            <div>{{ getMonthName(data.month) || '—' }}</div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Processed By</div>
+                            <div>{{ data.processedBy?.fullName || data.fullName || '—' }}</div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Processed On</div>
+                            <div>{{ data.processedOn | date:'MMMM d, yyyy h:mm a' }}</div>
+                        </div>
+                    </div>
+                </div>
+            </app-ui-card>
+        </div>
+
+        <!-- Depreciation Details -->
+        <div class="col-xl-12">
+            <app-ui-card title="Depreciation Details">
+                <div class="col-xl-12 p-3" card-body>
+                    <div class="table-responsive">
+                        <table class="table table-custom table-centered table-select table-hover w-100 mb-0">
+                            <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                                <tr class="text-uppercase fs-xxs">
+                                    <th>Acct No</th>
+                                    <th>Asset Ref No</th>
+                                    <th>Description</th>
+                                    <th>Account</th>
+                                    <th class="text-end">Depreciation Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @for (det of details; track $index) {
+                                    <tr>
+                                        <td class="fw-bold">{{ det.acctNo || '—' }}</td>
+                                        <td>{{ det.assetRefNo || '—' }}</td>
+                                        <td>{{ det.description || '—' }}</td>
+                                        <td>
+                                            @if (det.account) {
+                                                <span class="fw-bold">{{ det.account.accountCode }}</span>
+                                                <span class="text-muted ms-1">{{ det.account.accountTitle || det.account.accountDescription }}</span>
+                                            } @else { — }
+                                        </td>
+                                        <td class="text-end">{{ det.depreciationAmount | number:'1.2-2' }}</td>
+                                    </tr>
+                                }
+                                @if (details.length === 0) {
+                                    <tr>
+                                        <td colspan="5" class="text-center text-muted py-3">No depreciation details found.</td>
+                                    </tr>
+                                }
+                                @if (details.length > 0) {
+                                    <tr class="fw-bold bg-light">
+                                        <td colspan="5" class="text-end fw-bold">
+                                            Total Number of assets: <code>{{ footer.count }}</code><br/>
+                                            Total of Depreciation Amount: <code>{{ footer.total | number:'1.2-2' }}</code>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </app-ui-card>
+        </div>
+
+        <!-- Footer Actions -->
+        <div class="col-xl-12">
+            <div class="d-flex gap-2 justify-content-start align-items-center py-2">
+                <button type="button" class="btn btn-light fw-bold" [routerLink]="['/' + menuLink]">
+                    <ng-icon name="tablerArrowLeft" class="ps-0 pe-2 fw-bold"></ng-icon>Back
+                </button>
+            </div>
+        </div>
+
+    </div>
+    }
+</div>

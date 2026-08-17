@@ -1,0 +1,65 @@
+package com.noreco1.fireflyv2.model.enums;
+
+import lombok.*;
+
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+public enum Workflow {
+
+    APV(1),
+    CV(2),
+    RV(3),
+    JV(4),
+    MIV(5),
+    SALES_VOUCHER(6),
+    CASH_RECEIPTS(7),
+    BANK_DEPOSIT(8),
+    PO(9),
+    JO(10),
+    JOA(11),
+    RP(12),
+    RV_FOR_IT(13),
+    PCV(14),
+    CA(15),
+    BUDGET(16),
+    OTHER_ACCOUNT_RECEIVABLE(17),
+    AJ(18),
+    CANVASS(108),
+    RR(109),
+    WITHDRAWAL(110),
+    RELEASING(111),
+    MATERIAL_CREDIT_TICKET(112),
+    STOCK_ADJUSTMENT(113),
+    MATERIAL_SALVAGE_TICKET(114),
+    STOCK_TRANSFER(115),
+    STOCK_RECEIVE(116),
+    RELEASING_OFE(117),
+    PO_FORBIDDING(119),
+    JO_FORBIDDING(120),
+    QUOTATION_SUMMARY(121),
+    CE(123),
+    SITE_INSPECTION_REPORT(124),
+    PROJECT(125),
+    PROJECT_ACCEPTANCE_REPORT(126),
+    PROJECT_ACCEPTANCE_CERTIFICATION(127),
+    RV_SUPERVISORY(129),
+    RV_MANAGERIAL(130),
+    ITEMS_FOR_REPAIR(131),
+    BUDGET_LINE_ITEM(507),
+    QUOTATION_SUMMARY_LEVEL_1(508),
+    PO_MANAGERIAL(509),
+    JOA_INSPECTION(510),
+    QUOTATION_SUMMARY_LEVEL_2(511),
+    RV_WAREHOUSE(512),
+    PC_LIQUIDATION(517),
+    CAL(513),
+    CEC(514),
+    MRTE(515),
+    RMRTE(516),
+    BOM(518),
+    CCPR(519);
+
+    private int id;
+
+}

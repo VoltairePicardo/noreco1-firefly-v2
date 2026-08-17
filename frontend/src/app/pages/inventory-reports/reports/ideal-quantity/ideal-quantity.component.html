@@ -1,0 +1,85 @@
+<div class="container-fluid">
+    <app-page-title [title]="'Inventory Reports'" [subTitle]="module" [menuLink]="menuLink" [useSubtitleAsTitle]="true"/>
+</div>
+
+<div class="container-fluid">
+    <div class="card">
+        <div class="card-body">
+
+            <div class="row g-2 align-items-end mb-3">
+                <div class="col-md-3">
+                    <label class="form-label fw-bold mb-1">Inventory Location <span class="text-danger">*</span></label>
+                    <select class="form-select" [(ngModel)]="locationId">
+                        <option [ngValue]="0">— Select Location —</option>
+                        @for (loc of locations; track loc.id) {
+                            <option [ngValue]="loc.id">{{ loc.description }}</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label fw-bold mb-1">Report Type</label>
+                    <select class="form-select" [(ngModel)]="reportTypeId">
+                        @for (rt of reportTypes; track rt.id) {
+                            <option [ngValue]="rt.id">{{ rt.label }}</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-bold mb-1">Inventory Category</label>
+                    <select class="form-select" [(ngModel)]="categoryId">
+                        @for (cat of categories; track cat.id) {
+                            <option [ngValue]="cat.id">{{ cat.description }}</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-1">
+                    <button type="button" class="btn btn-success fw-bold" (click)="search()">
+                        <ng-icon name="tablerSearch" class="fw-bold me-1"></ng-icon>Search
+                    </button>
+                </div>
+                <div class="col-md-3">
+                    <div class="d-flex gap-2 justify-content-end">
+                        <button type="button" class="btn btn-success fw-bold" (click)="export('pdf')">
+                            <ng-icon name="tablerFileTypePdf" class="fw-bold me-1"></ng-icon>Export PDF
+                        </button>
+                        <button type="button" class="btn btn-success fw-bold" (click)="export('xls')">
+                            <ng-icon name="tablerFileTypeXls" class="fw-bold me-1"></ng-icon>Export Excel
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-responsive mt-3">
+                <table class="table table-custom table-centered table-select table-hover w-100 mb-0">
+                    <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                        <tr class="text-uppercase fs-xxs">
+                            @if (rows().length > 0) {
+                                @for (key of rows()[0] | keyvalue; track key.key) {
+                                    <th>{{ key.key }}</th>
+                                }
+                            }
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (isLoading()) {
+                            <tr><td colspan="10" class="text-center text-muted py-3">
+                                <span class="spinner-border spinner-border-sm me-2"></span>Loading...
+                            </td></tr>
+                        } @else if (rows().length === 0) {
+                            <tr><td colspan="10" class="text-center text-muted py-3">No records found.</td></tr>
+                        } @else {
+                            @for (row of rows(); track $index) {
+                                <tr>
+                                    @for (entry of row | keyvalue; track entry.key) {
+                                        <td>{{ entry.value }}</td>
+                                    }
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+</div>

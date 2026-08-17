@@ -1,0 +1,128 @@
+<div class="container-fluid">
+    <app-page-title [title]="module" [subTitle]="subModule" [menuLink]="menuLink"/>
+</div>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-xl-12">
+            <app-ui-card [title]="module + ' Form'">
+                <div class="col-xl-12 p-3" card-body>
+
+                    @if (isLoading()) {
+                        <div class="d-flex align-items-center gap-2 text-muted py-2">
+                            <span class="spinner-border spinner-border-sm" role="status"></span>Loading...
+                        </div>
+                    } @else {
+
+                    <!-- Temporary GL Selection -->
+                    <div class="alert mb-3" [class.alert-warning]="!tempBatch" [class.alert-success]="tempBatch">
+                        @if (!tempBatch) {
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="text-muted fs-sm">You may select from temporary GL entries.</span>
+                                <button type="button" class="btn btn-success fw-bold btn-sm" (click)="openTempGLBrowse()">
+                                    <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse Temp GL
+                                </button>
+                            </div>
+                        } @else {
+                            <div class="d-flex align-items-start justify-content-between gap-2">
+                                <div class="row g-2 flex-grow-1">
+                                    <div class="col-md-4">
+                                        <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Document</div>
+                                        <div class="fw-semibold">{{ tempBatch.docTypeDesc }}</div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Date</div>
+                                        <div>{{ tempBatch.tempBatchDate | date:'MMM dd, yyyy' }}</div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Amount</div>
+                                        <div class="fw-bold">{{ tempBatch.amount | number:'1.2-2' }}</div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Remarks</div>
+                                        <div>{{ tempBatch.remarks }}</div>
+                                    </div>
+                                </div>
+                                <button type="button" class="btn btn-danger btn-sm fw-bold" (click)="clearTempGL()">
+                                    <ng-icon name="tablerX" class="fw-bold"></ng-icon>
+                                </button>
+                            </div>
+                        }
+                    </div>
+
+                    <!-- Basic Info -->
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold">Voucher Date <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" mwlFlatpickr [options]="flatpickrOptions"
+                                   [(ngModel)]="voucherDate" [ngModelOptions]="{ standalone: true }"
+                                   placeholder="Select date"/>
+                        </div>
+                        <div class="col-md-9">
+                            <label class="form-label fw-bold">Particulars <span class="text-danger">*</span></label>
+                            <textarea class="form-control" rows="3"
+                                      [(ngModel)]="particulars" [ngModelOptions]="{ standalone: true }"
+                                      maxlength="1024" placeholder="Enter particulars..."></textarea>
+                        </div>
+                    </div>
+
+                    <hr class="mt-4"/>
+
+                    <!-- Journal Entries -->
+                    <div class="row mt-3">
+                        <div class="col-12">
+                            <app-journal-entries-form [entries]="journalEntries"/>
+                            @if (journalEntries.length > 0 && !isBalanced) {
+                                <div class="text-danger text-center fs-xs fw-bold py-1 mt-1">
+                                    Debit and credit totals must be equal.
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    <hr class="mt-4"/>
+
+                    <!-- Signatory -->
+                    <div class="row mt-3">
+                        <div class="col-12 mb-2">
+                            <h6 class="fw-semibold text-uppercase fs-xs mb-0">Signatory</h6>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label fw-bold">Approving Officer</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control"
+                                       [value]="approvingOfficer ? (approvingOfficer.name || approvingOfficer.fullName || '') : ''"
+                                       readonly placeholder="Select approving officer..."/>
+                                <button type="button" class="btn btn-success fw-bold"
+                                        (click)="openEntityBrowse()">
+                                    <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
+                                </button>
+                                @if (approvingOfficer) {
+                                    <button type="button" class="btn btn-light" (click)="approvingOfficer = null">
+                                        <ng-icon name="tablerX" class="fw-bold"></ng-icon>
+                                    </button>
+                                }
+                            </div>
+                            @if (approvingOfficer?.position) {
+                                <small class="text-muted">{{ approvingOfficer.position }}</small>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-2 justify-content-end align-items-center pt-3 border-top mt-3">
+                        <a [routerLink]="['/' + menuLink]" class="btn btn-light fw-bold">
+                            <ng-icon name="tablerArrowLeft" class="ps-0 pe-3 fw-bold"></ng-icon>Back
+                        </a>
+                        <button type="button" class="btn btn-primary fw-bold"
+                                [disabled]="formSubmit" (click)="save()">
+                            <ng-icon name="tablerCheck" class="ps-0 pe-3 fw-bold"></ng-icon>
+                            {{ editMode ? 'Update' : 'Save' }}
+                        </button>
+                    </div>
+
+                    }
+                </div>
+            </app-ui-card>
+        </div>
+    </div>
+</div>

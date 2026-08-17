@@ -1,0 +1,210 @@
+<div class="container-fluid">
+    <app-page-title [title]="module" [subTitle]="subModule" [menuLink]="menuLink"/>
+</div>
+
+<div class="card">
+    <div class="card-body">
+
+        <ul ngbNav #nav="ngbNav" [activeId]="activeTab" (activeIdChange)="onTabChange($event)"
+            class="nav-tabs mb-3">
+
+            <!-- Tab 1: Check Releasing (Not Released) -->
+            <li [ngbNavItem]="1">
+                <button ngbNavLink class="fw-semibold">Check Releasing</button>
+                <ng-template ngbNavContent>
+
+                    <div class="row mb-3 align-items-end g-2">
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold mb-1 fs-xs text-uppercase">Search</label>
+                            <input type="text" class="form-control" placeholder="Search by code, check #, account, particulars..."
+                                   [(ngModel)]="unreleasedSearch" (ngModelChange)="unreleasedPage = 1"/>
+                        </div>
+                        <div class="col-md-auto ms-auto">
+                            <button type="button" class="btn btn-success fw-bold" (click)="loadUnreleased()">
+                                <ng-icon name="tablerRefresh" class="ps-0 pe-3 fw-bold"></ng-icon>Refresh
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-custom table-centered table-select table-hover w-100 mb-0">
+                            <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                                <tr class="text-uppercase fs-xxs">
+                                    <th>CV Code</th>
+                                    <th>Payee</th>
+                                    <th>Account</th>
+                                    <th>Check Number</th>
+                                    <th class="text-end">Check Amount</th>
+                                    <th>Particulars</th>
+                                    <th>Voucher Date</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (pagedUnreleased.length > 0) {
+                                    @for (item of pagedUnreleased; track item.id) {
+                                        <tr>
+                                            <td class="fw-bold">{{ item.code }}</td>
+                                            <td>{{ item.payee }}</td>
+                                            <td>{{ item.accountTitle }}</td>
+                                            <td>{{ item.checkNumber }}</td>
+                                            <td class="text-end fw-bold">{{ item.amount | number:'1.2-2' }}</td>
+                                            <td>{{ item.particulars }}</td>
+                                            <td>{{ item.voucherDate | date:'MM/dd/yyyy' }}</td>
+                                            <td class="text-nowrap">
+                                                <div class="d-flex justify-content-end gap-1">
+                                                    <a href="javascript:void(0)" ngbTooltip="Release Check"
+                                                       (click)="releaseCheck(item)"
+                                                       class="btn btn-light btn-icon btn-sm rounded-circle">
+                                                        <ng-icon name="tablerSend" class="fs-lg"></ng-icon>
+                                                    </a>
+                                                    <a href="javascript:void(0)" ngbTooltip="View"
+                                                       [routerLink]="['/' + menuLink, item.id, 'detail']"
+                                                       class="btn btn-light btn-icon btn-sm rounded-circle">
+                                                        <ng-icon name="tablerEye" class="fs-lg"></ng-icon>
+                                                    </a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                } @else {
+                                    <tr class="no-results">
+                                        <td colspan="8" class="text-center text-muted py-3">
+                                            @if (unreleasedLoading()) {
+                                                <span class="spinner-border spinner-border-sm me-2" role="status"></span>Loading...
+                                            } @else { No unreleased checks found. }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+
+                    @if (filteredUnreleased.length > unreleasedPageSize) {
+                        <div class="d-flex justify-content-center mt-3">
+                            <ngb-pagination
+                                [collectionSize]="filteredUnreleased.length"
+                                [(page)]="unreleasedPage"
+                                [pageSize]="unreleasedPageSize"
+                                [maxSize]="5">
+                            </ngb-pagination>
+                        </div>
+                    }
+
+                </ng-template>
+            </li>
+
+            <!-- Tab 2: Released Check -->
+            <li [ngbNavItem]="2">
+                <button ngbNavLink class="fw-semibold">Released Check</button>
+                <ng-template ngbNavContent>
+
+                    <!-- Filters -->
+                    <div class="row mb-3 align-items-end g-2">
+                        <div class="col-md-2">
+                            <label class="form-label fw-bold mb-1 fs-xs text-uppercase">From</label>
+                            <input type="text" mwlFlatpickr [options]="flatpickrOptions"
+                                   class="form-control" [(ngModel)]="fromDate" placeholder="From date"/>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label fw-bold mb-1 fs-xs text-uppercase">To</label>
+                            <input type="text" mwlFlatpickr [options]="flatpickrOptions"
+                                   class="form-control" [(ngModel)]="toDate" placeholder="To date"/>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold mb-1 fs-xs text-uppercase">Search</label>
+                            <input type="text" class="form-control" placeholder="CV code, check #, received by..."
+                                   [(ngModel)]="releasedSearch" (ngModelChange)="releasedPage = 1"/>
+                        </div>
+                        <div class="col-auto d-flex gap-2">
+                            <button type="button" class="btn btn-success fw-bold" (click)="searchReleased()">
+                                <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Search
+                            </button>
+                            <button type="button" class="btn btn-danger fw-bold" (click)="resetReleased()">
+                                <ng-icon name="tablerRefresh" class="ps-0 pe-3 fw-bold"></ng-icon>Reset
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-custom table-centered table-select table-hover w-100 mb-0">
+                            <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                                <tr class="text-uppercase fs-xxs">
+                                    <th>CV No.</th>
+                                    <th>CV Date</th>
+                                    <th class="text-end">Check Amount</th>
+                                    <th>Check Number</th>
+                                    <th>Date Released</th>
+                                    <th>Released By</th>
+                                    <th>Released To</th>
+                                    <th>Status</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (pagedReleased.length > 0) {
+                                    @for (item of pagedReleased; track item.id) {
+                                        <tr>
+                                            <td class="fw-bold">{{ item.code }}</td>
+                                            <td>{{ item.voucherDate | date:'MM/dd/yyyy' }}</td>
+                                            <td class="text-end fw-bold">{{ item.checkAmount | number:'1.2-2' }}</td>
+                                            <td>{{ item.checkNumber }}</td>
+                                            <td>{{ item.dateReleased | date:'MM/dd/yyyy' }}</td>
+                                            <td>{{ item.releasedBy || item.receivedBy }}</td>
+                                            <td>{{ item.releasedTo }}</td>
+                                            <td>
+                                                <span class="badge bg-secondary bg-opacity-25 text-dark border">
+                                                    {{ item.status }}
+                                                </span>
+                                            </td>
+                                            <td class="text-nowrap">
+                                                <div class="d-flex justify-content-end gap-1">
+                                                    <a href="javascript:void(0)" ngbTooltip="View Detail"
+                                                       (click)="viewDetail(item)"
+                                                       class="btn btn-light btn-icon btn-sm rounded-circle">
+                                                        <ng-icon name="tablerEye" class="fs-lg"></ng-icon>
+                                                    </a>
+                                                    @if (item.status === 'Released') {
+                                                        <a href="javascript:void(0)" ngbTooltip="Cancel Release"
+                                                           (click)="cancelCheck(item)"
+                                                           class="btn btn-light btn-icon btn-sm rounded-circle">
+                                                            <ng-icon name="tablerX" class="fs-lg"></ng-icon>
+                                                        </a>
+                                                    }
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                } @else {
+                                    <tr class="no-results">
+                                        <td colspan="9" class="text-center text-muted py-3">
+                                            @if (releasedLoading()) {
+                                                <span class="spinner-border spinner-border-sm me-2" role="status"></span>Loading...
+                                            } @else { No released checks found. }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+
+                    @if (filteredReleased.length > releasedPageSize) {
+                        <div class="d-flex justify-content-center mt-3">
+                            <ngb-pagination
+                                [collectionSize]="filteredReleased.length"
+                                [(page)]="releasedPage"
+                                [pageSize]="releasedPageSize"
+                                [maxSize]="5">
+                            </ngb-pagination>
+                        </div>
+                    }
+
+                </ng-template>
+            </li>
+
+        </ul>
+
+        <div [ngbNavOutlet]="nav"></div>
+
+    </div>
+</div>

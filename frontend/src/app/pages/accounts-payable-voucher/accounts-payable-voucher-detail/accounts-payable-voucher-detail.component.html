@@ -1,0 +1,332 @@
+<div class="container-fluid">
+    <app-page-title [title]="module" [subTitle]="'Detail'" [menuLink]="menuLink"/>
+</div>
+
+<div class="container-fluid">
+
+    @if (isLoading()) {
+        <div class="d-flex align-items-center gap-2 text-muted py-4">
+            <span class="spinner-border spinner-border-sm" role="status"></span>
+            Loading...
+        </div>
+    } @else {
+
+    <!-- Header card -->
+    <app-ui-card [title]="'APV Details'">
+        <div class="col-xl-12 p-3" card-body>
+            <div class="row">
+                <div class="col-sm-6">
+                    <dl class="row mb-0">
+                        <dt class="col-sm-5 fw-normal text-muted">APV Code</dt>
+                        <dd class="col-sm-7 fw-bold">{{ data.localCode || '—' }}</dd>
+
+                        <dt class="col-sm-5 fw-normal text-muted">Status</dt>
+                        <dd class="col-sm-7">
+                            <span class="badge" [ngClass]="statusBadgeClass(data.documentStatus?.status)">
+                                {{ data.documentStatus?.status || '—' }}
+                            </span>
+                        </dd>
+
+                        <dt class="col-sm-5 fw-normal text-muted">Voucher Date</dt>
+                        <dd class="col-sm-7 fw-bold">{{ data.voucherDate | date:'MMMM d, yyyy' }}</dd>
+
+                        <dt class="col-sm-5 fw-normal text-muted">Invoice Date</dt>
+                        <dd class="col-sm-7 fw-bold">{{ data.invoiceDate ? (data.invoiceDate | date:'MMMM d, yyyy') : '—' }}</dd>
+
+                        <dt class="col-sm-5 fw-normal text-muted">Due Date</dt>
+                        <dd class="col-sm-7 fw-bold">{{ data.dueDate ? (data.dueDate | date:'MMMM d, yyyy') : '—' }}</dd>
+                    </dl>
+                </div>
+                <div class="col-sm-6">
+                    <dl class="row mb-0">
+                        <dt class="col-sm-5 fw-normal text-muted">Vendor / Supplier</dt>
+                        <dd class="col-sm-7 fw-bold">{{ data.vendor?.name || '—' }}</dd>
+
+                        <dt class="col-sm-5 fw-normal text-muted">Amount</dt>
+                        <dd class="col-sm-7 fw-bold">{{ data.amount | number:'1.2-2' }}</dd>
+
+                        <dt class="col-sm-5 fw-normal text-muted">Payment Term</dt>
+                        <dd class="col-sm-7 fw-bold">{{ data.paymentTerm ? data.paymentTerm + ' days' : '—' }}</dd>
+
+                        <dt class="col-sm-5 fw-normal text-muted">For Installment</dt>
+                        <dd class="col-sm-7 fw-bold">{{ data.forInstallment ? 'Yes' : 'No' }}</dd>
+
+                        @if (data.forInstallment) {
+                            <dt class="col-sm-5 fw-normal text-muted">No. of Payments</dt>
+                            <dd class="col-sm-7 fw-bold">{{ data.numberOfPayments ?? '—' }}</dd>
+                        }
+
+                        <dt class="col-sm-5 fw-normal text-muted">Prepared By</dt>
+                        <dd class="col-sm-7 fw-bold">{{ data.createdBy?.name || '—' }}</dd>
+                    </dl>
+                </div>
+            </div>
+
+            @if (data.particulars) {
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <dt class="fw-normal text-muted mb-1">Particulars</dt>
+                        <dd class="fw-bold">{{ data.particulars }}</dd>
+                    </div>
+                </div>
+            }
+        </div>
+    </app-ui-card>
+
+    <!-- Linked RRs card -->
+    <app-ui-card [title]="'Linked Receiving Reports'" class="mt-3">
+        <div class="col-xl-12 p-3" card-body>
+            <div class="table-responsive">
+                <table class="table table-custom table-centered table-hover w-100 mb-0">
+                    <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                        <tr class="text-uppercase fs-xxs">
+                            <th style="width:50px">#</th>
+                            <th>RR Code</th>
+                            <th>Supplier</th>
+                            <th class="text-end">Amount</th>
+                            <th>Date</th>
+                            <th>Particulars</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (receivingReports.length > 0) {
+                            @for (rr of receivingReports; track $index; let i = $index) {
+                                <tr>
+                                    <td>{{ i + 1 }}</td>
+                                    <td class="fw-bold">{{ rr.localCode || rr['localCode'] || '—' }}</td>
+                                    <td>{{ rr.slentityName || rr['slentityName'] || rr.vendor?.name || '—' }}</td>
+                                    <td class="text-end">{{ (rr.netAmount || rr['netAmount'] || 0) | number:'1.2-2' }}</td>
+                                    <td>{{ (rr.voucherDate || rr['voucherDate']) | date:'MMM d, yyyy' }}</td>
+                                    <td>{{ rr.particulars || rr['particulars'] || '—' }}</td>
+                                </tr>
+                            }
+                            <tr class="fw-bold bg-light">
+                                <td colspan="3" class="text-end fw-bold text-uppercase fs-xs">Total</td>
+                                <td class="text-end fw-bold">{{ totalAmount | number:'1.2-2' }}</td>
+                                <td colspan="2"></td>
+                            </tr>
+                        } @else {
+                            <tr>
+                                <td colspan="6" class="text-center text-muted py-3">No receiving reports linked.</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </app-ui-card>
+
+    <!-- IEMOP Billings card -->
+    @if (iemopBillings.length > 0) {
+        <app-ui-card [title]="'IEMOP Billings'" class="mt-3">
+            <div class="col-xl-12 p-3" card-body>
+                <div class="table-responsive">
+                    <table class="table table-custom table-centered table-hover w-100 mb-0">
+                        <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                            <tr class="text-uppercase fs-xxs">
+                                <th style="width:80px">STL ID</th>
+                                <th>Reference Number</th>
+                                <th>Date</th>
+                                <th>Sub-Supplier</th>
+                                <th class="text-end">Base Amount</th>
+                                <th class="text-end">WTax</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (bill of iemopBillings; track $index) {
+                                <tr>
+                                    <td class="fw-bold">{{ bill.stlId || '—' }}</td>
+                                    <td class="fw-bold">{{ bill.referenceNumber || '—' }}</td>
+                                    <td>{{ bill.transDate | date:'MMM d, yyyy' }}</td>
+                                    <td>{{ bill.subSupplier?.tradeName || '—' }}</td>
+                                    <td class="text-end">{{ ((bill.vatablePurchases || 0) + (bill.zeroRatedEcoPurchases || 0)) | number:'1.2-2' }}</td>
+                                    <td class="text-end">{{ (bill.ewtPurchases || 0) | number:'1.2-2' }}</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </app-ui-card>
+    }
+
+    <!-- Journal Entries card -->
+    @if (journalEntries.length > 0) {
+        <app-ui-card [title]="'Journal Entries'" class="mt-3">
+            <div class="col-xl-12 p-3" card-body>
+                <div class="table-responsive">
+                    <table class="table table-custom table-centered table-hover w-100 mb-0">
+                        <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                            <tr class="text-uppercase fs-xxs">
+                                <th>Account Code</th>
+                                <th>Description</th>
+                                <th class="text-end">Debit</th>
+                                <th class="text-end">Credit</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (entry of journalEntries; track $index) {
+                                <tr>
+                                    <td class="fw-bold">{{ entry.code || entry.accountCode || '—' }}</td>
+                                    <td>{{ entry.description || entry.accountTitle || '—' }}</td>
+                                    <td class="text-end">{{ (entry.debit || 0) | number:'1.2-2' }}</td>
+                                    <td class="text-end">{{ (entry.credit || 0) | number:'1.2-2' }}</td>
+                                </tr>
+                            }
+                            <tr class="fw-bold bg-light">
+                                <td colspan="2" class="text-end text-uppercase fs-xs">Total</td>
+                                <td class="text-end">{{ journalDebitTotal | number:'1.2-2' }}</td>
+                                <td class="text-end">{{ journalCreditTotal | number:'1.2-2' }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </app-ui-card>
+    }
+
+    <!-- Workflow card -->
+    @if (workflowActions.length > 0) {
+        <app-ui-card [title]="'Process Document'" class="mt-3">
+            <div class="col-xl-12 p-3" card-body>
+                <div class="row g-3 align-items-end">
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold">Action</label>
+                        <select class="form-select"
+                                [(ngModel)]="selectedAction"
+                                [ngModelOptions]="{ standalone: true }">
+                            @for (action of workflowActions; track action.actionMapId) {
+                                <option [ngValue]="action">{{ action.action }}</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Remarks</label>
+                        <input type="text"
+                               class="form-control"
+                               [(ngModel)]="remarks"
+                               [ngModelOptions]="{ standalone: true }"
+                               placeholder="Optional remarks..."/>
+                    </div>
+                    <div class="col-md-2">
+                        <button type="button"
+                                class="btn btn-primary fw-bold w-100"
+                                [disabled]="processingWorkflow"
+                                (click)="processWorkflow()">
+                            <span *ngIf="processingWorkflow" class="spinner-border spinner-border-sm me-2" role="status"></span>
+                            <ng-icon *ngIf="!processingWorkflow" name="tablerCheck" class="ps-0 pe-2 fw-bold"></ng-icon>
+                            {{ processingWorkflow ? 'Processing...' : 'Process' }}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </app-ui-card>
+    }
+
+    <!-- Signatories card (read-only) -->
+    @if (data.checker || data.reviewer || data.recommendingOfficer || data.approvingOfficer) {
+        <app-ui-card [title]="'Signatories'" class="mt-3">
+            <div class="col-xl-12 p-3" card-body>
+                <div class="row">
+                    <div class="col-sm-6">
+                        <dl class="row mb-0">
+                            @if (data.checker) {
+                                <dt class="col-sm-5 fw-normal text-muted">Checker</dt>
+                                <dd class="col-sm-7 fw-bold">{{ data.checker?.name || '—' }}</dd>
+                            }
+                            @if (data.reviewer) {
+                                <dt class="col-sm-5 fw-normal text-muted">Reviewer</dt>
+                                <dd class="col-sm-7 fw-bold">{{ data.reviewer?.name || '—' }}</dd>
+                            }
+                        </dl>
+                    </div>
+                    <div class="col-sm-6">
+                        <dl class="row mb-0">
+                            @if (data.recommendingOfficer) {
+                                <dt class="col-sm-5 fw-normal text-muted">Recommending</dt>
+                                <dd class="col-sm-7 fw-bold">{{ data.recommendingOfficer?.name || '—' }}</dd>
+                            }
+                            @if (data.approvingOfficer) {
+                                <dt class="col-sm-5 fw-normal text-muted">Approving Officer</dt>
+                                <dd class="col-sm-7 fw-bold">{{ data.approvingOfficer?.name || '—' }}</dd>
+                            }
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </app-ui-card>
+    }
+
+    <!-- Document Logs -->
+    <div class="mt-3">
+        <button type="button"
+                class="btn btn-light fw-bold btn-sm"
+                (click)="toggleLogs()">
+            <ng-icon name="tablerHistory" class="ps-0 pe-2 fw-bold"></ng-icon>
+            {{ showLogs ? 'Hide' : 'Show' }} Document Logs
+        </button>
+
+        @if (showLogs) {
+            <div class="mt-2">
+                @if (logsLoading) {
+                    <div class="d-flex align-items-center gap-2 text-muted py-2">
+                        <span class="spinner-border spinner-border-sm" role="status"></span>
+                        Loading logs...
+                    </div>
+                } @else if (logs.length === 0) {
+                    <p class="text-muted mt-2">No logs available.</p>
+                } @else {
+                    <div class="table-responsive mt-2">
+                        <table class="table table-sm table-hover w-100 mb-0">
+                            <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                                <tr class="text-uppercase fs-xxs">
+                                    <th>Date / Time</th>
+                                    <th>Action</th>
+                                    <th>By</th>
+                                    <th>Remarks</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @for (log of logs; track log.id) {
+                                    <tr>
+                                        <td>{{ log.createdAt | date:'MMM d, yyyy h:mm a' }}</td>
+                                        <td>{{ log.action || '—' }}</td>
+                                        <td>{{ log.createdBy?.fullName || log.createdBy?.username || '—' }}</td>
+                                        <td>{{ log.remarks || '—' }}</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+
+    <!-- Footer actions -->
+    <hr class="mt-4"/>
+    <div class="d-flex gap-2 justify-content-end align-items-center mb-4">
+        <button type="button"
+                class="btn btn-light fw-bold"
+                [routerLink]="['/' + menuLink]">
+            <ng-icon name="tablerArrowLeft" class="ps-0 pe-2 fw-bold"></ng-icon>Back
+        </button>
+        <div class="d-flex gap-2 justify-content-end">
+            <button type="button"
+                    class="btn btn-success fw-bold"
+                    (click)="print()">
+                <ng-icon name="tablerPrinter" class="ps-0 pe-2 fw-bold"></ng-icon>Print
+            </button>
+            @if (isEditable) {
+                <button type="button"
+                        class="btn btn-primary fw-bold"
+                        [routerLink]="['/' + menuLink, id, 'edit']">
+                    <ng-icon name="tablerPencil" class="ps-0 pe-2 fw-bold"></ng-icon>Edit
+                </button>
+            }
+        </div>
+    </div>
+
+    }
+
+</div>

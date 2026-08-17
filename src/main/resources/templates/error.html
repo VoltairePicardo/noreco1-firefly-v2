@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Error</title>
+    <style>
+        body { font-family: monospace; background: #1e1e2e; color: #cdd6f4; padding: 2rem; }
+        h2 { color: #f38ba8; margin-bottom: 1rem; }
+        table { border-collapse: collapse; width: 100%; max-width: 800px; }
+        td { padding: 0.4rem 0.8rem; border: 1px solid #45475a; vertical-align: top; }
+        td:first-child { color: #a6e3a1; white-space: nowrap; width: 140px; }
+        pre { background: #181825; padding: 1rem; border-radius: 4px; overflow-x: auto; white-space: pre-wrap; word-break: break-all; }
+    </style>
+</head>
+<body>
+    <h2>Application Error</h2>
+    <table>
+        <tr><td>Status</td><td th:text="${status}"></td></tr>
+        <tr><td>Error</td><td th:text="${error}"></td></tr>
+        <tr><td>Path</td><td th:text="${path}"></td></tr>
+        <tr><td>Timestamp</td><td th:text="${timestamp}"></td></tr>
+        <tr><td>Message</td><td><pre th:text="${message}"></pre></td></tr>
+        <tr th:if="${trace}"><td>Trace</td><td><pre th:text="${trace}"></pre></td></tr>
+    </table>
+</body>
+</html>

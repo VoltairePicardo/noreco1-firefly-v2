@@ -1,0 +1,382 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="SiteInspectionReport" pageWidth="612" pageHeight="792" whenNoDataType="AllSectionsNoDetail" columnWidth="572" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isFloatColumnFooter="true" uuid="b29c3ba6-1020-4625-9bd3-1937355162ed">
+	<property name="ireport.zoom" value="1.461537825000004"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="27"/>
+	<parameter name="DATE_OF_INSPECTION" class="java.util.Date"/>
+	<parameter name="INSPECTED_BY" class="java.lang.String"/>
+	<parameter name="CHECKER" class="java.lang.String"/>
+	<parameter name="NOTED_BY" class="java.lang.String"/>
+	<parameter name="COMP_ADDR" class="java.lang.String"/>
+	<parameter name="COMP_NAME" class="java.lang.String"/>
+	<parameter name="COMP_CONTACT" class="java.lang.String"/>
+	<parameter name="LOGO_PATH" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["Q:\\Develop\\Noreco 1\\accounting-no1\\src\\no1\\img\\No1-Logo.jpg"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="PREPARAR_POS" class="java.lang.String"/>
+	<parameter name="CHECKER_POS" class="java.lang.String"/>
+	<parameter name="NOTED_POS" class="java.lang.String"/>
+	<parameter name="PREPARAR_SIGN" class="java.lang.String"/>
+	<parameter name="PREPARAR_TIME" class="java.sql.Timestamp"/>
+	<parameter name="CHECKER_SIGN" class="java.lang.String"/>
+	<parameter name="CHECKER_TIME" class="java.sql.Timestamp"/>
+	<parameter name="NOTED_SIGN" class="java.lang.String"/>
+	<parameter name="NOTED_TIME" class="java.sql.Timestamp"/>
+	<parameter name="PROJECT" class="java.lang.String"/>
+	<parameter name="ADDRESS" class="java.lang.String"/>
+	<parameter name="NOW" class="java.util.Date"/>
+	<parameter name="WO_NUMBER" class="java.lang.String"/>
+	<parameter name="CODE" class="java.lang.String"/>
+	<parameter name="APPROVAR_POS" class="java.lang.String"/>
+	<parameter name="APPROVAR_TIME" class="java.sql.Timestamp"/>
+	<parameter name="APPROVED_BY" class="java.lang.String"/>
+	<parameter name="APPROVAR_SIGN" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[select now()]]>
+	</queryString>
+	<field name="count" class="java.lang.Integer"/>
+	<field name="description" class="java.lang.String"/>
+	<field name="remark" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="83" splitType="Stretch">
+			<image isLazy="true" onErrorType="Icon">
+				<reportElement x="81" y="4" width="60" height="52" uuid="a572ebb6-75d3-4cc5-adf8-83c0b47be5b6"/>
+				<imageExpression><![CDATA[$P{LOGO_PATH}]]></imageExpression>
+			</image>
+			<staticText>
+				<reportElement mode="Transparent" x="1" y="43" width="571" height="24" forecolor="#000000" backcolor="#FFFFFF" uuid="704a590d-ed7c-4d64-b48d-4d1367152a73"/>
+				<textElement textAlignment="Center" verticalAlignment="Top" rotation="None" markup="none">
+					<font fontName="SansSerif" size="16" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[SITE INSPECTION REPORT]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="1" y="14" width="571" height="20" uuid="8dc03b87-ce0f-42e3-84cc-ff569c6fde86"/>
+				<textElement textAlignment="Center">
+					<font fontName="Calibri Light" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{COMP_ADDR}]]></textFieldExpression>
+			</textField>
+			<textField pattern="MM/dd/yyyy hh:mm a">
+				<reportElement x="807" y="0" width="86" height="14" uuid="f50810b0-83ee-4d20-9622-690449fae3c6"/>
+				<textElement>
+					<font fontName="Calibri Light" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="1" y="0" width="571" height="20" uuid="ae3d854d-6819-4ef4-9f26-69fb77969167"/>
+				<textElement textAlignment="Center">
+					<font fontName="Calibri" size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{COMP_NAME}]]></textFieldExpression>
+			</textField>
+			<textField pattern="MM/dd/yyyy h.mm a" isBlankWhenNull="true">
+				<reportElement x="460" y="0" width="112" height="13" uuid="4edd7aca-d78f-4a85-8add-6128785bb660"/>
+				<textElement textAlignment="Right">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{NOW}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
+				<reportElement x="1" y="67" width="570" height="15" isPrintWhenDetailOverflows="true" uuid="a1a2bf96-6ed2-4a5d-9816-a107d0fdf57c"/>
+				<textElement textAlignment="Center">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{CODE}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="87" splitType="Stretch">
+			<staticText>
+				<reportElement x="1" y="12" width="100" height="15" uuid="10633d09-9264-418b-a0ef-754ea4832a0c"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[PROJECT TITLE:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1" y="28" width="100" height="15" uuid="2e3cd95f-cca5-419b-a069-618a2203c851"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[ADDRESS:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1" y="44" width="100" height="15" uuid="0b7c0763-45bc-4c8d-b1d9-7768960053c2"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Date of Inspection:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="101" y="12" width="10" height="15" uuid="4fb3bca9-49f7-41ae-b755-42ba48de89f5"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="101" y="28" width="10" height="15" uuid="e04089fd-1295-41b9-9931-de57d754eba9"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="101" y="44" width="10" height="15" uuid="be268344-a4d2-48bd-9edd-7de5614a4026"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="111" y="12" width="461" height="15" isPrintWhenDetailOverflows="true" uuid="2ba17193-13dd-4efb-adea-7a3451a8b50d"/>
+				<textFieldExpression><![CDATA[$P{PROJECT}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="111" y="28" width="461" height="15" isPrintWhenDetailOverflows="true" uuid="ecb325e8-a08c-446f-9257-d5d44f2c075c"/>
+				<textFieldExpression><![CDATA[$P{ADDRESS}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="MMMMM dd, yyyy" isBlankWhenNull="true">
+				<reportElement x="111" y="44" width="175" height="15" isPrintWhenDetailOverflows="true" uuid="97f7fc42-12dd-48a8-802c-4b1291c8c9f7"/>
+				<textFieldExpression><![CDATA[$P{DATE_OF_INSPECTION}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="1" y="59" width="100" height="15" uuid="41debca3-7e0f-4f98-a47e-32c93d4fe960"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Work Order No.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="101" y="59" width="10" height="15" uuid="50eff801-3cc8-43b4-8e84-36f2a6b557fd"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
+				<reportElement x="111" y="59" width="175" height="15" isPrintWhenDetailOverflows="true" uuid="72c8b7bb-4def-4f5c-aaef-71045e4e61a5"/>
+				<textFieldExpression><![CDATA[$P{WO_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="17">
+			<line>
+				<reportElement x="0" y="16" width="571" height="1" uuid="96df93ba-0418-4832-86fc-72b816ef708c"/>
+			</line>
+			<staticText>
+				<reportElement x="34" y="0" width="309" height="15" uuid="6817784c-4ee9-454d-98e5-1567428c5b50"/>
+				<textElement textAlignment="Center">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[DESCRIPTION]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="343" y="0" width="229" height="15" uuid="09ca149f-4f7e-4369-8405-ba88d0425962"/>
+				<textElement textAlignment="Center">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[RECOMMENDATION / REMARKS]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="15" splitType="Stretch">
+			<textField>
+				<reportElement stretchType="RelativeToTallestObject" x="1" y="0" width="33" height="15" uuid="e61272ff-1340-4f2d-9a2e-5227c6987e85"/>
+				<box leftPadding="3">
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{count}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToTallestObject" x="34" y="0" width="309" height="15" isPrintWhenDetailOverflows="true" uuid="ef5220d5-187f-43c5-b9a7-733f41b1e238"/>
+				<box leftPadding="3">
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textFieldExpression><![CDATA[$F{description}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToTallestObject" x="343" y="0" width="228" height="15" isPrintWhenDetailOverflows="true" uuid="e25bd72d-c280-4b60-b239-39263f345646"/>
+				<box leftPadding="3">
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textFieldExpression><![CDATA[$F{remark}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="3" splitType="Stretch"/>
+	</columnFooter>
+	<summary>
+		<band height="207">
+			<staticText>
+				<reportElement x="11" y="8" width="100" height="20" uuid="46f6a6bf-7559-4520-b23a-72e5022df277"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Prepared by:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="286" y="8" width="100" height="20" uuid="a6345db9-5346-427f-9f52-95bee2e5520f"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Concurred by:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="286" y="111" width="100" height="20" uuid="aa73eb59-55e6-4d32-8127-28196905d8b4"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Approved By:]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="11" y="68" width="220" height="20" isPrintWhenDetailOverflows="true" uuid="165e0b48-c29f-4bcc-bad4-0d87d9a528ca"/>
+				<box>
+					<bottomPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Left" verticalAlignment="Bottom">
+					<font fontName="Times New Roman" size="11"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{INSPECTED_BY}.toUpperCase()]]></textFieldExpression>
+			</textField>
+			<textField pattern="MM/dd/yyyy" isBlankWhenNull="true">
+				<reportElement x="11" y="58" width="220" height="10" uuid="18f72183-9201-44cc-84c5-36a8da4c723c"/>
+				<textElement textAlignment="Left" verticalAlignment="Bottom">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{PREPARAR_TIME}]]></textFieldExpression>
+			</textField>
+			<image hAlign="Center" isLazy="true" onErrorType="Blank">
+				<reportElement x="11" y="28" width="220" height="30" uuid="ebd4b654-355f-40f6-9cd1-e01a2cd5c5b1"/>
+				<imageExpression><![CDATA[$P{PREPARAR_SIGN}]]></imageExpression>
+			</image>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="11" y="88" width="220" height="20" isPrintWhenDetailOverflows="true" uuid="83e29a99-26fa-45b4-821e-6b1214719698"/>
+				<textElement textAlignment="Left">
+					<font fontName="Times New Roman" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{PREPARAR_POS}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="286" y="88" width="220" height="20" isPrintWhenDetailOverflows="true" uuid="f54078d7-4482-4a69-bd99-8703f27677ee"/>
+				<textElement textAlignment="Left">
+					<font fontName="Times New Roman" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{CHECKER_POS}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="286" y="68" width="220" height="20" isPrintWhenDetailOverflows="true" uuid="7a076796-d8fc-41a6-9042-56056915eacc"/>
+				<box>
+					<bottomPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Left" verticalAlignment="Bottom">
+					<font fontName="Times New Roman" size="11"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{CHECKER}.toUpperCase()]]></textFieldExpression>
+			</textField>
+			<textField pattern="MM/dd/yyyy" isBlankWhenNull="true">
+				<reportElement x="286" y="58" width="220" height="10" uuid="c923e3cc-2d7d-4ddd-bdd3-0b1c215f0fe6"/>
+				<textElement textAlignment="Left" verticalAlignment="Bottom">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{CHECKER_TIME}]]></textFieldExpression>
+			</textField>
+			<image hAlign="Center" isLazy="true" onErrorType="Blank">
+				<reportElement x="286" y="28" width="220" height="30" uuid="47bfeae2-392c-4f01-bdee-4b2a49d952ec"/>
+				<imageExpression><![CDATA[$P{CHECKER_SIGN}]]></imageExpression>
+			</image>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="286" y="190" width="220" height="15" isPrintWhenDetailOverflows="true" uuid="3afab9f1-289b-42bd-979b-6c7a6a9068de"/>
+				<textElement textAlignment="Left">
+					<font fontName="Times New Roman" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{APPROVAR_POS}]]></textFieldExpression>
+			</textField>
+			<image hAlign="Center" isLazy="true" onErrorType="Blank">
+				<reportElement x="286" y="131" width="220" height="30" uuid="5c94dce2-0a0c-4246-8a59-8726e189ec4b"/>
+				<imageExpression><![CDATA[$P{APPROVAR_SIGN}]]></imageExpression>
+			</image>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="286" y="171" width="220" height="20" isPrintWhenDetailOverflows="true" uuid="4aeab83e-814e-4e60-bedf-b32b3539a662"/>
+				<box>
+					<bottomPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Left" verticalAlignment="Bottom">
+					<font fontName="Times New Roman" size="11"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{APPROVED_BY}.toUpperCase()]]></textFieldExpression>
+			</textField>
+			<textField pattern="MM/dd/yyyy" isBlankWhenNull="true">
+				<reportElement x="286" y="161" width="220" height="10" uuid="556f404c-fa89-491c-941e-6b5da74b7af5"/>
+				<textElement textAlignment="Left" verticalAlignment="Bottom">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{APPROVAR_TIME}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="11" y="88" width="205" height="1" uuid="25a570ae-3760-42a7-95cf-26a1ab0e4bd5"/>
+			</line>
+			<line>
+				<reportElement x="286" y="87" width="205" height="1" uuid="7e557452-6cc7-469c-906c-4ad6b4451df4"/>
+			</line>
+			<line>
+				<reportElement x="286" y="190" width="205" height="1" uuid="d365d792-c73a-4179-9ffc-47094d065f3b"/>
+			</line>
+			<textField pattern="MM/dd/yyyy" isBlankWhenNull="true">
+				<reportElement x="11" y="161" width="220" height="10" uuid="a8c8f33b-d9c4-4aa5-9d0d-1f6decddd02f"/>
+				<textElement textAlignment="Left" verticalAlignment="Bottom">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{NOTED_TIME}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="11" y="111" width="183" height="20" uuid="c39ca00f-7b33-4b71-bb13-58de48f93a4f"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Recommended By:]]></text>
+			</staticText>
+			<line>
+				<reportElement x="11" y="191" width="205" height="1" uuid="bbf73087-7d79-4d0a-bca4-2b92a2d6d6ac"/>
+			</line>
+			<image hAlign="Center" isLazy="true" onErrorType="Blank">
+				<reportElement x="11" y="131" width="220" height="30" uuid="b110f939-11e2-4157-bc00-e6e622c124b9"/>
+				<imageExpression><![CDATA[$P{NOTED_SIGN}]]></imageExpression>
+			</image>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="11" y="171" width="220" height="20" isPrintWhenDetailOverflows="true" uuid="85e5897e-fea1-4436-827c-51197db6bb1d"/>
+				<box>
+					<bottomPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Left" verticalAlignment="Bottom">
+					<font fontName="Times New Roman" size="11"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{NOTED_BY}.toUpperCase()]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="11" y="191" width="220" height="15" isPrintWhenDetailOverflows="true" uuid="5a617d34-a54b-45da-bae4-cc2a0e99b884"/>
+				<textElement textAlignment="Left">
+					<font fontName="Times New Roman" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{NOTED_POS}]]></textFieldExpression>
+			</textField>
+		</band>
+	</summary>
+</jasperReport>

@@ -1,0 +1,181 @@
+<div class="container-fluid">
+    <app-page-title [title]="module" [subTitle]="subModule" [menuLink]="menuLink"/>
+</div>
+
+<div class="container-fluid">
+    @if (isLoading()) {
+        <div class="d-flex align-items-center gap-2 text-muted py-4">
+            <span class="spinner-border spinner-border-sm" role="status"></span> Loading...
+        </div>
+    } @else {
+
+    <div class="row g-3">
+
+        <!-- Header Card -->
+        <div class="col-xl-12">
+            <app-ui-card title="Document Information">
+                <div class="col-xl-12 p-3" card-body>
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <div class="fw-bold fs-xs text-uppercase text-muted mb-1">SV Code</div>
+                            <div class="fw-bold">{{ data.localCode || data.code || '—' }}</div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Voucher Date</div>
+                            <div>{{ data.voucherDate | date:'MMMM d, yyyy' }}</div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Status</div>
+                            <span class="badge bg-secondary bg-opacity-25 text-dark border">
+                                {{ data.documentStatus?.status || data.status }}
+                            </span>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Amount</div>
+                            <div class="fw-bold">{{ (data.amount || totalDebit) | number:'1.2-2' }}</div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Prepared By</div>
+                            <div>{{ data.preparedBy?.fullName || data.preparedBy || '—' }}</div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Approving Officer</div>
+                            <div>{{ data.approvingOfficer?.name || '—' }}</div>
+                            @if (data.approvingOfficer?.position) {
+                                <small class="text-muted">{{ data.approvingOfficer.position }}</small>
+                            }
+                        </div>
+                        <div class="col-md-3">
+                            <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Last Updated</div>
+                            <div>{{ data.lastUpdated | date:'MMM dd, yyyy HH:mm' }}</div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Particulars</div>
+                            <div>{{ data.particulars || '—' }}</div>
+                        </div>
+                    </div>
+                </div>
+            </app-ui-card>
+        </div>
+
+        <!-- Journal Entries -->
+        <div class="col-xl-12">
+            <app-ui-card title="Journal Entries">
+                <div class="col-xl-12 p-3" card-body>
+                    <div class="table-responsive">
+                        <table class="table table-custom table-centered table-hover w-100 mb-0">
+                            <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                                <tr class="text-uppercase fs-xxs">
+                                    <th style="width:40px">#</th>
+                                    <th>Account Code</th>
+                                    <th>Account Title</th>
+                                    <th>Particulars</th>
+                                    <th class="text-end">Debit</th>
+                                    <th class="text-end">Credit</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @for (e of journalEntries; track $index; let i = $index) {
+                                    <tr>
+                                        <td>{{ i + 1 }}</td>
+                                        <td class="fw-bold">{{ e.account?.accountCode || e.code || '—' }}</td>
+                                        <td>{{ e.account?.accountTitle || e.account?.accountDescription || e.description || '—' }}</td>
+                                        <td>{{ e.particulars || '—' }}</td>
+                                        <td class="text-end">{{ e.debitAmount | number:'1.2-2' }}</td>
+                                        <td class="text-end">{{ e.creditAmount | number:'1.2-2' }}</td>
+                                    </tr>
+                                }
+                                @if (journalEntries.length === 0) {
+                                    <tr><td colspan="6" class="text-center text-muted py-3">No journal entries.</td></tr>
+                                }
+                                @if (journalEntries.length > 0) {
+                                    <tr class="fw-bold bg-light">
+                                        <td colspan="4" class="text-end fw-bold text-uppercase fs-xs">Totals</td>
+                                        <td class="text-end">{{ totalDebit | number:'1.2-2' }}</td>
+                                        <td class="text-end">{{ totalCredit | number:'1.2-2' }}</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </app-ui-card>
+        </div>
+
+        <!-- Workflow Actions -->
+        @if (workflowActions.length > 0) {
+            <div class="col-xl-12">
+                <app-ui-card title="Process Document">
+                    <div class="col-xl-12 p-3" card-body>
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold">Action</label>
+                                <select class="form-select" [(ngModel)]="selectedAction" [ngModelOptions]="{ standalone: true }">
+                                    <option [ngValue]="null">— Select Action —</option>
+                                    @for (a of workflowActions; track a.actionMapId) {
+                                        <option [ngValue]="a">{{ a.action }}</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Remarks</label>
+                                <input type="text" class="form-control" [(ngModel)]="remarks" [ngModelOptions]="{ standalone: true }" placeholder="Optional remarks"/>
+                            </div>
+                            <div class="col-md-2 d-flex align-items-end">
+                                <button type="button" class="btn btn-primary fw-bold w-100"
+                                        [disabled]="!selectedAction || formSubmit"
+                                        (click)="processWorkflow()">
+                                    {{ formSubmit ? 'Processing...' : 'Submit' }}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </app-ui-card>
+            </div>
+        }
+
+        <!-- Footer Actions -->
+        <div class="col-xl-12">
+            <div class="d-flex gap-2 justify-content-end align-items-center py-2">
+                <button type="button" class="btn btn-light fw-bold" [routerLink]="['/' + menuLink]">
+                    <ng-icon name="tablerArrowLeft" class="ps-0 pe-2 fw-bold"></ng-icon>Back
+                </button>
+                <div class="d-flex gap-2 justify-content-end">
+                    <button type="button" class="btn btn-success fw-bold" (click)="print()">
+                        <ng-icon name="tablerPrinter" class="ps-0 pe-2 fw-bold"></ng-icon>Print
+                    </button>
+                    @if (isEditable()) {
+                        <a class="btn btn-primary fw-bold" [routerLink]="['/' + menuLink, id, 'edit']">
+                            <ng-icon name="tablerEdit" class="ps-0 pe-2 fw-bold"></ng-icon>Edit
+                        </a>
+                    }
+                </div>
+            </div>
+
+            <!-- Document Logs -->
+            <div class="mt-2">
+                <button type="button" class="btn btn-light btn-sm fw-bold" (click)="toggleLogs()">
+                    {{ showLogs ? 'Hide' : 'Show' }} Document Logs
+                </button>
+                @if (showLogs) {
+                    <div class="mt-2">
+                        @if (logsLoading) {
+                            <div class="text-muted"><span class="spinner-border spinner-border-sm me-2"></span>Loading logs...</div>
+                        } @else {
+                            @for (log of logs; track $index) {
+                                <div class="border-bottom py-1 fs-xs">
+                                    <span class="fw-bold me-2">{{ log.createdAt | date:'MM/dd/yyyy HH:mm' }}</span>
+                                    <span class="badge bg-light text-dark border me-2">{{ log.action || log.status }}</span>
+                                    <span>{{ log.remarks || log.loggedBy?.fullName || log.user }}</span>
+                                </div>
+                            }
+                            @if (logs.length === 0) { <div class="text-muted fs-xs">No logs found.</div> }
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+
+    </div>
+    }
+</div>

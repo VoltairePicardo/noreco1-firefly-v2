@@ -1,0 +1,110 @@
+<div class="modal-header">
+    <h4 class="modal-title">Browse Job Orders</h4>
+    <button type="button" class="btn-close" (click)="activeModal.dismiss()"></button>
+</div>
+
+<div class="modal-body p-0">
+    <div class="row g-0" style="min-height: 460px;">
+
+        <!-- Left: Supplier list -->
+        <div class="col-md-5 border-end d-flex flex-column p-3">
+            <div class="fw-bold fs-xs text-uppercase text-muted mb-2">1. Select Supplier</div>
+            <div class="app-search mb-2">
+                <input ngbAutofocus [(ngModel)]="vendorSearch" type="search" class="form-control"
+                       placeholder="Search by name, acct no., address..."/>
+                <ng-icon name="tablerSearch" class="app-search-icon text-muted"/>
+            </div>
+            <div class="flex-grow-1 overflow-auto" style="max-height: 400px;">
+                @if (vendorsLoading) {
+                    <div class="d-flex justify-content-center align-items-center gap-2 py-4 text-muted">
+                        <span class="spinner-border spinner-border-sm"></span>
+                        <span>Loading suppliers...</span>
+                    </div>
+                } @else {
+                    <table class="table table-custom table-centered table-select table-hover w-100 mb-0">
+                        <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                            <tr class="text-uppercase fs-xxs">
+                                <th>Acct No.</th>
+                                <th>Name</th>
+                                <th>Address</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (filteredVendors.length === 0) {
+                                <tr class="no-results">
+                                    <td colspan="3" class="text-center text-muted py-3">No suppliers found.</td>
+                                </tr>
+                            } @else {
+                                @for (v of filteredVendors; track v.accountNo) {
+                                    <tr [class.table-primary]="selectedVendor?.accountNo === v.accountNo"
+                                        style="cursor:pointer" (click)="selectVendor(v)">
+                                        <td class="text-nowrap">{{ v.accountNo }}</td>
+                                        <td class="fw-bold">{{ v.name }}</td>
+                                        <td class="text-muted fs-xs">{{ v.address || '—' }}</td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                }
+            </div>
+        </div>
+
+        <!-- Right: JO list -->
+        <div class="col-md-7 d-flex flex-column p-3">
+            <div class="fw-bold fs-xs text-uppercase text-muted mb-2">2. Select Job Order</div>
+            <div class="app-search mb-2">
+                <input [(ngModel)]="joSearch" type="search" class="form-control"
+                       [disabled]="!selectedVendor || jobOrdersLoading"
+                       placeholder="Search JO no., supplier, prepared by..."/>
+                <ng-icon name="tablerSearch" class="app-search-icon text-muted"/>
+            </div>
+            <div class="flex-grow-1 overflow-auto" style="max-height: 400px;">
+                @if (!selectedVendor) {
+                    <div class="d-flex align-items-center justify-content-center h-100 text-muted py-4">
+                        Select a supplier on the left to load job orders.
+                    </div>
+                } @else if (jobOrdersLoading) {
+                    <div class="d-flex justify-content-center align-items-center gap-2 py-4 text-muted">
+                        <span class="spinner-border spinner-border-sm"></span>
+                        <span>Loading job orders...</span>
+                    </div>
+                } @else {
+                    <table class="table table-custom table-centered table-select table-hover w-100 mb-0">
+                        <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                            <tr class="text-uppercase fs-xxs">
+                                <th>JO Number</th>
+                                <th>Date</th>
+                                <th>Supplier</th>
+                                <th class="text-end">Amount</th>
+                                <th>Prepared By</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (filteredJobOrders.length === 0) {
+                                <tr class="no-results">
+                                    <td colspan="5" class="text-center text-muted py-3">No records found.</td>
+                                </tr>
+                            } @else {
+                                @for (jo of filteredJobOrders; track jo.id) {
+                                    <tr style="cursor:pointer" (click)="select(jo)">
+                                        <td class="fw-bold">{{ jo.localCode }}</td>
+                                        <td class="text-nowrap">{{ jo.voucherDate | date:'MMM dd, yyyy' }}</td>
+                                        <td>{{ jo.supplier || jo.vendor?.name }}</td>
+                                        <td class="text-end">{{ jo.amount | number:'1.2-2' }}</td>
+                                        <td>{{ jo.preparedBy }}</td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                }
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<div class="modal-footer">
+    <button type="button" class="btn btn-light fw-bold" (click)="activeModal.dismiss()">Close</button>
+</div>

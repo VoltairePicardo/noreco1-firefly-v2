@@ -1,0 +1,264 @@
+<div class="container-fluid">
+    <app-page-title [title]="module" [subTitle]="subModule" [menuLink]="menuLink"/>
+</div>
+
+<div class="container-fluid">
+    <div class="row g-3">
+        <div class="col-xl-12">
+            <app-ui-card title="PCV Closeout / Setup Print">
+                <div class="col-xl-12 p-3" card-body>
+
+                    <!-- Filter row -->
+                    <div class="fs-xs text-uppercase fw-semibold text-muted mb-2">Filters</div>
+                    <div class="row g-2 mb-3 align-items-end">
+                        <div class="col-md-2">
+                            <label class="form-label fw-bold fs-xs text-uppercase">From</label>
+                            <input type="text" mwlFlatpickr [options]="flatpickrOptions"
+                                   class="form-control" [(ngModel)]="fromDate" placeholder="From date"/>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label fw-bold fs-xs text-uppercase">To</label>
+                            <input type="text" mwlFlatpickr [options]="flatpickrOptions"
+                                   class="form-control" [(ngModel)]="toDate" placeholder="To date"/>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold fs-xs text-uppercase">Office</label>
+                            <select class="form-select" [(ngModel)]="selectedOffice">
+                                <option [ngValue]="null">— All Offices —</option>
+                                @for (o of offices; track o.id) {
+                                    <option [ngValue]="o">{{ o.name }}</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label fw-bold fs-xs text-uppercase">Status</label>
+                            <select class="form-select" [(ngModel)]="selectedStatus">
+                                <option [ngValue]="null">— All Statuses —</option>
+                                @for (s of documentStatuses; track s.id) {
+                                    <option [ngValue]="s">{{ s.desc || s.status }}</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-auto d-flex gap-2">
+                            <button type="button" class="btn btn-success fw-bold" (click)="search()">
+                                <ng-icon name="tablerEye" class="ps-0 pe-3 fw-bold"></ng-icon>View Only
+                            </button>
+                            <button type="button" class="btn btn-success fw-bold" (click)="printSummary()">
+                                <ng-icon name="tablerPrinter" class="ps-0 pe-3 fw-bold"></ng-icon>Print Summary
+                            </button>
+                        </div>
+                    </div>
+
+                    <hr/>
+                    <div class="fs-xs text-uppercase fw-semibold text-muted mb-2">Batch Management</div>
+
+                    <!-- Batch toolbar -->
+                    <div class="row g-2 mb-3 align-items-end">
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold fs-xs text-uppercase">Batch</label>
+                            <select class="form-select" [(ngModel)]="selectedBatch" [compareWith]="compareBatch">
+                                <option [ngValue]="null">— All Batches —</option>
+                                @for (b of filteredBatches; track b.id) {
+                                    <option [ngValue]="b">{{ b.id }} — {{ b.status }}</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-auto d-flex align-items-center gap-2 pb-1">
+                            <div class="form-check form-switch mb-0">
+                                <input class="form-check-input" type="checkbox" id="activeOnlyCO"
+                                       [(ngModel)]="activeOnly"/>
+                                <label class="form-check-label fw-bold fs-xs" for="activeOnlyCO">Active Only</label>
+                            </div>
+                        </div>
+                        <div class="col-auto d-flex gap-2">
+                            <button type="button" class="btn btn-primary fw-bold" (click)="createBatch()">
+                                <ng-icon name="tablerPlus" class="ps-0 pe-3 fw-bold"></ng-icon>Create New Batch
+                            </button>
+                            <button type="button" class="btn btn-danger fw-bold"
+                                    [disabled]="!selectedBatch"
+                                    (click)="closeBatch()">
+                                <ng-icon name="tablerX" class="ps-0 pe-3 fw-bold"></ng-icon>Close
+                            </button>
+                            <button type="button" class="btn btn-success fw-bold" (click)="openReplenish()">
+                                <ng-icon name="tablerCheck" class="ps-0 pe-3 fw-bold"></ng-icon>Replenish
+                            </button>
+                        </div>
+                    </div>
+
+                    <hr/>
+                    <div class="fs-xs text-uppercase fw-semibold text-muted mb-2">Vouchers</div>
+
+                    <!-- Table -->
+                    <div class="table-responsive mb-3">
+                        <table class="table table-custom table-centered table-select table-hover w-100 mb-0">
+                            <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                                <tr class="text-uppercase fs-xxs">
+                                    <th>Date</th>
+                                    <th>Code</th>
+                                    <th>Payee</th>
+                                    <th>Nature of Payment</th>
+                                    <th>G/L Acct.</th>
+                                    <th class="text-end">Amount</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (isLoading()) {
+                                    <tr><td colspan="7" class="text-center text-muted py-3">
+                                        <span class="spinner-border spinner-border-sm me-2" role="status"></span>Loading...
+                                    </td></tr>
+                                } @else if (records().length > 0) {
+                                    @for (rec of records(); track rec.id) {
+                                        <tr>
+                                            <td>{{ rec.date || rec.pettyCashDate | date:'MMM dd, yyyy' }}</td>
+                                            <td class="fw-bold">{{ rec.code }}</td>
+                                            <td>{{ rec.payee }}</td>
+                                            <td>{{ rec.purpose || rec.natureOfPayment || '—' }}</td>
+                                            <td>{{ rec.glAccountCode || '—' }}</td>
+                                            <td class="text-end fw-bold">{{ rec.amount | number:'1.2-2' }}</td>
+                                            <td>
+                                                <span class="badge bg-secondary bg-opacity-25 text-dark border">
+                                                    {{ rec.documentStatus?.status || rec.documentStatus || '—' }}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    }
+                                } @else {
+                                    <tr><td colspan="7" class="text-center text-muted py-3">No records found.</td></tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <hr/>
+                    <div class="fs-xs text-uppercase fw-semibold text-muted mb-2">Officers</div>
+
+                    <!-- Officers -->
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">Checked By</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control"
+                                       [value]="checkedBy ? (checkedBy.name || checkedBy.fullName || '') : ''"
+                                       readonly placeholder="Browse officer..."/>
+                                <button type="button" class="btn btn-success fw-bold"
+                                        (click)="openSignatoryBrowse('checkedBy')">
+                                    <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
+                                </button>
+                                @if (checkedBy) {
+                                    <button type="button" class="btn btn-danger fw-bold"
+                                            (click)="clearSignatory('checkedBy')">
+                                        <ng-icon name="tablerX" class="ps-0 pe-0 fw-bold"></ng-icon>
+                                    </button>
+                                }
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">Replenished By</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control"
+                                       [value]="replenishedBy ? (replenishedBy.name || replenishedBy.fullName || '') : ''"
+                                       readonly placeholder="Browse officer..."/>
+                                <button type="button" class="btn btn-success fw-bold"
+                                        (click)="openSignatoryBrowse('replenishedBy')">
+                                    <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
+                                </button>
+                                @if (replenishedBy) {
+                                    <button type="button" class="btn btn-danger fw-bold"
+                                            (click)="clearSignatory('replenishedBy')">
+                                        <ng-icon name="tablerX" class="ps-0 pe-0 fw-bold"></ng-icon>
+                                    </button>
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Footer -->
+                    <div class="d-flex gap-2 justify-content-end align-items-center pt-3 border-top mt-3">
+                        <a [routerLink]="['/' + menuLink]" class="btn btn-light fw-bold">
+                            <ng-icon name="tablerArrowLeft" class="ps-0 pe-3 fw-bold"></ng-icon>Back
+                        </a>
+                    </div>
+
+                </div>
+            </app-ui-card>
+        </div>
+    </div>
+</div>
+
+<!-- Replenish Modal (ng-template) -->
+<ng-template #replenishModal let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title fw-bold">Check Voucher List</h5>
+        <button type="button" class="btn-close" (click)="modal.dismiss()"></button>
+    </div>
+    <div class="modal-body">
+        <div class="row g-2 mb-3 align-items-end">
+            <div class="col-md-3">
+                <label class="form-label fw-bold fs-xs text-uppercase">From</label>
+                <input type="text" mwlFlatpickr [options]="flatpickrOptions"
+                       class="form-control" [(ngModel)]="replenishFrom" placeholder="From date"/>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label fw-bold fs-xs text-uppercase">To</label>
+                <input type="text" mwlFlatpickr [options]="flatpickrOptions"
+                       class="form-control" [(ngModel)]="replenishTo" placeholder="To date"/>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label fw-bold fs-xs text-uppercase">Code</label>
+                <input type="text" class="form-control" [(ngModel)]="replenishCode" placeholder="CV code"/>
+            </div>
+            <div class="col-md-3">
+                <button type="button" class="btn btn-success fw-bold w-100" (click)="loadCheckVouchers()">
+                    <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Search
+                </button>
+            </div>
+        </div>
+        <div class="table-responsive">
+            @if (cvsLoading) {
+                <div class="d-flex align-items-center gap-2 text-muted py-3">
+                    <span class="spinner-border spinner-border-sm" role="status"></span> Loading...
+                </div>
+            } @else {
+                <table class="table table-custom table-centered table-hover w-100 mb-0">
+                    <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                        <tr class="text-uppercase fs-xxs">
+                            <th>Code</th>
+                            <th>Payee</th>
+                            <th class="text-end">Amount</th>
+                            <th>Particulars</th>
+                            <th>Voucher Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (cvs.length > 0) {
+                            @for (cv of cvs; track cv.id) {
+                                <tr (click)="selectCv(cv)" style="cursor:pointer"
+                                    [class.table-info]="selectedCv?.id === cv.id">
+                                    <td class="fw-bold">{{ cv.code }}</td>
+                                    <td>{{ cv.payee }}</td>
+                                    <td class="text-end fw-bold">{{ cv.checkAmount | number:'1.2-2' }}</td>
+                                    <td>{{ cv.particulars }}</td>
+                                    <td>{{ cv.voucherDate | date:'MMM dd, yyyy' }}</td>
+                                </tr>
+                            }
+                        } @else {
+                            <tr><td colspan="5" class="text-center text-muted py-3">No records found.</td></tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        </div>
+    </div>
+    <div class="modal-footer d-flex justify-content-between">
+        <button type="button" class="btn btn-light fw-bold" (click)="modal.dismiss()">
+            <ng-icon name="tablerArrowLeft" class="ps-0 pe-3 fw-bold"></ng-icon>Cancel
+        </button>
+        <button type="button" class="btn btn-danger fw-bold"
+                [disabled]="!selectedCv || replenishProcessing"
+                (click)="confirmReplenish(modal)">
+            <ng-icon name="tablerCheck" class="ps-0 pe-3 fw-bold"></ng-icon>
+            {{ replenishProcessing ? 'Processing...' : 'Replenish CV' }}
+        </button>
+    </div>
+</ng-template>

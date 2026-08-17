@@ -1,0 +1,200 @@
+<div class="container-fluid">
+    <app-page-title [title]="module" [subTitle]="subModule" [menuLink]="menuLink"/>
+</div>
+
+<div class="container-fluid">
+    @if (isLoading()) {
+        <div class="d-flex align-items-center gap-2 text-muted py-4">
+            <span class="spinner-border spinner-border-sm" role="status"></span> Loading...
+        </div>
+    } @else {
+    <div class="row g-3">
+
+        <!-- Check Voucher Information -->
+        <div class="col-xl-12">
+            <app-ui-card title="Check Voucher Information">
+                <div class="col-xl-12 p-3" card-body>
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <div class="fw-bold fs-xs text-uppercase text-muted mb-1">CV Code</div>
+                            <div class="fw-bold">{{ data.code || data.cvCode || '—' }}</div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="fw-bold fs-xs text-uppercase text-muted mb-1">CV Date</div>
+                            <div>{{ data.voucherDate | date:'MMMM d, yyyy' }}</div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Check Number</div>
+                            <div>{{ data.checkNumber || '—' }}</div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Check Amount</div>
+                            <div class="fw-bold">{{ data.checkAmount || data.amount | number:'1.2-2' }}</div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Payee</div>
+                            <div>{{ data.payee || '—' }}</div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Account</div>
+                            <div>{{ data.accountTitle || '—' }}</div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Status</div>
+                            <span class="badge bg-secondary bg-opacity-25 text-dark border">
+                                {{ data.status || '—' }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </app-ui-card>
+        </div>
+
+        <!-- Release Information -->
+        <div class="col-xl-8">
+            <app-ui-card title="Release Information">
+                <div class="col-xl-12 p-3" card-body>
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Received By</div>
+                            <div>{{ data.receivedBy || '—' }}</div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Date Released</div>
+                            <div>{{ data.dateReleased | date:'MMMM d, yyyy' }}</div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="fw-bold fs-xs text-uppercase text-muted mb-1">OR Number</div>
+                            <div>{{ data.orNumber || '—' }}</div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="fw-bold fs-xs text-uppercase text-muted mb-1">ID Number</div>
+                            <div>{{ data.idNumber || '—' }}</div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Deposit Slip</div>
+                            <div>{{ data.depositSlip || '—' }}</div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Remarks</div>
+                            <div>{{ data.remarks || '—' }}</div>
+                        </div>
+
+                        <!-- Attachments -->
+                        @if (files().length > 0) {
+                            <div class="col-md-12">
+                                <div class="fw-bold fs-xs text-uppercase text-muted mb-2">Attachments</div>
+                                <div class="d-flex flex-wrap gap-2">
+                                    @for (f of files(); track f.id) {
+                                        <a [href]="fileUrl(f.id)" target="_blank"
+                                           class="d-flex align-items-center gap-1 border rounded px-2 py-1 bg-light text-decoration-none text-dark">
+                                            @if (isImage(f.mimeType)) {
+                                                <ng-icon name="tablerPhoto" class="text-primary"></ng-icon>
+                                            } @else {
+                                                <ng-icon name="tablerFile" class="text-muted"></ng-icon>
+                                            }
+                                            <span class="fs-xs text-truncate" style="max-width:200px"
+                                                  [ngbTooltip]="f.originalFilename">{{ f.originalFilename }}</span>
+                                            <ng-icon name="tablerExternalLink" class="text-muted fs-xs ms-1"></ng-icon>
+                                        </a>
+                                    }
+                                </div>
+                            </div>
+                        }
+
+                        <hr/>
+
+                        <div class="d-flex justify-content-end gap-2">
+                            <a [routerLink]="['/' + menuLink]" class="btn btn-light fw-bold">
+                                <ng-icon name="tablerArrowLeft" class="ps-0 pe-3 fw-bold"></ng-icon>Back
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </app-ui-card>
+        </div>
+
+        <!-- View Logs -->
+        <div class="col-xl-12">
+            <app-ui-card>
+                <div class="col-xl-12 p-3" card-body>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="fw-semibold fs-xs text-uppercase text-muted">Transaction Logs</span>
+                        <button type="button" class="btn btn-success fw-bold btn-sm" (click)="toggleLogs()">
+                            <ng-icon name="tablerList" class="ps-0 pe-2 fw-bold"></ng-icon>
+                            {{ showLogs ? 'Hide Logs' : 'View Logs' }}
+                        </button>
+                    </div>
+
+                    @if (showLogs) {
+                        @if (logsLoading()) {
+                            <div class="d-flex align-items-center gap-2 text-muted py-3">
+                                <span class="spinner-border spinner-border-sm" role="status"></span> Loading logs...
+                            </div>
+                        } @else {
+                            <div class="table-responsive">
+                                <table class="table table-custom table-centered table-select table-hover w-100 mb-0">
+                                    <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                                        <tr class="text-uppercase fs-xxs">
+                                            <th style="width:15%">Timestamp</th>
+                                            <th style="width:50%">Log</th>
+                                            <th style="width:20%">Remarks</th>
+                                            <th>User</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @if (logs().length > 0) {
+                                            @for (log of logs(); track log.id) {
+                                                @let v = parseLogValue(log.newValue);
+                                                <tr>
+                                                    <td class="text-nowrap align-top">{{ log.createdAt | date:'yyyy-MM-dd h:mma' }}</td>
+                                                    <td class="align-top">
+                                                        <div class="fs-sm">
+                                                            <p class="mb-1"><span class="fw-bold">Received By:</span> {{ v.receivedBy || '—' }}</p>
+                                                            <p class="mb-1"><span class="fw-bold">Status:</span> {{ v.status || '—' }}</p>
+                                                            <p class="mb-1"><span class="fw-bold">Deposit Slip:</span> {{ v.depositSlip || '—' }}</p>
+                                                            <p class="mb-1"><span class="fw-bold">ID Number:</span> {{ v.idNumber || '—' }}</p>
+                                                            <p class="mb-1"><span class="fw-bold">OR Number:</span> {{ v.orNumber || '—' }}</p>
+                                                            <p class="mb-0"><span class="fw-bold">Date Released:</span> {{ v.dateReleased | date:'MMM dd, yyyy' }}</p>
+                                                        </div>
+                                                    </td>
+                                                    <td class="align-top">{{ v.remarks || '—' }}</td>
+                                                    <td class="align-top">{{ log.loggedBy?.fullName || '—' }}</td>
+                                                </tr>
+                                            }
+                                        } @else {
+                                            <tr class="no-results">
+                                                <td colspan="4" class="text-center text-muted py-3">No logs found.</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
+                    }
+                </div>
+            </app-ui-card>
+        </div>
+
+        <!-- Recipient Photo -->
+        <div class="col-xl-4">
+            <app-ui-card title="Recipient Photo">
+                <div class="col-xl-12 p-3 d-flex flex-column align-items-center gap-3" card-body>
+                    @if (data.personImage) {
+                        <img [src]="data.personImage" alt="Recipient Photo"
+                             class="img-fluid rounded border"
+                             style="max-height:300px; object-fit:cover; width:100%"/>
+                    } @else {
+                        <div class="d-flex flex-column align-items-center justify-content-center border rounded bg-light text-muted gap-2"
+                             style="height:220px; width:100%">
+                            <ng-icon name="tablerCamera" style="font-size:3rem"></ng-icon>
+                            <span class="fs-sm">No photo captured</span>
+                        </div>
+                    }
+                </div>
+            </app-ui-card>
+        </div>
+
+    </div>
+    }
+</div>

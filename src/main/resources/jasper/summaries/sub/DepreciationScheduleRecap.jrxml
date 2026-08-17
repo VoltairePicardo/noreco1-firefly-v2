@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="DepreciationSummaryAccountRecap" pageWidth="612" pageHeight="792" columnWidth="598" leftMargin="14" rightMargin="0" topMargin="0" bottomMargin="0" isFloatColumnFooter="true" uuid="0b948967-77e7-4031-abf0-493559410c46">
+	<property name="net.sf.jasperreports.export.xls.exclude.origin.keep.first.band.1" value="columnHeader"/>
+	<property name="net.sf.jasperreports.export.xls.exclude.origin.band.1" value="pageHeader"/>
+	<property name="net.sf.jasperreports.export.xls.exclude.origin.band.2" value="pageFooter"/>
+	<property name="net.sf.jasperreports.export.xls.exclude.origin.band.3" value="lastPageFooter"/>
+	<property name="net.sf.jasperreports.export.xls.ignore.cell.background" value="true"/>
+	<property name="net.sf.jasperreports.export.xls.white.page.background" value="false"/>
+	<property name="net.sf.jasperreports.export.xls.ignore.graphics" value="false"/>
+	<property name="net.sf.jasperreports.export.xls.detect.cell.type" value="true"/>
+	<property name="net.sf.jasperreports.export.xls.remove.empty.space.between.rows" value="true"/>
+	<property name="net.sf.jasperreports.export.xls.remove.empty.space.between.columns" value="true"/>
+	<property name="net.sf.jasperreports.export.xls.collapse.row.span" value="true"/>
+	<property name="net.sf.jasperreports.export.xls.ignore.page.margins" value="true"/>
+	<property name="net.sf.jasperreports.export.xls.one.page.per.sheet" value="true"/>
+	<property name="net.sf.jasperreports.export.xls.wrap.text" value="true"/>
+	<property name="net.sf.jasperreports.export.xls.column.width.ratio" value="1.40f"/>
+	<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+	<property name="ireport.zoom" value="3.8906136901500026"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["D:\\accounting\\src\\inventory\\reports\\"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="RANGE" class="java.lang.String"/>
+	<parameter name="REPORT_TITLE" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[]]>
+	</queryString>
+	<field name="accountTitle" class="java.lang.String">
+		<fieldDescription><![CDATA[accountTitle]]></fieldDescription>
+	</field>
+	<field name="accountCode" class="java.lang.String">
+		<fieldDescription><![CDATA[accountCode]]></fieldDescription>
+	</field>
+	<field name="glDebitAmount" class="java.math.BigDecimal">
+		<fieldDescription><![CDATA[glDebitAmount]]></fieldDescription>
+	</field>
+	<field name="glCreditAmount" class="java.math.BigDecimal">
+		<fieldDescription><![CDATA[glCreditAmount]]></fieldDescription>
+	</field>
+	<field name="slDebitAmount" class="java.math.BigDecimal">
+		<fieldDescription><![CDATA[glDebitAmount]]></fieldDescription>
+	</field>
+	<field name="slCreditAmount" class="java.math.BigDecimal">
+		<fieldDescription><![CDATA[slCreditAmount]]></fieldDescription>
+	</field>
+	<columnHeader>
+		<band height="15">
+			<staticText>
+				<reportElement x="0" y="0" width="241" height="15" uuid="688d0122-d99c-4306-93dc-9bc5fd9031c9"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Account]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="241" y="0" width="100" height="15" uuid="cc5627fe-e121-44af-b3ec-4d09a3037624"/>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Debit]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="341" y="0" width="100" height="15" uuid="c9554efd-76de-4f50-9e60-8875d0bb2347"/>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Credit]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="12" splitType="Stretch">
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="0" y="0" width="241" height="12" uuid="d434d724-954e-4c6b-a17a-89e72039366b"/>
+				<box leftPadding="0"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{accountTitle}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern=" #,##0.00" isBlankWhenNull="true">
+				<reportElement x="241" y="0" width="100" height="12" uuid="f1102ced-e4ca-43d9-be19-327e4addd63f"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[($F{glDebitAmount}.compareTo(new java.math.BigDecimal(0)) ==0 ? null:$F{glDebitAmount})]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern=" #,##0.00" isBlankWhenNull="true">
+				<reportElement x="341" y="0" width="100" height="12" uuid="c7054397-9e39-4305-8d4b-dc0c3706f257"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[($F{glCreditAmount}.compareTo(new java.math.BigDecimal(0)) ==0 ? null:$F{glCreditAmount})]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<lastPageFooter>
+		<band height="19"/>
+	</lastPageFooter>
+</jasperReport>

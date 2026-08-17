@@ -1,0 +1,173 @@
+<div class="container-fluid">
+    <app-page-title [title]="module" [subTitle]="subModule" [menuLink]="menuLink"/>
+</div>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-xl-12">
+            <app-ui-card [title]="module + ' Details'">
+                <div class="col-xl-12 p-3" card-body>
+                    @if (isLoading()) {
+                        <div class="d-flex align-items-center gap-2 text-muted py-2">
+                            <span class="spinner-border spinner-border-sm" role="status"></span>
+                            Loading...
+                        </div>
+                    } @else if (validationForm) {
+                    <form class="row g-3 needs-validation" novalidate
+                          (ngSubmit)="validSubmit()" [formGroup]="validationForm">
+
+                        <!-- Row 1: Code + Title -->
+                        <div class="row">
+                            <div class="col-md-3 mt-2">
+                                <label for="code" class="form-label fw-bold">Account Code <span class="text-danger">*</span></label>
+                                <input id="code" type="text" class="form-control"
+                                       placeholder="e.g. 1-001" formControlName="code"
+                                       [class]="submit && !form.get('code')?.errors ? 'is-valid'
+                                              : submit &&  form.get('code')?.errors ? 'is-invalid' : ''"
+                                       required/>
+                                <div class="invalid-feedback">Please provide an account code.</div>
+                            </div>
+                            <div class="col-md-9 mt-2">
+                                <label for="title" class="form-label fw-bold">Title <span class="text-danger">*</span></label>
+                                <input id="title" type="text" class="form-control"
+                                       placeholder="Account Title" formControlName="title"
+                                       [class]="submit && !form.get('title')?.errors ? 'is-valid'
+                                              : submit &&  form.get('title')?.errors ? 'is-invalid' : ''"
+                                       required/>
+                                <div class="invalid-feedback">Please provide a title.</div>
+                            </div>
+                        </div>
+
+                        <!-- Row 2: GL Account + SL Account + Aux Account -->
+                        <div class="row">
+                            <div class="col-md-4 mt-2">
+                                <label for="glaccount" class="form-label fw-bold">GL Account</label>
+                                <input id="glaccount" type="text" class="form-control"
+                                       placeholder="GL Account" formControlName="glaccount"/>
+                            </div>
+                            <div class="col-md-4 mt-2">
+                                <label for="slaccount" class="form-label fw-bold">SL Account</label>
+                                <input id="slaccount" type="text" class="form-control"
+                                       placeholder="SL Account" formControlName="slaccount"/>
+                            </div>
+                            <div class="col-md-4 mt-2">
+                                <label for="auxAccount" class="form-label fw-bold">Auxiliary Account</label>
+                                <input id="auxAccount" type="text" class="form-control"
+                                       placeholder="Auxiliary Account" formControlName="auxAccount"/>
+                            </div>
+                        </div>
+
+                        <!-- Row 3: Account Group + Account Type -->
+                        <div class="row">
+                            <div class="col-md-6 mt-2">
+                                <label for="accountGroupId" class="form-label fw-bold">Account Group <span class="text-danger">*</span></label>
+                                <select id="accountGroupId" class="form-select" formControlName="accountGroupId"
+                                        [class]="submit && !form.get('accountGroupId')?.errors ? 'is-valid'
+                                               : submit &&  form.get('accountGroupId')?.errors ? 'is-invalid' : ''">
+                                    <option [value]="null">— Select Group —</option>
+                                    @for (g of accountGroups(); track g.id) {
+                                        <option [value]="g.id">{{ g.code }} - {{ g.description }}</option>
+                                    }
+                                </select>
+                                <div class="invalid-feedback">Please select an account group.</div>
+                            </div>
+                            <div class="col-md-6 mt-2">
+                                <label for="accountTypeId" class="form-label fw-bold">Account Type <span class="text-danger">*</span></label>
+                                <select id="accountTypeId" class="form-select" formControlName="accountTypeId"
+                                        [class]="submit && !form.get('accountTypeId')?.errors ? 'is-valid'
+                                               : submit &&  form.get('accountTypeId')?.errors ? 'is-invalid' : ''">
+                                    <option [value]="null">— Select Type —</option>
+                                    @for (t of accountTypes(); track t.id) {
+                                        <option [value]="t.id">{{ t.code }} - {{ t.description }}</option>
+                                    }
+                                </select>
+                                <div class="invalid-feedback">Please select an account type.</div>
+                            </div>
+                        </div>
+
+                        <!-- Row 4: Classification + Normal Balance + Allocation Factor -->
+                        <div class="row">
+                            <div class="col-md-4 mt-2">
+                                <label for="classification" class="form-label fw-bold">Classification</label>
+                                <select id="classification" class="form-select" formControlName="classification">
+                                    <option value="">— Select —</option>
+                                    <option value="NEA">NEA</option>
+                                    <option value="BSUP">BSUP</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 mt-2">
+                                <label for="normalBalance" class="form-label fw-bold">Normal Balance</label>
+                                <select id="normalBalance" class="form-select" formControlName="normalBalance">
+                                    <option [value]="1">Debit</option>
+                                    <option [value]="2">Credit</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 mt-2">
+                                <label for="factorId" class="form-label fw-bold">Allocation Factor</label>
+                                <select id="factorId" class="form-select" formControlName="factorId">
+                                    <option [value]="null">— None —</option>
+                                    @for (f of factors(); track f.id) {
+                                        <option [value]="f.id">{{ f.code }} - {{ f.description }}</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Row 5: Parent Account -->
+                        <div class="row">
+                            <div class="col-md-6 mt-2">
+                                <label class="form-label fw-bold">Parent Account</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control"
+                                           [value]="selectedParentAccount ? (selectedParentAccount.code + ' - ' + selectedParentAccount.title) : ''"
+                                           readonly placeholder="No parent account selected"/>
+                                    <button type="button" class="btn btn-success fw-bold" (click)="openParentAccountBrowse()">
+                                        <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
+                                    </button>
+                                    @if (selectedParentAccount) {
+                                        <button type="button" class="btn btn-danger fw-bold" (click)="clearParentAccount()">
+                                            <ng-icon name="tablerX" class="fw-bold"></ng-icon>
+                                        </button>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Row 6: Flags -->
+                        <div class="row">
+                            <div class="col-md-2 mt-3">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="isActive" formControlName="isActive"/>
+                                    <label class="form-check-label fw-bold" for="isActive">Active</label>
+                                </div>
+                            </div>
+                            <div class="col-md-2 mt-3">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="isHeader" formControlName="isHeader"/>
+                                    <label class="form-check-label fw-bold" for="isHeader">Header Account</label>
+                                </div>
+                            </div>
+                            <div class="col-md-2 mt-3">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="hasSL" formControlName="hasSL"/>
+                                    <label class="form-check-label fw-bold" for="hasSL">Has SL</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex gap-2 justify-content-end align-items-center pt-3 border-top mt-3">
+                            <a [routerLink]="['/' + menuLink]" class="btn btn-light fw-bold">
+                                <ng-icon name="tablerArrowLeft" class="ps-0 pe-3 fw-bold"></ng-icon>Back
+                            </a>
+                            <button type="submit" class="btn btn-primary fw-bold" [disabled]="formSubmit">
+                                <ng-icon name="tablerCheck" class="ps-0 pe-3 fw-bold"></ng-icon>
+                                {{ editMode ? 'Update' : 'Save ' + module}}
+                            </button>
+                        </div>
+                    </form>
+                    }
+                </div>
+            </app-ui-card>
+        </div>
+    </div>
+</div>

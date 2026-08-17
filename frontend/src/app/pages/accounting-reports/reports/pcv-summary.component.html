@@ -1,0 +1,80 @@
+<div class="container-fluid">
+    <app-page-title [title]="'Accounting Reports'" [subTitle]="module" [menuLink]="menuLink" [useSubtitleAsTitle]="true"/>
+</div>
+<div class="container-fluid">
+    <div class="card">
+        <div class="card-body">
+            <div class="row g-2 align-items-end mb-3">
+                <div class="col-md-auto">
+                    <label class="form-label fw-bold mb-1">From</label>
+                    <input type="text" mwlFlatpickr [options]="flatpickrOptions"
+                           class="form-control" [(ngModel)]="fromDate" placeholder="From date"/>
+                </div>
+                <div class="col-md-auto">
+                    <label class="form-label fw-bold mb-1">To</label>
+                    <input type="text" mwlFlatpickr [options]="flatpickrOptions"
+                           class="form-control" [(ngModel)]="toDate" placeholder="To date"/>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-bold mb-1">Office</label>
+                    <select class="form-select" [(ngModel)]="officeId" (change)="onOfficeChange()">
+                        @for (o of offices(); track o.id) {
+                            <option [ngValue]="o.id">{{ o.name }}</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-bold mb-1">PCF Batch</label>
+                    <select class="form-select" [(ngModel)]="pcfId">
+                        <option [ngValue]="0">All</option>
+                        @for (f of pcfFunds(); track f.id) {
+                            <option [ngValue]="f.id">{{ f.description }}</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label fw-bold mb-1">Status</label>
+                    <select class="form-select" [(ngModel)]="docStatId">
+                        @for (s of documentStatuses(); track s.id) {
+                            <option [ngValue]="s.id">{{ s.status }}</option>
+                        }
+                    </select>
+                </div>
+            </div>
+            <div class="row g-2 align-items-end">
+                <div class="col-md-4">
+                    <label class="form-label fw-bold mb-1">Checked By</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control" readonly
+                               [value]="checkedBy?.name ?? ''"
+                               placeholder="Browse employee..."/>
+                        <button type="button" class="btn btn-success fw-bold" (click)="browseCheckedBy()">
+                            <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
+                        </button>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-bold mb-1">Replenished By</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control" readonly
+                               [value]="replenishedBy?.name ?? ''"
+                               placeholder="Browse employee..."/>
+                        <button type="button" class="btn btn-success fw-bold" (click)="browseReplenishedBy()">
+                            <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
+                        </button>
+                    </div>
+                </div>
+                <div class="col-md-auto ms-auto">
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-success fw-bold" (click)="export('pdf')">
+                            <ng-icon name="tablerFileTypePdf" class="fw-bold me-1"></ng-icon>Export PDF
+                        </button>
+                        <button type="button" class="btn btn-success fw-bold" (click)="export('xls')">
+                            <ng-icon name="tablerFileTypeXls" class="fw-bold me-1"></ng-icon>Export Excel
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

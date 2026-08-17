@@ -1,0 +1,101 @@
+<div class="container-fluid">
+    <app-page-title [title]="module" [subTitle]="subModule" [menuLink]="menuLink"/>
+</div>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-xl-12">
+            <app-ui-card [title]="module + ' Details'">
+                <div class="col-xl-12 p-3" card-body>
+                    @if (isLoading()) {
+                        <div class="d-flex align-items-center gap-2 text-muted py-2">
+                            <span class="spinner-border spinner-border-sm" role="status"></span>
+                            Loading...
+                        </div>
+                    } @else if (validationForm) {
+                    <form class="row g-3 needs-validation" novalidate
+                          (ngSubmit)="validSubmit()" [formGroup]="validationForm">
+
+                        <div class="row">
+                            <div class="col-md-6 mt-2">
+                                <label for="name" class="form-label fw-bold">Name <span class="text-danger">*</span></label>
+                                <input id="name" type="text" class="form-control"
+                                       placeholder="Name" formControlName="name"
+                                       [class]="submit && !form.get('name')?.errors ? 'is-valid'
+                                              : submit &&  form.get('name')?.errors ? 'is-invalid' : ''"
+                                       required/>
+                                <div class="invalid-feedback">Please provide a name.</div>
+                            </div>
+                            <div class="col-md-4 mt-2">
+                                <label for="ordinalNumber" class="form-label fw-bold">Ordinal Number <span class="text-danger">*</span></label>
+                                <input id="ordinalNumber" type="number" class="form-control"
+                                       placeholder="0" formControlName="ordinalNumber"
+                                       [class]="submit && !form.get('ordinalNumber')?.errors ? 'is-valid'
+                                              : submit &&  form.get('ordinalNumber')?.errors ? 'is-invalid' : ''"
+                                       required/>
+                                <div class="invalid-feedback">Please provide an ordinal number.</div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mt-2">
+                                <label for="cashflowItemTypeId" class="form-label fw-bold">Funding Source <span class="text-danger">*</span></label>
+                                <select id="cashflowItemTypeId" class="form-select" formControlName="cashflowItemTypeId"
+                                        [class]="submit && !form.get('cashflowItemTypeId')?.errors ? 'is-valid'
+                                               : submit &&  form.get('cashflowItemTypeId')?.errors ? 'is-invalid' : ''"
+                                        required>
+                                    <option [ngValue]="null">— Select Type —</option>
+                                    @for (type of types(); track type.id) {
+                                        <option [ngValue]="type.id">{{ type.name }}</option>
+                                    }
+                                </select>
+                                <div class="invalid-feedback">Please select a type.</div>
+                            </div>
+                            <div class="col-md-6 mt-2">
+                                <label for="parentCashflowItemId" class="form-label fw-bold">Parent Item</label>
+                                <select id="parentCashflowItemId" class="form-select" formControlName="parentCashflowItemId">
+                                    <option [ngValue]="null">— None —</option>
+                                    @for (item of parentItems(); track item.id) {
+                                        <option [ngValue]="item.id">{{ item.name }}</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row align-items-end">
+                            <div class="col-md-6 mt-2">
+                                <label class="form-label fw-bold">Account</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" readonly
+                                           [value]="getAccountLabel()"
+                                           placeholder="Browse an account..."/>
+                                    <button type="button" class="btn btn-success fw-bold" (click)="openAccountBrowse()">
+                                        <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="col-md-auto mt-2 pb-2">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="showInCashFlowStatement"
+                                           formControlName="showInCashFlowStatement"/>
+                                    <label class="form-check-label fw-bold" for="showInCashFlowStatement">Show in Cash Flow Statement</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex gap-2 justify-content-end align-items-center pt-3 border-top mt-3">
+                            <a [routerLink]="['/' + menuLink]" class="btn btn-light fw-bold">
+                                <ng-icon name="tablerArrowLeft" class="ps-0 pe-3 fw-bold"></ng-icon>Back
+                            </a>
+                            <button type="submit" class="btn btn-primary fw-bold" [disabled]="formSubmit">
+                                <ng-icon name="tablerCheck" class="ps-0 pe-3 fw-bold"></ng-icon>
+                                {{ editMode ? 'Update' : 'Save' }}
+                            </button>
+                        </div>
+                    </form>
+                    }
+                </div>
+            </app-ui-card>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,101 @@
+<div class="container-fluid">
+    <app-page-title [title]="module" [subTitle]="subModule" [menuLink]="menuLink"/>
+</div>
+
+<div class="container-fluid">
+    <div class="card">
+        <div class="card-body">
+
+            <div class="row g-2 align-items-end mb-3">
+                <div class="d-flex gap-2 justify-content-end col-md-12">
+                    <button type="button" class="btn btn-success fw-bold" (click)="search()">
+                        <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Search
+                    </button>
+                    <button type="button" class="btn btn-success fw-bold" (click)="export('pdf')">
+                        <ng-icon name="tablerFileTypePdf" class="ps-0 pe-3 fw-bold"></ng-icon>Export PDF
+                    </button>
+                    <button type="button" class="btn btn-success fw-bold" (click)="export('xls')">
+                        <ng-icon name="tablerFileTypeXls" class="ps-0 pe-3 fw-bold"></ng-icon>Export Excel
+                    </button>
+                </div>
+            </div>
+
+            <div class="row g-2 align-items-end mb-3">
+                <div class="col-md-auto">
+                    <label class="form-label fw-bold mb-1">From</label>
+                    <input type="text" mwlFlatpickr [options]="flatpickrOptions"
+                           class="form-control" [(ngModel)]="fromDate" placeholder="From date"/>
+                </div>
+                <div class="col-md-auto">
+                    <label class="form-label fw-bold mb-1">To</label>
+                    <input type="text" mwlFlatpickr [options]="flatpickrOptions"
+                           class="form-control" [(ngModel)]="toDate" placeholder="To date"/>
+                </div>
+                <div class="col">
+                    <label class="form-label fw-bold mb-1">Account</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control" [value]="selectedAccount?.title || ''" readonly
+                               placeholder="Browse an account..."/>
+                        <button type="button" class="btn btn-success fw-bold" (click)="browseAccount()">
+                            <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
+                        </button>
+                    </div>
+                </div>
+                <div class="col">
+                    <label class="form-label fw-bold mb-1">SL Entity</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control" [value]="selectedSLEntity?.name || ''" readonly
+                               placeholder="Browse SL Entity..."/>
+                        <button type="button" class="btn btn-success fw-bold" (click)="browseSLEntity()">
+                            <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Results Table -->
+            <div class="table-responsive">
+                <table class="table table-custom table-centered table-hover w-100 mb-0">
+                    <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                        <tr class="text-uppercase fs-xxs">
+                            <th>Date</th>
+                            <th>Reference</th>
+                            <th>Particulars</th>
+                            <th class="text-end">Debit</th>
+                            <th class="text-end">Credit</th>
+                            <th class="text-end">Balance</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (isLoading()) {
+                            <tr><td colspan="6" class="text-center text-muted py-4">
+                                <span class="spinner-border spinner-border-sm me-2" role="status"></span>Loading...
+                            </td></tr>
+                        } @else if (rows().length === 0) {
+                            <tr><td colspan="6" class="text-center text-muted py-4">No records found.</td></tr>
+                        } @else {
+                            @for (row of rows(); track $index) {
+                                <tr>
+                                    <td>{{ row.date | date:'MMM dd, yyyy' }}</td>
+                                    <td>{{ row.reference }}</td>
+                                    <td>{{ row.particulars }}</td>
+                                    <td class="text-end">{{ row.debit ? (row.debit | number:'1.2-2') : '' }}</td>
+                                    <td class="text-end">{{ row.credit ? (row.credit | number:'1.2-2') : '' }}</td>
+                                    <td class="text-end">{{ row.balance | number:'1.2-2' }}</td>
+                                </tr>
+                            }
+                            <tr class="fw-bold border-top">
+                                <td>TOTAL</td>
+                                <td colspan="2"></td>
+                                <td class="text-end">{{ totals.debit | number:'1.2-2' }}</td>
+                                <td class="text-end">{{ totals.credit | number:'1.2-2' }}</td>
+                                <td></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+</div>

@@ -1,0 +1,567 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="RequisitionVoucher" pageWidth="612" pageHeight="792" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isFloatColumnFooter="true" uuid="b29c3ba6-1020-4625-9bd3-1937355162ed">
+	<property name="ireport.zoom" value="1.1566298682885952"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="TRANS_ID" class="java.lang.String"/>
+	<parameter name="VOUCHER_NO" class="java.lang.String"/>
+	<parameter name="V_DATE" class="java.util.Date"/>
+	<parameter name="APPROVEDBY" class="java.lang.String"/>
+	<parameter name="REQUESTEDBY" class="java.lang.String"/>
+	<parameter name="AUDITBY" class="java.lang.String"/>
+	<parameter name="RECAPPBY" class="java.lang.String"/>
+	<parameter name="APPROVEDBY_POS" class="java.lang.String"/>
+	<parameter name="RECAPPBY_POS" class="java.lang.String"/>
+	<parameter name="AUDITBY_POS" class="java.lang.String"/>
+	<parameter name="NAME" class="java.lang.String"/>
+	<parameter name="POSITION" class="java.lang.String"/>
+	<parameter name="DEPARTMENT" class="java.lang.String"/>
+	<parameter name="COMP_NAME" class="java.lang.String"/>
+	<parameter name="COMP_ADDR" class="java.lang.String"/>
+	<parameter name="COMP_CONTACT" class="java.lang.String"/>
+	<parameter name="LOGO_PATH" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["Q:\\Develop\\Noreco 1\\accounting-no1\\src\\no1\\img\\No1-Logo.jpg"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="PURPOSE" class="java.lang.String"/>
+	<parameter name="PREPARAR_SIGN" class="java.lang.String" isForPrompting="false"/>
+	<parameter name="AUDITOR_SIGN" class="java.lang.String" isForPrompting="false"/>
+	<parameter name="APPROVAR_SIGN" class="java.lang.String" isForPrompting="false"/>
+	<parameter name="RECOMMENDAR_SIGN" class="java.lang.String" isForPrompting="false"/>
+	<parameter name="APPROVAR_TIME" class="java.sql.Timestamp" isForPrompting="false"/>
+	<parameter name="PREPARAR_TIME" class="java.sql.Timestamp" isForPrompting="false"/>
+	<parameter name="AUDITOR_TIME" class="java.sql.Timestamp" isForPrompting="false"/>
+	<parameter name="RECOMMENDAR_TIME" class="java.sql.Timestamp" isForPrompting="false"/>
+	<parameter name="BAC_DATE" class="java.lang.String"/>
+	<parameter name="BAC_REPRESENTATIVE" class="java.lang.String"/>
+	<parameter name="BUDGET_OFFICER" class="java.lang.String"/>
+	<parameter name="MODE_OPEN_CANVASS" class="java.lang.String"/>
+	<parameter name="MODE_EMERGENCY" class="java.lang.String"/>
+	<parameter name="MODE_REPEAT_ORDER" class="java.lang.String"/>
+	<parameter name="MODE_REVOLVING" class="java.lang.String"/>
+	<parameter name="MODE_SIMPLIFIED" class="java.lang.String"/>
+	<parameter name="ESTIMATED_AMOUNT" class="java.math.BigDecimal"/>
+	<parameter name="BUDGET_OFFICER_SIGN" class="java.lang.String"/>
+	<parameter name="BUDGET_OFFICER_TIME" class="java.sql.Timestamp"/>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["D:\\TSI\\Repo\\firefly-ileco2\\src\\main\\resources\\jasper\\vouchers\\sub_reports\\"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="WORKFLOW" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[3]]></defaultValueExpression>
+	</parameter>
+	<parameter name="NOTER_SIGN" class="java.lang.String" isForPrompting="false"/>
+	<parameter name="NOTEDBY" class="java.lang.String" isForPrompting="false"/>
+	<parameter name="NOTEDBY_POS" class="java.lang.String" isForPrompting="false"/>
+	<parameter name="NOTER_TIME" class="java.sql.Timestamp"/>
+	<parameter name="BUDGET_SOURCE" class="java.lang.String" isForPrompting="false"/>
+	<parameter name="MODE_BIDDING" class="java.lang.String"/>
+	<parameter name="BUDGETCHECKEDBY" class="java.lang.String"/>
+	<parameter name="BUDGETCHECKEDBY_TIME" class="java.sql.Timestamp"/>
+	<parameter name="BUDGETCHECKEDBY_POS" class="java.lang.String"/>
+	<parameter name="BUDGETCHECKEDBY_SIGN" class="java.lang.String"/>
+	<parameter name="REVIEWEDANDACCEPTEDBY" class="java.lang.String"/>
+	<parameter name="REVIEWEDANDACCEPTEDBY_TIME" class="java.sql.Timestamp"/>
+	<parameter name="REVIEWEDANDACCEPTEDBY_SIGN" class="java.lang.String"/>
+	<parameter name="REVIEWEDANDACCEPTEDBY_POS" class="java.lang.String"/>
+	<parameter name="REPORT_TITLE" class="java.lang.String"/>
+	<parameter name="INVENTORYCHECKEDBY" class="java.lang.String"/>
+	<parameter name="INVENTORYCHECKEDBY_TIME" class="java.sql.Timestamp"/>
+	<parameter name="INVENTORYCHECKEDBY_SIGN" class="java.lang.String"/>
+	<parameter name="INVENTORYCHECKEDBY_POS" class="java.lang.String"/>
+	<parameter name="WORK_ORDER" class="java.lang.String"/>
+	<parameter name="IS_EMERGENCY_PURCHASE" class="java.lang.String"/>
+	<parameter name="BUDGET_LINE_ITEM" class="java.lang.String"/>
+	<parameter name="PURCHASING_CONTACT" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[]]>
+	</queryString>
+	<field name="description" class="java.lang.String"/>
+	<field name="quantity" class="java.math.BigDecimal"/>
+	<field name="unitCode" class="java.lang.String"/>
+	<field name="id" class="java.lang.Integer"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="180" splitType="Stretch">
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="16" width="572" height="14" uuid="a6715665-534c-47cf-b145-1cc845d4a9b0"/>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{COMP_ADDR}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="0" y="0" width="572" height="16" isPrintWhenDetailOverflows="true" uuid="413e6e16-0f96-4cb0-a01c-7e1af0e4756c"/>
+				<textElement textAlignment="Center" markup="html">
+					<font fontName="SansSerif" size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{COMP_NAME}]]></textFieldExpression>
+			</textField>
+			<textField pattern="MM/dd/yyyy hh:mm a">
+				<reportElement x="487" y="0" width="85" height="16" uuid="b1986d7c-0148-4d69-be84-53461f44b64c"/>
+				<textElement textAlignment="Right">
+					<font fontName="SansSerif" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement mode="Transparent" x="1" y="77" width="25" height="15" forecolor="#000000" backcolor="#FFFFFF" uuid="be8bb49a-9994-415f-a379-df9e2a096d67"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="Times New Roman" size="10" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[Date:]]></text>
+			</staticText>
+			<textField pattern="MMMM dd, yyyy" isBlankWhenNull="true">
+				<reportElement x="28" y="77" width="141" height="15" uuid="81f7878c-e33c-447a-9752-2a0586b640e3"/>
+				<box>
+					<bottomPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Monospaced" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{V_DATE}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="1" y="92" width="114" height="15" uuid="b2eb8f63-f0d4-4cdb-b62a-6c10446bca4d"/>
+				<box leftPadding="0"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="10"/>
+				</textElement>
+				<text><![CDATA[Requesting Department:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1" y="118" width="173" height="15" uuid="8ed54869-cede-49a8-b6db-96f03012eb56"/>
+				<box leftPadding="0"/>
+				<textElement>
+					<font fontName="Times New Roman" size="10"/>
+				</textElement>
+				<text><![CDATA[Purpose:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="115" y="92" width="457" height="15" uuid="a308fd0a-06b2-450f-8b41-dfd60e3a5e12"/>
+				<box leftPadding="0"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Monospaced" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{DEPARTMENT}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="386" y="77" width="30" height="15" uuid="0fa4d944-00f9-4805-8ed3-a90223963eae"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="10"/>
+				</textElement>
+				<text><![CDATA[No:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="416" y="77" width="156" height="15" uuid="337a0511-22ad-41c5-a206-4797750bc1bf"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Monospaced" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{VOUCHER_NO}]]></textFieldExpression>
+			</textField>
+			<image isLazy="true" onErrorType="Icon">
+				<reportElement x="58" y="0" width="60" height="52" uuid="cc49424d-3aa8-4b91-8278-8afc19a70af4"/>
+				<imageExpression><![CDATA[$P{LOGO_PATH}]]></imageExpression>
+			</image>
+			<textField isStretchWithOverflow="true">
+				<reportElement x="44" y="118" width="528" height="15" uuid="6b91b08e-d961-4ebc-81ee-289d1eb776b6"/>
+				<textElement>
+					<font fontName="Monospaced"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{PURPOSE}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="1" y="133" width="80" height="15" uuid="d920442d-5bdf-4901-b4d7-51854c19fa79"/>
+				<box leftPadding="0"/>
+				<textElement>
+					<font fontName="Times New Roman" size="10"/>
+				</textElement>
+				<text><![CDATA[Budget Line Item:]]></text>
+			</staticText>
+			<textField pattern="" isBlankWhenNull="false">
+				<reportElement mode="Transparent" x="81" y="133" width="491" height="15" forecolor="#000000" backcolor="#FFFFFF" uuid="9ab115db-8870-4610-bf01-f76c138c43b6"/>
+				<textElement textAlignment="Left" verticalAlignment="Top" rotation="None" markup="none">
+					<font fontName="Monospaced" size="10" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{BUDGET_SOURCE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="52" width="572" height="14" uuid="a99c1ff6-ec13-4d88-aeb0-a6c95e25cffb"/>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" size="11" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{REPORT_TITLE}]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="false">
+				<reportElement mode="Transparent" x="58" y="148" width="514" height="15" forecolor="#000000" backcolor="#FFFFFF" uuid="d1355356-63b4-4ba2-ba3d-cae56f96c0d3"/>
+				<textElement textAlignment="Left" verticalAlignment="Top" rotation="None" markup="none">
+					<font fontName="Monospaced" size="10" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{WORK_ORDER}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="1" y="148" width="57" height="15" uuid="c7f41091-f400-4db0-bb6b-2d295e5872e0"/>
+				<box leftPadding="0"/>
+				<textElement>
+					<font fontName="Times New Roman" size="10"/>
+				</textElement>
+				<text><![CDATA[Work Order:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1" y="163" width="100" height="15" uuid="c2716407-6274-4ca9-af36-dbe78538f0c7"/>
+				<box leftPadding="0"/>
+				<textElement>
+					<font fontName="Times New Roman" size="10"/>
+				</textElement>
+				<text><![CDATA[Emergency Purchase:]]></text>
+			</staticText>
+			<textField pattern="" isBlankWhenNull="false">
+				<reportElement mode="Transparent" x="101" y="163" width="504" height="15" forecolor="#000000" backcolor="#FFFFFF" uuid="f6a4fcf4-8eda-4c12-9a06-329efe166d56"/>
+				<textElement textAlignment="Left" verticalAlignment="Top" rotation="None" markup="none">
+					<font fontName="Monospaced" size="10" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{IS_EMERGENCY_PURCHASE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="30" width="572" height="14" uuid="f9244627-05a0-4736-b145-e152daee7183"/>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{PURCHASING_CONTACT}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="17">
+			<staticText>
+				<reportElement mode="Transparent" x="0" y="2" width="64" height="15" forecolor="#000000" backcolor="#FFFFFF" uuid="2b1a4ca7-bed1-4778-a049-7fddf8c3274b"/>
+				<box topPadding="0" leftPadding="0">
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="SansSerif" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[Item #]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Transparent" x="222" y="2" width="350" height="15" forecolor="#000000" backcolor="#FFFFFF" uuid="ded69caa-1fbf-49ba-ae89-a0c00c8cf107"/>
+				<box topPadding="0" leftPadding="0">
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="SansSerif" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[Description/Specification]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Transparent" x="147" y="2" width="75" height="15" forecolor="#000000" backcolor="#FFFFFF" uuid="16813774-4ab5-4b41-a654-509c5c85e34a"/>
+				<box topPadding="0" leftPadding="0">
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="SansSerif" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[Unit]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Transparent" x="64" y="2" width="83" height="15" forecolor="#000000" backcolor="#FFFFFF" uuid="14c755af-8334-4d5b-be11-b39214f1b423"/>
+				<box topPadding="0" leftPadding="0">
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="SansSerif" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[Quantity]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="16" splitType="Stretch">
+			<textField isStretchWithOverflow="true">
+				<reportElement stretchType="RelativeToBandHeight" x="222" y="0" width="350" height="15" uuid="84bde88f-e1cd-4931-972a-8aada816e229"/>
+				<box leftPadding="5">
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement>
+					<font fontName="Monospaced" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{description}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement stretchType="RelativeToBandHeight" x="64" y="0" width="83" height="15" uuid="b2b6f8b2-80a0-4968-b250-c518545d7805"/>
+				<box rightPadding="5">
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font fontName="Monospaced" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{quantity}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement stretchType="RelativeToBandHeight" x="0" y="0" width="64" height="15" uuid="806700e1-75d6-452c-938e-296eab94f6a1"/>
+				<box>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="Monospaced" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{id}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement stretchType="RelativeToBandHeight" x="147" y="0" width="75" height="15" uuid="e97c2813-cf02-4ed3-82b5-c185fa8002d9"/>
+				<box rightPadding="5">
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font fontName="Monospaced" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{unitCode}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="1" splitType="Stretch">
+			<printWhenExpression><![CDATA[new Boolean($V{PAGE_NUMBER}.equals($P{REPORT_PARAMETERS_MAP}.get("LastPageNumber")))]]></printWhenExpression>
+			<line>
+				<reportElement x="0" y="-1" width="572" height="1" uuid="999b0e37-e3e3-4f9c-ab8b-d0ef54b39868">
+					<printWhenExpression><![CDATA[new Boolean(!($V{PAGE_NUMBER}.equals($P{REPORT_PARAMETERS_MAP}.get("LastPageNumber"))))]]></printWhenExpression>
+				</reportElement>
+			</line>
+		</band>
+	</columnFooter>
+	<pageFooter>
+		<band height="14">
+			<textField>
+				<reportElement x="-1" y="0" width="573" height="14" uuid="8a2fabf4-458b-41e8-b556-8f290cd8ec52"/>
+				<textElement textAlignment="Center">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="13">
+			<subreport>
+				<reportElement x="1" y="0" width="571" height="13" uuid="9a610a1e-a010-4ea3-8ee0-069238213fec"/>
+				<subreportParameter name="PREPARAR_SIGN">
+					<subreportParameterExpression><![CDATA[$P{PREPARAR_SIGN}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="RECAPPBY">
+					<subreportParameterExpression><![CDATA[$P{RECAPPBY}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="COMP_ADDR">
+					<subreportParameterExpression><![CDATA[$P{COMP_ADDR}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="BUDGETCHECKEDBY_POS">
+					<subreportParameterExpression><![CDATA[$P{BUDGETCHECKEDBY_POS}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="MODE_REPEAT_ORDER">
+					<subreportParameterExpression><![CDATA[$P{MODE_REPEAT_ORDER}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="BUDGET_OFFICER_SIGN">
+					<subreportParameterExpression><![CDATA[$P{BUDGET_OFFICER_SIGN}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="BAC_REPRESENTATIVE">
+					<subreportParameterExpression><![CDATA[$P{BAC_REPRESENTATIVE}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="REVIEWEDANDACCEPTEDBY_POS">
+					<subreportParameterExpression><![CDATA[$P{REVIEWEDANDACCEPTEDBY_POS}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="RECOMMENDAR_SIGN">
+					<subreportParameterExpression><![CDATA[$P{RECOMMENDAR_SIGN}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="IS_EMERGENCY_PURCHASE">
+					<subreportParameterExpression><![CDATA[$P{IS_EMERGENCY_PURCHASE}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="INVENTORYCHECKEDBY_TIME">
+					<subreportParameterExpression><![CDATA[$P{INVENTORYCHECKEDBY_TIME}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="APPROVEDBY">
+					<subreportParameterExpression><![CDATA[$P{APPROVEDBY}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="MODE_SIMPLIFIED">
+					<subreportParameterExpression><![CDATA[$P{MODE_SIMPLIFIED}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="POSITION">
+					<subreportParameterExpression><![CDATA[$P{POSITION}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="BUDGETCHECKEDBY">
+					<subreportParameterExpression><![CDATA[$P{BUDGETCHECKEDBY}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="MODE_OPEN_CANVASS">
+					<subreportParameterExpression><![CDATA[$P{MODE_OPEN_CANVASS}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="NAME">
+					<subreportParameterExpression><![CDATA[$P{NAME}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="REPORT_TITLE">
+					<subreportParameterExpression><![CDATA[$P{REPORT_TITLE}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="INVENTORYCHECKEDBY_SIGN">
+					<subreportParameterExpression><![CDATA[$P{INVENTORYCHECKEDBY_SIGN}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="NOTER_SIGN">
+					<subreportParameterExpression><![CDATA[$P{NOTER_SIGN}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="REQUESTEDBY">
+					<subreportParameterExpression><![CDATA[$P{REQUESTEDBY}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="MODE_BIDDING">
+					<subreportParameterExpression><![CDATA[$P{MODE_BIDDING}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="BUDGETCHECKEDBY_TIME">
+					<subreportParameterExpression><![CDATA[$P{BUDGETCHECKEDBY_TIME}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="VOUCHER_NO">
+					<subreportParameterExpression><![CDATA[$P{VOUCHER_NO}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="AUDITBY_POS">
+					<subreportParameterExpression><![CDATA[$P{AUDITBY_POS}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="BUDGET_SOURCE">
+					<subreportParameterExpression><![CDATA[$P{BUDGET_SOURCE}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="INVENTORYCHECKEDBY_POS">
+					<subreportParameterExpression><![CDATA[$P{INVENTORYCHECKEDBY_POS}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="REVIEWEDANDACCEPTEDBY_SIGN">
+					<subreportParameterExpression><![CDATA[$P{REVIEWEDANDACCEPTEDBY_SIGN}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="WORKFLOW">
+					<subreportParameterExpression><![CDATA[$P{WORKFLOW}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="BAC_DATE">
+					<subreportParameterExpression><![CDATA[$P{BAC_DATE}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="AUDITBY">
+					<subreportParameterExpression><![CDATA[$P{AUDITBY}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="BUDGET_OFFICER_TIME">
+					<subreportParameterExpression><![CDATA[$P{BUDGET_OFFICER_TIME}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="MODE_EMERGENCY">
+					<subreportParameterExpression><![CDATA[$P{MODE_EMERGENCY}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="NOTEDBY">
+					<subreportParameterExpression><![CDATA[$P{NOTEDBY}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="BUDGET_OFFICER">
+					<subreportParameterExpression><![CDATA[$P{BUDGET_OFFICER}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="ESTIMATED_AMOUNT">
+					<subreportParameterExpression><![CDATA[$P{ESTIMATED_AMOUNT}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="COMP_CONTACT">
+					<subreportParameterExpression><![CDATA[$P{COMP_CONTACT}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="REVIEWEDANDACCEPTEDBY">
+					<subreportParameterExpression><![CDATA[$P{REVIEWEDANDACCEPTEDBY}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="APPROVEDBY_POS">
+					<subreportParameterExpression><![CDATA[$P{APPROVEDBY_POS}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="V_DATE">
+					<subreportParameterExpression><![CDATA[$P{V_DATE}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="RECAPPBY_POS">
+					<subreportParameterExpression><![CDATA[$P{RECAPPBY_POS}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="PURPOSE">
+					<subreportParameterExpression><![CDATA[$P{PURPOSE}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="AUDITOR_SIGN">
+					<subreportParameterExpression><![CDATA[$P{AUDITOR_SIGN}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="TRANS_ID">
+					<subreportParameterExpression><![CDATA[$P{TRANS_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="COMP_NAME">
+					<subreportParameterExpression><![CDATA[$P{COMP_NAME}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="APPROVAR_TIME">
+					<subreportParameterExpression><![CDATA[$P{APPROVAR_TIME}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="DEPARTMENT">
+					<subreportParameterExpression><![CDATA[$P{DEPARTMENT}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="AUDITOR_TIME">
+					<subreportParameterExpression><![CDATA[$P{AUDITOR_TIME}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="LOGO_PATH">
+					<subreportParameterExpression><![CDATA[$P{LOGO_PATH}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="WORK_ORDER">
+					<subreportParameterExpression><![CDATA[$P{WORK_ORDER}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="APPROVAR_SIGN">
+					<subreportParameterExpression><![CDATA[$P{APPROVAR_SIGN}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="BUDGETCHECKEDBY_SIGN">
+					<subreportParameterExpression><![CDATA[$P{BUDGETCHECKEDBY_SIGN}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="NOTER_TIME">
+					<subreportParameterExpression><![CDATA[$P{NOTER_TIME}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="REVIEWEDANDACCEPTEDBY_TIME">
+					<subreportParameterExpression><![CDATA[$P{REVIEWEDANDACCEPTEDBY_TIME}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="INVENTORYCHECKEDBY">
+					<subreportParameterExpression><![CDATA[$P{INVENTORYCHECKEDBY}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="NOTEDBY_POS">
+					<subreportParameterExpression><![CDATA[$P{NOTEDBY_POS}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="SUBREPORT_DIR">
+					<subreportParameterExpression><![CDATA[$P{SUBREPORT_DIR}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="PREPARAR_TIME">
+					<subreportParameterExpression><![CDATA[$P{PREPARAR_TIME}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="BUDGET_LINE_ITEM">
+					<subreportParameterExpression><![CDATA[$P{BUDGET_LINE_ITEM}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="RECOMMENDAR_TIME">
+					<subreportParameterExpression><![CDATA[$P{RECOMMENDAR_TIME}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="MODE_REVOLVING">
+					<subreportParameterExpression><![CDATA[$P{MODE_REVOLVING}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "RequisitionVoucher_Workflow_"  + $P{WORKFLOW} + ".jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+	</summary>
+</jasperReport>

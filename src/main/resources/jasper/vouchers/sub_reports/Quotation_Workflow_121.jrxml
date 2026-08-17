@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Quotation_Workflow_121" language="groovy" pageWidth="1008" pageHeight="612" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="1008" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="e4c154f9-f32f-4938-9765-d8dfe6cd8bc3">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="218"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="PREPARED_BY" class="java.lang.String"/>
+	<parameter name="PREPARED_BY_POS" class="java.lang.String"/>
+	<parameter name="PREPARED_BY_TIME" class="java.sql.Timestamp"/>
+	<parameter name="PREPARED_BY_SIGN" class="java.lang.String"/>
+	<parameter name="APPROVED_BY_PROCUREMENT_OFFICER_TIME" class="java.sql.Timestamp"/>
+	<parameter name="APPROVED_BY_PROCUREMENT_OFFICER" class="java.lang.String"/>
+	<parameter name="APPROVED_BY_PROCUREMENT_OFFICER_POS" class="java.lang.String"/>
+	<parameter name="APPROVED_BY_PROCUREMENT_OFFICER_SIGN" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<summary>
+		<band height="115" splitType="Stretch">
+			<textField isBlankWhenNull="true">
+				<reportElement x="109" y="60" width="200" height="15" uuid="62afb9ee-e949-4e97-90a0-b4c718f72b09"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$P{PREPARED_BY_TIME}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="708" y="0" width="100" height="20" uuid="c553e18d-132a-47c5-8d03-b981aee1df6f"/>
+				<textElement verticalAlignment="Middle"/>
+				<text><![CDATA[Approved By:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="109" y="75" width="200" height="20" uuid="f226397c-87c3-463b-aae1-380bc3afa482"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$P{PREPARED_BY}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="708" y="60" width="200" height="15" uuid="7896c1a2-979a-41a8-bf52-5919f58bec95"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$P{APPROVED_BY_PROCUREMENT_OFFICER_TIME}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="708" y="75" width="200" height="20" uuid="104df954-2002-41dd-9004-859e1455b63e"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$P{APPROVED_BY_PROCUREMENT_OFFICER}]]></textFieldExpression>
+			</textField>
+			<image hAlign="Center" isLazy="true" onErrorType="Blank">
+				<reportElement x="109" y="20" width="200" height="40" uuid="d2260a52-fc8f-4adb-b778-2a309b9b7c61"/>
+				<imageExpression><![CDATA[$P{PREPARED_BY_SIGN}]]></imageExpression>
+			</image>
+			<staticText>
+				<reportElement x="109" y="0" width="100" height="20" uuid="1af62a6a-7068-47f5-b0c8-6660d068b3a5"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Prepared By:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="109" y="95" width="200" height="20" uuid="de238161-52b8-4517-9a00-f5cc8320d3d3"/>
+				<box>
+					<topPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$P{PREPARED_BY_POS}]]></textFieldExpression>
+			</textField>
+			<image hAlign="Center" isLazy="true" onErrorType="Blank">
+				<reportElement x="708" y="20" width="200" height="40" uuid="dc05e79a-a0c1-431a-878f-3c3ca7f5e892"/>
+				<imageExpression><![CDATA[$P{APPROVED_BY_PROCUREMENT_OFFICER_SIGN}]]></imageExpression>
+			</image>
+			<textField>
+				<reportElement x="708" y="95" width="200" height="20" uuid="13cf297f-03f1-44e9-81eb-9b656702c81f"/>
+				<box>
+					<topPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$P{APPROVED_BY_PROCUREMENT_OFFICER_POS}]]></textFieldExpression>
+			</textField>
+		</band>
+	</summary>
+</jasperReport>

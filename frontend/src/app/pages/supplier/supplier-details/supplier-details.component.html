@@ -1,0 +1,83 @@
+<div class="container-fluid">
+    <app-page-title [title]="module" [subTitle]="subModule" [menuLink]="menuLink"/>
+</div>
+
+<app-ui-card [title]="module + ' Details'">
+    <div class="col-xl-12 p-3" card-body>
+        @if (isLoading()) {
+            <div class="d-flex align-items-center gap-2 text-muted py-2">
+                <span class="spinner-border spinner-border-sm" role="status"></span>
+                Loading...
+            </div>
+        } @else {
+        <div class="row">
+            <div class="col-sm-6">
+                <dl class="row mb-0">
+                    <dt class="col-sm-4 fw-normal">Name</dt>
+                    <dd class="col-sm-8 fw-bold">{{ data.name }}</dd>
+                    <dt class="col-sm-4 fw-normal">Address</dt>
+                    <dd class="col-sm-8 fw-bold">{{ data.address || '—' }}</dd>
+                    <dt class="col-sm-4 fw-normal">Phone</dt>
+                    <dd class="col-sm-8 fw-bold">{{ data.phone || '—' }}</dd>
+                    <dt class="col-sm-4 fw-normal">Fax</dt>
+                    <dd class="col-sm-8 fw-bold">{{ data.fax || '—' }}</dd>
+                    <dt class="col-sm-4 fw-normal">Email</dt>
+                    <dd class="col-sm-8 fw-bold">{{ data.email || '—' }}</dd>
+                    <dt class="col-sm-4 fw-normal">TIN</dt>
+                    <dd class="col-sm-8 fw-bold">{{ data.tin || '—' }}</dd>
+                    <dt class="col-sm-4 fw-normal">ZIP</dt>
+                    <dd class="col-sm-8 fw-bold">{{ data.zip || '—' }}</dd>
+                    <dt class="col-sm-4 fw-normal">Account No.</dt>
+                    <dd class="col-sm-8 fw-bold">{{ data.accountNumber || '—' }}</dd>
+                </dl>
+            </div>
+            <div class="col-sm-6">
+                <dl class="row mb-0">
+                    <dt class="col-sm-5 fw-normal">Contact Person</dt>
+                    <dd class="col-sm-7 fw-bold">{{ data.contactPerson || '—' }}</dd>
+                    <dt class="col-sm-5 fw-normal">Position</dt>
+                    <dd class="col-sm-7 fw-bold">{{ data.contactPersonPosition || '—' }}</dd>
+                    <dt class="col-sm-5 fw-normal">Bank Account No.</dt>
+                    <dd class="col-sm-7 fw-bold">{{ data.bankAccountNumber || '—' }}</dd>
+                    <dt class="col-sm-5 fw-normal">Credit Limit</dt>
+                    <dd class="col-sm-7 fw-bold">{{ data.creditLimit || '—' }}</dd>
+                    <dt class="col-sm-5 fw-normal">Vatable</dt>
+                    <dd class="col-sm-7 fw-bold">{{ data.vatable ? 'Yes' : 'No' }}</dd>
+                    <dt class="col-sm-5 fw-normal">Accredited</dt>
+                    <dd class="col-sm-7 fw-bold">{{ data.accredited ? 'Yes' : 'No' }}</dd>
+                    <dt class="col-sm-5 fw-normal">Status</dt>
+                    <dd class="col-sm-7 fw-bold">
+                        @if (data.status) {
+                            <span class="badge bg-success">Active</span>
+                        } @else {
+                            <span class="badge bg-secondary">Inactive</span>
+                        }
+                    </dd>
+                    <dt class="col-sm-5 fw-normal">Remarks</dt>
+                    <dd class="col-sm-7 fw-bold">{{ data.remarks || '—' }}</dd>
+                    <dt class="col-sm-5 fw-normal">Date Created</dt>
+                    <dd class="col-sm-7 fw-bold">{{ data.createdAt ? (data.createdAt | date:'medium') : '—' }}</dd>
+                    <dt class="col-sm-5 fw-normal">Last Updated</dt>
+                    <dd class="col-sm-7 fw-bold">{{ data.updatedAt ? (data.updatedAt | date:'medium') : '—' }}</dd>
+                </dl>
+            </div>
+        </div>
+        }
+        <hr/>
+        <div class="d-flex justify-content-end gap-2">
+            <button type="button" class="btn btn-light fw-bold"
+                    [routerLink]="['/' + menuLink]">
+                <ng-icon name="tablerArrowLeft" class="ps-0 pe-3 fw-bold"></ng-icon>Back
+            </button>
+            <!-- TODO: Confirm with PM before enabling delete
+            <button type="button" class="btn btn-danger fw-bold" (click)="delete()">
+                <ng-icon name="tablerTrash" class="ps-0 pe-3 fw-bold"></ng-icon>Delete
+            </button>
+            -->
+            <button type="button" class="btn btn-primary fw-bold"
+                    [routerLink]="['/' + menuLink, data.id, 'edit']">
+                <ng-icon name="tablerPencil" class="ps-0 pe-3 fw-bold"></ng-icon>Edit
+            </button>
+        </div>
+    </div>
+</app-ui-card>

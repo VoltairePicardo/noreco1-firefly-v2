@@ -1,0 +1,178 @@
+<div class="container-fluid">
+    <app-page-title [title]="module" [subTitle]="subModule" [menuLink]="menuLink"/>
+</div>
+
+<div class="card">
+    <div class="row">
+        <div class="col-xl-12">
+            <div class="card-body">
+
+                <!-- Primary Filters -->
+                <div class="row mb-2 align-items-end g-2">
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold mb-1 fs-xs text-uppercase">Search</label>
+                        <input type="text" class="form-control" [(ngModel)]="searchQuery"
+                               placeholder="Code, check #, account, particulars..."
+                               (ngModelChange)="onSearch()"/>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label fw-bold mb-1 fs-xs text-uppercase">Type</label>
+                        <select class="form-select" [(ngModel)]="typeFilter" (ngModelChange)="page = 1">
+                            <option value="">All</option>
+                            <option value="RC">RC - Released Check</option>
+                            <option value="DT">DT - Deposit In Transit</option>
+                            <option value="OD">OD - Other Deposit</option>
+                        </select>
+                    </div>
+                    <div class="col-auto d-flex gap-2 align-self-end">
+                        <button type="button" class="btn btn-success fw-bold" (click)="onSearch()">
+                            <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Search
+                        </button>
+                        <button type="button" class="btn btn-danger fw-bold" (click)="reset()">
+                            <ng-icon name="tablerRefresh" class="ps-0 pe-3 fw-bold"></ng-icon>Reset
+                        </button>
+                    </div>
+                    <div class="col-md-auto ms-auto align-self-end">
+                        <a class="btn btn-primary fw-bold" [routerLink]="['/' + menuLink + '/od/create']">
+                            <ng-icon name="tablerPlus" class="ps-0 pe-3 fw-bold"></ng-icon>New Other Deposit
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Secondary Filters — visible only when a type is selected (mirrors legacy behavior) -->
+                @if (typeFilter) {
+                    <div class="row mb-3 align-items-end g-2">
+                        <div class="col-md-2">
+                            <label class="form-label fw-bold mb-1 fs-xs text-uppercase">Status</label>
+                            <select class="form-select" [(ngModel)]="clearedFilter" (ngModelChange)="page = 1">
+                                <option value="">All</option>
+                                <option value="cleared">Cleared</option>
+                                <option value="not-cleared">Not Cleared</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold mb-1 fs-xs text-uppercase">Account</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control"
+                                       [value]="selectedAccount ? (selectedAccount.accountCode + ' - ' + selectedAccount.accountTitle) : ''"
+                                       readonly placeholder="Browse account..."/>
+                                <button type="button" class="btn btn-success fw-bold" (click)="openAccBrowse()">
+                                    <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
+                                </button>
+                                @if (selectedAccount) {
+                                    <button type="button" class="btn btn-danger fw-bold" (click)="clearAccount()">
+                                        <ng-icon name="tablerX" class="ps-0 pe-0 fw-bold"></ng-icon>
+                                    </button>
+                                }
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label fw-bold mb-1 fs-xs text-uppercase">Date</label>
+                            <input type="text" class="form-control" mwlFlatpickr [options]="flatpickrOptions"
+                                   [(ngModel)]="dateFilter" placeholder="Select date"
+                                   (ngModelChange)="page = 1"/>
+                        </div>
+                    </div>
+                }
+
+                <!-- Table -->
+                <div class="row">
+                    <div class="table-responsive">
+                        <table class="table table-custom table-centered table-select table-hover w-100 mb-0">
+                            <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                                <tr class="text-uppercase fs-xxs">
+                                    <th>Ref No.</th>
+                                    <th>Account</th>
+                                    <th>Check No.</th>
+                                    <th>Date</th>
+                                    <th>Particulars</th>
+                                    <th class="text-end">Amount</th>
+                                    <th class="text-center">Type</th>
+                                    <th class="text-center">Status</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (pagedRecords.length > 0) {
+                                    @for (rec of pagedRecords; track rec.documentId + rec.type) {
+                                        <tr>
+                                            <td class="fw-bold">{{ rec.localCode }}</td>
+                                            <td>{{ rec.account }}</td>
+                                            <td>{{ rec.checkNo || '—' }}</td>
+                                            <td>{{ rec.voucherDate | date:'MMM dd, yyyy' }}</td>
+                                            <td>{{ rec.particulars }}</td>
+                                            <td class="text-end">{{ rec.amount | number:'1.2-2' }}</td>
+                                            <td class="text-center">
+                                                @if (rec.type === 'RC') {
+                                                    <span class="badge bg-primary bg-opacity-25 text-primary border">RC</span>
+                                                } @else if (rec.type === 'DT') {
+                                                    <span class="badge bg-warning bg-opacity-25 text-warning border">DT</span>
+                                                } @else {
+                                                    <span class="badge bg-info bg-opacity-25 text-info border">OD</span>
+                                                }
+                                            </td>
+                                            <td class="text-center">
+                                                @if (isCleared(rec)) {
+                                                    <span class="badge bg-success">Cleared</span>
+                                                } @else {
+                                                    <span class="badge bg-secondary">Not Cleared</span>
+                                                }
+                                            </td>
+                                            <td class="text-nowrap">
+                                                <div class="d-flex justify-content-end gap-1">
+                                                    @if (rec.type === 'OD') {
+                                                        <a class="btn btn-light btn-icon btn-sm rounded-circle"
+                                                           [routerLink]="['/' + menuLink + '/od', rec.documentId, 'detail']"
+                                                           ngbTooltip="View">
+                                                            <ng-icon name="tablerEye"></ng-icon>
+                                                        </a>
+                                                    }
+                                                    @if (isCleared(rec)) {
+                                                        <button type="button"
+                                                                class="btn btn-light btn-sm fw-bold"
+                                                                ngbTooltip="Mark as Not Cleared"
+                                                                (click)="toggleCleared(rec)">
+                                                            <ng-icon name="tablerX" class="ps-0 pe-3 fw-bold"></ng-icon>UnClear
+                                                        </button>
+                                                    } @else {
+                                                        <button type="button"
+                                                                class="btn btn-success btn-sm fw-bold"
+                                                                ngbTooltip="Mark as Cleared"
+                                                                (click)="toggleCleared(rec)">
+                                                            <ng-icon name="tablerCheck" class="ps-0 pe-3 fw-bold"></ng-icon>Clear
+                                                        </button>
+                                                    }
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                } @else {
+                                    <tr class="no-results">
+                                        <td colspan="9" class="text-center text-muted py-3">
+                                            @if (isLoading()) {
+                                                <span class="spinner-border spinner-border-sm me-2" role="status"></span>Loading...
+                                            } @else { Nothing found. }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Pagination -->
+                @if (filteredRecords.length > pageSize) {
+                    <div class="d-flex justify-content-center mt-3">
+                        <ngb-pagination
+                            [collectionSize]="filteredRecords.length"
+                            [(page)]="page"
+                            [pageSize]="pageSize"
+                            [maxSize]="5">
+                        </ngb-pagination>
+                    </div>
+                }
+
+            </div>
+        </div>
+    </div>
+</div>

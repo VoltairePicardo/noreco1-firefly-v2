@@ -1,0 +1,204 @@
+<div class="container-fluid">
+    <app-page-title [title]="module" [subTitle]="subModule" [menuLink]="menuLink"/>
+</div>
+
+<div class="container-fluid">
+    @if (isLoading()) {
+        <div class="d-flex align-items-center gap-2 text-muted py-4">
+            <span class="spinner-border spinner-border-sm" role="status"></span> Loading...
+        </div>
+    } @else {
+    <div class="row g-3">
+
+        <div class="col-xl-12">
+            <app-ui-card title="Petty Cash Liquidation Details">
+                <div class="col-xl-12 p-3" card-body>
+                    <form class="row g-3 needs-validation" novalidate (ngSubmit)="save()">
+
+                        <!-- PCV Selection -->
+                        <div class="col-md-12">
+                            <label class="form-label fw-bold">
+                                Petty Cash Voucher (Released) <span class="text-danger">*</span>
+                            </label>
+                            <select class="form-select" [(ngModel)]="pettyCashTrans" name="pettyCashTrans"
+                                    [compareWith]="compareFn"
+                                    (ngModelChange)="onPCVChange()"
+                                    [class]="submit && !pettyCashTrans ? 'is-invalid' : submit && pettyCashTrans ? 'is-valid' : ''"
+                                    [disabled]="editMode"
+                                    required>
+                                <option [ngValue]="null">— Select PCV —</option>
+                                @for (pcv of releasedPCVs; track pcv.id) {
+                                    <option [ngValue]="pcv">{{ pcv.code }} — {{ pcv.payee || '' }}</option>
+                                }
+                            </select>
+                            @if (submit && !pettyCashTrans) {
+                                <div class="text-danger fs-xs mt-1">Please select a petty cash voucher.</div>
+                            }
+                        </div>
+
+                        <!-- PCV Info (when selected) -->
+                        @if (pettyCashTrans) {
+                            <div class="col-md-12">
+                                <div class="alert alert-info py-2 mb-0">
+                                    <div class="row g-1">
+                                        <div class="col-md-3">
+                                            <span class="text-uppercase fs-xxs fw-bold">Request Type</span>
+                                            <div>{{ pettyCashTrans.request || '—' }}</div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <span class="text-uppercase fs-xxs fw-bold">Office</span>
+                                            <div>{{ pettyCashTrans.office?.name || pettyCashTrans.officeName || '—' }}</div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <span class="text-uppercase fs-xxs fw-bold">Petty Cash Fund</span>
+                                            <div>{{ pettyCashTrans.pettyCashFund?.code || '—' }}</div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <span class="text-uppercase fs-xxs fw-bold">PCV Amount</span>
+                                            <div class="fw-bold">{{ pettyCashTrans.amount | number:'1.2-2' }}</div>
+                                        </div>
+                                    </div>
+                                    @if (isReimbursement) {
+                                        <small class="text-muted mt-1 d-block">
+                                            <strong>Note:</strong> This is a Reimbursement-type PCV. Signatories will be auto-set from defaults.
+                                        </small>
+                                    }
+                                </div>
+                            </div>
+                        }
+
+                        <!-- Liquidation Items Table -->
+                        @if (pettyCashTrans) {
+                            <div class="col-12">
+                                <label class="form-label fw-bold mb-2">Petty Cash Items</label>
+                                @if (loadingItems) {
+                                    <div class="text-muted fs-xs mb-2">
+                                        <span class="spinner-border spinner-border-sm me-1" role="status"></span>
+                                        Loading PCV details...
+                                    </div>
+                                } @else if (items.length > 0) {
+                                    <div class="table-responsive">
+                                        <table class="table table-sm table-bordered mb-0">
+                                            <thead class="bg-light thead-sm">
+                                                <tr class="text-uppercase fs-xxs">
+                                                    <th>Particulars</th>
+                                                    <th class="text-end" style="width:130px">PCV Amount</th>
+                                                    <th class="text-end" style="width:150px">Actual Amount <span class="text-danger">*</span></th>
+                                                    <th style="width:160px">OR Number</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @for (item of items; track $index) {
+                                                    <tr>
+                                                        <td>{{ item.remarks }}</td>
+                                                        <td class="text-end text-muted">{{ item.pcvAmount | number:'1.2-2' }}</td>
+                                                        <td>
+                                                            <input type="number" class="form-control form-control-sm text-end"
+                                                                   [(ngModel)]="item.amount"
+                                                                   [name]="'amt_' + $index"
+                                                                   min="0" step="0.01" placeholder="0.00"/>
+                                                        </td>
+                                                        <td>
+                                                            <input type="text" class="form-control form-control-sm"
+                                                                   [(ngModel)]="item.orNumber"
+                                                                   [name]="'or_' + $index"
+                                                                   maxlength="1024"
+                                                                   placeholder="OR #"/>
+                                                        </td>
+                                                    </tr>
+                                                }
+                                                <!-- Total Row -->
+                                                <tr class="fw-bold"
+                                                    [class.table-danger]="isOverLimit">
+                                                    <td class="text-end text-uppercase fs-xs" colspan="2">Total Actual Amount</td>
+                                                    <td class="text-end">{{ totalAmount | number:'1.2-2' }}</td>
+                                                    <td></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    @if (submit && totalAmount <= 0) {
+                                        <div class="text-danger fs-xs mt-1">Total amount must be greater than zero.</div>
+                                    }
+                                    @if (isOverLimit) {
+                                        <div class="text-danger fs-xs mt-1">
+                                            Total amount must not exceed {{ maxAmount | number:'1.2-2' }}.
+                                        </div>
+                                    }
+                                } @else {
+                                    <div class="text-muted fs-xs">No details found for this PCV.</div>
+                                }
+                            </div>
+                        }
+
+                        <!-- Signatories -->
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">
+                                Approving Officer <span class="text-danger">*</span>
+                            </label>
+                            @if (isReimbursement) {
+                                <p class="form-control-plaintext text-muted fs-sm">
+                                    Auto-set for Reimbursement type.
+                                </p>
+                            } @else {
+                                <select class="form-select" [(ngModel)]="approvingOfficer" name="approvingOfficer"
+                                        [compareWith]="compareFn"
+                                        [class]="submit && !approvingOfficer ? 'is-invalid' : submit && approvingOfficer ? 'is-valid' : ''">
+                                    <option [ngValue]="null">— Select Approving Officer —</option>
+                                    @if (approvingOfficer) {
+                                        <option [ngValue]="approvingOfficer">
+                                            {{ approvingOfficer.fullName || approvingOfficer.name || approvingOfficer.accountNo }}
+                                        </option>
+                                    }
+                                </select>
+                                @if (submit && !approvingOfficer) {
+                                    <div class="text-danger fs-xs mt-1">Please select an approving officer.</div>
+                                }
+                                <small class="text-muted fs-xs">Default signatory pre-selected. Override if needed.</small>
+                            }
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">
+                                Receiving Officer <span class="text-danger">*</span>
+                            </label>
+                            @if (isReimbursement) {
+                                <p class="form-control-plaintext text-muted fs-sm">
+                                    Auto-set for Reimbursement type.
+                                </p>
+                            } @else {
+                                <select class="form-select" [(ngModel)]="receivingOfficer" name="receivingOfficer"
+                                        [compareWith]="compareFn"
+                                        [class]="submit && !receivingOfficer ? 'is-invalid' : submit && receivingOfficer ? 'is-valid' : ''">
+                                    <option [ngValue]="null">— Select Receiving Officer —</option>
+                                    @if (receivingOfficer) {
+                                        <option [ngValue]="receivingOfficer">
+                                            {{ receivingOfficer.fullName || receivingOfficer.name || receivingOfficer.accountNo }}
+                                        </option>
+                                    }
+                                </select>
+                                @if (submit && !receivingOfficer) {
+                                    <div class="text-danger fs-xs mt-1">Please select a receiving officer.</div>
+                                }
+                                <small class="text-muted fs-xs">Default signatory pre-selected. Override if needed.</small>
+                            }
+                        </div>
+
+                        <div class="d-flex gap-2 justify-content-end align-items-center pt-3 border-top mt-3">
+                            <a [routerLink]="['/' + menuLink]" class="btn btn-light fw-bold">
+                                <ng-icon name="tablerArrowLeft" class="ps-0 pe-3 fw-bold"></ng-icon>Back
+                            </a>
+                            <button type="submit" class="btn btn-primary fw-bold" [disabled]="formSubmit">
+                                <ng-icon name="tablerCheck" class="ps-0 pe-3 fw-bold"></ng-icon>
+                                {{ editMode ? 'Update' : 'Save' }}
+                            </button>
+                        </div>
+
+                    </form>
+                </div>
+            </app-ui-card>
+        </div>
+
+    </div>
+    }
+</div>

@@ -1,0 +1,58 @@
+<div class="modal-header">
+    <h6 class="modal-title fw-semibold text-uppercase fs-xs">Browse Item Stock</h6>
+    <button type="button" class="btn-close" (click)="dismiss()"></button>
+</div>
+<div class="modal-body">
+    <div class="row mb-3">
+        <div class="col-md-4">
+            <input type="text" class="form-control form-control-sm"
+                   placeholder="Search code or description..."
+                   [(ngModel)]="searchText" (ngModelChange)="page = 1"/>
+        </div>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-custom table-centered table-hover w-100 mb-0">
+            <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                <tr class="text-uppercase fs-xxs">
+                    <th>Code</th>
+                    <th>Description</th>
+                    <th>Unit</th>
+                    <th class="text-center">Quantity</th>
+                    <th class="text-end">Unit Cost</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (isLoading) {
+                    <tr><td colspan="5" class="text-center py-3">
+                        <span class="spinner-border spinner-border-sm me-2"></span>Loading...
+                    </td></tr>
+                } @else if (pagedRecords.length === 0) {
+                    <tr><td colspan="5" class="text-center text-muted py-3">No items found.</td></tr>
+                } @else {
+                    @for (item of pagedRecords; track item.id) {
+                        <tr style="cursor:pointer" (click)="select(item)">
+                            <td class="fw-bold">{{ item.item?.code || item.code }}</td>
+                            <td>{{ item.item?.description || item.description }}</td>
+                            <td>{{ item.item?.unit?.code || item.unitCode }}</td>
+                            <td class="text-center">{{ (item.totalQuantity ?? item.quantity) | number:'1.0-3' }}</td>
+                            <td class="text-end">{{ item.unitCost | number:'1.2-2' }}</td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+    @if (filteredTotal > pageSize) {
+        <div class="d-flex justify-content-center mt-3">
+            <ngb-pagination
+                [collectionSize]="filteredTotal"
+                [(page)]="page"
+                [pageSize]="pageSize"
+                [maxSize]="5">
+            </ngb-pagination>
+        </div>
+    }
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-light fw-bold" (click)="dismiss()">Cancel</button>
+</div>

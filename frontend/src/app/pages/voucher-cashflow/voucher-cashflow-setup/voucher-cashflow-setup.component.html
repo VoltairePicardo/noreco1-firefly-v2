@@ -1,0 +1,251 @@
+<div class="container-fluid">
+    <app-page-title [title]="module" [subTitle]="subModule" [menuLink]="menuLink"/>
+</div>
+
+<div class="container-fluid">
+    @if (isLoading()) {
+        <div class="d-flex align-items-center gap-2 text-muted py-4">
+            <span class="spinner-border spinner-border-sm" role="status"></span> Loading...
+        </div>
+    } @else {
+    <div class="row g-3">
+
+        <!-- Voucher Header -->
+        <div class="col-xl-12">
+            <app-ui-card title="Voucher Information">
+                <div class="col-xl-12 p-3" card-body>
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Document Code</div>
+                            <div class="fw-bold">
+                                @if (voucher()?.detailLink) {
+                                    <a [href]="voucher()?.detailLink" target="_blank" class="text-primary">
+                                        {{ voucher()?.code || '—' }}
+                                    </a>
+                                } @else {
+                                    {{ voucher()?.code || '—' }}
+                                }
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Document Type</div>
+                            <div>{{ voucher()?.documentType || '—' }}</div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Voucher Date</div>
+                            <div>{{ voucher()?.voucherDate | date:'MMMM d, yyyy' }}</div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Amount</div>
+                            <div class="fw-bold">{{ voucher()?.amount | number:'1.2-2' }}</div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Payee / Particulars</div>
+                            <div>{{ voucher()?.payee || voucher()?.particulars || '—' }}</div>
+                        </div>
+                    </div>
+                </div>
+            </app-ui-card>
+        </div>
+
+        <!-- Closed-cycle alert (mirrors legacy `hide` flag) -->
+        @if (isClosed) {
+            <div class="col-xl-12">
+                <div class="alert alert-info mb-0">
+                    Monthly cycle for this voucher is already closed!
+                </div>
+            </div>
+        }
+
+        <!-- Accounting Entries Panel -->
+        <div class="col-xl-12">
+            <app-ui-card title="Accounting Entries">
+                <div class="col-xl-12 p-3" card-body>
+                    <div class="table-responsive">
+                        <table class="table table-custom table-centered table-hover w-100 mb-0">
+                            <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                                <tr class="text-uppercase fs-xxs">
+                                    <th>Code</th>
+                                    <th>Title</th>
+                                    <th class="text-end">Debit</th>
+                                    <th class="text-end">Credit</th>
+                                    <th class="text-center">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @for (entry of generalLedger(); track entry.id) {
+                                    <tr>
+                                        <td class="fw-bold">{{ entry.code }}</td>
+                                        <td>{{ entry.title }}</td>
+                                        <td class="text-end">{{ entry.debit | number:'1.2-2' }}</td>
+                                        <td class="text-end">{{ entry.credit | number:'1.2-2' }}</td>
+                                        <td class="text-center">
+                                            @if (!isClosed) {
+                                                <button type="button"
+                                                        class="btn btn-success btn-sm fw-bold"
+                                                        (click)="openInlinePanel(entry.id)">
+                                                    <ng-icon name="tablerPlus" class="ps-0 pe-3 fw-bold"></ng-icon>Set Cashflow
+                                                </button>
+                                            }
+                                        </td>
+                                    </tr>
+
+                                    <!-- Inline Assignment Panel -->
+                                    @if (activeLedgerId === entry.id) {
+                                        <tr>
+                                            <td colspan="5" class="p-0">
+                                                <div class="border rounded m-2 p-3 bg-light bg-opacity-50">
+                                                    <div class="fw-semibold fs-xs text-uppercase mb-2">Assign Cashflow Item — {{ entry.code }}</div>
+                                                    <div class="row g-2 align-items-end">
+                                                        <div class="col-md-5">
+                                                            <label class="form-label fw-bold mb-1 fs-xs text-uppercase">Cashflow Item</label>
+                                                            <select class="form-select form-select-sm"
+                                                                    [(ngModel)]="selectedCashflowItemId"
+                                                                    [ngModelOptions]="{ standalone: true }">
+                                                                <option [ngValue]="null">— Select Item —</option>
+                                                                @for (ci of cashflowItems(); track ci.id) {
+                                                                    <option [ngValue]="ci.id">
+                                                                        {{ ci.name }}
+                                                                        @if (ci.cashflowItemType?.name) {
+                                                                            ({{ ci.cashflowItemType.name }})
+                                                                        }
+                                                                    </option>
+                                                                }
+                                                            </select>
+                                                        </div>
+                                                        <div class="col-md-3">
+                                                            <label class="form-label fw-bold mb-1 fs-xs text-uppercase">Amount</label>
+                                                            <input type="number" class="form-control form-control-sm"
+                                                                   [(ngModel)]="inlineAmount"
+                                                                   [ngModelOptions]="{ standalone: true }"
+                                                                   placeholder="0.00" min="0" step="0.01"/>
+                                                        </div>
+                                                        <div class="col-md-auto">
+                                                            <button type="button" class="btn btn-success btn-sm fw-bold"
+                                                                    (click)="addAssignment(entry.id)">
+                                                                <ng-icon name="tablerPlus" class="ps-0 pe-3 fw-bold"></ng-icon>Add
+                                                            </button>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Items added for this ledger entry -->
+                                                    @if ((cashflowAssignments[entry.id] || []).length > 0) {
+                                                        <div class="mt-3">
+                                                            <table class="table table-sm table-bordered mb-0">
+                                                                <thead class="bg-light align-middle bg-opacity-50">
+                                                                    <tr class="text-uppercase fs-xxs">
+                                                                        <th>Cashflow Item</th>
+                                                                        <th class="text-end">Amount</th>
+                                                                        <th class="text-center" style="width:50px"></th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    @for (a of (cashflowAssignments[entry.id] || []); track $index; let i = $index) {
+                                                                        <tr>
+                                                                            <td>{{ a.cashflowItemName }}</td>
+                                                                            <td class="text-end">{{ a.amount | number:'1.2-2' }}</td>
+                                                                            <td class="text-center">
+                                                                                <button type="button"
+                                                                                        class="btn btn-danger btn-icon btn-sm rounded-circle"
+                                                                                        ngbTooltip="Remove"
+                                                                                        (click)="removeAssignment(entry.id, i)">
+                                                                                    <ng-icon name="tablerTrash" class="fs-sm"></ng-icon>
+                                                                                </button>
+                                                                            </td>
+                                                                        </tr>
+                                                                    }
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    }
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                                @if (generalLedger().length === 0) {
+                                    <tr>
+                                        <td colspan="5" class="text-center text-muted py-3">No accounting entries found.</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </app-ui-card>
+        </div>
+
+        <!-- Cashflow Settings Panel -->
+        <div class="col-xl-12">
+            <app-ui-card title="Cashflow Settings Per Accounting Entry">
+                <div class="col-xl-12 p-3" card-body>
+                    <div class="table-responsive">
+                        <table class="table table-custom table-centered table-hover w-100 mb-0">
+                            <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                                <tr class="text-uppercase fs-xxs">
+                                    <th>Account Code</th>
+                                    <th>Account Title</th>
+                                    <th>Cashflow Item</th>
+                                    <th class="text-end">Amount</th>
+                                    <th class="text-end">Debit</th>
+                                    <th class="text-end">Credit</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (cashflowDetails().length > 0) {
+                                    @for (d of cashflowDetails(); track $index) {
+                                        <tr>
+                                            <td class="fw-bold">{{ d.accountCode || '—' }}</td>
+                                            <td>{{ d.accountTitle || '—' }}</td>
+                                            <td>{{ d.cashflowItemName || d.cashflowItem?.name || '—' }}</td>
+                                            <td class="text-end">{{ d.amount | number:'1.2-2' }}</td>
+                                            <td class="text-end">{{ d.debit | number:'1.2-2' }}</td>
+                                            <td class="text-end">{{ d.credit | number:'1.2-2' }}</td>
+                                        </tr>
+                                    }
+                                } @else {
+                                    <tr>
+                                        <td colspan="6" class="text-center text-muted py-3">No cashflow settings saved yet.</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </app-ui-card>
+        </div>
+
+        <!-- Footer Actions -->
+        @if (!isClosed) {
+            <div class="col-xl-12">
+                <div class="d-flex gap-2 justify-content-end align-items-center pt-3 border-top mt-1">
+                    <a [routerLink]="['/' + menuLink]" class="btn btn-light fw-bold">
+                        <ng-icon name="tablerArrowLeft" class="ps-0 pe-3 fw-bold"></ng-icon>Back
+                    </a>
+                    <button type="button" class="btn btn-danger fw-bold" (click)="clearAssignments()">
+                        <ng-icon name="tablerRefresh" class="ps-0 pe-3 fw-bold"></ng-icon>Reset
+                    </button>
+                    <button type="button" class="btn btn-primary fw-bold"
+                            [disabled]="isSaving()"
+                            (click)="save()">
+                        @if (isSaving()) {
+                            <span class="spinner-border spinner-border-sm me-2" role="status"></span>Saving...
+                        } @else {
+                            <ng-icon name="tablerDeviceFloppy" class="ps-0 pe-3 fw-bold"></ng-icon>Save
+                        }
+                    </button>
+                </div>
+            </div>
+        } @else {
+            <div class="col-xl-12">
+                <div class="d-flex gap-2 justify-content-end align-items-center pt-3 border-top mt-1">
+                    <a [routerLink]="['/' + menuLink]" class="btn btn-light fw-bold">
+                        <ng-icon name="tablerArrowLeft" class="ps-0 pe-3 fw-bold"></ng-icon>Back
+                    </a>
+                </div>
+            </div>
+        }
+
+    </div>
+    }
+</div>

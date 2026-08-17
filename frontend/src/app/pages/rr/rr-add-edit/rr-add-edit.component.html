@@ -1,0 +1,419 @@
+<div class="container-fluid">
+    <app-page-title [title]="module" [subTitle]="subModule" [menuLink]="menuLink"/>
+</div>
+
+<div class="container-fluid">
+    @if (isLoading() && editMode) {
+        <div class="d-flex align-items-center gap-2 text-muted py-4">
+            <span class="spinner-border spinner-border-sm" role="status"></span> Loading...
+        </div>
+    } @else {
+    <form (ngSubmit)="save()" #f="ngForm">
+        <div class="row g-3">
+            <div class="col-xl-12">
+                <app-ui-card title="Receiving Report Information">
+                    <div class="col-xl-12 p-3" card-body>
+
+                        <!-- ─── Section: Basic Info ─────────────────────────────────── -->
+                        <div class="row g-3">
+
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold">Delivery Date <span class="text-danger">*</span></label>
+                                <input type="text" mwlFlatpickr [options]="flatpickrOptions"
+                                       class="form-control" [(ngModel)]="deliveryDate"
+                                       name="deliveryDate" placeholder="Select date" required/>
+                            </div>
+
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold">Delivery Number</label>
+                                <input type="text" class="form-control"
+                                       [(ngModel)]="deliveryNumber" name="deliveryNumber"
+                                       placeholder="Delivery No."/>
+                            </div>
+
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold">Invoice Date</label>
+                                <input type="text" mwlFlatpickr [options]="flatpickrOptions"
+                                       class="form-control" [(ngModel)]="invoiceDate"
+                                       name="invoiceDate" placeholder="Select date"/>
+                            </div>
+
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold">Invoice Number</label>
+                                <input type="text" class="form-control"
+                                       [(ngModel)]="invoiceNumber" name="invoiceNumber"
+                                       placeholder="Invoice No."/>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold">Inventory Location</label>
+                                <select class="form-select"
+                                        [(ngModel)]="selectedInventoryLocation"
+                                        name="inventoryLocation"
+                                        [compareWith]="compareById">
+                                    <option [ngValue]="null">— Select Location —</option>
+                                    @for (loc of inventoryLocations(); track loc.id) {
+                                        <option [ngValue]="loc">{{ loc.description || loc.name }}</option>
+                                    }
+                                </select>
+                            </div>
+
+                            <div class="col-md-8">
+                                <label class="form-label fw-bold">Remarks</label>
+                                <textarea class="form-control" [(ngModel)]="remarks" name="remarks"
+                                          rows="2" placeholder="Remarks"></textarea>
+                            </div>
+
+                        </div>
+
+                        <!-- ─── Section: Document Type ─────────────────────────────── -->
+                        <hr/>
+                        <div class="col-12 fs-xs text-uppercase fw-semibold text-muted mb-2">Document Type</div>
+
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <div class="d-flex flex-wrap gap-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio"
+                                               id="docTypePO" name="docType"
+                                               [checked]="isPO"
+                                               (change)="selectDocType(1)"/>
+                                        <label class="form-check-label fw-bold" for="docTypePO">Purchase Order</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio"
+                                               id="docTypeTested" name="docType"
+                                               [checked]="isTested"
+                                               (change)="selectDocType(5)"/>
+                                        <label class="form-check-label fw-bold" for="docTypeTested">Tested Items (PO)</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio"
+                                               id="docTypeJO" name="docType"
+                                               [checked]="isJO"
+                                               (change)="selectDocType(4)"/>
+                                        <label class="form-check-label fw-bold" for="docTypeJO">Job Order</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio"
+                                               id="docTypeIFR" name="docType"
+                                               [checked]="isIFR"
+                                               (change)="selectDocType(2)"/>
+                                        <label class="form-check-label fw-bold" for="docTypeIFR">Items For Repair</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio"
+                                               id="docTypeRV" name="docType"
+                                               [checked]="isRV"
+                                               (change)="selectDocType(3)"/>
+                                        <label class="form-check-label fw-bold" for="docTypeRV">Requisition Voucher</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ─── Section: Reference Browse ──────────────────────────── -->
+                        <div class="row g-3 mt-1">
+
+                            <!-- PO Browse (for PO and Tested Items) -->
+                            @if (isPO || isTested) {
+                                <div class="col-md-8">
+                                    <label class="form-label fw-bold">
+                                        Purchase Order <span class="text-danger">*</span>
+                                    </label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control"
+                                               [value]="poDesc" readonly
+                                               placeholder="Browse purchase order..."/>
+                                        <button type="button" class="btn btn-success fw-bold"
+                                                (click)="openPOBrowse()">
+                                            <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
+                                        </button>
+                                    </div>
+                                </div>
+                            }
+
+                            <!-- JO Browse -->
+                            @if (isJO) {
+                                <div class="col-md-8">
+                                    <label class="form-label fw-bold">
+                                        Job Order <span class="text-danger">*</span>
+                                    </label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control"
+                                               [value]="joDesc" readonly
+                                               placeholder="Browse job order..."/>
+                                        <button type="button" class="btn btn-success fw-bold"
+                                                (click)="openJOBrowse()">
+                                            <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
+                                        </button>
+                                    </div>
+                                </div>
+                            }
+
+                            <!-- IFR: no header reference browse — items added as free-form rows -->
+
+                            <!-- RV Browse + Supplier Browse -->
+                            @if (isRV) {
+                                <div class="col-md-4">
+                                    <label class="form-label fw-bold">
+                                        Supplier <span class="text-danger">*</span>
+                                    </label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control"
+                                               [value]="selectedSupplier?.name || ''" readonly
+                                               placeholder="Browse supplier..."/>
+                                        <button type="button" class="btn btn-success fw-bold"
+                                                (click)="openSupplierBrowse()">
+                                            <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
+                                        </button>
+                                    </div>
+                                </div>
+                            }
+
+                        </div>
+
+                        <!-- ─── Section: Items Table ────────────────────────────────── -->
+                        <hr/>
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <span class="fs-xs text-uppercase fw-semibold text-muted">Items Received</span>
+                            <!-- Add row button only for IFR and RV (free-form entry) -->
+                            @if (isIFR || isRV) {
+                                <button type="button" class="btn btn-success btn-sm fw-bold"
+                                        (click)="addIFRRow()">
+                                    <ng-icon name="tablerPlus" class="ps-0 pe-2 fw-bold"></ng-icon>Add Row
+                                </button>
+                            }
+                        </div>
+
+                        <!-- PO / JO / Tested Items Table (read-only item info, editable qty/adjustment) -->
+                        @if (isPO || isJO || isTested) {
+                            <div class="table-responsive">
+                                <table class="table table-custom table-centered table-hover w-100 mb-0">
+                                    <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                                        <tr class="text-uppercase fs-xxs">
+                                            <th style="width:40px">#</th>
+                                            <th style="width:80px">Unit</th>
+                                            <th>Description</th>
+                                            <th class="text-center" style="width:100px">Qty Ordered</th>
+                                            <th class="text-end" style="width:120px">Unit Cost</th>
+                                            <th class="text-center" style="width:120px">Qty Received</th>
+                                            <th class="text-end" style="width:110px">Adjustment</th>
+                                            <th class="text-end" style="width:120px">Net Amount</th>
+                                            <th style="width:50px"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @if (rrDetails.length === 0) {
+                                            <tr>
+                                                <td colspan="9" class="text-center text-muted py-3">
+                                                    @if (isPO || isTested) {
+                                                        Browse and select a Purchase Order to load items.
+                                                    } @else {
+                                                        Browse and select a Job Order to load items.
+                                                    }
+                                                </td>
+                                            </tr>
+                                        }
+                                        @for (row of rrDetails; track $index) {
+                                            <tr>
+                                                <td class="text-center text-muted">{{ $index + 1 }}</td>
+                                                <td>{{ row.unitCode }}</td>
+                                                <td>{{ row.itemDescription }}</td>
+                                                <td class="text-center fw-bold">{{ row.quantity | number:'1.0-3' }}</td>
+                                                <td class="text-end text-nowrap">{{ row.unitPrice | number:'1.2-2' }}</td>
+                                                <td>
+                                                    <input type="number"
+                                                           class="form-control form-control-sm text-center fw-bold"
+                                                           [(ngModel)]="row.quantityReceived"
+                                                           [name]="'qtyRcvd_' + $index"
+                                                           (ngModelChange)="updateNetAmount($index, 'quantityReceived')"
+                                                           min="0" step="0.001" placeholder="0"/>
+                                                </td>
+                                                <td>
+                                                    <input type="number"
+                                                           class="form-control form-control-sm text-end"
+                                                           [(ngModel)]="row.adjustment"
+                                                           [name]="'adj_' + $index"
+                                                           (ngModelChange)="updateNetAmount($index, 'adjustment')"
+                                                           step="0.01" placeholder="0.00"/>
+                                                </td>
+                                                <td class="text-end fw-bold text-nowrap">
+                                                    {{ row.netAmount | number:'1.2-2' }}
+                                                </td>
+                                                <td class="text-center">
+                                                    <button type="button"
+                                                            class="btn btn-light btn-icon btn-sm rounded-circle text-danger"
+                                                            (click)="removeRow($index)"
+                                                            title="Remove row">
+                                                        <ng-icon name="tablerTrash"></ng-icon>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        }
+                                        @if (rrDetails.length > 0) {
+                                            <tr class="fw-bold bg-light bg-opacity-50">
+                                                <td colspan="4" class="text-end text-uppercase fs-xxs">Totals:</td>
+                                                <td class="text-end text-nowrap">—</td>
+                                                <td class="text-center">{{ totals.qtyReceived | number:'1.0-3' }}</td>
+                                                <td class="text-end">{{ totals.adjustment | number:'1.2-2' }}</td>
+                                                <td class="text-end text-nowrap">{{ totals.netAmount | number:'1.2-2' }}</td>
+                                                <td></td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
+
+                        <!-- IFR / RV Table (free-form item browse per row) -->
+                        @if (isIFR || isRV) {
+                            <div class="table-responsive">
+                                <table class="table table-custom table-centered table-hover w-100 mb-0">
+                                    <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                                        <tr class="text-uppercase fs-xxs">
+                                            <th style="width:40px">#</th>
+                                            <th style="width:80px">Unit</th>
+                                            <th>Description</th>
+                                            <th class="text-center" style="width:120px">Qty Received</th>
+                                            <th class="text-end" style="width:120px">Unit Cost</th>
+                                            <th class="text-end" style="width:110px">Adjustment</th>
+                                            <th class="text-end" style="width:120px">Net Amount</th>
+                                            <th style="width:80px"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @if (rrDetails.length === 0) {
+                                            <tr>
+                                                <td colspan="8" class="text-center text-muted py-3">
+                                                    Click <strong>Add Row</strong> to add items.
+                                                </td>
+                                            </tr>
+                                        }
+                                        @for (row of rrDetails; track $index) {
+                                            <tr>
+                                                <td class="text-center text-muted">{{ $index + 1 }}</td>
+                                                <td>{{ row.unitCode }}</td>
+                                                <td>
+                                                    <div class="input-group input-group-sm">
+                                                        <input type="text" class="form-control form-control-sm"
+                                                               [value]="row.itemDescription" readonly
+                                                               placeholder="Browse item..."/>
+                                                        <button type="button"
+                                                                class="btn btn-success btn-sm fw-bold"
+                                                                (click)="openItemBrowse($index)">
+                                                            <ng-icon name="tablerSearch" class="ps-0 pe-0 fw-bold"></ng-icon>
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <input type="number"
+                                                           class="form-control form-control-sm text-center fw-bold"
+                                                           [(ngModel)]="row.quantityReceived"
+                                                           [name]="'ifrQtyRcvd_' + $index"
+                                                           (ngModelChange)="updateNetAmount($index, 'quantityReceived')"
+                                                           min="0" step="0.001" placeholder="0"/>
+                                                </td>
+                                                <td>
+                                                    <input type="number"
+                                                           class="form-control form-control-sm text-end"
+                                                           [(ngModel)]="row.unitPrice"
+                                                           [name]="'ifrCost_' + $index"
+                                                           (ngModelChange)="updateNetAmount($index, 'unitPrice')"
+                                                           min="0" step="0.01" placeholder="0.00"/>
+                                                </td>
+                                                <td>
+                                                    <input type="number"
+                                                           class="form-control form-control-sm text-end"
+                                                           [(ngModel)]="row.adjustment"
+                                                           [name]="'ifrAdj_' + $index"
+                                                           (ngModelChange)="updateNetAmount($index, 'adjustment')"
+                                                           step="0.01" placeholder="0.00"/>
+                                                </td>
+                                                <td class="text-end fw-bold text-nowrap">
+                                                    {{ row.netAmount | number:'1.2-2' }}
+                                                </td>
+                                                <td class="text-center">
+                                                    <button type="button"
+                                                            class="btn btn-light btn-icon btn-sm rounded-circle text-danger"
+                                                            (click)="removeRow($index)"
+                                                            title="Remove row">
+                                                        <ng-icon name="tablerTrash"></ng-icon>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        }
+                                        @if (rrDetails.length > 0) {
+                                            <tr class="fw-bold bg-light bg-opacity-50">
+                                                <td colspan="3" class="text-end text-uppercase fs-xxs">Totals:</td>
+                                                <td class="text-center">{{ totals.qtyReceived | number:'1.0-3' }}</td>
+                                                <td class="text-end">—</td>
+                                                <td class="text-end">{{ totals.adjustment | number:'1.2-2' }}</td>
+                                                <td class="text-end text-nowrap">{{ totals.netAmount | number:'1.2-2' }}</td>
+                                                <td></td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
+
+                        <!-- ─── Section: Signatories ────────────────────────────────── -->
+                        <hr/>
+                        <div class="col-12 fs-xs text-uppercase fw-semibold text-muted mb-2">Signatories</div>
+
+                        <div class="row g-3">
+
+                            <!-- Noted By -->
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Noted By</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control"
+                                           [value]="notedBy ? (notedBy.name || notedBy.fullName || '') : ''"
+                                           readonly placeholder="Browse noted by..."/>
+                                    <button type="button" class="btn btn-success fw-bold"
+                                            (click)="openSignatoryBrowse('notedBy')">
+                                        <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Approved By -->
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Approved By</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control"
+                                           [value]="approvedBy ? (approvedBy.name || approvedBy.fullName || '') : ''"
+                                           readonly placeholder="Browse approved by..."/>
+                                    <button type="button" class="btn btn-success fw-bold"
+                                            (click)="openSignatoryBrowse('approvedBy')">
+                                        <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
+                                    </button>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <!-- ─── Footer ──────────────────────────────────────────────── -->
+                        <div class="d-flex gap-2 justify-content-end align-items-center pt-3 border-top mt-3">
+                            <a [routerLink]="['/' + menuLink]" class="btn btn-light fw-bold">
+                                <ng-icon name="tablerArrowLeft" class="ps-0 pe-3 fw-bold"></ng-icon>Back
+                            </a>
+                            <button type="submit" class="btn btn-primary fw-bold" [disabled]="isLoading()">
+                                @if (isLoading()) {
+                                    <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                                    {{ editMode ? 'Updating...' : 'Saving...' }}
+                                } @else {
+                                    <ng-icon name="tablerCheck" class="ps-0 pe-3 fw-bold"></ng-icon>
+                                    {{ editMode ? 'Update' : 'Save ' + module }}
+                                }
+                            </button>
+                        </div>
+
+                    </div>
+                </app-ui-card>
+            </div>
+        </div>
+    </form>
+    }
+</div>

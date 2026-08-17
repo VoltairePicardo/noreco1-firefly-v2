@@ -1,0 +1,486 @@
+<div class="container-fluid">
+    <app-page-title [title]="module" [subTitle]="subModule" [menuLink]="menuLink"/>
+</div>
+
+<div class="container-fluid">
+    @if (isLoading() && editMode) {
+        <div class="d-flex align-items-center gap-2 text-muted py-4">
+            <span class="spinner-border spinner-border-sm" role="status"></span> Loading...
+        </div>
+    } @else {
+    <form (ngSubmit)="save()" #f="ngForm">
+        <app-ui-card title="Cost Estimate Information">
+            <div class="p-3" card-body>
+
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold">Date <span class="text-danger">*</span></label>
+                        <input type="text" mwlFlatpickr [options]="flatpickrOptions"
+                               class="form-control" [(ngModel)]="date"
+                               name="date" placeholder="Select date" required/>
+                    </div>
+                    <div class="col-md-5">
+                        <label class="form-label fw-bold">Inventory Location</label>
+                        <select class="form-select" [(ngModel)]="selectedInventoryLocation"
+                                name="selectedInventoryLocation"
+                                [compareWith]="compareById">
+                            <option [ngValue]="null">— Select —</option>
+                            @for (loc of inventoryLocations(); track loc.id) {
+                                <option [ngValue]="loc">{{ loc.description }}</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold">Type</label>
+                        <select class="form-select" [(ngModel)]="selectedType"
+                                name="selectedType"
+                                [compareWith]="compareById">
+                            @for (t of ceTypes; track t.id) {
+                                <option [ngValue]="t">{{ t.description }}</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Project Details -->
+                <hr/>
+                <p class="fs-xs text-uppercase fw-semibold text-muted mb-3">Project Details</p>
+                <div class="row g-3">
+                    <div class="col-md-12">
+                        <label class="form-label fw-bold">Project</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" readonly
+                                   [value]="project ? (project.code + ' — ' + project.name) : ''"
+                                   placeholder="No project selected"/>
+                            <button type="button" class="btn btn-success fw-bold" (click)="browseProject()">
+                                <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
+                            </button>
+                        </div>
+                    </div>
+                    @if (project) {
+                        <div class="col-md-3">
+                            <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Code</div>
+                            <div>{{ project.code || '—' }}</div>
+                        </div>
+                        <div class="col-md-9">
+                            <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Name</div>
+                            <div>{{ project.name || '—' }}</div>
+                        </div>
+                        @if (project.location) {
+                            <div class="col-md-12">
+                                <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Location</div>
+                                <div>{{ project.location }}</div>
+                            </div>
+                        }
+                    }
+                </div>
+
+                @if (project) {
+
+                <!-- Assemblies -->
+                <hr/>
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <p class="fs-xs text-uppercase fw-semibold text-muted mb-0">Assemblies</p>
+                    <button type="button" class="btn btn-success fw-bold" (click)="browseAssemblyUnit()">
+                        <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse Assembly Unit
+                    </button>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-custom table-centered table-hover w-100 mb-0">
+                        <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                            <tr class="text-uppercase fs-xxs">
+                                <th style="width:40px">#</th>
+                                <th style="width:120px">Code</th>
+                                <th>Description</th>
+                                <th class="text-center" style="width:100px">Calculated</th>
+                                <th class="text-end" style="width:160px">Labor Cost</th>
+                                <th class="text-end" style="width:100px">Qty</th>
+                                <th class="text-end" style="width:160px">Total Cost</th>
+                                <th style="width:60px"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (a of assemblies; track $index; let i = $index) {
+                                <tr>
+                                    <td>{{ i + 1 }}</td>
+                                    <td class="text-muted fw-bold">{{ a.code || '—' }}</td>
+                                    <td>{{ a.description || '—' }}</td>
+                                    <td class="text-center">
+                                        <input type="checkbox" class="form-check-input"
+                                               [(ngModel)]="a.isCalculated"
+                                               [name]="'assCalc_' + i"
+                                               title="Include in labor cost total"/>
+                                    </td>
+                                    <td class="text-end">{{ (a.laborCost || 0) | number:'1.2-2' }}</td>
+                                    <td>
+                                        <input type="number" class="form-control form-control-sm text-end"
+                                               [(ngModel)]="a.quantity" [name]="'assQty_' + i"
+                                               min="0" step="1" placeholder="0"/>
+                                    </td>
+                                    <td class="text-end">{{ (a.laborCost * a.quantity) | number:'1.2-2' }}</td>
+                                    <td class="text-center">
+                                        <button type="button"
+                                                class="btn btn-danger btn-icon btn-sm rounded-circle"
+                                                (click)="removeAssembly(i)"
+                                                ngbTooltip="Remove">
+                                            <ng-icon name="tablerTrash" class="fs-sm"></ng-icon>
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                            @if (assemblies.length === 0) {
+                                <tr class="no-results">
+                                    <td colspan="8" class="text-center text-muted py-3 fs-xs">No assemblies added.</td>
+                                </tr>
+                            } @else {
+                                <tr class="fw-bold bg-light">
+                                    <td colspan="6" class="text-end text-uppercase fs-xs">Total Labor Cost</td>
+                                    <td class="text-end">{{ totalAssemblyLaborCost | number:'1.2-2' }}</td>
+                                    <td></td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Accessories -->
+                <hr/>
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <p class="fs-xs text-uppercase fw-semibold text-muted mb-0">Accessories</p>
+                    <button type="button" class="btn btn-success fw-bold" (click)="browseAccessoryItem()">
+                        <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse Item
+                    </button>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-custom table-centered table-hover w-100 mb-0">
+                        <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                            <tr class="text-uppercase fs-xxs">
+                                <th style="width:40px">#</th>
+                                <th style="width:120px">Code</th>
+                                <th>Description</th>
+                                <th class="text-end" style="width:160px">Unit Cost</th>
+                                <th class="text-end" style="width:100px">Qty</th>
+                                <th class="text-end" style="width:160px">Total Cost</th>
+                                <th style="width:60px"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (d of detailsAccess; track $index; let i = $index) {
+                                <tr>
+                                    <td>{{ i + 1 }}</td>
+                                    <td class="text-muted fw-bold">{{ d.code || '—' }}</td>
+                                    <td>{{ d.description || '—' }}</td>
+                                    <td>
+                                        <input type="number" class="form-control form-control-sm text-end"
+                                               [(ngModel)]="d.unitCost" [name]="'accUc_' + i"
+                                               min="0" step="0.01" placeholder="0.00"/>
+                                    </td>
+                                    <td>
+                                        <input type="number" class="form-control form-control-sm text-end"
+                                               [(ngModel)]="d.quantity" [name]="'accQty_' + i"
+                                               min="0" step="1" placeholder="0"/>
+                                    </td>
+                                    <td class="text-end">{{ (d.quantity * d.unitCost) | number:'1.2-2' }}</td>
+                                    <td class="text-center">
+                                        <button type="button"
+                                                class="btn btn-danger btn-icon btn-sm rounded-circle"
+                                                (click)="removeDetailAccess(i)"
+                                                ngbTooltip="Remove">
+                                            <ng-icon name="tablerTrash" class="fs-sm"></ng-icon>
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                            @if (detailsAccess.length === 0) {
+                                <tr class="no-results">
+                                    <td colspan="7" class="text-center text-muted py-3 fs-xs">No accessories added.</td>
+                                </tr>
+                            } @else {
+                                <tr class="fw-bold bg-light">
+                                    <td colspan="5" class="text-end text-uppercase fs-xs">Total</td>
+                                    <td class="text-end">{{ totalMaterialCost | number:'1.2-2' }}</td>
+                                    <td></td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Metering -->
+                <hr/>
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <p class="fs-xs text-uppercase fw-semibold text-muted mb-0">Metering</p>
+                    <button type="button" class="btn btn-success fw-bold" (click)="browseMeterItem()">
+                        <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse Item
+                    </button>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-custom table-centered table-hover w-100 mb-0">
+                        <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                            <tr class="text-uppercase fs-xxs">
+                                <th style="width:40px">#</th>
+                                <th style="width:120px">Code</th>
+                                <th>Description</th>
+                                <th class="text-end" style="width:160px">Unit Cost</th>
+                                <th class="text-end" style="width:100px">Qty</th>
+                                <th class="text-end" style="width:160px">Total Cost</th>
+                                <th style="width:60px"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (d of detailsMeter; track $index; let i = $index) {
+                                <tr>
+                                    <td>{{ i + 1 }}</td>
+                                    <td class="text-muted fw-bold">{{ d.code || '—' }}</td>
+                                    <td>{{ d.description || '—' }}</td>
+                                    <td>
+                                        <input type="number" class="form-control form-control-sm text-end"
+                                               [(ngModel)]="d.unitCost" [name]="'mUc_' + i"
+                                               min="0" step="0.01" placeholder="0.00"/>
+                                    </td>
+                                    <td>
+                                        <input type="number" class="form-control form-control-sm text-end"
+                                               [(ngModel)]="d.quantity" [name]="'mQty_' + i"
+                                               min="0" step="1" placeholder="0"/>
+                                    </td>
+                                    <td class="text-end">{{ (d.quantity * d.unitCost) | number:'1.2-2' }}</td>
+                                    <td class="text-center">
+                                        <button type="button"
+                                                class="btn btn-danger btn-icon btn-sm rounded-circle"
+                                                (click)="removeDetailMeter(i)"
+                                                ngbTooltip="Remove">
+                                            <ng-icon name="tablerTrash" class="fs-sm"></ng-icon>
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                            @if (detailsMeter.length === 0) {
+                                <tr class="no-results">
+                                    <td colspan="7" class="text-center text-muted py-3 fs-xs">No metering items added.</td>
+                                </tr>
+                            } @else {
+                                <tr class="fw-bold bg-light">
+                                    <td colspan="5" class="text-end text-uppercase fs-xs">Total</td>
+                                    <td class="text-end">{{ totalMeteringCost | number:'1.2-2' }}</td>
+                                    <td></td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Miscellaneous Charges -->
+                <hr/>
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <p class="fs-xs text-uppercase fw-semibold text-muted mb-0">Miscellaneous Charges</p>
+                    <button type="button" class="btn btn-success fw-bold" (click)="browseMiscCharge()">
+                        <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse Misc Charge
+                    </button>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-custom table-centered table-hover w-100 mb-0">
+                        <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                            <tr class="text-uppercase fs-xxs">
+                                <th style="width:40px">#</th>
+                                <th>Description</th>
+                                <th class="text-end" style="width:160px">Unit Cost</th>
+                                <th class="text-end" style="width:100px">Qty</th>
+                                <th class="text-end" style="width:160px">Total Cost</th>
+                                <th style="width:220px">Remarks</th>
+                                <th style="width:60px"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (m of miscCharges; track $index; let i = $index) {
+                                <tr>
+                                    <td>{{ i + 1 }}</td>
+                                    <td>{{ m.description || '—' }}</td>
+                                    <td>
+                                        <input type="number" class="form-control form-control-sm text-end"
+                                               [(ngModel)]="m.unitCost" [name]="'miscUc_' + i"
+                                               min="0" step="0.01" placeholder="0.00"/>
+                                    </td>
+                                    <td>
+                                        <input type="number" class="form-control form-control-sm text-end"
+                                               [(ngModel)]="m.quantity" [name]="'miscQty_' + i"
+                                               min="0" step="1" placeholder="0"/>
+                                    </td>
+                                    <td class="text-end">{{ (m.unitCost * m.quantity) | number:'1.2-2' }}</td>
+                                    <td>
+                                        <input type="text" class="form-control form-control-sm"
+                                               [(ngModel)]="m.remarks" [name]="'miscRmk_' + i"
+                                               placeholder="Remarks"/>
+                                    </td>
+                                    <td class="text-center">
+                                        <button type="button"
+                                                class="btn btn-danger btn-icon btn-sm rounded-circle"
+                                                (click)="removeMiscCharge(i)"
+                                                ngbTooltip="Remove">
+                                            <ng-icon name="tablerTrash" class="fs-sm"></ng-icon>
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                            @if (miscCharges.length === 0) {
+                                <tr class="no-results">
+                                    <td colspan="7" class="text-center text-muted py-3 fs-xs">No miscellaneous charges added.</td>
+                                </tr>
+                            } @else {
+                                <tr class="fw-bold bg-light">
+                                    <td colspan="4" class="text-end text-uppercase fs-xs">Total</td>
+                                    <td class="text-end">{{ totalMiscCost | number:'1.2-2' }}</td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Cost Summary -->
+                <hr/>
+                <p class="fs-xs text-uppercase fw-semibold text-muted mb-3">Cost Summary</p>
+                <table class="table table-sm mb-0" style="max-width:640px; margin-left:auto">
+                    <tbody>
+                        <tr>
+                            <td class="text-end fw-semibold text-uppercase fs-xs pe-4">Total Material Cost (Accessories)</td>
+                            <td class="text-end" style="width:180px">{{ totalMaterialCost | number:'1.2-2' }}</td>
+                        </tr>
+                        <tr>
+                            <td class="text-end fw-semibold text-uppercase fs-xs pe-4">Total Metering Cost</td>
+                            <td class="text-end">{{ totalMeteringCost | number:'1.2-2' }}</td>
+                        </tr>
+                        <tr>
+                            <td class="text-end pe-4">
+                                <span class="fw-semibold text-uppercase fs-xs me-3">Total Labor Cost</span>
+                                <input type="number" class="form-control form-control-sm d-inline-block text-end me-1"
+                                       style="width:70px" [(ngModel)]="laborCostPercentage" name="laborCostPerc"
+                                       min="0" step="0.01"/>
+                                <span class="fs-xs me-2">%</span>
+                                <input type="checkbox" class="form-check-input"
+                                       [(ngModel)]="isTotalLaborCalculated" name="isLaborCalc"
+                                       title="Calculate automatically"/>
+                            </td>
+                            <td class="text-end">
+                                @if (isTotalLaborCalculated) {
+                                    {{ totalLaborCost | number:'1.2-2' }}
+                                } @else {
+                                    <input type="number" class="form-control form-control-sm text-end"
+                                           [(ngModel)]="totalLaborCostManual" name="totalLaborManual"
+                                           min="0" step="0.01"/>
+                                }
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="text-end pe-4">
+                                <span class="fw-semibold text-uppercase fs-xs me-3">Freight &amp; Handling</span>
+                                <input type="number" class="form-control form-control-sm d-inline-block text-end me-1"
+                                       style="width:70px" [(ngModel)]="freightHandlingPercentage" name="freightPerc"
+                                       min="0" step="0.01"/>
+                                <span class="fs-xs me-2">%</span>
+                                <input type="checkbox" class="form-check-input"
+                                       [(ngModel)]="isFreightHandlingCalculated" name="isFreightCalc"
+                                       title="Calculate automatically"/>
+                            </td>
+                            <td class="text-end">
+                                @if (isFreightHandlingCalculated) {
+                                    {{ freightHandling | number:'1.2-2' }}
+                                } @else {
+                                    <input type="number" class="form-control form-control-sm text-end"
+                                           [(ngModel)]="freightHandlingManual" name="freightManual"
+                                           min="0" step="0.01"/>
+                                }
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="text-end pe-4">
+                                <span class="fw-semibold text-uppercase fs-xs me-3">Contingency</span>
+                                <input type="number" class="form-control form-control-sm d-inline-block text-end me-1"
+                                       style="width:70px" [(ngModel)]="contingencyPercentage" name="contingencyPerc"
+                                       min="0" step="0.01"/>
+                                <span class="fs-xs me-2">%</span>
+                                <input type="checkbox" class="form-check-input"
+                                       [(ngModel)]="isContingencyCalculated" name="isContingencyCalc"
+                                       title="Calculate automatically"/>
+                            </td>
+                            <td class="text-end">
+                                @if (isContingencyCalculated) {
+                                    {{ contingency | number:'1.2-2' }}
+                                } @else {
+                                    <input type="number" class="form-control form-control-sm text-end"
+                                           [(ngModel)]="contingencyManual" name="contingencyManual"
+                                           min="0" step="0.01"/>
+                                }
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="text-end fw-semibold text-uppercase fs-xs pe-4">Total Miscellaneous Charges</td>
+                            <td class="text-end">{{ totalMiscCost | number:'1.2-2' }}</td>
+                        </tr>
+                        <tr>
+                            <td class="text-end fw-semibold text-uppercase fs-xs pe-4">Total Assembly Labor Cost</td>
+                            <td class="text-end">{{ totalAssemblyLaborCost | number:'1.2-2' }}</td>
+                        </tr>
+                        <tr class="table-primary">
+                            <td class="text-end fw-bold text-uppercase pe-4">Grand Total</td>
+                            <td class="text-end fw-bold fs-5">{{ grandTotal | number:'1.2-2' }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                } <!-- end @if (project) -->
+
+                <!-- Notes -->
+                <hr/>
+                <p class="fs-xs text-uppercase fw-semibold text-muted mb-3">Notes</p>
+                <textarea class="form-control" [(ngModel)]="notes" name="notes"
+                          rows="4" placeholder="Enter notes" maxlength="1024"></textarea>
+
+                <!-- Signatories -->
+                <hr/>
+                <p class="fs-xs text-uppercase fw-semibold text-muted mb-3">Signatories</p>
+                <div class="row g-3">
+                    @for (key of signatoryKeys; track key) {
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">{{ signatoryLabels[key] }}</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control"
+                                       [value]="signatories[key] ? signatories[key].name : ''"
+                                       readonly placeholder="Select signatory..."/>
+                                <button type="button" class="btn btn-success fw-bold"
+                                        (click)="openEntityBrowse(key)">
+                                    <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
+                                </button>
+                                @if (signatories[key]) {
+                                    <button type="button" class="btn btn-light" (click)="clearSignatory(key)">
+                                        <ng-icon name="tablerX" class="fw-bold"></ng-icon>
+                                    </button>
+                                }
+                            </div>
+                            @if (signatories[key]?.position) {
+                                <small class="text-muted">{{ signatories[key].position }}</small>
+                            }
+                        </div>
+                    }
+                </div>
+
+                <div class="d-flex gap-2 justify-content-end align-items-center pt-3 border-top mt-3">
+                    <a [routerLink]="['/' + menuLink]" class="btn btn-light fw-bold">
+                        <ng-icon name="tablerArrowLeft" class="ps-0 pe-3 fw-bold"></ng-icon>Back
+                    </a>
+                    <button type="submit" class="btn btn-primary fw-bold" [disabled]="formSubmit">
+                        @if (formSubmit) {
+                            <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                            {{ editMode ? 'Updating...' : 'Saving...' }}
+                        } @else {
+                            <ng-icon name="tablerCheck" class="ps-0 pe-3 fw-bold"></ng-icon>
+                            {{ editMode ? 'Update' : 'Save ' + module}}
+                        }
+                    </button>
+                </div>
+
+            </div>
+        </app-ui-card>
+    </form>
+    }
+</div>

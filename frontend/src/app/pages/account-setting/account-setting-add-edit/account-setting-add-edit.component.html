@@ -1,0 +1,294 @@
+<div class="container-fluid">
+    <app-page-title [title]="module" [subTitle]="subModule" [menuLink]="menuLink"/>
+</div>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-xl-12">
+            <app-ui-card [title]="module + ' Details'">
+                <div class="col-xl-12 p-3" card-body>
+
+                    @if (isLoading()) {
+                        <div class="d-flex align-items-center gap-2 text-muted py-2">
+                            <span class="spinner-border spinner-border-sm" role="status"></span>Loading...
+                        </div>
+                    } @else {
+
+                    <!-- Date -->
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold">Date <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control"
+                                   mwlFlatpickr [options]="flatpickrOptions"
+                                   [(ngModel)]="date"
+                                   [class.is-invalid]="submitted && !date"
+                                   placeholder="Select date"/>
+                            <div class="invalid-feedback">Please provide a date.</div>
+                        </div>
+                    </div>
+
+                    <!-- Document Type + Browse -->
+                    <div class="row g-3 mb-3 align-items-end">
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold">Document Type <span class="text-danger">*</span></label>
+                            <select class="form-select" [(ngModel)]="selectedDocType" (ngModelChange)="onDocTypeChange()">
+                                @for (opt of docTypeOptions; track opt.value) {
+                                    <option [value]="opt.value">{{ opt.label }}</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-5">
+                            <label class="form-label fw-bold">Document <span class="text-danger">*</span></label>
+                            <div class="input-group" [class.is-invalid]="submitted && !selectedDocument">
+                                <input type="text" class="form-control"
+                                       [value]="selectedDocument ? (selectedDocument.localCode || selectedDocument.code || '') : ''"
+                                       readonly
+                                       [class.is-invalid]="submitted && !selectedDocument"
+                                       placeholder="Select document..."/>
+                                <button type="button" class="btn btn-success fw-bold"
+                                        (click)="openDocBrowse()">
+                                    <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
+                                </button>
+                                @if (selectedDocument) {
+                                    <button type="button" class="btn btn-danger fw-bold"
+                                            ngbTooltip="Clear selection"
+                                            (click)="clearDocument()">
+                                        <ng-icon name="tablerX" class="ps-0 pe-0 fw-bold"></ng-icon>
+                                    </button>
+                                }
+                            </div>
+                            @if (submitted && !selectedDocument) {
+                                <div class="text-danger small mt-1">Please select a document.</div>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Selected Document Details -->
+                    @if (selectedDocument) {
+                        <div class="card bg-light border-0 mb-3">
+                            <div class="card-body py-2 px-3">
+                                <div class="row g-2 align-items-center">
+                                    <div class="col-auto">
+                                        <span class="badge bg-secondary text-uppercase">{{ getDocTypeLabel() }}</span>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <span class="fw-bold">{{ selectedDocument.localCode || selectedDocument.code || '—' }}</span>
+                                    </div>
+                                    @if (selectedDocument.netAmount != null) {
+                                        <div class="col-md-2">
+                                            <small class="text-muted">Amount</small><br/>
+                                            <span>{{ selectedDocument.netAmount | number:'1.2-2' }}</span>
+                                        </div>
+                                    }
+                                    @if (selectedDocument.quantity != null) {
+                                        <div class="col-md-2">
+                                            <small class="text-muted">Quantity</small><br/>
+                                            <span>{{ selectedDocument.quantity | number:'1.2-2' }}</span>
+                                        </div>
+                                    }
+                                    @if (selectedDocument.particulars) {
+                                        <div class="col-md-3">
+                                            <small class="text-muted">Particulars</small><br/>
+                                            <span>{{ selectedDocument.particulars }}</span>
+                                        </div>
+                                    }
+                                    @if (selectedDocument.voucherDate) {
+                                        <div class="col-md-2">
+                                            <small class="text-muted">Date</small><br/>
+                                            <span>{{ selectedDocument.voucherDate | date:'MMM d, yyyy' }}</span>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    }
+
+                    <!-- RR Linked Data (shown when RR doc is selected) -->
+                    @if (selectedDocType === 'rr' && rrLinkedData) {
+                        <div class="mb-3">
+                            <h6 class="fw-semibold text-uppercase fs-xs mb-2">RR Linked Information</h6>
+                            <div class="row g-2">
+                                <div class="col-md-2">
+                                    <label class="form-label fw-bold text-uppercase fs-xs">CV Code</label>
+                                    <p class="mb-0">{{ rrLinkedData.cvCode || '—' }}</p>
+                                </div>
+                                @if (rrLinkedData.cvAmount != null) {
+                                    <div class="col-md-2">
+                                        <label class="form-label fw-bold text-uppercase fs-xs">CV Amount</label>
+                                        <p class="mb-0">{{ rrLinkedData.cvAmount | number:'1.2-2' }}</p>
+                                    </div>
+                                }
+                                <div class="col-md-2">
+                                    <label class="form-label fw-bold text-uppercase fs-xs">CA Liquidation</label>
+                                    <p class="mb-0">{{ rrLinkedData.calCode || '—' }}</p>
+                                </div>
+                                @if (rrLinkedData.amount != null) {
+                                    <div class="col-md-2">
+                                        <label class="form-label fw-bold text-uppercase fs-xs">CAL Amount</label>
+                                        <p class="mb-0">{{ rrLinkedData.amount | number:'1.2-2' }}</p>
+                                    </div>
+                                }
+                                <div class="col-md-2">
+                                    <label class="form-label fw-bold text-uppercase fs-xs">CA Code</label>
+                                    <p class="mb-0">{{ rrLinkedData.caCode || '—' }}</p>
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label fw-bold text-uppercase fs-xs">Use Credit Card</label>
+                                    <p class="mb-0">{{ rrLinkedData.useCreditCard ? 'YES' : 'NO' }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <hr/>
+                    }
+
+                    <!-- Remarks -->
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-8">
+                            <label class="form-label fw-bold">Remarks</label>
+                            <textarea class="form-control" rows="3"
+                                      [(ngModel)]="remarks"
+                                      placeholder="Enter remarks"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Batch Apply (shown when line items exist) -->
+                    @if (lineItems.length > 0) {
+                        <hr/>
+                        <div class="mb-3">
+                            <h6 class="fw-semibold text-uppercase fs-xs mb-2">Apply to Selected Items</h6>
+                            <div class="row g-2 align-items-end">
+                                <div class="col-md-4">
+                                    <label class="form-label fw-bold fs-xs text-uppercase">Debit Account</label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control form-control-sm"
+                                               [value]="getAccountLabel(batchDebitAccount)"
+                                               readonly
+                                               placeholder="Select debit account..."/>
+                                        <button type="button" class="btn btn-success btn-sm fw-bold"
+                                                (click)="openBatchAccBrowse('debit')">
+                                            <ng-icon name="tablerSearch" class="ps-0 pe-1 fw-bold"></ng-icon>Browse
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="col-auto">
+                                    <button type="button" class="btn btn-primary btn-sm fw-bold"
+                                            [disabled]="!batchDebitAccount || !anySelected"
+                                            (click)="applyBatchDebit()">
+                                        Apply Debit
+                                    </button>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label fw-bold fs-xs text-uppercase">Credit Account</label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control form-control-sm"
+                                               [value]="getAccountLabel(batchCreditAccount)"
+                                               readonly
+                                               placeholder="Select credit account..."/>
+                                        <button type="button" class="btn btn-success btn-sm fw-bold"
+                                                (click)="openBatchAccBrowse('credit')">
+                                            <ng-icon name="tablerSearch" class="ps-0 pe-1 fw-bold"></ng-icon>Browse
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="col-auto">
+                                    <button type="button" class="btn btn-primary btn-sm fw-bold"
+                                            [disabled]="!batchCreditAccount || !anySelected"
+                                            (click)="applyBatchCredit()">
+                                        Apply Credit
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Line Items Table -->
+                        <h6 class="fw-semibold text-uppercase fs-xs mb-2">Account Setting Details</h6>
+                        <div class="table-responsive mb-3">
+                            <table class="table table-custom table-centered table-hover w-100 mb-0">
+                                <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                                    <tr class="text-uppercase fs-xxs">
+                                        <th style="width:40px">
+                                            <input type="checkbox" class="form-check-input"
+                                                   [checked]="allSelected"
+                                                   (change)="toggleAll($any($event.target).checked)"/>
+                                        </th>
+                                        <th>Item No.</th>
+                                        <th>Unit</th>
+                                        <th>Description</th>
+                                        <th>Debit Account</th>
+                                        <th>Credit Account</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @for (item of lineItems; track $index; let i = $index) {
+                                        <tr [class.table-active]="item.isSelected">
+                                            <td>
+                                                <input type="checkbox" class="form-check-input"
+                                                       [(ngModel)]="lineItems[i].isSelected"/>
+                                            </td>
+                                            <td class="fw-bold">{{ item.itemCode }}</td>
+                                            <td>{{ item.unitCode }}</td>
+                                            <td>{{ item.itemDescription }}</td>
+                                            <td style="min-width:220px">
+                                                <div class="input-group input-group-sm">
+                                                    <input type="text" class="form-control form-control-sm"
+                                                           [value]="getAccountLabel(item.debitAccount)"
+                                                           readonly
+                                                           placeholder="Select debit..."/>
+                                                    <button type="button" class="btn btn-success btn-sm fw-bold"
+                                                            ngbTooltip="Browse debit account"
+                                                            (click)="openAccBrowse(i, 'debit')">
+                                                        <ng-icon name="tablerSearch" class="ps-0 pe-0 fw-bold"></ng-icon>
+                                                    </button>
+                                                    @if (item.debitAccount) {
+                                                        <button type="button" class="btn btn-danger btn-sm"
+                                                                (click)="lineItems[i].debitAccount = null">
+                                                            <ng-icon name="tablerX" class="ps-0 pe-0"></ng-icon>
+                                                        </button>
+                                                    }
+                                                </div>
+                                            </td>
+                                            <td style="min-width:220px">
+                                                <div class="input-group input-group-sm">
+                                                    <input type="text" class="form-control form-control-sm"
+                                                           [value]="getAccountLabel(item.creditAccount)"
+                                                           readonly
+                                                           placeholder="Select credit..."/>
+                                                    <button type="button" class="btn btn-success btn-sm fw-bold"
+                                                            ngbTooltip="Browse credit account"
+                                                            (click)="openAccBrowse(i, 'credit')">
+                                                        <ng-icon name="tablerSearch" class="ps-0 pe-0 fw-bold"></ng-icon>
+                                                    </button>
+                                                    @if (item.creditAccount) {
+                                                        <button type="button" class="btn btn-danger btn-sm"
+                                                                (click)="lineItems[i].creditAccount = null">
+                                                            <ng-icon name="tablerX" class="ps-0 pe-0"></ng-icon>
+                                                        </button>
+                                                    }
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+
+                    <!-- Footer -->
+                    <div class="d-flex gap-2 justify-content-end align-items-center pt-3 border-top mt-3">
+                        <a [routerLink]="['/' + menuLink]" class="btn btn-light fw-bold">
+                            <ng-icon name="tablerArrowLeft" class="ps-0 pe-3 fw-bold"></ng-icon>Back
+                        </a>
+                        <button type="button" class="btn btn-primary fw-bold"
+                                [disabled]="formSubmit"
+                                (click)="save()">
+                            <ng-icon name="tablerCheck" class="ps-0 pe-3 fw-bold"></ng-icon>
+                            {{ editMode ? 'Update' : 'Save' }}
+                        </button>
+                    </div>
+
+                    }
+                </div>
+            </app-ui-card>
+        </div>
+    </div>
+</div>

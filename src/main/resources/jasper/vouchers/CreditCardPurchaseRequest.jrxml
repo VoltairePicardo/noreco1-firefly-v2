@@ -1,0 +1,610 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="CreditCardPurchaseRequest" language="groovy" pageWidth="612" pageHeight="792" whenNoDataType="AllSectionsNoDetail" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="f6803e17-c3c7-445b-88f8-355d370b3490">
+	<property name="ireport.zoom" value="1.4641000000000213"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="COMP_NAME" class="java.lang.String"/>
+	<parameter name="COMP_ADDR" class="java.lang.String"/>
+	<parameter name="COMP_CONTACT" class="java.lang.String"/>
+	<parameter name="LOGO_PATH" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["Q:\\Develop\\Noreco 1\\accounting-no1\\src\\no1\\img\\No1-Logo.jpg"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="PURCHASING_CONTACT" class="java.lang.String"/>
+	<parameter name="REQUESTED_BY" class="java.lang.String"/>
+	<parameter name="PURPOSE" class="java.lang.String"/>
+	<parameter name="VOUCHER_DATE" class="java.util.Date"/>
+	<parameter name="MODE" class="java.lang.String"/>
+	<parameter name="FUNDING_SOURCE" class="java.lang.String"/>
+	<parameter name="SUPPLIER_NAME" class="java.lang.String"/>
+	<parameter name="SUPPLIER_ADDRESS" class="java.lang.String"/>
+	<parameter name="VOUCHER_NO" class="java.lang.String"/>
+	<parameter name="REQUESTED_BY_DEPARTMENT" class="java.lang.String"/>
+	<parameter name="APPROVED_BY" class="java.lang.String"/>
+	<parameter name="APPROVED_BY_POS" class="java.lang.String"/>
+	<parameter name="RECOMMENDED_BY" class="java.lang.String"/>
+	<parameter name="RECOMMENDED_BY_POS" class="java.lang.String"/>
+	<parameter name="PREPARED_BY" class="java.lang.String"/>
+	<parameter name="PREPARED_BY_POS" class="java.lang.String"/>
+	<parameter name="APPROVED_BY_SIGN" class="java.lang.String"/>
+	<parameter name="APPROVED_BY_TIME" class="java.sql.Timestamp"/>
+	<parameter name="RECOMMENDED_BY_SIGN" class="java.lang.String"/>
+	<parameter name="RECOMMENDED_BY_TIME" class="java.sql.Timestamp"/>
+	<parameter name="PREPARED_BY_SIGN" class="java.lang.String"/>
+	<parameter name="PREPARED_BY_TIME" class="java.sql.Timestamp"/>
+	<field name="quantity" class="java.math.BigDecimal"/>
+	<field name="itemCode" class="java.lang.String"/>
+	<field name="itemDescription" class="java.lang.String"/>
+	<field name="unitPrice" class="java.math.BigDecimal"/>
+	<field name="total" class="java.math.BigDecimal"/>
+	<variable name="GRAND_TOTAL" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{total}]]></variableExpression>
+	</variable>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="80" splitType="Stretch">
+			<textField pattern="MM/dd/yyyy hh:mm a">
+				<reportElement x="454" y="0" width="118" height="16" uuid="7aceb72c-caf4-4496-991b-f82fb471740f"/>
+				<textElement textAlignment="Right">
+					<font fontName="Calibri Light" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="1" y="0" width="571" height="16" isPrintWhenDetailOverflows="true" uuid="dcf7e7ab-771c-46ad-911b-789ae0c6607d"/>
+				<textElement textAlignment="Center" markup="html">
+					<font fontName="Calibri" size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{COMP_NAME}]]></textFieldExpression>
+			</textField>
+			<image isLazy="true" onErrorType="Icon">
+				<reportElement x="0" y="0" width="80" height="70" uuid="c36316ed-763b-4891-9b8f-625a67dd8743"/>
+				<imageExpression><![CDATA[$P{LOGO_PATH}]]></imageExpression>
+			</image>
+			<textField isBlankWhenNull="true">
+				<reportElement x="1" y="16" width="571" height="14" uuid="2a3653cb-33bb-4f5e-9bef-6489630b06c9"/>
+				<textElement textAlignment="Center">
+					<font fontName="Calibri Light" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{COMP_ADDR}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement mode="Transparent" x="1" y="43" width="571" height="24" forecolor="#000000" backcolor="#FFFFFF" uuid="35ab968b-ce7d-4acd-a441-4067636cd003"/>
+				<textElement textAlignment="Center" verticalAlignment="Top" rotation="None" markup="none">
+					<font fontName="Calibri" size="16" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[CREDIT CARD PURCHASE REQUEST]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="29" width="572" height="14" uuid="6d2f1ec6-3f2c-485c-b639-62a3c2bb4a2f"/>
+				<textElement textAlignment="Center">
+					<font fontName="Calibri Light" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{PURCHASING_CONTACT}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="124" splitType="Stretch">
+			<staticText>
+				<reportElement stretchType="RelativeToBandHeight" mode="Transparent" x="0" y="0" width="572" height="124" forecolor="#000000" backcolor="#FFFFFF" uuid="8ca0f05b-b3d4-4981-aea3-6dec93d34740"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="Times New Roman" size="12" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true">
+				<reportElement x="86" y="99" width="485" height="15" uuid="224fea39-d75a-40ed-ada0-96add9badce4"/>
+				<box topPadding="1" leftPadding="3"/>
+				<textElement verticalAlignment="Top">
+					<font fontName="Times New Roman" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{PURPOSE}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="1" y="99" width="80" height="15" uuid="33fd8f5c-73bd-4143-82ac-0b041ed67c61"/>
+				<box topPadding="0" leftPadding="3"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="12" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Purpose]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1" y="9" width="80" height="15" uuid="c9d0c154-2891-4396-93e7-51f2af32b791"/>
+				<box topPadding="0" leftPadding="3"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="12" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Requested By]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true">
+				<reportElement x="86" y="9" width="293" height="15" uuid="d59138d1-e2f8-47eb-bab5-d81eaec43063"/>
+				<box leftPadding="3"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{REQUESTED_BY}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="81" y="9" width="5" height="15" uuid="a3173c69-91f0-49e7-abd9-ca0a168c4267"/>
+				<box leftPadding="0"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="10" isBold="false"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="81" y="99" width="5" height="15" uuid="c550c615-daaa-44b4-9e4e-d009a4e6b196"/>
+				<box leftPadding="0"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="10" isBold="false"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="379" y="9" width="60" height="15" uuid="75b69baa-8c81-4580-b0bb-cd9be3d70b9d"/>
+				<box leftPadding="0"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="12" isBold="false"/>
+				</textElement>
+				<text><![CDATA[CCPR No.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="439" y="9" width="5" height="15" uuid="9bc566b4-7337-4ced-85a9-b54b8841a208"/>
+				<box leftPadding="0"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="10" isBold="false"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" pattern="MMM dd, yyyy">
+				<reportElement x="444" y="9" width="128" height="15" uuid="23fc8a7d-cfb8-4807-a2d8-190a655a8285"/>
+				<box leftPadding="3"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{VOUCHER_NO}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="1" y="39" width="80" height="15" uuid="1333088d-8ba6-49c6-8dbb-811179a04887"/>
+				<box topPadding="0" leftPadding="3"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="12" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Mode]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="81" y="39" width="5" height="15" uuid="ef44d4ef-ad60-4e7c-acf1-7234dcc3de89"/>
+				<box leftPadding="0"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="10" isBold="false"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true">
+				<reportElement x="86" y="39" width="293" height="15" uuid="69ccbfd7-b573-423d-9e9c-3721b58ddefe"/>
+				<box leftPadding="3"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{MODE}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement x="86" y="54" width="293" height="15" uuid="f69c83b6-fb30-46c3-9607-9fbcae0c8545"/>
+				<box leftPadding="3"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{FUNDING_SOURCE}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="81" y="54" width="5" height="15" uuid="69b9c0ae-5745-4399-b1ec-10e11981f847"/>
+				<box leftPadding="0"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="10" isBold="false"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1" y="54" width="80" height="15" uuid="e55feda1-b4b7-4896-aba5-48880110be91"/>
+				<box topPadding="0" leftPadding="3"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="12" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Funding Source]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="81" y="69" width="5" height="15" uuid="9eef1c19-fe7f-4395-bd06-539332311e4e"/>
+				<box leftPadding="0"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="10" isBold="false"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1" y="69" width="80" height="15" uuid="a7a0b185-8587-4cbc-9698-48847c82d99e"/>
+				<box topPadding="0" leftPadding="3"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="12" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Supplier]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1" y="84" width="80" height="15" uuid="07f13333-e2a2-4919-b5ff-7bcf3e8d5735"/>
+				<box topPadding="0" leftPadding="3"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="12" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Address]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="81" y="84" width="5" height="15" uuid="16e017d8-de3c-4084-9930-db7fb9268ab8"/>
+				<box leftPadding="0"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="10" isBold="false"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true">
+				<reportElement x="86" y="69" width="293" height="15" uuid="a28d1be5-414a-45d5-aaf2-86cb232c37b4"/>
+				<box leftPadding="3"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{SUPPLIER_NAME}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement x="86" y="84" width="293" height="15" uuid="b1a97ee0-b428-414d-aaea-1045fae5ad6e"/>
+				<box leftPadding="3"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{SUPPLIER_ADDRESS}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="MMM dd, yyyy">
+				<reportElement x="444" y="24" width="128" height="15" uuid="073e8389-a255-428c-9901-4f2679df4d04"/>
+				<box leftPadding="3"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{VOUCHER_DATE}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="379" y="24" width="60" height="15" uuid="c9c90d65-1da7-4631-8d31-ac6e0a9fad20"/>
+				<box leftPadding="0"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="12" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Date]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="439" y="24" width="5" height="15" uuid="094d9d39-3cf4-4cef-81b2-9eb517283f8a"/>
+				<box leftPadding="0"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="10" isBold="false"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="81" y="24" width="5" height="15" uuid="46cc136f-5c2c-40d9-bb23-d8f707aa3fad"/>
+				<box leftPadding="0"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="10" isBold="false"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true">
+				<reportElement x="86" y="24" width="293" height="15" uuid="90d5fca4-7620-414c-87b6-9cbd152bb301"/>
+				<box leftPadding="3"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{REQUESTED_BY_DEPARTMENT}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="1" y="24" width="80" height="15" uuid="369d976b-2be5-440b-93fb-a6f62b640527"/>
+				<box topPadding="0" leftPadding="3"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="12" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Department]]></text>
+			</staticText>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="15" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="75" height="15" uuid="154b9b48-6dc3-4ff1-af62-49b50a194251"/>
+				<box topPadding="0" leftPadding="3">
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="12" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Quantity]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="75" y="0" width="100" height="15" uuid="e6d86149-981e-4de8-b0fc-cf07e2b43cc7"/>
+				<box topPadding="0" leftPadding="3">
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="12" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Item]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="175" y="0" width="180" height="15" uuid="f421e0e1-8ba5-421e-8942-0272767e6973"/>
+				<box topPadding="0" leftPadding="3">
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="12" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Description]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="355" y="0" width="108" height="15" uuid="dd7335ff-bc8c-43bb-8b18-9b1feae42abb"/>
+				<box topPadding="0" leftPadding="3">
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="12" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Price]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="463" y="0" width="109" height="15" uuid="d2976c02-a067-45e9-8471-e01a7e2e6572"/>
+				<box topPadding="0" leftPadding="3">
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="12" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Total]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="15" splitType="Stretch">
+			<textField isStretchWithOverflow="true" pattern="#,##0" isBlankWhenNull="true">
+				<reportElement x="0" y="0" width="75" height="15" isPrintWhenDetailOverflows="true" uuid="2d8d3796-0b93-469e-9995-918818d816c4"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{quantity}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="75" y="0" width="100" height="15" isPrintWhenDetailOverflows="true" uuid="a1a7ed71-098a-43ca-862e-5277120eea30"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{itemCode}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="175" y="0" width="180" height="15" isPrintWhenDetailOverflows="true" uuid="dde35dd5-e13a-42af-9f71-ef8c863e9d70"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{itemDescription}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="#,##0" isBlankWhenNull="true">
+				<reportElement x="355" y="0" width="108" height="15" isPrintWhenDetailOverflows="true" uuid="f381ad86-45e7-4bde-9553-68e0e822a2d1"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{unitPrice}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="#,##0" isBlankWhenNull="true">
+				<reportElement x="463" y="0" width="109" height="15" isPrintWhenDetailOverflows="true" uuid="2fd89aa3-bfe1-400f-9f66-26632392c30b"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{total}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<summary>
+		<band height="125" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="463" height="15" uuid="d904261c-e5f9-4b66-af7b-fffa22ce6651"/>
+				<box topPadding="0" leftPadding="3">
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="12" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Total]]></text>
+			</staticText>
+			<textField pattern="#,##0.00">
+				<reportElement x="463" y="0" width="109" height="15" uuid="f0b32415-3942-4611-a996-a24e92a3f580"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$V{GRAND_TOTAL}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement positionType="Float" x="8" y="25" width="150" height="20" isRemoveLineWhenBlank="true" uuid="f1f3158c-34fa-438b-b25b-90f7cd6a72d9"/>
+				<textElement textAlignment="Left">
+					<font fontName="Times New Roman" size="12" isBold="false" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[Prepared By:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement positionType="Float" x="413" y="25" width="150" height="20" isRemoveLineWhenBlank="true" uuid="712073a7-3a9e-4d45-b16f-017679d11830"/>
+				<textElement textAlignment="Left">
+					<font fontName="Times New Roman" size="12" isBold="false" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[Approved By:]]></text>
+			</staticText>
+			<textField pattern="MM/dd/yyyy h.mm a" isBlankWhenNull="true">
+				<reportElement x="213" y="64" width="150" height="10" uuid="f8af81ad-4bea-43de-ad19-5fa61c841ad7"/>
+				<textElement textAlignment="Center">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{RECOMMENDED_BY_TIME}]]></textFieldExpression>
+			</textField>
+			<image hAlign="Center" isLazy="true" onErrorType="Blank">
+				<reportElement x="413" y="45" width="150" height="19" uuid="e96df852-f007-412c-916c-6fa0ed07be34"/>
+				<imageExpression><![CDATA[$P{APPROVED_BY_SIGN}]]></imageExpression>
+			</image>
+			<textField>
+				<reportElement x="213" y="74" width="150" height="20" uuid="2290182e-fe26-4e8d-8ff9-646d8a73a0a8"/>
+				<box>
+					<bottomPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Bottom">
+					<font fontName="Times New Roman" size="10" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{RECOMMENDED_BY}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="213" y="94" width="150" height="20" uuid="c7e2af5f-e6c3-4ae4-8a28-940be70d4d22"/>
+				<textElement textAlignment="Center">
+					<font fontName="Times New Roman" size="10" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{RECOMMENDED_BY_POS}]]></textFieldExpression>
+			</textField>
+			<image hAlign="Center" isLazy="true" onErrorType="Blank">
+				<reportElement x="213" y="45" width="150" height="19" uuid="1b5a0e57-974e-4a6a-a464-acec4cf945df"/>
+				<imageExpression><![CDATA[$P{RECOMMENDED_BY_SIGN}]]></imageExpression>
+			</image>
+			<textField>
+				<reportElement x="413" y="94" width="150" height="20" uuid="90983c77-d134-4e7a-8072-362f31c7fc33"/>
+				<textElement textAlignment="Center">
+					<font fontName="Times New Roman" size="10" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{APPROVED_BY_POS} == "" || $P{APPROVED_BY_POS} == null ? "GENERAL MANAGER" : $P{APPROVED_BY_POS}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement positionType="Float" x="213" y="25" width="150" height="20" isRemoveLineWhenBlank="true" uuid="10889c3a-3b84-4674-b083-ad8737220885"/>
+				<textElement textAlignment="Left">
+					<font fontName="Times New Roman" size="12" isBold="false" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[Recommended By:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Transparent" x="0" y="15" width="572" height="110" forecolor="#000000" backcolor="#FFFFFF" uuid="7a1e1437-bf17-42f1-b855-109a4efde047"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="Times New Roman" size="12" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="8" y="95" width="150" height="20" uuid="3c8c1f22-187d-4cd8-afe7-2c0b4663233d"/>
+				<textElement textAlignment="Center">
+					<font fontName="Times New Roman" size="10" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{PREPARED_BY_POS} == "" || $P{PREPARED_BY_POS} == null ? "PURCHASER" : $P{PREPARED_BY_POS}]]></textFieldExpression>
+			</textField>
+			<textField pattern="MM/dd/yyyy h.mm a" isBlankWhenNull="true">
+				<reportElement x="8" y="64" width="150" height="10" uuid="7a9b8f4c-dfc0-478f-a8c9-52a439dcc5e8"/>
+				<textElement textAlignment="Center">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{PREPARED_BY_TIME}]]></textFieldExpression>
+			</textField>
+			<textField pattern="MM/dd/yyyy h.mm a" isBlankWhenNull="true">
+				<reportElement x="413" y="64" width="150" height="10" uuid="8d3e2259-e1a8-4636-99ca-73f8f469df5c"/>
+				<textElement textAlignment="Center">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{APPROVED_BY_TIME}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="8" y="75" width="150" height="20" uuid="bb817596-e15f-4a8e-b440-492be89824fe"/>
+				<box>
+					<bottomPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Bottom">
+					<font fontName="Times New Roman" size="10" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{PREPARED_BY}]]></textFieldExpression>
+			</textField>
+			<image hAlign="Center" isLazy="true" onErrorType="Blank">
+				<reportElement x="8" y="45" width="150" height="19" uuid="eaec8f35-c87d-448a-9b97-f4afe93cc6a9"/>
+				<imageExpression><![CDATA[$P{PREPARED_BY_SIGN}]]></imageExpression>
+			</image>
+			<textField>
+				<reportElement x="413" y="74" width="150" height="20" uuid="0a87b592-823e-4cd0-a98f-6571b6b199fe"/>
+				<box>
+					<bottomPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Bottom">
+					<font fontName="Times New Roman" size="10" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{APPROVED_BY}]]></textFieldExpression>
+			</textField>
+		</band>
+	</summary>
+</jasperReport>

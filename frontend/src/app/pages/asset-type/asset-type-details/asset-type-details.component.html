@@ -1,0 +1,30 @@
+<div class="container-fluid">
+    <app-page-title [title]="module" [subTitle]="subModule" [menuLink]="menuLink"/>
+</div>
+
+<app-ui-card [title]="module + ' Details'">
+    <div class="col-xl-12 p-3" card-body>
+        @if (isLoading()) {
+            <div class="d-flex align-items-center gap-2 text-muted py-2">
+                <span class="spinner-border spinner-border-sm" role="status"></span>
+                Loading...
+            </div>
+        } @else {
+        <div class="row">
+            <div class="col-sm-6">
+                <dl class="row mb-0">
+                    <dt class="col-sm-4 fw-normal">Description</dt>
+                    <dd class="col-sm-8 fw-bold">{{ data.description || '—' }}</dd>
+                </dl>
+            </div>
+        </div>
+        }
+        <hr/>
+        <div class="d-flex justify-content-end gap-2">
+            <button type="button" class="btn btn-primary fw-bold"
+                    [routerLink]="['/' + menuLink, data.id, 'edit']">
+                <ng-icon name="tablerPencil" class="ps-0 pe-3 fw-bold"></ng-icon>Edit
+            </button>
+        </div>
+    </div>
+</app-ui-card>

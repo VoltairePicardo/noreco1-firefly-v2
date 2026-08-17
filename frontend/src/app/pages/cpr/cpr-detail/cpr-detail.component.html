@@ -1,0 +1,276 @@
+<div class="container-fluid">
+    <app-page-title [title]="module" [subTitle]="subModule" [menuLink]="menuLink"/>
+</div>
+
+<div class="container-fluid">
+    @if (isLoading()) {
+        <div class="d-flex align-items-center gap-2 text-muted py-4">
+            <span class="spinner-border spinner-border-sm" role="status"></span> Loading...
+        </div>
+    } @else {
+    <div class="row g-3">
+
+        <!-- Header Card -->
+        <div class="col-xl-12">
+            <app-ui-card title="Asset Information">
+                <div class="col-xl-12 p-3" card-body>
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Ref No / Code</div>
+                            <div class="fw-bold">{{ data.refNo || data.localCode || '—' }}</div>
+                        </div>
+                        <div class="col-md-5">
+                            <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Description</div>
+                            <div class="fw-bold">{{ data.description || '—' }}</div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Status</div>
+                            <span class="badge"
+                                  [class.bg-success]="data.status === 'ACTIVE'"
+                                  [class.bg-secondary]="data.status !== 'ACTIVE'"
+                                  [class.bg-opacity-25]="true"
+                                  [class.text-dark]="true"
+                                  [class.border]="true">
+                                {{ data.status }}
+                            </span>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Asset Type</div>
+                            <div>{{ data.assetType?.description || '—' }}</div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Location</div>
+                            <div>{{ data.location || '—' }}</div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Acquisition Date</div>
+                            <div>{{ data.acquisitionDate | date:'MMMM d, yyyy' }}</div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Start Year</div>
+                            <div>{{ data.startYear || '—' }}</div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Start Month</div>
+                            <div>{{ monthName(data.startMonth) }}</div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="fw-bold fs-xs text-uppercase text-muted mb-1">End Year</div>
+                            <div>{{ data.endYear || '—' }}</div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="fw-bold fs-xs text-uppercase text-muted mb-1">End Month</div>
+                            <div>{{ monthName(data.endMonth) }}</div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Dep. Years</div>
+                            <div>{{ data.depreciationYears }}</div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Dep. Months</div>
+                            <div>{{ data.depreciationMonths }}</div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Total Monthly Dep.</div>
+                            <div>{{ data.totalMonthlyDepreciation | number:'1.2-2' }}</div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Total Depreciated Value</div>
+                            <div>{{ data.totalDepreciatedValue | number:'1.2-2' }}</div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Total Remaining Value</div>
+                            <div>{{ data.totalRemainingValue | number:'1.2-2' }}</div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Created By</div>
+                            <div>{{ data.createdByUser?.fullName || '—' }}</div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Created On</div>
+                            <div>{{ data.createdAt | date:'MMM dd, yyyy HH:mm a' }}</div>
+                        </div>
+                        @if (data.retirementRemarks) {
+                            <div class="col-md-12">
+                                <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Retirement Remarks</div>
+                                <div>{{ data.retirementRemarks }}</div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </app-ui-card>
+        </div>
+
+        <!-- Linked Vouchers -->
+        @if (data.vouchers && data.vouchers.length > 0) {
+            <div class="col-xl-12">
+                <app-ui-card title="Linked Vouchers">
+                    <div class="col-xl-12 p-3" card-body>
+                        @for (voucher of data.vouchers; track $index) {
+                            <div class="border rounded p-3 mb-2 bg-light">
+                                <div class="row g-2">
+                                    <div class="col-md-3">
+                                        <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Code</div>
+                                        <div class="fw-bold">{{ voucher.code || '—' }}</div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Date</div>
+                                        <div>{{ voucher.date | date:'MMMM dd, yyyy' }}</div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Amount</div>
+                                        <div>{{ voucher.amount | number:'1.2-2' }}</div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Particulars</div>
+                                        <div>{{ voucher.particulars || '—' }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </app-ui-card>
+            </div>
+        }
+
+        <!-- Account Details -->
+        <div class="col-xl-12">
+            <app-ui-card title="Account Details">
+                <div class="col-xl-12 p-3" card-body>
+                    <div class="table-responsive">
+                        <table class="table table-custom table-centered table-hover w-100 mb-0">
+                            <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                                <tr class="text-uppercase fs-xxs">
+                                    <th>Asset Account</th>
+                                    <th>Expense Account</th>
+                                    <th>Accum. Dep. Account</th>
+                                    <th class="text-end">Value</th>
+                                    <th class="text-end">Monthly Dep.</th>
+                                    <th class="text-end">Dep. Value</th>
+                                    <th class="text-end">Remaining Value</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @for (row of assetDetails; track $index) {
+                                    <tr>
+                                        <td>
+                                            <div class="fw-bold fs-xs">{{ row.assetAccount?.code || row.assetAccount?.accountCode || '—' }}</div>
+                                            <div class="text-muted fs-xs">{{ row.assetAccount?.title || row.assetAccount?.accountTitle || row.assetAccount?.accountDescription || '' }}</div>
+                                        </td>
+                                        <td>
+                                            <div class="fw-bold fs-xs">{{ row.expenseAccount?.code || row.expenseAccount?.accountCode || '—' }}</div>
+                                            <div class="text-muted fs-xs">{{ row.expenseAccount?.title || row.expenseAccount?.accountTitle || row.expenseAccount?.accountDescription || '' }}</div>
+                                        </td>
+                                        <td>
+                                            <div class="fw-bold fs-xs">{{ row.accumDepAccount?.code || row.accumDepAccount?.accountCode || '—' }}</div>
+                                            <div class="text-muted fs-xs">{{ row.accumDepAccount?.title || row.accumDepAccount?.accountTitle || row.accumDepAccount?.accountDescription || '' }}</div>
+                                        </td>
+                                        <td class="text-end">{{ row.value | number:'1.2-2' }}</td>
+                                        <td class="text-end">{{ row.monthlyDepreciation | number:'1.2-2' }}</td>
+                                        <td class="text-end">{{ row.depreciatedValue | number:'1.2-2' }}</td>
+                                        <td class="text-end">{{ row.remainingValue | number:'1.2-2' }}</td>
+                                    </tr>
+                                }
+                                @if (assetDetails.length === 0) {
+                                    <tr><td colspan="7" class="text-center text-muted py-3">No account details.</td></tr>
+                                }
+                                @if (assetDetails.length > 0) {
+                                    <tr class="fw-bold bg-light">
+                                        <td colspan="3" class="text-end fw-bold text-uppercase fs-xs">Totals</td>
+                                        <td class="text-end">{{ totalValue | number:'1.2-2' }}</td>
+                                        <td class="text-end">{{ totalMonthlyDep | number:'1.2-2' }}</td>
+                                        <td class="text-end">{{ totalDepreciatedValue | number:'1.2-2' }}</td>
+                                        <td class="text-end">{{ totalRemainingValue | number:'1.2-2' }}</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </app-ui-card>
+        </div>
+
+        <!-- Asset Items -->
+        <div class="col-xl-12">
+            <app-ui-card title="Asset Items">
+                <div class="col-xl-12 p-3" card-body>
+                    <div class="table-responsive">
+                        <table class="table table-custom table-centered table-hover w-100 mb-0">
+                            <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                                <tr class="text-uppercase fs-xxs">
+                                    <th>Item Code</th>
+                                    <th>Description</th>
+                                    <th>MRCT Number</th>
+                                    <th>Unit</th>
+                                    <th class="text-end">Quantity</th>
+                                    <th class="text-end">Item Cost</th>
+                                    <th class="text-end">Total Cost</th>
+                                    <th class="text-end">Dep. Amount/Unit</th>
+                                    <th class="text-end">Dep. Amount Total</th>
+                                    <th class="text-end">Remaining Value/Unit</th>
+                                    <th class="text-end">Remaining Value Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @for (item of assetItems; track $index) {
+                                    <tr>
+                                        <td class="fw-bold">{{ item.itemCode || '—' }}</td>
+                                        <td>{{ item.description || '—' }}</td>
+                                        <td>{{ item.mrctNumber || '—' }}</td>
+                                        <td>{{ item.unit || '—' }}</td>
+                                        <td class="text-end">{{ item.quantity | number:'1.0-0' }}</td>
+                                        <td class="text-end">{{ item.amount | number:'1.2-2' }}</td>
+                                        <td class="text-end">{{ item.total | number:'1.2-2' }}</td>
+                                        <td class="text-end">{{ item.depreciatedAmountPerUnit | number:'1.2-2' }}</td>
+                                        <td class="text-end">{{ item.depreciatedAmountTotal | number:'1.2-2' }}</td>
+                                        <td class="text-end">{{ item.remainingValuePerUnit | number:'1.2-2' }}</td>
+                                        <td class="text-end">{{ item.remainingValueTotal | number:'1.2-2' }}</td>
+                                    </tr>
+                                }
+                                @if (assetItems.length === 0) {
+                                    <tr><td colspan="11" class="text-center text-muted py-3">No items found.</td></tr>
+                                }
+                                @if (assetItems.length > 0) {
+                                    <tr class="fw-bold bg-light">
+                                        <td colspan="10" class="text-end fw-bold text-uppercase fs-xs">Count:</td>
+                                        <td class="text-end">{{ assetItems.length }}</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </app-ui-card>
+        </div>
+
+        <!-- Footer Actions -->
+        <div class="col-xl-12">
+            <div class="d-flex gap-2 justify-content-between align-items-center py-2 flex-wrap">
+                <div class="d-flex gap-2">
+                    <button type="button" class="btn btn-light fw-bold" [routerLink]="['/' + menuLink]">
+                        <ng-icon name="tablerArrowLeft" class="ps-0 pe-2 fw-bold"></ng-icon>Back
+                    </button>
+                </div>
+                <div class="d-flex gap-2">
+                    @if (isActive()) {
+                        <button type="button" class="btn btn-danger fw-bold"
+                                [disabled]="formSubmit" (click)="retireAsset()">
+                            <ng-icon name="tablerPower" class="ps-0 pe-2 fw-bold"></ng-icon>
+                            {{ formSubmit ? 'Processing...' : 'Retire Asset' }}
+                        </button>
+                    }
+                    <a class="btn btn-success fw-bold"
+                       [routerLink]="['/' + menuLink, id, 'link']">
+                        <ng-icon name="tablerLink" class="ps-0 pe-2 fw-bold"></ng-icon>Link Voucher
+                    </a>
+                    <a class="btn btn-primary fw-bold"
+                       [routerLink]="['/' + menuLink, id, 'edit']">
+                        <ng-icon name="tablerEdit" class="ps-0 pe-2 fw-bold"></ng-icon>Edit
+                    </a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    }
+</div>

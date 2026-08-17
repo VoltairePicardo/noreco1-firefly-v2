@@ -1,0 +1,89 @@
+<div class="container-fluid">
+    <app-page-title [title]="'Accounting Reports'" [subTitle]="module" [menuLink]="menuLink" [useSubtitleAsTitle]="true"/>
+</div>
+<div class="container-fluid">
+    <div class="card">
+        <div class="card-body">
+            <div class="row g-2 align-items-end mb-3">
+                <div class="col-md-2">
+                    <label class="form-label fw-bold mb-1">Cut-Off Date</label>
+                    <input type="text" mwlFlatpickr [options]="flatpickrOptions"
+                           class="form-control" [(ngModel)]="cutOffDate" placeholder="Cut-off date"/>
+                </div>
+
+                <div class="col-md-2">
+                    <button type="button" class="btn btn-success fw-bold" (click)="search()">
+                        <ng-icon name="tablerSearch" class="fw-bold me-1"></ng-icon>Search
+                    </button>
+                </div>
+
+                <div class="col-md-auto ms-auto">
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-success fw-bold" (click)="export('pdf')">
+                            <ng-icon name="tablerFileTypePdf" class="fw-bold me-1"></ng-icon>Export PDF
+                        </button>
+                        <button type="button" class="btn btn-success fw-bold" (click)="export('xls')">
+                            <ng-icon name="tablerFileTypeXls" class="fw-bold me-1"></ng-icon>Export Excel
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-responsive mt-2">
+                <table class="table table-custom table-centered table-hover w-100 mb-0 small">
+                    <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                        <tr class="text-uppercase fs-xxs">
+                            <th rowspan="2" style="width:120px">Code</th>
+                            <th rowspan="2">Title</th>
+                            <th colspan="2" class="text-center">Unaudited</th>
+                            <th colspan="2" class="text-center">Adjustment</th>
+                            <th colspan="2" class="text-center">Audited</th>
+                        </tr>
+                        <tr class="text-uppercase fs-xxs">
+                            <th class="text-end">Debit</th>
+                            <th class="text-end">Credit</th>
+                            <th class="text-end">Debit</th>
+                            <th class="text-end">Credit</th>
+                            <th class="text-end">Debit</th>
+                            <th class="text-end">Credit</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (isLoading()) {
+                            <tr><td colspan="8" class="text-center text-muted py-3">
+                                <span class="spinner-border spinner-border-sm me-2"></span>Loading...
+                            </td></tr>
+                        } @else if (rows().length === 0) {
+                            <tr><td colspan="8" class="text-center text-muted py-3">No records found.</td></tr>
+                        } @else {
+                            @for (row of rows(); track $index) {
+                                <tr>
+                                    <td class="fw-bold">{{ row.code }}</td>
+                                    <td>{{ row.title }}</td>
+                                    <td class="text-end" [class.text-danger]="row.transDebit < 0">
+                                        {{ row.transDebit < 0 ? '(' : '' }}{{ (row.transDebit < 0 ? -row.transDebit : row.transDebit) | number:'1.2-2' }}{{ row.transDebit < 0 ? ')' : '' }}
+                                    </td>
+                                    <td class="text-end" [class.text-danger]="row.transCredit < 0">
+                                        {{ row.transCredit < 0 ? '(' : '' }}{{ (row.transCredit < 0 ? -row.transCredit : row.transCredit) | number:'1.2-2' }}{{ row.transCredit < 0 ? ')' : '' }}
+                                    </td>
+                                    <td class="text-end" [class.text-danger]="row.begDebit < 0">
+                                        {{ row.begDebit < 0 ? '(' : '' }}{{ (row.begDebit < 0 ? -row.begDebit : row.begDebit) | number:'1.2-2' }}{{ row.begDebit < 0 ? ')' : '' }}
+                                    </td>
+                                    <td class="text-end" [class.text-danger]="row.begCredit < 0">
+                                        {{ row.begCredit < 0 ? '(' : '' }}{{ (row.begCredit < 0 ? -row.begCredit : row.begCredit) | number:'1.2-2' }}{{ row.begCredit < 0 ? ')' : '' }}
+                                    </td>
+                                    <td class="text-end" [class.text-danger]="row.endingDebit < 0">
+                                        {{ row.endingDebit < 0 ? '(' : '' }}{{ (row.endingDebit < 0 ? -row.endingDebit : row.endingDebit) | number:'1.2-2' }}{{ row.endingDebit < 0 ? ')' : '' }}
+                                    </td>
+                                    <td class="text-end" [class.text-danger]="row.endingCredit < 0">
+                                        {{ row.endingCredit < 0 ? '(' : '' }}{{ (row.endingCredit < 0 ? -row.endingCredit : row.endingCredit) | number:'1.2-2' }}{{ row.endingCredit < 0 ? ')' : '' }}
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

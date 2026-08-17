@@ -1,0 +1,70 @@
+<header class="app-topbar">
+    <div class="container-fluid topbar-menu">
+        <div class="d-flex align-items-center gap-2">
+            <!-- Topbar Brand Logo -->
+            <div class="logo-topbar">
+                <!-- Logo light -->
+                <a routerLink="/" class="logo-light">
+                    <span class="logo-lg">
+                      <img src="assets/images/logo.png" alt="logo">
+                    </span>
+                    <span class="logo-sm">
+                        <img src="assets/images/logo-sm.png" alt="small logo">
+                    </span>
+                </a>
+
+                <!-- Logo Dark -->
+                <a routerLink="/" class="logo-dark">
+                    <span class="logo-lg">
+                      <img src="assets/images/logo-black.png" alt="dark logo">
+                    </span>
+                    <span class="logo-sm">
+                      <img src="assets/images/logo-sm.png" alt="small logo">
+                    </span>
+                </a>
+            </div>
+
+            <!-- Sidebar Menu Toggle Button -->
+            <button (click)="toggleSidebar()" class="sidenav-toggle-button btn btn-primary btn-icon">
+                <ng-icon name="tablerMenu4" class="fs-22"/>
+            </button>
+
+            <!-- Search -->
+            <div class="app-search d-none d-xl-flex position-relative" (click)="openSearch()">
+                <input type="search" class="form-control topbar-search pe-5"
+                       placeholder="Search modules..."
+                       readonly
+                       aria-label="Open module search (Ctrl+K)"
+                       aria-keyshortcuts="Control+k"
+                       style="cursor: pointer;">
+                <lucide-icon [img]="Search" class="app-search-icon text-muted"/>
+                <kbd class="position-absolute top-50 end-0 translate-middle-y me-2 rounded px-1 text-muted"
+                     style="font-size: 0.72rem; pointer-events: none; line-height: 1.8; background: none; border: 1px solid var(--ins-border-color);">Ctrl K</kbd>
+            </div>
+
+            <!-- Mega Menu Dropdown -->
+<!--            <app-mega-menu/>-->
+        </div>
+
+        <div class="d-flex align-items-center gap-2">
+            <!-- Language Dropdown -->
+<!--            <app-language-dropdown/>-->
+
+<!--            &lt;!&ndash; Messages Dropdown &ndash;&gt;-->
+<!--            <app-messages-dropdown/>-->
+
+<!--            &lt;!&ndash; Notification Dropdown &ndash;&gt;-->
+<!--            <app-notification-dropdown/>-->
+
+            <!-- Light/Dark Mode Button -->
+            <app-theme-toggler/>
+
+            <!-- Button Trigger Customizer Offcanvas -->
+            <app-customizer-toggler/>
+
+            <!-- User Dropdown -->
+            <app-user-profile-topbar/>
+
+        </div>
+    </div>
+</header>

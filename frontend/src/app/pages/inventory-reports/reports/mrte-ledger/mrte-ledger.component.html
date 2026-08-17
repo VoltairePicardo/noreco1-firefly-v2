@@ -1,0 +1,90 @@
+<div class="container-fluid">
+    <app-page-title [title]="'Inventory Reports'" [subTitle]="module" [menuLink]="menuLink" [useSubtitleAsTitle]="true"/>
+</div>
+
+<div class="container-fluid">
+    <div class="card">
+        <div class="card-body">
+
+            <div class="row g-2 align-items-end mb-3">
+                <div class="col-md-5">
+                    <label class="form-label fw-bold mb-1">Employee <span class="text-muted fw-normal">(optional — leave blank for all)</span></label>
+                    <div class="input-group">
+                        <input type="text" class="form-control"
+                               [value]="selectedEmployee ? (selectedEmployee.accountNo + ' — ' + selectedEmployee.name) : ''"
+                               readonly placeholder="All employees..."/>
+                        <button type="button" class="btn btn-success fw-bold" (click)="browseEmployee()">
+                            <ng-icon name="tablerSearch" class="fw-bold me-1"></ng-icon>Browse
+                        </button>
+                        @if (selectedEmployee) {
+                            <button type="button" class="btn btn-danger fw-bold" (click)="clearEmployee()">
+                                <ng-icon name="tablerX" class="ps-0 fw-bold"></ng-icon>
+                            </button>
+                        }
+                    </div>
+                </div>
+                <div class="col-md-auto">
+                    <button type="button" class="btn btn-success fw-bold" (click)="search()">
+                        <ng-icon name="tablerSearch" class="fw-bold me-1"></ng-icon>Search
+                    </button>
+                </div>
+                <div class="col-md-auto ms-auto">
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-success fw-bold" (click)="export('pdf')">
+                            <ng-icon name="tablerFileTypePdf" class="fw-bold me-1"></ng-icon>Export PDF
+                        </button>
+                        <button type="button" class="btn btn-success fw-bold" (click)="export('xls')">
+                            <ng-icon name="tablerFileTypeXls" class="fw-bold me-1"></ng-icon>Export Excel
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-responsive mt-3">
+                <table class="table table-custom table-centered table-select table-hover w-100 mb-0">
+                    <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                        <tr class="text-uppercase fs-xxs">
+                            <th>MR Code</th>
+                            <th>MR Date</th>
+                            <th>RR Code</th>
+                            <th>RMR Code</th>
+                            <th>RMR Date</th>
+                            <th>Item Code</th>
+                            <th>Description</th>
+                            <th>Unit Price</th>
+                            <th>Qty</th>
+                            <th>Qty Returned</th>
+                            <th>Balance</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (isLoading()) {
+                            <tr><td colspan="11" class="text-center text-muted py-3">
+                                <span class="spinner-border spinner-border-sm me-2"></span>Loading...
+                            </td></tr>
+                        } @else if (rows().length === 0) {
+                            <tr><td colspan="11" class="text-center text-muted py-3">No records found.</td></tr>
+                        } @else {
+                            @for (row of rows(); track $index) {
+                                <tr>
+                                    <td>{{ row.mrCode }}</td>
+                                    <td>{{ row.mrDate }}</td>
+                                    <td>{{ row.rrCode }}</td>
+                                    <td>{{ row.rmrCode }}</td>
+                                    <td>{{ row.rmrDate }}</td>
+                                    <td>{{ row.itemCode }}</td>
+                                    <td>{{ row.itemDesc }}</td>
+                                    <td>{{ row.unitPrice }}</td>
+                                    <td>{{ row.quantity }}</td>
+                                    <td>{{ row.quantityReturned }}</td>
+                                    <td>{{ row.balance }}</td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+</div>

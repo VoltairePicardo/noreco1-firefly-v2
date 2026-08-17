@@ -1,0 +1,86 @@
+<div class="container-fluid">
+    <app-page-title [title]="module" [subTitle]="subModule" [menuLink]="menuLink"/>
+</div>
+
+<div class="container-fluid">
+    <div class="card">
+        <div class="card-body">
+            <div class="row g-2 align-items-end mb-3">
+                <div class="col-md-auto">
+                    <label class="form-label fw-bold mb-1">From</label>
+                    <input type="text" mwlFlatpickr [options]="flatpickrOptions"
+                           class="form-control" [(ngModel)]="fromDate" placeholder="From date"/>
+                </div>
+                <div class="col-md-auto">
+                    <label class="form-label fw-bold mb-1">To</label>
+                    <input type="text" mwlFlatpickr [options]="flatpickrOptions"
+                           class="form-control" [(ngModel)]="toDate" placeholder="To date"/>
+                </div>
+                <div class="col-md-auto">
+                    <button type="button" class="btn btn-success fw-bold" (click)="load()">
+                        <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Search
+                    </button>
+                </div>
+                <div class="col-md-auto">
+                    <button type="button" class="btn btn-danger fw-bold" (click)="reset()">
+                        <ng-icon name="tablerRefresh" class="ps-0 pe-2 fw-bold"></ng-icon>Reset
+                    </button>
+                </div>
+                <div class="col-md-auto ms-auto">
+                    <a [routerLink]="['/' + menuLink, 'create']" class="btn btn-primary fw-bold">
+                        <ng-icon name="tablerPlus" class="ps-0 pe-2 fw-bold"></ng-icon>Create
+                    </a>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-custom table-centered table-select table-hover w-100 mb-0">
+                    <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                        <tr class="text-uppercase fs-xxs">
+                            <th>Code</th><th>Date</th><th>Remarks</th><th>Prepared By</th><th>Status</th><th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (isLoading()) {
+                            <tr><td colspan="6" class="text-center text-muted py-4">
+                                <span class="spinner-border spinner-border-sm me-2" role="status"></span>Loading...
+                            </td></tr>
+                        } @else if (pagedRecords.length === 0) {
+                            <tr><td colspan="6" class="text-center text-muted py-4">No records found.</td></tr>
+                        } @else {
+                            @for (rec of pagedRecords; track rec.id) {
+                                <tr>
+                                    <td class="fw-bold">{{ rec.code }}</td>
+                                    <td>{{ rec.date | date:'MM/dd/yyyy' }}</td>
+                                    <td>{{ rec.remarks || '—' }}</td>
+                                    <td>{{ rec.createdBy?.fullName || rec.preparedBy || '—' }}</td>
+                                    <td><span class="badge bg-secondary bg-opacity-25 text-dark border">{{ rec.documentStatus?.status || '—' }}</span></td>
+                                    <td>
+                                        <div class="d-flex gap-1">
+                                            <a [routerLink]="['/' + menuLink, rec.id, 'detail']"
+                                               class="btn btn-light btn-icon btn-sm rounded-circle" title="View">
+                                                <ng-icon name="tablerEye"></ng-icon>
+                                            </a>
+                                            @if (rec.documentStatus?.status === 'Document Created' || rec.documentStatus?.status === 'For Revision') {
+                                                <a [routerLink]="['/' + menuLink, rec.id, 'edit']"
+                                                   class="btn btn-light btn-icon btn-sm rounded-circle" title="Edit">
+                                                    <ng-icon name="tablerEdit"></ng-icon>
+                                                </a>
+                                            }
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            @if (records().length > pageSize) {
+                <div class="d-flex justify-content-end mt-3">
+                    <ngb-pagination [(page)]="page" [pageSize]="pageSize" [collectionSize]="records().length"/>
+                </div>
+            }
+        </div>
+    </div>
+</div>

@@ -1,0 +1,187 @@
+<div class="container-fluid">
+    <app-page-title [title]="module" [subTitle]="subModule" [menuLink]="menuLink"/>
+</div>
+
+<div class="card">
+    <div class="card-body">
+
+        @if (isLoading()) {
+            <div class="text-center py-4">
+                <span class="spinner-border spinner-border-sm me-2" role="status"></span>Loading...
+            </div>
+        } @else {
+
+        <!-- Header -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-3">
+                <label class="form-label fw-bold">Date <span class="text-danger">*</span></label>
+                <input type="text" mwlFlatpickr [options]="flatpickrOptions"
+                       class="form-control" [(ngModel)]="voucherDate" placeholder="Select date"
+                       [disabled]="editMode"/>
+            </div>
+            <div class="col-md-5">
+                <label class="form-label fw-bold">Supplier <span class="text-danger">*</span></label>
+                <div class="input-group">
+                    <input type="text" class="form-control" [value]="vendor?.name || ''"
+                           readonly placeholder="Browse supplier..."/>
+                    <button type="button" class="btn btn-success fw-bold" (click)="openVendorBrowse()">
+                        <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
+                    </button>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label fw-bold">Payment Term (days)</label>
+                <input type="number" class="form-control" [(ngModel)]="paymentTerm" min="0" placeholder="e.g. 30"/>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label fw-bold">Payment Term in Words</label>
+                <input type="text" class="form-control" [(ngModel)]="paymentTermInWords"
+                       placeholder="e.g. Thirty (30) calendar days"/>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label fw-bold">Purpose / Scope of Work</label>
+                <textarea class="form-control" [(ngModel)]="description" rows="2"
+                          placeholder="Enter purpose or scope of work" maxlength="1024"></textarea>
+            </div>
+        </div>
+
+        <!-- Items For Labor -->
+        <div class="mb-4">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+                <div class="fs-xs text-uppercase fw-semibold text-muted">Items For Labor</div>
+                <button type="button" class="btn btn-success fw-bold" (click)="openRvBrowse()">
+                    <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse Purchase Request
+                </button>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-custom table-centered table-hover w-100 mb-0">
+                    <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                        <tr class="text-uppercase fs-xxs">
+                            <th>Item Code</th>
+                            <th>Description</th>
+                            <th>JO Description</th>
+                            <th>Unit</th>
+                            <th class="text-end">Qty</th>
+                            <th class="text-end">Unit Price</th>
+                            <th class="text-end">VAT %</th>
+                            <th class="text-end">Disc %</th>
+                            <th class="text-end">Amount</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (lineItems.length > 0) {
+                            @for (item of lineItems; track $index) {
+                                <tr>
+                                    <td>{{ item.itemCode }}</td>
+                                    <td>{{ item.itemDescription }}</td>
+                                    <td>
+                                        <input type="text" class="form-control form-control-sm"
+                                               style="min-width:160px"
+                                               [(ngModel)]="item.joDescription"
+                                               placeholder="JO-specific description"/>
+                                    </td>
+                                    <td>{{ item.unitCode }}</td>
+                                    <td>
+                                        <input type="number" class="form-control form-control-sm text-end"
+                                               style="min-width:80px"
+                                               [(ngModel)]="item.quantity" min="0" step="1"/>
+                                    </td>
+                                    <td>
+                                        <input type="number" class="form-control form-control-sm text-end"
+                                               style="min-width:110px"
+                                               [(ngModel)]="item.unitPrice" min="0" step="0.01"/>
+                                    </td>
+                                    <td>
+                                        <input type="number" class="form-control form-control-sm text-end"
+                                               style="min-width:70px"
+                                               [(ngModel)]="item.vat" min="0" max="100" step="0.01"/>
+                                    </td>
+                                    <td>
+                                        <input type="number" class="form-control form-control-sm text-end"
+                                               style="min-width:70px"
+                                               [(ngModel)]="item.discount" min="0" max="100" step="0.01"/>
+                                    </td>
+                                    <td class="text-end text-nowrap">{{ lineItemAmount(item) | number:'1.2-2' }}</td>
+                                    <td>
+                                        <button type="button"
+                                                class="btn btn-light btn-icon btn-sm rounded-circle"
+                                                (click)="removeLineItem($index)">
+                                            <ng-icon name="tablerTrash" class="fs-lg"></ng-icon>
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                            <tr class="fw-bold">
+                                <td colspan="8" class="text-end text-uppercase fs-xs">Total</td>
+                                <td class="text-end">{{ totalAmount | number:'1.2-2' }}</td>
+                                <td></td>
+                            </tr>
+                        } @else {
+                            <tr>
+                                <td colspan="10" class="text-center text-muted py-3">No items added.</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <hr/>
+
+        <!-- Signatories -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-12">
+                <div class="fs-xs text-uppercase fw-semibold text-muted mb-2">Signatories</div>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label fw-bold">Budget Checked By <span class="text-danger">*</span></label>
+                <div class="input-group">
+                    <input type="text" class="form-control" [value]="budgetCheckedBy?.name || ''"
+                           readonly placeholder="Browse officer..."/>
+                    <button type="button" class="btn btn-success fw-bold"
+                            (click)="openSignatoryBrowse('budgetCheckedBy')">
+                        <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
+                    </button>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label fw-bold">Checked By <span class="text-danger">*</span></label>
+                <div class="input-group">
+                    <input type="text" class="form-control" [value]="checkedBy?.name || ''"
+                           readonly placeholder="Browse officer..."/>
+                    <button type="button" class="btn btn-success fw-bold"
+                            (click)="openSignatoryBrowse('checkedBy')">
+                        <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
+                    </button>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label fw-bold">Approved By <span class="text-danger">*</span></label>
+                <div class="input-group">
+                    <input type="text" class="form-control" [value]="approvedBy?.name || ''"
+                           readonly placeholder="Browse officer..."/>
+                    <button type="button" class="btn btn-success fw-bold"
+                            (click)="openSignatoryBrowse('approvedBy')">
+                        <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="d-flex gap-2 justify-content-end align-items-center pt-3 border-top mt-3">
+            <a [routerLink]="['/' + menuLink]" class="btn btn-light fw-bold">
+                <ng-icon name="tablerArrowLeft" class="ps-0 pe-3 fw-bold"></ng-icon>Back
+            </a>
+            <button type="button" class="btn btn-primary fw-bold"
+                    [disabled]="formSubmit" (click)="save()">
+                <ng-icon name="tablerCheck" class="ps-0 pe-3 fw-bold"></ng-icon>
+                {{ editMode ? 'Update' : 'Save ' + module }}
+            </button>
+        </div>
+
+        } <!-- end !isLoading -->
+    </div>
+</div>

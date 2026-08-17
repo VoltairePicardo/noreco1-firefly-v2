@@ -1,0 +1,70 @@
+<div class="container-fluid mt-3">
+    <div class="row mb-3">
+        <div class="col-12">
+            <h5 class="fw-semibold mb-0">NORECO I - Accounting and Inventory System</h5>
+            <p class="text-muted small mb-0">Welcome, {{ user?.fullName || user?.username || 'User' }}</p>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body p-0">
+            <ul class="nav nav-tabs nav-justified nav-bordered nav-bordered-primary mb-0">
+                <li class="nav-item">
+                    <button class="nav-link fw-semibold" [class.active]="activeTab === 'documents'" (click)="selectTab('documents')">
+                        Documents
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link fw-semibold" [class.active]="activeTab === 'other-approved'" (click)="selectTab('other-approved')">
+                        Other Approved Documents
+                    </button>
+                </li>
+            </ul>
+
+            <div class="p-3">
+                <div class="table-responsive">
+                    <table class="table table-custom table-centered table-hover w-100 mb-0">
+                        <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                            <tr class="text-uppercase fs-xxs">
+                                <th>Code</th>
+                                <th>Document Type</th>
+                                <th>Particulars</th>
+                                <th class="text-end">Amount</th>
+                                <th>Date</th>
+                                <th class="text-center">Tag</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (isLoading()) {
+                                <tr>
+                                    <td colspan="6" class="text-center text-muted py-3">
+                                        <span class="spinner-border spinner-border-sm me-2"></span>Loading...
+                                    </td>
+                                </tr>
+                            } @else if (rows().length === 0) {
+                                <tr>
+                                    <td colspan="6" class="text-center text-muted py-3">No records found.</td>
+                                </tr>
+                            } @else {
+                                @for (row of rows(); track $index) {
+                                    <tr>
+                                        <td>{{ row.code }}</td>
+                                        <td>{{ row.documentType }}</td>
+                                        <td>{{ row.particulars }}</td>
+                                        <td class="text-end">{{ row.amount | number:'1.2-2' }}</td>
+                                        <td>{{ row.voucherDate | date:'MMM dd, yyyy' }}</td>
+                                        <td class="text-center">
+                                            @if (row.tag) {
+                                                <span class="badge bg-secondary">{{ row.tag }}</span>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,237 @@
+<div class="container-fluid">
+    <app-page-title [title]="module" [subTitle]="subModule" [menuLink]="menuLink"/>
+</div>
+
+<div class="container-fluid">
+    @if (isLoading() && editMode) {
+        <div class="d-flex align-items-center gap-2 text-muted py-4">
+            <span class="spinner-border spinner-border-sm" role="status"></span> Loading...
+        </div>
+    } @else {
+    <form (ngSubmit)="save()" #f="ngForm">
+        <app-ui-card title="Project Information">
+            <div class="p-3" card-body>
+
+                <div class="row g-3">
+
+                    <!-- Requesting Party type -->
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold">Requesting Party</label>
+                        <select class="form-select" [(ngModel)]="selectedPartyType"
+                                name="selectedPartyType"
+                                [compareWith]="compareById">
+                            <option [ngValue]="null">— Select —</option>
+                            @for (p of requestingPartyTypes; track p.id) {
+                                <option [ngValue]="p">{{ p.description }}</option>
+                            }
+                        </select>
+                    </div>
+
+                    <!-- Office dropdown -->
+                    @if (isOffice) {
+                        <div class="col-md-8">
+                            <label class="form-label fw-bold">Office</label>
+                            <select class="form-select" [(ngModel)]="selectedOffice"
+                                    name="selectedOffice"
+                                    [compareWith]="compareById">
+                                <option [ngValue]="null">Select Office</option>
+                                @for (o of offices(); track o.id) {
+                                    <option [ngValue]="o">{{ o.name }}</option>
+                                }
+                            </select>
+                        </div>
+                    }
+
+                    <!-- Department dropdown -->
+                    @if (isDepartment) {
+                        <div class="col-md-8">
+                            <label class="form-label fw-bold">Department</label>
+                            <select class="form-select" [(ngModel)]="selectedDepartment"
+                                    name="selectedDepartment"
+                                    [compareWith]="compareById">
+                                <option [ngValue]="null">Select Department</option>
+                                @for (d of departments(); track d.id) {
+                                    <option [ngValue]="d">{{ d.name }}</option>
+                                }
+                            </select>
+                        </div>
+                    }
+
+                    <!-- Consumer/Employee fields -->
+                    @if (isConsumer) {
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">Consumer Acct. No.</label>
+                            <input type="text" class="form-control"
+                                   [(ngModel)]="consumerAccountNumber"
+                                   name="consumerAccountNumber"
+                                   placeholder="Enter consumer acct. no."/>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">Consumer Name</label>
+                            <input type="text" class="form-control"
+                                   [(ngModel)]="consumerName"
+                                   name="consumerName"
+                                   placeholder="Enter consumer name"/>
+                        </div>
+                    }
+
+                    <!-- Government field -->
+                    @if (isGovernment) {
+                        <div class="col-md-8">
+                            <label class="form-label fw-bold">Government Office Name</label>
+                            <input type="text" class="form-control"
+                                   [(ngModel)]="governmentOfficeName"
+                                   name="governmentOfficeName"
+                                   placeholder="Enter government office name"/>
+                        </div>
+                    }
+
+                    <div class="col-md-12">
+                        <label class="form-label fw-bold">Project Name <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" [(ngModel)]="name"
+                               name="name" placeholder="Enter project name" required/>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Location</label>
+                        <input type="text" class="form-control" [(ngModel)]="location"
+                               name="location" placeholder="Enter location"/>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Project Manager</label>
+                        <input type="text" class="form-control" [(ngModel)]="projectManager"
+                               name="projectManager" placeholder="Enter project manager"/>
+                    </div>
+
+                    <div class="col-md-12">
+                        <label class="form-label fw-bold">Purpose</label>
+                        <textarea class="form-control" [(ngModel)]="purpose" name="purpose"
+                                  rows="3" placeholder="Enter purpose" maxlength="1024"></textarea>
+                    </div>
+
+                    <div class="col-md-12">
+                        <label class="form-label fw-bold">Payment Details</label>
+                        <textarea class="form-control" [(ngModel)]="paymentDetails" name="paymentDetails"
+                                  rows="3" placeholder="Enter payment details" maxlength="1024"></textarea>
+                    </div>
+
+                </div>
+
+                <!-- Contractors -->
+                <hr/>
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <p class="fs-xs text-uppercase fw-semibold text-muted mb-0">Contractors</p>
+                    <button type="button" class="btn btn-success fw-bold" (click)="browseSupplier()">
+                        <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse Supplier
+                    </button>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-custom table-centered table-hover w-100 mb-0">
+                        <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                            <tr class="text-uppercase fs-xxs">
+                                <th style="width:40px">#</th>
+                                <th style="width:160px">Account No.</th>
+                                <th>Name</th>
+                                <th style="width:60px"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (contractors.length > 0) {
+                                @for (c of contractors; track $index; let i = $index) {
+                                    <tr>
+                                        <td>{{ i + 1 }}</td>
+                                        <td>{{ c.accountNo || '—' }}</td>
+                                        <td>{{ c.name || '—' }}</td>
+                                        <td class="text-center">
+                                            <button type="button"
+                                                    class="btn btn-danger btn-icon btn-sm rounded-circle"
+                                                    (click)="removeContractor(i)"
+                                                    ngbTooltip="Remove">
+                                                <ng-icon name="tablerTrash" class="fs-sm"></ng-icon>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                }
+                            } @else {
+                                <tr class="no-results">
+                                    <td colspan="4" class="text-center text-muted py-3 fs-xs">
+                                        No contractors added. Click Browse Supplier to add.
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- As Planned Staking Sheet -->
+                <hr/>
+                <p class="fs-xs text-uppercase fw-semibold text-muted mb-3">As Planned Staking Sheet</p>
+                <div class="d-flex align-items-center gap-3 mb-2">
+                    <button type="button" class="btn btn-success fw-bold" (click)="openStakingFilePicker()">
+                        <ng-icon name="tablerPaperclip" class="ps-0 pe-2 fw-bold"></ng-icon>Attach Files
+                    </button>
+                    <small class="text-muted">Supported: .jpg, .jpeg, .png, .pdf</small>
+                </div>
+                <input #stakingFileInput type="file" multiple accept=".jpg,.jpeg,.png,.pdf"
+                       style="display:none" (change)="onStakingFileSelect($event)"/>
+
+                <!-- Existing files (edit mode) -->
+                @if (editMode && existingFiles.length > 0) {
+                    <div class="mb-3">
+                        <h6 class="fw-semibold text-uppercase fs-xs mb-2">Existing Files</h6>
+                        <ul class="list-unstyled mb-0">
+                            @for (f of existingFiles; track $index) {
+                                <li class="mb-1">
+                                    <a [href]="fileUrl(f.id)" target="_blank" class="text-primary fs-xs">
+                                        <ng-icon name="tablerFile" class="me-1"></ng-icon>
+                                        {{ f.originalFilename || f.oFile || f.name || 'File' }}
+                                    </a>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                }
+
+                <!-- Staged files -->
+                @if (stagedStakingFiles.length > 0) {
+                    <div class="d-flex flex-wrap gap-2">
+                        @for (f of stagedStakingFiles; track $index; let i = $index) {
+                            <div class="d-flex align-items-center gap-2 border rounded px-3 py-2 bg-light">
+                                @if (isImage(f)) {
+                                    <ng-icon name="tablerPhoto" class="text-primary fs-sm"></ng-icon>
+                                } @else {
+                                    <ng-icon name="tablerFile" class="text-muted fs-sm"></ng-icon>
+                                }
+                                <span class="fs-xs text-truncate" style="max-width:200px" [title]="f.name">{{ f.name }}</span>
+                                <button type="button" class="btn btn-link p-0 text-danger ms-1"
+                                        (click)="removeStagedFile(i)">
+                                    <ng-icon name="tablerX" class="fs-sm"></ng-icon>
+                                </button>
+                            </div>
+                        }
+                    </div>
+                } @else if (!editMode || existingFiles.length === 0) {
+                    <p class="text-muted mb-0 fs-xs">No files attached.</p>
+                }
+
+                <div class="d-flex gap-2 justify-content-end align-items-center pt-3 border-top mt-3">
+                    <a [routerLink]="['/' + menuLink]" class="btn btn-light fw-bold">
+                        <ng-icon name="tablerArrowLeft" class="ps-0 pe-3 fw-bold"></ng-icon>Back
+                    </a>
+                    <button type="submit" class="btn btn-primary fw-bold" [disabled]="formSubmit">
+                        @if (formSubmit) {
+                            <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                            {{ editMode ? 'Updating...' : 'Saving...' }}
+                        } @else {
+                            <ng-icon name="tablerCheck" class="ps-0 pe-3 fw-bold"></ng-icon>
+                            {{ editMode ? 'Update' : 'Save ' + module}}
+                        }
+                    </button>
+                </div>
+
+            </div>
+        </app-ui-card>
+    </form>
+    }
+</div>

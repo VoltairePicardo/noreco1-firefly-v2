@@ -1,0 +1,325 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="JournalVoucherRegisterRecap" pageWidth="968" pageHeight="612" orientation="Landscape" columnWidth="968" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" isFloatColumnFooter="true" isIgnorePagination="true" uuid="9b05243c-a772-49c3-89bd-ea00365f0a0a">
+	<property name="net.sf.jasperreports.export.xls.exclude.origin.keep.first.band.1" value="columnHeader"/>
+	<property name="net.sf.jasperreports.export.xls.exclude.origin.band.1" value="pageHeader"/>
+	<property name="net.sf.jasperreports.export.xls.exclude.origin.band.2" value="pageFooter"/>
+	<property name="net.sf.jasperreports.export.xls.exclude.origin.band.3" value="lastPageFooter"/>
+	<property name="net.sf.jasperreports.export.xls.ignore.cell.background" value="true"/>
+	<property name="net.sf.jasperreports.export.xls.white.page.background" value="false"/>
+	<property name="net.sf.jasperreports.export.xls.ignore.graphics" value="false"/>
+	<property name="net.sf.jasperreports.export.xls.detect.cell.type=true"/>
+	<property name="net.sf.jasperreports.export.xls.remove.empty.space.between.rows=true"/>
+	<property name="net.sf.jasperreports.export.xls.remove.empty.space.between.columns=true"/>
+	<property name="net.sf.jasperreports.export.xls.collapse.row.span" value="true"/>
+	<property name="net.sf.jasperreports.export.xls.ignore.page.margins=true"/>
+	<property name="net.sf.jasperreports.export.xls.one.page.per.sheet=true"/>
+	<property name="net.sf.jasperreports.export.xls.wrap.text" value="true"/>
+	<property name="net.sf.jasperreports.export.xls.column.width.ratio" value="1.10f"/>
+	<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+	<property name="ireport.zoom" value="0.9090909090909117"/>
+	<property name="ireport.x" value="59"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["D:\\accounting\\src\\inventory\\reports\\"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="RANGE" class="java.lang.String"/>
+	<parameter name="REPORT_TITLE" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[]]>
+	</queryString>
+	<field name="glAccountTitle" class="java.lang.String">
+		<fieldDescription><![CDATA[glAccountTitle]]></fieldDescription>
+	</field>
+	<field name="glAccountCode" class="java.lang.String">
+		<fieldDescription><![CDATA[glAccountCode]]></fieldDescription>
+	</field>
+	<field name="glDebit" class="java.math.BigDecimal">
+		<fieldDescription><![CDATA[glDebit]]></fieldDescription>
+	</field>
+	<field name="glCredit" class="java.math.BigDecimal">
+		<fieldDescription><![CDATA[glCredit]]></fieldDescription>
+	</field>
+	<field name="slAccountTitle" class="java.lang.String">
+		<fieldDescription><![CDATA[slAccountTitle]]></fieldDescription>
+	</field>
+	<field name="slAccountCode" class="java.lang.String">
+		<fieldDescription><![CDATA[slAccountCode]]></fieldDescription>
+	</field>
+	<field name="slDebit" class="java.math.BigDecimal">
+		<fieldDescription><![CDATA[slDebit]]></fieldDescription>
+	</field>
+	<field name="slCredit" class="java.math.BigDecimal">
+		<fieldDescription><![CDATA[slCredit]]></fieldDescription>
+	</field>
+	<variable name="glDebit_Sum" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{glDebit}]]></variableExpression>
+	</variable>
+	<variable name="glCredit_Sum" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{glCredit}]]></variableExpression>
+	</variable>
+	<variable name="slDebit_Sum" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{slDebit}]]></variableExpression>
+	</variable>
+	<variable name="slCredit_Sum" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{slCredit}]]></variableExpression>
+	</variable>
+	<title>
+		<band height="17" splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band height="89" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="c01dc282-a440-49db-bb06-146e4ab133c3" isPrintRepeatedValues="false" x="0" y="59" width="478" height="20" isRemoveLineWhenBlank="true"/>
+				<box>
+					<pen lineStyle="Double"/>
+					<topPen lineStyle="Double"/>
+					<leftPen lineStyle="Double"/>
+					<bottomPen lineWidth="0.75" lineStyle="Solid"/>
+					<rightPen lineStyle="Double"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[General Ledger]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="635b4d94-7b48-4ab7-8a01-07b73ffa116b" isPrintRepeatedValues="false" x="0" y="39" width="968" height="20" isRemoveLineWhenBlank="true"/>
+				<box leftPadding="7"/>
+				<textElement>
+					<font fontName="Arial" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{RANGE}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="1fa1c404-4f0e-4e84-8349-45f70733c573" isPrintRepeatedValues="false" x="501" y="59" width="467" height="20" isRemoveLineWhenBlank="true"/>
+				<box>
+					<bottomPen lineWidth="0.75"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Subsidiary Ledger]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="5060111c-7a48-47b6-859b-35883a715608" isPrintRepeatedValues="false" mode="Transparent" x="0" y="18" width="968" height="21" isRemoveLineWhenBlank="true" forecolor="#000000" backcolor="#FFFFFF"/>
+				<box leftPadding="2"/>
+				<textElement textAlignment="Left" verticalAlignment="Top" rotation="None" markup="none">
+					<font fontName="Calibri" size="14" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{REPORT_TITLE} + " Recap Entries"]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="a64d4f9b-6fff-4292-96cb-0195da5ab36d" isPrintRepeatedValues="false" x="0" y="0" width="968" height="18" isRemoveLineWhenBlank="true"/>
+				<box>
+					<pen lineStyle="Double"/>
+					<topPen lineStyle="Double"/>
+					<leftPen lineStyle="Double"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid"/>
+					<rightPen lineStyle="Double"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[]]></text>
+			</staticText>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="21" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="0d179c60-23c8-4d25-bcbd-44bb4a9c22d0" x="0" y="0" width="202" height="20"/>
+				<box leftPadding="2"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Account Title]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="e3c7a3ff-66e4-4279-b0ac-767afd517a43" x="202" y="0" width="96" height="20"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Account Code]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="0800bbd2-f0ce-4d90-bc39-284e5718a798" x="298" y="0" width="90" height="20"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Debit]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="8143cd72-b3c9-4909-a39e-881dd70397fb" x="388" y="0" width="90" height="20"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Credit]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="2250c370-f2d3-4acb-a0a9-e791f7d64853" x="887" y="0" width="81" height="20"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Credit]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="6d58649d-a6d8-4b7e-b512-52ec270297f4" x="805" y="0" width="82" height="20"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Debit]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="3e158d88-4689-496e-91f8-8aaafdd479bb" x="704" y="0" width="101" height="20"/>
+				<box leftPadding="3"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Account Code]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="5f3a99a9-abda-4b42-8df0-1195b09c2f8c" x="501" y="0" width="203" height="20"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Name]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="12" splitType="Stretch">
+			<textField isStretchWithOverflow="true" pattern=" #,##0.00" isBlankWhenNull="true">
+				<reportElement uuid="2e5e8d16-7fb3-401a-9aa3-e885f4eb6348" x="887" y="0" width="81" height="12"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[($F{slCredit}.compareTo(new java.math.BigDecimal(0)) ==0 ? null:$F{slCredit})]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern=" #,##0.00" isBlankWhenNull="true">
+				<reportElement uuid="2e585efa-720b-4db4-8041-9f4838a91ca2" x="805" y="0" width="82" height="12"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[($F{slDebit}.compareTo(new java.math.BigDecimal(0)) ==0 ? null:$F{slDebit})]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="b05d9a88-f8d4-4d94-ab71-3a2358c76d6f" x="0" y="0" width="202" height="12"/>
+				<box leftPadding="5"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{glAccountTitle}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern=" #,##0.00" isBlankWhenNull="true">
+				<reportElement uuid="c9b71c11-e65a-473c-8e17-d10dd36743db" x="298" y="0" width="90" height="12"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[($F{glDebit}.compareTo(new java.math.BigDecimal(0)) ==0 ? null:$F{glDebit})]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern=" #,##0.00" isBlankWhenNull="true">
+				<reportElement uuid="6d5e7036-14a9-40aa-a14d-a8db1f30da5a" x="388" y="0" width="90" height="12"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[($F{glCredit}.compareTo(new java.math.BigDecimal(0)) ==0 ? null:$F{glCredit})]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="e204d022-e0da-4ed4-86d0-adaaf1cfcb37" x="202" y="0" width="96" height="12"/>
+				<box leftPadding="5"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{glAccountCode}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="faeff6f5-d1fb-4fb9-8a0e-8e4b203e7027" x="704" y="0" width="101" height="12"/>
+				<box leftPadding="5"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{slAccountCode}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="db7a79ba-99b0-4a4d-b2e7-fbcd0593bc9c" x="501" y="0" width="203" height="12"/>
+				<box leftPadding="0"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{slAccountTitle}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<lastPageFooter>
+		<band height="29">
+			<line>
+				<reportElement uuid="2fbbae99-812f-4767-94f8-dab40d0a6de6" x="298" y="20" width="180" height="1"/>
+				<graphicElement>
+					<pen lineWidth="0.25"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement uuid="f898707c-d301-4083-bd43-21d4007a0a62" x="298" y="23" width="180" height="1"/>
+				<graphicElement>
+					<pen lineWidth="0.25"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement uuid="167c39fe-7cad-4b63-ae39-983e4b0b3b65" x="805" y="23" width="163" height="1"/>
+				<graphicElement>
+					<pen lineWidth="0.25"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement uuid="cc93f142-febd-463a-a679-ae63a1b17c26" x="805" y="20" width="163" height="1"/>
+				<graphicElement>
+					<pen lineWidth="0.25"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement uuid="3206e1ec-a3e9-4b56-a27f-395ff81a3c69" x="298" y="1" width="180" height="1"/>
+				<graphicElement>
+					<pen lineWidth="0.25"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement uuid="1d3e9cb3-fab2-4a44-b9a3-c444b63798a4" x="805" y="1" width="163" height="1"/>
+				<graphicElement>
+					<pen lineWidth="0.25"/>
+				</graphicElement>
+			</line>
+			<textField isStretchWithOverflow="true" pattern="#,##0.00;(#,##0.00)" isBlankWhenNull="true">
+				<reportElement uuid="66190b63-521a-4ccb-a328-a5a1429598a2" x="886" y="2" width="82" height="17"/>
+				<textElement textAlignment="Right" verticalAlignment="Bottom">
+					<font fontName="Arial" size="10" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{slCredit_Sum}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;(#,##0.00)" isBlankWhenNull="true">
+				<reportElement uuid="5bed5373-dfa3-4d11-9f38-f8811e86454f" mode="Transparent" x="501" y="2" width="385" height="17" forecolor="#000000" backcolor="#FFFFFF"/>
+				<textElement textAlignment="Right" verticalAlignment="Bottom" rotation="None" markup="none">
+					<font fontName="Arial" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{slDebit_Sum}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;(#,##0.00)" isBlankWhenNull="true">
+				<reportElement uuid="14829eff-853e-4a75-9150-0773c5dcaa95" mode="Transparent" x="388" y="2" width="90" height="17" forecolor="#000000" backcolor="#FFFFFF"/>
+				<textElement textAlignment="Right" verticalAlignment="Bottom" rotation="None" markup="none">
+					<font fontName="Arial" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{glCredit_Sum}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;(#,##0.00)" isBlankWhenNull="true">
+				<reportElement uuid="1177ce23-e2a3-4a99-87b1-b08f3bf44aeb" mode="Transparent" x="0" y="2" width="388" height="17" forecolor="#000000" backcolor="#FFFFFF"/>
+				<textElement textAlignment="Right" verticalAlignment="Bottom" rotation="None" markup="none">
+					<font fontName="Arial" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{glDebit_Sum}]]></textFieldExpression>
+			</textField>
+		</band>
+	</lastPageFooter>
+</jasperReport>

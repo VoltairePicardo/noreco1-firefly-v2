@@ -1,0 +1,43 @@
+.message-wrapper {
+    height: 60vh;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f8f9fa;
+    font-family: 'Product Sans', Arial, sans-serif;
+    padding: 20px;
+    box-sizing: border-box;
+    text-align: center;
+
+    &.success { --accent: #198754; }
+    &.info    { --accent: #0dcaf0; }
+    &.warning { --accent: #ffc107; }
+    &.error   { --accent: #dc3545; }
+}
+
+.message-card {
+    max-width: 500px;
+    width: 100%;
+}
+
+.message-icon {
+    font-size: 64px;
+    color: var(--accent);
+    margin-bottom: 1.25rem;
+}
+
+.message-title {
+    color: #3c4043;
+    font-size: 1.75rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    letter-spacing: -0.02em;
+}
+
+.message-text {
+    color: #5f6368;
+    font-size: 1rem;
+    line-height: 1.5;
+    margin-bottom: 1.5rem;
+}

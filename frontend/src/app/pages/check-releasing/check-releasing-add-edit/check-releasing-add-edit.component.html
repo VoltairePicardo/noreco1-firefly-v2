@@ -1,0 +1,189 @@
+<div class="container-fluid">
+    <app-page-title [title]="module" [subTitle]="subModule" [menuLink]="menuLink"/>
+</div>
+
+<div class="container-fluid">
+    <div class="row g-3">
+
+        <!-- Check Information (read-only) -->
+        @if (checkInfo) {
+            <div class="col-xl-12">
+                <app-ui-card title="Check Information">
+                    <div class="col-xl-12 p-3" card-body>
+                        <div class="row g-3">
+                            <div class="col-md-3">
+                                <div class="fw-bold fs-xs text-uppercase text-muted mb-1">CV Code</div>
+                                <div class="fw-bold">{{ checkInfo.code || '—' }}</div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Account</div>
+                                <div>{{ checkInfo.accountTitle || '—' }}</div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Check Number</div>
+                                <div>{{ checkInfo.checkNumber || '—' }}</div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Amount</div>
+                                <div class="fw-bold">{{ checkInfo.amount | number:'1.2-2' }}</div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Voucher Date</div>
+                                <div>{{ checkInfo.voucherDate | date:'MMMM d, yyyy' }}</div>
+                            </div>
+                            <div class="col-md-9">
+                                <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Particulars</div>
+                                <div>{{ checkInfo.particulars || '—' }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </app-ui-card>
+            </div>
+        }
+
+        <!-- Release Form -->
+        <div class="col-xl-8">
+            <app-ui-card title="Release Details">
+                <div class="col-xl-12 p-3" card-body>
+                    <form class="row g-3 needs-validation" novalidate (ngSubmit)="save()">
+
+                        <div class="col-md-6">
+                            <label for="receivedBy" class="form-label fw-bold">
+                                Received By <span class="text-danger">*</span>
+                            </label>
+                            <input id="receivedBy" type="text" class="form-control"
+                                   placeholder="Name of recipient"
+                                   [(ngModel)]="receivedBy" name="receivedBy"
+                                   [class]="submit && !receivedBy.trim() ? 'is-invalid' : submit && receivedBy.trim() ? 'is-valid' : ''"
+                                   required/>
+                            <div class="invalid-feedback">Please provide the recipient's name.</div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="dateReleased" class="form-label fw-bold">
+                                Date Released <span class="text-danger">*</span>
+                            </label>
+                            <input id="dateReleased" type="text" mwlFlatpickr [options]="flatpickrOptions"
+                                   class="form-control" placeholder="Select date"
+                                   [(ngModel)]="dateReleased" name="dateReleased"
+                                   [class]="submit && !dateReleased ? 'is-invalid' : submit && dateReleased ? 'is-valid' : ''"
+                                   required/>
+                            <div class="invalid-feedback">Please select the release date.</div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label for="idNumber" class="form-label fw-bold">ID Number</label>
+                            <input id="idNumber" type="text" class="form-control"
+                                   placeholder="ID Number (optional)"
+                                   [(ngModel)]="idNumber" name="idNumber"/>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label for="orNumber" class="form-label fw-bold">OR Number</label>
+                            <input id="orNumber" type="text" class="form-control"
+                                   placeholder="OR Number (optional)"
+                                   [(ngModel)]="orNumber" name="orNumber"/>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label for="depositSlip" class="form-label fw-bold">Deposit Slip</label>
+                            <input id="depositSlip" type="text" class="form-control"
+                                   placeholder="Deposit Slip (optional)"
+                                   [(ngModel)]="depositSlip" name="depositSlip"/>
+                        </div>
+
+                        <div class="col-md-12">
+                            <label for="remarks" class="form-label fw-bold">Remarks</label>
+                            <textarea id="remarks" class="form-control" rows="3" maxlength="1024"
+                                      placeholder="Remarks (optional)"
+                                      [(ngModel)]="remarks" name="remarks"></textarea>
+                        </div>
+
+                        <!-- File Attachments -->
+                        <div class="col-md-12">
+                            <label class="form-label fw-bold">Attachments</label>
+                            <div class="d-flex flex-wrap gap-2 mb-2">
+                                @for (att of attachments; track att.name; let i = $index) {
+                                    <div class="d-flex align-items-center gap-1 border rounded px-2 py-1 bg-light">
+                                        @if (isImage(att)) {
+                                            <ng-icon name="tablerPhoto" class="text-primary"></ng-icon>
+                                        } @else {
+                                            <ng-icon name="tablerFile" class="text-muted"></ng-icon>
+                                        }
+                                        <span class="fs-xs text-truncate" style="max-width:180px"
+                                              [ngbTooltip]="att.name">{{ att.name }}</span>
+                                        <button type="button" class="btn btn-link p-0 text-danger ms-1"
+                                                (click)="removeAttachment(i)">
+                                            <ng-icon name="tablerX" class="fs-sm"></ng-icon>
+                                        </button>
+                                    </div>
+                                }
+                            </div>
+                            <button type="button" class="btn btn-success fw-bold" (click)="openFilePicker()">
+                                <ng-icon name="tablerPaperclip" class="ps-0 pe-3 fw-bold"></ng-icon>Attach Files
+                            </button>
+                            <small class="text-muted ms-2">JPG, PNG, PDF only</small>
+
+                            <!-- Hidden file input -->
+                            <input #fileInput type="file" multiple accept=".jpg,.jpeg,.png,.pdf"
+                                   style="display:none" (change)="onFileSelect($event)"/>
+                        </div>
+
+                        <hr/>
+
+                        <div class="d-flex gap-2 justify-content-end align-items-center pt-3 border-top mt-3">
+                            <a [routerLink]="['/' + menuLink]" class="btn btn-light fw-bold">
+                                <ng-icon name="tablerArrowLeft" class="ps-0 pe-3 fw-bold"></ng-icon>Back
+                            </a>
+                            <button type="submit" class="btn btn-primary fw-bold" [disabled]="formSubmit">
+                                @if (formSubmit) {
+                                    <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                                    Releasing...
+                                } @else {
+                                    <ng-icon name="tablerSend" class="ps-0 pe-3 fw-bold"></ng-icon>
+                                    Release Check
+                                }
+                            </button>
+                        </div>
+
+                    </form>
+                </div>
+            </app-ui-card>
+        </div>
+
+        <!-- Recipient Photo -->
+        <div class="col-xl-4">
+            <app-ui-card title="Recipient Photo">
+                <div class="col-xl-12 p-3 d-flex flex-column align-items-center gap-3" card-body>
+
+                    @if (personImage) {
+                        <!-- Preview of captured image -->
+                        <img [src]="personImage" alt="Recipient Photo"
+                             class="img-fluid rounded border"
+                             style="max-height:260px; object-fit:cover; width:100%"/>
+                        <div class="d-flex gap-2">
+                            <button type="button" class="btn btn-success fw-bold" (click)="retakePicture()">
+                                <ng-icon name="tablerCamera" class="ps-0 pe-3 fw-bold"></ng-icon>Retake
+                            </button>
+                            <button type="button" class="btn btn-danger fw-bold" (click)="removePicture()">
+                                <ng-icon name="tablerTrash" class="ps-0 pe-3 fw-bold"></ng-icon>Remove
+                            </button>
+                        </div>
+                    } @else {
+                        <!-- Placeholder before capture -->
+                        <div class="d-flex flex-column align-items-center justify-content-center border rounded bg-light text-muted gap-2"
+                             style="height:220px; width:100%">
+                            <ng-icon name="tablerCamera" style="font-size:3rem"></ng-icon>
+                            <span class="fs-sm">No photo captured</span>
+                        </div>
+                        <button type="button" class="btn btn-success fw-bold w-100" (click)="takePicture()">
+                            <ng-icon name="tablerCamera" class="ps-0 pe-3 fw-bold"></ng-icon>Take Picture
+                        </button>
+                    }
+
+                </div>
+            </app-ui-card>
+        </div>
+
+    </div>
+</div>

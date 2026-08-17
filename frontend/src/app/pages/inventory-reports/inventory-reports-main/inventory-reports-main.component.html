@@ -1,0 +1,30 @@
+<div class="container-fluid">
+    <app-page-title [title]="module" [subTitle]="''" [menuLink]="menuLink"/>
+</div>
+
+<div class="container-fluid">
+    <div class="row g-3">
+        @for (cat of categories; track cat.title) {
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <div class="card-header bg-light bg-opacity-50 py-2">
+                        <h6 class="mb-0 fw-semibold d-flex align-items-center gap-2">
+                            <ng-icon [name]="cat.icon" class="text-primary"></ng-icon>
+                            {{ cat.title }}
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <label class="form-label fw-bold mb-1">Select Report</label>
+                        <select class="form-select" [(ngModel)]="cat.selected"
+                                (ngModelChange)="onSelectionChange(cat)">
+                            <option value="">— Choose a report —</option>
+                            @for (opt of cat.options; track opt.route) {
+                                <option [value]="opt.route">{{ opt.label }}</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>

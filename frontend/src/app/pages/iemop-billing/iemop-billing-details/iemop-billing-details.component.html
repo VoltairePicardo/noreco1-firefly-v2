@@ -1,0 +1,111 @@
+<div class="container-fluid">
+    <app-page-title [title]="module" [subTitle]="subModule" [menuLink]="menuLink"/>
+</div>
+
+<div class="container-fluid">
+    @if (isLoading()) {
+        <div class="d-flex align-items-center gap-2 text-muted py-4">
+            <span class="spinner-border spinner-border-sm" role="status"></span> Loading...
+        </div>
+    } @else if (data) {
+    <div class="row g-3">
+
+        <div class="col-xl-12">
+            <app-ui-card title="IEMOP Billing Details">
+                <div class="col-xl-12 p-3" card-body>
+
+                    <div class="row g-3">
+
+                        <!-- Left Column -->
+                        <div class="col-md-6">
+                            <dl class="row mb-0">
+                                <dt class="col-sm-5 fw-bold">Reference Number</dt>
+                                <dd class="col-sm-7">{{ data.referenceNumber || '—' }}</dd>
+
+                                <dt class="col-sm-5 fw-bold">Transaction Date</dt>
+                                <dd class="col-sm-7">{{ data.transDate | date:'MMMM d, yyyy' }}</dd>
+
+                                <dt class="col-sm-5 fw-bold">STL ID</dt>
+                                <dd class="col-sm-7">{{ data.stlId || '—' }}</dd>
+
+                                <dt class="col-sm-5 fw-bold">Billing ID</dt>
+                                <dd class="col-sm-7">{{ data.billingId || '—' }}</dd>
+
+                                <dt class="col-sm-5 fw-bold">Facility Type</dt>
+                                <dd class="col-sm-7">{{ data.facilityType || '—' }}</dd>
+
+                                <dt class="col-sm-5 fw-bold">Sub-Supplier</dt>
+                                <dd class="col-sm-7">{{ data.subSupplier?.tradeName || data.subSupplier?.supplier?.name || '—' }}</dd>
+
+                                <dt class="col-sm-5 fw-bold">Supplier</dt>
+                                <dd class="col-sm-7">{{ data.subSupplier?.supplier?.name || '—' }}</dd>
+
+                                <dt class="col-sm-5 fw-bold">WHT Agent</dt>
+                                <dd class="col-sm-7">{{ data.whtAgent ? 'Yes' : 'No' }}</dd>
+
+                                <dt class="col-sm-5 fw-bold">ITH Tag</dt>
+                                <dd class="col-sm-7">{{ data.ithTag ? 'Yes' : 'No' }}</dd>
+
+                                <dt class="col-sm-5 fw-bold">Non-Vatable</dt>
+                                <dd class="col-sm-7">{{ data.nonVatable ? 'Yes' : 'No' }}</dd>
+
+                                <dt class="col-sm-5 fw-bold">Zero-Rated</dt>
+                                <dd class="col-sm-7">{{ data.zeroRated ? 'Yes' : 'No' }}</dd>
+
+                                <dt class="col-sm-5 fw-bold">Remarks</dt>
+                                <dd class="col-sm-7">{{ data.remarks || '—' }}</dd>
+                            </dl>
+                        </div>
+
+                        <!-- Right Column: Financial Fields -->
+                        <div class="col-md-6">
+                            <dl class="row mb-0">
+                                <dt class="col-sm-7 fw-bold">Vatable Sales</dt>
+                                <dd class="col-sm-5 text-end">{{ data.vatableSales | number:'1.2-2' }}</dd>
+
+                                <dt class="col-sm-7 fw-bold">Zero-Rated Sales</dt>
+                                <dd class="col-sm-5 text-end">{{ data.zeroRatedSales | number:'1.2-2' }}</dd>
+
+                                <dt class="col-sm-7 fw-bold">Zero-Rated Ecozone Sales</dt>
+                                <dd class="col-sm-5 text-end">{{ data.zeroRatedEcoSales | number:'1.2-2' }}</dd>
+
+                                <dt class="col-sm-7 fw-bold">VAT on Sales</dt>
+                                <dd class="col-sm-5 text-end">{{ data.vatOnSales | number:'1.2-2' }}</dd>
+
+                                <dt class="col-sm-7 fw-bold">Vatable Purchases</dt>
+                                <dd class="col-sm-5 text-end">{{ data.vatablePurchases | number:'1.2-2' }}</dd>
+
+                                <dt class="col-sm-7 fw-bold">Zero-Rated Purchases</dt>
+                                <dd class="col-sm-5 text-end">{{ data.zeroRatedPurchases | number:'1.2-2' }}</dd>
+
+                                <dt class="col-sm-7 fw-bold">Zero-Rated Ecozone Purchases</dt>
+                                <dd class="col-sm-5 text-end">{{ data.zeroRatedEcoPurchases | number:'1.2-2' }}</dd>
+
+                                <dt class="col-sm-7 fw-bold">VAT on Purchases</dt>
+                                <dd class="col-sm-5 text-end">{{ data.vatOnPurchases | number:'1.2-2' }}</dd>
+
+                                <dt class="col-sm-7 fw-bold">EWT Sales</dt>
+                                <dd class="col-sm-5 text-end">{{ data.ewtSales | number:'1.2-2' }}</dd>
+
+                                <dt class="col-sm-7 fw-bold">EWT Purchases</dt>
+                                <dd class="col-sm-5 text-end">{{ data.ewtPurchases | number:'1.2-2' }}</dd>
+                            </dl>
+                        </div>
+
+                    </div>
+
+                    <hr/>
+
+                    <div class="d-flex justify-content-end gap-2">
+                        <button type="button" class="btn btn-light fw-bold" (click)="back()">
+                            <ng-icon name="tablerArrowLeft" class="ps-0 pe-3 fw-bold"></ng-icon>Back
+                        </button>
+                    </div>
+
+                </div>
+            </app-ui-card>
+        </div>
+
+    </div>
+    }
+</div>

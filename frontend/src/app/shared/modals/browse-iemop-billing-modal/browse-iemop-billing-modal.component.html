@@ -1,0 +1,62 @@
+<div class="modal-header">
+    <h4 class="modal-title">Browse IEMOP Billing</h4>
+    <button type="button" class="btn-close" (click)="close()"></button>
+</div>
+<div class="modal-body">
+    <div class="d-flex gap-2 mb-3">
+        <div class="app-search flex-grow-1">
+            <input ngbAutofocus [(ngModel)]="searchText" type="search" class="form-control"
+                   placeholder="Search reference number..." (keyup.enter)="search()"/>
+            <ng-icon name="tablerSearch" class="app-search-icon text-muted"/>
+        </div>
+        <button type="button" class="btn btn-success fw-bold" (click)="search()">
+            <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"/>Search
+        </button>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-custom table-centered table-select table-hover w-100 mb-0">
+            <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                <tr class="text-uppercase fs-xxs">
+                    <th>Reference Number</th>
+                    <th>Date</th>
+                    <th>Sub-Supplier</th>
+                    <th class="text-end">Base Amount</th>
+                    <th class="text-end">WTax</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (isLoading()) {
+                    <tr><td colspan="5" class="text-center py-4">
+                        <div class="d-flex justify-content-center align-items-center gap-2 py-2 text-muted">
+                            <span class="spinner-border spinner-border-sm"></span><span>Loading...</span>
+                        </div>
+                    </td></tr>
+                } @else if (items().length > 0) {
+                    @for (item of items(); track item.id) {
+                        <tr style="cursor:pointer" (click)="select(item)">
+                            <td class="fw-bold">{{ item.referenceNumber || '—' }}</td>
+                            <td>{{ item.transDate | date:'MMM d, yyyy' }}</td>
+                            <td>{{ item.subSupplier?.tradeName || '—' }}</td>
+                            <td class="text-end">{{ ((item.vatablePurchases || 0) + (item.zeroRatedEcoPurchases || 0)) | number:'1.2-2' }}</td>
+                            <td class="text-end">{{ (item.ewtPurchases || 0) | number:'1.2-2' }}</td>
+                        </tr>
+                    }
+                } @else {
+                    <tr><td colspan="5" class="text-center text-muted py-3">Nothing found. Click Search to load.</td></tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    @if (totalItems > pageSize) {
+        <div class="d-flex justify-content-center pagination-boxed align-items-center mt-3">
+            <ngb-pagination [collectionSize]="totalItems" [(page)]="page" [pageSize]="pageSize"
+                            [maxSize]="5" [rotate]="true" (pageChange)="onPageChange()">
+                <ng-template ngbPaginationPrevious><ng-icon name="tablerChevronLeft"/></ng-template>
+                <ng-template ngbPaginationNext><ng-icon name="tablerChevronRight"/></ng-template>
+            </ngb-pagination>
+        </div>
+    }
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-light fw-bold" (click)="close()">Close</button>
+</div>

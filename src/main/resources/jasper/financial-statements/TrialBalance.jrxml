@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="TrialBalance" pageWidth="1008" pageHeight="612" orientation="Landscape" whenNoDataType="NoDataSection" columnWidth="968" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isFloatColumnFooter="true" uuid="b29c3ba6-1020-4625-9bd3-1937355162ed">
+	<property name="ireport.zoom" value="1.4615378250000013"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<style name="titleStyle" hAlign="Center" vAlign="Top" fontName="Arial" fontSize="14" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+	<style name="detailStyle" hAlign="Left" vAlign="Top" fontSize="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+	<style name="amountStyle" style="detailStyle" hAlign="Right" vAlign="Top" pattern="#,##0.00;(#,##0.00)" fontSize="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false">
+		<box rightPadding="2"/>
+	</style>
+	<style name="columnHeaderStyle" hAlign="Center" vAlign="Bottom" fontSize="8" isItalic="false" isUnderline="false" isStrikeThrough="false">
+		<box>
+			<bottomPen lineWidth="1.0"/>
+		</box>
+	</style>
+	<style name="subTitleStyle" style="titleStyle" fontSize="10" isBold="false"/>
+	<parameter name="COMP_ADDR" class="java.lang.String"/>
+	<parameter name="COMP_NAME" class="java.lang.String"/>
+	<parameter name="COMP_CONTACT" class="java.lang.String"/>
+	<parameter name="LOGO_PATH" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["Q:\\Develop\\Noreco 1\\accounting-no1\\src\\no1\\img\\No1-Logo.jpg"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="RANGE" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[select now()]]>
+	</queryString>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="112" splitType="Stretch">
+			<image isLazy="true" onErrorType="Icon">
+				<reportElement uuid="a572ebb6-75d3-4cc5-adf8-83c0b47be5b6" x="64" y="14" width="60" height="52"/>
+				<imageExpression><![CDATA[$P{LOGO_PATH}]]></imageExpression>
+			</image>
+			<staticText>
+				<reportElement uuid="97a850ee-d8e0-445e-89de-0f623269d28a" mode="Transparent" x="1" y="43" width="967" height="24" forecolor="#000000" backcolor="#FFFFFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Top" rotation="None" markup="none">
+					<font fontName="Calibri" size="18" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[TRIAL BALANCE]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="8dc03b87-ce0f-42e3-84cc-ff569c6fde86" x="1" y="17" width="967" height="12"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{COMP_ADDR}]]></textFieldExpression>
+			</textField>
+			<textField pattern="MM/dd/yyyy hh:mm a">
+				<reportElement uuid="f50810b0-83ee-4d20-9622-690449fae3c6" x="882" y="0" width="86" height="14"/>
+				<textElement>
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="ae3d854d-6819-4ef4-9f26-69fb77969167" style="titleStyle" x="1" y="0" width="967" height="15"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="13" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{COMP_NAME}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="3ae1aa15-ff4f-4986-8516-b17c621d9df3" x="1" y="66" width="967" height="36"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{RANGE}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<columnHeader>
+		<band height="20"/>
+	</columnHeader>
+	<detail>
+		<band height="12" splitType="Stretch"/>
+	</detail>
+	<columnFooter>
+		<band height="17" splitType="Stretch">
+			<line>
+				<reportElement uuid="999b0e37-e3e3-4f9c-ab8b-d0ef54b39868" x="0" y="0" width="968" height="1"/>
+			</line>
+		</band>
+	</columnFooter>
+	<summary>
+		<band height="34"/>
+	</summary>
+</jasperReport>

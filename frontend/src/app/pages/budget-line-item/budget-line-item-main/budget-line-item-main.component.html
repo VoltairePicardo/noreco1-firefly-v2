@@ -1,0 +1,180 @@
+<div class="container-fluid">
+    <app-page-title [title]="module" [subTitle]="subModule" [menuLink]="menuLink"/>
+</div>
+
+<div class="card">
+    <div class="row">
+        <div class="col-xl-12">
+            <div class="card-body">
+
+                <!-- Filters -->
+                <div class="row mb-3 align-items-end g-2">
+                    <div class="col-md-auto ms-auto d-flex gap-2">
+                        <button type="button" class="btn btn-primary fw-bold"
+                                (click)="approveAll()" [disabled]="approvingAll || isLoading()">
+                            <ng-icon name="tablerChecks" class="ps-0 pe-3 fw-bold"></ng-icon>
+                            {{ approvingAll ? 'Approving...' : 'Approve All' }}
+                        </button>
+                        <a class="btn btn-primary fw-bold" [routerLink]="['/' + menuLink + '/create']">
+                            <ng-icon name="tablerPlus" class="ps-0 pe-3 fw-bold"></ng-icon>New Budget Line Item
+                        </a>
+                    </div>
+                </div>
+
+                <div class="row mb-3 align-items-end g-2">
+                    <div class="col-md-1">
+                        <label class="form-label fw-bold mb-1 fs-xs text-uppercase">Year</label>
+                        <input type="number" class="form-control" [(ngModel)]="yearFilter" placeholder="Year"/>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label fw-bold mb-1 fs-xs text-uppercase">Department</label>
+                        <select class="form-select" [(ngModel)]="selectedDepartment" [compareWith]="compareById">
+                            <option [ngValue]="null">— All —</option>
+                            @for (d of departments(); track d.id) {
+                                <option [ngValue]="d">{{ d.name || d.description }}</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label fw-bold mb-1 fs-xs text-uppercase">Division</label>
+                        <select class="form-select" [(ngModel)]="selectedDivision" [compareWith]="compareById">
+                            <option [ngValue]="null">— All —</option>
+                            @for (d of divisions(); track d.id) {
+                                <option [ngValue]="d">{{ d.name || d.abbreviation }}</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label fw-bold mb-1 fs-xs text-uppercase">Document Status</label>
+                        <select class="form-select" [(ngModel)]="selectedStatus" [compareWith]="compareById">
+                            <option [ngValue]="null">Pending</option>
+                            @for (s of documentStatuses(); track s.id) {
+                                <option [ngValue]="s">{{ s.status }}</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold mb-1 fs-xs text-uppercase">Search</label>
+                        <input type="text" class="form-control" [(ngModel)]="searchQuery"
+                               placeholder="Code, department, division..."/>
+                    </div>
+                    <div class="col-auto d-flex gap-2">
+                        <button type="button" class="btn btn-success fw-bold" (click)="load()">
+                            <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Search
+                        </button>
+                        <button type="button" class="btn btn-danger fw-bold" (click)="reset()">
+                            <ng-icon name="tablerRefresh" class="ps-0 pe-3 fw-bold"></ng-icon>Reset
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Table -->
+                <div class="row">
+                    <div class="table-responsive">
+                        <table class="table table-custom table-centered table-select table-hover w-100 mb-0">
+                            <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                                <tr class="text-uppercase fs-xxs">
+                                    <th>Year</th>
+                                    <th>Division</th>
+                                    <th>Details</th>
+                                    <th>Status</th>
+                                    <th>Created On</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (pagedRecords.length > 0) {
+                                    @for (rec of pagedRecords; track rec.id) {
+                                        <tr>
+                                            <td class="fw-bold">{{ rec.year }}</td>
+                                            <td>{{ rec.division?.abbreviation || rec.division?.name }}</td>
+                                            <td>
+                                                <table class="table table-sm table-bordered mb-0 fs-xs">
+                                                    <thead class="bg-light thead-sm">
+                                                        <tr class="text-uppercase fs-xxs">
+                                                            <th>Budget Title</th>
+                                                            <th>Specification</th>
+                                                            <th class="text-end">Project Cost</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        @for (d of (rec.budgetLineItemDetails || []); track d.id) {
+                                                            <tr>
+                                                                <td>{{ d.title }}</td>
+                                                                <td>{{ d.item?.description ? (d.item.description + (d.specification ? ' - ' + d.specification : '')) : (d.specification || '') }}</td>
+                                                                <td class="text-end">{{ d.totalPrice | number:'1.2-2' }}</td>
+                                                            </tr>
+                                                        }
+                                                        @if (!(rec.budgetLineItemDetails?.length)) {
+                                                            <tr><td colspan="3" class="text-center text-muted">—</td></tr>
+                                                        }
+                                                    </tbody>
+                                                </table>
+                                            </td>
+                                            <td>
+                                                <span class="badge"
+                                                      [ngClass]="isEditable(rec) ? 'bg-secondary bg-opacity-25 text-dark border' : 'bg-success bg-opacity-25 text-success border'">
+                                                    {{ rec.documentStatus?.status || rec.status || 'N/A' }}
+                                                </span>
+                                            </td>
+                                            <td>{{ rec.createdAt | date:'MM/dd/yyyy' }}</td>
+                                            <td class="text-nowrap">
+                                                <div class="d-flex justify-content-end gap-1">
+                                                    @if (isEditable(rec)) {
+                                                        <a class="btn btn-light btn-icon btn-sm rounded-circle"
+                                                           [routerLink]="['/' + menuLink, rec.id, 'edit']"
+                                                           ngbTooltip="Edit">
+                                                            <ng-icon name="tablerEdit" class="fs-lg"></ng-icon>
+                                                        </a>
+                                                    }
+                                                    <a class="btn btn-light btn-icon btn-sm rounded-circle"
+                                                       [routerLink]="['/' + menuLink, rec.id, 'detail']"
+                                                       ngbTooltip="View">
+                                                        <ng-icon name="tablerEye" class="fs-lg"></ng-icon>
+                                                    </a>
+                                                    @if (isEditable(rec)) {
+                                                        <button type="button"
+                                                                class="btn btn-danger btn-icon btn-sm rounded-circle"
+                                                                ngbTooltip="Delete"
+                                                                (click)="delete(rec)">
+                                                            <ng-icon name="tablerTrash" class="fs-lg"></ng-icon>
+                                                        </button>
+                                                    }
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                    <tr class="fw-bold">
+                                        <td colspan="2" class="text-end text-uppercase fs-xs">Grand Total</td>
+                                        <td class="text-end">{{ grandTotal | number:'1.2-2' }}</td>
+                                        <td colspan="3"></td>
+                                    </tr>
+                                } @else {
+                                    <tr class="no-results">
+                                        <td colspan="6" class="text-center text-muted py-3">
+                                            @if (isLoading()) {
+                                                <span class="spinner-border spinner-border-sm me-2" role="status"></span>Loading...
+                                            } @else { Nothing found. }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                @if (filteredRecords.length > pageSize) {
+                    <div class="d-flex justify-content-center mt-3">
+                        <ngb-pagination
+                            [collectionSize]="filteredRecords.length"
+                            [(page)]="page"
+                            [pageSize]="pageSize"
+                            [maxSize]="5">
+                        </ngb-pagination>
+                    </div>
+                }
+
+            </div>
+        </div>
+    </div>
+</div>

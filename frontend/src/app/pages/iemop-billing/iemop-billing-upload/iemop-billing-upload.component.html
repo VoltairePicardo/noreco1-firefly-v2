@@ -1,0 +1,73 @@
+<div class="container-fluid">
+    <app-page-title [title]="module" [subTitle]="subModule" [menuLink]="menuLink"/>
+</div>
+
+<div class="container-fluid">
+    <div class="row g-3">
+        <div class="col-xl-12">
+            <app-ui-card title="Upload IEMOP Billing File">
+                <div class="col-xl-12 p-3" card-body>
+                    <form class="row g-3 needs-validation" novalidate (ngSubmit)="save()">
+
+                        <div class="col-md-12">
+                            <label class="form-label fw-bold">
+                                Reference Number <span class="text-danger">*</span>
+                            </label>
+                            <input type="text" class="form-control" placeholder="Enter reference number"
+                                   [(ngModel)]="referenceNumber" name="referenceNumber"
+                                   [class]="submit && !referenceNumber.trim() ? 'is-invalid' : submit && referenceNumber.trim() ? 'is-valid' : ''"
+                                   required/>
+                            <div class="invalid-feedback">Please enter a reference number.</div>
+                        </div>
+
+                        <div class="col-md-12">
+                            <label class="form-label fw-bold">
+                                Transaction Date <span class="text-danger">*</span>
+                            </label>
+                            <input type="text" mwlFlatpickr [options]="flatpickrOptions"
+                                   class="form-control" placeholder="Select date"
+                                   [(ngModel)]="transDate" name="transDate"
+                                   [class]="submit && !transDate ? 'is-invalid' : submit && transDate ? 'is-valid' : ''"
+                                   required/>
+                            <div class="invalid-feedback">Please select a transaction date.</div>
+                        </div>
+
+                        <div class="col-md-12">
+                            <label class="form-label fw-bold">
+                                Excel / CSV File <span class="text-danger">*</span>
+                            </label>
+                            <input type="file" class="form-control"
+                                   accept=".xlsx,.xls,.csv"
+                                   [class]="submit && !selectedFile ? 'is-invalid' : submit && selectedFile ? 'is-valid' : ''"
+                                   (change)="onFileSelected($event)"/>
+                            @if (fileName) {
+                                <div class="form-text text-muted">Selected: {{ fileName }}</div>
+                            }
+                            <div class="invalid-feedback">Please select a file (.xlsx, .xls, or .csv).</div>
+                        </div>
+
+                        <div class="col-12 mt-2">
+                            <p class="text-muted fs-xs mb-0">
+                                <strong>Note:</strong> Rows with strikeout formatting or missing STL IDs will be skipped automatically.
+                            </p>
+                        </div>
+
+                        <div class="d-flex gap-2 justify-content-end align-items-center pt-3 border-top mt-3">
+                            <a [routerLink]="['/' + menuLink]" class="btn btn-light fw-bold">
+                                <ng-icon name="tablerArrowLeft" class="ps-0 pe-3 fw-bold"></ng-icon>Back
+                            </a>
+                            <button type="button" class="btn btn-danger fw-bold" (click)="reset()" [disabled]="formSubmit">
+                                <ng-icon name="tablerRefresh" class="ps-0 pe-3 fw-bold"></ng-icon>Reset
+                            </button>
+                            <button type="submit" class="btn btn-primary fw-bold" [disabled]="formSubmit">
+                                <ng-icon name="tablerCheck" class="ps-0 pe-3 fw-bold"></ng-icon>
+                                {{ formSubmit ? 'Saving...' : 'Save' }}
+                            </button>
+                        </div>
+
+                    </form>
+                </div>
+            </app-ui-card>
+        </div>
+    </div>
+</div>

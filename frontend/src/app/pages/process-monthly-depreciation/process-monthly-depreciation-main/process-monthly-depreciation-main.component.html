@@ -1,0 +1,107 @@
+<div class="container-fluid">
+    <app-page-title [title]="module" [subTitle]="subModule" [menuLink]="menuLink"/>
+</div>
+
+<div class="card">
+    <div class="row">
+        <div class="col-xl-12">
+            <div class="card-body">
+
+                <!-- Filters -->
+                <div class="row mb-3 align-items-end g-2">
+                    <div class="col-md-2">
+                        <label class="form-label fw-bold mb-1 fs-xs text-uppercase">Year</label>
+                        <select class="form-select" [ngModel]="selectedYear()"
+                                (ngModelChange)="selectedYear.set($event); onFilterChange()">
+                            <option [ngValue]="null">— Select Year —</option>
+                            @for (y of years; track y) {
+                                <option [ngValue]="y">{{ y }}</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label fw-bold mb-1 fs-xs text-uppercase">Month</label>
+                        <select class="form-select" [ngModel]="selectedMonth()"
+                                (ngModelChange)="selectedMonth.set($event); onFilterChange()">
+                            <option [ngValue]="null">— Select Month —</option>
+                            @for (m of months; track m.id) {
+                                <option [ngValue]="m.id">{{ m.name }}</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-auto ms-auto">
+                        <button type="button" class="btn btn-primary fw-bold d-flex align-items-center gap-2"
+                                [disabled]="isProcessing()"
+                                (click)="processDepreciation()">
+                            @if (isProcessing()) {
+                                <span class="spinner-border spinner-border-sm" role="status"></span>
+                                Processing...
+                            } @else {
+                                <ng-icon name="tablerPlayerPlay" class="fw-bold"></ng-icon>
+                                Process Depreciation
+                            }
+                        </button>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="table-responsive">
+                        <table class="table table-custom table-centered table-select table-hover w-100 mb-0">
+                            <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                                <tr class="text-uppercase fs-xxs">
+                                    <th>Year</th>
+                                    <th>Month</th>
+                                    <th>Processed By</th>
+                                    <th>Last Updated</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (pagedRecords.length > 0) {
+                                    @for (rec of pagedRecords; track rec.id) {
+                                        <tr>
+                                            <td class="fw-bold">{{ rec.year }}</td>
+                                            <td>{{ getMonthName(rec.month) }}</td>
+                                            <td>{{ rec.processedBy?.fullName || rec.fullName || '—' }}</td>
+                                            <td>{{ rec.lastUpdated | date:'MMMM dd, yyyy hh:mm a' }}</td>
+                                            <td class="text-nowrap">
+                                                <div class="d-flex justify-content-end gap-1">
+                                                    <a href="javascript:void(0)" ngbTooltip="View"
+                                                       [routerLink]="['/' + menuLink, rec.id, 'detail']"
+                                                       class="btn btn-light btn-icon btn-sm rounded-circle">
+                                                        <ng-icon name="tablerEye" class="fs-lg"></ng-icon>
+                                                    </a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                } @else {
+                                    <tr class="no-results">
+                                        <td colspan="5" class="text-center text-muted py-3">
+                                            @if (isLoading()) {
+                                                <span class="spinner-border spinner-border-sm me-2" role="status"></span>Loading...
+                                            } @else { Nothing found. }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                @if (totalElements() > pageSize) {
+                    <div class="d-flex justify-content-center mt-3">
+                        <ngb-pagination
+                            [collectionSize]="totalElements()"
+                            [page]="pageNumber() + 1"
+                            [pageSize]="pageSize"
+                            [maxSize]="5"
+                            (pageChange)="onPageChange($event)">
+                        </ngb-pagination>
+                    </div>
+                }
+
+            </div>
+        </div>
+    </div>
+</div>

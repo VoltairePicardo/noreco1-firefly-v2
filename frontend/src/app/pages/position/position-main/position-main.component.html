@@ -1,0 +1,114 @@
+<div class="container-fluid">
+    <app-page-title [title]="module" [subTitle]="subModule" [menuLink]="menuLink"/>
+</div>
+
+<div class="card">
+    <div class="row">
+        <div class="col-xl-12">
+            <div class="card-body">
+
+                <div class="row mb-2 align-items-center">
+                    <div class="col-md-3 mt-2">
+                        <div class="app-search">
+                            <input type="text" class="form-control my-1 my-md-0"
+                                   placeholder="Search here..."
+                                   [(ngModel)]="searchText"
+                                   (keyup.enter)="search()"
+                                   [ngModelOptions]="{ standalone: true }"/>
+                            <ng-icon name="tablerSearch" class="app-search-icon text-muted"></ng-icon>
+                        </div>
+                    </div>
+                    <div class="col-md-2 mt-2 d-flex gap-2">
+                        <div class="app-search flex-grow-1">
+                            <button type="button" class="btn btn-success w-100 fw-bold" (click)="search()">
+                                <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Search
+                            </button>
+                        </div>
+                        <div class="app-search flex-grow-1">
+                            <button type="button" class="btn btn-danger w-100 fw-bold" (click)="clearSearch()">
+                                <ng-icon name="tablerRefresh" class="ps-0 pe-3 fw-bold"></ng-icon>Reset
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col-md-7 d-flex justify-content-end">
+                        <div class="col-auto mt-2">
+                            <button type="button" class="btn btn-primary d-flex align-items-center gap-2 fw-bold"
+                                    [routerLink]="['/' + menuLink + '/create']">
+                                <ng-icon name="tablerPlus" class="fw-bold"></ng-icon>
+                                Create {{ module }}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="table-responsive">
+                        <table class="table table-custom table-centered table-select table-hover w-100 mb-0">
+                            <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                                <tr class="text-uppercase fs-xxs">
+                                    <th>Code</th>
+                                    <th>Name</th>
+                                    <th>Department</th>
+                                    <th>Division</th>
+                                    <th>Section</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (pagedRecords.length > 0) {
+                                    @for (data of pagedRecords; track data.id) {
+                                        <tr>
+                                            <td class="fw-bold">{{ data.code }}</td>
+                                            <td>{{ data.name }}</td>
+                                            <td>{{ data.department?.name }}</td>
+                                            <td>{{ data.division?.name }}</td>
+                                            <td>{{ data.section?.name }}</td>
+                                            <td class="text-nowrap">
+                                                <div class="d-flex justify-content-end gap-1">
+                                                    <a href="javascript:void(0)" ngbTooltip="View"
+                                                       [routerLink]="['/' + menuLink, data.id, 'detail']"
+                                                       class="btn btn-light btn-icon btn-sm rounded-circle">
+                                                        <ng-icon name="tablerEye" class="fs-lg"></ng-icon>
+                                                    </a>
+                                                    <a href="javascript:void(0)" ngbTooltip="Edit"
+                                                       [routerLink]="['/' + menuLink, data.id, 'edit']"
+                                                       class="btn btn-light btn-icon btn-sm rounded-circle">
+                                                        <ng-icon name="tablerEdit" class="fs-lg"></ng-icon>
+                                                    </a>
+                                                    <a href="javascript:void(0)" ngbTooltip="Delete"
+                                                       (click)="delete(data.id)"
+                                                       class="btn btn-light btn-icon btn-sm rounded-circle">
+                                                        <ng-icon name="tablerTrash" class="fs-lg"></ng-icon>
+                                                    </a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                } @else {
+                                    <tr class="no-results">
+                                        <td colspan="6" class="text-center text-muted py-3">
+                                            @if (isLoading()) {
+                                                <span class="spinner-border spinner-border-sm me-2" role="status"></span>Loading...
+                                            } @else { Nothing found. }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                @if (filteredData().length > pageSize) {
+                    <div class="d-flex justify-content-center mt-3">
+                        <ngb-pagination
+                            [collectionSize]="filteredData().length"
+                            [(page)]="page"
+                            [pageSize]="pageSize"
+                            [maxSize]="5">
+                        </ngb-pagination>
+                    </div>
+                }
+
+            </div>
+        </div>
+    </div>
+</div>

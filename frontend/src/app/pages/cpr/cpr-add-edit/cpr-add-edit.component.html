@@ -1,0 +1,246 @@
+<div class="container-fluid">
+    <app-page-title [title]="module" [subTitle]="subModule" [menuLink]="menuLink"/>
+</div>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-xl-12">
+            <app-ui-card [title]="module + ' Form'">
+                <div class="col-xl-12 p-3" card-body>
+
+                    @if (isLoading()) {
+                        <div class="d-flex align-items-center gap-2 text-muted py-2">
+                            <span class="spinner-border spinner-border-sm" role="status"></span>
+                            Loading...
+                        </div>
+                    } @else {
+
+                    <!-- Basic Info -->
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Description <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control"
+                                   [(ngModel)]="description" [ngModelOptions]="{ standalone: true }"
+                                   placeholder="Asset description"/>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold">Asset Type <span class="text-danger">*</span></label>
+                            <select class="form-select" [(ngModel)]="selectedAssetType" [ngModelOptions]="{ standalone: true }">
+                                <option [ngValue]="null">— Select Asset Type —</option>
+                                @for (at of assetTypes(); track at.id) {
+                                    <option [ngValue]="at">{{ at.description }}</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold">Location</label>
+                            <input type="text" class="form-control"
+                                   [(ngModel)]="location" [ngModelOptions]="{ standalone: true }"
+                                   placeholder="Location (optional)"/>
+                        </div>
+                    </div>
+
+                    <!-- Depreciation Settings -->
+                    <div class="row g-3 mt-1">
+                        <div class="col-md-2">
+                            <label class="form-label fw-bold">Dep. Years <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control"
+                                   [(ngModel)]="depreciationYears" [ngModelOptions]="{ standalone: true }"
+                                   (ngModelChange)="onDepYearsChange()"
+                                   min="0" step="1" placeholder="0"/>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label fw-bold">Dep. Months <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control"
+                                   [(ngModel)]="depreciationMonths" [ngModelOptions]="{ standalone: true }"
+                                   (ngModelChange)="onDepMonthsChange()"
+                                   min="0" step="1" placeholder="0"/>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label fw-bold">Acquisition Date <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" mwlFlatpickr [options]="flatpickrOptions"
+                                   [(ngModel)]="acquisitionDate" [ngModelOptions]="{ standalone: true }"
+                                   placeholder="Select date"/>
+                        </div>
+                    </div>
+
+                    <!-- Start / End Date -->
+                    <div class="row g-3 mt-1">
+                        <div class="col-md-2">
+                            <label class="form-label fw-bold">Start Year <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control"
+                                   [(ngModel)]="startYear" [ngModelOptions]="{ standalone: true }"
+                                   (ngModelChange)="onStartYearChange()"
+                                   placeholder="YYYY"/>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label fw-bold">Start Month <span class="text-danger">*</span></label>
+                            <select class="form-select"
+                                    [(ngModel)]="startMonth" [ngModelOptions]="{ standalone: true }"
+                                    (ngModelChange)="onStartMonthChange()">
+                                @for (m of months; track m) {
+                                    <option [value]="m">{{ m }}</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label fw-bold">End Year</label>
+                            <input type="number" class="form-control" [ngModel]="endYear" [ngModelOptions]="{ standalone: true }" readonly/>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label fw-bold">End Month</label>
+                            <input type="text" class="form-control" [ngModel]="endMonth" [ngModelOptions]="{ standalone: true }" readonly/>
+                        </div>
+                    </div>
+
+                    <!-- Asset Account Details -->
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                <h6 class="fw-semibold text-uppercase fs-xs mb-0">Asset Account Details</h6>
+                                <button type="button" class="btn btn-success fw-bold" (click)="addRow()">
+                                    <ng-icon name="tablerPlus" class="ps-0 pe-2 fw-bold"></ng-icon>Add Row
+                                </button>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-custom table-centered table-hover w-100 mb-0">
+                                    <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                                        <tr class="text-uppercase fs-xxs">
+                                            <th style="min-width:220px">Asset Account</th>
+                                            <th style="min-width:220px">Expense Account</th>
+                                            <th style="min-width:220px">Accum. Dep. Account</th>
+                                            <th style="width:120px" class="text-end">Value</th>
+                                            <th style="width:120px" class="text-end">Monthly Dep.</th>
+                                            <th style="width:120px" class="text-end">Dep. Value</th>
+                                            <th style="width:120px" class="text-end">Remaining Value</th>
+                                            <th style="width:50px"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @for (row of assetDetails; track $index; let i = $index) {
+                                            <tr>
+                                                <!-- Asset Account -->
+                                                <td>
+                                                    <div class="input-group input-group-sm">
+                                                        <input type="text" class="form-control"
+                                                               [value]="accountLabel(row.assetAccount)"
+                                                               readonly placeholder="Browse account..."/>
+                                                        <button type="button" class="btn btn-success fw-bold"
+                                                                (click)="browseAccount('asset', i)">
+                                                            <ng-icon name="tablerSearch" class="fw-bold"></ng-icon>
+                                                        </button>
+                                                        @if (row.assetAccount) {
+                                                            <button type="button" class="btn btn-light"
+                                                                    (click)="clearAccount('asset', i)">
+                                                                <ng-icon name="tablerX" class="fw-bold"></ng-icon>
+                                                            </button>
+                                                        }
+                                                    </div>
+                                                </td>
+                                                <!-- Expense Account -->
+                                                <td>
+                                                    <div class="input-group input-group-sm">
+                                                        <input type="text" class="form-control"
+                                                               [value]="accountLabel(row.expenseAccount)"
+                                                               readonly placeholder="Browse account..."/>
+                                                        <button type="button" class="btn btn-success fw-bold"
+                                                                (click)="browseAccount('expense', i)">
+                                                            <ng-icon name="tablerSearch" class="fw-bold"></ng-icon>
+                                                        </button>
+                                                        @if (row.expenseAccount) {
+                                                            <button type="button" class="btn btn-light"
+                                                                    (click)="clearAccount('expense', i)">
+                                                                <ng-icon name="tablerX" class="fw-bold"></ng-icon>
+                                                            </button>
+                                                        }
+                                                    </div>
+                                                </td>
+                                                <!-- Accum. Dep. Account -->
+                                                <td>
+                                                    <div class="input-group input-group-sm">
+                                                        <input type="text" class="form-control"
+                                                               [value]="accountLabel(row.accumDepAccount)"
+                                                               readonly placeholder="Browse account..."/>
+                                                        <button type="button" class="btn btn-success fw-bold"
+                                                                (click)="browseAccount('accumDep', i)">
+                                                            <ng-icon name="tablerSearch" class="fw-bold"></ng-icon>
+                                                        </button>
+                                                        @if (row.accumDepAccount) {
+                                                            <button type="button" class="btn btn-light"
+                                                                    (click)="clearAccount('accumDep', i)">
+                                                                <ng-icon name="tablerX" class="fw-bold"></ng-icon>
+                                                            </button>
+                                                        }
+                                                    </div>
+                                                </td>
+                                                <!-- Value -->
+                                                <td>
+                                                    <input type="number" class="form-control form-control-sm text-end"
+                                                           [(ngModel)]="row.value"
+                                                           [ngModelOptions]="{ standalone: true }"
+                                                           (ngModelChange)="onRowValueChange(row)"
+                                                           min="0" step="0.01" placeholder="0.00"/>
+                                                </td>
+                                                <!-- Monthly Dep (readonly) -->
+                                                <td class="text-end">{{ row.monthlyDepreciation | number:'1.2-2' }}</td>
+                                                <!-- Depreciated Value -->
+                                                <td>
+                                                    <input type="number" class="form-control form-control-sm text-end"
+                                                           [(ngModel)]="row.depreciatedValue"
+                                                           [ngModelOptions]="{ standalone: true }"
+                                                           (ngModelChange)="onRowDepreciatedValueChange(row)"
+                                                           min="0" step="0.01" placeholder="0.00"/>
+                                                </td>
+                                                <!-- Remaining Value (readonly) -->
+                                                <td class="text-end">{{ row.remainingValue | number:'1.2-2' }}</td>
+                                                <!-- Remove -->
+                                                <td class="text-center">
+                                                    <button type="button"
+                                                            class="btn btn-danger btn-icon btn-sm rounded-circle"
+                                                            (click)="removeRow(i)"
+                                                            ngbTooltip="Remove">
+                                                        <ng-icon name="tablerTrash" class="fs-sm"></ng-icon>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        }
+                                        @if (assetDetails.length === 0) {
+                                            <tr>
+                                                <td colspan="8" class="text-center text-muted py-3">
+                                                    No rows. Click "Add Row" to begin.
+                                                </td>
+                                            </tr>
+                                        }
+                                        @if (assetDetails.length > 0) {
+                                            <tr class="fw-bold bg-light">
+                                                <td colspan="3" class="text-end fw-bold text-uppercase fs-xs">Totals</td>
+                                                <td class="text-end">{{ totalValue | number:'1.2-2' }}</td>
+                                                <td class="text-end">{{ totalMonthlyDep | number:'1.2-2' }}</td>
+                                                <td class="text-end">{{ totalDepreciatedValue | number:'1.2-2' }}</td>
+                                                <td class="text-end">{{ totalRemainingValue | number:'1.2-2' }}</td>
+                                                <td></td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-2 justify-content-end align-items-center pt-3 border-top mt-3">
+                        <a [routerLink]="['/' + menuLink]" class="btn btn-light fw-bold">
+                            <ng-icon name="tablerArrowLeft" class="ps-0 pe-3 fw-bold"></ng-icon>Back
+                        </a>
+                        <button type="button" class="btn btn-primary fw-bold"
+                                [disabled]="formSubmit" (click)="save()">
+                            <ng-icon name="tablerCheck" class="ps-0 pe-3 fw-bold"></ng-icon>
+                            {{ editMode ? 'Update' : 'Save' }}
+                        </button>
+                    </div>
+
+                    }
+                </div>
+            </app-ui-card>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,91 @@
+<div class="container-fluid">
+    <app-page-title [title]="'Accounting Reports'" [subTitle]="module" [menuLink]="menuLink" [useSubtitleAsTitle]="true"/>
+</div>
+<div class="container-fluid">
+    <div class="card">
+        <div class="card-body">
+            <div class="row g-2 align-items-end mb-3">
+                <div class="col-md-2">
+                    <label class="form-label fw-bold mb-1">Year</label>
+                    <select class="form-select" [ngModel]="selectedYear()"
+                            (ngModelChange)="selectedYear.set($event)">
+                        @for (y of years; track y) {
+                            <option [ngValue]="y">{{ y }}</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="button" class="btn btn-success fw-bold" (click)="search()">
+                        <ng-icon name="tablerSearch" class="fw-bold me-1"></ng-icon>Search
+                    </button>
+                </div>
+                <div class="col-md-auto ms-auto">
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-success fw-bold" (click)="export('pdf')">
+                            <ng-icon name="tablerFileTypePdf" class="fw-bold me-1"></ng-icon>Export PDF
+                        </button>
+                        <button type="button" class="btn btn-success fw-bold" (click)="export('xls')">
+                            <ng-icon name="tablerFileTypeXls" class="fw-bold me-1"></ng-icon>Export Excel
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="table-responsive mt-3">
+                <table class="table table-custom table-centered table-select table-hover w-100 mb-0">
+                    <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                        <tr class="text-uppercase fs-xxs">
+                            <th>Asset Code</th>
+                            <th>Asset Description</th>
+                            <th>Account Code</th>
+                            <th>Account</th>
+                            <th>Jan</th>
+                            <th>Feb</th>
+                            <th>Mar</th>
+                            <th>Apr</th>
+                            <th>May</th>
+                            <th>Jun</th>
+                            <th>Jul</th>
+                            <th>Aug</th>
+                            <th>Sep</th>
+                            <th>Oct</th>
+                            <th>Nov</th>
+                            <th>Dec</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (isLoading()) {
+                            <tr><td colspan="17" class="text-center text-muted py-3">
+                                <span class="spinner-border spinner-border-sm me-2"></span>Loading...
+                            </td></tr>
+                        } @else if (rows().length === 0) {
+                            <tr><td colspan="17" class="text-center text-muted py-3">No records found.</td></tr>
+                        } @else {
+                            @for (row of rows(); track $index) {
+                                <tr>
+                                    <td>{{ row.assetCode }}</td>
+                                    <td>{{ row.assetDescription }}</td>
+                                    <td>{{ row.assetAccountCode }}</td>
+                                    <td>{{ row.assetAccount }}</td>
+                                    <td>{{ row.jan | number:'1.2-2' }}</td>
+                                    <td>{{ row.feb | number:'1.2-2' }}</td>
+                                    <td>{{ row.mar | number:'1.2-2' }}</td>
+                                    <td>{{ row.apr | number:'1.2-2' }}</td>
+                                    <td>{{ row.may | number:'1.2-2' }}</td>
+                                    <td>{{ row.jun | number:'1.2-2' }}</td>
+                                    <td>{{ row.jul | number:'1.2-2' }}</td>
+                                    <td>{{ row.aug | number:'1.2-2' }}</td>
+                                    <td>{{ row.sep | number:'1.2-2' }}</td>
+                                    <td>{{ row.oct | number:'1.2-2' }}</td>
+                                    <td>{{ row.nov | number:'1.2-2' }}</td>
+                                    <td>{{ row.dec | number:'1.2-2' }}</td>
+                                    <td>{{ row.total | number:'1.2-2' }}</td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

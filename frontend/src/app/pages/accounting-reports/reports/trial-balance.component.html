@@ -1,0 +1,73 @@
+<div class="container-fluid">
+    <app-page-title [title]="'Accounting Reports'" [subTitle]="module" [menuLink]="menuLink" [useSubtitleAsTitle]="true"/>
+</div>
+<div class="container-fluid">
+    <div class="card">
+        <div class="card-body">
+            <div class="row g-2 align-items-end mb-3">
+                <div class="col-md-auto">
+                    <label class="form-label fw-bold mb-1">As-of Date</label>
+                    <input type="text" mwlFlatpickr [options]="flatpickrOptions"
+                           class="form-control" [(ngModel)]="asOfDate" placeholder="As-of date"/>
+                </div>
+                <div class="col-md-2">
+                    <button type="button" class="btn btn-success fw-bold" (click)="search()">
+                        <ng-icon name="tablerSearch" class="fw-bold me-1"></ng-icon>Search
+                    </button>
+                </div>
+                <div class="col-md-auto ms-auto">
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-success fw-bold" (click)="export('pdf')">
+                            <ng-icon name="tablerFileTypePdf" class="fw-bold me-1"></ng-icon>Export PDF
+                        </button>
+                        <button type="button" class="btn btn-success fw-bold" (click)="export('xls')">
+                            <ng-icon name="tablerFileTypeXls" class="fw-bold me-1"></ng-icon>Export Excel
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            @if (openMonths().length > 0) {
+                <div class="alert alert-warning mb-3">
+                    <strong>Warning:</strong> The following months are not yet closed:
+                    <ul class="mb-0 mt-1">
+                        @for (m of openMonths(); track $index) {
+                            <li>{{ m.month }} is not yet closed.</li>
+                        }
+                    </ul>
+                </div>
+            }
+
+            <div class="table-responsive mt-2">
+                <table class="table table-custom table-centered table-hover w-100 mb-0 small">
+                    <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                        <tr class="text-uppercase fs-xxs">
+                            <th style="width:120px">Code</th>
+                            <th>Title</th>
+                            <th class="text-end">Total Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (isLoading()) {
+                            <tr><td colspan="3" class="text-center text-muted py-3">
+                                <span class="spinner-border spinner-border-sm me-2"></span>Loading...
+                            </td></tr>
+                        } @else if (rows().length === 0) {
+                            <tr><td colspan="3" class="text-center text-muted py-3">No records found.</td></tr>
+                        } @else {
+                            @for (row of rows(); track $index) {
+                                <tr [class.fw-bold]="!row.code">
+                                    <td>{{ row.code }}</td>
+                                    <td>{{ row.title }}</td>
+                                    <td class="text-end" [class.text-danger]="row.totalAmount < 0">
+                                        {{ row.totalAmount < 0 ? '(' : '' }}{{ (row.totalAmount < 0 ? -row.totalAmount : row.totalAmount) | number:'1.2-2' }}{{ row.totalAmount < 0 ? ')' : '' }}
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

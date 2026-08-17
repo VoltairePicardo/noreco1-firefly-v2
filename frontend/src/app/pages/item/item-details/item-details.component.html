@@ -1,0 +1,81 @@
+<div class="container-fluid">
+    <app-page-title [title]="module" [subTitle]="subModule" [menuLink]="menuLink"/>
+</div>
+
+<app-ui-card [title]="module + ' Details'">
+    <div class="col-xl-12 p-3" card-body>
+        @if (isLoading()) {
+            <div class="d-flex align-items-center gap-2 text-muted py-2">
+                <span class="spinner-border spinner-border-sm" role="status"></span>
+                Loading...
+            </div>
+        } @else {
+        <div class="row">
+            <div class="col-sm-6">
+                <dl class="row mb-0">
+                    <dt class="col-sm-4 fw-normal">Code</dt>
+                    <dd class="col-sm-8 fw-bold">{{ data.code || '—' }}</dd>
+                    <dt class="col-sm-4 fw-normal">Description</dt>
+                    <dd class="col-sm-8 fw-bold">{{ data.description }}</dd>
+                    <dt class="col-sm-4 fw-normal">Unit</dt>
+                    <dd class="col-sm-8 fw-bold">{{ data.unit?.code || '—' }}</dd>
+                    <dt class="col-sm-4 fw-normal">Location</dt>
+                    <dd class="col-sm-8 fw-bold">{{ data.location || '—' }}</dd>
+                    <dt class="col-sm-4 fw-normal">Barcode</dt>
+                    <dd class="col-sm-8 fw-bold">{{ data.barcode || '—' }}</dd>
+                    <dt class="col-sm-4 fw-normal">Reorder Point</dt>
+                    <dd class="col-sm-8 fw-bold">{{ data.reorderPoint ?? '—' }}</dd>
+                    <dt class="col-sm-4 fw-normal">Ideal Qty</dt>
+                    <dd class="col-sm-8 fw-bold">{{ data.idealQty ?? '—' }}</dd>
+                </dl>
+            </div>
+            <div class="col-sm-6">
+                <dl class="row mb-0">
+                    <dt class="col-sm-5 fw-normal">Asset Account</dt>
+                    <dd class="col-sm-7 fw-bold">{{ data.assetAccount ? (data.assetAccount.code + ' — ' + data.assetAccount.title) : '—' }}</dd>
+                    <dt class="col-sm-5 fw-normal">Expense Account</dt>
+                    <dd class="col-sm-7 fw-bold">{{ data.expenseAccount ? (data.expenseAccount.code + ' — ' + data.expenseAccount.title) : '—' }}</dd>
+                    <dt class="col-sm-5 fw-normal">Inventory Category</dt>
+                    <dd class="col-sm-7 fw-bold">{{ data.inventoryCategory?.description || '—' }}</dd>
+                    <dt class="col-sm-5 fw-normal">Has Serial Numbers</dt>
+                    <dd class="col-sm-7 fw-bold">{{ data.hasSerialNumbers ? 'Yes' : 'No' }}</dd>
+                    <dt class="col-sm-5 fw-normal">Active</dt>
+                    <dd class="col-sm-7">
+                        @if (data.isActive) {
+                            <span class="badge bg-success">Active</span>
+                        } @else {
+                            <span class="badge bg-secondary">Inactive</span>
+                        }
+                    </dd>
+                </dl>
+            </div>
+        </div>
+        }
+        @if (data.base64Image) {
+            <div class="row mt-3">
+                <div class="col-sm-12">
+                    <div class="fw-normal mb-2 text-muted small text-uppercase">Item Picture</div>
+                    <img [src]="data.base64Image" alt="Item Picture"
+                         class="img-thumbnail"
+                         style="max-width: 300px; max-height: 300px; object-fit: contain;"/>
+                </div>
+            </div>
+        }
+        <hr/>
+        <div class="d-flex justify-content-end gap-2">
+            <button type="button" class="btn btn-light fw-bold"
+                    [routerLink]="['/' + menuLink]">
+                <ng-icon name="tablerArrowLeft" class="ps-0 pe-3 fw-bold"></ng-icon>Back
+            </button>
+            <!-- TODO: Confirm with PM before enabling delete
+            <button type="button" class="btn btn-danger fw-bold" (click)="delete()">
+                <ng-icon name="tablerTrash" class="ps-0 pe-3 fw-bold"></ng-icon>Delete
+            </button>
+            -->
+            <button type="button" class="btn btn-primary fw-bold"
+                    [routerLink]="['/' + menuLink, data.id, 'edit']">
+                <ng-icon name="tablerPencil" class="ps-0 pe-3 fw-bold"></ng-icon>Edit
+            </button>
+        </div>
+    </div>
+</app-ui-card>

@@ -1,0 +1,683 @@
+<div class="container-fluid">
+    <app-page-title [title]="module" [subTitle]="subModule" [menuLink]="menuLink"/>
+</div>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-xl-12">
+            <app-ui-card [title]="module + ' Details'">
+                <div class="col-xl-12 p-3" card-body>
+                    @if (isLoading()) {
+                        <div class="d-flex align-items-center gap-2 text-muted py-2">
+                            <span class="spinner-border spinner-border-sm" role="status"></span>
+                            Loading...
+                        </div>
+                    } @else if (validationForm) {
+                    <form class="row g-3 needs-validation" novalidate
+                          (ngSubmit)="validSubmit()" [formGroup]="validationForm">
+
+                        <!-- Type & Dates -->
+                        <div class="row">
+                            <div class="col-md-3 mt-2">
+                                <label for="rvType" class="form-label fw-bold">Type <span class="text-danger">*</span></label>
+                                <select id="rvType" class="form-select" formControlName="rvType"
+                                        [class]="submit && !form.get('rvType')?.errors ? 'is-valid'
+                                               : submit &&  form.get('rvType')?.errors ? 'is-invalid' : ''"
+                                        (change)="onRvTypeChange()" required>
+                                    <option [ngValue]="null">— Select Type —</option>
+                                    @for (t of rvTypes; track t.id) {
+                                        <option [ngValue]="t.id">{{ t.label }}</option>
+                                    }
+                                </select>
+                                <div class="invalid-feedback">Please select a type.</div>
+                            </div>
+                            <div class="col-md-3 mt-2">
+                                <label for="voucherDate" class="form-label fw-bold">Voucher Date <span class="text-danger">*</span></label>
+                                <input id="voucherDate" type="text" mwlFlatpickr
+                                       [options]="flatpickrOptions"
+                                       class="form-control" placeholder="Select voucher date"
+                                       formControlName="voucherDate"
+                                       [class]="submit && !form.get('voucherDate')?.errors ? 'is-valid'
+                                              : submit &&  form.get('voucherDate')?.errors ? 'is-invalid' : ''"
+                                       required/>
+                                <div class="invalid-feedback">Please provide a voucher date.</div>
+                            </div>
+                            @if (!isForLab()) {
+                                <div class="col-md-3 mt-2">
+                                    <label for="deliveryDate" class="form-label fw-bold">Delivery Date <span class="text-danger">*</span></label>
+                                    <input id="deliveryDate" type="text" mwlFlatpickr
+                                           [options]="flatpickrOptions"
+                                           class="form-control" placeholder="Select delivery date"
+                                           formControlName="deliveryDate"
+                                           [class]="submit && !form.get('deliveryDate')?.errors ? 'is-valid'
+                                                  : submit &&  form.get('deliveryDate')?.errors ? 'is-invalid' : ''"/>
+                                    <div class="invalid-feedback">Please provide a delivery date.</div>
+                                </div>
+                            }
+                        </div>
+
+                        <!-- Purpose -->
+                        <div class="row">
+                            <div class="col-md-6 mt-2">
+                                <label for="purpose" class="form-label fw-bold">Purpose <span class="text-danger">*</span></label>
+                                <textarea id="purpose" rows="1" class="form-control"
+                                          placeholder="Purpose of request" formControlName="purpose"
+                                          [class]="submit && !form.get('purpose')?.errors ? 'is-valid'
+                                                 : submit &&  form.get('purpose')?.errors ? 'is-invalid' : ''"
+                                          required></textarea>
+                                <div class="invalid-feedback">Please provide a purpose.</div>
+                            </div>
+                        </div>
+
+                        <!-- ===== FOR PO FIELDS ===== -->
+                        @if (isForPo()) {
+                            <hr class="mt-3 mb-1"/>
+                            <h6 class="fw-bold text-muted text-uppercase fs-xxs mb-0">Purchase Request Details</h6>
+
+                            <div class="row">
+                                <div class="col-md-3 mt-2">
+                                    <label for="costEstimateId" class="form-label fw-bold">Cost Estimate</label>
+                                    <select id="costEstimateId" class="form-select" formControlName="costEstimateId">
+                                        <option [ngValue]="null">— Select Cost Estimate —</option>
+                                        @for (c of costEstimates(); track c.id) {
+                                            <option [ngValue]="c.id">{{ c.code }}{{ c.projectCode ? ' (' + c.projectCode + ' – ' + c.projectName + ')' : '' }}</option>
+                                        }
+                                    </select>
+                                </div>
+                                <div class="col-md-3 mt-2">
+                                    <label for="workOrderId" class="form-label fw-bold">Work Order</label>
+                                    <select id="workOrderId" class="form-select" formControlName="workOrderId">
+                                        <option [ngValue]="null">— Select Work Order —</option>
+                                        @for (w of workOrders(); track w.id) {
+                                            <option [ngValue]="w.id">{{ w.code }} – {{ w.description }}</option>
+                                        }
+                                    </select>
+                                </div>
+                                <div class="col-md-3 mt-2">
+                                    <label for="estimatedAmount" class="form-label fw-bold">Estimated Amount <span class="text-danger">*</span></label>
+                                    <input id="estimatedAmount" type="number" class="form-control"
+                                           formControlName="estimatedAmount" placeholder="0.00" min="0" step="0.01"
+                                           [class]="submit && form.get('estimatedAmount')?.errors ? 'is-invalid' : submit && !form.get('estimatedAmount')?.errors ? 'is-valid' : ''"/>
+                                    <div class="invalid-feedback">Please provide an estimated amount.</div>
+                                </div>
+                                <div class="col-md-3 mt-2 d-flex align-items-end">
+                                    <div class="form-check mb-2">
+                                        <input id="emergencyPurchase" type="checkbox" class="form-check-input"
+                                               formControlName="emergencyPurchase"/>
+                                        <label for="emergencyPurchase" class="form-check-label">Emergency Purchase</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mt-2">
+                                    <label class="form-label fw-bold">Budget Line Item <span class="text-danger">*</span></label>
+                                    <div class="input-group" [class.is-invalid]="submit && form.get('budgetLineItemDetailId')?.errors">
+                                        <input type="text" class="form-control" [value]="selectedBudgetLineItemText" readonly
+                                               placeholder="Browse Budget Line Item..."
+                                               [class]="submit && form.get('budgetLineItemDetailId')?.errors ? 'is-invalid' : submit && form.get('budgetLineItemDetailId')?.value ? 'is-valid' : ''"/>
+                                        <button type="button" class="btn btn-success fw-bold" (click)="openBudgetLineItemBrowse()">
+                                            <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
+                                        </button>
+                                    </div>
+                                    @if (submit && form.get('budgetLineItemDetailId')?.errors) {
+                                        <div class="text-danger small mt-1">Please select a budget line item.</div>
+                                    }
+                                </div>
+                                @if (showBudgetSubItem()) {
+                                    <div class="col-md-6 mt-2">
+                                        <label class="form-label fw-bold">Budget Sub Item</label>
+                                        <select class="form-select" formControlName="budgetSubItemId"
+                                                (change)="onBudgetSubItemChange()">
+                                            <option [ngValue]="null">— Select Sub Item —</option>
+                                            @for (s of budgetSubItems(); track s.id) {
+                                                <option [ngValue]="s.id">{{ s.description }}{{ s.amount ? ' — ' + (s.amount | number:'1.2-2') : '' }}</option>
+                                            }
+                                        </select>
+                                    </div>
+                                }
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mt-2">
+                                    <label for="vehicleIdPo" class="form-label fw-bold">Vehicle</label>
+                                    <select id="vehicleIdPo" class="form-select" formControlName="vehicleId">
+                                        <option [ngValue]="null">— Select Vehicle —</option>
+                                        @for (v of vehicles(); track v.id) {
+                                            <option [ngValue]="v.id">{{ v.plateNumber }} {{ v.description }}</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                        }
+
+                        <!-- ===== FOR IT FIELDS ===== -->
+                        @if (isForIt()) {
+                            <hr class="mt-3 mb-1"/>
+                            <h6 class="fw-bold text-muted text-uppercase fs-xxs mb-0">Internal Transfer Details</h6>
+
+                            <div class="row">
+                                <div class="col-md-4 mt-2">
+                                    <label for="officeId" class="form-label fw-bold">Office</label>
+                                    <select id="officeId" class="form-select" formControlName="officeId">
+                                        <option [ngValue]="null">— Select Office —</option>
+                                        @for (o of offices(); track o.id) {
+                                            <option [ngValue]="o.id">{{ o.name }}</option>
+                                        }
+                                    </select>
+                                </div>
+                                <div class="col-md-5 mt-2">
+                                    <label class="form-label fw-bold">IT Type</label>
+                                    <div class="d-flex gap-4 mt-1">
+                                        <div class="form-check">
+                                            <input type="radio" id="rvItHW" class="form-check-input"
+                                                   formControlName="rvItType" value="Hardware"/>
+                                            <label for="rvItHW" class="form-check-label">Hardware</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input type="radio" id="rvItSW" class="form-check-input"
+                                                   formControlName="rvItType" value="Software"/>
+                                            <label for="rvItSW" class="form-check-label">Software</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input type="radio" id="rvItOther" class="form-check-input"
+                                                   formControlName="rvItType" value="Others"/>
+                                            <label for="rvItOther" class="form-check-label">Others</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mt-2">
+                                    <label class="form-label fw-bold">Budget Line Item <span class="text-danger">*</span></label>
+                                    <div class="input-group" [class.is-invalid]="submit && form.get('budgetLineItemDetailId')?.errors">
+                                        <input type="text" class="form-control" [value]="selectedBudgetLineItemText" readonly
+                                               placeholder="Browse Budget Line Item..."
+                                               [class]="submit && form.get('budgetLineItemDetailId')?.errors ? 'is-invalid' : submit && form.get('budgetLineItemDetailId')?.value ? 'is-valid' : ''"/>
+                                        <button type="button" class="btn btn-success fw-bold" (click)="openBudgetLineItemBrowse()">
+                                            <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
+                                        </button>
+                                    </div>
+                                    @if (submit && form.get('budgetLineItemDetailId')?.errors) {
+                                        <div class="text-danger small mt-1">Please select a budget line item.</div>
+                                    }
+                                </div>
+                                @if (showBudgetSubItem()) {
+                                    <div class="col-md-6 mt-2">
+                                        <label class="form-label fw-bold">Budget Sub Item</label>
+                                        <select class="form-select" formControlName="budgetSubItemId"
+                                                (change)="onBudgetSubItemChange()">
+                                            <option [ngValue]="null">— Select Sub Item —</option>
+                                            @for (s of budgetSubItems(); track s.id) {
+                                                <option [ngValue]="s.id">{{ s.description }}{{ s.amount ? ' — ' + (s.amount | number:'1.2-2') : '' }}</option>
+                                            }
+                                        </select>
+                                    </div>
+                                }
+                            </div>
+                        }
+
+                        <!-- ===== FOR REP FIELDS ===== -->
+                        @if (isForRep()) {
+                            <hr class="mt-3 mb-1"/>
+                            <h6 class="fw-bold text-muted text-uppercase fs-xxs mb-0">Repair Work Request Details</h6>
+
+                            <div class="row">
+                                <div class="col-md-3 mt-2">
+                                    <label for="estimatedAmountRep" class="form-label fw-bold">Estimated Amount <span class="text-danger">*</span></label>
+                                    <input id="estimatedAmountRep" type="number" class="form-control"
+                                           formControlName="estimatedAmount" placeholder="0.00" min="0" step="0.01"
+                                           [class]="submit && form.get('estimatedAmount')?.errors ? 'is-invalid' : submit && !form.get('estimatedAmount')?.errors ? 'is-valid' : ''"/>
+                                    <div class="invalid-feedback">Please provide an estimated amount.</div>
+                                </div>
+                                <div class="col-md-3 mt-2 d-flex align-items-end">
+                                    <div class="form-check mb-2">
+                                        <input id="emergencyPurchaseRep" type="checkbox" class="form-check-input"
+                                               formControlName="emergencyPurchase"/>
+                                        <label for="emergencyPurchaseRep" class="form-check-label">Emergency Purchase</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mt-2">
+                                    <label class="form-label fw-bold">Budget Line Item <span class="text-danger">*</span></label>
+                                    <div class="input-group" [class.is-invalid]="submit && form.get('budgetLineItemDetailId')?.errors">
+                                        <input type="text" class="form-control" [value]="selectedBudgetLineItemText" readonly
+                                               placeholder="Browse Budget Line Item..."
+                                               [class]="submit && form.get('budgetLineItemDetailId')?.errors ? 'is-invalid' : submit && form.get('budgetLineItemDetailId')?.value ? 'is-valid' : ''"/>
+                                        <button type="button" class="btn btn-success fw-bold" (click)="openBudgetLineItemBrowse()">
+                                            <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
+                                        </button>
+                                    </div>
+                                    @if (submit && form.get('budgetLineItemDetailId')?.errors) {
+                                        <div class="text-danger small mt-1">Please select a budget line item.</div>
+                                    }
+                                </div>
+                                @if (showBudgetSubItem()) {
+                                    <div class="col-md-6 mt-2">
+                                        <label class="form-label fw-bold">Budget Sub Item</label>
+                                        <select class="form-select" formControlName="budgetSubItemId"
+                                                (change)="onBudgetSubItemChange()">
+                                            <option [ngValue]="null">— Select Sub Item —</option>
+                                            @for (s of budgetSubItems(); track s.id) {
+                                                <option [ngValue]="s.id">{{ s.description }}{{ s.amount ? ' — ' + (s.amount | number:'1.2-2') : '' }}</option>
+                                            }
+                                        </select>
+                                    </div>
+                                }
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-4 mt-2">
+                                    <label for="vehicleIdRep" class="form-label fw-bold">Vehicle</label>
+                                    <select id="vehicleIdRep" class="form-select" formControlName="vehicleId">
+                                        <option [ngValue]="null">— Select Vehicle —</option>
+                                        @for (v of vehicles(); track v.id) {
+                                            <option [ngValue]="v.id">{{ v.plateNumber }} {{ v.description }}</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                        }
+
+                        <!-- ===== FOR LAB FIELDS ===== -->
+                        @if (isForLab()) {
+                            <hr class="mt-3 mb-1"/>
+                            <h6 class="fw-bold text-muted text-uppercase fs-xxs mb-0">Labor Work Request Details</h6>
+
+                            <div class="row">
+                                <div class="col-md-3 mt-2">
+                                    <label for="durationStart" class="form-label fw-bold">Duration Start <span class="text-danger">*</span></label>
+                                    <input id="durationStart" type="text" mwlFlatpickr
+                                           [options]="flatpickrOptions"
+                                           class="form-control" placeholder="Select start date"
+                                           formControlName="durationStart"
+                                           [class]="submit && form.get('durationStart')?.errors ? 'is-invalid' : submit && !form.get('durationStart')?.errors ? 'is-valid' : ''"/>
+                                    <div class="invalid-feedback">Please provide a duration start date.</div>
+                                </div>
+                                <div class="col-md-3 mt-2">
+                                    <label for="durationEnd" class="form-label fw-bold">Duration End <span class="text-danger">*</span></label>
+                                    <input id="durationEnd" type="text" mwlFlatpickr
+                                           [options]="flatpickrOptions"
+                                           class="form-control" placeholder="Select end date"
+                                           formControlName="durationEnd"
+                                           [class]="submit && form.get('durationEnd')?.errors ? 'is-invalid' : submit && !form.get('durationEnd')?.errors ? 'is-valid' : ''"/>
+                                    <div class="invalid-feedback">Please provide a duration end date.</div>
+                                </div>
+                                <div class="col-md-3 mt-2">
+                                    <label for="estimatedAmountLab" class="form-label fw-bold">Estimated Amount <span class="text-danger">*</span></label>
+                                    <input id="estimatedAmountLab" type="number" class="form-control"
+                                           formControlName="estimatedAmount" placeholder="0.00" min="0" step="0.01"
+                                           [class]="submit && form.get('estimatedAmount')?.errors ? 'is-invalid' : submit && !form.get('estimatedAmount')?.errors ? 'is-valid' : ''"/>
+                                    <div class="invalid-feedback">Please provide an estimated amount.</div>
+                                </div>
+                                <div class="col-md-3 mt-2 d-flex align-items-end">
+                                    <div class="form-check mb-2">
+                                        <input id="emergencyPurchaseLab" type="checkbox" class="form-check-input"
+                                               formControlName="emergencyPurchase"/>
+                                        <label for="emergencyPurchaseLab" class="form-check-label">Emergency Purchase</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mt-2">
+                                    <label class="form-label fw-bold">Budget Line Item <span class="text-danger">*</span></label>
+                                    <div class="input-group" [class.is-invalid]="submit && form.get('budgetLineItemDetailId')?.errors">
+                                        <input type="text" class="form-control" [value]="selectedBudgetLineItemText" readonly
+                                               placeholder="Browse Budget Line Item..."
+                                               [class]="submit && form.get('budgetLineItemDetailId')?.errors ? 'is-invalid' : submit && form.get('budgetLineItemDetailId')?.value ? 'is-valid' : ''"/>
+                                        <button type="button" class="btn btn-success fw-bold" (click)="openBudgetLineItemBrowse()">
+                                            <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
+                                        </button>
+                                    </div>
+                                    @if (submit && form.get('budgetLineItemDetailId')?.errors) {
+                                        <div class="text-danger small mt-1">Please select a budget line item.</div>
+                                    }
+                                </div>
+                                <div class="col-md-4 mt-2">
+                                    <label for="vehicleIdLab" class="form-label fw-bold">Vehicle</label>
+                                    <select id="vehicleIdLab" class="form-select" formControlName="vehicleId">
+                                        <option [ngValue]="null">— Select Vehicle —</option>
+                                        @for (v of vehicles(); track v.id) {
+                                            <option [ngValue]="v.id">{{ v.plateNumber }} {{ v.description }}</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                            @if (showBudgetSubItem()) {
+                                <div class="row">
+                                    <div class="col-md-6 mt-2">
+                                        <label for="budgetSubItemIdLab" class="form-label fw-bold">Budget Sub Item</label>
+                                        <select id="budgetSubItemIdLab" class="form-select" formControlName="budgetSubItemId"
+                                                (change)="onBudgetSubItemChange()">
+                                            <option [ngValue]="null">— Select Sub Item —</option>
+                                            @for (s of budgetSubItems(); track s.id) {
+                                                <option [ngValue]="s.id">{{ s.description }}{{ s.amount ? ' — ' + (s.amount | number:'1.2-2') : '' }}</option>
+                                            }
+                                        </select>
+                                    </div>
+                                </div>
+                            }
+                            @if (budgetBalance()) {
+                                <div class="row mt-2 g-2">
+                                    <div class="col-md-4">
+                                        <div class="alert alert-info py-2 mb-0 small">
+                                            <span class="fw-bold">Qty Balance:</span> {{ budgetBalance().quantityBalance | number:'1.2-2' }}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="alert alert-info py-2 mb-0 small">
+                                            <span class="fw-bold">Amount Balance (CV):</span> {{ budgetBalance().amountBalanceCV | number:'1.2-2' }}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="alert alert-info py-2 mb-0 small">
+                                            <span class="fw-bold">Amount Balance (PO/JO):</span> {{ budgetBalance().amountBalancePOJO | number:'1.2-2' }}
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                            @if (budgetSubItemBalance()) {
+                                <div class="row mt-1 g-2">
+                                    <div class="col-md-6">
+                                        <div class="alert alert-warning py-2 mb-0 small">
+                                            <span class="fw-bold">Sub Item Balance (CV):</span> {{ budgetSubItemBalance().amountBalanceCV | number:'1.2-2' }}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="alert alert-warning py-2 mb-0 small">
+                                            <span class="fw-bold">Sub Item Balance (PO/JO):</span> {{ budgetSubItemBalance().amountBalancePOJO | number:'1.2-2' }}
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        }
+
+                        <!-- Budget Balance (shown for PO/IT/REP; LAB has its own inline balance above) -->
+                        @if (budgetBalance() && !isForLab()) {
+                            <div class="row mt-2 g-2">
+                                <div class="col-md-4">
+                                    <div class="alert alert-info py-2 mb-0 small">
+                                        <span class="fw-bold">Qty Balance:</span> {{ budgetBalance().quantityBalance | number:'1.2-2' }}
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="alert alert-info py-2 mb-0 small">
+                                        <span class="fw-bold">Amount Balance (CV):</span> {{ budgetBalance().amountBalanceCV | number:'1.2-2' }}
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="alert alert-info py-2 mb-0 small">
+                                        <span class="fw-bold">Amount Balance (PO/JO):</span> {{ budgetBalance().amountBalancePOJO | number:'1.2-2' }}
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                        @if (budgetSubItemBalance() && !isForLab()) {
+                            <div class="row mt-1 g-2">
+                                <div class="col-md-6">
+                                    <div class="alert alert-warning py-2 mb-0 small">
+                                        <span class="fw-bold">Sub Item Balance (CV):</span> {{ budgetSubItemBalance().amountBalanceCV | number:'1.2-2' }}
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="alert alert-warning py-2 mb-0 small">
+                                        <span class="fw-bold">Sub Item Balance (PO/JO):</span> {{ budgetSubItemBalance().amountBalancePOJO | number:'1.2-2' }}
+                                    </div>
+                                </div>
+                            </div>
+                        }
+
+                        <hr class="mt-3 mb-1"/>
+                        <h6 class="fw-bold text-muted text-uppercase fs-xxs mb-0">{{ isForLab() ? 'Labor Charges' : 'Items to be Requested' }}</h6>
+
+                        <!-- Items Table -->
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="table-responsive">
+                                    <table class="table table-sm table-bordered align-middle">
+                                        <thead class="bg-light thead-sm text-uppercase fs-xxs">
+                                            <tr>
+                                                @if (isForLab()) {
+                                                    <th style="width:18%">Unit</th>
+                                                    <th style="width:62%">Description</th>
+                                                    <th style="width:12%">Quantity</th>
+                                                } @else {
+                                                    <th style="width:10%">Item No.</th>
+                                                    <th style="width:15%">Unit</th>
+                                                    <th style="width:38%">Description</th>
+                                                    <th style="width:12%">Quantity</th>
+                                                    @if (isForIt()) {
+                                                        <th style="width:17%">JO Description</th>
+                                                    }
+                                                }
+                                                <th style="width:8%" class="text-end">
+                                                    <button type="button" class="btn btn-primary fw-bold"
+                                                            (click)="addLineItem()">
+                                                        <ng-icon name="tablerPlus" class="ps-0 pe-3 fw-bold"></ng-icon>Add
+                                                    </button>
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @for (li of lineItems; track trackByIndex($index); let i = $index) {
+                                                <tr>
+                                                    @if (isForLab()) {
+                                                        <!-- LAB: Unit | Description | Quantity -->
+                                                        <td>
+                                                            <select class="form-select form-select-sm"
+                                                                    [(ngModel)]="li.unitId"
+                                                                    [ngModelOptions]="{standalone: true}">
+                                                                <option [ngValue]="null">— Select —</option>
+                                                                @for (u of units(); track u.id) {
+                                                                    <option [ngValue]="u.id">{{ u.code }}</option>
+                                                                }
+                                                            </select>
+                                                        </td>
+                                                        <td>
+                                                            <input type="text" class="form-control form-control-sm"
+                                                                   [(ngModel)]="li.joDescription"
+                                                                   [ngModelOptions]="{standalone: true}"
+                                                                   placeholder="Description"/>
+                                                        </td>
+                                                        <td>
+                                                            <input type="number" class="form-control form-control-sm"
+                                                                   [(ngModel)]="li.quantity"
+                                                                   [ngModelOptions]="{standalone: true}"
+                                                                   min="1" placeholder="0"/>
+                                                        </td>
+                                                    } @else {
+                                                        <!-- PO/IT/REP: Item No. | Unit | Description | Quantity | [JO Desc for IT] -->
+                                                        <td class="text-muted small">{{ li.itemCode || '—' }}</td>
+                                                        <td>
+                                                            <select class="form-select form-select-sm"
+                                                                    [(ngModel)]="li.unitId"
+                                                                    [ngModelOptions]="{standalone: true}">
+                                                                <option [ngValue]="null">— Select —</option>
+                                                                @for (u of units(); track u.id) {
+                                                                    <option [ngValue]="u.id">{{ u.code }}</option>
+                                                                }
+                                                            </select>
+                                                        </td>
+                                                        <td>
+                                                            <div class="input-group input-group-sm">
+                                                                <input type="text" class="form-control form-control-sm"
+                                                                       [value]="li.itemDescription"
+                                                                       readonly
+                                                                       placeholder="Browse item..."
+                                                                       style="cursor:pointer; background:#fff;"
+                                                                       (click)="openItemBrowse(i)"/>
+                                                                <button type="button" class="btn btn-success fw-bold"
+                                                                        (click)="openItemBrowse(i)">
+                                                                    <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
+                                                                </button>
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            <input type="number" class="form-control form-control-sm"
+                                                                   [(ngModel)]="li.quantity"
+                                                                   [ngModelOptions]="{standalone: true}"
+                                                                   min="1" placeholder="0"/>
+                                                        </td>
+                                                        @if (isForIt()) {
+                                                            <td>
+                                                                <input type="text" class="form-control form-control-sm"
+                                                                       [(ngModel)]="li.joDescription"
+                                                                       [ngModelOptions]="{standalone: true}"
+                                                                       placeholder="JO description"/>
+                                                            </td>
+                                                        }
+                                                    }
+                                                    <td class="text-center">
+                                                        @if (lineItems.length > 1) {
+                                                            <button type="button" class="btn btn-light btn-icon rounded-circle"
+                                                                    (click)="removeLineItem(i)">
+                                                                <ng-icon name="tablerTrash" class="text-danger"></ng-icon>
+                                                            </button>
+                                                        }
+                                                    </td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Signatories -->
+                        <hr class="mt-3 mb-1"/>
+                        <h6 class="fw-bold text-muted text-uppercase fs-xxs mb-0">Signatories</h6>
+                        <div class="row">
+                            <div class="col-md-6 mt-2">
+                                <label class="form-label fw-bold">Approving Officer <span class="text-danger">*</span></label>
+                                <div class="input-group"
+                                     [class.is-invalid]="submit && form.get('approvingOfficer')?.errors">
+                                    <input type="text" class="form-control"
+                                           [value]="signatoryNames['approvingOfficer'] || ''"
+                                           readonly placeholder="Browse Approving Officer..."
+                                           [class]="submit && form.get('approvingOfficer')?.errors ? 'is-invalid' : submit && form.get('approvingOfficer')?.value ? 'is-valid' : ''"/>
+                                    <button type="button" class="btn btn-success fw-bold"
+                                            (click)="openSignatoryBrowse('approvingOfficer')">
+                                        <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
+                                    </button>
+                                </div>
+                                @if (submit && form.get('approvingOfficer')?.errors) {
+                                    <div class="text-danger small mt-1">Please select an approving officer.</div>
+                                }
+                            </div>
+                            @if (isForPo() || isForRep() || isForLab()) {
+                                <div class="col-md-6 mt-2">
+                                    <label class="form-label fw-bold">Reviewed / Accepted By <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control"
+                                               [value]="signatoryNames['reviewedAcceptedByAccountNo'] || ''"
+                                               readonly placeholder="Browse Reviewed/Accepted By..."
+                                               [class]="submit && form.get('reviewedAcceptedByAccountNo')?.errors ? 'is-invalid' : submit && form.get('reviewedAcceptedByAccountNo')?.value ? 'is-valid' : ''"/>
+                                        <button type="button" class="btn btn-success fw-bold"
+                                                (click)="openSignatoryBrowse('reviewedAcceptedByAccountNo')">
+                                            <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
+                                        </button>
+                                    </div>
+                                    @if (submit && form.get('reviewedAcceptedByAccountNo')?.errors) {
+                                        <div class="text-danger small mt-1">Please select a reviewer.</div>
+                                    }
+                                </div>
+                            }
+                        </div>
+                        @if (isForIt()) {
+                            <div class="row">
+                                <div class="col-md-4 mt-2">
+                                    <label class="form-label fw-bold">Recommended Approval Officer <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control"
+                                               [value]="signatoryNames['recAppByAccountNo'] || ''"
+                                               readonly placeholder="Browse..."
+                                               [class]="submit && form.get('recAppByAccountNo')?.errors ? 'is-invalid' : submit && form.get('recAppByAccountNo')?.value ? 'is-valid' : ''"/>
+                                        <button type="button" class="btn btn-success fw-bold"
+                                                (click)="openSignatoryBrowse('recAppByAccountNo')">
+                                            <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
+                                        </button>
+                                    </div>
+                                    @if (submit && form.get('recAppByAccountNo')?.errors) {
+                                        <div class="text-danger small mt-1">Please select an officer.</div>
+                                    }
+                                </div>
+                                <div class="col-md-4 mt-2">
+                                    <label class="form-label fw-bold">BAC Representative <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control"
+                                               [value]="signatoryNames['bacRepresentativeAccountNo'] || ''"
+                                               readonly placeholder="Browse..."
+                                               [class]="submit && form.get('bacRepresentativeAccountNo')?.errors ? 'is-invalid' : submit && form.get('bacRepresentativeAccountNo')?.value ? 'is-valid' : ''"/>
+                                        <button type="button" class="btn btn-success fw-bold"
+                                                (click)="openSignatoryBrowse('bacRepresentativeAccountNo')">
+                                            <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
+                                        </button>
+                                    </div>
+                                    @if (submit && form.get('bacRepresentativeAccountNo')?.errors) {
+                                        <div class="text-danger small mt-1">Please select a BAC representative.</div>
+                                    }
+                                </div>
+                                <div class="col-md-4 mt-2">
+                                    <label class="form-label fw-bold">Budget Officer <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control"
+                                               [value]="signatoryNames['budgetOfficerAccountNo'] || ''"
+                                               readonly placeholder="Browse..."
+                                               [class]="submit && form.get('budgetOfficerAccountNo')?.errors ? 'is-invalid' : submit && form.get('budgetOfficerAccountNo')?.value ? 'is-valid' : ''"/>
+                                        <button type="button" class="btn btn-success fw-bold"
+                                                (click)="openSignatoryBrowse('budgetOfficerAccountNo')">
+                                            <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
+                                        </button>
+                                    </div>
+                                    @if (submit && form.get('budgetOfficerAccountNo')?.errors) {
+                                        <div class="text-danger small mt-1">Please select a budget officer.</div>
+                                    }
+                                </div>
+                            </div>
+                        }
+                        @if (showInventoryChecked()) {
+                            <div class="row">
+                                <div class="col-md-6 mt-2">
+                                    <label class="form-label fw-bold">Inventory Checked By <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control"
+                                               [value]="signatoryNames['inventoryCheckedByAccountNo'] || ''"
+                                               readonly placeholder="Browse Inventory Checker..."
+                                               [class]="submit && form.get('inventoryCheckedByAccountNo')?.errors ? 'is-invalid' : submit && form.get('inventoryCheckedByAccountNo')?.value ? 'is-valid' : ''"/>
+                                        <button type="button" class="btn btn-success fw-bold"
+                                                (click)="openSignatoryBrowse('inventoryCheckedByAccountNo')">
+                                            <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
+                                        </button>
+                                    </div>
+                                    @if (submit && form.get('inventoryCheckedByAccountNo')?.errors) {
+                                        <div class="text-danger small mt-1">Required when items are for warehousing.</div>
+                                    }
+                                </div>
+                            </div>
+                        }
+
+                        <div class="d-flex gap-2 justify-content-end align-items-center pt-3 border-top mt-3">
+                            <a [routerLink]="['/' + menuLink]" class="btn btn-light fw-bold">
+                                <ng-icon name="tablerArrowLeft" class="ps-0 pe-3 fw-bold"></ng-icon>Back
+                            </a>
+                            <button type="submit" class="btn btn-primary fw-bold" [disabled]="formSubmit">
+                                @if (formSubmit) {
+                                    <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                                    {{ editMode ? 'Updating...' : 'Saving...' }}
+                                } @else {
+                                    <ng-icon name="tablerCheck" class="ps-0 pe-3 fw-bold"></ng-icon>
+                                    {{ editMode ? 'Update' : 'Save ' + module }}
+                                }
+                            </button>
+                        </div>
+                    </form>
+                    }
+                </div>
+            </app-ui-card>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,143 @@
+<div class="container-fluid">
+    <app-page-title [title]="module" [subTitle]="subModule" [menuLink]="menuLink"/>
+</div>
+
+@if (isLoading()) {
+    <div class="card">
+        <div class="card-body text-center py-5 text-muted">
+            <span class="spinner-border spinner-border-sm me-2" role="status"></span>Loading...
+        </div>
+    </div>
+} @else {
+<div class="card">
+    <div class="card-body">
+
+        <div class="row mb-3">
+            <div class="col-md-3">
+                <label class="form-label fw-bold">Code <span class="text-danger">*</span></label>
+                <input type="text" class="form-control text-uppercase"
+                       [(ngModel)]="code" [ngModelOptions]="{ standalone: true }"
+                       placeholder="Enter code..."
+                       [class.is-invalid]="submit && !code.trim()"/>
+                @if (submit && !code.trim()) {
+                    <div class="invalid-feedback d-block">Code is required.</div>
+                }
+            </div>
+            <div class="col-md-5">
+                <label class="form-label fw-bold">Description <span class="text-danger">*</span></label>
+                <input type="text" class="form-control"
+                       [(ngModel)]="description" [ngModelOptions]="{ standalone: true }"
+                       placeholder="Enter description..."
+                       [class.is-invalid]="submit && !description.trim()"/>
+                @if (submit && !description.trim()) {
+                    <div class="invalid-feedback d-block">Description is required.</div>
+                }
+            </div>
+        </div>
+
+        <hr/>
+        <h6 class="fw-semibold text-uppercase mb-3">New Percentage Distribution</h6>
+
+        <div class="row mb-3">
+            <div class="col-md-4">
+                <label class="form-label fw-bold">Validity Date <span class="text-danger">*</span></label>
+                <select class="form-select" [(ngModel)]="selectedValidity"
+                        [ngModelOptions]="{ standalone: true }"
+                        [class.is-invalid]="submit && !selectedValidity">
+                    <option [ngValue]="null" disabled>Select validity period...</option>
+                    @for (dr of dateRanges(); track dr.id) {
+                        <option [ngValue]="dr">{{ dr.description }}</option>
+                    }
+                </select>
+                @if (submit && !selectedValidity) {
+                    <div class="invalid-feedback d-block">Validity date is required.</div>
+                }
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-custom table-centered table-hover w-100 mb-0">
+                <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                    <tr class="text-uppercase fs-xxs">
+                        <th>Business Segment</th>
+                        <th style="width: 180px">Percentage (%)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (row of segmentRows; track row.segmentId; let i = $index) {
+                        <tr>
+                            <td>{{ row.description }}</td>
+                            <td>
+                                <input type="number" class="form-control form-control-sm"
+                                       min="0" max="100" step="0.01"
+                                       [(ngModel)]="segmentRows[i].value"
+                                       [ngModelOptions]="{ standalone: true }"/>
+                            </td>
+                        </tr>
+                    }
+                    @if (segmentRows.length === 0) {
+                        <tr><td colspan="2" class="text-center text-muted py-3">No segments available.</td></tr>
+                    }
+                </tbody>
+                @if (segmentRows.length > 0) {
+                    <tfoot>
+                        <tr class="fw-bold">
+                            <td class="text-end">Total</td>
+                            <td [class.text-danger]="total !== 100" [class.text-success]="total === 100">
+                                {{ total }}%
+                                @if (total !== 100) {
+                                    <small class="ms-1 text-danger">(must be 100%)</small>
+                                }
+                            </td>
+                        </tr>
+                    </tfoot>
+                }
+            </table>
+        </div>
+
+        @if (editMode && validityEntries().length > 0) {
+            <hr class="mt-4"/>
+            <h6 class="fw-semibold text-uppercase mb-3">Existing Percentage Distributions</h6>
+            @for (entry of validityEntries(); track entry[0]) {
+                <div class="mb-4">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <h6 class="fw-bold text-primary mb-0">{{ entry[0] }}</h6>
+                        <a [routerLink]="['/' + menuLink, factorId, 'validity', entry[1][0]?.validityDate?.id, 'edit']"
+                           class="btn btn-success btn-sm fw-bold">
+                            <ng-icon name="tablerEdit" class="ps-0 pe-2 fw-bold"></ng-icon>Edit
+                        </a>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-custom table-centered table-hover w-100 mb-0">
+                            <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                                <tr class="text-uppercase fs-xxs">
+                                    <th>Business Segment</th>
+                                    <th class="text-end">Percentage (%)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @for (row of entry[1]; track $index) {
+                                    <tr>
+                                        <td>{{ row.businessSegment?.description }}</td>
+                                        <td class="text-end fw-bold">{{ (row.percentage * 100) | number:'1.2-2' }}%</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            }
+        }
+
+        <div class="d-flex gap-2 justify-content-end align-items-center pt-3 border-top mt-3">
+            <a [routerLink]="['/' + menuLink]" class="btn btn-light fw-bold">
+                <ng-icon name="tablerArrowLeft" class="ps-0 pe-3 fw-bold"></ng-icon>Back
+            </a>
+            <button type="button" class="btn btn-primary fw-bold" (click)="validSubmit()" [disabled]="formSubmit">
+                <ng-icon name="tablerCheck" class="ps-0 pe-3 fw-bold"></ng-icon>
+                {{ editMode ? 'Update' : 'Save ' + module }}
+            </button>
+        </div>
+    </div>
+</div>
+}

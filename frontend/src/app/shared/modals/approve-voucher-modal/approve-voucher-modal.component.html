@@ -1,0 +1,48 @@
+<div class="modal-header">
+    <h5 class="modal-title fw-bold">Approve Voucher</h5>
+    <button type="button" class="btn-close" (click)="activeModal.dismiss()"></button>
+</div>
+
+<div class="modal-body">
+    @if (voucher) {
+        <div class="row g-2 mb-3">
+            <div class="col-6">
+                <label class="form-label fw-bold fs-xs text-uppercase">Code</label>
+                <p class="mb-0 fw-bold">{{ voucher.code || voucher.localCode }}</p>
+            </div>
+            <div class="col-6">
+                <label class="form-label fw-bold fs-xs text-uppercase">Document Type</label>
+                <p class="mb-0">{{ voucher.documentType || '—' }}</p>
+            </div>
+            <div class="col-6">
+                <label class="form-label fw-bold fs-xs text-uppercase">Amount</label>
+                <p class="mb-0">{{ voucher.amount ?? voucher.totalDebit | number:'1.2-2' }}</p>
+            </div>
+            <div class="col-6">
+                <label class="form-label fw-bold fs-xs text-uppercase">Voucher Date</label>
+                <p class="mb-0">{{ voucher.voucherDate | date:'MM/dd/yyyy' }}</p>
+            </div>
+        </div>
+
+        <hr class="my-3"/>
+
+        <div>
+            <label class="form-label fw-bold">Remarks <span class="text-muted fw-normal">(optional)</span></label>
+            <textarea class="form-control" rows="3" [(ngModel)]="remarks"
+                      placeholder="Enter approval remarks..."></textarea>
+        </div>
+    }
+</div>
+
+<div class="modal-footer d-flex justify-content-end">
+    <button type="button" class="btn btn-light fw-bold" (click)="activeModal.dismiss()">
+        <ng-icon name="tablerX" class="ps-0 pe-3 fw-bold"></ng-icon>Cancel
+    </button>
+    <button type="button" class="btn btn-primary fw-bold" [disabled]="isSubmitting()" (click)="approve()">
+        @if (isSubmitting()) {
+            <span class="spinner-border spinner-border-sm me-2" role="status"></span>Approving...
+        } @else {
+            <ng-icon name="tablerCheck" class="ps-0 pe-3 fw-bold"></ng-icon>Approve
+        }
+    </button>
+</div>

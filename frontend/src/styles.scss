@@ -1,0 +1,14 @@
+/* You can add global styles to this file, and also import other style files */
+@use "simplebar/dist/simplebar.min.css";
+@use "jsvectormap/dist/css/jsvectormap.css";
+@use "flatpickr/dist/flatpickr.css";
+@use "shepherd.js/dist/css/shepherd.css";
+@use "ladda/dist/ladda.min.css";
+@use "choices.js/src/styles/choices";
+@use "./assets/scss/app.scss";
+@use "sweetalert2/dist/sweetalert2.min.css";
+@use "@ng-select/ng-select/themes/default.theme.css";
+
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+

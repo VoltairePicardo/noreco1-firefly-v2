@@ -1,0 +1,197 @@
+<div class="modal-header">
+    <h4 class="modal-title">You are about to close out work order</h4>
+    <button type="button" class="btn-close" (click)="activeModal.dismiss()"></button>
+</div>
+
+<div class="modal-body" style="max-height: 75vh; overflow-y: auto;">
+
+    <!-- Work Order Summary -->
+    <h6 class="fw-semibold text-uppercase fs-xs mb-2">Work Order Details</h6>
+    <div class="row g-2 mb-3">
+        <div class="col-md-4">
+            <label class="form-label fw-bold mb-1 fs-xs text-muted text-uppercase">Number</label>
+            <div class="form-control bg-light">{{ workOrder?.code }}</div>
+        </div>
+        <div class="col-md-8">
+            <label class="form-label fw-bold mb-1 fs-xs text-muted text-uppercase">Description</label>
+            <div class="form-control bg-light">{{ workOrder?.description || '—' }}</div>
+        </div>
+        <div class="col-md-4">
+            <label class="form-label fw-bold mb-1 fs-xs text-muted text-uppercase">Amount</label>
+            <div class="form-control bg-light text-end fw-semibold">{{ totalAmount | number:'1.2-2' }}</div>
+        </div>
+    </div>
+
+    <hr/>
+
+    <!-- Asset Details -->
+    <h6 class="fw-semibold text-uppercase fs-xs mb-2">Asset Details</h6>
+    <div class="row g-3 mb-3">
+        <div class="col-md-12">
+            <label class="form-label fw-bold">Description</label>
+            <textarea class="form-control" [(ngModel)]="asset.description" rows="2"
+                      placeholder="Enter asset description"></textarea>
+        </div>
+        <div class="col-md-4">
+            <label class="form-label fw-bold">Asset Type <span class="text-danger">*</span></label>
+            <select class="form-select" [(ngModel)]="asset.assetTypeId">
+                <option [ngValue]="null">— Select asset type —</option>
+                @for (t of assetTypes; track t.id) {
+                    <option [ngValue]="t.id">{{ t.description }}</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-4">
+            <label class="form-label fw-bold">Value</label>
+            <div class="form-control bg-light text-end">{{ assetValue | number:'1.2-2' }}</div>
+        </div>
+        <div class="col-md-4">
+            <label class="form-label fw-bold">Depreciation Years <span class="text-danger">*</span></label>
+            <input type="number" min="0" step="1" class="form-control"
+                   [(ngModel)]="asset.depreciationYears"
+                   (ngModelChange)="onDepreciationYearsChange()"
+                   placeholder="Enter depreciation years"/>
+        </div>
+        <div class="col-md-4">
+            <label class="form-label fw-bold">Depreciation Months</label>
+            <div class="form-control bg-light text-end">{{ asset.depreciationMonths || 0 }}</div>
+        </div>
+        <div class="col-md-4">
+            <label class="form-label fw-bold">Monthly Depreciation</label>
+            <div class="form-control bg-light text-end">{{ asset.monthlyDepreciation | number:'1.2-2' }}</div>
+        </div>
+        <div class="col-md-4">
+            <label class="form-label fw-bold">Remaining Value</label>
+            <div class="form-control bg-light text-end">{{ assetValue | number:'1.2-2' }}</div>
+        </div>
+        <div class="col-md-3">
+            <label class="form-label fw-bold">Start Year <span class="text-danger">*</span></label>
+            <input type="number" min="2000" step="1" class="form-control"
+                   [(ngModel)]="asset.startYear" placeholder="Enter start year"/>
+        </div>
+        <div class="col-md-4">
+            <label class="form-label fw-bold">Start Month <span class="text-danger">*</span></label>
+            <select class="form-select" [(ngModel)]="asset.startMonth">
+                <option [ngValue]="null">— Select month —</option>
+                @for (m of months; track m.id) {
+                    <option [ngValue]="m.id">{{ m.description }}</option>
+                }
+            </select>
+        </div>
+    </div>
+
+    <hr/>
+
+    <!-- Account Detail Table -->
+    <div class="d-flex align-items-center mb-2 gap-2">
+        <h6 class="fw-semibold text-uppercase fs-xs mb-0">Account Detail</h6>
+        <button type="button" class="btn btn-primary btn-sm fw-bold" (click)="addRow()">
+            <ng-icon name="tablerPlus" class="pe-1"></ng-icon>Add Row
+        </button>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-custom table-bordered table-centered w-100 mb-0">
+            <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                <tr class="text-uppercase fs-xxs">
+                    <th>Asset Account</th>
+                    <th>Expense Account</th>
+                    <th>Accum Dep Account</th>
+                    <th class="text-end">Value</th>
+                    <th class="text-end">Depreciated Value</th>
+                    <th class="text-end">Monthly Dep.</th>
+                    <th class="text-end">Remaining Value</th>
+                    <th style="width:40px"></th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (assetDetails.length === 0) {
+                    <tr class="no-results">
+                        <td colspan="8" class="text-center text-muted py-3">
+                            No rows. Click "Add Row" to add an account entry.
+                        </td>
+                    </tr>
+                }
+                @for (row of assetDetails; track $index) {
+                    <tr>
+                        <td>
+                            <div class="d-flex align-items-center gap-1">
+                                <span class="text-truncate" style="max-width:120px" [title]="row.assetAccount?.accountTitle || ''">
+                                    {{ row.assetAccount?.accountTitle || '—' }}
+                                </span>
+                                <button type="button" class="btn btn-light btn-icon btn-sm rounded-circle ms-auto flex-shrink-0"
+                                        ngbTooltip="Browse" (click)="browseAccount('asset', $index)">
+                                    <ng-icon name="tablerSearch" class="fs-sm"></ng-icon>
+                                </button>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="d-flex align-items-center gap-1">
+                                <span class="text-truncate" style="max-width:120px" [title]="row.expenseAccount?.accountTitle || ''">
+                                    {{ row.expenseAccount?.accountTitle || '—' }}
+                                </span>
+                                <button type="button" class="btn btn-light btn-icon btn-sm rounded-circle ms-auto flex-shrink-0"
+                                        ngbTooltip="Browse" (click)="browseAccount('expense', $index)">
+                                    <ng-icon name="tablerSearch" class="fs-sm"></ng-icon>
+                                </button>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="d-flex align-items-center gap-1">
+                                <span class="text-truncate" style="max-width:120px" [title]="row.accumDepAccount?.accountTitle || ''">
+                                    {{ row.accumDepAccount?.accountTitle || '—' }}
+                                </span>
+                                <button type="button" class="btn btn-light btn-icon btn-sm rounded-circle ms-auto flex-shrink-0"
+                                        ngbTooltip="Browse" (click)="browseAccount('accumDep', $index)">
+                                    <ng-icon name="tablerSearch" class="fs-sm"></ng-icon>
+                                </button>
+                            </div>
+                        </td>
+                        <td>
+                            <input type="number" min="0" step="0.01" class="form-control form-control-sm text-end"
+                                   [(ngModel)]="row.value"
+                                   (ngModelChange)="onRowValueChange(row)"/>
+                        </td>
+                        <td>
+                            <input type="number" min="0" step="0.01" class="form-control form-control-sm text-end"
+                                   [(ngModel)]="row.depreciatedValue"
+                                   (ngModelChange)="onRowDepreciatedValueChange(row)"/>
+                        </td>
+                        <td class="text-end">{{ row.monthlyDepreciation | number:'1.2-2' }}</td>
+                        <td class="text-end">{{ row.remainingValue | number:'1.2-2' }}</td>
+                        <td class="text-center">
+                            <button type="button" class="btn btn-danger btn-icon btn-sm rounded-circle"
+                                    ngbTooltip="Remove" (click)="removeRow($index)">
+                                <ng-icon name="tablerTrash" class="fs-sm"></ng-icon>
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+            @if (assetDetails.length > 0) {
+                <tfoot class="table-light fw-bold">
+                    <tr>
+                        <td colspan="3" class="text-end">Totals</td>
+                        <td class="text-end">{{ totals.value | number:'1.2-2' }}</td>
+                        <td class="text-end">{{ totals.depreciatedValue | number:'1.2-2' }}</td>
+                        <td class="text-end">{{ totals.monthlyDepreciation | number:'1.2-2' }}</td>
+                        <td class="text-end">{{ totals.remainingValue | number:'1.2-2' }}</td>
+                        <td></td>
+                    </tr>
+                </tfoot>
+            }
+        </table>
+    </div>
+</div>
+
+<div class="modal-footer">
+    <button type="button" class="btn btn-light fw-bold" [disabled]="submitting" (click)="activeModal.dismiss()">
+        Cancel
+    </button>
+    <button type="button" class="btn btn-danger fw-bold" [disabled]="submitting" (click)="continueClosing()">
+        @if (submitting) {
+            <span class="spinner-border spinner-border-sm me-2"></span>
+        }
+        Continue Close Out
+    </button>
+</div>

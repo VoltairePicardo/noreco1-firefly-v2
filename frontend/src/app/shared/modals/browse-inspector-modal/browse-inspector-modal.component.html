@@ -1,0 +1,46 @@
+<div class="modal-header">
+    <h4 class="modal-title">Browse Inspector</h4>
+    <button type="button" class="btn-close" (click)="activeModal.dismiss()"></button>
+</div>
+
+<div class="modal-body">
+    <div class="d-flex gap-2 mb-3">
+        <div class="app-search flex-grow-1">
+            <input ngbAutofocus [(ngModel)]="searchText" type="search" class="form-control"
+                   placeholder="Search by name"/>
+            <ng-icon name="tablerSearch" class="app-search-icon text-muted"/>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-custom table-centered table-select table-hover w-100 mb-0">
+            <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                <tr class="text-uppercase fs-xxs">
+                    <th>Name</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (loading) {
+                    <tr>
+                        <td class="text-center py-4">
+                            <div class="d-flex justify-content-center align-items-center gap-2 py-2 text-muted">
+                                <span class="spinner-border spinner-border-sm"></span>
+                                <span>Loading...</span>
+                            </div>
+                        </td>
+                    </tr>
+                } @else if (filtered.length === 0) {
+                    <tr class="no-results">
+                        <td class="text-center text-muted py-3">Nothing found.</td>
+                    </tr>
+                } @else {
+                    @for (e of filtered; track e.accountNo) {
+                        <tr style="cursor: pointer" (click)="select(e)">
+                            <td class="fw-bold">{{ e.name }}</td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

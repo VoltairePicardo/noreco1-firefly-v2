@@ -1,0 +1,81 @@
+<div class="modal-header">
+    <h4 class="modal-title">Browse Item</h4>
+    <button type="button" class="btn-close" (click)="close()"></button>
+</div>
+
+<div class="modal-body">
+    <div class="d-flex gap-2 mb-3">
+        @if (categories.length > 0) {
+            <select class="form-select" style="max-width:200px"
+                    [(ngModel)]="selectedCategoryId" (change)="onCategoryChange()">
+                <option [ngValue]="null">All Categories</option>
+                @for (c of categories; track c.id) {
+                    <option [ngValue]="c.id">{{ c.description }}</option>
+                }
+            </select>
+        }
+        <div class="app-search flex-grow-1">
+            <input ngbAutofocus [(ngModel)]="searchText" type="search" class="form-control"
+                   placeholder="Search by code or description" (keyup.enter)="onSearchChange()"/>
+            <ng-icon name="tablerSearch" class="app-search-icon text-muted"/>
+        </div>
+        <button type="button" class="btn btn-success fw-bold" (click)="onSearchChange()">
+            <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"/>Search
+        </button>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-custom table-centered table-select table-hover w-100 mb-0">
+            <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                <tr class="text-uppercase fs-xxs">
+                    <th>Code</th>
+                    <th>Description</th>
+                    <th>Unit</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (loading) {
+                    <tr>
+                        <td colspan="3" class="text-center py-4">
+                            <div class="d-flex justify-content-center align-items-center gap-2 py-2 text-muted">
+                                <span class="spinner-border spinner-border-sm"></span>
+                                <span>Loading...</span>
+                            </div>
+                        </td>
+                    </tr>
+                } @else if (total > 0) {
+                    @for (item of items; track item.id) {
+                        <tr (click)="select(item)" style="cursor: pointer">
+                            <td class="fw-bold">{{ item.code || '—' }}</td>
+                            <td>{{ item.description }}</td>
+                            <td>{{ item.unit?.code || '—' }}</td>
+                        </tr>
+                    }
+                } @else {
+                    <tr class="no-results">
+                        <td colspan="3" class="text-center text-muted py-3">Nothing found.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    @if (total > 0) {
+        <div class="d-flex justify-content-center pagination-boxed align-items-center mt-3">
+            <ngb-pagination
+                [collectionSize]="total"
+                [(page)]="page"
+                [pageSize]="pageSize"
+                [maxSize]="5"
+                [rotate]="true"
+                (pageChange)="loadData()">
+                <ng-template ngbPaginationPrevious>
+                    <ng-icon name="tablerChevronLeft"/>
+                </ng-template>
+                <ng-template ngbPaginationNext>
+                    <ng-icon name="tablerChevronRight"/>
+                </ng-template>
+            </ngb-pagination>
+        </div>
+    }
+</div>

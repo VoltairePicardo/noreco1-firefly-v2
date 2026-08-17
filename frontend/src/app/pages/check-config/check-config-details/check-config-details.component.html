@@ -1,0 +1,134 @@
+<div class="container-fluid">
+    <app-page-title [title]="module" [subTitle]="subModule" [menuLink]="menuLink"/>
+</div>
+
+<app-ui-card [title]="module + ' Details'">
+    <div class="col-xl-12 p-3" card-body>
+        @if (isLoading()) {
+            <div class="d-flex align-items-center gap-2 text-muted py-2">
+                <span class="spinner-border spinner-border-sm" role="status"></span>
+                Loading...
+            </div>
+        } @else {
+
+        <!-- General Info -->
+        <div class="row mb-3">
+            <div class="col-sm-8">
+                <dl class="row mb-0">
+                    <dt class="col-sm-3 fw-normal">Code</dt>
+                    <dd class="col-sm-9 fw-bold">{{ data.code || '—' }}</dd>
+
+                    <dt class="col-sm-3 fw-normal">Bank Account</dt>
+                    <dd class="col-sm-9 fw-bold">
+                        {{ data.bankAccount?.accountNumber || '—' }}{{ data.bankAccount?.bank?.name ? ' — ' + data.bankAccount.bank.name : '' }}
+                    </dd>
+
+                    <dt class="col-sm-3 fw-normal">Check No. Prefix</dt>
+                    <dd class="col-sm-9 fw-bold">{{ data.checkNoPrefix || '—' }}</dd>
+
+                    <dt class="col-sm-3 fw-normal">With Signer</dt>
+                    <dd class="col-sm-9 fw-bold">{{ data.withSigner ? 'Yes' : 'No' }}</dd>
+
+                    <dt class="col-sm-3 fw-normal">Show Designation</dt>
+                    <dd class="col-sm-9 fw-bold">{{ data.showDesignation ? 'Yes' : 'No' }}</dd>
+                </dl>
+            </div>
+        </div>
+
+        <hr class="my-3"/>
+
+        <!-- Field Positions Grid -->
+        <div class="table-responsive">
+            <table class="table table-bordered table-centered w-100 mb-0">
+                <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                    <tr class="text-uppercase fs-xxs">
+                        <th style="width: 14%">Fields</th>
+                        <th style="width: 11%">Left</th>
+                        <th style="width: 11%">Top</th>
+                        <th style="width: 11%">Width</th>
+                        <th style="width: 11%">Line Spacing</th>
+                        <th style="width: 14%">Format</th>
+                        <th style="width: 13%">Char Adjust</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="fw-bold">Check Number</td>
+                        <td>{{ data.checkNoX ?? '—' }}</td>
+                        <td>{{ data.checkNoY ?? '—' }}</td>
+                        <td class="text-muted">—</td>
+                        <td class="text-muted">—</td>
+                        <td class="text-muted">—</td>
+                        <td class="text-muted">—</td>
+                    </tr>
+                    <tr>
+                        <td class="fw-bold">Date</td>
+                        <td>{{ data.dateX ?? '—' }}</td>
+                        <td>{{ data.dateY ?? '—' }}</td>
+                        <td class="text-muted">—</td>
+                        <td>{{ data.dateLineSpacing ?? '—' }}</td>
+                        <td>{{ data.dateFormat || '—' }}</td>
+                        <td class="text-muted">—</td>
+                    </tr>
+                    <tr>
+                        <td class="fw-bold">Payee</td>
+                        <td>{{ data.payeeX ?? '—' }}</td>
+                        <td>{{ data.payeeY ?? '—' }}</td>
+                        <td>{{ data.payeeW ?? '—' }}</td>
+                        <td class="text-muted">—</td>
+                        <td class="text-muted">—</td>
+                        <td>{{ data.nameNoOfCharToAdjust ?? '—' }}</td>
+                    </tr>
+                    <tr>
+                        <td class="fw-bold">Amount</td>
+                        <td>{{ data.numericAmountX ?? '—' }}</td>
+                        <td>{{ data.numericAmountY ?? '—' }}</td>
+                        <td class="text-muted">—</td>
+                        <td class="text-muted">—</td>
+                        <td class="text-muted">—</td>
+                        <td class="text-muted">—</td>
+                    </tr>
+                    <tr>
+                        <td class="fw-bold">Amount in Words</td>
+                        <td>{{ data.alphaAmountX ?? '—' }}</td>
+                        <td>{{ data.alphaAmountY ?? '—' }}</td>
+                        <td>{{ data.alphaAmountW ?? '—' }}</td>
+                        <td class="text-muted">—</td>
+                        <td class="text-muted">—</td>
+                        <td>{{ data.amountNoOfCharToAdjust ?? '—' }}</td>
+                    </tr>
+                    <tr>
+                        <td class="fw-bold">First Signature</td>
+                        <td>{{ data.sig1X ?? '—' }}</td>
+                        <td>{{ data.sig1Y ?? '—' }}</td>
+                        <td class="text-muted">—</td>
+                        <td class="text-muted">—</td>
+                        <td class="text-muted">—</td>
+                        <td class="text-muted">—</td>
+                    </tr>
+                    <tr>
+                        <td class="fw-bold">Second Signature</td>
+                        <td>{{ data.sig2X ?? '—' }}</td>
+                        <td>{{ data.sig2Y ?? '—' }}</td>
+                        <td class="text-muted">—</td>
+                        <td class="text-muted">—</td>
+                        <td class="text-muted">—</td>
+                        <td class="text-muted">—</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        }
+        <hr class="mt-4"/>
+        <div class="d-flex justify-content-end gap-2">
+            <button type="button" class="btn btn-success fw-bold" (click)="testPrint()">
+                <ng-icon name="tablerPrinter" class="ps-0 pe-3 fw-bold"></ng-icon>Test Print
+            </button>
+            <button type="button" class="btn btn-primary fw-bold"
+                    [routerLink]="['/' + menuLink, data.id, 'edit']">
+                <ng-icon name="tablerPencil" class="ps-0 pe-3 fw-bold"></ng-icon>Edit
+            </button>
+        </div>
+    </div>
+</app-ui-card>

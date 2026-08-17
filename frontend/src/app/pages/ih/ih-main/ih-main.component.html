@@ -1,0 +1,80 @@
+<div class="container-fluid">
+    <app-page-title [title]="module" [subTitle]="subModule" [menuLink]="menuLink"/>
+</div>
+
+<div class="card">
+    <div class="row">
+        <div class="col-xl-12">
+            <div class="card-body">
+
+                <div class="row mb-3 align-items-end g-2">
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold mb-1 fs-xs text-uppercase">Serial No.</label>
+                        <input type="text" class="form-control" [(ngModel)]="serialNo"
+                               placeholder="Enter serial number" (keyup.enter)="search()"/>
+                    </div>
+                    <div class="col-auto d-flex gap-2">
+                        <button type="button" class="btn btn-success fw-bold" (click)="search()">
+                            <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Search
+                        </button>
+                        <button type="button" class="btn btn-danger fw-bold" (click)="clear()">
+                            <ng-icon name="tablerRefresh" class="ps-0 pe-3 fw-bold"></ng-icon>Clear
+                        </button>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="table-responsive">
+                        <table class="table table-custom table-centered table-select table-hover w-100 mb-0">
+                            <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                                <tr class="text-uppercase fs-xxs">
+                                    <th>Date</th>
+                                    <th>Transaction Type</th>
+                                    <th>Reference No.</th>
+                                    <th>Crew</th>
+                                    <th>Remarks</th>
+                                    <th>Transact By</th>
+                                    <th>Transaction Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (pagedHistories.length > 0) {
+                                    @for (rec of pagedHistories; track $index) {
+                                        <tr>
+                                            <td>{{ rec.historyDate | date:'MM/dd/yyyy' }}</td>
+                                            <td>{{ rec.transactionType || '—' }}</td>
+                                            <td class="fw-bold">{{ rec.referenceNumber || '—' }}</td>
+                                            <td>{{ rec.crew || '—' }}</td>
+                                            <td>{{ rec.remark || rec.remarks || '—' }}</td>
+                                            <td>{{ rec.transactBy || '—' }}</td>
+                                            <td>{{ rec.transactionDate | date:'MM/dd/yyyy h:mm a' }}</td>
+                                        </tr>
+                                    }
+                                } @else {
+                                    <tr class="no-results">
+                                        <td colspan="7" class="text-center text-muted py-3">
+                                            @if (isLoading()) {
+                                                <span class="spinner-border spinner-border-sm me-2" role="status"></span>Loading...
+                                            } @else if (searched) {
+                                                No history found for this serial number.
+                                            } @else {
+                                                Enter a serial number and click Search.
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                @if (histories().length > pageSize) {
+                    <div class="d-flex justify-content-center mt-3">
+                        <ngb-pagination [collectionSize]="histories().length" [(page)]="page" [pageSize]="pageSize" [maxSize]="5"></ngb-pagination>
+                    </div>
+                }
+
+            </div>
+        </div>
+    </div>
+</div>

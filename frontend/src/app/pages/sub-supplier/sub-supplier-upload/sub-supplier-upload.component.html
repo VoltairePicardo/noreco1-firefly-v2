@@ -1,0 +1,75 @@
+<div class="container-fluid">
+    <app-page-title [title]="module" [subTitle]="subModule" [menuLink]="menuLink"/>
+</div>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-xl-12">
+            <app-ui-card title="Upload Sub-Suppliers">
+                <div class="col-xl-12 p-3" card-body>
+
+                    <div class="row">
+                        <div class="col-md-6">
+
+                            <div class="row mb-3">
+                                <div class="col-12">
+                                    <label class="form-label fw-bold">Supplier <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control"
+                                               [value]="selectedSupplier?.name || ''"
+                                               readonly placeholder="Select a Supplier"
+                                               [class]="submit && !selectedSupplier ? 'is-invalid' : ''"/>
+                                        @if (selectedSupplier) {
+                                            <button type="button" class="btn btn-danger fw-bold" (click)="clearSupplier()">
+                                                <ng-icon name="tablerX" class="fw-bold"></ng-icon>
+                                            </button>
+                                        } @else {
+                                            <button type="button" class="btn btn-success fw-bold" (click)="openSupplierBrowse()">
+                                                <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
+                                            </button>
+                                        }
+                                    </div>
+                                    @if (submit && !selectedSupplier) {
+                                        <div class="text-danger small mt-1">Please select a supplier.</div>
+                                    }
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-12">
+                                    <label class="form-label fw-bold">Excel File <span class="text-danger">*</span></label>
+                                    <input type="file" class="form-control"
+                                           accept=".xls,.xlsx"
+                                           [class]="submit && !selectedFile ? 'is-invalid' : ''"
+                                           (change)="onFileChange($event)"/>
+                                    <div class="form-text">Accepted formats: .xls, .xlsx</div>
+                                    @if (submit && !selectedFile) {
+                                        <div class="text-danger small mt-1">Please select an Excel file.</div>
+                                    }
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <hr/>
+
+                    <div class="text-end">
+                        <button type="button" class="btn btn-light fw-bold me-1"
+                                [routerLink]="['/' + menuLink]">
+                            <ng-icon name="tablerArrowLeft" class="ps-0 pe-3 fw-bold"></ng-icon>Back
+                        </button>
+                        <button type="button" class="btn btn-primary fw-bold"
+                                [disabled]="isSubmitting()"
+                                (click)="processUpload()">
+                            <span *ngIf="isSubmitting()" class="spinner-border spinner-border-sm me-2" role="status"></span>
+                            <ng-icon *ngIf="!isSubmitting()" name="tablerUpload" class="ps-0 pe-3 fw-bold"></ng-icon>
+                            {{ isSubmitting() ? 'Uploading...' : 'Upload' }}
+                        </button>
+                    </div>
+
+                </div>
+            </app-ui-card>
+        </div>
+    </div>
+</div>

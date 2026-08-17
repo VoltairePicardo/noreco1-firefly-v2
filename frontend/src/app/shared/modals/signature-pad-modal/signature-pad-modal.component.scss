@@ -1,0 +1,31 @@
+.camera-wrapper {
+    touch-action: none;
+}
+
+.signature-container {
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    width: 100%;
+    height: 100%;
+    background-color: #e7e7e7;
+    touch-action: none;
+}
+
+
+.signature-canvas {
+    width: 100%;
+    height: 500px;
+    border-radius: 4px;
+    touch-action: none;
+    pointer-events: auto;
+    user-select: none;
+    cursor: crosshair;
+}
+
+
+.actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 8px;
+}

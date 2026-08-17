@@ -1,0 +1,220 @@
+<div class="container-fluid">
+    <app-page-title [title]="module" [subTitle]="subModule" [menuLink]="menuLink"/>
+</div>
+
+@if (isLoading()) {
+    <div class="card"><div class="card-body text-center py-4">
+        <span class="spinner-border spinner-border-sm me-2" role="status"></span>Loading...
+    </div></div>
+} @else {
+
+<!-- Header Info -->
+<div class="card mb-3">
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-md-2">
+                <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Year</div>
+                <div class="fw-bold fs-5">{{ data.year || '—' }}</div>
+            </div>
+            <div class="col-md-3">
+                <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Department</div>
+                <div>{{ data.department?.name || '—' }}</div>
+            </div>
+            <div class="col-md-3">
+                <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Division</div>
+                <div>{{ data.division?.name || data.division?.abbreviation || '—' }}</div>
+            </div>
+            <div class="col-md-2">
+                <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Supplemental</div>
+                <div>{{ data.forSupplementalBudget ? 'Yes' : 'No' }}</div>
+            </div>
+            <div class="col-md-2">
+                <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Status</div>
+                <span class="badge"
+                      [ngClass]="isEditable() ? 'bg-secondary bg-opacity-25 text-dark border' : 'bg-success bg-opacity-25 text-success border'">
+                    {{ data.documentStatus?.status || '—' }}
+                </span>
+            </div>
+            <div class="col-md-3">
+                <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Prepared By</div>
+                <div>{{ data.createdBy?.fullName || '—' }}</div>
+            </div>
+            <div class="col-md-3">
+                <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Checked By</div>
+                <div>{{ data.checkedBy?.fullName || '—' }}</div>
+            </div>
+            <div class="col-md-3">
+                <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Verified By</div>
+                <div>{{ data.verifiedBy?.fullName || '—' }}</div>
+            </div>
+            <div class="col-md-3">
+                <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Approved By</div>
+                <div>{{ data.approvingOfficer?.fullName || '—' }}</div>
+            </div>
+            <div class="col-md-3">
+                <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Date</div>
+                <div>{{ data.createdAt | date:'MMMM d, yyyy' }}</div>
+            </div>
+            <div class="col-md-3">
+                <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Last Updated</div>
+                <div>{{ data.updatedAt | date:'MMMM d, yyyy HH:mm' }}</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Workflow Actions -->
+@if (workflowActions.length > 0) {
+    <div class="card mb-3">
+        <div class="card-body">
+            <div class="fw-semibold fs-xs text-uppercase text-muted mb-2">Process Document</div>
+            <div class="row g-2 align-items-end">
+                <div class="col-md-4">
+                    <label class="form-label fw-bold mb-1">Action</label>
+                    <select class="form-select" [(ngModel)]="selectedAction" [compareWith]="compareById">
+                        <option [ngValue]="null">— Select Action —</option>
+                        @for (a of workflowActions; track a.actionMapId) {
+                            <option [ngValue]="a">{{ a.action }}</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-5">
+                    <label class="form-label fw-bold mb-1">Remarks</label>
+                    <input type="text" class="form-control" [(ngModel)]="remarks" placeholder="Enter remarks"/>
+                </div>
+                <div class="col-auto">
+                    <button type="button" class="btn btn-primary fw-bold"
+                            [disabled]="!selectedAction || processingWorkflow"
+                            (click)="processWorkflow()">
+                        <ng-icon name="tablerCheck" class="ps-0 pe-3 fw-bold"></ng-icon>
+                        {{ processingWorkflow ? 'Processing...' : 'Process' }}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<!-- Budget Line Item Details -->
+<div class="card mb-3">
+    <div class="card-body">
+        <div class="fw-semibold fs-xs text-uppercase text-muted mb-3">Budget Line Item Details</div>
+
+        @for (d of details; track d.id) {
+            <div class="border rounded p-3 mb-3">
+                <div class="fw-semibold fs-xs text-uppercase mb-2">Detail {{ $index + 1 }}</div>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="fs-xs text-muted mb-1">Title</div>
+                        <div>{{ d.title || '—' }}</div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="fs-xs text-muted mb-1">Budget Line Item Code</div>
+                        <div>{{ d.code || '—' }}</div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="fs-xs text-muted mb-1">Project Type</div>
+                        <div>{{ d.projectType?.description || '—' }}</div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="fs-xs text-muted mb-1">Location</div>
+                        <div>{{ d.location || '—' }}</div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="fs-xs text-muted mb-1">Length</div>
+                        <div>{{ d.length || 0 }}</div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="fs-xs text-muted mb-1">Justification or Strategic Initiative</div>
+                        <div>{{ d.strategicInitiative?.description || '—' }}</div>
+                    </div>
+
+                    <div class="col-12"><hr class="my-1"/><div class="fs-xs text-uppercase fw-semibold mb-1">Materials</div></div>
+
+                    <div class="col-md-6">
+                        <div class="fs-xs text-muted mb-1">Specification</div>
+                        <div>{{ d.item?.description || '' }}{{ d.item?.description && d.specification ? ' — ' : '' }}{{ d.specification || (d.item?.description ? '' : '—') }}</div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="fs-xs text-muted mb-1">Quantity</div>
+                        <div>{{ d.quantity || 0 }}</div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="fs-xs text-muted mb-1">Unit Measure</div>
+                        <div>{{ d.unit?.code || d.unit?.description || '—' }}</div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="fs-xs text-muted mb-1">Unit Price</div>
+                        <div class="text-end">{{ (d.finalAmount || d.applicationAmount || 0) | number:'1.2-2' }}</div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="fs-xs text-muted mb-1">Project Cost</div>
+                        <div class="text-end fw-bold">{{ d.totalPrice | number:'1.2-2' }}</div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="fs-xs text-muted mb-1">Implementation</div>
+                        <div>{{ monthName(d.startMonth) }} – {{ monthName(d.endMonth) }} {{ d.year || '' }}</div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Document Logs -->
+<div class="card mb-3">
+    <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <span class="fw-semibold fs-xs text-uppercase text-muted">Document Logs</span>
+            <button type="button" class="btn btn-light btn-sm fw-bold" (click)="toggleLogs()">
+                {{ showLogs ? 'Hide Logs' : 'Show Logs' }}
+            </button>
+        </div>
+        @if (showLogs) {
+            @if (logsLoading) {
+                <div class="text-muted fs-xs"><span class="spinner-border spinner-border-sm me-1"></span>Loading...</div>
+            } @else if (logs.length === 0) {
+                <div class="text-muted fs-xs">No logs found.</div>
+            } @else {
+                <div class="table-responsive">
+                    <table class="table table-sm table-bordered mb-0">
+                        <thead class="bg-light thead-sm">
+                            <tr class="text-uppercase fs-xxs">
+                                <th style="width:160px">Timestamp</th>
+                                <th>Log</th>
+                                <th style="width:160px">User</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (log of logs; track log.id) {
+                                <tr>
+                                    <td class="fs-xs">{{ log.createdAt | date:'yyyy-MM-dd h:mma' }}</td>
+                                    <td class="fs-xs">{{ log.newValue }}</td>
+                                    <td class="fs-xs">{{ log.loggedBy?.fullName || '—' }}</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        }
+    </div>
+</div>
+
+<!-- Footer Actions -->
+<div class="card">
+    <div class="card-body">
+        <div class="d-flex gap-2 justify-content-end align-items-center">
+            <a [routerLink]="['/' + menuLink]" class="btn btn-light fw-bold">
+                <ng-icon name="tablerArrowLeft" class="ps-0 pe-3 fw-bold"></ng-icon>Back
+            </a>
+            @if (isEditable()) {
+                <a [routerLink]="['/' + menuLink, id, 'edit']" class="btn btn-primary fw-bold">
+                    <ng-icon name="tablerEdit" class="ps-0 pe-3 fw-bold"></ng-icon>Edit
+                </a>
+            }
+        </div>
+    </div>
+</div>
+
+}

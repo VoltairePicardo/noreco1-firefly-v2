@@ -1,0 +1,86 @@
+<div class="modal-header">
+    <h4 class="modal-title">{{ title }}</h4>
+    <button type="button" class="btn-close" (click)="cancel()"></button>
+</div>
+
+<div class="modal-body">
+
+    <form [formGroup]="form">
+
+        <!-- Check Number -->
+        <div class="mb-3">
+            <label class="form-label">Check Number</label>
+            <input
+                type="text"
+                class="form-control"
+                formControlName="checkNumber"
+                [ngClass]="{
+                    'is-invalid': form.get('checkNumber')?.invalid && (form.get('checkNumber')?.touched || form.get('checkNumber')?.dirty),
+                    'is-valid': form.get('checkNumber')?.valid && (form.get('checkNumber')?.touched || form.get('checkNumber')?.dirty)
+                }"/>
+            <div class="invalid-feedback">
+                Check Number is required.
+            </div>
+        </div>
+
+
+        <!-- Bank Name -->
+        <div class="mb-3">
+            <label class="form-label">Bank Name</label>
+            <input
+                type="text"
+                class="form-control"
+                formControlName="bankName"
+                [ngClass]="{
+                    'is-invalid': form.get('bankName')?.invalid && (form.get('bankName')?.touched || form.get('bankName')?.dirty),
+                    'is-valid': form.get('bankName')?.valid && (form.get('bankName')?.touched || form.get('bankName')?.dirty)
+                }"/>
+            <div class="invalid-feedback">
+                Bank is required.
+            </div>
+        </div>
+
+        <!-- Check Amount -->
+        <div class="mb-3">
+            <label class="form-label">Check Amount</label>
+            <input
+                type="number"
+                class="form-control"
+                formControlName="checkAmount"
+                [ngClass]="{
+                    'is-invalid': form.get('checkAmount')?.invalid && (form.get('checkAmount')?.touched || form.get('checkAmount')?.dirty),
+                    'is-valid': form.get('checkAmount')?.valid && (form.get('checkAmount')?.touched || form.get('checkAmount')?.dirty)
+                }"/>
+            <div class="invalid-feedback">
+                Please enter a valid amount.
+            </div>
+        </div>
+
+        <!-- Check Date -->
+        <div class="mb-3">
+            <label class="form-label">Check Date</label>
+            <input
+                type="date"
+                class="form-control"
+                formControlName="checkDate"
+                [ngClass]="{
+                    'is-invalid': form.get('checkDate')?.invalid && (form.get('checkDate')?.touched || form.get('checkDate')?.dirty),
+                    'is-valid': form.get('checkDate')?.valid && (form.get('checkDate')?.touched || form.get('checkDate')?.dirty)
+                }"/>
+            <div class="invalid-feedback">
+                Check Date is required.
+            </div>
+        </div>
+
+    </form>
+
+</div>
+
+<div class="modal-footer">
+    <button type="button" class="btn btn-primary" (click)="continue()">
+        Continue
+    </button>
+    <button type="button" class="btn btn-light" (click)="cancel()">
+        Cancel
+    </button>
+</div>
