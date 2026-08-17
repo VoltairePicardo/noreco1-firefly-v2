@@ -124,4 +124,7 @@ public class CheckVoucher extends Voucher implements Serializable {
     @Transient
     private List<AccountsPayableVoucherInstallmentDetail> selectedInstallmentDetails = new ArrayList<>();
 
+    @Transient
+    private BankAccount bankAccount;
+
 }

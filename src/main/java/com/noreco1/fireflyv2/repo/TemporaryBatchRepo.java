@@ -21,7 +21,7 @@ public interface TemporaryBatchRepo extends JpaRepository<TemporaryBatch, Intege
             "TemporaryBatch.remarks AS remarks, " +
             "DocumentType.id AS docTypeId, " +
             "DocumentType.description AS docTypeDesc, " +
-            "TemporaryGeneralLedger.id AS tempGLId, " +
+            "MIN(TemporaryGeneralLedger.id) AS tempGLId, " +
             "SUM(TemporaryGeneralLedger.debit) as amount, " +
             "TemporaryBatch.FK_transactionId " +
             "FROM TemporaryBatch " +

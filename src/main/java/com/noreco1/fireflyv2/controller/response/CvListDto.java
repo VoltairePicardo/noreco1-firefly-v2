@@ -17,6 +17,7 @@ public class CvListDto {
     private Boolean enableCheckBox;
     private Boolean selected;
     private String documentCode;
+    private String checkNumber;
 
     public CvListDto() {}
 
@@ -98,5 +99,13 @@ public class CvListDto {
 
     public void setDocumentCode(String documentCode) {
         this.documentCode = documentCode;
+    }
+
+    public String getCheckNumber() {
+        return checkNumber;
+    }
+
+    public void setCheckNumber(String checkNumber) {
+        this.checkNumber = checkNumber;
     }
 }

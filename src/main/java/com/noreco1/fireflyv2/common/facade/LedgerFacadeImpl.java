@@ -118,8 +118,11 @@ public class LedgerFacadeImpl implements LedgerFacade {
                                 for(FactorPercentageDistro obj:percentages) {
                                     counter++;  // used to check if end of loop
 
-                                    System.out.println("TESTERS: "+ledgerLine.getAccountId() +" - "+ obj.getBusinessSegment().getId());
                                     SegmentAccount segmentAccount = segmentAccountRepo.findOneByAccountIdAndBusinessSegmentId(ledgerLine.getAccountId(), obj.getBusinessSegment().getId());
+                                    if (segmentAccount == null) {
+                                        count++;
+                                        continue;
+                                    }
                                     BigDecimal percentage = obj.getPercentage();
 
                                     BigDecimal glShareDebit = (percentage.multiply(glAmountDebit)).setScale(2, BigDecimal.ROUND_HALF_UP);
@@ -290,9 +293,13 @@ public class LedgerFacadeImpl implements LedgerFacade {
 //                    BigDecimal glShare = new BigDecimal(obj.get("amount") != null ? obj.get("amount").toString():"0");
                     Integer segmentAccountId = (Integer)obj.get("segmentAccountId");
 
-                    // prevent insertion of GL entries having no debit or credit amount
+                    // prevent insertion of GL entries having no debit or credit amount, or no segment account
                     if (glShare == null || glShare.compareTo(BigDecimal.ZERO) == 0) {
                         count ++;
+                        continue;
+                    }
+                    if (segmentAccountId == null) {
+                        count++;
                         continue;
                     }
 

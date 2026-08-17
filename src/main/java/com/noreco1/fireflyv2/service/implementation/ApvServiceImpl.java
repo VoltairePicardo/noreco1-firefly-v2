@@ -731,7 +731,6 @@ public class ApvServiceImpl implements ApvService, PrintableVoucher {
             params.put("SUPPLIER_ADDR", payableVoucher.getVendor().getAddress());
             params.put("DUE_DATE", payableVoucher.getDueDate());
             params.put("PARTICULARS", payableVoucher.getParticulars());
-            params.put("SUBREPORT_DIR", GlobalConstant.JASPER_BASE_PATH + "/vouchers/sub_reports/");
             params = signatureFacade.getDocumentSignature(params, com.noreco1.fireflyv2.model.enums.DocumentType.APV, payableVoucher);
 
             List<Map> items = new ArrayList<>();

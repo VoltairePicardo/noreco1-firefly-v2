@@ -274,7 +274,14 @@ public class CvServiceImpl implements CvService, PrintableVoucher, PrintableCheq
             existingCv.setCheckAmount(cv.getCheckAmount());
             existingCv.setRrNumber(cv.getRrNumber());
             existingCv.setAdditionalPayeeInfo(cv.getAdditionalPayeeInfo());
-            existingCv.setBank(cv.getBank());
+            if (cv.getBank() != null) {
+                existingCv.setBank(cv.getBank());
+            } else if (cv.getBankAccount() != null && cv.getBankAccount().getId() != null) {
+                BankAccount resolvedBankAccount = bankAccountRepo.findById(cv.getBankAccount().getId()).orElse(null);
+                if (resolvedBankAccount != null) {
+                    existingCv.setBank(resolvedBankAccount.getBank());
+                }
+            }
 //            existingCv.setBudgetLineItemDetail(cv.getBudgetLineItemDetail());
             existingCv.setPurchaseOrder(cv.getPurchaseOrder());
             existingCv.setJobOrder(cv.getJobOrder());
@@ -858,7 +865,8 @@ public class CvServiceImpl implements CvService, PrintableVoucher, PrintableCheq
 
             DecimalFormat df = new DecimalFormat("#,##0.00");
 
-            params.put("SUBREPORT_DIR", GlobalConstant.JASPER_BASE_PATH + "/vouchers/sub_reports/");
+            java.net.URL subreportUrl = getClass().getResource(GlobalConstant.JASPER_BASE_PATH + "/vouchers/sub_reports/");
+            params.put("SUBREPORT_DIR", subreportUrl != null ? subreportUrl.toString() + "/" : GlobalConstant.JASPER_BASE_PATH + "/vouchers/sub_reports/");
             params.put("CASHFLOW_ACCOUNTS", new JRBeanCollectionDataSource(cashflowAccounts));
             params.put("TRANS_ID", checkVoucher.getTransaction().getId());
             params.put("VOUCHER_NO", checkVoucher.getCode());
@@ -2291,6 +2299,11 @@ public class CvServiceImpl implements CvService, PrintableVoucher, PrintableCheq
                 }
 
                 cvListDto.setDocumentCode(com.noreco1.fireflyv2.model.enums.DocumentType.CV.getCode());
+
+                List<CheckVoucherCheque> cheques = chequeRepo.findByTransactionId(cv.getTransaction().getId());
+                if (!cheques.isEmpty()) {
+                    cvListDto.setCheckNumber(cheques.get(0).getCheckNumber());
+                }
 
                 returnVouchers.add(cvListDto);
             }

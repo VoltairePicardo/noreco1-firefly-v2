@@ -7,7 +7,7 @@ import { AlertService } from '@/app/shared/services/alert.service';
 import { SharedModule } from '@/app/shared/shared.module';
 import { RrService } from '../rr.service';
 import { provideIcons } from '@ng-icons/core';
-import { tablerPrinter, tablerEdit, tablerPaperclip, tablerArrowLeft } from '@ng-icons/tabler-icons';
+import { tablerPrinter, tablerEdit, tablerPaperclip, tablerArrowLeft, tablerEye, tablerEyeOff, tablerCheck } from '@ng-icons/tabler-icons';
 
 const TERMINAL_STATUSES = ['Approved', 'Denied', 'Cancelled'];
 
@@ -15,7 +15,7 @@ const TERMINAL_STATUSES = ['Approved', 'Denied', 'Cancelled'];
     selector: 'app-rr-detail',
     imports: [...COMMON_ALL_PAGE_IMPORTS, SharedModule, FormsModule, RouterLink],
     templateUrl: './rr-detail.component.html',
-    providers: [provideIcons({ tablerPrinter, tablerEdit, tablerPaperclip, tablerArrowLeft })]
+    providers: [provideIcons({ tablerPrinter, tablerEdit, tablerPaperclip, tablerArrowLeft, tablerEye, tablerEyeOff, tablerCheck })]
 })
 export class RrDetailComponent {
     module    = 'Receiving Report';

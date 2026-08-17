@@ -6,21 +6,17 @@ import {
     COMMON_MAIN_PAGE_IMPORTS,
     SHARED_PROVIDERS
 } from '@/app/shared/providers/shared-providers';
-import { SharedModule } from '@/app/shared/shared.module';
-import { LaddaModule } from 'angular2-ladda';
 import { AccountsPayableVoucherService } from '../accounts-payable-voucher.service';
 import { provideIcons } from '@ng-icons/core';
-import { tablerCheck, tablerHistory, tablerPencil, tablerPrinter, tablerArrowLeft } from '@ng-icons/tabler-icons';
+import { tablerCheck, tablerHistory, tablerEdit, tablerPrinter, tablerArrowLeft } from '@ng-icons/tabler-icons';
 
 @Component({
     selector: 'app-accounts-payable-voucher-detail',
     imports: [
         ...COMMON_ALL_PAGE_IMPORTS,
-        ...COMMON_MAIN_PAGE_IMPORTS,
-        SharedModule,
-        LaddaModule
+        ...COMMON_MAIN_PAGE_IMPORTS
     ],
-    providers: [...SHARED_PROVIDERS, provideIcons({ tablerCheck, tablerHistory, tablerPencil, tablerPrinter, tablerArrowLeft })],
+    providers: [...SHARED_PROVIDERS, provideIcons({ tablerCheck, tablerHistory, tablerEdit, tablerPrinter, tablerArrowLeft })],
     templateUrl: './accounts-payable-voucher-detail.component.html'
 })
 export class AccountsPayableVoucherDetailComponent {
@@ -97,7 +93,7 @@ export class AccountsPayableVoucherDetailComponent {
         this.service.getWorkflowActions(transId).subscribe({
             next: (actions) => {
                 this.workflowActions = actions || [];
-                this.selectedAction  = this.workflowActions.length > 0 ? this.workflowActions[0] : null;
+                this.selectedAction  = null;
             },
             error: () => {
                 this.workflowActions = [];
@@ -112,7 +108,7 @@ export class AccountsPayableVoucherDetailComponent {
         );
     }
 
-    get isEditable(): boolean {
+    isEditable(): boolean {
         const status = this.data?.documentStatus?.status || '';
         return status === 'Document Created' || status === 'For Revision';
     }
@@ -134,9 +130,10 @@ export class AccountsPayableVoucherDetailComponent {
         this.processingWorkflow = true;
 
         const payload = {
-            actionMapId: this.selectedAction.actionMapId,
-            documentId:  this.data.id,
-            remarks:     this.remarks
+            documentId:         this.data.id,
+            transId:            this.data.transId,
+            workflowActionsDto: this.selectedAction,
+            remarks:            this.remarks || ''
         };
 
         this.service.process(payload).subscribe({
@@ -182,12 +179,4 @@ export class AccountsPayableVoucherDetailComponent {
         this.service.print(this.id);
     }
 
-    statusBadgeClass(status: string): string {
-        if (!status) return 'bg-secondary bg-opacity-25 text-dark border';
-        const s = status.toLowerCase();
-        if (s.includes('approved'))                     return 'bg-success bg-opacity-25 text-success border border-success';
-        if (s.includes('pending') || s.includes('draft') || s.includes('created'))
-                                                        return 'bg-warning bg-opacity-25 text-warning border border-warning';
-        return 'bg-secondary bg-opacity-25 text-dark border';
-    }
 }

@@ -466,6 +466,7 @@ export class RrAddEditComponent {
                 id:               row.id               || null,
                 poDetailId:       row.poDetailId        || null,
                 joDetailId:       row.joDetailId        || null,
+                rvDetailId:       row.rvDetailId        || null,
                 itemId:           row.itemId            || null,
                 itemDescription:  row.itemDescription   || '',
                 unitCode:         row.unitCode          || '',
