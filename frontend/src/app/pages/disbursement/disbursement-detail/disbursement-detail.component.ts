@@ -4,12 +4,12 @@ import { AlertService } from '@/app/shared/services/alert.service';
 import { COMMON_ALL_PAGE_IMPORTS, COMMON_MAIN_PAGE_IMPORTS, SHARED_PROVIDERS } from '@/app/shared/providers/shared-providers';
 import { DisbursementService } from '../disbursement.service';
 import { provideIcons } from '@ng-icons/core';
-import { tablerArrowLeft, tablerPrinter, tablerEdit, tablerHistory } from '@ng-icons/tabler-icons';
+import { tablerArrowLeft, tablerPrinter, tablerEdit, tablerCheck, tablerEye, tablerEyeOff } from '@ng-icons/tabler-icons';
 
 @Component({
     selector: 'app-disbursement-detail',
     imports: [...COMMON_ALL_PAGE_IMPORTS, ...COMMON_MAIN_PAGE_IMPORTS],
-    providers: [...SHARED_PROVIDERS, provideIcons({ tablerArrowLeft, tablerPrinter, tablerEdit, tablerHistory })],
+    providers: [...SHARED_PROVIDERS, provideIcons({ tablerArrowLeft, tablerPrinter, tablerEdit, tablerCheck, tablerEye, tablerEyeOff })],
     templateUrl: './disbursement-detail.component.html'
 })
 export class DisbursementDetailComponent {
@@ -21,8 +21,8 @@ export class DisbursementDetailComponent {
     journalEntries: any[] = [];
     iemopBillings : any[] = [];
     attachments   : any[] = [];
-    isLoading   = signal(false);
-    formSubmit  = false;
+    isLoading          = signal(false);
+    processingWorkflow = false;
 
     workflowActions: any[] = [];
     selectedAction: any    = null;
@@ -80,7 +80,7 @@ export class DisbursementDetailComponent {
 
     processWorkflow(): void {
         if (!this.selectedAction) return;
-        this.formSubmit = true;
+        this.processingWorkflow = true;
         const payload = {
             documentId:         this.data.id,
             transId:            this.data.transId,
@@ -89,7 +89,7 @@ export class DisbursementDetailComponent {
         };
         this.service.process(payload).subscribe({
             next: (res) => {
-                this.formSubmit = false;
+                this.processingWorkflow = false;
                 if (res.success) {
                     this.alertService.success(this.module, 'Processed', '');
                     this.loadData();
@@ -97,7 +97,7 @@ export class DisbursementDetailComponent {
                     this.alertService.error(this.module, 'Process', res.failureMessage || '');
                 }
             },
-            error: () => { this.formSubmit = false; this.alertService.error(this.module, 'Process', ''); }
+            error: () => { this.processingWorkflow = false; this.alertService.error(this.module, 'Process', ''); }
         });
     }
 

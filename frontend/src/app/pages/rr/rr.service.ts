@@ -5,7 +5,6 @@ import { environment } from '@/environments/environment';
 import { DownloadService } from '@/app/core/services/download.service';
 
 const BASE_API = environment.get('baseApiUrl');
-const BASE_URL = environment.get('baseUrl');
 const httpOptions = { headers: new HttpHeaders({ 'Content-Type': 'application/json' }) };
 
 @Injectable({ providedIn: 'root' })
@@ -45,31 +44,31 @@ export class RrService {
     }
 
     getWorkflowActions(transId: number): Observable<any[]> {
-        return this.http.get<any[]>(`${BASE_URL}/json/workflow-actions/${transId}`);
+        return this.http.get<any[]>(`${BASE_API}/json/workflow-actions/${transId}`);
     }
 
     getDocumentLogs(transId: number): Observable<any[]> {
-        return this.http.post<any[]>(`${BASE_URL}/document/${transId}/logs`, {}, httpOptions);
+        return this.http.post<any[]>(`${BASE_API}/document/${transId}/logs`, {}, httpOptions);
     }
 
     print(id: number): void {
-        this.downloadService.print(`${BASE_URL}/rr/export/${id}`, { type: 'pdf' });
+        this.downloadService.print(`${BASE_API}/rr/export/${id}`, { type: 'pdf' });
     }
 
     getInventoryLocations(): Observable<any[]> {
-        return this.http.get<any[]>(`${BASE_API}/rr/inventory-locations`);
+        return this.http.get<any[]>(`${BASE_API}/inventory-location/all`);
     }
 
     getPurchaseOrderDetailsForRR(poId: number): Observable<any[]> {
-        return this.http.get<any[]>(`${BASE_API}/rr/po-details/${poId}`);
+        return this.http.get<any[]>(`${BASE_API}/po-detail/pod/${poId}`);
     }
 
     getPurchaseOrderDetailsWithItemTesting(poId: number): Observable<any[]> {
-        return this.http.get<any[]>(`${BASE_API}/rr/po-details-item-testing/${poId}`);
+        return this.http.get<any[]>(`${BASE_API}/po-detail/pod-with-item-testing/${poId}`);
     }
 
     getJobOrderDetailsForRR(joId: number): Observable<any[]> {
-        return this.http.get<any[]>(`${BASE_API}/rr/jo-details/${joId}`);
+        return this.http.get<any[]>(`${BASE_API}/job-order/detail/${joId}`);
     }
 
     getDefaultSignatories(): Observable<any> {

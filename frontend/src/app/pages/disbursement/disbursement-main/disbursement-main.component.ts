@@ -36,7 +36,7 @@ export class DisbursementMainComponent {
     get filteredRecords(): any[] {
         if (!this.searchText.trim()) return this.records();
         const q = this.searchText.toLowerCase();
-        return this.records().filter((r: any) => (r.localCode || r.code || '').toLowerCase().includes(q));
+        return this.records().filter((r: any) => (r.code || '').toLowerCase().includes(q));
     }
 
     get pagedRecords(): any[] {

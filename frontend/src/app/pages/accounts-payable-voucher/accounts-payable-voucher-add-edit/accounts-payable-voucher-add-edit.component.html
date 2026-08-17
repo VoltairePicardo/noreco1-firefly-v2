@@ -5,7 +5,7 @@
 <div class="container-fluid">
     <div class="row">
         <div class="col-xl-12">
-            <app-ui-card [title]="module + ' Form'">
+            <app-ui-card [title]="module + ' Details'">
                 <div class="col-xl-12 p-3" card-body>
 
                     @if (isLoading()) {
@@ -60,7 +60,7 @@
 
                     <!-- Vendor row -->
                     <div class="row g-3 mt-1">
-                        <div class="col-md-8">
+                        <div class="col-md-6">
                             <label class="form-label fw-bold">Vendor / Supplier <span class="text-danger">*</span></label>
                             <div class="input-group">
                                 <input type="text"
@@ -71,25 +71,22 @@
                                 <button type="button"
                                         class="btn btn-success fw-bold"
                                         (click)="openVendorBrowse()">
-                                    <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
+                                    <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
                                 </button>
                                 @if (vendor) {
-                                    <button type="button" class="btn btn-danger fw-bold" (click)="clearVendor()">
-                                        <ng-icon name="tablerX" class="ps-0 pe-0 fw-bold"></ng-icon>
+                                    <button type="button" class="btn btn-light" (click)="clearVendor()">
+                                        <ng-icon name="tablerX" class="fw-bold"></ng-icon>
                                     </button>
                                 }
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Particulars row -->
-                    <div class="row g-3 mt-1">
-                        <div class="col-md-12">
+                        <div class="col-md-6">
                             <label class="form-label fw-bold">Particulars</label>
                             <textarea class="form-control"
                                       [(ngModel)]="particulars"
                                       [ngModelOptions]="{ standalone: true }"
-                                      rows="2"
+                                      rows="1"
                                       placeholder="Enter particulars..."></textarea>
                         </div>
                     </div>
@@ -122,6 +119,8 @@
                     </div>
 
                     <!-- Signatories -->
+                    <hr class="mt-3 mb-1"/>
+                    <h6 class="fw-bold text-muted text-uppercase fs-xxs mb-0">Signatories</h6>
                     <div class="row g-3 mt-1">
                         <div class="col-md-6">
                             <label class="form-label fw-bold">Checked By</label>
@@ -134,11 +133,11 @@
                                 <button type="button"
                                         class="btn btn-success fw-bold"
                                         (click)="openSignatoryBrowse('checker')">
-                                    <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
+                                    <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
                                 </button>
                                 @if (checker) {
-                                    <button type="button" class="btn btn-danger fw-bold" (click)="clearSignatory('checker')">
-                                        <ng-icon name="tablerX" class="ps-0 pe-0 fw-bold"></ng-icon>
+                                    <button type="button" class="btn btn-light" (click)="clearSignatory('checker')">
+                                        <ng-icon name="tablerX" class="fw-bold"></ng-icon>
                                     </button>
                                 }
                             </div>
@@ -154,11 +153,11 @@
                                 <button type="button"
                                         class="btn btn-success fw-bold"
                                         (click)="openSignatoryBrowse('approvingOfficer')">
-                                    <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
+                                    <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
                                 </button>
                                 @if (approvingOfficer) {
-                                    <button type="button" class="btn btn-danger fw-bold" (click)="clearSignatory('approvingOfficer')">
-                                        <ng-icon name="tablerX" class="ps-0 pe-0 fw-bold"></ng-icon>
+                                    <button type="button" class="btn btn-light" (click)="clearSignatory('approvingOfficer')">
+                                        <ng-icon name="tablerX" class="fw-bold"></ng-icon>
                                     </button>
                                 }
                             </div>
@@ -166,10 +165,11 @@
                     </div>
 
                     <!-- IEMOP Billings section -->
-                    <div class="row mt-4">
+                    <hr class="mt-3 mb-1"/>
+                    <div class="row mt-2">
                         <div class="col-12">
                             <div class="d-flex align-items-center justify-content-between mb-2">
-                                <h6 class="fw-semibold text-uppercase fs-xs mb-0">IEMOP Billings</h6>
+                                <h6 class="fw-bold text-muted text-uppercase fs-xxs mb-0">IEMOP Billings</h6>
                                 <button type="button"
                                         class="btn btn-success fw-bold"
                                         (click)="openIemopBrowse()">
@@ -222,17 +222,20 @@
                     </div>
 
                     <!-- Journal Entries section -->
-                    <div class="row mt-4">
+                    <hr class="mt-3 mb-1"/>
+                    <h6 class="fw-bold text-muted text-uppercase fs-xxs mb-0">Journal Entries</h6>
+                    <div class="row mt-2">
                         <div class="col-12">
                             <app-journal-entries-form [entries]="journalEntries"></app-journal-entries-form>
                         </div>
                     </div>
 
                     <!-- Attachments section -->
-                    <div class="row mt-4">
+                    <hr class="mt-3 mb-1"/>
+                    <div class="row mt-2">
                         <div class="col-12">
                             <div class="d-flex align-items-center justify-content-between mb-2">
-                                <h6 class="fw-semibold text-uppercase fs-xs mb-0">Attachments</h6>
+                                <h6 class="fw-bold text-muted text-uppercase fs-xxs mb-0">Attachments</h6>
                                 <label class="btn btn-success fw-bold mb-0" style="cursor:pointer">
                                     <ng-icon name="tablerPaperclip" class="ps-0 pe-2 fw-bold"></ng-icon>Attach File
                                     <input type="file" multiple class="d-none" (change)="onFileChange($event)"/>
@@ -265,10 +268,14 @@
                         <a [routerLink]="['/' + menuLink]" class="btn btn-light fw-bold">
                             <ng-icon name="tablerArrowLeft" class="ps-0 pe-3 fw-bold"></ng-icon>Back
                         </a>
-                        <button type="button" class="btn btn-primary fw-bold"
-                                [disabled]="formSubmit" (click)="save()">
-                            <ng-icon name="tablerCheck" class="ps-0 pe-3 fw-bold"></ng-icon>
-                            {{ editMode ? 'Update' : 'Save' }}
+                        <button type="button" class="btn btn-primary fw-bold" [disabled]="formSubmit" (click)="save()">
+                            @if (formSubmit) {
+                                <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                                {{ editMode ? 'Updating...' : 'Saving...' }}
+                            } @else {
+                                <ng-icon name="tablerCheck" class="ps-0 pe-3 fw-bold"></ng-icon>
+                                {{ editMode ? 'Update' : 'Save ' + module }}
+                            }
                         </button>
                     </div>
 

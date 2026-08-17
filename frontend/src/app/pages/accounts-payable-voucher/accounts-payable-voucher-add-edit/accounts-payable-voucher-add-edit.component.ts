@@ -7,7 +7,6 @@ import {
     COMMON_MAIN_PAGE_IMPORTS,
     SHARED_PROVIDERS
 } from '@/app/shared/providers/shared-providers';
-import { LaddaModule } from 'angular2-ladda';
 import { FlatpickrDirective, provideFlatpickrDefaults } from 'angularx-flatpickr';
 import { AccountsPayableVoucherService } from '../accounts-payable-voucher.service';
 import { ModalService } from '@/app/shared/modals/modal-service';
@@ -23,7 +22,6 @@ import { tablerCheck, tablerArrowLeft, tablerSearch, tablerPlus, tablerTrash, ta
         ...COMMON_ALL_PAGE_IMPORTS,
         ...COMMON_ADD_EDIT_PAGE_IMPORTS,
         ...COMMON_MAIN_PAGE_IMPORTS,
-        LaddaModule,
         FlatpickrDirective,
         JournalEntriesFormComponent
     ],

@@ -76,7 +76,7 @@
                                             <td>{{ rec.supplier?.name || '—' }}</td>
                                             <td class="text-end fw-bold">{{ rec.totalAmount | number:'1.2-2' }}</td>
                                             <td>{{ rec.receivedBy || rec.preparedBy || '—' }}</td>
-                                            <td><span class="badge bg-secondary bg-opacity-25 text-dark border">{{ rec.documentStatus?.status || '—' }}</span></td>
+                                            <td><span class="badge bg-secondary bg-opacity-25 text-dark border">{{ rec.documentStatus || '—' }}</span></td>
                                             <td class="text-nowrap">
                                                 <div class="d-flex justify-content-end gap-1">
                                                     <a href="javascript:void(0)" ngbTooltip="View"

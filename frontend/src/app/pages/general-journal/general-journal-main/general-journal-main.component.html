@@ -9,6 +9,16 @@
 
                 <!-- Filters -->
                 <div class="row mb-3 align-items-end g-2">
+                    <div class="col-md-auto ms-auto">
+                        <button type="button" class="btn btn-primary d-flex align-items-center gap-2 fw-bold"
+                                [routerLink]="['/' + menuLink + '/create']">
+                            <ng-icon name="tablerPlus" class="fw-bold"></ng-icon>
+                            Create {{ module }}
+                        </button>
+                    </div>
+                </div>
+
+                <div class="row mb-3 align-items-end g-2">
                     <div class="col-md-2">
                         <label class="form-label fw-bold mb-1 fs-xs text-uppercase">From</label>
                         <input type="text" mwlFlatpickr [options]="flatpickrOptions"
@@ -36,17 +46,10 @@
                     </div>
                     <div class="col-auto d-flex gap-2">
                         <button type="button" class="btn btn-success fw-bold" (click)="load()">
-                            <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Search
+                            <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Search
                         </button>
                         <button type="button" class="btn btn-danger fw-bold" (click)="reset()">
-                            <ng-icon name="tablerRefresh" class="ps-0 pe-2 fw-bold"></ng-icon>Reset
-                        </button>
-                    </div>
-                    <div class="col-md-auto ms-auto">
-                        <button type="button" class="btn btn-primary d-flex align-items-center gap-2 fw-bold"
-                                [routerLink]="['/' + menuLink + '/create']">
-                            <ng-icon name="tablerPlus" class="fw-bold"></ng-icon>
-                            Create {{ module }}
+                            <ng-icon name="tablerRefresh" class="ps-0 pe-3 fw-bold"></ng-icon>Reset
                         </button>
                     </div>
                 </div>

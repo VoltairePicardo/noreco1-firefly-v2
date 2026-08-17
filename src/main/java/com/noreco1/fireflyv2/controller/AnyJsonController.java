@@ -1,5 +1,6 @@
 package com.noreco1.fireflyv2.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.noreco1.fireflyv2.common.facade.AuthenticationFacade;
 import com.noreco1.fireflyv2.common.facade.SettingFacade;
 import com.noreco1.fireflyv2.common.helpers.Checker;
@@ -242,9 +243,40 @@ public class AnyJsonController {
     }
 
     @GetMapping(value = "/document-logs/{transId}")
-    
-    public List<DocumentLog> logs(@PathVariable Integer transId) {
-        return documentLogRepo.findAllByTransactionIdOrderByCreatedAtDesc(transId);
+    public List<Map<String, Object>> logs(@PathVariable Integer transId) {
+        List<DocumentLog> rawLogs = documentLogRepo.findAllByTransactionIdOrderByCreatedAtDesc(transId);
+        ObjectMapper mapper = new ObjectMapper();
+        List<Map<String, Object>> result = new ArrayList<>();
+        for (DocumentLog log : rawLogs) {
+            Map<String, Object> dto = new LinkedHashMap<>();
+            dto.put("id",        log.getId());
+            dto.put("createdAt", log.getCreatedAt());
+
+            // map loggedBy → createdBy
+            Map<String, Object> createdBy = new HashMap<>();
+            if (log.getLoggedBy() != null) {
+                createdBy.put("fullName", log.getLoggedBy().getFullName());
+                createdBy.put("username", log.getLoggedBy().getUsername());
+            }
+            dto.put("createdBy", createdBy);
+
+            // parse newValue JSON to extract action (documentStatus) and remarks
+            String action  = null;
+            String remarks = null;
+            if (log.getNewValue() != null && !log.getNewValue().isEmpty()) {
+                try {
+                    @SuppressWarnings("unchecked")
+                    Map<String, Object> newValueMap = mapper.readValue(log.getNewValue(), Map.class);
+                    action  = (String) newValueMap.get("documentStatus");
+                    remarks = (String) newValueMap.get("remarks");
+                } catch (Exception ignored) { }
+            }
+            dto.put("action",  action  != null ? action  : "");
+            dto.put("remarks", remarks != null ? remarks : "");
+
+            result.add(dto);
+        }
+        return result;
     }
 
     @GetMapping(value = "/setting/{code}")
