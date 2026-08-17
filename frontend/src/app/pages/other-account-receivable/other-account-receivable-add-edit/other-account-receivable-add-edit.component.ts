@@ -203,7 +203,8 @@ export class OtherAccountReceivableAddEditComponent {
                     this.alertService.success(this.module, 'Saved successfully.', '');
                     this.router.navigate(['/' + this.menuLink, res.modelId, 'detail']);
                 } else {
-                    this.alertService.error(this.module, 'Save failed.', res?.failureMessage || '');
+                    const msg = res?.messages?.[0] || res?.failureMessage || '';
+                    this.alertService.error(this.module, 'Save failed.', msg);
                 }
             },
             error: () => { this.formSubmit = false; this.alertService.error(this.module, 'An error occurred.', ''); }

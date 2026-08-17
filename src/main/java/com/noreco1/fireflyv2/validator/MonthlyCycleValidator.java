@@ -25,7 +25,7 @@ public class MonthlyCycleValidator implements Validator {
         MonthlyCycle cycle = monthlyCycleRepo.findByYearAndMonth(mc.getYear(), mc.getMonth());
 
         if (cycle != null) {
-            if (!mc.getId().equals(cycle.getId())) { // compare with other cycle
+            if (mc.getId() == null || !mc.getId().equals(cycle.getId())) { // compare with other cycle
                 errors.rejectValue("year", "monthly.cycle.taken");
             }
         }

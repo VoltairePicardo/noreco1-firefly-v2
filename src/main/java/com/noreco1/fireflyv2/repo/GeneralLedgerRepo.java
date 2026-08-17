@@ -23,34 +23,34 @@ public interface GeneralLedgerRepo extends JpaRepository<GeneralLedger, Integer>
             "SegmentAccount.FK_accountId as accountId, " +
             "SUM(GeneralLedger.debit) AS debit, " +
             "SUM(GeneralLedger.credit) AS credit, " +
-            "GeneralLedger.id, " +
+            "MIN(GeneralLedger.id) AS id, " +
             "IF(debit-credit > 0 , 1, 2) as side " +
             "FROM GeneralLedger " +
             "JOIN SegmentAccount ON GeneralLedger.FK_segmentAccountId = SegmentAccount.id " +
             "WHERE GeneralLedger.FK_transactionId = :transId " +
             "GROUP BY SegmentAccount.FK_accountId, side " +
-            "ORDER BY GeneralLedger.id) as gl  " +
+            "ORDER BY id) as gl  " +
             "JOIN Account ON gl.accountId = Account.id", nativeQuery = true)
     public List<Object[]> findByTransactionIdGroupByAccount(@Param("transId") Integer transId);
 
     @Query(value = "SELECT " +
-            "debit, " +
-            "credit, " +
+            "SUM(debit) AS debit, " +
+            "SUM(credit) AS credit, " +
             "Account.id, " +
             "Account.code, " +
             "Account.title, " +
-            "gl.id  as glId " +
+            "MIN(gl.id) as glId " +
             "FROM(SELECT " +
             "SegmentAccount.FK_accountId as accountId, " +
             "SUM(GeneralLedger.debit) AS debit, " +
             "SUM(GeneralLedger.credit) AS credit, " +
-            "GeneralLedger.id, " +
+            "MIN(GeneralLedger.id) AS id, " +
             "IF(debit-credit > 0 , 1, 2) as side " +
             "FROM GeneralLedger " +
             "JOIN SegmentAccount ON GeneralLedger.FK_segmentAccountId = SegmentAccount.id " +
             "WHERE GeneralLedger.FK_transactionId = :transId " +
             "GROUP BY SegmentAccount.FK_accountId, side " +
-            "ORDER BY GeneralLedger.id) as gl  " +
+            "ORDER BY id) as gl  " +
             "JOIN Account ON gl.accountId = Account.id " +
             "LEFT JOIN TaxCode ON Account.id = TaxCode.FK_accountId " +
             "WHERE TaxCode.id is null " +

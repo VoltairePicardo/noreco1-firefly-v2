@@ -6,6 +6,7 @@ import com.noreco1.fireflyv2.model.User;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by Personal on 1/26/2016.
@@ -23,6 +24,7 @@ public class OtherAccountReceivableDto {
     private DocumentStatus documentStatus;
     private Date lastUpdated;
     private Date created;
+    private List<GeneralLedgerLineDto> journalEntries;
 
     public OtherAccountReceivableDto() {
     }
@@ -135,5 +137,13 @@ public class OtherAccountReceivableDto {
 
     public void setPreparedBy(User preparedBy) {
         this.preparedBy = preparedBy;
+    }
+
+    public List<GeneralLedgerLineDto> getJournalEntries() {
+        return journalEntries;
+    }
+
+    public void setJournalEntries(List<GeneralLedgerLineDto> journalEntries) {
+        this.journalEntries = journalEntries;
     }
 }

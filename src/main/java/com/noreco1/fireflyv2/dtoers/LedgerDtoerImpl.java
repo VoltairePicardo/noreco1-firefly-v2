@@ -104,6 +104,7 @@ public class LedgerDtoerImpl implements LedgerDtoer {
                 lineDto.setDebit(line.getDebit());
                 lineDto.setDescription(description);
                 lineDto.setId(line.getId());
+                lineDto.setAccountId(acctId);
                 lineDto.setSegmentAccountCode(code);
                 lineDto.setSegmentAccountId(segmentId);
 

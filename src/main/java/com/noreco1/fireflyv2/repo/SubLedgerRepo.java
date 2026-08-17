@@ -14,10 +14,10 @@ public interface SubLedgerRepo extends JpaRepository<SubLedger, Integer> {
     public List<SubLedger> findByTransactionIdAndSegmentAccountId(Integer transId, Integer accountId);
 
     @Query(value = "select " +
-            "SubLedger.id, " +
+            "MIN(SubLedger.id), " +
             "SubLedger.FK_accountNo, " +
-            "slentity.name, " +
-            "SegmentAccount.FK_accountId, " +
+            "MIN(slentity.name), " +
+            "MIN(SegmentAccount.FK_accountId), " +
             "SUM(SubLedger.debit + SubLedger.credit) AS amount, " +
             "SUM(SubLedger.debit), " +
             "SUM(SubLedger.credit) " +
@@ -30,10 +30,10 @@ public interface SubLedgerRepo extends JpaRepository<SubLedger, Integer> {
     public List<Object[]> findByTransactionIdAndAccountId(@Param("transId") Integer transId, @Param("accountId") Integer accountId);
 
     @Query(value = "select " +
-            "SubLedger.id, " +
+            "MIN(SubLedger.id), " +
             "SubLedger.FK_accountNo, " +
-            "slentity.name, " +
-            "SegmentAccount.FK_accountId, " +
+            "MIN(slentity.name), " +
+            "MIN(SegmentAccount.FK_accountId), " +
             "SUM(SubLedger.debit + SubLedger.credit) AS amount " +
             "from SubLedger " +
             "JOIN SegmentAccount ON SubLedger.FK_segmentAccountId = SegmentAccount.id " +
@@ -45,10 +45,10 @@ public interface SubLedgerRepo extends JpaRepository<SubLedger, Integer> {
     List<Object[]> findByTransactionIdAndAccountIdAndDebit(@Param("transId") Integer transId, @Param("accountId") Integer accountId);
 
     @Query(value = "select " +
-            "SubLedger.id, " +
+            "MIN(SubLedger.id), " +
             "SubLedger.FK_accountNo, " +
-            "slentity.name, " +
-            "SegmentAccount.FK_accountId, " +
+            "MIN(slentity.name), " +
+            "MIN(SegmentAccount.FK_accountId), " +
             "SUM(SubLedger.debit + SubLedger.credit) AS amount " +
             "from SubLedger " +
             "JOIN SegmentAccount ON SubLedger.FK_segmentAccountId = SegmentAccount.id " +
@@ -60,10 +60,10 @@ public interface SubLedgerRepo extends JpaRepository<SubLedger, Integer> {
     List<Object[]> findByTransactionIdAndAccountIdAndCredit(@Param("transId") Integer transId, @Param("accountId") Integer accountId);
 
     @Query(value = "select " +
-            "SubLedger.id, " +
+            "MIN(SubLedger.id), " +
             "SubLedger.FK_accountNo, " +
-            "slentity.name, " +
-            "SegmentAccount.FK_accountId, " +
+            "MIN(slentity.name), " +
+            "MIN(SegmentAccount.FK_accountId), " +
             "SUM(SubLedger.debit + SubLedger.credit) AS amount " +
             "from SubLedger " +
             "JOIN SegmentAccount ON SubLedger.FK_segmentAccountId = SegmentAccount.id " +

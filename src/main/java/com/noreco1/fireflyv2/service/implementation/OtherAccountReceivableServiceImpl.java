@@ -2,6 +2,7 @@ package com.noreco1.fireflyv2.service.implementation;
 
 import com.noreco1.fireflyv2.common.GlobalConstant;
 import com.noreco1.fireflyv2.common.facade.*;
+import com.noreco1.fireflyv2.dtoers.DocumentDtoer;
 import com.noreco1.fireflyv2.common.helpers.Checker;
 import com.noreco1.fireflyv2.common.helpers.MessageFormatter;
 import com.noreco1.fireflyv2.common.helpers.ReportUtil;
@@ -22,6 +23,7 @@ import org.springframework.validation.BindingResult;
 import com.noreco1.fireflyv2.common.helpers.CurrencyIntoWords;
 
 import jakarta.servlet.http.HttpServletRequest;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -83,6 +85,9 @@ public class OtherAccountReceivableServiceImpl implements OtherAccountReceivable
     SignatureFacade signatureFacade;
 
     @Autowired
+    DocumentDtoer documentDtoer;
+
+    @Autowired
     EmployeeRepo employeeRepo;
 
     @Override
@@ -131,6 +136,7 @@ public class OtherAccountReceivableServiceImpl implements OtherAccountReceivable
             oarDto.setCreated(oar.getCreatedAt());
             oarDto.setLastUpdated(oar.getUpdatedAt());
             oarDto.setPreparedBy(oar.getCreatedBy());
+            oarDto.setJournalEntries(ledgerDtoers.getGLEntriesDtoByTrans(oar.getTransaction().getId()));
         }
 
         return  oarDto;
@@ -203,7 +209,7 @@ public class OtherAccountReceivableServiceImpl implements OtherAccountReceivable
 
     @Override
     public List<DocumentStatus> getDocumentsStatuses() {
-        return null;
+        return documentDtoer.getDocumentStatuses(com.noreco1.fireflyv2.model.enums.Workflow.OTHER_ACCOUNT_RECEIVABLE.getId());
     }
 
     @Override
@@ -321,7 +327,12 @@ public class OtherAccountReceivableServiceImpl implements OtherAccountReceivable
             existingOar.setApprovingOfficer(approvingOfficer);
             existingOar.setChecker(checker);
             existingOar.setYear(voucherYear);
-            existingOar.setAmount(oar.getAmount());
+            BigDecimal totalAmount = oar.getGeneralLedgerLines() != null
+                ? oar.getGeneralLedgerLines().stream()
+                    .map(gl -> gl.getDebit() != null ? gl.getDebit() : BigDecimal.ZERO)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add)
+                : BigDecimal.ZERO;
+            existingOar.setAmount(totalAmount);
 
             this.model = oarRepo.save(existingOar);
 

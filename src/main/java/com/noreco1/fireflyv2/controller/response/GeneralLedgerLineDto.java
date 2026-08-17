@@ -7,6 +7,7 @@ import java.math.BigDecimal;
  */
 public class GeneralLedgerLineDto {
     private Integer id;
+    private Integer accountId;
     private Integer segmentAccountId;
     private String segmentAccountCode;
     private String description;
@@ -23,6 +24,14 @@ public class GeneralLedgerLineDto {
 
     public void setId(Integer id) {
         this.id = id;
+    }
+
+    public Integer getAccountId() {
+        return accountId;
+    }
+
+    public void setAccountId(Integer accountId) {
+        this.accountId = accountId;
     }
 
     public Integer getSegmentAccountId() {
@@ -63,6 +72,10 @@ public class GeneralLedgerLineDto {
 
     public void setSegmentAccountCode(String segmentAccountCode) {
         this.segmentAccountCode = segmentAccountCode;
+    }
+
+    public String getCode() {
+        return segmentAccountCode;
     }
 
     public Boolean getHasSL() {

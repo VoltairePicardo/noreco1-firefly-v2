@@ -5,7 +5,7 @@
 <div class="container-fluid">
     <div class="row">
         <div class="col-xl-12">
-            <app-ui-card [title]="module + ' Form'">
+            <app-ui-card [title]="module + ' Details'">
                 <div class="col-xl-12 p-3" card-body>
 
                     @if (isLoading()) {
@@ -31,7 +31,8 @@
                         </div>
                     </div>
 
-                    <hr class="mt-4"/>
+                    <hr class="mt-3 mb-1"/>
+                    <h6 class="fw-bold text-muted text-uppercase fs-xxs mb-0">Journal Entries</h6>
 
                     <!-- Journal Entries -->
                     <div class="row mt-3">
@@ -45,13 +46,11 @@
                         </div>
                     </div>
 
-                    <hr class="mt-4"/>
+                    <hr class="mt-3 mb-1"/>
+                    <h6 class="fw-bold text-muted text-uppercase fs-xxs mb-0">Signatories</h6>
 
                     <!-- Signatories -->
                     <div class="row mt-3">
-                        <div class="col-12 mb-2">
-                            <h6 class="fw-semibold text-uppercase fs-xs mb-0">Signatories</h6>
-                        </div>
                         @for (key of signatoryKeys; track key) {
                             <div class="col-md-6 mb-3">
                                 <label class="form-label fw-bold">{{ signatoryLabels[key] }}</label>
@@ -61,13 +60,8 @@
                                            readonly placeholder="Select signatory..."/>
                                     <button type="button" class="btn btn-success fw-bold"
                                             (click)="openEntityBrowse(key)">
-                                        <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
+                                        <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
                                     </button>
-                                    @if (signatories[key]) {
-                                        <button type="button" class="btn btn-light" (click)="clearSignatory(key)">
-                                            <ng-icon name="tablerX" class="fw-bold"></ng-icon>
-                                        </button>
-                                    }
                                 </div>
                                 @if (signatories[key]?.position) {
                                     <small class="text-muted">{{ signatories[key].position }}</small>
@@ -80,10 +74,14 @@
                         <a [routerLink]="['/' + menuLink]" class="btn btn-light fw-bold">
                             <ng-icon name="tablerArrowLeft" class="ps-0 pe-3 fw-bold"></ng-icon>Back
                         </a>
-                        <button type="button" class="btn btn-primary fw-bold"
-                                [disabled]="formSubmit" (click)="save()">
-                            <ng-icon name="tablerCheck" class="ps-0 pe-3 fw-bold"></ng-icon>
-                            {{ editMode ? 'Update' : 'Save' }}
+                        <button type="button" class="btn btn-primary fw-bold" [disabled]="formSubmit" (click)="save()">
+                            @if (formSubmit) {
+                                <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                                {{ editMode ? 'Updating...' : 'Saving...' }}
+                            } @else {
+                                <ng-icon name="tablerCheck" class="ps-0 pe-3 fw-bold"></ng-icon>
+                                {{ editMode ? 'Update' : 'Save ' + module }}
+                            }
                         </button>
                     </div>
 
