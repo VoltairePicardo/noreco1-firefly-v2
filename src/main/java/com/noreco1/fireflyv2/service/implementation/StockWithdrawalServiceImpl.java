@@ -165,6 +165,75 @@ public class StockWithdrawalServiceImpl implements StockWithdrawalService, Print
     }
 
     @Override
+    public PostResponse create(Map<String, Object> payload) {
+        PostResponse response = new PostResponse();
+        try {
+            StockWithdrawal sw = new StockWithdrawal();
+            Object dateObj = payload.get("voucherDate");
+            if (dateObj instanceof String dateStr && !dateStr.isEmpty()) {
+                Date voucherDate = java.sql.Date.valueOf(dateStr);
+                sw.setVoucherDate(voucherDate);
+                int year = Integer.parseInt(GlobalConstant.YYYY_DATE_FORMAT.format(voucherDate));
+                sw.setYear(year);
+                sw.setType(1);
+                Object latestCode = stockWithdrawalRepo.findLatestCodeByYear(year, 1);
+                String code = generatorFacade.voucherCodeNoOffice("MRS",
+                        latestCode == null ? "" : String.valueOf(latestCode),
+                        voucherDate, GlobalConstant.COUNTER_PAD_4);
+                sw.setCode(code);
+            }
+            sw.setDescription(payload.get("description") != null ? String.valueOf(payload.get("description")) : null);
+            Date now = new Date();
+            sw.setCreatedAt(now);
+            sw.setUpdatedAt(now);
+            sw.setCreatedBy(authenticationFacade.getLoggedIn());
+            DocumentStatus ds = new DocumentStatus();
+            ds.setId(com.noreco1.fireflyv2.model.enums.DocumentStatus.DOCUMENT_CREATED.getId());
+            sw.setDocumentStatus(ds);
+            Workflow wf = new Workflow();
+            wf.setId(com.noreco1.fireflyv2.model.enums.Workflow.WITHDRAWAL.getId());
+            sw.setWorkflow(wf);
+            sw.setTransaction(generatorFacade.transaction());
+            StockWithdrawal saved = stockWithdrawalRepo.save(sw);
+            response.setSuccessMessage("Stock Withdrawal saved.");
+            response.setModelId(saved.getId());
+        } catch (Exception e) {
+            response.setFailureMessage("Failed to save: " + e.getMessage());
+        }
+        return response;
+    }
+
+    @Override
+    public PostResponse update(Map<String, Object> payload) {
+        PostResponse response = new PostResponse();
+        Object idObj = payload.get("id");
+        if (idObj == null) {
+            response.setFailureMessage("ID is required.");
+            return response;
+        }
+        Integer id = ((Number) idObj).intValue();
+        StockWithdrawal sw = stockWithdrawalRepo.findById(id).orElse(null);
+        if (sw == null) {
+            response.setFailureMessage("Record not found.");
+            return response;
+        }
+        try {
+            Object dateObj = payload.get("voucherDate");
+            if (dateObj instanceof String dateStr && !dateStr.isEmpty()) {
+                sw.setVoucherDate(java.sql.Date.valueOf(dateStr));
+            }
+            sw.setDescription(payload.get("description") != null ? String.valueOf(payload.get("description")) : null);
+            sw.setUpdatedAt(new Date());
+            StockWithdrawal saved = stockWithdrawalRepo.save(sw);
+            response.setSuccessMessage("Stock Withdrawal updated.");
+            response.setModelId(saved.getId());
+        } catch (Exception e) {
+            response.setFailureMessage("Failed to update: " + e.getMessage());
+        }
+        return response;
+    }
+
+    @Override
     public List<StockWithdrawal> findAll() {
         return stockWithdrawalRepo.findAll();
     }

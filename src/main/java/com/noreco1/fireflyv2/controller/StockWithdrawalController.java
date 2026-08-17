@@ -1,21 +1,16 @@
 package com.noreco1.fireflyv2.controller;
 
 import com.noreco1.fireflyv2.common.GlobalConstant;
-import com.noreco1.fireflyv2.common.facade.AuthenticationFacade;
-import com.noreco1.fireflyv2.common.facade.GeneratorFacade;
 import com.noreco1.fireflyv2.controller.response.PostResponse;
 import com.noreco1.fireflyv2.controller.response.ProcessDocumentDto;
 import com.noreco1.fireflyv2.model.DocumentStatus;
 import com.noreco1.fireflyv2.model.StockWithdrawal;
-import com.noreco1.fireflyv2.model.Workflow;
-import com.noreco1.fireflyv2.repo.StockWithdrawalRepo;
 import com.noreco1.fireflyv2.service.DownloadService;
 import com.noreco1.fireflyv2.service.PrintableVoucher;
 import com.noreco1.fireflyv2.service.StockWithdrawalService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import net.sf.jasperreports.engine.JRDataSource;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.MessageSource;
 import org.springframework.validation.BeanPropertyBindingResult;
@@ -31,21 +26,17 @@ import java.util.Map;
 @RequestMapping("/api/withdrawal")
 public class StockWithdrawalController {
 
-    @Autowired
-    @Qualifier("withdrawalServiceImpl")
-    private StockWithdrawalService withdrawalService;
+    private final StockWithdrawalService withdrawalService;
+    private final MessageSource messageSource;
+    private final PrintableVoucher printableVoucher;
+    private final DownloadService downloadService;
 
-    @Autowired
-    private StockWithdrawalRepo withdrawalRepo;
-
-    @Autowired
-    private AuthenticationFacade authenticationFacade;
-
-    @Autowired
-    private GeneratorFacade generatorFacade;
-
-    @Autowired
-    private MessageSource messageSource;
+    public StockWithdrawalController(@Qualifier("withdrawalServiceImpl") StockWithdrawalService withdrawalService, MessageSource messageSource, @Qualifier("withdrawalServiceImpl") PrintableVoucher printableVoucher, DownloadService downloadService) {
+        this.withdrawalService = withdrawalService;
+        this.messageSource = messageSource;
+        this.printableVoucher = printableVoucher;
+        this.downloadService = downloadService;
+    }
 
     @GetMapping("/list")
     public List<Map> list() {
@@ -76,65 +67,12 @@ public class StockWithdrawalController {
 
     @PostMapping("/create")
     public PostResponse create(@RequestBody Map<String, Object> payload) {
-        PostResponse response = new PostResponse();
-        try {
-            StockWithdrawal sw = new StockWithdrawal();
-            Object dateObj = payload.get("voucherDate");
-            if (dateObj instanceof String dateStr && !dateStr.isEmpty()) {
-                Date voucherDate = java.sql.Date.valueOf(dateStr);
-                sw.setVoucherDate(voucherDate);
-                int year = Integer.parseInt(GlobalConstant.YYYY_DATE_FORMAT.format(voucherDate));
-                sw.setYear(year);
-                sw.setType(1);
-                Object latestCode = withdrawalRepo.findLatestCodeByYear(year, 1);
-                String code = generatorFacade.voucherCodeNoOffice("MRS",
-                        latestCode == null ? "" : String.valueOf(latestCode),
-                        voucherDate, GlobalConstant.COUNTER_PAD_4);
-                sw.setCode(code);
-            }
-            sw.setDescription(payload.get("description") != null ? String.valueOf(payload.get("description")) : null);
-            Date now = new Date();
-            sw.setCreatedAt(now);
-            sw.setUpdatedAt(now);
-            sw.setCreatedBy(authenticationFacade.getLoggedIn());
-            DocumentStatus ds = new DocumentStatus();
-            ds.setId(com.noreco1.fireflyv2.model.enums.DocumentStatus.DOCUMENT_CREATED.getId());
-            sw.setDocumentStatus(ds);
-            Workflow wf = new Workflow();
-            wf.setId(com.noreco1.fireflyv2.model.enums.Workflow.WITHDRAWAL.getId());
-            sw.setWorkflow(wf);
-            sw.setTransaction(generatorFacade.transaction());
-            StockWithdrawal saved = withdrawalRepo.save(sw);
-            response.setSuccessMessage("Stock Withdrawal saved.");
-            response.setModelId(saved.getId());
-        } catch (Exception e) {
-            response.setFailureMessage("Failed to save: " + e.getMessage());
-        }
-        return response;
+        return withdrawalService.create(payload);
     }
 
     @PostMapping("/update")
     public PostResponse update(@RequestBody Map<String, Object> payload) {
-        PostResponse response = new PostResponse();
-        Object idObj = payload.get("id");
-        if (idObj == null) { response.setFailureMessage("ID is required."); return response; }
-        Integer id = ((Number) idObj).intValue();
-        StockWithdrawal sw = withdrawalRepo.findById(id).orElse(null);
-        if (sw == null) { response.setFailureMessage("Record not found."); return response; }
-        try {
-            Object dateObj = payload.get("voucherDate");
-            if (dateObj instanceof String dateStr && !dateStr.isEmpty()) {
-                sw.setVoucherDate(java.sql.Date.valueOf(dateStr));
-            }
-            sw.setDescription(payload.get("description") != null ? String.valueOf(payload.get("description")) : null);
-            sw.setUpdatedAt(new Date());
-            StockWithdrawal saved = withdrawalRepo.save(sw);
-            response.setSuccessMessage("Stock Withdrawal updated.");
-            response.setModelId(saved.getId());
-        } catch (Exception e) {
-            response.setFailureMessage("Failed to update: " + e.getMessage());
-        }
-        return response;
+        return withdrawalService.update(payload);
     }
 
     @PostMapping("/process")
@@ -142,13 +80,6 @@ public class StockWithdrawalController {
         BindingResult br = new BeanPropertyBindingResult(dto, "dto");
         return withdrawalService.process(dto, br, messageSource);
     }
-
-    @Autowired
-    @Qualifier("withdrawalServiceImpl")
-    PrintableVoucher printableVoucher;
-
-    @Autowired
-    private DownloadService downloadService;
 
     @RequestMapping(value="/export/{id}")
     public void exportToPdf(@PathVariable Integer id,
