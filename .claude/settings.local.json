@@ -74,7 +74,9 @@
       "Read(//c/Users/TSI-KEN04/Documents/GitHub/**)",
       "mcp__ide__getDiagnostics",
       "Bash(bash:*)",
-      "Bash(./mvnw -q -o compile)"
+      "Bash(./mvnw -q -o compile)",
+      "Bash(npx ng *)",
+      "Bash(npx tsc *)"
     ]
   }
 }

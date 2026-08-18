@@ -1,0 +1,268 @@
+<div class="container-fluid">
+    <app-page-title [title]="module()" [subTitle]="subModule()" [menuLink]="menuLink"/>
+</div>
+
+<div class="container-fluid">
+    @if (isLoading() && editMode()) {
+        <div class="d-flex align-items-center gap-2 text-muted py-4">
+            <span class="spinner-border spinner-border-sm" role="status"></span> Loading...
+        </div>
+    } @else {
+    <form [formGroup]="form" (ngSubmit)="save()">
+        <div class="row g-3">
+            <div class="col-xl-12">
+                <app-ui-card title="Stock Withdrawal Information">
+                    <div class="col-xl-12 p-3" card-body>
+
+                        <div class="row g-3">
+
+                            <div class="col-md-3">
+                                <label for="voucherDate" class="form-label fw-bold">Voucher Date <span class="text-danger">*</span></label>
+                                <input id="voucherDate" type="text" mwlFlatpickr [options]="flatpickrOptions"
+                                       class="form-control" formControlName="voucherDate"
+                                       placeholder="Select date" required/>
+                            </div>
+
+                            <div class="col-md-3">
+                                <label for="inventoryLocation" class="form-label fw-bold">Inventory Location <span class="text-danger">*</span></label>
+                                <select id="inventoryLocation" class="form-select"
+                                        formControlName="inventoryLocation"
+                                        [compareWith]="compareById"
+                                        required>
+                                    <option [ngValue]="null">— Select Location —</option>
+                                    @for (loc of inventoryLocations(); track loc.id) {
+                                        <option [ngValue]="loc">{{ loc.description || loc.name }}</option>
+                                    }
+                                </select>
+                            </div>
+
+                            <div class="col-md-3">
+                                <label for="inventoryCategory" class="form-label fw-bold">Inventory Category <span class="text-danger">*</span></label>
+                                <select id="inventoryCategory" class="form-select"
+                                        formControlName="inventoryCategory"
+                                        [compareWith]="compareById"
+                                        required
+                                        (change)="onCategoryChange()">
+                                    <option [ngValue]="null">— Select Category —</option>
+                                    @for (cat of inventoryCategories(); track cat.id) {
+                                        <option [ngValue]="cat">{{ cat.description || cat.name }}</option>
+                                    }
+                                </select>
+                            </div>
+
+                            <div class="col-md-3">
+                                <label for="purpose" class="form-label fw-bold">Purpose <span class="text-danger">*</span></label>
+                                <select id="purpose" class="form-select"
+                                        formControlName="purpose"
+                                        [compareWith]="compareById"
+                                        required>
+                                    <option [ngValue]="null">— Select Purpose —</option>
+                                    @for (p of purposes(); track p.id) {
+                                        <option [ngValue]="p">{{ p.description || p.name }}</option>
+                                    }
+                                </select>
+                            </div>
+
+                            @if (showPurposeInput()) {
+                                <div class="col-md-12">
+                                    <label for="description" class="form-label fw-bold">Description / Purpose <span class="text-danger">*</span></label>
+                                    <textarea id="description" class="form-control" formControlName="description"
+                                              rows="3" placeholder="Describe the purpose" maxlength="1024" required></textarea>
+                                </div>
+                            }
+
+                        </div>
+
+                        <hr/>
+                        <div class="col-12 fs-xs text-uppercase fw-semibold text-muted mb-2">Reference Document (Optional)</div>
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="workOrderDesc" class="form-label fw-bold">Work Order</label>
+                                <div class="input-group">
+                                    <input id="workOrderDesc" type="text" class="form-control"
+                                           [value]="workOrderDesc()" readonly
+                                           placeholder="Browse work order..."/>
+                                    <button type="button" class="btn btn-primary fw-bold"
+                                            (click)="openWorkOrderBrowse()">
+                                        <ng-icon name="tablerSearch" class="me-1 fs-lg fw-bold"></ng-icon>Browse
+                                    </button>
+                                    @if (hasWorkOrder()) {
+                                        <button type="button" class="btn btn-danger fw-bold" (click)="clearWorkOrder()"
+                                                aria-label="Clear work order">
+                                            <ng-icon name="tablerTrash" class="ps-0 pe-0 fw-bold"></ng-icon>
+                                        </button>
+                                    }
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="rvCostEstimate" class="form-label fw-bold">Requisition Voucher / Cost Estimate</label>
+                                <div class="input-group">
+                                    <input id="rvCostEstimate" type="text" class="form-control" readonly placeholder="(Pending integration)"/>
+                                    <button type="button" class="btn btn-primary fw-bold" disabled>
+                                        <ng-icon name="tablerSearch" class="me-1 fs-lg fw-bold"></ng-icon>Browse
+                                    </button>
+                                </div>
+                                <div class="form-text text-muted fs-xxs">RV / Cost Estimate browse pending integration.</div>
+                            </div>
+                        </div>
+
+                        @if (showEmployeeSection()) {
+                            <hr/>
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                <span class="fs-xs text-uppercase fw-semibold text-muted">Employees</span>
+                                <button type="button" class="btn btn-primary btn-sm fw-bold"
+                                        (click)="openEmployeeBrowse()">
+                                    <ng-icon name="tablerPlus" class="me-1 fs-lg fw-bold"></ng-icon>Add Employee
+                                </button>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-custom table-centered w-100 mb-0">
+                                    <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                                        <tr class="text-uppercase fs-xxs">
+                                            <th>#</th>
+                                            <th>Account No.</th>
+                                            <th>Name</th>
+                                            <th style="width:50px"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody formArrayName="employees">
+                                        @if (employeesCount() === 0) {
+                                            <tr>
+                                                <td colspan="4" class="text-center text-muted py-3">
+                                                    No employees added. Click Add Employee to browse.
+                                                </td>
+                                            </tr>
+                                        }
+                                        @for (row of employeesArray.controls; track row; let i = $index) {
+                                            <tr [formGroupName]="i">
+                                                <td>{{ i + 1 }}</td>
+                                                <td>{{ row.controls.accountNo.value }}</td>
+                                                <td>{{ row.controls.name.value }}</td>
+                                                <td class="text-center">
+                                                    <button type="button"
+                                                            class="btn btn-light btn-icon btn-sm rounded-circle text-danger"
+                                                            (click)="removeEmployee(i)"
+                                                            aria-label="Remove employee">
+                                                        <ng-icon name="tablerTrash"></ng-icon>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
+
+                        <hr/>
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <span class="fs-xs text-uppercase fw-semibold text-muted">Items</span>
+                            <div class="d-flex gap-2">
+                                <button type="button" class="btn btn-primary btn-sm fw-bold"
+                                        (click)="openItemStockBrowse()">
+                                    <ng-icon name="tablerPlus" class="me-1 fs-lg fw-bold"></ng-icon>Browse Items
+                                </button>
+                                <button type="button" class="btn btn-primary btn-sm fw-bold" disabled
+                                        title="Special Equipment browse — pending integration">
+                                    <ng-icon name="tablerPlus" class="me-1 fs-lg fw-bold"></ng-icon>Special Equipment
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="table table-custom table-centered table-hover w-100 mb-0">
+                                <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                                    <tr class="text-uppercase fs-xxs">
+                                        <th style="width:40px">#</th>
+                                        <th style="width:80px">Code</th>
+                                        <th style="width:70px">Unit</th>
+                                        <th>Description</th>
+                                        <th class="text-center" style="width:100px">Balance</th>
+                                        <th class="text-center" style="width:120px">Quantity</th>
+                                        <th style="width:50px"></th>
+                                    </tr>
+                                </thead>
+                                <tbody formArrayName="details">
+                                    @if (detailsCount() === 0) {
+                                        <tr>
+                                            <td colspan="7" class="text-center text-muted py-3">
+                                                Click <strong>Browse Items</strong> to add items.
+                                            </td>
+                                        </tr>
+                                    }
+                                    @for (row of detailsArray.controls; track row; let i = $index) {
+                                        <tr [formGroupName]="i">
+                                            <td class="text-center text-muted">{{ i + 1 }}</td>
+                                            <td class="fw-bold">{{ row.controls.itemCode.value }}</td>
+                                            <td>{{ row.controls.unitCode.value }}</td>
+                                            <td>{{ row.controls.itemDescription.value }}</td>
+                                            <td class="text-center fw-bold">{{ row.controls.inventoryBalance.value | number:'1.0-3' }}</td>
+                                            <td>
+                                                <label class="visually-hidden" [attr.for]="'qty_' + i">Quantity for {{ row.controls.itemDescription.value }}</label>
+                                                <input [id]="'qty_' + i" type="number"
+                                                       class="form-control form-control-sm text-center fw-bold"
+                                                       formControlName="quantity"
+                                                       (change)="onQuantityChange(i)"
+                                                       min="0" step="0.01" placeholder="0"/>
+                                            </td>
+                                            <td class="text-center">
+                                                <button type="button"
+                                                        class="btn btn-light btn-icon btn-sm rounded-circle text-danger"
+                                                        (click)="removeRow(i)"
+                                                        aria-label="Remove item">
+                                                    <ng-icon name="tablerTrash"></ng-icon>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    }
+                                    @if (detailsCount() > 0) {
+                                        <tr class="fw-bold bg-light bg-opacity-50">
+                                            <td colspan="5" class="text-end text-uppercase fs-xxs">Total Quantity:</td>
+                                            <td class="text-center">{{ totalQuantity() | number:'1.0-3' }}</td>
+                                            <td></td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <hr/>
+                        <div class="col-12 fs-xs text-uppercase fw-semibold text-muted mb-2">Signatories</div>
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="approvingOfficer" class="form-label fw-bold">Approving Officer <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <input id="approvingOfficer" type="text" class="form-control"
+                                           [value]="approvingOfficerLabel()"
+                                           readonly placeholder="Browse approving officer..."/>
+                                    <button type="button" class="btn btn-primary fw-bold"
+                                            (click)="openApprovingOfficerBrowse()">
+                                        <ng-icon name="tablerSearch" class="me-1 fs-lg fw-bold"></ng-icon>Browse
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex gap-2 justify-content-end align-items-center pt-3 border-top mt-3">
+                            <a [routerLink]="['/' + menuLink]" class="btn btn-light fw-bold">
+                                <ng-icon name="tablerArrowLeft" class="ps-0 pe-3 fw-bold"></ng-icon>Back
+                            </a>
+                            <button type="submit" class="btn btn-primary fw-bold" [disabled]="isLoading()">
+                                @if (isLoading()) {
+                                    <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                                    {{ editMode() ? 'Updating...' : 'Saving...' }}
+                                } @else {
+                                    <ng-icon name="tablerCheck" class="ps-0 pe-3 fw-bold"></ng-icon>
+                                    {{ editMode() ? 'Update' : 'Save ' + module() }}
+                                }
+                            </button>
+                        </div>
+
+                    </div>
+                </app-ui-card>
+            </div>
+        </div>
+    </form>
+    }
+</div>

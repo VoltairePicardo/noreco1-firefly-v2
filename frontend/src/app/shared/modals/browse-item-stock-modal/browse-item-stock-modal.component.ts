@@ -3,7 +3,7 @@ import { COMMON_ALL_PAGE_IMPORTS, COMMON_MAIN_PAGE_IMPORTS, SHARED_PROVIDERS } f
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { provideIcons } from '@ng-icons/core';
 import { tablerSearch } from '@ng-icons/tabler-icons';
-import { WithdrawalService } from '@/app/pages/withdrawal/withdrawal.service';
+import { WithdrawalService } from '@/app/pages/inventory/withdrawal/withdrawal.service';
 
 @Component({
     selector: 'app-browse-item-stock-modal',
@@ -38,7 +38,7 @@ export class BrowseItemStockModalComponent implements OnInit {
         this.loading = true;
         this.service.getItemStocksForWithdrawal(this.locationId, this.categoryId).subscribe({
             next: (data) => {
-                this.items   = data || [];
+                this.items   = data?.content ?? data ?? [];
                 this.loading = false;
                 this.cdr.markForCheck();
             },

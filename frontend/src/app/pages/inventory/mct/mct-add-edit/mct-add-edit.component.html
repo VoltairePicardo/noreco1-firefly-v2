@@ -1,0 +1,172 @@
+<div class="container-fluid">
+    <app-page-title [title]="module" [subTitle]="subModule" [menuLink]="menuLink"/>
+</div>
+
+<div class="container-fluid">
+    @if (isLoading() && editMode) {
+        <div class="d-flex align-items-center gap-2 text-muted py-4">
+            <span class="spinner-border spinner-border-sm" role="status"></span> Loading...
+        </div>
+    } @else {
+    <form (ngSubmit)="save()" #f="ngForm">
+        <div class="row g-3">
+            <div class="col-xl-12">
+                <app-ui-card title="Material Credit Ticket Information">
+                    <div class="col-xl-12 p-3" card-body>
+
+                        <div class="row g-3">
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold">Date <span class="text-danger">*</span></label>
+                                <input type="text" mwlFlatpickr [options]="flatpickrOptions"
+                                       class="form-control" [(ngModel)]="voucherDate"
+                                       name="voucherDate" placeholder="Select date" required/>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold">Inventory Location <span class="text-danger">*</span></label>
+                                <select class="form-select"
+                                        [ngModel]="selectedLocation()" (ngModelChange)="selectedLocation.set($event)"
+                                        name="inventoryLocation"
+                                        [compareWith]="compareById">
+                                    <option [ngValue]="null">— Select Location —</option>
+                                    @for (loc of inventoryLocations(); track loc.id) {
+                                        <option [ngValue]="loc">{{ loc.description || loc.name }}</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+
+                        <hr/>
+                        <div class="col-12 fs-xs text-uppercase fw-semibold text-muted mb-2">Source Stock Release Document</div>
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Stock Release <span class="text-danger">*</span></label>
+                                @if (editMode) {
+                                    <div class="form-control bg-light">{{ selectedStockRelease()?.code || '—' }}</div>
+                                } @else {
+                                    <div class="input-group">
+                                        <input type="text" class="form-control"
+                                               [value]="selectedStockRelease()?.code || ''"
+                                               readonly placeholder="Browse stock release..."/>
+                                        <button type="button" class="btn btn-success fw-bold"
+                                                (click)="openStockReleaseBrowse()">
+                                            <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
+                                        </button>
+                                        @if (selectedStockRelease()) {
+                                            <button type="button" class="btn btn-danger fw-bold"
+                                                    (click)="clearStockRelease()">✕</button>
+                                        }
+                                    </div>
+                                }
+                            </div>
+                        </div>
+
+                        <hr/>
+                        <div class="col-12 fs-xs text-uppercase fw-semibold text-muted mb-2">Items to Return</div>
+
+                        <div class="table-responsive">
+                            <table class="table table-custom table-centered table-hover w-100 mb-0">
+                                <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                                    <tr class="text-uppercase fs-xxs">
+                                        <th style="width:40px">#</th>
+                                        <th style="width:80px">Code</th>
+                                        <th>Description</th>
+                                        <th class="text-center" style="width:120px">Qty Released</th>
+                                        <th class="text-center" style="width:140px">Return Qty <span class="text-danger">*</span></th>
+                                        <th class="text-end" style="width:120px">Unit Cost</th>
+                                        <th style="width:70px">Unit</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (details().length === 0) {
+                                        <tr>
+                                            <td colspan="7" class="text-center text-muted py-3">
+                                                Browse and select a <strong>Stock Release</strong> to load items.
+                                            </td>
+                                        </tr>
+                                    }
+                                    @for (row of details(); track $index) {
+                                        <tr>
+                                            <td class="text-center text-muted">{{ $index + 1 }}</td>
+                                            <td class="fw-bold">{{ row.itemCode }}</td>
+                                            <td>{{ row.itemDescription }}</td>
+                                            <td class="text-center fw-bold text-muted">{{ row.quantityReleased | number:'1.0-3' }}</td>
+                                            <td>
+                                                <input type="number"
+                                                       class="form-control form-control-sm text-center fw-bold"
+                                                       [(ngModel)]="row.quantity"
+                                                       [name]="'qty_' + $index"
+                                                       (ngModelChange)="onQuantityChange($index)"
+                                                       min="0" step="0.01" placeholder="0"/>
+                                            </td>
+                                            <td>
+                                                <input type="number"
+                                                       class="form-control form-control-sm text-end"
+                                                       [(ngModel)]="row.unitCost"
+                                                       [name]="'uc_' + $index"
+                                                       min="0" step="0.01" placeholder="0.00"/>
+                                            </td>
+                                            <td>{{ row.unitCode }}</td>
+                                        </tr>
+                                    }
+                                    @if (details().length > 0) {
+                                        <tr class="fw-bold bg-light bg-opacity-50">
+                                            <td colspan="4" class="text-end text-uppercase fs-xxs">Total Return Qty:</td>
+                                            <td class="text-center">{{ totalQuantity() | number:'1.0-3' }}</td>
+                                            <td></td>
+                                            <td></td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <hr/>
+                        <div class="row g-3">
+                            <div class="col-md-12">
+                                <label class="form-label fw-bold">Remarks</label>
+                                <textarea class="form-control" [(ngModel)]="remarks" name="remarks"
+                                          rows="2" placeholder="Optional remarks" maxlength="1024"></textarea>
+                            </div>
+                        </div>
+
+                        <hr/>
+                        <div class="col-12 fs-xs text-uppercase fw-semibold text-muted mb-2">Signatories</div>
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Received By <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control"
+                                           [value]="approvingOfficer() ? (approvingOfficer().fullName || approvingOfficer().name || '') : ''"
+                                           readonly placeholder="Browse receiving officer..."/>
+                                    <button type="button" class="btn btn-success fw-bold"
+                                            (click)="openApprovingOfficerBrowse()">
+                                        <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex gap-2 justify-content-end align-items-center pt-3 border-top mt-3">
+                            <a [routerLink]="['/' + menuLink]" class="btn btn-light fw-bold">
+                                <ng-icon name="tablerArrowLeft" class="ps-0 pe-3 fw-bold"></ng-icon>Back
+                            </a>
+                            <button type="submit" class="btn btn-primary fw-bold" [disabled]="isLoading()">
+                                @if (isLoading()) {
+                                    <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                                    {{ editMode ? 'Updating...' : 'Saving...' }}
+                                } @else {
+                                    <ng-icon name="tablerCheck" class="ps-0 pe-3 fw-bold"></ng-icon>
+                                    {{ editMode ? 'Update' : 'Save ' + module }}
+                                }
+                            </button>
+                        </div>
+
+                    </div>
+                </app-ui-card>
+            </div>
+        </div>
+    </form>
+    }
+</div>

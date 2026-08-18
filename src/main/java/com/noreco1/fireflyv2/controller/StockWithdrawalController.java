@@ -60,6 +60,11 @@ public class StockWithdrawalController {
         return withdrawalService.getDocumentsStatuses();
     }
 
+    @GetMapping("/default-signatories")
+    public Map defaultSignatories() {
+        return withdrawalService.defaultSignatories();
+    }
+
     @GetMapping("/{id}")
     public StockWithdrawal getById(@PathVariable Integer id) {
         return withdrawalService.findById(id);

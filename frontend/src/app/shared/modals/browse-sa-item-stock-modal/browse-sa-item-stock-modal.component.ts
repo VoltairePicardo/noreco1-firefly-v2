@@ -3,7 +3,7 @@ import { COMMON_ALL_PAGE_IMPORTS, COMMON_MAIN_PAGE_IMPORTS, SHARED_PROVIDERS } f
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { provideIcons } from '@ng-icons/core';
 import { tablerSearch } from '@ng-icons/tabler-icons';
-import { StockAdjustmentService } from '@/app/pages/stock-adjustment/stock-adjustment.service';
+import { StockAdjustmentService } from '@/app/pages/inventory/stock-adjustment/stock-adjustment.service';
 
 @Component({
     selector: 'app-browse-sa-item-stock-modal',

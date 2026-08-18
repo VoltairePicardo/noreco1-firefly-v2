@@ -1,7 +1,7 @@
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef, inject } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { COMMON_ALL_PAGE_IMPORTS, COMMON_MAIN_PAGE_IMPORTS } from '@/app/shared/providers/shared-providers';
-import { StockReceiveService } from '@/app/pages/stock-receive/stock-receive.service';
+import { StockReceiveService } from '@/app/pages/inventory/stock-receive/stock-receive.service';
 
 @Component({
     selector: 'app-browse-stock-receive-doc-modal',

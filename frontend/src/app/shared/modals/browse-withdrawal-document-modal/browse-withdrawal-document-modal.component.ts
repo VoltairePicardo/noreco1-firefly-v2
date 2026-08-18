@@ -3,7 +3,7 @@ import { COMMON_ALL_PAGE_IMPORTS, COMMON_MAIN_PAGE_IMPORTS, SHARED_PROVIDERS } f
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { provideIcons } from '@ng-icons/core';
 import { tablerSearch } from '@ng-icons/tabler-icons';
-import { StockReleaseService } from '@/app/pages/stock-release/stock-release.service';
+import { StockReleaseService } from '@/app/pages/inventory/stock-release/stock-release.service';
 
 @Component({
     selector: 'app-browse-withdrawal-document-modal',
