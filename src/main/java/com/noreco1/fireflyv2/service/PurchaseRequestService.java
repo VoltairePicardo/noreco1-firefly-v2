@@ -47,12 +47,13 @@ public interface PurchaseRequestService extends VoucherService {
     @Transactional
     PostResponse setModeOfProcurement(SetModeOfProcurementDto postData, BindingResult bindingResult, MessageSource messageSource);
 
-    Page<Object[]> getRequisitionVoucherForStockWithdrawal(String query, Integer invLocId, Pageable pageable);
-
     Page<Object[]> getRequisitionVoucherForRR(String query, Pageable pageable);
 
     List<PurchaseRequest> getPurchaseRequestForPOBudgetAmountBalance();
 
     List<RvListDto> getPurchaseRequestForCanvass();
+
+
+    Page<Map<String, Object>> purchaseRequestListForStockWithdrawal(Integer locationId, String query, Pageable pageable);
 
 }

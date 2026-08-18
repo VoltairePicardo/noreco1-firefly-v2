@@ -76,7 +76,15 @@
       "Bash(bash:*)",
       "Bash(./mvnw -q -o compile)",
       "Bash(npx ng *)",
-      "Bash(npx tsc *)"
+      "Bash(npx tsc *)",
+      "Bash(powershell -Command \"Test-NetConnection -ComputerName 192.168.254.200 -Port 3306 -WarningAction SilentlyContinue | Select-Object -ExpandProperty TcpTestSucceeded\")",
+      "Bash(command -v mysql)",
+      "Bash(command -v python3)",
+      "Bash(command -v python)",
+      "Bash(command -v node)",
+      "Read(//c/Users/buena/.m2/repository/com/mysql/**)",
+      "Bash(JAVA_HOME=\"C:/Program Files/Java/jdk-21\" ./mvnw.cmd -q -Dtest=DiagPagingTest test)",
+      "Bash(JAVA_HOME=\"C:\\\\Program Files\\\\Java\\\\jdk-21\" ./mvnw.cmd -q -o compile)"
     ]
   }
 }

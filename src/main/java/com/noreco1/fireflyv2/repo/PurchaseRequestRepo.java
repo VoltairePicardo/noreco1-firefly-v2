@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Dhokie on 10/6/2022.
@@ -202,8 +203,14 @@ public interface PurchaseRequestRepo extends JpaRepository<PurchaseRequest, Inte
             "GROUP_CONCAT(DISTINCT q.code ORDER BY q.code ASC SEPARATOR ', '), " +
             "GROUP_CONCAT(DISTINCT po.code ORDER BY po.code ASC SEPARATOR ', '), " +
             "GROUP_CONCAT(DISTINCT rr.code ORDER BY rr.code ASC SEPARATOR ', ')) AS numbers, " +
-            "rv.id, rv.code, rv.voucherDate, rv.purpose, u.fullName, " +
-            "rr.id as rrId, rr.code as rrCode, rr.totalQuantity as quantityReceived " +
+            "   rv.id as id, " +
+            "   rv.code, " +
+            "   rv.voucherDate, " +
+            "   rv.purpose, " +
+            "   u.fullName as fullname, " +
+            "   rr.id as rrId, " +
+            "   rr.code as rrCode, " +
+            "   rr.totalQuantity as quantityReceived " +
             "FROM PurchaseRequest rv " +
             "INNER JOIN PurchaseRequestDetail rd ON rv.id = rd.FK_PurchaseRequestId " +
             "LEFT JOIN CanvassDetail cd ON rd.id = cd.FK_purchaseRequestDetailId " +
@@ -223,7 +230,7 @@ public interface PurchaseRequestRepo extends JpaRepository<PurchaseRequest, Inte
             "HAVING SUM(pd.deliveredQuantity) > SUM(rd.withdrawQuantity) OR (pd.id IS NULL AND rd.withdrawquantity<rd.quantity)) " +
             ") AND rr.FK_inventoryLocationId = :invLocId AND rv.FK_createdByUserId = :userId " +
             "GROUP BY rv.id " +
-            "ORDER BY rv.id \n#pageable\n",
+            "ORDER BY rv.id ",
             countQuery = "SELECT COUNT(*) " +
                     "FROM PurchaseRequest rv " +
                     "INNER JOIN PurchaseRequestDetail rd ON rv.id = rd.FK_PurchaseRequestId " +
@@ -245,9 +252,9 @@ public interface PurchaseRequestRepo extends JpaRepository<PurchaseRequest, Inte
                     "HAVING SUM(pd.deliveredQuantity) > SUM(rd.withdrawQuantity) OR (pd.id IS NULL AND rd.withdrawquantity<rd.quantity)) " +
                     ") AND rr.FK_inventoryLocationId = :invLocId AND rv.FK_createdByUserId = :userId " +
                     "GROUP BY rv.id " +
-                    "ORDER BY rv.id",
+                    "ORDER BY rv.id ",
             nativeQuery = true)
-    Page<Object[]> findPurchaseRequestsForStockWithdrawal(@Param("invLocId") Integer invLocId, @Param("userId") Integer userId, Pageable pageable);
+    Page<Map<String, Object>> findPurchaseRequestsForStockWithdrawal(@Param("invLocId") Integer invLocId, @Param("userId") Integer userId, Pageable pageable);
 
     @Query(value = "SELECT " +
             "CONCAT_WS(', ', GROUP_CONCAT(DISTINCT rv.code ORDER BY rv.code ASC SEPARATOR ', '), " +
@@ -301,10 +308,10 @@ public interface PurchaseRequestRepo extends JpaRepository<PurchaseRequest, Inte
                     "GROUP BY rv.id " +
                     "ORDER BY rv.id",
             nativeQuery = true)
-    Page<Object[]> findPurchaseRequestsForStockWithdrawal(@Param("query") String query,
-                                                          @Param("invLocId") Integer invLocId,
-                                                          @Param("userId") Integer userId,
-                                                          Pageable pageable);
+    Page<Map<String, Object>> findPurchaseRequestsForStockWithdrawal(@Param("query") String query,
+                                                                     @Param("invLocId") Integer invLocId,
+                                                                     @Param("userId") Integer userId,
+                                                                     Pageable pageable);
 
     @Query(value = "SELECT " +
             "rv.id, rv.code, rv.voucherDate, rv.purpose, u.fullName " +

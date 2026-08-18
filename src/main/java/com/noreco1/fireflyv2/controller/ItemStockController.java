@@ -43,9 +43,9 @@ public class ItemStockController {
     }
 
     @GetMapping(value = "/item-stock/list-paged-with-zero-quantity/inv-loc/inv-cat/{invLocId}/{invCatId}")
-    public Page<ItemStock> getItemStocksWithZeroQuantityInvLocInvCat(Pageable pageable,
-                                                                     @PathVariable Integer invLocId, @PathVariable Integer invCatId,
-                                                                     @RequestParam(value = "q", required = false) String query) {
+    public Page<ItemStock> getItemStocksWithZeroQuantityInvLocInvCat(@PathVariable Integer invLocId, @PathVariable Integer invCatId,
+                                                                     @RequestParam(value = "q", required = false) String query,
+                                                                     Pageable pageable) {
         return itemStockService.getItemStocksWithZeroQuantityInvLocInvCat(invLocId, invCatId, query, pageable);
     }
 

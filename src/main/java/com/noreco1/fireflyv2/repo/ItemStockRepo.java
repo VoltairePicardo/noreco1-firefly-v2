@@ -167,8 +167,7 @@ public interface ItemStockRepo extends JpaRepository<ItemStock, Integer> {
             "AND ItemStock.totalQuantity > :qty " +
             "AND (upper(Item.code) LIKE :query OR upper(Item.description) LIKE :query) " +
             "AND (ItemStockDetail.FK_departmentId IS NULL OR ItemStockDetail.FK_departmentId = :devId) " +
-            "ORDER BY ItemStockDetail.FK_departmentId DESC, ItemStockDetail.id ASC " +
-            "\n#pageable\n",
+            "ORDER BY ItemStockDetail.FK_departmentId DESC, ItemStockDetail.id ",
             countQuery = "SELECT " +
                     "COUNT(*) " +
                     "FROM ItemStockDetail " +

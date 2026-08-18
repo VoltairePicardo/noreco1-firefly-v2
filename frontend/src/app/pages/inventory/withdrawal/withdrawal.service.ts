@@ -12,15 +12,11 @@ export class WithdrawalService {
     private http            = inject(HttpClient);
     private downloadService = inject(DownloadService);
 
-    list(): Observable<any[]> {
-        return this.http.get<any[]>(`${BASE_API}/withdrawal/list`);
-    }
-
-    listByDateRange(from: string, to: string, statusId?: number | null): Observable<any[]> {
-        const url = statusId
-            ? `${BASE_API}/withdrawal/list/${from}/${to}/${statusId}`
-            : `${BASE_API}/withdrawal/list/${from}/${to}`;
-        return this.http.get<any[]>(url);
+    listPaged(from: string, to: string, statusId: number | null, query: string, page: number, size: number): Observable<any> {
+        let params = new HttpParams().set('from', from).set('to', to).set('page', page).set('size', size);
+        if (statusId != null) params = params.set('statusId', statusId);
+        if (query) params = params.set('query', query);
+        return this.http.get(`${BASE_API}/withdrawal/list-paged`, { params });
     }
 
     getDocumentStatuses(): Observable<any[]> {
@@ -71,13 +67,13 @@ export class WithdrawalService {
         return this.http.get(`${BASE_API}/withdrawal/default-signatories`);
     }
 
-    getItemStocksForWithdrawal(locationId: number, categoryId: number, q = ''): Observable<any> {
-        const params = new HttpParams().set('q', q).set('page', 0).set('size', 1000);
+    getItemStocksForWithdrawal(locationId: number, categoryId: number, q = '', page = 0, size = 10): Observable<any> {
+        const params = new HttpParams().set('q', q).set('page', page).set('size', size);
         return this.http.get(`${BASE_API}/item-stock/item-stock/list-paged-with-zero-quantity/inv-loc/inv-cat/${locationId}/${categoryId}`, { params });
     }
 
     getRVDetailsForWithdrawal(rvId: number, locationId: number, categoryId: number): Observable<any[]> {
-        return this.http.get<any[]>(`${BASE_API}/withdrawal/rv-details/${rvId}/${locationId}/${categoryId}`);
+        return this.http.get<any[]>(`${BASE_API}/rv-detail/rvd/type/withdrawal/${rvId}/${locationId}/${categoryId}`);
     }
 
     getWorkOrderDetails(workOrderId: number, locationId: number, categoryId: number): Observable<any[]> {
@@ -85,6 +81,16 @@ export class WithdrawalService {
     }
 
     getCostEstimateDetails(transactionId: number): Observable<any[]> {
-        return this.http.get<any[]>(`${BASE_API}/withdrawal/cost-estimate-details/${transactionId}`);
+        return this.http.get<any[]>(`${BASE_API}/cost-estimate/details-for-withdrawal/${transactionId}`);
+    }
+
+    listRvForWithdrawal(locationId: number, q = '', page = 0, size = 10): Observable<any> {
+        const params = new HttpParams().set('q', q).set('page', page).set('size', size);
+        return this.http.get(`${BASE_API}/purchase-request/list/stock-withdrawal/${locationId}`, { params });
+    }
+
+    listCostEstimateForWithdrawal(locationId: number, q = '', page = 0, size = 10): Observable<any> {
+        const params = new HttpParams().set('q', q).set('page', page).set('size', size);
+        return this.http.get(`${BASE_API}/cost-estimate/list/stock-withdrawal/${locationId}`, { params });
     }
 }

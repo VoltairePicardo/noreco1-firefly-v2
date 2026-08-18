@@ -65,7 +65,7 @@ export class QuotationService {
             .set('q', search)
             .set('page', page)
             .set('size', size);
-        return this.http.get<any>(`${BASE_API}/requisition-voucher/list`, { params });
+        return this.http.get<any>(`${BASE_API}/purchase-request/list`, { params });
     }
 
     searchSuppliers(search: string, page: number, size: number): Observable<any> {

@@ -27,9 +27,7 @@ public interface StockWithdrawalService extends VoucherService {
     Page<StockWithdrawal> findByQuery(String query, Pageable pageable);
     List<Map> getDetails(int id);
     @Transactional(readOnly = true)
-    List<Map> findByDateRangeAndStatusId(String from, String to, Integer docStatusId, Integer officeId);
-    @Transactional(readOnly = true)
-    List<Map> findByDateRangePending(String from, String to, Integer officeId);
+    Page<Map<String, Object>> getStockWithdrawalPaged(String from, String to, Integer statusId, String query, Pageable pageable);
     Page<InventoryDocumentDto> findAllForReleasingByQuery(String query, Pageable pageable);
     List<StockWithdrawal> getListForSummaryReport(String from, String to, HttpServletRequest request);
     List<StockWithdrawalDetailDto> getItems(Integer withdrawalId);

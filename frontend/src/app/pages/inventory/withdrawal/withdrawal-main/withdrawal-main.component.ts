@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
 import { COMMON_ALL_PAGE_IMPORTS, COMMON_MAIN_PAGE_IMPORTS, SHARED_PROVIDERS } from '@/app/shared/providers/shared-providers';
 import { AlertService } from '@/app/shared/services/alert.service';
 import { FlatpickrDirective, provideFlatpickrDefaults } from 'angularx-flatpickr';
@@ -20,32 +20,10 @@ export class WithdrawalMainComponent implements OnInit {
     isLoading        = signal(false);
     documentStatuses = signal<any[]>([]);
 
-    page     = signal(1);
-    pageSize = 10;
-    searchText = signal('');
-
-    filteredTotal = computed(() => {
-        const q = this.searchText().trim().toLowerCase();
-        if (!q) return this.records().length;
-        return this.records().filter(r =>
-            (r.code        || '').toLowerCase().includes(q) ||
-            (r.description || '').toLowerCase().includes(q) ||
-            (r.createdBy?.fullName || r.preparedBy || '').toLowerCase().includes(q)
-        ).length;
-    });
-
-    pagedRecords = computed(() => {
-        const q = this.searchText().trim().toLowerCase();
-        const filtered = q
-            ? this.records().filter(r =>
-                (r.code        || '').toLowerCase().includes(q) ||
-                (r.description || '').toLowerCase().includes(q) ||
-                (r.createdBy?.fullName || r.preparedBy || '').toLowerCase().includes(q)
-              )
-            : this.records();
-        const start = (this.page() - 1) * this.pageSize;
-        return filtered.slice(start, start + this.pageSize);
-    });
+    page          = signal(1);
+    pageSize      = 10;
+    filteredTotal = signal(0);
+    searchText    = signal('');
 
     flatpickrOptions = { dateFormat: 'Y-m-d', altInput: true, altFormat: 'F j, Y' };
 
@@ -78,24 +56,42 @@ export class WithdrawalMainComponent implements OnInit {
 
     load(): void {
         this.isLoading.set(true);
-        const obs = (this.fromDate && this.toDate)
-            ? this.service.listByDateRange(this.fromDate, this.toDate, this.selectedStatus())
-            : this.service.list();
-        obs.subscribe({
-            next: (data) => { this.records.set(data || []); this.page.set(1); this.isLoading.set(false); },
-            error: () => { this.alertService.error(this.module, 'Load', ''); this.isLoading.set(false); }
-        });
+        this.service.listPaged(this.fromDate, this.toDate, this.selectedStatus(), this.searchText().trim(), this.page() - 1, this.pageSize)
+            .subscribe({
+                next: (data) => {
+                    this.records.set(data?.content ?? []);
+                    this.filteredTotal.set(data?.page?.totalElements ?? 0);
+                    this.isLoading.set(false);
+                },
+                error: () => {
+                    this.records.set([]);
+                    this.filteredTotal.set(0);
+                    this.alertService.error(this.module, 'Load', '');
+                    this.isLoading.set(false);
+                }
+            });
+    }
+
+    search(): void {
+        this.page.set(1);
+        this.load();
+    }
+
+    onPageChange(page: number): void {
+        this.page.set(page);
+        this.load();
     }
 
     reset(): void {
         this.setDefaultDates();
         this.selectedStatus.set(null);
         this.searchText.set('');
+        this.page.set(1);
         this.load();
     }
 
     isEditable(rec: any): boolean {
-        const s = rec?.documentStatus?.status || '';
+        const s = rec?.status || '';
         return s === 'Document Created' || s === 'Returned to Creator';
     }
 }

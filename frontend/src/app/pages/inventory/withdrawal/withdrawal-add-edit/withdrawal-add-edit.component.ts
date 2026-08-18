@@ -10,8 +10,10 @@ import { ModalService } from '@/app/shared/modals/modal-service';
 import { BrowseEntityModalComponent } from '@/app/shared/modals/browse-entity-modal/browse-entity-modal.component';
 import { BrowseWorkOrderModalComponent } from '@/app/shared/modals/browse-work-order-modal/browse-work-order-modal.component';
 import { BrowseItemStockModalComponent } from '@/app/shared/modals/browse-item-stock-modal/browse-item-stock-modal.component';
+import { BrowseRvCostEstimateModalComponent } from '@/app/shared/modals/browse-rv-cost-estimate-modal/browse-rv-cost-estimate-modal.component';
 import { provideIcons } from '@ng-icons/core';
 import { tablerSearch, tablerTrash, tablerPlus, tablerArrowLeft, tablerCheck } from '@ng-icons/tabler-icons';
+import { ItemStock } from '@/app/models/item-stock.model';
 
 interface InventoryLocation {
     id: number;
@@ -45,6 +47,15 @@ interface WorkOrder {
     project?: { name?: string };
 }
 
+interface RvCostEstimateRef {
+    type: 'rv' | 'ce';
+    /** PurchaseRequest.id (rv) or CostEstimate.id (ce) — sent to the server as the reference. */
+    id: number;
+    /** Key used to fetch line items: PurchaseRequest.id for rv, CostEstimate.transaction.id for ce. */
+    detailKey: number;
+    code: string;
+}
+
 interface EmployeeRef {
     name: string;
     accountNo: string;
@@ -65,20 +76,6 @@ interface WithdrawalDetailRow {
     specialEquipment: boolean;
 }
 
-interface ItemStock {
-    id: number;
-    unitCost?: number;
-    totalQuantity?: number;
-    balance?: number;
-    inventoryLocation?: { id: number };
-    item?: {
-        id: number;
-        code?: string;
-        description?: string;
-        unit?: { id: number; code?: string };
-    };
-}
-
 interface WithdrawalRecord {
     id: number;
     voucherDate?: string;
@@ -90,6 +87,8 @@ interface WithdrawalRecord {
     inventoryCategory?: InventoryCategory;
     purpose?: Purpose;
     workOrder?: WorkOrder;
+    purchaseRequest?: { id: number; code?: string };
+    costEstimate?: { id: number; code?: string; transaction?: { id: number } };
 }
 
 interface WithdrawalPayload {
@@ -104,8 +103,8 @@ interface WithdrawalPayload {
     employees: EmployeeRef[];
     details: WithdrawalDetailRow[];
     workOrder: { id: number } | null;
-    purchaseRequest: null;
-    costEstimate: null;
+    purchaseRequest: { id: number } | null;
+    costEstimate: { id: number } | null;
 }
 
 const OFFICE_EQUIPMENT_FIXTURES_AND_FURNITURE_CATEGORY_ID = 5;
@@ -172,6 +171,7 @@ export class WithdrawalAddEditComponent implements OnInit {
         purpose:            new FormControl<Purpose | null>(null, Validators.required),
         approvingOfficer:   new FormControl<SlEntity | null>(null, Validators.required),
         workOrder:          new FormControl<WorkOrder | null>(null),
+        rvCostEstimate:     new FormControl<RvCostEstimateRef | null>(null),
         employees:          new FormArray<EmployeeForm>([]),
         details:            new FormArray<DetailForm>([]),
     });
@@ -194,6 +194,12 @@ export class WithdrawalAddEditComponent implements OnInit {
     workOrderDesc     = computed(() => {
         const wo = this.formValue().workOrder;
         return wo ? (wo.code || '') + (wo.project?.name ? ' — ' + wo.project.name : '') : '';
+    });
+    hasRvCostEstimate = computed(() => !!this.formValue().rvCostEstimate);
+    rvCostEstimateDesc = computed(() => {
+        const ref = this.formValue().rvCostEstimate;
+        if (!ref) return '';
+        return (ref.type === 'rv' ? 'RV: ' : 'CE: ') + (ref.code || '');
     });
     approvingOfficerLabel = computed(() => {
         const officer = this.formValue().approvingOfficer;
@@ -284,11 +290,18 @@ export class WithdrawalAddEditComponent implements OnInit {
                 this.employeesArray.clear();
                 (data.employees || []).forEach(e => this.employeesArray.push(this.createEmployeeGroup(e)));
 
+                const rvCostEstimate: RvCostEstimateRef | null = data.purchaseRequest?.id
+                    ? { type: 'rv', id: data.purchaseRequest.id, detailKey: data.purchaseRequest.id, code: data.purchaseRequest.code || '' }
+                    : data.costEstimate?.id
+                        ? { type: 'ce', id: data.costEstimate.id, detailKey: data.costEstimate.transaction?.id ?? data.costEstimate.id, code: data.costEstimate.code || '' }
+                        : null;
+
                 this.form.patchValue({
                     voucherDate:      toYmd(data.voucherDate),
                     description:      data.description || '',
                     approvingOfficer: data.approvingOfficer || null,
                     workOrder:        data.workOrder?.id ? data.workOrder : null,
+                    rvCostEstimate,
                 });
 
                 const tryMatch = () => {
@@ -382,6 +395,63 @@ export class WithdrawalAddEditComponent implements OnInit {
 
     clearWorkOrder(): void {
         this.form.controls.workOrder.setValue(null);
+        this.detailsArray.clear();
+    }
+
+    async openRvCostEstimateBrowse(): Promise<void> {
+        const location = this.form.controls.inventoryLocation.value;
+        const category = this.form.controls.inventoryCategory.value;
+        if (!location?.id || !category?.id) {
+            this.alertService.warning(this.module(), 'Validation', 'Please select Inventory Location and Category first.');
+            return;
+        }
+        try {
+            const result = await this.modalService.openModal(
+                BrowseRvCostEstimateModalComponent, { locationId: location.id }, { size: 'lg', centered: true }
+            );
+            if (result?.action !== 'select' || !result?.data) return;
+
+            const { type, item } = result.data as { type: 'rv' | 'ce'; item: any };
+            const ref: RvCostEstimateRef = type === 'rv'
+                ? { type, id: item.id, detailKey: item.id, code: item.code }
+                : { type, id: item.id, detailKey: item.transaction?.id, code: item.code };
+
+            if (!ref.detailKey) {
+                this.alertService.error(this.module(), 'Selected document has no linked items.', '');
+                return;
+            }
+
+            const details$ = type === 'rv'
+                ? this.service.getRVDetailsForWithdrawal(ref.detailKey, location.id, category.id)
+                : this.service.getCostEstimateDetails(ref.detailKey);
+
+            details$.subscribe({
+                next: (rows: any[]) => {
+                    this.form.controls.rvCostEstimate.setValue(ref);
+                    this.detailsArray.clear();
+                    (rows || []).forEach(row => this.detailsArray.push(this.createDetailGroup(
+                        type === 'rv' ? row : {
+                            itemId:              row.itemId,
+                            itemCode:            row.itemCode,
+                            itemDescription:     row.itemDescription,
+                            unitCode:            row.unitCode,
+                            unitId:              row.unitId,
+                            unitCost:            Number(row.unitCost) || 0,
+                            quantity:            Number(row.quantity) || 0,
+                            quantityReleased:    0,
+                            inventoryBalance:    Number(row.quantity) || 0,
+                            inventoryLocationId: location.id,
+                            specialEquipment:    false
+                        }
+                    )));
+                },
+                error: () => this.alertService.error(this.module(), `Failed to load ${type === 'rv' ? 'RV' : 'Cost Estimate'} items.`, '')
+            });
+        } catch { }
+    }
+
+    clearRvCostEstimate(): void {
+        this.form.controls.rvCostEstimate.setValue(null);
         this.detailsArray.clear();
     }
 
@@ -527,8 +597,8 @@ export class WithdrawalAddEditComponent implements OnInit {
                 specialEquipment:    d.specialEquipment   || false
             })),
             workOrder:      value.workOrder ? { id: value.workOrder.id } : null,
-            purchaseRequest: null,
-            costEstimate:    null
+            purchaseRequest: value.rvCostEstimate?.type === 'rv' ? { id: value.rvCostEstimate.id } : null,
+            costEstimate:    value.rvCostEstimate?.type === 'ce' ? { id: value.rvCostEstimate.id } : null,
         };
 
         if (this.editMode()) payload.id = this.id() ?? undefined;

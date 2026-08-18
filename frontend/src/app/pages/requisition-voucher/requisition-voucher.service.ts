@@ -15,22 +15,22 @@ export class RequisitionVoucherService {
     private downloadService = inject(DownloadService);
 
     list(): Observable<any[]> {
-        return this.http.get<any[]>(`${BASE_API}/requisition-voucher/list`);
+        return this.http.get<any[]>(`${BASE_API}/purchase-request/list`);
     }
 
     listByDateRange(from: string, to: string, statusId?: number | null): Observable<any[]> {
         const url = statusId
-            ? `${BASE_API}/requisition-voucher/list/${from}/${to}/${statusId}`
-            : `${BASE_API}/requisition-voucher/list/${from}/${to}`;
+            ? `${BASE_API}/purchase-request/list/${from}/${to}/${statusId}`
+            : `${BASE_API}/purchase-request/list/${from}/${to}`;
         return this.http.get<any[]>(url);
     }
 
     getDocumentStatuses(): Observable<any[]> {
-        return this.http.get<any[]>(`${BASE_API}/requisition-voucher/document-statuses`);
+        return this.http.get<any[]>(`${BASE_API}/purchase-request/document-statuses`);
     }
 
     getData(id: number): Observable<any> {
-        return this.http.get(`${BASE_API}/requisition-voucher/${id}`);
+        return this.http.get(`${BASE_API}/purchase-request/${id}`);
     }
 
     getDetails(id: number): Observable<any[]> {
@@ -38,11 +38,11 @@ export class RequisitionVoucherService {
     }
 
     create(form: any): Observable<any> {
-        return this.http.post(`${BASE_API}/requisition-voucher/create`, form, httpOptions);
+        return this.http.post(`${BASE_API}/purchase-request/create`, form, httpOptions);
     }
 
     update(form: any): Observable<any> {
-        return this.http.post(`${BASE_API}/requisition-voucher/update`, form, httpOptions);
+        return this.http.post(`${BASE_API}/purchase-request/update`, form, httpOptions);
     }
 
     getWorkflowActions(transId: number): Observable<any[]> {
@@ -50,15 +50,15 @@ export class RequisitionVoucherService {
     }
 
     process(payload: any): Observable<any> {
-        return this.http.post(`${BASE_API}/requisition-voucher/process`, payload, httpOptions);
+        return this.http.post(`${BASE_API}/purchase-request/process`, payload, httpOptions);
     }
 
     getModesOfProcurement(rvId: number): Observable<any[]> {
-        return this.http.get<any[]>(`${BASE_API}/requisition-voucher/modes-of-procurement/${rvId}`);
+        return this.http.get<any[]>(`${BASE_API}/purchase-request/modes-of-procurement/${rvId}`);
     }
 
     setModeOfProcurement(payload: any): Observable<any> {
-        return this.http.post(`${BASE_API}/requisition-voucher/set-mode-of-procurement`, payload, httpOptions);
+        return this.http.post(`${BASE_API}/purchase-request/set-mode-of-procurement`, payload, httpOptions);
     }
 
     getDefaultSignatories(): Observable<any> {
@@ -118,10 +118,10 @@ export class RequisitionVoucherService {
      * RV type: For PO → /export, For IT → /export1, For REP → /export2, For LAB → /export3.
      */
     print(id: number, rvType: string): void {
-        let path = '/requisition-voucher/export';
-        if      (rvType.includes('REP')) path = '/requisition-voucher/export2';
-        else if (rvType.includes('LAB')) path = '/requisition-voucher/export3';
-        else if (rvType.includes('IT'))  path = '/requisition-voucher/export1';
+        let path = '/purchase-request/export';
+        if      (rvType.includes('REP')) path = '/purchase-request/export2';
+        else if (rvType.includes('LAB')) path = '/purchase-request/export3';
+        else if (rvType.includes('IT'))  path = '/purchase-request/export1';
         this.downloadService.print(`${BASE_API}${path}/${id}`, { type: 'pdf' });
     }
 }
