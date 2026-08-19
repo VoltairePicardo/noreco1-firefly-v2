@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { environment } from '@/environments/environment';
 
-const BASE_API = environment.get('baseUrl');
+const BASE_API = environment.get('baseApiUrl');
 const httpOptions = { headers: new HttpHeaders({ 'Content-Type': 'application/json' }) };
 
 @Injectable({ providedIn: 'root' })
@@ -57,7 +57,7 @@ export class PcvService {
     }
 
     getLogs(transId: number | string): Observable<any[]> {
-        return this.http.get<any[]>(`${BASE_API}/document-logs/${transId}`);
+        return this.http.get<any[]>(`${BASE_API}/json/document-logs/${transId}`);
     }
 
     getBatches(): Observable<any[]> {
@@ -65,7 +65,7 @@ export class PcvService {
     }
 
     createBatch(): Observable<any> {
-        return this.http.post(`${BASE_API}/pcv/batch/create`, {}, httpOptions);
+        return this.http.post(`${BASE_API}/pcv/batch/create`, { status: 1 }, httpOptions);
     }
 
     closeBatch(batchId: number): Observable<any> {
@@ -93,7 +93,15 @@ export class PcvService {
     }
 
     saveCashFlowItems(payload: any): Observable<any> {
-        return this.http.post(`${BASE_API}/pcv/cashflow-items/save`, payload, httpOptions);
+        return this.http.post(`${BASE_API}/pcv/saveCashFlowItem`, payload, httpOptions);
+    }
+
+    getPcvCashFlowDetails(pcvId: number): Observable<any[]> {
+        return this.http.get<any[]>(`${BASE_API}/pcv/cash-flow/${pcvId}`);
+    }
+
+    isDocumentForCashFlowAssignment(transactionId: number): Observable<boolean> {
+        return this.http.get<boolean>(`${BASE_API}/pcv/is-document-for-cash-flow-item-assignment/${transactionId}`);
     }
 
     print(id: number): void {

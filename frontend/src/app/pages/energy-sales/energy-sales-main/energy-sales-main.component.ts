@@ -43,7 +43,7 @@ export class EnergySalesMainComponent {
 
     fromDate       = '';
     toDate         = '';
-    selectedStatus = signal<number | null>(null);
+    selectedStatus = signal<number>(0);
 
     private service      = inject(EnergySalesService);
     private alertService = inject(AlertService);
@@ -78,7 +78,7 @@ export class EnergySalesMainComponent {
 
     reset(): void {
         this.setDefaultDates();
-        this.selectedStatus.set(null);
+        this.selectedStatus.set(0);
         this.searchText = '';
         this.load();
     }

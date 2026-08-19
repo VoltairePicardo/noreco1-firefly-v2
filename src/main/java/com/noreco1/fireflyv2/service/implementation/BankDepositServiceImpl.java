@@ -5,14 +5,19 @@ import com.noreco1.fireflyv2.common.facade.*;
 import com.noreco1.fireflyv2.common.helpers.Checker;
 import com.noreco1.fireflyv2.common.helpers.DateHelper;
 import com.noreco1.fireflyv2.common.helpers.MessageFormatter;
+import com.noreco1.fireflyv2.common.helpers.ReportUtil;
+import com.noreco1.fireflyv2.dtoers.LedgerDtoerImpl;
 import com.noreco1.fireflyv2.model.*;
 import com.noreco1.fireflyv2.model.DocumentType;
 import com.noreco1.fireflyv2.repo.*;
 import com.noreco1.fireflyv2.controller.response.*;
 import com.noreco1.fireflyv2.service.BankDepositService;
+import com.noreco1.fireflyv2.service.PrintableVoucher;
 
 import com.noreco1.fireflyv2.validator.BankDepositValidator;
 
+import net.sf.jasperreports.engine.JRDataSource;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
@@ -26,7 +31,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Service
-public class BankDepositServiceImpl implements BankDepositService {
+public class BankDepositServiceImpl implements BankDepositService, PrintableVoucher {
 
     private BankDeposit model;
 
@@ -56,6 +61,9 @@ public class BankDepositServiceImpl implements BankDepositService {
 
     @Autowired
     private BankAccountRepo bankAccountRepo;
+
+    @Autowired
+    LedgerDtoerImpl ledgerDtoers;
 
     @Override
     @Transactional
@@ -90,6 +98,7 @@ public class BankDepositServiceImpl implements BankDepositService {
 
                 bankDeposit.setCreatedBy(createdBy);
                 bankDeposit.setTransaction(generatorFacade.transaction());
+                bankDeposit.setCreatedAt(new Date());
 
                 existingBankDeposit = bankDeposit;
 
@@ -98,6 +107,7 @@ public class BankDepositServiceImpl implements BankDepositService {
             }
 
             // editable fields
+            existingBankDeposit.setUpdatedAt(new Date());
             existingBankDeposit.setDepositDate(bankDeposit.getDepositDate());
             existingBankDeposit.setReferenceNumber(bankDeposit.getReferenceNumber());
             existingBankDeposit.setPostingDate(bankDeposit.getPostingDate());
@@ -325,14 +335,57 @@ public class BankDepositServiceImpl implements BankDepositService {
             entry.setCredit(amount);
 
             Map<String, Object> stringObjectMap = this.settingFacade.getByCode("CASH_ON_HAND_ACCOUNT");
-            Integer cashOnHandId = (Integer) stringObjectMap.get("id");
-
-            entry.setAccount(Account.builder().id(cashOnHandId).build());
+            if (stringObjectMap != null) {
+                Integer cashOnHandId = (Integer) stringObjectMap.get("id");
+                entry.setAccount(Account.builder().id(cashOnHandId).build());
+            }
 
         }
 
         temporaryGeneralLedgerRepo.save(entry);
 
+    }
+
+    @Override
+    public HashMap reportParameters(Integer vid, HttpServletRequest request) {
+        HashMap<String, Object> params = ReportUtil.setupSharedReportHeaders(request);
+
+        BankDeposit bankDeposit = bankDepositRepo.findById(vid).orElse(null);
+        if (bankDeposit != null) {
+            params.put("TRANS_ID", bankDeposit.getTransaction().getId());
+            params.put("VOUCHER_NO", bankDeposit.getCode());
+            params.put("V_DATE", bankDeposit.getDepositDate());
+            params.put("EXPLANATION", "");
+
+            User preparedBy = bankDeposit.getCreatedBy();
+            if (preparedBy != null) {
+                Employee emp = employeeRepo.findOneByAccountNumber(preparedBy.getAccountNo());
+                String name = emp != null ? emp.getName() : preparedBy.getUsername();
+                String position = emp != null && emp.getPosition() != null ? emp.getPosition().getName() : "";
+                params.put("PREPARAR", name);
+                params.put("PREPARAR_POS", position);
+            } else {
+                params.put("PREPARAR", "");
+                params.put("PREPARAR_POS", "");
+            }
+            params.put("CHECKER", "");
+            params.put("CHECKER_POS", "");
+            params.put("APPROVAR", "");
+            params.put("APPROVAR_POS", "");
+        }
+
+        return params;
+    }
+
+    @Override
+    public JRDataSource datasource(Integer vid) {
+        BankDeposit bankDeposit = bankDepositRepo.findById(vid).orElse(null);
+        if (bankDeposit != null) {
+            return new JRBeanCollectionDataSource(
+                ledgerDtoers.getVoucherLedgerLines(bankDeposit.getTransaction().getId())
+            );
+        }
+        return new JRBeanCollectionDataSource(Collections.emptyList());
     }
 
 }

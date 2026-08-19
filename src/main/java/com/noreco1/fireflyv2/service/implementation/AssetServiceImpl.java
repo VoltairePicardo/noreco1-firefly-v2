@@ -885,6 +885,7 @@ public class AssetServiceImpl implements AssetService {
                 SLEntityClassification slEntityClassification = new SLEntityClassification();
                 slEntityClassification.setId(com.noreco1.fireflyv2.model.enums.SLEntityClassification.ASSET.getId());
                 asset.setSlEntityClassification(slEntityClassification);
+                asset.setCreatedAt(new Date());
 
                 Asset a = assetRepo.save(asset);
 

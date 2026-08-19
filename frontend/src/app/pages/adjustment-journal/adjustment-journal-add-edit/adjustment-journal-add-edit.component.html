@@ -81,15 +81,8 @@
                                     <button type="button"
                                             class="btn btn-success fw-bold"
                                             (click)="openEntityBrowse(key)">
-                                        <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
+                                        <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
                                     </button>
-                                    @if (signatories[key]) {
-                                        <button type="button"
-                                                class="btn btn-light"
-                                                (click)="clearSignatory(key)">
-                                            <ng-icon name="tablerX" class="fw-bold"></ng-icon>
-                                        </button>
-                                    }
                                 </div>
                                 @if (signatories[key]?.position) {
                                     <small class="text-muted">{{ signatories[key].position }}</small>
@@ -107,7 +100,7 @@
                                 <h6 class="fw-semibold text-uppercase fs-xs mb-0">Attachments</h6>
                                 <button type="button" class="btn btn-success fw-bold btn-sm"
                                         [disabled]="uploadingFiles" (click)="openFilePicker()">
-                                    <ng-icon name="tablerPaperclip" class="ps-0 pe-2 fw-bold"></ng-icon>Attach Files
+                                    <ng-icon name="tablerPaperclip" class="ps-0 pe-3 fw-bold"></ng-icon>Attach Files
                                 </button>
                                 <small class="text-muted">JPG, PNG, PDF only</small>
                             </div>
@@ -142,8 +135,13 @@
                         </a>
                         <button type="button" class="btn btn-primary fw-bold"
                                 [disabled]="formSubmit" (click)="save()">
-                            <ng-icon name="tablerCheck" class="ps-0 pe-3 fw-bold"></ng-icon>
-                            {{ editMode ? 'Update' : 'Save' }}
+                            @if (formSubmit) {
+                                <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                                {{ editMode ? 'Updating...' : 'Saving...' }}
+                            } @else {
+                                <ng-icon name="tablerCheck" class="ps-0 pe-3 fw-bold"></ng-icon>
+                                {{ editMode ? 'Update' : 'Save ' + module }}
+                            }
                         </button>
                     </div>
 

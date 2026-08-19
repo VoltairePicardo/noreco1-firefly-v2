@@ -2,7 +2,7 @@
     <app-page-title [title]="module" [subTitle]="subModule" [menuLink]="menuLink"/>
 </div>
 
-<div class="card">
+<div class="card mb-3">
     <div class="row">
         <div class="col-xl-12">
             <div class="card-body">
@@ -23,7 +23,7 @@
                     </div>
                     <div class="col-md-auto ms-auto">
                         <a class="btn btn-primary fw-bold" [routerLink]="['/' + menuLink + '/create']">
-                            <ng-icon name="tablerPlus" class="ps-0 pe-3 fw-bold"></ng-icon>Create
+                            <ng-icon name="tablerPlus" class="ps-0 pe-3 fw-bold"></ng-icon>Create {{module}}
                         </a>
                     </div>
                 </div>

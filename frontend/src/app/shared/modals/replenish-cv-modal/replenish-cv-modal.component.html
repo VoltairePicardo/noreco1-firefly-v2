@@ -1,0 +1,83 @@
+<div class="modal-header">
+    <h5 class="modal-title fw-bold">Check Voucher List</h5>
+    <button type="button" class="btn-close" (click)="activeModal.dismiss()"></button>
+</div>
+<div class="modal-body">
+    <div class="row g-2 mb-3 align-items-end">
+        <div class="col-md-3">
+            <label class="form-label fw-bold fs-xs text-uppercase">From</label>
+            <input type="text" mwlFlatpickr [options]="flatpickrOptions"
+                   class="form-control" [(ngModel)]="from" placeholder="From date"/>
+        </div>
+        <div class="col-md-3">
+            <label class="form-label fw-bold fs-xs text-uppercase">To</label>
+            <input type="text" mwlFlatpickr [options]="flatpickrOptions"
+                   class="form-control" [(ngModel)]="to" placeholder="To date"/>
+        </div>
+        <div class="col-md-3">
+            <label class="form-label fw-bold fs-xs text-uppercase">Code</label>
+            <input type="text" class="form-control" [(ngModel)]="code" placeholder="CV code"/>
+        </div>
+        <div class="col-md-3 d-flex align-items-end">
+            <button type="button" class="btn btn-success fw-bold w-100" (click)="search()">
+                <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Search
+            </button>
+        </div>
+    </div>
+
+    @if (selectedCv) {
+        <div class="alert alert-primary py-2 mb-3 d-flex align-items-center gap-2">
+            <ng-icon name="tablerCheck" class="text-primary"></ng-icon>
+            <span>Selected: <strong>{{ selectedCv.code }}</strong> — {{ selectedCv.payee }}
+                (<strong>{{ selectedCv.checkAmount | number:'1.2-2' }}</strong>)</span>
+        </div>
+    }
+
+    <div class="table-responsive">
+        <table class="table table-custom table-centered table-hover w-100 mb-0">
+            <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                <tr class="text-uppercase fs-xxs">
+                    <th>Code</th>
+                    <th>Payee</th>
+                    <th class="text-end">Amount</th>
+                    <th>Particulars</th>
+                    <th>Voucher Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (loading) {
+                    <tr><td colspan="5" class="text-center text-muted py-3">
+                        <span class="spinner-border spinner-border-sm me-2" role="status"></span>Loading...
+                    </td></tr>
+                } @else if (items.length > 0) {
+                    @for (item of items; track item.id) {
+                        <tr (click)="select(item)" style="cursor:pointer"
+                            [class.table-primary]="selectedCv?.id === item.id">
+                            <td class="fw-bold">{{ item.code }}</td>
+                            <td>{{ item.payee }}</td>
+                            <td class="text-end fw-bold">{{ item.checkAmount | number:'1.2-2' }}</td>
+                            <td>{{ item.particulars }}</td>
+                            <td>{{ item.voucherDate | date:'MMM dd, yyyy' }}</td>
+                        </tr>
+                    }
+                } @else {
+                    <tr><td colspan="5" class="text-center text-muted py-3">No records found.</td></tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="modal-footer d-flex justify-content-between">
+    <button type="button" class="btn btn-light fw-bold" (click)="activeModal.dismiss()">
+        <ng-icon name="tablerArrowLeft" class="ps-0 pe-3 fw-bold"></ng-icon>Cancel
+    </button>
+    <button type="button" class="btn btn-primary fw-bold"
+            [disabled]="!selectedCv || processing"
+            (click)="replenish()">
+        @if (processing) {
+            <span class="spinner-border spinner-border-sm me-2" role="status"></span>Processing...
+        } @else {
+            <ng-icon name="tablerCheck" class="ps-0 pe-3 fw-bold"></ng-icon>Replenish CV
+        }
+    </button>
+</div>

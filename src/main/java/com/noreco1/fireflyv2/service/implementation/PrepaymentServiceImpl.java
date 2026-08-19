@@ -148,6 +148,8 @@ public class PrepaymentServiceImpl implements PrepaymentService {
                 pp.setTransaction(transaction);
                 pp.setAccountNo(generatorFacade.entityAccountNumber());
                 pp.setCreatedBy(createdBy);
+                pp.setCreatedAt(new Date());
+                pp.setUpdatedAt(new Date());
                 existingPp = pp;
             } else {
                 existingPp = prepaymentRepo.findById(pp.getId()).orElse(null);
@@ -166,6 +168,7 @@ public class PrepaymentServiceImpl implements PrepaymentService {
                 existingPp.setYear(voucherYear);
                 existingPp.setStartMonth(pp.getStartMonth()+1);  // js month index starts at 0
                 existingPp.setStartYear(pp.getStartYear());
+                existingPp.setUpdatedAt(new Date());
 
                 SLEntityClassification slEntityClassification = new SLEntityClassification();
                 slEntityClassification.setId(com.noreco1.fireflyv2.model.enums.SLEntityClassification.PREPAYMENT.getId());
@@ -300,7 +303,7 @@ public class PrepaymentServiceImpl implements PrepaymentService {
                 ppDto.setCode(pp.getCode());
                 ppDto.setDescription(pp.getDescription());
                 ppDto.setAccountNo(pp.getAccountNo());
-                ppDto.setTransId(pp.getTransaction().getId());
+                ppDto.setTransId(pp.getTransaction() != null ? pp.getTransaction().getId() : null);
                 ppDto.setDatePaid(pp.getDatePaid());
                 ppDto.setCreated(pp.getCreatedAt());
                 ppDto.setLastUpdated(pp.getUpdatedAt());
@@ -333,7 +336,7 @@ public class PrepaymentServiceImpl implements PrepaymentService {
                 ppDto.setCode(pp.getCode());
                 ppDto.setDescription(pp.getDescription());
                 ppDto.setAccountNo(pp.getAccountNo());
-                ppDto.setTransId(pp.getTransaction().getId());
+                ppDto.setTransId(pp.getTransaction() != null ? pp.getTransaction().getId() : null);
                 ppDto.setDatePaid(pp.getDatePaid());
                 ppDto.setCreated(pp.getCreatedAt());
                 ppDto.setLastUpdated(pp.getUpdatedAt());
@@ -380,7 +383,7 @@ public class PrepaymentServiceImpl implements PrepaymentService {
             ppDto.setMonthlyCost(pp.getMonthlyCost());
             ppDto.setAppliedCost(pp.getAppliedCost());
             ppDto.setBalance(pp.getBalance());
-            ppDto.setStartMonth(pp.getStartMonth()-1); // js month starts at 0
+            ppDto.setStartMonth(pp.getStartMonth() != null ? pp.getStartMonth() - 1 : null); // js month starts at 0
             ppDto.setStartYear(pp.getStartYear());
 
             if(pp.getStartMonth() != null) {

@@ -70,5 +70,9 @@ public class PettyCashTrans extends Voucher {
     @JoinColumn(name = "FK_releasedByUserId")
     private User releasingOfficer;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "FK_pettyCashBatchId")
+    private PettyCashBatch pettyCashBatch;
+
 
 }

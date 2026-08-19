@@ -581,9 +581,12 @@ public class CashAdvanceServiceImpl implements CashAdvanceService, PrintableVouc
             } else {
                 CashAdvance existingCa = null;
                 User createdBy = authenticationFacade.getLoggedIn();
-                User approvingOfficer = userRepo.findOneByAccountNo(ca.getApprovingOfficer().getAccountNo());
-                User recommendedBy = userRepo.findOneByAccountNo(ca.getRecommendedBy().getAccountNo());
-                User budgetOfficer = userRepo.findOneByAccountNo(ca.getBudgetOfficer().getAccountNo());
+                User approvingOfficer = (ca.getApprovingOfficer() != null && ca.getApprovingOfficer().getAccountNo() != null)
+                        ? userRepo.findOneByAccountNo(ca.getApprovingOfficer().getAccountNo()) : null;
+                User recommendedBy = (ca.getRecommendedBy() != null && ca.getRecommendedBy().getAccountNo() != null)
+                        ? userRepo.findOneByAccountNo(ca.getRecommendedBy().getAccountNo()) : null;
+                User budgetOfficer = (ca.getBudgetOfficer() != null && ca.getBudgetOfficer().getAccountNo() != null)
+                        ? userRepo.findOneByAccountNo(ca.getBudgetOfficer().getAccountNo()) : null;
                 Integer voucherYear = Integer.parseInt(GlobalConstant.YYYY_DATE_FORMAT.format(ca.getCashAdvanceDate()));
                 boolean insertMode = !Checker.isValidId(ca.getId());
                 DocumentStatus ds = new DocumentStatus();
@@ -689,8 +692,12 @@ public class CashAdvanceServiceImpl implements CashAdvanceService, PrintableVouc
                 }
             }
 
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+            throw e;
         } catch (Exception e) {
             e.printStackTrace();
+            throw new RuntimeException("Failed to process cash advance", e);
         }
 
         return response;
@@ -843,6 +850,31 @@ public class CashAdvanceServiceImpl implements CashAdvanceService, PrintableVouc
 
             hm.put("isAllowedCheck", allowCheck && !isChecked);
             hm.put("allowEditAmount", allowEditAmount);
+
+            // Particulars
+            List<CashAdvanceParticular> particulars = cashAdvanceParticularRepo.findByCashAdvanceId(cashAdvance.getId());
+            List<Map<String, Object>> particularList = new ArrayList<>();
+            if (particulars != null) {
+                for (CashAdvanceParticular p : particulars) {
+                    Map<String, Object> pm = new HashMap<>();
+                    pm.put("id",         p.getId());
+                    pm.put("particular", p.getParticular());
+                    pm.put("date",       p.getDate());
+                    pm.put("quantity",   p.getQuantity());
+                    pm.put("amount",     p.getAmount());
+                    pm.put("total",      p.getTotal());
+                    if (p.getUnit() != null) {
+                        Map<String, Object> um = new HashMap<>();
+                        um.put("id",   p.getUnit().getId());
+                        um.put("code", p.getUnit().getCode());
+                        pm.put("unit", um);
+                    } else {
+                        pm.put("unit", null);
+                    }
+                    particularList.add(pm);
+                }
+            }
+            hm.put("cashAdvanceParticulars", particularList);
 
         } catch (Exception ex) {
             Logger.getLogger(CashAdvanceServiceImpl.class.getName()).log(Level.SEVERE, null, ex);

@@ -1,18 +1,18 @@
 import { Component, inject, signal } from '@angular/core';
-import { COMMON_ALL_PAGE_IMPORTS, COMMON_MAIN_PAGE_IMPORTS, SHARED_PROVIDERS } from '@/app/shared/providers/shared-providers';
+import { COMMON_ALL_PAGE_IMPORTS, COMMON_MAIN_PAGE_IMPORTS } from '@/app/shared/providers/shared-providers';
 import { AlertService } from '@/app/shared/services/alert.service';
-import { FlatpickrDirective, provideFlatpickrDefaults } from 'angularx-flatpickr';
+import { FlatpickrDefaults, FlatpickrModule } from 'angularx-flatpickr';
 import { CaService } from '../ca.service';
 
 @Component({
     selector: 'app-ca-main',
-    imports: [...COMMON_ALL_PAGE_IMPORTS, ...COMMON_MAIN_PAGE_IMPORTS, FlatpickrDirective],
-    providers: [provideFlatpickrDefaults(), ...SHARED_PROVIDERS],
+    imports: [...COMMON_ALL_PAGE_IMPORTS, ...COMMON_MAIN_PAGE_IMPORTS, FlatpickrModule],
+    providers: [FlatpickrDefaults],
     templateUrl: './ca-main.component.html'
 })
 export class CaMainComponent {
     module    = 'Cash Advance';
-    subModule = 'List';
+    subModule = '';
     menuLink  = 'ca';
 
     records          = signal<any[]>([]);
@@ -23,8 +23,8 @@ export class CaMainComponent {
     searchQuery      = '';
     fromDate         = '';
     toDate           = '';
-    selectedStatusId?: number;
-    selectedOffice: any = null;
+    selectedStatusId = 0;
+    selectedOfficeId = 0;
     page             = 1;
     pageSize         = 20;
 
@@ -85,14 +85,14 @@ export class CaMainComponent {
 
     loadUserOffice(): void {
         this.service.getUserOffice().subscribe({
-            next: (data) => { this.selectedOffice = data || null; this.load(); },
+            next: (data) => { this.selectedOfficeId = data?.id || 0; this.load(); },
             error: () => this.load()
         });
     }
 
     load(): void {
         this.isLoading.set(true);
-        this.service.list(this.fromDate, this.toDate, this.selectedStatusId, this.selectedOffice?.id).subscribe({
+        this.service.list(this.fromDate, this.toDate, this.selectedStatusId || undefined, this.selectedOfficeId || undefined).subscribe({
             next: (data) => { this.records.set(data || []); this.page = 1; this.isLoading.set(false); },
             error: () => { this.alertService.error(this.module, 'Failed to load records.', ''); this.isLoading.set(false); }
         });
@@ -100,15 +100,11 @@ export class CaMainComponent {
 
     reset(): void {
         this.searchQuery      = '';
-        this.selectedStatusId = undefined;
-        this.selectedOffice   = null;
+        this.selectedStatusId = 0;
+        this.selectedOfficeId = 0;
         this.setDefaultDates();
         this.page             = 1;
         this.load();
-    }
-
-    compareById(a: any, b: any): boolean {
-        return a && b ? a.id === b.id : a === b;
     }
 
     isEditable(rec: any): boolean {

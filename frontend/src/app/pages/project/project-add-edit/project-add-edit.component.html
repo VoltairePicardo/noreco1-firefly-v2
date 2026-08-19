@@ -123,7 +123,7 @@
                 <div class="d-flex align-items-center justify-content-between mb-3">
                     <p class="fs-xs text-uppercase fw-semibold text-muted mb-0">Contractors</p>
                     <button type="button" class="btn btn-success fw-bold" (click)="browseSupplier()">
-                        <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse Supplier
+                        <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse Supplier
                     </button>
                 </div>
                 <div class="table-responsive">
@@ -145,7 +145,7 @@
                                         <td>{{ c.name || '—' }}</td>
                                         <td class="text-center">
                                             <button type="button"
-                                                    class="btn btn-danger btn-icon btn-sm rounded-circle"
+                                                    class="btn btn-danger btn-icon rounded-circle"
                                                     (click)="removeContractor(i)"
                                                     ngbTooltip="Remove">
                                                 <ng-icon name="tablerTrash" class="fs-sm"></ng-icon>
@@ -169,7 +169,7 @@
                 <p class="fs-xs text-uppercase fw-semibold text-muted mb-3">As Planned Staking Sheet</p>
                 <div class="d-flex align-items-center gap-3 mb-2">
                     <button type="button" class="btn btn-success fw-bold" (click)="openStakingFilePicker()">
-                        <ng-icon name="tablerPaperclip" class="ps-0 pe-2 fw-bold"></ng-icon>Attach Files
+                        <ng-icon name="tablerPaperclip" class="ps-0 pe-3 fw-bold"></ng-icon>Attach Files
                     </button>
                     <small class="text-muted">Supported: .jpg, .jpeg, .png, .pdf</small>
                 </div>

@@ -763,8 +763,8 @@ public class CostEstimateServiceImpl implements CostEstimateService, PrintableVo
                     detailMap.put("code", detail.getItem().getCode());
                     detailMap.put("description", detail.getItem().getDescription());
                     detailMap.put("quantity", detail.getQuantity());
-                    detailMap.put("unitCode", detail.getItem().getUnit().getCode());
-                    detailMap.put("unitId", detail.getItem().getUnit().getId());
+                    detailMap.put("unitCode", detail.getItem().getUnit() != null ? detail.getItem().getUnit().getCode() : "");
+                    detailMap.put("unitId", detail.getItem().getUnit() != null ? detail.getItem().getUnit().getId() : "");
                     detailMap.put("unitCost", detail.getUnitCost());
                     detailMap.put("totalCost", detail.getTotalCost());
                     detailMap.put("inventoryCost", detail.getInventoryCost());
@@ -839,23 +839,25 @@ public class CostEstimateServiceImpl implements CostEstimateService, PrintableVo
                         dto.setAssemblyUnitId(assemblyUnitItem.getCostEstimateAssemblyUnit().getAssemblyUnit().getId());
                         dto.setAssemblyCode(assemblyUnitItem.getCostEstimateAssemblyUnit().getAssemblyUnit().getCode());
 
-                        AssemblyUnitDetail assemblyUnitDetail = assemblyUnitDetailRepo.findByAssemblyUnitIdAndItemId(assemblyUnitItem.getCostEstimateAssemblyUnit().getAssemblyUnit().getId(), itemStock.getItem().getId());
-
-                        Map assemblyUnitIdsMap = new HashMap();
-                        assemblyUnitIdsMap.put("assemblyUnitId", assemblyUnitItem.getCostEstimateAssemblyUnit().getAssemblyUnit().getId());
-                        assemblyUnitIdsMap.put("multiplier", assemblyUnitDetail.getQuantity());
-
-                        dto.getAssemblyUnitIds().add(assemblyUnitIdsMap);
+                        if (itemStock != null) {
+                            AssemblyUnitDetail assemblyUnitDetail = assemblyUnitDetailRepo.findByAssemblyUnitIdAndItemId(assemblyUnitItem.getCostEstimateAssemblyUnit().getAssemblyUnit().getId(), itemStock.getItem().getId());
+                            if (assemblyUnitDetail != null) {
+                                Map assemblyUnitIdsMap = new HashMap();
+                                assemblyUnitIdsMap.put("assemblyUnitId", assemblyUnitItem.getCostEstimateAssemblyUnit().getAssemblyUnit().getId());
+                                assemblyUnitIdsMap.put("multiplier", assemblyUnitDetail.getQuantity());
+                                dto.getAssemblyUnitIds().add(assemblyUnitIdsMap);
+                            }
+                        }
                     }
                 }
 
                 dto.setItemId(detail.getItem().getId());
                 dto.setInventoryCost(detail.getInventoryCost());
                 dto.setQuantity(detail.getQuantity());
-                dto.setInventoryQty(itemStock.getQuantity());
+                dto.setInventoryQty(itemStock != null ? itemStock.getQuantity() : BigDecimal.ZERO);
                 dto.setItemCode(detail.getItem().getCode());
                 dto.setItemDescription(detail.getItem().getDescription());
-                dto.setUnitCode(detail.getItem().getUnit().getCode());
+                dto.setUnitCode(detail.getItem().getUnit() != null ? detail.getItem().getUnit().getCode() : "");
                 dto.setMarkUp(detail.getMarkUp());
                 dto.setUnitCost(detail.getUnitCost());
                 dto.setTotalCost(detail.getTotalCost());

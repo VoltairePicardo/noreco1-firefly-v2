@@ -4,12 +4,12 @@ import { AlertService } from '@/app/shared/services/alert.service';
 import { COMMON_ALL_PAGE_IMPORTS, COMMON_MAIN_PAGE_IMPORTS, SHARED_PROVIDERS } from '@/app/shared/providers/shared-providers';
 import { BankDepositService } from '../bank-deposit.service';
 import { provideIcons } from '@ng-icons/core';
-import { tablerArrowLeft, tablerPrinter, tablerEdit, tablerPlus } from '@ng-icons/tabler-icons';
+import { tablerArrowLeft, tablerPrinter, tablerEdit } from '@ng-icons/tabler-icons';
 
 @Component({
     selector: 'app-bank-deposit-detail',
     imports: [...COMMON_ALL_PAGE_IMPORTS, ...COMMON_MAIN_PAGE_IMPORTS],
-    providers: [...SHARED_PROVIDERS, provideIcons({ tablerArrowLeft, tablerPrinter, tablerEdit, tablerPlus })],
+    providers: [...SHARED_PROVIDERS, provideIcons({ tablerArrowLeft, tablerPrinter, tablerEdit })],
     templateUrl: './bank-deposit-detail.component.html'
 })
 export class BankDepositDetailComponent {
@@ -46,7 +46,11 @@ export class BankDepositDetailComponent {
                     this.router.navigate(['/' + this.menuLink]);
                 }
             },
-            error: () => { this.isLoading.set(false); this.alertService.error(this.module, 'Error', ''); this.router.navigate(['/' + this.menuLink]); }
+            error: () => {
+                this.isLoading.set(false);
+                this.alertService.error(this.module, 'Error', '');
+                this.router.navigate(['/' + this.menuLink]);
+            }
         });
     }
 
@@ -59,11 +63,6 @@ export class BankDepositDetailComponent {
 
     fileUrl(fileId: number): string {
         return this.service.fileUrl(fileId);
-    }
-
-    isEditable(): boolean {
-        const s = this.data?.documentStatus?.status || this.data?.status || '';
-        return s === 'Document Created' || s === 'Returned to Creator';
     }
 
     get totalAmount(): number {

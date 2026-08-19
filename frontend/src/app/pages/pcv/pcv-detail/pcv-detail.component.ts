@@ -27,15 +27,18 @@ export class PcvDetailComponent {
     isLoading = signal(false);
 
     // Workflow
-    workflowActions : any[]  = [];
-    selectedAction  : any    = null;
-    remarks                  = '';
-    formSubmit               = false;
+    workflowActions    : any[] = [];
+    selectedAction     : any   = null;
+    remarks                    = '';
+    processingWorkflow         = false;
+
+    // Cash flow save
+    formSubmit = false;
 
     // Logs
-    showLogs    = false;
-    logs        = signal<any[]>([]);
-    logsLoading = signal(false);
+    logs        : any[] = [];
+    showLogs            = false;
+    logsLoading         = false;
 
     // Cash flow
     @ViewChild('cashFlowBrowseModal') cashFlowBrowseModalRef!: TemplateRef<any>;
@@ -86,7 +89,12 @@ export class PcvDetailComponent {
         return this.items().reduce((s, i) => s + (Number(i.amount) || 0), 0);
     }
 
-    // ─── Workflow actions ─────────────────────────────────────────────
+    isEditable(): boolean {
+        const status = this.data?.documentStatus?.status || '';
+        return status === 'Document Created' || status === 'Returned to Creator';
+    }
+
+    // ─── Workflow ─────────────────────────────────────────────────────
 
     loadWorkflowActions(): void {
         const transId = this.data?.transId || this.data?.transaction?.id;
@@ -99,7 +107,7 @@ export class PcvDetailComponent {
 
     processWorkflow(): void {
         if (!this.selectedAction) return;
-        this.formSubmit = true;
+        this.processingWorkflow = true;
         const transId = this.data?.transId || this.data?.transaction?.id;
         const payload = {
             documentId:         this.data.id,
@@ -109,7 +117,7 @@ export class PcvDetailComponent {
         };
         this.service.process(payload).subscribe({
             next: (res) => {
-                this.formSubmit = false;
+                this.processingWorkflow = false;
                 if (res?.success) {
                     this.alertService.success(this.module, 'Processed.', '');
                     this.loadData();
@@ -117,7 +125,7 @@ export class PcvDetailComponent {
                     this.alertService.error(this.module, 'Process failed.', res?.failureMessage || '');
                 }
             },
-            error: () => { this.formSubmit = false; this.alertService.error(this.module, 'Process Error', ''); }
+            error: () => { this.processingWorkflow = false; this.alertService.error(this.module, 'Process Error', ''); }
         });
     }
 
@@ -131,34 +139,45 @@ export class PcvDetailComponent {
 
     toggleLogs(): void {
         this.showLogs = !this.showLogs;
-        if (this.showLogs && this.logs().length === 0) {
+        if (this.showLogs && this.logs.length === 0 && !this.logsLoading) {
             this.loadLogs();
         }
     }
 
     loadLogs(): void {
-        const transId = this.data?.transaction?.id;
-        if (!transId) return;
-        this.logsLoading.set(true);
+        const transId = this.data?.transId || this.data?.transaction?.id;
+        if (!transId || this.logsLoading) return;
+        this.logsLoading = true;
         this.service.getLogs(transId).subscribe({
-            next: (logs) => { this.logs.set(Array.isArray(logs) ? logs : []); this.logsLoading.set(false); },
-            error: () => this.logsLoading.set(false)
+            next: (logs) => { this.logs = Array.isArray(logs) ? logs : []; this.logsLoading = false; },
+            error: () => { this.logsLoading = false; }
         });
-    }
-
-    parseLogValue(newValue: string): any {
-        try { return JSON.parse(newValue); } catch { return {}; }
     }
 
     // ─── Cash flow ────────────────────────────────────────────────────
 
     loadCashFlowData(): void {
-        this.cashFlowDetails = this.data?.cashFlowDetails || this.data?.budgetDetails || [];
-        const budgetLineItemDetailId = this.data?.budgetLineItemDetail?.id;
-        if (this.data?.isDocumentForCashFlowItemAssignment && budgetLineItemDetailId) {
-            this.loadCashFlowBalances(budgetLineItemDetailId);
-            this.loadCashFlowItems();
-        }
+        const transactionId = this.data?.transaction?.id;
+        if (!transactionId) return;
+
+        this.service.isDocumentForCashFlowAssignment(transactionId).subscribe({
+            next: (flag) => {
+                this.data.isDocumentForCashFlowItemAssignment = flag;
+                if (flag) {
+                    const budgetLineItemDetailId = this.data?.budgetLineItemDetail?.id;
+                    if (budgetLineItemDetailId) {
+                        this.loadCashFlowBalances(budgetLineItemDetailId);
+                    }
+                    this.loadCashFlowItems();
+                }
+            },
+            error: () => { this.data.isDocumentForCashFlowItemAssignment = false; }
+        });
+
+        this.service.getPcvCashFlowDetails(this.data.id).subscribe({
+            next: (details) => { this.cashFlowDetails = details || []; },
+            error: () => { this.cashFlowDetails = []; }
+        });
     }
 
     loadCashFlowItems(): void {

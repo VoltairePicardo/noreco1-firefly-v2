@@ -2,97 +2,85 @@
     <app-page-title [title]="module" [subTitle]="subModule" [menuLink]="menuLink"/>
 </div>
 
-<div class="container-fluid">
-    @if (isLoading()) {
-        <div class="d-flex align-items-center gap-2 text-muted py-4">
-            <span class="spinner-border spinner-border-sm" role="status"></span> Loading...
+<div class="card mb-3">
+    <div class="card-body">
+
+        <!-- Actions -->
+        <div class="d-flex gap-2 justify-content-end align-items-center pt-3 border-top mt-3">
+            <a [routerLink]="['/' + menuLink]" class="btn btn-light fw-bold">
+                <ng-icon name="tablerArrowLeft" class="ps-0 pe-3 fw-bold"></ng-icon>Back
+            </a>
+            <a [routerLink]="['/' + menuLink, id, 'edit']" class="btn btn-primary fw-bold">
+                <ng-icon name="tablerEdit" class="ps-0 pe-3 fw-bold"></ng-icon>Edit
+            </a>
         </div>
-    } @else {
-    <div class="row g-3">
 
-        <!-- Budget Information -->
-        <div class="col-xl-12">
-            <app-ui-card title="Budget Information">
-                <div class="col-xl-12 p-3" card-body>
-                    <div class="row g-3">
+        @if (isLoading()) {
+            <div class="d-flex align-items-center gap-2 text-muted py-4">
+                <span class="spinner-border spinner-border-sm" role="status"></span> Loading...
+            </div>
+        } @else {
+            <hr class="my-3"/>
 
-                        <div class="col-md-3">
-                            <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Reference No.</div>
-                            <div class="fw-bold">{{ data.localCode || data.id || '—' }}</div>
-                        </div>
-
-                        <div class="col-md-3">
-                            <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Year</div>
-                            <div class="fw-bold">{{ data.year || '—' }}</div>
-                        </div>
-
-                        <div class="col-md-3">
-                            <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Total Amount</div>
-                            <div class="fw-bold">{{ (data.amount ?? totalAmount) | number:'1.2-2' }}</div>
-                        </div>
-
-                        <div class="col-md-3">
-                            <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Created On</div>
-                            <div>{{ data.createdAt | date:'MMM dd, yyyy' }}</div>
-                        </div>
-
-                        <div class="col-md-3">
-                            <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Prepared By</div>
-                            <div>{{ data.createdBy?.fullName || '—' }}</div>
-                        </div>
-
-                    </div>
+            <!-- Budget Information -->
+            <div class="fs-xs text-uppercase fw-semibold text-muted mb-2">Budget Information</div>
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Reference No.</div>
+                    <div class="fw-bold">{{ data.localCode || data.id || '—' }}</div>
                 </div>
-            </app-ui-card>
-        </div>
-
-        <!-- Budget Details -->
-        <div class="col-xl-12">
-            <app-ui-card title="Budget Details">
-                <div class="col-xl-12 p-3" card-body>
-                    <div class="table-responsive">
-                        <table class="table table-custom table-centered table-hover w-100 mb-0">
-                            <thead class="bg-light align-middle bg-opacity-25 thead-sm">
-                                <tr class="text-uppercase fs-xxs">
-                                    <th>Cashflow Item</th>
-                                    <th>Cashflow Type</th>
-                                    <th class="text-end">Amount</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @for (detail of details; track $index) {
-                                    <tr>
-                                        <td>{{ detail.cashflowItem?.name || '—' }}</td>
-                                        <td>{{ detail.cashflowItem?.cashflowItemType?.name || detail.cashflowItem?.cashflowItemType || '—' }}</td>
-                                        <td class="text-end fw-bold">{{ detail.amount | number:'1.2-2' }}</td>
-                                    </tr>
-                                }
-                                @if (details.length === 0) {
-                                    <tr><td colspan="3" class="text-center text-muted py-3">No budget details.</td></tr>
-                                }
-                                @if (details.length > 0) {
-                                    <tr class="fw-bold bg-light">
-                                        <td colspan="2" class="text-end fw-bold text-uppercase fs-xs">Total</td>
-                                        <td class="text-end">{{ totalAmount | number:'1.2-2' }}</td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <div class="d-flex gap-2 justify-content-end align-items-center pt-3 border-top mt-3">
-                        <a [routerLink]="['/' + menuLink]" class="btn btn-light fw-bold">
-                            <ng-icon name="tablerArrowLeft" class="ps-0 pe-3 fw-bold"></ng-icon>Back
-                        </a>
-                        <a [routerLink]="['/' + menuLink, id, 'edit']" class="btn btn-primary fw-bold">
-                            <ng-icon name="tablerEdit" class="ps-0 pe-3 fw-bold"></ng-icon>Edit
-                        </a>
-                    </div>
-
+                <div class="col-md-3">
+                    <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Year</div>
+                    <div class="fw-bold">{{ data.year || '—' }}</div>
                 </div>
-            </app-ui-card>
-        </div>
+                <div class="col-md-3">
+                    <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Total Amount</div>
+                    <div class="fw-bold">{{ (data.amount ?? totalAmount) | number:'1.2-2' }}</div>
+                </div>
+                <div class="col-md-3">
+                    <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Created On</div>
+                    <div>{{ data.createdAt | date:'MMM dd, yyyy' }}</div>
+                </div>
+                <div class="col-md-3">
+                    <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Prepared By</div>
+                    <div>{{ data.createdBy?.fullName || '—' }}</div>
+                </div>
+            </div>
+
+            <hr class="my-3"/>
+
+            <!-- Budget Details -->
+            <div class="fs-xs text-uppercase fw-semibold text-muted mb-2">Budget Details</div>
+            <div class="table-responsive">
+                <table class="table table-custom table-centered table-hover w-100 mb-0">
+                    <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                        <tr class="text-uppercase fs-xxs">
+                            <th>Cashflow Item</th>
+                            <th>Cashflow Type</th>
+                            <th class="text-end">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (detail of details; track $index) {
+                            <tr>
+                                <td>{{ detail.cashflowItem?.name || '—' }}</td>
+                                <td>{{ detail.cashflowItem?.cashflowItemType?.name || detail.cashflowItem?.cashflowItemType || '—' }}</td>
+                                <td class="text-end fw-bold">{{ detail.amount | number:'1.2-2' }}</td>
+                            </tr>
+                        }
+                        @if (details.length === 0) {
+                            <tr><td colspan="3" class="text-center text-muted py-3">No budget details.</td></tr>
+                        }
+                        @if (details.length > 0) {
+                            <tr class="fw-bold bg-light">
+                                <td colspan="2" class="text-end fw-bold text-uppercase fs-xs">Total</td>
+                                <td class="text-end">{{ totalAmount | number:'1.2-2' }}</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
 
     </div>
-    }
 </div>

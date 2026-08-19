@@ -107,6 +107,9 @@ public class PettyCashTransServiceImpl implements PettyCashTransService, Printab
     @Autowired
     PettyCashTransBudgetDetailRepo pettyCashTransBudgetDetailRepo;
 
+    @Autowired
+    CheckVoucherRepo checkVoucherRepo;
+
     @Override
     public HashMap findById(Integer id) {
         HashMap map = new HashMap();
@@ -213,6 +216,7 @@ public class PettyCashTransServiceImpl implements PettyCashTransService, Printab
 
             pettyCashBatch.setCreatedBy(processedBy);
             pettyCashBatch.setStatus(closed);
+            pettyCashBatch.setCreatedAt(new Date());
 
             pettyCashBatch = pettyCashBatchRepo.save(pettyCashBatch);
 
@@ -222,6 +226,7 @@ public class PettyCashTransServiceImpl implements PettyCashTransService, Printab
 
                 pettyCashBatch.setCreatedBy(processedBy);
                 pettyCashBatch.setStatus(active);
+                pettyCashBatch.setCreatedAt(new Date());
 
                 pettyCashBatch = pettyCashBatchRepo.save(pettyCashBatch);
 
@@ -242,6 +247,7 @@ public class PettyCashTransServiceImpl implements PettyCashTransService, Printab
 
         pettyCashBatch.setCreatedBy(authenticationFacade.getLoggedIn());
         pettyCashBatch.setStatus(pettyCashBatchDto.getStatus() != 0);
+        pettyCashBatch.setCreatedAt(new Date());
 
         if(loggedInEmployee != null){
             if(loggedInEmployee.getOffice() != null){
@@ -536,6 +542,7 @@ public class PettyCashTransServiceImpl implements PettyCashTransService, Printab
             response = messageFormatter.getResponse();
         } else {
             PettyCashTrans existingPct;
+
             User createdBy = authenticationFacade.getLoggedIn();
             User approvedBy = userRepo.findOneByAccountNo(pct.getApprovingOfficer().getAccountNo());
             User checkedBy = userRepo.findOneByAccountNo(pct.getChecker().getAccountNo());
@@ -561,6 +568,9 @@ public class PettyCashTransServiceImpl implements PettyCashTransService, Printab
                 pct.setTransaction(generatorFacade.transaction());
                 pct.setCreatedBy(createdBy);
                 pct.setWorkflow(wf);
+                pct.setCreatedAt(new Date());
+                PettyCashBatch activeBatch = pettyCashBatchRepo.findFirstByStatusAndOfficeIdOrderByCreatedAtDesc(true, employee.getOffice().getId());
+                pct.setPettyCashBatch(activeBatch);
 
                 existingPct = pct;
             } else {
@@ -626,6 +636,7 @@ public class PettyCashTransServiceImpl implements PettyCashTransService, Printab
             existingPct.setYear(voucherYear);
             existingPct.setBudgetLineItemDetail(pct.getBudgetLineItemDetail());
             existingPct.setPettyCashFund(pct.getPettyCashFund());
+            existingPct.setCreatedAt(new Date());
 
             this.model = pettyCashTransRepo.save(existingPct);
 
@@ -806,6 +817,41 @@ public class PettyCashTransServiceImpl implements PettyCashTransService, Printab
         return pettyCashTransBudgetDetails;
     }
 
+    @Override
+    public List<HashMap> findCheckVouchers(String from, String to, String code) {
+        List<HashMap> list = new ArrayList<>();
+        try {
+            java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd");
+
+            java.util.Calendar cal = java.util.Calendar.getInstance();
+            cal.set(java.util.Calendar.DAY_OF_MONTH, 1);
+            Date fromDate = (from != null && !from.isEmpty()) ? sdf.parse(from) : cal.getTime();
+            Date toDate   = (to   != null && !to.isEmpty())   ? sdf.parse(to)   : new Date();
+
+            List<Object[]> results = checkVoucherRepo.findByDocumentStatusIdAndTransactionIdInAndVoucherDateBetween(
+                    fromDate, toDate, 7); // 7 = APPROVED
+
+            for (Object[] row : results) {
+                String cvCode = row[4] != null ? row[4].toString() : "";
+                if (code != null && !code.isEmpty() && !cvCode.toLowerCase().contains(code.toLowerCase())) {
+                    continue;
+                }
+                HashMap<String, Object> hm = new HashMap<>();
+                hm.put("id",            row[0]);
+                hm.put("transactionId", row[1]);
+                hm.put("checkAmount",   row[2]);
+                hm.put("particulars",   row[3]);
+                hm.put("code",          row[4]);
+                hm.put("voucherDate",   row[5]);
+                hm.put("payee",         row[6]);
+                list.add(hm);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
     private HashMap composeHashMap(PettyCashTrans pettyCashTrans) {
         HashMap<String, Object> hm = new HashMap<>();
         HashMap<String, Object> documentStatus;
@@ -886,6 +932,16 @@ public class PettyCashTransServiceImpl implements PettyCashTransService, Printab
             hm.put("officeId", pettyCashTrans.getOffice() == null ? "":pettyCashTrans.getOffice().getId());
             hm.put("documentStatusId", pettyCashTrans.getDocumentStatus() == null ? "":pettyCashTrans.getDocumentStatus().getId());
             hm.put("budgetLineItemDetail", pettyCashTrans.getBudgetLineItemDetail() == null ? "":pettyCashTrans.getBudgetLineItemDetail());
+            List<HashMap<String, Object>> detailList = new ArrayList<>();
+            for (PettyCashTransDetail d : pettyCashTransDetailRepo.findByPCVId(pettyCashTrans.getId())) {
+                HashMap<String, Object> dm = new HashMap<>();
+                dm.put("id", d.getId());
+                dm.put("remarks", d.getRemarks());
+                dm.put("amount", d.getAmount());
+                dm.put("balance", d.getBalance());
+                detailList.add(dm);
+            }
+            hm.put("pettyCashTransDetails", detailList);
         } catch (Exception ex) {
             Logger.getLogger(PettyCashTransServiceImpl.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -907,7 +963,7 @@ public class PettyCashTransServiceImpl implements PettyCashTransService, Printab
 
             hm.put("id", pettyCashBatch.getId());
             hm.put("createdBy", createdBy);
-            hm.put("status", (pettyCashBatch.getStatus() == false ? "Active" : "Closed"));
+            hm.put("status", (pettyCashBatch.getStatus() ? "Active" : "Closed"));
             hm.put("createdAt", pettyCashBatch.getCreatedAt());
         } catch (Exception ex) {
             Logger.getLogger(PettyCashTransServiceImpl.class.getName()).log(Level.SEVERE, null, ex);

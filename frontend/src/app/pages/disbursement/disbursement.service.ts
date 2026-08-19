@@ -70,7 +70,8 @@ export class DisbursementService {
     }
 
     approveAll(ids: number[]): Observable<any> {
-        return this.http.post<any>(`${BASE_API}/disbursement/approve-all`, { ids }, httpOptions);
+        const payloads = ids.map(id => ({ documentId: id, remarks: '', documentType: 'CV' }));
+        return this.http.post<any>(`${BASE_API}/approve-vouchers/process-all`, payloads, httpOptions);
     }
 
     getFiles(id: number): Observable<any[]> {

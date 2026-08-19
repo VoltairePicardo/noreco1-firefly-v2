@@ -9,6 +9,15 @@
 
                 <!-- Filters -->
                 <div class="row mb-3 align-items-end g-2">
+                    <div class="col-md-auto ms-auto">
+                        <button type="button" class="btn btn-primary fw-bold d-flex align-items-center gap-2"
+                                [routerLink]="['/' + menuLink, 'create']">
+                            <ng-icon name="tablerPlus" class="fw-bold"></ng-icon>Create {{ module }}
+                        </button>
+                    </div>
+                </div>
+
+                <div class="row mb-3 align-items-end g-2">
                     <div class="col-md-2">
                         <label class="form-label fw-bold mb-1 fs-xs text-uppercase">From</label>
                         <input type="text" mwlFlatpickr [options]="flatpickrOptions"
@@ -22,7 +31,7 @@
                     <div class="col-md-2">
                         <label class="form-label fw-bold mb-1 fs-xs text-uppercase">Status</label>
                         <select class="form-select" [(ngModel)]="selectedStatusId">
-                            <option [ngValue]="null">Pending APV</option>
+                            <option [ngValue]="0">All</option>
                             @for (s of statuses(); track s.id) {
                                 <option [ngValue]="s.id">{{ s.status || s.description }}</option>
                             }
@@ -39,12 +48,6 @@
                         </button>
                         <button type="button" class="btn btn-danger fw-bold" (click)="reset()">
                             <ng-icon name="tablerRefresh" class="ps-0 pe-3 fw-bold"></ng-icon>Reset
-                        </button>
-                    </div>
-                    <div class="col-md-auto ms-auto">
-                        <button type="button" class="btn btn-primary fw-bold d-flex align-items-center gap-2"
-                                [routerLink]="['/' + menuLink, 'create']">
-                            <ng-icon name="tablerPlus" class="fw-bold"></ng-icon>Create {{ module }}
                         </button>
                     </div>
                 </div>

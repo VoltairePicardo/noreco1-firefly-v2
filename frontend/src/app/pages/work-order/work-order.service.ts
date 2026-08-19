@@ -5,7 +5,6 @@ import { environment } from '@/environments/environment';
 import { DownloadService } from '@/app/core/services/download.service';
 
 const BASE_API = environment.get('baseApiUrl');
-const BASE_URL = environment.get('baseUrl');
 const httpOptions = {
     headers: new HttpHeaders({ 'Content-Type': 'application/json' })
 };
@@ -45,11 +44,11 @@ export class WorkOrderService {
     }
 
     getWorkflowActions(transId: number): Observable<any[]> {
-        return this.http.get<any[]>(`${BASE_URL}/json/workflow-actions/${transId}`);
+        return this.http.get<any[]>(`${BASE_API}/json/workflow-actions/${transId}`);
     }
 
     getDocumentLogs(transId: number): Observable<any[]> {
-        return this.http.post<any[]>(`${BASE_URL}/document/${transId}/logs`, {}, httpOptions);
+        return this.http.post<any[]>(`${BASE_API}/document/${transId}/logs`, {}, httpOptions);
     }
 
     getPostedVouchers(id: number): Observable<any[]> {
@@ -69,6 +68,6 @@ export class WorkOrderService {
     }
 
     print(id: number): void {
-        this.downloadService.print(`${BASE_URL}/work-order/export/${id}`, { type: 'pdf' });
+        this.downloadService.print(`${BASE_API}/work-order/export/${id}`, { type: 'pdf' });
     }
 }

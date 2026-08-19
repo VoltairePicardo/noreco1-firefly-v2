@@ -5,7 +5,6 @@ import { environment } from '@/environments/environment';
 import { DownloadService } from '@/app/core/services/download.service';
 
 const BASE_API = environment.get('baseApiUrl');
-const BASE_URL = environment.get('baseUrl');
 const httpOptions = { headers: new HttpHeaders({ 'Content-Type': 'application/json' }) };
 
 @Injectable({ providedIn: 'root' })
@@ -23,7 +22,7 @@ export class CashReceiptsService {
 
     listByDateRange(from: string, to: string, statusId: number | null = null): Observable<any[]> {
         let params = new HttpParams().set('from', from).set('to', to);
-        if (statusId != null) params = params.set('statusId', statusId);
+        if (statusId != null && statusId !== 0) params = params.set('statusId', statusId);
         return this.http.get<any[]>(`${BASE_API}/cash-receipts/list/date-range`, { params });
     }
 
@@ -52,11 +51,11 @@ export class CashReceiptsService {
     }
 
     getWorkflowActions(transId: number): Observable<any[]> {
-        return this.http.get<any[]>(`${BASE_URL}/json/workflow-actions/${transId}`);
+        return this.http.get<any[]>(`${BASE_API}/json/workflow-actions/${transId}`);
     }
 
     getDocumentLogs(transId: number): Observable<any[]> {
-        return this.http.get<any[]>(`${BASE_URL}/json/document-logs/${transId}`);
+        return this.http.get<any[]>(`${BASE_API}/json/document-logs/${transId}`);
     }
 
     searchAccounts(q: string = '', page = 0, size = 10): Observable<any> {
@@ -65,7 +64,8 @@ export class CashReceiptsService {
     }
 
     approveAll(ids: number[]): Observable<any> {
-        return this.http.post<any>(`${BASE_API}/cash-receipts/approve-all`, { ids }, httpOptions);
+        const payloads = ids.map(id => ({ documentId: id, remarks: '', documentType: 'CRV' }));
+        return this.http.post<any>(`${BASE_API}/approve-vouchers/process-all`, payloads, httpOptions);
     }
 
     print(id: number): void {

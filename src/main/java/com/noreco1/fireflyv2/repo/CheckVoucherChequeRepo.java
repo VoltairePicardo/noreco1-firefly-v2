@@ -22,7 +22,7 @@ public interface CheckVoucherChequeRepo extends JpaRepository<CheckVoucherCheque
     @Query(value = "SELECT " +
             "cvc.id, " +
             "cvc.checkNumber, " +
-            "gl.debit + gl.credit AS amount, " +
+            "SUM(gl.debit + gl.credit) AS amount, " +
             "cv.code, " +
             "cv.voucherDate, " +
             "cv.particulars, " +
@@ -30,12 +30,16 @@ public interface CheckVoucherChequeRepo extends JpaRepository<CheckVoucherCheque
             "cvc.cleared, " +
             "cvc.FK_transactionId, " +
             "cvc.FK_accountId, " +
-            "a.id as accountId " +
+            "a.id as accountId, " +
+            "sle.name as payee " +
             "FROM CheckVoucherCheque cvc " +
             "INNER JOIN GeneralLedger gl ON gl.FK_transactionId = cvc.FK_transactionId " +
             "INNER JOIN CheckVoucher cv ON cv.FK_transactionId = cvc.FK_transactionId " +
-            "INNER JOIN SegmentAccount sa ON sa.id = gl.FK_segmentAccountId " +
-            "INNER JOIN Account a ON a.id = sa.FK_accountId WHERE cvc.released = :isReleased", nativeQuery = true)
+            "INNER JOIN SegmentAccount sa ON sa.id = gl.FK_segmentAccountId AND sa.FK_accountId = cvc.FK_accountId " +
+            "INNER JOIN Account a ON a.id = sa.FK_accountId " +
+            "LEFT JOIN slentity sle ON sle.accountNo = cv.FK_payeeAccountNo " +
+            "WHERE cvc.released = :isReleased " +
+            "GROUP BY cvc.id, cvc.checkNumber, cv.code, cv.voucherDate, cv.particulars, a.title, cvc.cleared, cvc.FK_transactionId, cvc.FK_accountId, a.id, sle.name", nativeQuery = true)
     public List<Object[]> findByReleasedWithCheckVoucherAndAmount(@Param("isReleased") Boolean isReleased);
 
     @Query(value = "SELECT code, voucherDate, checkNumber, SUM(GeneralLedger.credit) as checkAmount, `status`, released FROM CheckVoucherCheque " +

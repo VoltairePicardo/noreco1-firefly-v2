@@ -113,11 +113,11 @@ export class GeneralJournalDetailComponent {
     }
 
     get totalDebit(): number {
-        return this.journalEntries.reduce((sum, e) => sum + (Number(e.debit ?? e.debitAmount) || 0), 0);
+        return this.journalEntries.reduce((sum, e) => sum + (Number(e.glDebitAmount) || 0), 0);
     }
 
     get totalCredit(): number {
-        return this.journalEntries.reduce((sum, e) => sum + (Number(e.credit ?? e.creditAmount) || 0), 0);
+        return this.journalEntries.reduce((sum, e) => sum + (Number(e.glCreditAmount) || 0), 0);
     }
 
     fileUrl(fileId: number): string {

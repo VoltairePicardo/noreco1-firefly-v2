@@ -87,11 +87,6 @@
                                         (click)="openBankBrowse()">
                                     <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
                                 </button>
-                                @if (bankAccount) {
-                                    <button type="button" class="btn btn-light" (click)="bankAccount = null">
-                                        <ng-icon name="tablerX" class="fw-bold"></ng-icon>
-                                    </button>
-                                }
                             </div>
                             @if (bankAccount?.accountNumber) {
                                 <small class="text-muted">Account No: {{ bankAccount.accountNumber }}</small>

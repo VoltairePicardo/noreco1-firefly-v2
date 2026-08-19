@@ -60,6 +60,7 @@ public class PurchaseRequest extends Document implements Serializable {
 
     @Column
     private Date bacDate;
+
     @Column
     private BigDecimal estimatedAmount;
 

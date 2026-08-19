@@ -33,7 +33,7 @@
                         <label class="form-label fw-bold mb-1 fs-xs text-uppercase">Status</label>
                         <select class="form-select" [ngModel]="selectedStatus()"
                                 (ngModelChange)="selectedStatus.set($event)">
-                            <option [ngValue]="null">— All Statuses —</option>
+                            <option [ngValue]="0">All</option>
                             @for (s of documentStatuses(); track s.id) {
                                 <option [ngValue]="s.id">{{ s.status || s.description }}</option>
                             }
@@ -69,11 +69,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @if (isLoading()) {
-                                    <tr><td colspan="7" class="text-center py-3">
-                                        <span class="spinner-border spinner-border-sm me-2"></span>Loading...
-                                    </td></tr>
-                                } @else if (pagedRecords.length > 0) {
+                                @if (pagedRecords.length > 0) {
                                     @for (rec of pagedRecords; track rec.id) {
                                         <tr>
                                             <td class="text-center">
@@ -81,11 +77,11 @@
                                                     <input type="checkbox" class="form-check-input" [(ngModel)]="rec.selected"/>
                                                 }
                                             </td>
-                                            <td class="fw-bold">{{ rec.localCode }}</td>
+                                            <td class="fw-bold">{{ rec.code }}</td>
                                             <td>{{ rec.voucherDate | date:'MM/dd/yyyy' }}</td>
                                             <td>{{ rec.explanation || rec.remarks }}</td>
-                                            <td class="text-end fw-bold">{{ (rec.amount || rec.totalDebit) | number:'1.2-2' }}</td>
-                                            <td><span class="badge bg-secondary bg-opacity-25 text-dark border">{{ rec.status }}</span></td>
+                                            <td class="text-end fw-bold">{{ rec.amount | number:'1.2-2' }}</td>
+                                            <td><span class="badge bg-secondary bg-opacity-25 text-dark border">{{ rec.documentStatus?.status }}</span></td>
                                             <td class="text-nowrap">
                                                 <div class="d-flex justify-content-end gap-1">
                                                     <a href="javascript:void(0)" ngbTooltip="View"
@@ -105,7 +101,13 @@
                                         </tr>
                                     }
                                 } @else {
-                                    <tr><td colspan="7" class="text-center text-muted py-3">Nothing found.</td></tr>
+                                    <tr class="no-results">
+                                        <td colspan="7" class="text-center text-muted py-3">
+                                            @if (isLoading()) {
+                                                <span class="spinner-border spinner-border-sm me-2" role="status"></span>Loading...
+                                            } @else { Nothing found. }
+                                        </td>
+                                    </tr>
                                 }
                             </tbody>
                         </table>
@@ -126,11 +128,12 @@
                 </div>
 
                 @if (filteredRecords.length > pageSize) {
-                    <div class="d-flex justify-content-center pagination-boxed align-items-center mt-3">
-                        <ngb-pagination [collectionSize]="filteredRecords.length" [(page)]="page" [pageSize]="pageSize"
-                                        [maxSize]="5" [rotate]="true">
-                            <ng-template ngbPaginationPrevious><ng-icon name="tablerChevronLeft"/></ng-template>
-                            <ng-template ngbPaginationNext><ng-icon name="tablerChevronRight"/></ng-template>
+                    <div class="d-flex justify-content-center mt-3">
+                        <ngb-pagination
+                            [collectionSize]="filteredRecords.length"
+                            [(page)]="page"
+                            [pageSize]="pageSize"
+                            [maxSize]="5">
                         </ngb-pagination>
                     </div>
                 }

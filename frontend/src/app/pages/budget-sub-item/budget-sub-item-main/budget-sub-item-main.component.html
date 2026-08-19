@@ -21,7 +21,7 @@
                         <label class="form-label fw-bold mb-1 fs-xs text-uppercase">Division</label>
                         <select class="form-select" [(ngModel)]="divisionFilter" name="divisionFilter"
                                 [compareWith]="compareFn">
-                            <option [ngValue]="null">— All Divisions —</option>
+                            <option [ngValue]="null">All Divisions</option>
                             @for (d of divisions; track d.id) {
                                 <option [ngValue]="d">{{ d.name || d.description }}</option>
                             }
@@ -49,6 +49,7 @@
                         <table class="table table-custom table-centered table-select table-hover w-100 mb-0">
                             <thead class="bg-light align-middle bg-opacity-25 thead-sm">
                                 <tr class="text-uppercase fs-xxs">
+                                    <th style="width:30px"></th>
                                     <th style="width:10%">Code</th>
                                     <th style="width:15%">Division</th>
                                     <th>Title / Description</th>
@@ -58,11 +59,19 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @if (treeData().length > 0) {
-                                    @for (row of treeData(); track $index) {
+                                @if (visibleRows.length > 0) {
+                                    @for (row of visibleRows; track row._idx) {
                                         @if (row.isHeader) {
                                             <!-- Header row (BudgetLineItemDetail) -->
                                             <tr class="table-light">
+                                                <td class="text-center">
+                                                    <button type="button"
+                                                            class="btn btn-light btn-icon btn-sm rounded-circle"
+                                                            [ngbTooltip]="isCollapsed(row.id) ? 'Expand' : 'Collapse'"
+                                                            (click)="toggleRow(row.id)">
+                                                        <ng-icon [name]="isCollapsed(row.id) ? 'tablerPlus' : 'tablerMinus'"></ng-icon>
+                                                    </button>
+                                                </td>
                                                 <td class="fw-bold">{{ row.code }}</td>
                                                 <td class="fw-semibold">{{ row.division }}</td>
                                                 <td class="fw-bold">{{ row.title }}</td>
@@ -74,7 +83,7 @@
                                                                 class="btn btn-light btn-icon btn-sm rounded-circle"
                                                                 ngbTooltip="Manage Sub Items"
                                                                 (click)="editSubItems(row)">
-                                                            <ng-icon name="tablerPlus"></ng-icon>
+                                                            <ng-icon name="tablerEdit"></ng-icon>
                                                         </button>
                                                     </div>
                                                 </td>
@@ -84,13 +93,14 @@
                                             <tr>
                                                 <td></td>
                                                 <td></td>
+                                                <td></td>
                                                 <td class="ps-4 text-muted">{{ row.title }}</td>
                                                 <td></td>
                                                 <td class="text-end">{{ row.projectCost | number:'1.2-2' }}</td>
                                                 <td class="text-nowrap">
                                                     <div class="d-flex justify-content-end gap-1">
                                                         <button type="button"
-                                                                class="btn btn-danger btn-icon btn-sm rounded-circle"
+                                                                class="btn btn-light btn-icon btn-sm rounded-circle"
                                                                 ngbTooltip="Delete Sub Item"
                                                                 (click)="deleteSubItem(row)">
                                                             <ng-icon name="tablerTrash"></ng-icon>
@@ -102,7 +112,7 @@
                                     }
                                 } @else {
                                     <tr class="no-results">
-                                        <td colspan="6" class="text-center text-muted py-3">
+                                        <td colspan="7" class="text-center text-muted py-3">
                                             @if (isLoading()) {
                                                 <span class="spinner-border spinner-border-sm me-2" role="status"></span>Loading...
                                             } @else { Nothing found. }

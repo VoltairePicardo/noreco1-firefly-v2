@@ -7,23 +7,12 @@ const BASE_API = environment.get('baseApiUrl');
 const httpOptions = { headers: new HttpHeaders({ 'Content-Type': 'application/json' }) };
 
 const DOC_BROWSE_ENDPOINTS: Record<string, string> = {
-    rr:            'receiving-report/apv-approved-paged',
-    stockReceive:  'inventory/receiving/approved-paged',
-    mct:           'inventory/mct/approved-paged',
-    stockRelease:  'inventory/releasing/approved-paged',
-    mst:           'inventory/mst/approved-paged',
-    stockAdjust:   'inventory/stock-adjustment/approved-paged',
-    rv:            'requisition-voucher/browse-paged',
-    canvass:       'canvass/browse-paged',
-    quotation:     'quotation/browse-paged',
-    po:            'purchase-order/browse-paged',
-    jo:            'job-order/browse-paged',
-    joa:           'jo-acceptance/browse-paged',
-    paymentReq:    'payment-request/browse-paged',
-    ccpr:          'credit-card-purchase-request/browse-paged',
-    apv:           'apv/browse-paged',
-    disbursement:  'disbursement/browse-paged',
-    generalJournal: 'general-journal/browse-paged',
+    rr:           'receiving-report/apv-approved-paged',
+    stockReceive: 'inventory/receiving/approved-paged',
+    mct:          'inventory/mct/approved-paged',
+    stockRelease: 'inventory/releasing/approved-paged',
+    mst:          'inventory/mst/approved-paged',
+    stockAdjust:  'inventory/stock-adjustment/approved-paged',
 };
 
 @Injectable({ providedIn: 'root' })
@@ -61,12 +50,8 @@ export class AccountSettingService {
         return this.http.get(`${BASE_API}/${endpoint}`, { params });
     }
 
-    searchAccounts(q: string = '', page = 0, size = 20): Observable<any> {
-        const params = new HttpParams().set('q', q).set('page', page).set('size', size);
-        return this.http.get(`${BASE_API}/accounting/accounts/search`, { params });
-    }
-
     getSupplierAccount(): Observable<any> {
         return this.http.get(`${BASE_API}/accounting/accounts/supplier-account`);
     }
+
 }

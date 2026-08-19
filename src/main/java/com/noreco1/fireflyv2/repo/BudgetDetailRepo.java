@@ -50,6 +50,9 @@ public interface BudgetDetailRepo extends JpaRepository<BudgetDetail, Integer> {
 
     Long deleteByBudgetId(Integer id);
 
+    @Query(value = "SELECT COALESCE(SUM(bd.amount), 0) FROM BudgetDetail bd WHERE bd.FK_budgetId = :budgetId", nativeQuery = true)
+    BigDecimal sumAmountByBudgetId(@Param("budgetId") Integer budgetId);
+
     @Query(value = "SELECT " +
             "    bd.* " +
             "FROM BudgetDetail bd " +

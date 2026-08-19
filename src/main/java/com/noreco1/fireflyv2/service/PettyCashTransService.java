@@ -58,4 +58,6 @@ public interface PettyCashTransService extends VoucherService {
 
     List<PettyCashTransBudgetDetail> getPettyCashTransBudgetDetail(Integer pcvId);
 
+    List<HashMap> findCheckVouchers(String from, String to, String code);
+
 }

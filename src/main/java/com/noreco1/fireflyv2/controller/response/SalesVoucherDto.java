@@ -1,5 +1,6 @@
 package com.noreco1.fireflyv2.controller.response;
 
+import com.noreco1.fireflyv2.controller.response.reports.CommonLedgerDetail;
 import com.noreco1.fireflyv2.model.DocumentStatus;
 import com.noreco1.fireflyv2.model.Office;
 import com.noreco1.fireflyv2.model.SlEntity;
@@ -7,6 +8,7 @@ import com.noreco1.fireflyv2.model.User;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by TSI Admin on 4/23/2015.
@@ -27,6 +29,7 @@ public class SalesVoucherDto {
     private Date lastUpdated;
     private Date created;
     private Office office;
+    private List<CommonLedgerDetail> journalEntries;
 
 
     public SalesVoucherDto() {}
@@ -149,5 +152,13 @@ public class SalesVoucherDto {
 
     public void setRecommendingOfficer(SlEntity recommendingOfficer) {
         this.recommendingOfficer = recommendingOfficer;
+    }
+
+    public List<CommonLedgerDetail> getJournalEntries() {
+        return journalEntries;
+    }
+
+    public void setJournalEntries(List<CommonLedgerDetail> journalEntries) {
+        this.journalEntries = journalEntries;
     }
 }

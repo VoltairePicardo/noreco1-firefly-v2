@@ -103,14 +103,8 @@
                                     <button type="button" class="btn btn-success fw-bold"
                                             (click)="openBudgetLineItemBrowse()"
                                             [disabled]="budgetUpdate">
-                                        <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
+                                        <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
                                     </button>
-                                    @if (budgetLineItemDetail) {
-                                        <button type="button" class="btn btn-danger fw-bold"
-                                                (click)="clearBudgetLineItem()">
-                                            <ng-icon name="tablerX" class="ps-0 pe-0 fw-bold"></ng-icon>
-                                        </button>
-                                    }
                                 </div>
                             </div>
                         </div>
@@ -143,9 +137,9 @@
                         <!-- 8. Petty Cash Items table -->
                         <div class="col-12">
                             <div class="d-flex justify-content-end mb-2">
-                                <button type="button" class="btn btn-success btn-sm fw-bold" (click)="addDetail()"
+                                <button type="button" class="btn btn-primary fw-bold" (click)="addDetail()"
                                         [disabled]="budgetUpdate">
-                                    <ng-icon name="tablerPlus" class="ps-0 pe-2 fw-bold"></ng-icon>Add Row
+                                    <ng-icon name="tablerPlus" class="ps-0 pe-3 fw-bold"></ng-icon>Add Row
                                 </button>
                             </div>
                             <div class="table-responsive">
@@ -239,14 +233,8 @@
                                 <button type="button" class="btn btn-success fw-bold"
                                         (click)="openSignatoryBrowse('approvingOfficer')"
                                         [disabled]="budgetUpdate">
-                                    <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
+                                    <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
                                 </button>
-                                @if (approvingOfficer) {
-                                    <button type="button" class="btn btn-danger fw-bold"
-                                            (click)="clearSignatory('approvingOfficer')">
-                                        <ng-icon name="tablerX" class="ps-0 pe-0 fw-bold"></ng-icon>
-                                    </button>
-                                }
                             </div>
                             @if (submit && !approvingOfficer) {
                                 <div class="text-danger fs-xs mt-1">Please select an approving officer.</div>
@@ -263,14 +251,8 @@
                                 <button type="button" class="btn btn-success fw-bold"
                                         (click)="openSignatoryBrowse('checker')"
                                         [disabled]="budgetUpdate">
-                                    <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
+                                    <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
                                 </button>
-                                @if (checker) {
-                                    <button type="button" class="btn btn-danger fw-bold"
-                                            (click)="clearSignatory('checker')">
-                                        <ng-icon name="tablerX" class="ps-0 pe-0 fw-bold"></ng-icon>
-                                    </button>
-                                }
                             </div>
                         </div>
 
@@ -284,14 +266,8 @@
                                 <button type="button" class="btn btn-success fw-bold"
                                         (click)="openSignatoryBrowse('releasingOfficer')"
                                         [disabled]="budgetUpdate">
-                                    <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
+                                    <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
                                 </button>
-                                @if (releasingOfficer) {
-                                    <button type="button" class="btn btn-danger fw-bold"
-                                            (click)="clearSignatory('releasingOfficer')">
-                                        <ng-icon name="tablerX" class="ps-0 pe-0 fw-bold"></ng-icon>
-                                    </button>
-                                }
                             </div>
                         </div>
 
@@ -300,8 +276,13 @@
                                 <ng-icon name="tablerArrowLeft" class="ps-0 pe-3 fw-bold"></ng-icon>Back
                             </a>
                             <button type="submit" class="btn btn-primary fw-bold" [disabled]="formSubmit">
-                                <ng-icon name="tablerCheck" class="ps-0 pe-3 fw-bold"></ng-icon>
-                                {{ editMode ? 'Update' : 'Save ' + module }}
+                                @if (formSubmit) {
+                                    <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                                    {{ editMode ? 'Updating...' : 'Saving...' }}
+                                } @else {
+                                    <ng-icon name="tablerCheck" class="ps-0 pe-3 fw-bold"></ng-icon>
+                                    {{ editMode ? 'Update' : 'Save ' + module }}
+                                }
                             </button>
                         </div>
 

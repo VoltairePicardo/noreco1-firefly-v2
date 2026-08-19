@@ -18,20 +18,15 @@
                     <!-- Inventory Document -->
                     <div class="row g-3">
                         <div class="col-md-8">
-                            <label class="form-label fw-bold">Inventory Document <span class="text-danger">*</span></label>
+                            <label class="form-label fw-bold">Inventory Document <!--<span class="text-danger">*</span>--></label>
                             <div class="input-group">
                                 <input type="text" class="form-control"
                                        [value]="selectedInventoryDoc ? ((selectedInventoryDoc.localCode || selectedInventoryDoc.code) + (selectedInventoryDoc.purpose ? ' — ' + selectedInventoryDoc.purpose : '')) : ''"
                                        readonly placeholder="Select inventory document..."/>
                                 <button type="button" class="btn btn-success fw-bold"
                                         (click)="openInvDocBrowse()">
-                                    <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
+                                    <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
                                 </button>
-                                @if (selectedInventoryDoc) {
-                                    <button type="button" class="btn btn-light" (click)="clearInventoryDoc()">
-                                        <ng-icon name="tablerX" class="fw-bold"></ng-icon>
-                                    </button>
-                                }
                             </div>
                         </div>
                     </div>
@@ -117,13 +112,8 @@
                                            readonly placeholder="Select person..."/>
                                     <button type="button" class="btn btn-success fw-bold"
                                             (click)="openEntityBrowse(key)">
-                                        <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
+                                        <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
                                     </button>
-                                    @if (signatories[key]) {
-                                        <button type="button" class="btn btn-light" (click)="clearSignatory(key)">
-                                            <ng-icon name="tablerX" class="fw-bold"></ng-icon>
-                                        </button>
-                                    }
                                 </div>
                                 @if (signatories[key]?.position) {
                                     <small class="text-muted">{{ signatories[key].position }}</small>
@@ -138,8 +128,13 @@
                         </a>
                         <button type="button" class="btn btn-primary fw-bold"
                                 [disabled]="formSubmit" (click)="save()">
-                            <ng-icon name="tablerCheck" class="ps-0 pe-3 fw-bold"></ng-icon>
-                            {{ editMode ? 'Update' : 'Save' }}
+                            @if (formSubmit) {
+                                <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                                {{ editMode ? 'Updating...' : 'Saving...' }}
+                            } @else {
+                                <ng-icon name="tablerCheck" class="ps-0 pe-3 fw-bold"></ng-icon>
+                                {{ editMode ? 'Update' : 'Save ' + module }}
+                            }
                         </button>
                     </div>
 

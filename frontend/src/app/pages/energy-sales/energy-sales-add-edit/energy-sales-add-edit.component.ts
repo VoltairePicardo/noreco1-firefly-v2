@@ -76,10 +76,10 @@ export class EnergySalesAddEditComponent {
                     this.voucherDate      = data.voucherDate ? new Date(data.voucherDate).toISOString().substring(0, 10) : '';
                     this.particulars      = data.particulars || '';
                     this.approvingOfficer = data.approvingOfficer || null;
-                    this.journalEntries   = (data.journalEntries || data.details || []).map((e: any): JournalEntry => ({
-                        account:         e.account || (e.code ? { accountCode: e.code, accountTitle: e.description, id: e.accountId } : null),
-                        debit:           Number(e.debit ?? e.debitAmount) || null,
-                        credit:          Number(e.credit ?? e.creditAmount) || null,
+                    this.journalEntries   = (data.journalEntries || data.details || []).filter((e: any) => e.accountCode || e.account?.accountCode || e.code).map((e: any): JournalEntry => ({
+                        account:         e.account || (e.accountCode ? { accountCode: e.accountCode, accountTitle: e.accountTitle, id: e.accountId } : e.code ? { accountCode: e.code, accountTitle: e.description, id: e.accountId } : null),
+                        debit:           Number(e.debit ?? e.debitAmount ?? e.glDebitAmount) || null,
+                        credit:          Number(e.credit ?? e.creditAmount ?? e.glCreditAmount) || null,
                         applyAllocation: e.applyAllocation || false,
                         allocationPct:   e.allocationPct   ?? null,
                         applyWht:        e.applyWht        || false,

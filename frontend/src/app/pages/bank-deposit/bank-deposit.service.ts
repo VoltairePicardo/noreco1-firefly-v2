@@ -29,8 +29,8 @@ export class BankDepositService {
         return this.http.post(`${BASE_API}/bank-deposit/update`, form, httpOptions);
     }
 
-    getBankAccounts(): Observable<any[]> {
-        return this.http.get<any[]>(`${BASE_API}/bank-account/list`);
+    getBankAccounts(q = '', page = 0, size = 10): Observable<any> {
+        return this.http.get(`${BASE_API}/bank-account/list`, { params: { q, page, size } });
     }
 
     getFiles(id: number): Observable<any[]> {

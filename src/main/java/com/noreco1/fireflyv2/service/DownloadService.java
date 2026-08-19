@@ -50,7 +50,7 @@ public class DownloadService {
 		 
 		try {
 
-			InputStream reportStream = this.getClass().getResourceAsStream(template);
+			InputStream reportStream = this.getClass().getResourceAsStream("/" + template);
 			JasperDesign jd = JRXmlLoader.load(reportStream);
 			JasperReport jr = JasperCompileManager.compileReport(jd);
 			// Make sure to pass the JasperReport, report parameters, and data source
@@ -116,7 +116,7 @@ public class DownloadService {
                 tokenService.remove(token);
             } else {
 
-                InputStream reportStream = this.getClass().getResourceAsStream(template);
+                InputStream reportStream = this.getClass().getResourceAsStream("/" + template);
                 JasperDesign jd = JRXmlLoader.load(reportStream);
                 JasperReport jr = JasperCompileManager.compileReport(jd);
                 // Make sure to pass the JasperReport, report parameters, and data source
@@ -181,7 +181,7 @@ public class DownloadService {
 
         try {
 
-            InputStream reportStream = this.getClass().getResourceAsStream(template);
+            InputStream reportStream = this.getClass().getResourceAsStream("/" + template);
             JasperDesign jd = JRXmlLoader.load(reportStream);
             JasperReport jr = JasperCompileManager.compileReport(jd);
 

@@ -9,44 +9,43 @@
         </div>
     } @else {
     <div class="row g-3">
-
         <div class="col-xl-12">
-
-            <!-- Parent Info Card -->
-            @if (parentInfo?.title) {
-                <div class="card mb-3">
-                    <div class="card-body py-2">
-                        <div class="row g-2">
-                            <div class="col-md-2">
-                                <span class="text-uppercase fs-xxs text-muted fw-bold">Code</span>
-                                <div class="fw-bold">{{ parentInfo.code || '—' }}</div>
-                            </div>
-                            <div class="col-md-3">
-                                <span class="text-uppercase fs-xxs text-muted fw-bold">Division</span>
-                                <div>{{ parentInfo.division || '—' }}</div>
-                            </div>
-                            <div class="col-md-4">
-                                <span class="text-uppercase fs-xxs text-muted fw-bold">Title</span>
-                                <div class="fw-semibold">{{ parentInfo.title }}</div>
-                            </div>
-                            <div class="col-md-1">
-                                <span class="text-uppercase fs-xxs text-muted fw-bold">Location</span>
-                                <div>{{ parentInfo.location || '—' }}</div>
-                            </div>
-                            <div class="col-md-2 text-end">
-                                <span class="text-uppercase fs-xxs text-muted fw-bold">Project Cost</span>
-                                <div class="fw-bold">{{ parentInfo.projectCost | number:'1.2-2' }}</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            }
 
             <app-ui-card title="Budget Sub Items">
                 <div class="col-xl-12 p-3" card-body>
                     <form class="row g-3 needs-validation" novalidate (ngSubmit)="save()">
 
+                        <!-- Parent Info -->
+                        <p class="fs-xs text-uppercase fw-semibold text-muted mb-0">Budget Line Item</p>
+                        @if (parentInfo?.title) {
+                            <div class="row g-2">
+                                <div class="col-md-2">
+                                    <span class="text-uppercase fs-xxs text-muted fw-bold">Code</span>
+                                    <div class="fw-bold">{{ parentInfo.code || '—' }}</div>
+                                </div>
+                                <div class="col-md-3">
+                                    <span class="text-uppercase fs-xxs text-muted fw-bold">Division</span>
+                                    <div>{{ parentInfo.division || '—' }}</div>
+                                </div>
+                                <div class="col-md-4">
+                                    <span class="text-uppercase fs-xxs text-muted fw-bold">Title</span>
+                                    <div class="fw-semibold">{{ parentInfo.title }}</div>
+                                </div>
+                                <div class="col-md-1">
+                                    <span class="text-uppercase fs-xxs text-muted fw-bold">Location</span>
+                                    <div>{{ parentInfo.location || '—' }}</div>
+                                </div>
+                                <div class="col-md-2 text-end">
+                                    <span class="text-uppercase fs-xxs text-muted fw-bold">Project Cost</span>
+                                    <div class="fw-bold">{{ parentInfo.projectCost | number:'1.2-2' }}</div>
+                                </div>
+                            </div>
+                        }
+
+                        <hr/>
+
                         <!-- Sub Items Table -->
+                        <p class="fs-xs text-uppercase fw-semibold text-muted mb-0">Sub Items</p>
                         <div class="col-12">
                             <div class="table-responsive">
                                 <table class="table table-sm table-bordered mb-0">
@@ -84,7 +83,7 @@
                                                 </td>
                                                 <td class="text-center">
                                                     <button type="button"
-                                                            class="btn btn-danger btn-icon btn-sm rounded-circle"
+                                                            class="btn btn-light btn-icon btn-sm rounded-circle"
                                                             ngbTooltip="Remove Row"
                                                             [disabled]="items.length <= 1"
                                                             (click)="removeRow($index)">
@@ -120,8 +119,7 @@
                                 <ng-icon name="tablerArrowLeft" class="ps-0 pe-3 fw-bold"></ng-icon>Back
                             </a>
                             <button type="submit" class="btn btn-primary fw-bold" [disabled]="formSubmit">
-                                <ng-icon name="tablerCheck" class="ps-0 pe-3 fw-bold"></ng-icon>
-                                {{ 'Save' }}
+                                <ng-icon name="tablerCheck" class="ps-0 pe-3 fw-bold"></ng-icon>Save {{ module }}
                             </button>
                         </div>
 
@@ -130,7 +128,6 @@
             </app-ui-card>
 
         </div>
-
     </div>
     }
 </div>

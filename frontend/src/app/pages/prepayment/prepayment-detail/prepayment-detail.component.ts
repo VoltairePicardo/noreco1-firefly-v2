@@ -3,12 +3,14 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { AlertService } from '@/app/shared/services/alert.service';
 import { COMMON_ALL_PAGE_IMPORTS, COMMON_MAIN_PAGE_IMPORTS, SHARED_PROVIDERS } from '@/app/shared/providers/shared-providers';
 import { PrepaymentService } from '../prepayment.service';
+import { provideIcons } from '@ng-icons/core';
+import { tablerArrowLeft, tablerEdit, tablerLink, tablerSearch } from '@ng-icons/tabler-icons';
 import Swal from 'sweetalert2';
 
 @Component({
     selector: 'app-prepayment-detail',
     imports: [...COMMON_ALL_PAGE_IMPORTS, ...COMMON_MAIN_PAGE_IMPORTS],
-    providers: [...SHARED_PROVIDERS],
+    providers: [...SHARED_PROVIDERS, provideIcons({ tablerArrowLeft, tablerEdit, tablerLink, tablerSearch })],
     templateUrl: './prepayment-detail.component.html'
 })
 export class PrepaymentDetailComponent {

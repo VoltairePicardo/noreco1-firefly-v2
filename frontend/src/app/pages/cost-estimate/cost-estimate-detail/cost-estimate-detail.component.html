@@ -8,17 +8,68 @@
     </div></div>
 } @else {
 
-<!-- Header Info -->
 <div class="card mb-3">
     <div class="card-body">
+
+        <!-- Footer Actions -->
+        <div class="d-flex gap-2 justify-content-end align-items-center pt-3 border-top mt-3">
+            <a [routerLink]="['/' + menuLink]" class="btn btn-light fw-bold">
+                <ng-icon name="tablerArrowLeft" class="ps-0 pe-3 fw-bold"></ng-icon>Back
+            </a>
+            <button type="button" class="btn btn-success fw-bold" (click)="print()">
+                <ng-icon name="tablerPrinter" class="ps-0 pe-3 fw-bold"></ng-icon>Print
+            </button>
+            @if (isEditable()) {
+                <a [routerLink]="['/' + menuLink, data.id, 'edit']" class="btn btn-primary fw-bold">
+                    <ng-icon name="tablerEdit" class="ps-0 pe-3 fw-bold"></ng-icon>Edit
+                </a>
+            }
+        </div>
+
+        <!-- Workflow Processing -->
+        @if (workflowActions.length > 0) {
+            <hr class="my-3"/>
+            <div class="fs-xs text-uppercase fw-semibold text-muted mb-2">Process Document</div>
+            <div class="row g-3 align-items-end">
+                <div class="col-md-3">
+                    <label class="form-label fw-bold">Action</label>
+                    <select class="form-select" [(ngModel)]="selectedAction">
+                        <option [ngValue]="null">— Select Action —</option>
+                        @for (a of workflowActions; track a.actionMapId) {
+                            <option [ngValue]="a">{{ a.action }}</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-bold">Remarks <span class="text-muted fw-normal">(optional)</span></label>
+                    <textarea rows="1" class="form-control" [(ngModel)]="remarks" placeholder="Enter remarks"></textarea>
+                </div>
+                <div class="col-md-2">
+                    <button type="button" class="btn btn-primary fw-bold"
+                            (click)="processWorkflow()"
+                            [disabled]="!selectedAction || processingWorkflow">
+                        @if (processingWorkflow) {
+                            <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                        } @else {
+                            <ng-icon name="tablerCheck" class="ps-0 pe-3 fw-bold"></ng-icon>
+                        }
+                        Process
+                    </button>
+                </div>
+            </div>
+        }
+
+        <hr class="my-3"/>
+
+        <!-- Header Info -->
         <div class="row g-3">
             <div class="col-md-2">
-                <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Code</div>
+                <div class="fs-xs text-uppercase fw-bold text-muted mb-1">CE No.</div>
                 <div class="fw-bold fs-5">{{ data.code || '—' }}</div>
             </div>
             <div class="col-md-2">
                 <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Date</div>
-                <div>{{ data.date | date:'MMMM d, yyyy' }}</div>
+                <div>{{ data.voucherDate | date:'MMMM d, yyyy' }}</div>
             </div>
             <div class="col-md-2">
                 <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Status</div>
@@ -32,64 +83,51 @@
             </div>
             <div class="col-md-3">
                 <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Type</div>
-                <div>{{ data.typeText || data.type?.description || '—' }}</div>
+                <div>{{ data.type === 1 ? 'Consumer' : data.type === 2 ? 'Other' : data.type || '—' }}</div>
             </div>
-            @if (data.notes) {
+        </div>
+        @if (data.notes) {
+            <div class="row g-3 mt-1">
                 <div class="col-md-12">
                     <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Notes</div>
                     <div style="white-space:pre-wrap">{{ data.notes }}</div>
                 </div>
-            }
-        </div>
-    </div>
-</div>
+            </div>
+        }
 
-<!-- Signatories -->
-@if (data.concurredBy || data.recommendedBy || data.approvedBy || data.createdBy) {
-    <div class="card mb-3">
-        <div class="card-body">
-            <div class="row g-3">
-                @if (data.createdBy) {
-                    <div class="col-md-3">
-                        <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Prepared By</div>
-                        <div>{{ data.createdBy?.fullName || data.createdBy || '—' }}</div>
-                    </div>
-                }
-                @if (data.concurredBy) {
-                    <div class="col-md-3">
-                        <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Concurred By</div>
-                        <div>{{ data.concurredBy }}</div>
-                    </div>
-                }
-                @if (data.recommendedBy) {
-                    <div class="col-md-3">
-                        <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Recommended By</div>
-                        <div>{{ data.recommendedBy }}</div>
-                    </div>
-                }
-                @if (data.approvedBy) {
-                    <div class="col-md-3">
-                        <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Approved By</div>
-                        <div>{{ data.approvedBy }}</div>
-                    </div>
-                }
+        <!-- Signatories -->
+        <hr class="my-3"/>
+        <div class="fs-xs text-uppercase fw-semibold text-muted mb-2">Signatories</div>
+        <div class="row g-3">
+            <div class="col-md-3">
+                <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Prepared By</div>
+                <div>{{ data.createdBy?.fullName || '—' }}</div>
+            </div>
+            <div class="col-md-3">
+                <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Concurred By</div>
+                <div>{{ data.checker?.fullName || '—' }}</div>
+            </div>
+            <div class="col-md-3">
+                <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Recommended By</div>
+                <div>{{ data.recommendedBy?.fullName || '—' }}</div>
+            </div>
+            <div class="col-md-3">
+                <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Approved By</div>
+                <div>{{ data.approvingOfficer?.fullName || '—' }}</div>
             </div>
         </div>
-    </div>
-}
 
-<!-- Project Details -->
-@if (data.project) {
-    <div class="card mb-3">
-        <div class="card-body">
-            <h6 class="fw-semibold text-uppercase fs-xs mb-3">Project Details</h6>
+        <!-- Project Details -->
+        @if (data.project) {
+            <hr class="my-3"/>
+            <div class="fs-xs text-uppercase fw-semibold text-muted mb-2">Project Details</div>
             <div class="row g-3">
                 <div class="col-md-3">
-                    <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Code</div>
+                    <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Project No.</div>
                     <div class="fw-semibold">{{ data.project.code || '—' }}</div>
                 </div>
                 <div class="col-md-9">
-                    <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Name</div>
+                    <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Project Name</div>
                     <div>{{ data.project.name || '—' }}</div>
                 </div>
                 @if (data.project.location) {
@@ -111,20 +149,17 @@
                     </div>
                 }
             </div>
-        </div>
-    </div>
-}
+        }
 
-<!-- Assemblies -->
-@if (assemblies.length > 0) {
-    <div class="card mb-3">
-        <div class="card-body">
-            <h6 class="fw-semibold text-uppercase fs-xs mb-3">Assemblies</h6>
+        <!-- Assemblies -->
+        @if (assemblies.length > 0) {
+            <hr class="my-3"/>
+            <div class="fs-xs text-uppercase fw-semibold text-muted mb-2">Assemblies</div>
             <div class="table-responsive">
                 <table class="table table-custom table-centered table-hover w-100 mb-0">
                     <thead class="bg-light align-middle bg-opacity-25 thead-sm">
                         <tr class="text-uppercase fs-xxs">
-                            <th>#</th>
+                            <th style="width:40px">#</th>
                             <th style="width:120px">Code</th>
                             <th>Description</th>
                             <th class="text-end">Labor Cost</th>
@@ -146,19 +181,16 @@
                     </tbody>
                 </table>
             </div>
-        </div>
-    </div>
-}
+        }
 
-<!-- Accessories -->
-<div class="card mb-3">
-    <div class="card-body">
-        <h6 class="fw-semibold text-uppercase fs-xs mb-3">Accessories</h6>
+        <!-- Accessories -->
+        <hr class="my-3"/>
+        <div class="fs-xs text-uppercase fw-semibold text-muted mb-2">Accessories</div>
         <div class="table-responsive">
             <table class="table table-custom table-centered table-hover w-100 mb-0">
                 <thead class="bg-light align-middle bg-opacity-25 thead-sm">
                     <tr class="text-uppercase fs-xxs">
-                        <th>#</th>
+                        <th style="width:40px">#</th>
                         <th>Description</th>
                         <th class="text-end">Qty</th>
                         <th class="text-end">Unit Cost</th>
@@ -182,18 +214,15 @@
                 </tbody>
             </table>
         </div>
-    </div>
-</div>
 
-<!-- Metering -->
-<div class="card mb-3">
-    <div class="card-body">
-        <h6 class="fw-semibold text-uppercase fs-xs mb-3">Metering</h6>
+        <!-- Metering -->
+        <hr class="my-3"/>
+        <div class="fs-xs text-uppercase fw-semibold text-muted mb-2">Metering</div>
         <div class="table-responsive">
             <table class="table table-custom table-centered table-hover w-100 mb-0">
                 <thead class="bg-light align-middle bg-opacity-25 thead-sm">
                     <tr class="text-uppercase fs-xxs">
-                        <th>#</th>
+                        <th style="width:40px">#</th>
                         <th>Description</th>
                         <th class="text-end">Qty</th>
                         <th class="text-end">Unit Cost</th>
@@ -217,19 +246,16 @@
                 </tbody>
             </table>
         </div>
-    </div>
-</div>
 
-<!-- Miscellaneous Charges -->
-@if (miscCharges.length > 0) {
-    <div class="card mb-3">
-        <div class="card-body">
-            <h6 class="fw-semibold text-uppercase fs-xs mb-3">Miscellaneous Charges</h6>
+        <!-- Miscellaneous Charges -->
+        @if (miscCharges.length > 0) {
+            <hr class="my-3"/>
+            <div class="fs-xs text-uppercase fw-semibold text-muted mb-2">Miscellaneous Charges</div>
             <div class="table-responsive">
                 <table class="table table-custom table-centered table-hover w-100 mb-0">
                     <thead class="bg-light align-middle bg-opacity-25 thead-sm">
                         <tr class="text-uppercase fs-xxs">
-                            <th>#</th>
+                            <th style="width:40px">#</th>
                             <th>Description</th>
                             <th class="text-end">Unit Cost</th>
                             <th class="text-end">Qty</th>
@@ -251,14 +277,11 @@
                     </tbody>
                 </table>
             </div>
-        </div>
-    </div>
-}
+        }
 
-<!-- Cost Summary -->
-<div class="card mb-3">
-    <div class="card-body">
-        <h6 class="fw-semibold text-uppercase fs-xs mb-3">Cost Summary</h6>
+        <!-- Cost Summary -->
+        <hr class="my-3"/>
+        <div class="fs-xs text-uppercase fw-semibold text-muted mb-2">Cost Summary</div>
         <table class="table table-sm mb-0" style="max-width:480px; margin-left:auto">
             <tbody>
                 <tr>
@@ -270,24 +293,24 @@
                     <td class="text-end">{{ (data.totalMeteringCost || 0) | number:'1.2-2' }}</td>
                 </tr>
                 <tr>
-                    <td class="text-end text-muted fs-xs text-uppercase pe-4">Total Labor Cost</td>
-                    <td class="text-end">{{ (data.laborCost || 0) | number:'1.2-2' }}</td>
-                </tr>
-                <tr>
-                    <td class="text-end text-muted fs-xs text-uppercase pe-4">Freight &amp; Handling</td>
-                    <td class="text-end">{{ (data.freightHandling || 0) | number:'1.2-2' }}</td>
-                </tr>
-                <tr>
-                    <td class="text-end text-muted fs-xs text-uppercase pe-4">Contingency</td>
-                    <td class="text-end">{{ (data.contingency || 0) | number:'1.2-2' }}</td>
+                    <td class="text-end text-muted fs-xs text-uppercase pe-4">Total Assembly Labor Cost</td>
+                    <td class="text-end">{{ (data.totalAssemblyLaborCost || 0) | number:'1.2-2' }}</td>
                 </tr>
                 <tr>
                     <td class="text-end text-muted fs-xs text-uppercase pe-4">Total Miscellaneous Charges</td>
                     <td class="text-end">{{ (data.totalMiscellaneousCharge || 0) | number:'1.2-2' }}</td>
                 </tr>
                 <tr>
-                    <td class="text-end text-muted fs-xs text-uppercase pe-4">Total Assembly Labor Cost</td>
-                    <td class="text-end">{{ (data.totalAssemblyLaborCost || 0) | number:'1.2-2' }}</td>
+                    <td class="text-end text-muted fs-xs text-uppercase pe-4">Labor Cost ({{ data.laborCostPercentage || 0 }}%)</td>
+                    <td class="text-end">{{ (data.laborCost || 0) | number:'1.2-2' }}</td>
+                </tr>
+                <tr>
+                    <td class="text-end text-muted fs-xs text-uppercase pe-4">Freight &amp; Handling ({{ data.freightHandlingPercentage || 0 }}%)</td>
+                    <td class="text-end">{{ (data.freightHandling || 0) | number:'1.2-2' }}</td>
+                </tr>
+                <tr>
+                    <td class="text-end text-muted fs-xs text-uppercase pe-4">Contingency ({{ data.contingencyPercentage || 0 }}%)</td>
+                    <td class="text-end">{{ (data.contingency || 0) | number:'1.2-2' }}</td>
                 </tr>
                 <tr class="table-primary">
                     <td class="text-end fw-bold text-uppercase pe-4">Grand Total</td>
@@ -295,63 +318,14 @@
                 </tr>
             </tbody>
         </table>
-    </div>
-</div>
 
-<!-- Workflow Processing -->
-@if (!isTerminal() && workflowActions.length > 0) {
-    <div class="card mb-3">
-        <div class="card-body">
-            <h6 class="fw-semibold text-uppercase fs-xs mb-3">Process Document</h6>
-            <div class="row g-3 align-items-end">
-                <div class="col-md-4">
-                    <label class="form-label fw-bold">Action</label>
-                    <select class="form-select" [(ngModel)]="selectedAction">
-                        <option [ngValue]="null">— Select action —</option>
-                        @for (a of workflowActions; track a.actionMapId) {
-                            <option [ngValue]="a">{{ a.action }}</option>
-                        }
-                    </select>
-                </div>
-                <div class="col-md-5">
-                    <label class="form-label fw-bold">Remarks</label>
-                    <input type="text" class="form-control" [(ngModel)]="remarks" placeholder="Optional remarks"/>
-                </div>
-                <div class="col-md-auto">
-                    <button type="button" class="btn btn-primary fw-bold"
-                            [disabled]="!selectedAction || processingWorkflow"
-                            (click)="processWorkflow()">
-                        @if (processingWorkflow) {
-                            <span class="spinner-border spinner-border-sm me-2" role="status"></span>
-                        }
-                        Process
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-}
-
-<!-- Footer Actions -->
-<div class="card">
-    <div class="card-body d-flex gap-2 justify-content-end align-items-center">
-        <a [routerLink]="['/' + menuLink]" class="btn btn-light fw-bold">Back</a>
-        <div class="d-flex gap-2">
-            <button type="button" class="btn btn-success fw-bold" (click)="print()">
-                <ng-icon name="tablerPrinter" class="ps-0 pe-3 fw-bold"></ng-icon>Print
-            </button>
-            @if (isEditable()) {
-                <a [routerLink]="['/' + menuLink, data.id, 'edit']" class="btn btn-primary fw-bold">
-                    <ng-icon name="tablerEdit" class="ps-0 pe-3 fw-bold"></ng-icon>Edit
-                </a>
-            }
-        </div>
     </div>
 </div>
 
 <!-- Document Logs -->
 <div class="mt-3">
-    <button type="button" class="btn btn-light btn-sm fw-bold" (click)="toggleLogs()">
+    <button type="button" class="btn btn-light fw-bold" (click)="toggleLogs()">
+        <ng-icon [name]="showLogs ? 'tablerEyeOff' : 'tablerEye'" class="ps-0 pe-3 fw-bold"></ng-icon>
         {{ showLogs ? 'Hide' : 'Show' }} Document Logs
     </button>
     @if (showLogs) {
@@ -365,17 +339,26 @@
                     <p class="text-muted mb-0">No logs found.</p>
                 } @else {
                     <div class="table-responsive">
-                        <table class="table table-sm w-100 mb-0">
-                            <thead><tr class="text-uppercase fs-xxs text-muted">
-                                <th>Date</th><th>Action</th><th>By</th><th>Remarks</th>
-                            </tr></thead>
+                        <table class="table table-sm table-hover w-100 mb-0">
+                            <thead class="bg-light bg-opacity-50">
+                                <tr class="text-uppercase fs-xxs text-muted">
+                                    <th class="text-nowrap">Date</th>
+                                    <th class="text-nowrap">By</th>
+                                    <th class="text-nowrap">Status</th>
+                                    <th>Remarks</th>
+                                </tr>
+                            </thead>
                             <tbody>
                                 @for (log of logs; track log.id) {
-                                    <tr>
-                                        <td class="text-nowrap">{{ log.createdAt | date:'MM/dd/yyyy hh:mm a' }}</td>
-                                        <td>{{ log.action }}</td>
-                                        <td>{{ log.createdBy?.fullName }}</td>
-                                        <td>{{ log.remarks }}</td>
+                                    <tr class="align-middle">
+                                        <td class="text-nowrap text-muted fs-xs">{{ log.createdAt | date:'MM/dd/yyyy hh:mm a' }}</td>
+                                        <td class="text-nowrap">{{ log.createdBy?.fullName || '—' }}</td>
+                                        <td class="text-nowrap">
+                                            <span class="badge bg-secondary bg-opacity-25 text-dark border">
+                                                {{ log.action || '—' }}
+                                            </span>
+                                        </td>
+                                        <td>{{ log.remarks || '—' }}</td>
                                     </tr>
                                 }
                             </tbody>

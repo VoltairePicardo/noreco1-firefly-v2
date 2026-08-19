@@ -266,6 +266,8 @@ public class SalesVoucherServiceImpl implements SalesVoucherService, PrintableVo
             if(salesVoucher.getPostedBy() != null) {
                 svDto.setPostedBy(slEntityRepo.findById(salesVoucher.getPostedBy().getAccountNo()).orElse(null));
             }
+
+            svDto.setJournalEntries(ledgerDtoers.getVoucherLedgerLines(salesVoucher.getTransaction().getId()));
         }
 
         return  svDto;

@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, ElementRef, HostListener, inject, QueryList, signal, ViewChildren } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AlertService } from '@/app/shared/services/alert.service';
 import {
@@ -7,6 +7,10 @@ import {
     COMMON_MAIN_PAGE_IMPORTS,
     SHARED_PROVIDERS
 } from '@/app/shared/providers/shared-providers';
+import { provideIcons } from '@ng-icons/core';
+import { tablerPlus, tablerArrowLeft, tablerCheck, tablerTrash, tablerEdit } from '@ng-icons/tabler-icons';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { BrowseCashflowItemModalComponent } from '@/app/shared/modals/browse-cashflow-item-modal/browse-cashflow-item-modal.component';
 import { BudgetService } from '../budget.service';
 
 @Component({
@@ -16,7 +20,7 @@ import { BudgetService } from '../budget.service';
         ...COMMON_ADD_EDIT_PAGE_IMPORTS,
         ...COMMON_MAIN_PAGE_IMPORTS,
     ],
-    providers: [...SHARED_PROVIDERS],
+    providers: [...SHARED_PROVIDERS, provideIcons({ tablerPlus, tablerArrowLeft, tablerCheck, tablerTrash, tablerEdit })],
     templateUrl: './budget-add-edit.component.html'
 })
 export class BudgetAddEditComponent {
@@ -42,6 +46,9 @@ export class BudgetAddEditComponent {
     private route        = inject(ActivatedRoute);
     private router       = inject(Router);
     private alertService = inject(AlertService);
+    private modal        = inject(NgbModal);
+
+    @ViewChildren('amountInput') amountInputs!: QueryList<ElementRef>;
 
     ngOnInit(): void {
         this.loadCashflowItems();
@@ -54,7 +61,6 @@ export class BudgetAddEditComponent {
                 this.loadForEdit();
             } else {
                 this.subModule = 'Create';
-                this.addDetail();
             }
         });
     }
@@ -95,17 +101,66 @@ export class BudgetAddEditComponent {
                     cashflowItem: d.cashflowItem || null,
                     amount: d.amount || 0
                 }));
-                if (this.budgetDetails.length === 0) this.addDetail();
             },
             error: () => {
                 this.isLoading.set(false);
-                this.addDetail();
             }
         });
     }
 
-    addDetail(): void {
-        this.budgetDetails.push({ cashflowItem: null, amount: 0 });
+    openCashflowBrowse(index?: number): void {
+        const ref = this.modal.open(BrowseCashflowItemModalComponent, { size: 'lg', centered: true, scrollable: true });
+        ref.componentInstance.items = this.cashflowItems();
+        ref.result.then(result => {
+            if (result?.action === 'select') {
+                const item = result.data;
+                if (index === undefined) {
+                    this.budgetDetails.push({ cashflowItem: item, amount: 0 });
+                } else {
+                    this.budgetDetails[index] = { ...this.budgetDetails[index], cashflowItem: item };
+                }
+                const targetIndex = index !== undefined ? index : this.budgetDetails.length - 1;
+                setTimeout(() => {
+                    const inputs = this.amountInputs.toArray();
+                    if (inputs[targetIndex]) {
+                        inputs[targetIndex].nativeElement.focus();
+                        inputs[targetIndex].nativeElement.select();
+                    }
+                }, 50);
+            }
+        }, () => {});
+    }
+
+    private lastEnterTime = 0;
+
+    @HostListener('document:keydown', ['$event'])
+    onGlobalKeydown(event: KeyboardEvent): void {
+        if (event.key !== '+') return;
+        const tag = (document.activeElement as HTMLElement)?.tagName?.toLowerCase();
+        if (tag !== 'input' && tag !== 'textarea' && tag !== 'select') {
+            event.preventDefault();
+            this.openCashflowBrowse();
+        }
+    }
+
+    onAmountKeydown(event: KeyboardEvent): void {
+        if (event.key === '+') {
+            event.preventDefault();
+            event.stopPropagation();
+            this.openCashflowBrowse();
+        } else if (event.key === 'Enter') {
+            this.onAmountEnter();
+        }
+    }
+
+    onAmountEnter(): void {
+        const now = Date.now();
+        if (now - this.lastEnterTime < 400) {
+            this.lastEnterTime = 0;
+            this.save();
+        } else {
+            this.lastEnterTime = now;
+        }
     }
 
     removeDetail(index: number): void {
@@ -116,8 +171,12 @@ export class BudgetAddEditComponent {
         return this.budgetDetails.reduce((sum, d) => sum + (Number(d.amount) || 0), 0);
     }
 
-    compareFn(a: any, b: any): boolean {
-        return a && b ? a.id === b.id : a === b;
+    clampYear(event: Event): void {
+        const input = event.target as HTMLInputElement;
+        if (input.value.length > 4) {
+            this.year = input.value.slice(0, 4);
+            input.value = this.year;
+        }
     }
 
     trackByIndex(index: number): number {

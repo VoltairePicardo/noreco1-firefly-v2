@@ -1,17 +1,17 @@
 import { Component, inject, signal } from '@angular/core';
+import { FormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AlertService } from '@/app/shared/services/alert.service';
 import {
     COMMON_ALL_PAGE_IMPORTS,
     COMMON_ADD_EDIT_PAGE_IMPORTS,
-    COMMON_MAIN_PAGE_IMPORTS,
-    SHARED_PROVIDERS
 } from '@/app/shared/providers/shared-providers';
-import { FlatpickrDirective, provideFlatpickrDefaults } from 'angularx-flatpickr';
+import { FlatpickrDefaults, FlatpickrModule } from 'angularx-flatpickr';
 import { CaService } from '../ca.service';
-import { ModalService } from '@/app/shared/modals/modal-service';
+import { SharedModalService } from '@/app/shared/modals/shared-modal-service/shared-modal.service';
 import { BrowseEntityModalComponent } from '@/app/shared/modals/browse-entity-modal/browse-entity-modal.component';
 import { BrowseBudgetLineItemModalComponent } from '@/app/shared/modals/browse-budget-line-item-modal/browse-budget-line-item-modal.component';
+import { forkJoin } from 'rxjs';
 
 interface CaParticular {
     particular: string;
@@ -26,10 +26,9 @@ interface CaParticular {
     imports: [
         ...COMMON_ALL_PAGE_IMPORTS,
         ...COMMON_ADD_EDIT_PAGE_IMPORTS,
-        ...COMMON_MAIN_PAGE_IMPORTS,
-        FlatpickrDirective
+        FlatpickrModule
     ],
-    providers: [provideFlatpickrDefaults(), ...SHARED_PROVIDERS],
+    providers: [FlatpickrDefaults],
     templateUrl: './ca-add-edit.component.html'
 })
 export class CaAddEditComponent {
@@ -39,53 +38,57 @@ export class CaAddEditComponent {
 
     id: any    = null;
     editMode   = false;
-    formSubmit = false;
     submit     = false;
+    formSubmit = false;
     isLoading  = signal(false);
 
-    units              = signal<any[]>([]);
-    offices            = signal<any[]>([]);
-    budgetLineItems    = signal<any[]>([]);
-    unliquidatedCAs    = signal<any[]>([]);
-    selectedOffice:        any = null;
-    budgetLineItemDetail:  any = null;
+    units           = signal<any[]>([]);
+    offices         = signal<any[]>([]);
+    budgetLineItems = signal<any[]>([]);
+    unliquidatedCAs = signal<any[]>([]);
 
     flatpickrOptions = { dateFormat: 'Y-m-d', altInput: true, altFormat: 'F j, Y' };
 
-    voucherDate       = '';
-    purpose           = '';
-    remarks           = '';
-    location          = '';
-    periodCoveredFrom = '';
-    periodCoveredTo   = '';
-
-    recommendedBy:    any = null;
-    budgetOfficer:    any = null;
-    approvingOfficer: any = null;
-
     particulars: CaParticular[] = [];
+    signatoryNames: { [key: string]: string } = {};
+    selectedBudgetLineItemText = '';
+
+    validationForm!: UntypedFormGroup;
 
     private service      = inject(CaService);
     private route        = inject(ActivatedRoute);
     private router       = inject(Router);
-    private modalService = inject(ModalService);
+    private modalService = inject(SharedModalService);
     private alertService = inject(AlertService);
+    private fb           = inject(FormBuilder);
 
     ngOnInit(): void {
-        this.loadUnits();
+        forkJoin({
+            units:           this.service.getUnits(),
+            budgetLineItems: this.service.getBudgetLineItems(),
+            offices:         this.service.getOffices(),
+        }).subscribe({
+            next: (res) => {
+                this.units.set(res.units || []);
+                this.budgetLineItems.set(res.budgetLineItems || []);
+                this.offices.set(res.offices || []);
+            },
+            error: () => {}
+        });
+
         this.route.paramMap.subscribe(params => {
             const idParam = params.get('id');
             this.editMode = idParam != null && /^\d+$/.test(idParam);
             if (this.editMode) {
                 this.id        = Number(idParam);
                 this.subModule = 'Edit';
-                this.loadOffices(() => this.loadForEdit());
+                this.loadForEdit();
             } else {
                 this.subModule = 'Create';
+                this.initForm();
                 this.addParticular();
-                this.setDefaultDates();
                 this.loadDefaultSignatories();
-                this.loadOffices(() => this.loadUserOffice());
+                this.loadUserOffice();
                 this.loadUnliquidatedCAs();
             }
         });
@@ -95,19 +98,38 @@ export class CaAddEditComponent {
         return new Date().toISOString().substring(0, 10);
     }
 
-    setDefaultDates(): void {
-        const t = this.today();
-        this.voucherDate       = t;
-        this.periodCoveredFrom = t;
-        this.periodCoveredTo   = t;
+    toDateInput(val: any): string {
+        if (!val) return '';
+        return new Date(val).toISOString().substring(0, 10);
     }
 
-    loadUnits(): void {
-        this.service.getUnits().subscribe({
-            next: (data) => { this.units.set(data || []); this.loadBudgetLineItems(); },
-            error: () => {}
+    initForm(data?: any): void {
+        const t = this.today();
+        this.validationForm = this.fb.group({
+            voucherDate:               [data?.voucherDate       ? this.toDateInput(data.voucherDate)       : t, Validators.required],
+            periodCoveredFrom:         [data?.periodCoveredFrom ? this.toDateInput(data.periodCoveredFrom) : t],
+            periodCoveredTo:           [data?.periodCoveredTo   ? this.toDateInput(data.periodCoveredTo)   : t],
+            purpose:                   [data?.purpose    || '', Validators.required],
+            remarks:                   [data?.remarks    || ''],
+            location:                  [data?.location   || ''],
+            officeId:                  [data?.office?.id || null],
+            budgetLineItemDetailId:    [data?.budgetLineItemDetail?.id || null],
+            recommendedByAccountNo:    [data?.recommendedBy?.accountNo    || null],
+            budgetOfficerAccountNo:    [data?.budgetOfficer?.accountNo    || null],
+            approvingOfficerAccountNo: [data?.approvingOfficer?.accountNo || null, Validators.required],
         });
+
+        if (data) {
+            if (data.recommendedBy?.name    || data.recommendedBy?.fullName)    this.signatoryNames['recommendedByAccountNo']    = data.recommendedBy.name    || data.recommendedBy.fullName;
+            if (data.budgetOfficer?.name    || data.budgetOfficer?.fullName)    this.signatoryNames['budgetOfficerAccountNo']    = data.budgetOfficer.name    || data.budgetOfficer.fullName;
+            if (data.approvingOfficer?.name || data.approvingOfficer?.fullName) this.signatoryNames['approvingOfficerAccountNo'] = data.approvingOfficer.name || data.approvingOfficer.fullName;
+            if (data.budgetLineItemDetail) {
+                this.selectedBudgetLineItemText = data.budgetLineItemDetail.code + ' — ' + data.budgetLineItemDetail.title;
+            }
+        }
     }
+
+    get form(): UntypedFormGroup { return this.validationForm; }
 
     loadUnliquidatedCAs(): void {
         this.service.getUnliquidatedList().subscribe({
@@ -116,23 +138,9 @@ export class CaAddEditComponent {
         });
     }
 
-    loadBudgetLineItems(): void {
-        this.service.getBudgetLineItems().subscribe({
-            next: (data) => this.budgetLineItems.set(data || []),
-            error: () => {}
-        });
-    }
-
-    loadOffices(callback?: () => void): void {
-        this.service.getOffices().subscribe({
-            next: (data) => { this.offices.set(data || []); if (callback) callback(); },
-            error: () => { if (callback) callback(); }
-        });
-    }
-
     loadUserOffice(): void {
         this.service.getUserOffice().subscribe({
-            next: (data) => { this.selectedOffice = data || null; },
+            next: (data) => { if (data?.id) this.form.get('officeId')?.setValue(data.id); },
             error: () => {}
         });
     }
@@ -140,11 +148,15 @@ export class CaAddEditComponent {
     loadDefaultSignatories(): void {
         this.service.getDefaultSignatories().subscribe({
             next: (data) => {
-                if (data) {
-                    this.recommendedBy    = data.recommendedBy    || null;
-                    this.budgetOfficer    = data.budgetOfficer    || null;
-                    this.approvingOfficer = data.approvingOfficer || data.approvedBy || null;
-                }
+                if (!data) return;
+                const patch: any = {};
+                const rec  = data.recommendedBy;
+                const bud  = data.budgetOfficer;
+                const app  = data.approvingOfficer || data.approvedBy;
+                if (rec?.accountNo)  { patch['recommendedByAccountNo']    = rec.accountNo;  this.signatoryNames['recommendedByAccountNo']    = rec.name; }
+                if (bud?.accountNo)  { patch['budgetOfficerAccountNo']    = bud.accountNo;  this.signatoryNames['budgetOfficerAccountNo']    = bud.name; }
+                if (app?.accountNo)  { patch['approvingOfficerAccountNo'] = app.accountNo;  this.signatoryNames['approvingOfficerAccountNo'] = app.name; }
+                this.form.patchValue(patch);
             },
             error: () => {}
         });
@@ -156,20 +168,10 @@ export class CaAddEditComponent {
             next: (data) => {
                 this.isLoading.set(false);
                 if (data?.id) {
-                    this.voucherDate       = data.voucherDate       ? new Date(data.voucherDate).toISOString().substring(0, 10) : '';
-                    this.periodCoveredFrom = data.periodCoveredFrom ? new Date(data.periodCoveredFrom).toISOString().substring(0, 10) : '';
-                    this.periodCoveredTo   = data.periodCoveredTo   ? new Date(data.periodCoveredTo).toISOString().substring(0, 10) : '';
-                    this.purpose           = data.purpose    || '';
-                    this.remarks           = data.remarks    || '';
-                    this.location          = data.location   || '';
-                    this.selectedOffice       = data.office              || null;
-                    this.budgetLineItemDetail = data.budgetLineItemDetail || null;
-                    this.recommendedBy        = data.recommendedBy       || null;
-                    this.budgetOfficer     = data.budgetOfficer    || null;
-                    this.approvingOfficer  = data.approvingOfficer || null;
+                    this.initForm(data);
                     this.particulars = (data.cashAdvanceParticulars || []).map((p: any) => ({
                         particular: p.particular || '',
-                        date:       p.date ? new Date(p.date).toISOString().substring(0, 10) : '',
+                        date:       p.date ? this.toDateInput(p.date) : '',
                         quantity:   Number(p.quantity) || 1,
                         unit:       p.unit || null,
                         amount:     Number(p.amount) || 0
@@ -212,63 +214,54 @@ export class CaAddEditComponent {
                 { size: 'lg', centered: true }
             );
             if (result?.action === 'select' && result?.data) {
-                this.budgetLineItemDetail = result.data;
+                this.form.get('budgetLineItemDetailId')?.setValue(result.data.id);
+                this.selectedBudgetLineItemText = result.data.code + ' — ' + result.data.title;
             }
         } catch { }
     }
 
     clearBudgetLineItem(): void {
-        this.budgetLineItemDetail = null;
+        this.form.get('budgetLineItemDetailId')?.setValue(null);
+        this.selectedBudgetLineItemText = '';
     }
 
-    async openSignatoryBrowse(field: 'recommendedBy' | 'budgetOfficer' | 'approvingOfficer'): Promise<void> {
+    async openSignatoryBrowse(field: 'recommendedByAccountNo' | 'budgetOfficerAccountNo' | 'approvingOfficerAccountNo'): Promise<void> {
         try {
             const result = await this.modalService.openModal(BrowseEntityModalComponent, { entityTypes: [1] }, { size: 'lg', centered: true });
             if (result?.action === 'select' && result?.data) {
-                this[field] = result.data;
+                this.form.get(field)?.setValue(result.data.accountNo);
+                this.signatoryNames[field] = result.data.name;
             }
         } catch { }
     }
 
-    clearSignatory(field: 'recommendedBy' | 'budgetOfficer' | 'approvingOfficer'): void {
-        this[field] = null;
-    }
-
-    compareById(a: any, b: any): boolean {
-        return a && b ? a.id === b.id : a === b;
-    }
-
-    isValid(): boolean {
-        return !!(
-            this.voucherDate &&
-            this.purpose?.trim() &&
-            this.recommendedBy &&
-            this.approvingOfficer &&
-            this.totalAmount > 0
-        );
-    }
-
-    save(): void {
+    validSubmit(): void {
         this.submit = true;
-        if (!this.isValid()) return;
-
         this.formSubmit = true;
+        if (this.validationForm.invalid) { this.formSubmit = false; return; }
+        if (this.totalAmount <= 0) {
+            this.alertService.error(this.module, 'Validation', 'Please add at least one item with an amount.');
+            this.formSubmit = false;
+            return;
+        }
+
+        const v = this.form.getRawValue();
         const payload: any = {
             id:               this.editMode ? this.id : null,
-            voucherDate:      this.voucherDate,
-            cashAdvanceDate:  this.voucherDate,
-            purpose:          this.purpose.trim(),
-            remarks:          this.remarks?.trim() || null,
-            location:         this.location?.trim() || null,
-            periodCoveredFrom: this.periodCoveredFrom || null,
-            periodCoveredTo:   this.periodCoveredTo   || null,
+            voucherDate:      v.voucherDate,
+            cashAdvanceDate:  v.voucherDate,
+            purpose:          v.purpose.trim(),
+            remarks:          v.remarks?.trim()  || null,
+            location:         v.location?.trim() || null,
+            periodCoveredFrom: v.periodCoveredFrom || null,
+            periodCoveredTo:   v.periodCoveredTo   || null,
             amount:           this.totalAmount,
             employee:         null,
-            office:               this.selectedOffice       ? { id: this.selectedOffice.id }       : null,
-            budgetLineItemDetail: this.budgetLineItemDetail ? { id: this.budgetLineItemDetail.id } : null,
-            recommendedBy:    this.recommendedBy    ? { id: this.recommendedBy.id }    : null,
-            budgetOfficer:    this.budgetOfficer    ? { id: this.budgetOfficer.id }    : null,
-            approvingOfficer: this.approvingOfficer ? { id: this.approvingOfficer.id } : null,
+            office:               v.officeId              ? { id: v.officeId }              : null,
+            budgetLineItemDetail: v.budgetLineItemDetailId ? { id: v.budgetLineItemDetailId } : null,
+            recommendedBy:    v.recommendedByAccountNo    ? { accountNo: v.recommendedByAccountNo }    : null,
+            budgetOfficer:    v.budgetOfficerAccountNo    ? { accountNo: v.budgetOfficerAccountNo }    : null,
+            approvingOfficer: v.approvingOfficerAccountNo ? { accountNo: v.approvingOfficerAccountNo } : null,
             cashAdvanceParticulars: this.particulars
                 .filter(p => p.particular?.trim())
                 .map(p => ({
@@ -286,8 +279,7 @@ export class CaAddEditComponent {
                 this.formSubmit = false;
                 if (res?.success) {
                     this.alertService.success(this.module, 'Saved successfully.', '');
-                    const id = res.modelId || this.id;
-                    this.router.navigate(['/' + this.menuLink, id, 'detail']);
+                    this.router.navigate(['/' + this.menuLink, res.modelId || this.id, 'detail']);
                 } else {
                     this.alertService.error(this.module, 'Save failed.', res?.failureMessage || '');
                 }

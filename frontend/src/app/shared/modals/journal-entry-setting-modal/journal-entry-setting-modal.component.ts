@@ -11,7 +11,7 @@ import { tablerCheck, tablerX } from '@ng-icons/tabler-icons';
 import { environment } from '@/environments/environment';
 import { JournalEntry } from '@/app/shared/forms/journal-entries-form/journal-entries-form.component';
 
-const BASE_URL = environment.get('baseUrl');
+const BASE_API = environment.get('baseApiUrl');
 
 @Component({
     selector: 'app-journal-entry-setting-modal',
@@ -51,7 +51,7 @@ export class JournalEntrySettingModalComponent implements OnInit {
             this.whtAmount   = this.entry.wht.amount ?? null;
         }
 
-        this.http.get<any[]>(`${BASE_URL}/json/tax-codes`).subscribe({
+        this.http.get<any[]>(`${BASE_API}/json/tax-codes`).subscribe({
             next:  (data) => { this.atcList = data || []; },
             error: ()     => { this.atcList = []; }
         });

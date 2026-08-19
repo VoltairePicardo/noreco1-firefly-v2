@@ -4,6 +4,7 @@ import com.noreco1.fireflyv2.model.ReceivingReport;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
@@ -61,7 +62,7 @@ public interface ReceivingReportRepo extends JpaRepository<ReceivingReport, Inte
             "LEFT JOIN CashAdvanceLiquidation cal ON ca.id = cal.FK_cashAdvanceId " +
             "LEFT JOIN CheckVoucher cv ON po.id = cv.FK_purchaseOrderId " +
             "WHERE rr.id = :rrId " +
-            "GROUP BY rr.id", nativeQuery = true)
+            "GROUP BY rr.id, cv.code, cv.amount, cal.id, cal.code, cal.amount, ca.code, po.useCreditCard", nativeQuery = true)
     public List<Object[]> detailsForAccountSetting(@Param("rrId") Integer rrId);
 
     @Transactional(readOnly = true)
@@ -380,4 +381,9 @@ public interface ReceivingReportRepo extends JpaRepository<ReceivingReport, Inte
                     "AND ReceivingReport.FK_transactionId NOT IN (SELECT COALESCE(JournalVoucher.invDocTransactionId, 0) FROM JournalVoucher) ",
             nativeQuery = true)
     Page<ReceivingReport> findAllForJV(@Param("documentStatusId") Integer documentStatusId, Pageable pageable);
+
+    @Modifying
+    @Transactional
+    @Query("UPDATE ReceivingReport r SET r.confirmedForJv = :confirmed WHERE r.id = :id")
+    void updateConfirmedForJv(@Param("id") Integer id, @Param("confirmed") boolean confirmed);
 }

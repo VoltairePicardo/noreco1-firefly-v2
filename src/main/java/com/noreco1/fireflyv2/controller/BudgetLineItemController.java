@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/budget-line-item")
+@RequestMapping("/api/budget-line-item")
 public class BudgetLineItemController {
 
     @Autowired

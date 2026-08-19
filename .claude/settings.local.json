@@ -73,7 +73,8 @@
       "Read(//mnt/c/Users/TSI-KEN04/Documents/**)",
       "Read(//c/Users/TSI-KEN04/Documents/GitHub/**)",
       "mcp__ide__getDiagnostics",
-      "Bash(bash:*)"
+      "Bash(bash:*)",
+      "WebFetch(domain:localhost)"
     ]
   }
 }

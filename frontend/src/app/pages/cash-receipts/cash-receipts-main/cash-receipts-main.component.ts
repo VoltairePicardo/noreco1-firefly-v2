@@ -43,7 +43,7 @@ export class CashReceiptsMainComponent {
 
     fromDate       = '';
     toDate         = '';
-    selectedStatus = signal<number | null>(null);
+    selectedStatus = signal<number>(0);
 
     private service      = inject(CashReceiptsService);
     private alertService = inject(AlertService);
@@ -78,7 +78,7 @@ export class CashReceiptsMainComponent {
 
     reset(): void {
         this.setDefaultDates();
-        this.selectedStatus.set(null);
+        this.selectedStatus.set(0);
         this.searchText = '';
         this.load();
     }

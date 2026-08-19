@@ -66,7 +66,8 @@ export class AdjustmentJournalService {
     }
 
     approveAll(ids: number[]): Observable<any> {
-        return this.http.post<any>(`${BASE_API}/adjustment-journal/approve-all`, { ids }, httpOptions);
+        const payloads = ids.map(id => ({ documentId: id, remarks: '', documentType: 'AJ' }));
+        return this.http.post<any>(`${BASE_API}/approve-vouchers/process-all`, payloads, httpOptions);
     }
 
     uploadFiles(id: number, formData: FormData): Observable<any> {

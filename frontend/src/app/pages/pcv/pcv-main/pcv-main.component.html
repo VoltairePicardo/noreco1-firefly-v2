@@ -15,7 +15,7 @@
                                placeholder="Code, payee, particulars..."
                                (ngModelChange)="onSearch()"/>
                     </div>
-                    <div class="col-auto d-flex gap-2">
+                    <div class="col-2 d-flex gap-2">
                         <button type="button" class="btn btn-success fw-bold" (click)="load()">
                             <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Search
                         </button>
@@ -23,16 +23,21 @@
                             <ng-icon name="tablerRefresh" class="ps-0 pe-3 fw-bold"></ng-icon>Reset
                         </button>
                     </div>
-                    <div class="col-md-auto ms-auto">
-                        <a class="btn btn-primary fw-bold" [routerLink]="['/' + menuLink + '/create']">
-                            <ng-icon name="tablerPlus" class="ps-0 pe-3 fw-bold"></ng-icon>New PCV
-                        </a>
+                    <div class="col-md-6">
+                        <div class="d-flex justify-content-end gap-2">
+                            <button type="button" class="btn btn-primary fw-bold" (click)="createBatch()">
+                                <ng-icon name="tablerPlus" class="ps-0 pe-3 fw-bold"></ng-icon>Create New Batch
+                            </button>
+                            <a class="btn btn-primary fw-bold" [routerLink]="['/' + menuLink + '/create']">
+                                <ng-icon name="tablerPlus" class="ps-0 pe-3 fw-bold"></ng-icon>New PCV
+                            </a>
+                        </div>
                     </div>
                 </div>
 
                 <!-- Row 2: Batch management toolbar -->
-                <div class="row mb-3 align-items-end g-2">
-                    <div class="col-md-3">
+                <div class="row mb-2 align-items-end mt-2">
+                    <div class="col-md-2">
                         <label class="form-label fw-bold mb-1 fs-xs text-uppercase">Batch</label>
                         <select class="form-select" [(ngModel)]="selectedBatch" (ngModelChange)="onSearch()"
                                 [compareWith]="compareBatch">
@@ -42,23 +47,21 @@
                             }
                         </select>
                     </div>
-                    <div class="col-auto d-flex align-items-center gap-2 pb-1">
+
+                    <div class="col-md-auto d-flex align-items-center gap-2 pb-1">
                         <div class="form-check form-switch mb-0">
                             <input class="form-check-input" type="checkbox" id="activeOnly"
-                                   [(ngModel)]="activeOnly" (ngModelChange)="onSearch()"/>
+                                   [(ngModel)]="activeOnly" (ngModelChange)="onActiveOnlyChange()"/>
                             <label class="form-check-label fw-bold fs-xs" for="activeOnly">Active Only</label>
                         </div>
-                    </div>
-                    <div class="col-auto d-flex gap-2">
-                        <button type="button" class="btn btn-primary fw-bold" (click)="createBatch()">
-                            <ng-icon name="tablerPlus" class="ps-0 pe-3 fw-bold"></ng-icon>Create New Batch
-                        </button>
+
                         <button type="button" class="btn btn-danger fw-bold"
                                 [disabled]="!selectedBatch"
                                 (click)="closeBatch()">
                             <ng-icon name="tablerX" class="ps-0 pe-3 fw-bold"></ng-icon>Close
                         </button>
-                        <button type="button" class="btn btn-success fw-bold" (click)="openReplenish()">
+
+                        <button type="button" class="btn btn-primary fw-bold" (click)="openReplenish()">
                             <ng-icon name="tablerCheck" class="ps-0 pe-3 fw-bold"></ng-icon>Replenish
                         </button>
                     </div>
@@ -141,82 +144,3 @@
         </div>
     </div>
 </div>
-
-<!-- Replenish Modal (ng-template) -->
-<ng-template #replenishModal let-modal>
-    <div class="modal-header">
-        <h5 class="modal-title fw-bold">Check Voucher List</h5>
-        <button type="button" class="btn-close" (click)="modal.dismiss()"></button>
-    </div>
-    <div class="modal-body">
-        <!-- Filter row -->
-        <div class="row g-2 mb-3 align-items-end">
-            <div class="col-md-3">
-                <label class="form-label fw-bold fs-xs text-uppercase">From</label>
-                <input type="text" mwlFlatpickr [options]="flatpickrOptions"
-                       class="form-control" [(ngModel)]="replenishFrom" placeholder="From date"/>
-            </div>
-            <div class="col-md-3">
-                <label class="form-label fw-bold fs-xs text-uppercase">To</label>
-                <input type="text" mwlFlatpickr [options]="flatpickrOptions"
-                       class="form-control" [(ngModel)]="replenishTo" placeholder="To date"/>
-            </div>
-            <div class="col-md-3">
-                <label class="form-label fw-bold fs-xs text-uppercase">Code</label>
-                <input type="text" class="form-control" [(ngModel)]="replenishCode" placeholder="CV code"/>
-            </div>
-            <div class="col-md-3">
-                <button type="button" class="btn btn-success fw-bold w-100" (click)="loadCheckVouchers()">
-                    <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Search
-                </button>
-            </div>
-        </div>
-        <!-- CV table -->
-        <div class="table-responsive">
-            @if (cvsLoading) {
-                <div class="d-flex align-items-center gap-2 text-muted py-3">
-                    <span class="spinner-border spinner-border-sm" role="status"></span> Loading...
-                </div>
-            } @else {
-                <table class="table table-custom table-centered table-hover w-100 mb-0">
-                    <thead class="bg-light align-middle bg-opacity-25 thead-sm">
-                        <tr class="text-uppercase fs-xxs">
-                            <th>Code</th>
-                            <th>Payee</th>
-                            <th class="text-end">Amount</th>
-                            <th>Particulars</th>
-                            <th>Voucher Date</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @if (cvs.length > 0) {
-                            @for (cv of cvs; track cv.id) {
-                                <tr (click)="selectCv(cv)" style="cursor:pointer"
-                                    [class.table-info]="selectedCv?.id === cv.id">
-                                    <td class="fw-bold">{{ cv.code }}</td>
-                                    <td>{{ cv.payee }}</td>
-                                    <td class="text-end fw-bold">{{ cv.checkAmount | number:'1.2-2' }}</td>
-                                    <td>{{ cv.particulars }}</td>
-                                    <td>{{ cv.voucherDate | date:'MMM dd, yyyy' }}</td>
-                                </tr>
-                            }
-                        } @else {
-                            <tr><td colspan="5" class="text-center text-muted py-3">No records found.</td></tr>
-                        }
-                    </tbody>
-                </table>
-            }
-        </div>
-    </div>
-    <div class="modal-footer d-flex justify-content-between">
-        <button type="button" class="btn btn-light fw-bold" (click)="modal.dismiss()">
-            <ng-icon name="tablerArrowLeft" class="ps-0 pe-3 fw-bold"></ng-icon>Cancel
-        </button>
-        <button type="button" class="btn btn-danger fw-bold"
-                [disabled]="!selectedCv || replenishProcessing"
-                (click)="confirmReplenish(modal)">
-            <ng-icon name="tablerCheck" class="ps-0 pe-3 fw-bold"></ng-icon>
-            {{ replenishProcessing ? 'Processing...' : 'Replenish CV' }}
-        </button>
-    </div>
-</ng-template>

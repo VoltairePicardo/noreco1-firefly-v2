@@ -834,6 +834,10 @@ public class JvServiceImpl implements JvService, PrintableVoucher {
 
         map.put("forAddingBudgetDetail", authenticationFacade.getLoggedIn().getAccountNo().equals(journalVoucher.getBudgetOfficer().getAccountNo()) && journalVoucher.getDocumentStatus().getId().equals(com.noreco1.fireflyv2.model.enums.DocumentStatus.FOR_BUDGET_OFFICER.getId()));
 
+        if (journalVoucher.getTransaction() != null) {
+            map.put("journalEntries", ledgerDtoers.getVoucherLedgerLines(journalVoucher.getTransaction().getId()));
+        }
+
         return map;
     }
 

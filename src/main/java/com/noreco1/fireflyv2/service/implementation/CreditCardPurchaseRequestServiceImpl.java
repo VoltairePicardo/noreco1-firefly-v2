@@ -263,7 +263,7 @@ public class CreditCardPurchaseRequestServiceImpl implements CreditCardPurchaseR
     @Override
     public List<DocumentStatus> getDocumentsStatuses() {
         CreditCardPurchaseRequest voucher = creditCardPurchaseRequestRepo.findFirstByOrderByIdAsc();
-        if (voucher != null) {
+        if (voucher != null && voucher.getWorkflow() != null) {
             return documentDtoer.getDocumentStatuses(voucher.getWorkflow().getId());
         }
 

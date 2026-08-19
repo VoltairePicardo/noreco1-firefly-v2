@@ -98,10 +98,12 @@ public class BankReconServiceImpl implements BankReconService {
                 od.setTransaction(generatorFacade.transaction());
                 od.setCreatedBy(createdBy);
                 od.setCleared(false);
+                od.setCreatedAt(new Date());
                 existingOd = od;
             } else {
                 existingOd = otherDepositRepo.findById(od.getId()).orElse(null);
             }
+            existingOd.setUpdatedAt(new Date());
             existingOd.setVoucherDate(od.getVoucherDate());
             existingOd.setCheckNumber(od.getCheckNumber());
             existingOd.setAmount(od.getAmount());

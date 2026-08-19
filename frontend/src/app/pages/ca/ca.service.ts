@@ -13,12 +13,13 @@ export class CaService {
     private downloadService = inject(DownloadService);
 
     list(from?: string, to?: string, statusId?: number, officeId?: number): Observable<any[]> {
-        let params = new HttpParams();
-        if (from)     params = params.set('from',     from);
-        if (to)       params = params.set('to',       to);
+        if (!from || !to) {
+            return this.http.get<any[]>(`${BASE_API}/cash-advance/list`);
+        }
+        let params = new HttpParams().set('from', from).set('to', to);
         if (statusId) params = params.set('statusId', statusId.toString());
         if (officeId) params = params.set('officeId', officeId.toString());
-        return this.http.get<any[]>(`${BASE_API}/cash-advance/list`, { params });
+        return this.http.get<any[]>(`${BASE_API}/cash-advance/list/date-range`, { params });
     }
 
     getData(id: number): Observable<any> {

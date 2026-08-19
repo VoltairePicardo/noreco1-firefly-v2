@@ -8,12 +8,62 @@
     </div></div>
 } @else {
 
-<!-- Header Info -->
 <div class="card mb-3">
     <div class="card-body">
+
+        <!-- Footer Actions -->
+        <div class="d-flex gap-2 justify-content-end align-items-center pt-3 border-top mt-3">
+            <a [routerLink]="['/' + menuLink]" class="btn btn-light fw-bold">
+                <ng-icon name="tablerArrowLeft" class="ps-0 pe-3 fw-bold"></ng-icon>Back
+            </a>
+            <!-- Print not yet implemented -->
+
+            @if (isEditable()) {
+                <a [routerLink]="['/' + menuLink, data.id, 'edit']" class="btn btn-primary fw-bold">
+                    <ng-icon name="tablerEdit" class="ps-0 pe-3 fw-bold"></ng-icon>Edit
+                </a>
+            }
+        </div>
+
+        <!-- Workflow Processing -->
+        @if (workflowActions.length > 0) {
+            <hr class="my-3"/>
+            <div class="fs-xs text-uppercase fw-semibold text-muted mb-2">Process Document</div>
+            <div class="row g-3 align-items-end">
+                <div class="col-md-3">
+                    <label class="form-label fw-bold">Action</label>
+                    <select class="form-select" [(ngModel)]="selectedAction">
+                        <option [ngValue]="null">— Select Action —</option>
+                        @for (a of workflowActions; track a.actionMapId) {
+                            <option [ngValue]="a">{{ a.action }}</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-bold">Remarks <span class="text-muted fw-normal">(optional)</span></label>
+                    <textarea rows="1" class="form-control" [(ngModel)]="remarks" placeholder="Enter remarks"></textarea>
+                </div>
+                <div class="col-md-2">
+                    <button type="button" class="btn btn-primary fw-bold"
+                            (click)="processWorkflow()"
+                            [disabled]="!selectedAction || processingWorkflow">
+                        @if (processingWorkflow) {
+                            <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                        } @else {
+                            <ng-icon name="tablerCheck" class="ps-0 pe-3 fw-bold"></ng-icon>
+                        }
+                        Process
+                    </button>
+                </div>
+            </div>
+        }
+
+        <hr class="my-3"/>
+
+        <!-- Header Info -->
         <div class="row g-3">
             <div class="col-md-3">
-                <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Code</div>
+                <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Project No.</div>
                 <div class="fw-bold fs-5">{{ data.code || '—' }}</div>
             </div>
             <div class="col-md-3">
@@ -22,7 +72,17 @@
                     {{ data.documentStatus?.status || '—' }}
                 </span>
             </div>
-            <div class="col-md-6">
+            <div class="col-md-3">
+                <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Year</div>
+                <div>{{ data.year || '—' }}</div>
+            </div>
+            <div class="col-md-3">
+                <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Project Manager</div>
+                <div>{{ data.projectManager || '—' }}</div>
+            </div>
+        </div>
+        <div class="row g-3 mt-1">
+            <div class="col-md-8">
                 <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Project Name</div>
                 <div class="fw-semibold">{{ data.name || '—' }}</div>
             </div>
@@ -30,31 +90,21 @@
                 <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Location</div>
                 <div>{{ data.location || '—' }}</div>
             </div>
+        </div>
+        <div class="row g-3 mt-1">
             <div class="col-md-4">
-                <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Project Type</div>
-                <div>{{ data.projectType || '—' }}</div>
-            </div>
-            <div class="col-md-4">
-                <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Funding Source</div>
-                <div>{{ data.fundingSource?.name || '—' }}</div>
-            </div>
-            <div class="col-md-8">
                 <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Requesting Party</div>
                 @if (data.office) {
-                    <div>{{ data.office.name }} ({{ data.office.accronym }})</div>
+                    <div>{{ data.office.name }}</div>
                 } @else if (data.department) {
-                    <div>{{ data.department.name }} ({{ data.department.abbreviation }})</div>
+                    <div>{{ data.department.name }}</div>
                 } @else if (data.consumerName) {
                     <div>{{ data.consumerAccountNumber }} — {{ data.consumerName }}</div>
                 } @else if (data.governmentOfficeName) {
                     <div>{{ data.governmentOfficeName }}</div>
                 } @else {
-                    <div>{{ data.requestingPartyName || data.requestingPartyType || '—' }}</div>
+                    <div>{{ data.requestingPartyName || '—' }}</div>
                 }
-            </div>
-            <div class="col-md-4">
-                <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Project Manager</div>
-                <div>{{ data.projectManager || '—' }}</div>
             </div>
             <div class="col-md-4">
                 <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Cost Estimate No.</div>
@@ -64,32 +114,33 @@
                 <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Work Order No.</div>
                 <div>{{ data.workOrderCode || '—' }}</div>
             </div>
-            @if (data.purpose) {
+        </div>
+        @if (data.purpose) {
+            <div class="row g-3 mt-1">
                 <div class="col-md-12">
                     <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Purpose</div>
                     <div>{{ data.purpose }}</div>
                 </div>
-            }
-            @if (data.paymentDetails) {
+            </div>
+        }
+        @if (data.paymentDetails) {
+            <div class="row g-3 mt-1">
                 <div class="col-md-12">
                     <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Payment Details</div>
                     <div>{{ data.paymentDetails }}</div>
                 </div>
-            }
-        </div>
-    </div>
-</div>
+            </div>
+        }
 
-<!-- Contractors -->
-@if (data.contractors?.length > 0) {
-    <div class="card mb-3">
-        <div class="card-body">
-            <h6 class="fw-semibold text-uppercase fs-xs mb-3">Contractors</h6>
+        <!-- Contractors -->
+        @if (data.contractors?.length > 0) {
+            <hr class="my-3"/>
+            <div class="fs-xs text-uppercase fw-semibold text-muted mb-2">Contractors</div>
             <div class="table-responsive">
                 <table class="table table-custom table-centered table-hover w-100 mb-0">
                     <thead class="bg-light align-middle bg-opacity-25 thead-sm">
                         <tr class="text-uppercase fs-xxs">
-                            <th>#</th>
+                            <th style="width:40px">#</th>
                             <th style="width:160px">Account No.</th>
                             <th>Name</th>
                         </tr>
@@ -105,82 +156,30 @@
                     </tbody>
                 </table>
             </div>
-        </div>
-    </div>
-}
+        }
 
-<!-- As Planned Staking Sheet -->
-@if (attachments.length > 0) {
-    <div class="card mb-3">
-        <div class="card-body">
-            <h6 class="fw-semibold text-uppercase fs-xs mb-3">As Planned Staking Sheet</h6>
+        <!-- As Planned Staking Sheet -->
+        @if (attachments.length > 0) {
+            <hr class="my-3"/>
+            <div class="fs-xs text-uppercase fw-semibold text-muted mb-2">As Planned Staking Sheet</div>
             <ul class="list-unstyled mb-0">
                 @for (f of attachments; track f.id) {
                     <li class="mb-1">
-                        <a [href]="fileUrl(f.id)" target="_blank" class="text-primary">
+                        <a [href]="fileUrl(f.id)" target="_blank" class="text-primary fs-xs">
                             {{ f.originalFilename || f.oFile || f.name || 'File' }}
                         </a>
                     </li>
                 }
             </ul>
-        </div>
-    </div>
-}
+        }
 
-<!-- Workflow Processing -->
-@if (!isTerminal() && workflowActions.length > 0) {
-    <div class="card mb-3">
-        <div class="card-body">
-            <h6 class="fw-semibold text-uppercase fs-xs mb-3">Process Document</h6>
-            <div class="row g-3 align-items-end">
-                <div class="col-md-4">
-                    <label class="form-label fw-bold">Action</label>
-                    <select class="form-select" [(ngModel)]="selectedAction">
-                        <option [ngValue]="null">— Select action —</option>
-                        @for (a of workflowActions; track a.actionMapId) {
-                            <option [ngValue]="a">{{ a.action }}</option>
-                        }
-                    </select>
-                </div>
-                <div class="col-md-5">
-                    <label class="form-label fw-bold">Remarks</label>
-                    <input type="text" class="form-control" [(ngModel)]="remarks" placeholder="Optional remarks"/>
-                </div>
-                <div class="col-md-auto">
-                    <button type="button" class="btn btn-primary fw-bold"
-                            [disabled]="!selectedAction || processingWorkflow"
-                            (click)="processWorkflow()">
-                        @if (processingWorkflow) {
-                            <span class="spinner-border spinner-border-sm me-2" role="status"></span>
-                        }
-                        Process
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-}
-
-<!-- Footer Actions -->
-<div class="card">
-    <div class="card-body d-flex gap-2 justify-content-end align-items-center">
-        <a [routerLink]="['/' + menuLink]" class="btn btn-light fw-bold">Back</a>
-        <div class="d-flex gap-2">
-            <button type="button" class="btn btn-success fw-bold" (click)="print()">
-                <ng-icon name="tablerPrinter" class="ps-0 pe-3 fw-bold"></ng-icon>Print
-            </button>
-            @if (isEditable()) {
-                <a [routerLink]="['/' + menuLink, data.id, 'edit']" class="btn btn-primary fw-bold">
-                    <ng-icon name="tablerEdit" class="ps-0 pe-3 fw-bold"></ng-icon>Edit
-                </a>
-            }
-        </div>
     </div>
 </div>
 
 <!-- Document Logs -->
 <div class="mt-3">
-    <button type="button" class="btn btn-light btn-sm fw-bold" (click)="toggleLogs()">
+    <button type="button" class="btn btn-light fw-bold" (click)="toggleLogs()">
+        <ng-icon [name]="showLogs ? 'tablerEyeOff' : 'tablerEye'" class="ps-0 pe-3 fw-bold"></ng-icon>
         {{ showLogs ? 'Hide' : 'Show' }} Document Logs
     </button>
     @if (showLogs) {
@@ -194,17 +193,26 @@
                     <p class="text-muted mb-0">No logs found.</p>
                 } @else {
                     <div class="table-responsive">
-                        <table class="table table-sm w-100 mb-0">
-                            <thead><tr class="text-uppercase fs-xxs text-muted">
-                                <th>Date</th><th>Action</th><th>By</th><th>Remarks</th>
-                            </tr></thead>
+                        <table class="table table-sm table-hover w-100 mb-0">
+                            <thead class="bg-light bg-opacity-50">
+                                <tr class="text-uppercase fs-xxs text-muted">
+                                    <th class="text-nowrap">Date</th>
+                                    <th class="text-nowrap">By</th>
+                                    <th class="text-nowrap">Status</th>
+                                    <th>Remarks</th>
+                                </tr>
+                            </thead>
                             <tbody>
                                 @for (log of logs; track log.id) {
-                                    <tr>
-                                        <td class="text-nowrap">{{ log.createdAt | date:'MM/dd/yyyy hh:mm a' }}</td>
-                                        <td>{{ log.action }}</td>
-                                        <td>{{ log.createdBy?.fullName }}</td>
-                                        <td>{{ log.remarks }}</td>
+                                    <tr class="align-middle">
+                                        <td class="text-nowrap text-muted fs-xs">{{ log.createdAt | date:'MM/dd/yyyy hh:mm a' }}</td>
+                                        <td class="text-nowrap">{{ log.createdBy?.fullName || '—' }}</td>
+                                        <td class="text-nowrap">
+                                            <span class="badge bg-secondary bg-opacity-25 text-dark border">
+                                                {{ log.action || '—' }}
+                                            </span>
+                                        </td>
+                                        <td>{{ log.remarks || '—' }}</td>
                                     </tr>
                                 }
                             </tbody>

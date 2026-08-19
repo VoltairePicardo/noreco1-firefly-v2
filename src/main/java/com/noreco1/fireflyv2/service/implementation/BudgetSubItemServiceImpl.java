@@ -47,7 +47,8 @@ public class BudgetSubItemServiceImpl implements BudgetSubItemService {
             if (!Checker.isValidId(year) && !Checker.isValidId(divisionId) && Checker.isStringNullOrEmpty(searchText)){
                 budgetLineItemDetails = this.budgetLineItemDetailRepo.findAll();
             } else {
-                budgetLineItemDetails = this.budgetLineItemDetailRepo.getAllBudgetLineItemByParam(year, divisionId, "%" + searchText + "%");
+                String searchParam = Checker.isStringNullOrEmpty(searchText) ? null : "%" + searchText + "%";
+                budgetLineItemDetails = this.budgetLineItemDetailRepo.getAllBudgetLineItemByParam(year, divisionId, searchParam);
             }
 
         } catch (Exception ex){
@@ -90,6 +91,15 @@ public class BudgetSubItemServiceImpl implements BudgetSubItemService {
 
             if(response.isSuccess()) {
 
+                BudgetLineItemDetail managedDetail = this.budgetLineItemDetailRepo
+                        .findById(dto.getBudgetLineItemDetail().getId()).orElse(null);
+
+                if (managedDetail == null) {
+                    response.setSuccess(Boolean.FALSE);
+                    response.setFailureMessage("Budget line item detail not found.");
+                    return response;
+                }
+
                 List<BudgetSubItem> budgetSubItemList = new ArrayList<>();
 
                 for (BudgetSubItem item : dto.getBudgetSubItems()){
@@ -98,12 +108,15 @@ public class BudgetSubItemServiceImpl implements BudgetSubItemService {
 
                     if(Checker.isValidId(item.getId())){
                         budgetSubItem = this.budgetSubItemRepo.findById(item.getId()).orElse(null);
+                        if (budgetSubItem == null) continue;
                         budgetSubItem.setUpdatedAt(DateHelper.getServerDate());
                     } else {
                         budgetSubItem = new BudgetSubItem();
+                        budgetSubItem.setCreatedAt(new Date());
+                        budgetSubItem.setUpdatedAt(new Date());
                     }
 
-                    budgetSubItem.setBudgetLineItemDetail(dto.getBudgetLineItemDetail());
+                    budgetSubItem.setBudgetLineItemDetail(managedDetail);
                     budgetSubItem.setDescription(item.getDescription());
                     budgetSubItem.setAmount(item.getAmount());
                     budgetSubItem.setCreatedBy(this.authenticationFacade.getLoggedIn());
@@ -122,6 +135,8 @@ public class BudgetSubItemServiceImpl implements BudgetSubItemService {
 
             }
 
+        } catch (RuntimeException e) {
+            throw e;
         } catch (Exception e) {
             e.printStackTrace();
         }

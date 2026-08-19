@@ -1,5 +1,6 @@
 package com.noreco1.fireflyv2.controller.response;
 
+import com.noreco1.fireflyv2.controller.response.reports.CommonLedgerDetail;
 import com.noreco1.fireflyv2.model.*;
 
 import java.io.Serializable;
@@ -53,6 +54,7 @@ public class MaterialIssueRegisterDto implements Serializable {
     private ArrayList<SubLedgerDto> subLedgerLines;
     private ArrayList<MaterialIssueRegisterDetailDto> materialIssueRegisterDetails;
     private List<MrctDetail> mrctDetails = new ArrayList<>();
+    private List<CommonLedgerDetail> journalEntries;
 
     public Integer getId() {
         return id;
@@ -284,5 +286,13 @@ public class MaterialIssueRegisterDto implements Serializable {
 
     public void setDocumentCode(String documentCode) {
         this.documentCode = documentCode;
+    }
+
+    public List<CommonLedgerDetail> getJournalEntries() {
+        return journalEntries;
+    }
+
+    public void setJournalEntries(List<CommonLedgerDetail> journalEntries) {
+        this.journalEntries = journalEntries;
     }
 }

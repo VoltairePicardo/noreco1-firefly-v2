@@ -2,12 +2,14 @@ import { Component, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AlertService } from '@/app/shared/services/alert.service';
 import { COMMON_ALL_PAGE_IMPORTS, COMMON_MAIN_PAGE_IMPORTS, SHARED_PROVIDERS } from '@/app/shared/providers/shared-providers';
+import { provideIcons } from '@ng-icons/core';
+import { tablerArrowLeft, tablerEdit } from '@ng-icons/tabler-icons';
 import { BudgetService } from '../budget.service';
 
 @Component({
     selector: 'app-budget-detail',
     imports: [...COMMON_ALL_PAGE_IMPORTS, ...COMMON_MAIN_PAGE_IMPORTS],
-    providers: [...SHARED_PROVIDERS],
+    providers: [...SHARED_PROVIDERS, provideIcons({ tablerArrowLeft, tablerEdit })],
     templateUrl: './budget-detail.component.html'
 })
 export class BudgetDetailComponent {

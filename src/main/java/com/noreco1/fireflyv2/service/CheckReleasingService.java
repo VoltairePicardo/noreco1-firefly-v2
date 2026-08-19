@@ -1,6 +1,5 @@
 package com.noreco1.fireflyv2.service;
 
-import com.noreco1.fireflyv2.model.Document;
 import com.noreco1.fireflyv2.model.ReleasedCheque;
 import com.noreco1.fireflyv2.controller.response.PostResponse;
 import org.springframework.context.MessageSource;
@@ -8,16 +7,28 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.Map;
 
 public interface CheckReleasingService {
-    @Transactional
-    public PostResponse releaseCheck(ReleasedCheque chequeToRelease, BindingResult bindingResult, MessageSource messageSource);
+
+    List<Map<String, Object>> getUnreleased();
+
+    List<Map<String, Object>> getReleased(String from, String to);
+
+    Map<String, Object> getDetailById(Integer id);
+
+    List<Map<String, Object>> getFilesById(Integer id);
+
+    void downloadFile(Integer fileId, HttpServletResponse response);
 
     @Transactional
-    public PostResponse cancelReleaseCheck(ReleasedCheque chequeToRelease, BindingResult bindingResult, MessageSource messageSource);
+    PostResponse releaseCheck(ReleasedCheque chequeToRelease, BindingResult bindingResult, MessageSource messageSource);
 
     @Transactional
-    public PostResponse processReleaseCheck(ReleasedCheque chequeToRelease, BindingResult bindingResult, MessageSource messageSource, HttpServletRequest request, List<Map> filesToRemove);
+    PostResponse cancelReleaseCheck(ReleasedCheque chequeToRelease, BindingResult bindingResult, MessageSource messageSource);
+
+    @Transactional
+    PostResponse processReleaseCheck(ReleasedCheque chequeToRelease, BindingResult bindingResult, MessageSource messageSource, HttpServletRequest request, List<Map> filesToRemove);
 }
