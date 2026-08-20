@@ -16,6 +16,8 @@ import com.noreco1.fireflyv2.controller.response.SubLedgerDto;
 import com.noreco1.fireflyv2.service.LedgerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.text.ParseException;
 import java.util.*;
@@ -35,11 +37,13 @@ public class LedgerServiceImpl implements LedgerService {
     @Autowired
     FactorPercentageDistroRepo factorPercentageDistroRepo;
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<GeneralLedgerLineDto> getGLEntries(Integer transId) {
         return null;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<SubLedgerDto> getSLEntries(Integer glId) {
         return null;

@@ -7,6 +7,8 @@ import com.noreco1.fireflyv2.repo.BusinessSegmentRepo;
 import com.noreco1.fireflyv2.service.AccountTypeService;
 import com.noreco1.fireflyv2.service.BusinessSegmentService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import java.util.List;
@@ -26,6 +28,7 @@ public class AccountTypeServiceImpl implements AccountTypeService {
         return null;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<AccountType> findAll() {
         return accountTypeRepo.findAll();
@@ -36,6 +39,7 @@ public class AccountTypeServiceImpl implements AccountTypeService {
         return null;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public AccountType findById(Integer id) {
         return null;

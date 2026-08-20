@@ -23,6 +23,8 @@ import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -104,6 +106,7 @@ public class ItemsForRepairServiceImpl implements ItemsForRepairService, Printab
     ItemSerialNoFacade itemSerialNoFacade;
     private Map reportMeta = new HashMap();
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public ItemsForRepair findById(Integer id) {
 
@@ -169,16 +172,19 @@ public class ItemsForRepairServiceImpl implements ItemsForRepairService, Printab
 
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<ItemsForRepair> findAll() {
         return itemsForRepairRepo.findAll();
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<ItemsForRepair> findAll(Pageable pageable) {
         return itemsForRepairRepo.findAll(pageable);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<ItemsForRepair> findByQuery(String query, Pageable pageable) {
         return itemsForRepairRepo.findByCode(query, pageable);
@@ -189,6 +195,7 @@ public class ItemsForRepairServiceImpl implements ItemsForRepairService, Printab
         return documentDtoer.getDocumentStatuses(com.noreco1.fireflyv2.model.enums.Workflow.ITEMS_FOR_REPAIR.getId());
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<ItemsForRepair> getListForSummaryReport(String from, String to, HttpServletRequest request) {
         List<ItemsForRepair> list = new ArrayList<>();
@@ -228,6 +235,7 @@ public class ItemsForRepairServiceImpl implements ItemsForRepairService, Printab
         return list;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<ItemTransactionDetailDto> getItemDetails(Integer transId) {
         List<ItemTransactionDetailDto> data = new ArrayList<>();
@@ -257,6 +265,7 @@ public class ItemsForRepairServiceImpl implements ItemsForRepairService, Printab
         return data;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<Object[]> getForRR(String query, Integer invLocId, Pageable pageable) {
         if (Checker.isStringNullAndEmpty(query)) {
@@ -588,6 +597,7 @@ public class ItemsForRepairServiceImpl implements ItemsForRepairService, Printab
         return signatoryFacade.defaultSignatories(com.noreco1.fireflyv2.model.enums.DocumentType.IFR);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<Map> findByDateRangeAndStatusId(String from, String to, Integer docStatusId, Integer officeId) {
         try {
@@ -612,6 +622,7 @@ public class ItemsForRepairServiceImpl implements ItemsForRepairService, Printab
         return null;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<Map> findByDateRangePending(String from, String to, Integer officeId) {
         try {

@@ -20,6 +20,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 
@@ -51,6 +52,7 @@ public class ItemTestingServiceImpl implements ItemTestingService, PrintableVouc
     @Autowired
     EmployeeRepo employeeRepo;
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<ItemTesting> findAll(String startDate, String endDate, Pageable pageable) {
         Date fromDate = DateHelper.strToDate(startDate, "yyyy-MM-dd");
@@ -150,6 +152,7 @@ public class ItemTestingServiceImpl implements ItemTestingService, PrintableVouc
 
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public ItemTestingDto findById(Integer id) {
         ItemTesting itemTesting =  itemTestingRepo.findById(id).orElse(null);
@@ -231,6 +234,7 @@ public class ItemTestingServiceImpl implements ItemTestingService, PrintableVouc
         return response;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<Map> getItemTestingDetails(Integer id) {
 

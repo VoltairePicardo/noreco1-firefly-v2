@@ -16,6 +16,7 @@ import org.apache.commons.collections.map.HashedMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 
@@ -194,6 +195,7 @@ public class AssetDepreciationServiceImpl implements AssetDepreciationService {
         return response;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<AssetDepreciation> findAllByYearAndMonth(Integer year, Integer month) {
         try {
@@ -204,11 +206,13 @@ public class AssetDepreciationServiceImpl implements AssetDepreciationService {
         return null;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public AssetDepreciation findById(Integer id) {
         return assetDepreciationRepo.findById(id).orElse(null);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<Map> findAllDetailsById(Integer assetDepreciationId) {
         List<Map> data = new ArrayList<>();
@@ -242,6 +246,7 @@ public class AssetDepreciationServiceImpl implements AssetDepreciationService {
         return data;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Map getTotals(Integer assetDepreciationId) {
         Map map = new HashMap();

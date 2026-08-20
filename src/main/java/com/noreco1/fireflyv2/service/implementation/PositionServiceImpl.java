@@ -7,6 +7,7 @@ import com.noreco1.fireflyv2.repo.PositionRepo;
 import com.noreco1.fireflyv2.service.PositionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Comparator;
@@ -20,6 +21,7 @@ public class PositionServiceImpl implements PositionService {
     private final PositionRepo positionRepo;
     private final AuthenticationFacade authFacade;
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<Position> list() {
         return positionRepo.findAll().stream()
@@ -27,6 +29,7 @@ public class PositionServiceImpl implements PositionService {
                 .toList();
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Position findById(Integer id) {
         return positionRepo.findById(id).orElse(null);

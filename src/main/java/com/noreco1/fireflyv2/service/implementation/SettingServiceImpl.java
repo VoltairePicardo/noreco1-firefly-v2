@@ -16,6 +16,8 @@ import com.noreco1.fireflyv2.validator.SettingValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 
 import java.io.IOException;
@@ -65,7 +67,6 @@ public class SettingServiceImpl implements SettingService {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            throw new RuntimeException(e.getMessage());
         }
         return response;
     }
@@ -98,7 +99,6 @@ public class SettingServiceImpl implements SettingService {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            throw new RuntimeException(e.getMessage());
         }
         return response;
     }
@@ -117,16 +117,17 @@ public class SettingServiceImpl implements SettingService {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            throw new RuntimeException(e.getMessage());
         }
         return response;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Map findByCode(String code) {
         return settingFacade.getByCode(code);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<Map> findAll() {
         List<Map> settingsMap = new ArrayList<>();
@@ -201,6 +202,7 @@ public class SettingServiceImpl implements SettingService {
         return  settingsMap;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Setting findById(Integer id) {
         return settingRepo.findById(id).orElse(null);

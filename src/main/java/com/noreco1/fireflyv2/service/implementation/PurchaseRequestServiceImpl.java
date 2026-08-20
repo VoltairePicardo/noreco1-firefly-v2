@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 
@@ -378,6 +379,7 @@ public class PurchaseRequestServiceImpl implements PurchaseRequestService, Print
         return returnVouchers;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<RvListDto> findAllWithQuotations() {
         List<PurchaseRequest> vouchers = purchaseRequestRepo.findPurchaseRequestsWithQuotations();
@@ -450,6 +452,7 @@ public class PurchaseRequestServiceImpl implements PurchaseRequestService, Print
         return returnVouchers;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<RvListDto> getRequisitionVoucherForCanvass(Integer[] canvassIds) {
         List<Object[]> vouchers = purchaseRequestRepo.findPurchaseRequestsForCanvass(Arrays.asList(canvassIds));
@@ -486,6 +489,7 @@ public class PurchaseRequestServiceImpl implements PurchaseRequestService, Print
         return returnVouchers;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<RvListDto> getRequisitionVoucherForPO() {
         List<PurchaseRequest> vouchers = purchaseRequestRepo.findPurchaseRequestsForPO(com.noreco1.fireflyv2.model.enums.DocumentStatus.APPROVED.getId());
@@ -521,6 +525,7 @@ public class PurchaseRequestServiceImpl implements PurchaseRequestService, Print
         return returnVouchers;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public org.springframework.data.domain.Page<Object[]> getRequisitionVoucherForStockWithdrawal(String query, Integer invLocId, Pageable pageable) {
         if (Checker.isStringNullAndEmpty(query)) {
@@ -530,6 +535,7 @@ public class PurchaseRequestServiceImpl implements PurchaseRequestService, Print
         }
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public org.springframework.data.domain.Page<Object[]> getRequisitionVoucherForRR(String query, Pageable pageable) {
         if (Checker.isStringNullAndEmpty(query)) {
@@ -539,6 +545,7 @@ public class PurchaseRequestServiceImpl implements PurchaseRequestService, Print
         }
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<PurchaseRequest> getPurchaseRequestForPOBudgetAmountBalance() {
 
@@ -556,6 +563,7 @@ public class PurchaseRequestServiceImpl implements PurchaseRequestService, Print
 
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<RvListDto> getPurchaseRequestForCanvass() {
 
@@ -594,6 +602,7 @@ public class PurchaseRequestServiceImpl implements PurchaseRequestService, Print
 
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<Map> findByDateRangeAndStatusId(String from, String to, Integer docStatusId) {
         try {
@@ -640,6 +649,7 @@ public class PurchaseRequestServiceImpl implements PurchaseRequestService, Print
         return null;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<Map> findByDateRangePending(String from, String to) {
         try {
@@ -749,6 +759,7 @@ public class PurchaseRequestServiceImpl implements PurchaseRequestService, Print
         return response;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public RvDto findByRvId(Integer id) {
         User loggedIn = authenticationFacade.getLoggedIn();

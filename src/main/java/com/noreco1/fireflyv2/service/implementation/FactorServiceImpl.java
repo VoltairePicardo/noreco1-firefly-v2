@@ -15,6 +15,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 
@@ -43,11 +44,13 @@ public class FactorServiceImpl implements FactorService {
     @Autowired
     private FactorFacade factorFacade;
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<Factor> findAll(Pageable pageable) {
         return factorRepo.findAllByOrderByCodeAsc(pageable);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<Factor> findAll() {
         return factorRepo.findAllByOrderByCodeAsc();
@@ -59,6 +62,7 @@ public class FactorServiceImpl implements FactorService {
         return Checker.collectionIsNotEmpty(distros);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Factor findByIdAndValidity(Integer factorId, Integer validityId) {
         Factor factor = factorRepo.findById(factorId).orElse(null);
@@ -73,6 +77,7 @@ public class FactorServiceImpl implements FactorService {
         return factor;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Factor findById(Integer id) {
         Factor factor = factorRepo.findById(id).orElse(null);
@@ -89,12 +94,14 @@ public class FactorServiceImpl implements FactorService {
         return factor;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Factor findByCode(String code) {
         code = code.trim().toUpperCase();
         return factorRepo.findOneByCode(code);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<Factor> findByQuery(String query, Pageable pageable) {
         return factorRepo.findByDescriptionContainingIgnoreCaseOrCodeContainingIgnoreCaseOrderByDescriptionAsc(query, query, pageable);

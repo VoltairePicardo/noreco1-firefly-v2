@@ -12,6 +12,8 @@ import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 
 import java.util.Date;
@@ -99,22 +101,26 @@ public class InventoryLocationServiceImpl implements InventoryLocationService{
 
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<InventoryLocation> findAll(Pageable pageable) {
         return inventoryLocationRepo.findAll(pageable);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<InventoryLocation> find(String query, Pageable pageable) {
         query = "%"+query.trim()+"%";
         return inventoryLocationRepo.findByDescriptionContainingIgnoreCase(query, pageable);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public InventoryLocation findById(Integer id) {
         return inventoryLocationRepo.findById(id).orElse(null);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public InventoryLocation findByDescription(String query) {
         return inventoryLocationRepo.findByDescriptionContainingIgnoreCase(query.trim());

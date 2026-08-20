@@ -20,6 +20,8 @@ import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -113,6 +115,7 @@ public class StockReleaseServiceImpl implements StockReleaseService, PrintableVo
 
     MemorandumReceiptRepo memorandumReceiptRepo;
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public StockRelease findById(Integer id) {
 
@@ -207,6 +210,7 @@ public class StockReleaseServiceImpl implements StockReleaseService, PrintableVo
 
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public StockRelease findByCode(String code) {
 
@@ -217,21 +221,25 @@ public class StockReleaseServiceImpl implements StockReleaseService, PrintableVo
         } else return null;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<StockRelease> findAll() {
         return stockReleaseRepo.findAll();
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<StockRelease> findAll(Pageable pageable) {
         return null;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<StockRelease> findByQuery(String query, Pageable pageable) {
         return null;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<Map> getDetails(int id) {
         List<Map> data = new ArrayList<>();
@@ -267,6 +275,7 @@ public class StockReleaseServiceImpl implements StockReleaseService, PrintableVo
         return data;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<Map> findByDateRangeAndStatusId(String from, String to, Integer docStatusId, Integer officeId) {
         try {
@@ -291,6 +300,7 @@ public class StockReleaseServiceImpl implements StockReleaseService, PrintableVo
         return null;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<Map> findByDateRangePending(String from, String to, Integer officeId) {
         try {
@@ -322,11 +332,13 @@ public class StockReleaseServiceImpl implements StockReleaseService, PrintableVo
         return null;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<StockWithdrawal> findStockWithdrawalByDocumentStatusId(Integer documentStatusId) {
         return stockReleaseRepo.findStockWithdrawalByDocumentStatusId(documentStatusId);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<Map> getAvailableItemStock(Integer itemId) {
 
@@ -706,6 +718,7 @@ public class StockReleaseServiceImpl implements StockReleaseService, PrintableVo
 
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<StockRelease> getListForSummaryReport(String from, String to, HttpServletRequest request) {
         List<StockRelease> list = new ArrayList<>();
@@ -762,6 +775,7 @@ public class StockReleaseServiceImpl implements StockReleaseService, PrintableVo
         return list;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<StockWithdrawalDetailDto> getItems(Integer docTransId) {
         List<StockWithdrawalDetailDto> data = new ArrayList<>();
@@ -973,6 +987,7 @@ public class StockReleaseServiceImpl implements StockReleaseService, PrintableVo
         return response;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<StockRelease> findByDateRangeAndCodeAndType(String from, String to, Integer type, String query, Pageable pageable) {
         String format = "yyyy-MM-dd";
@@ -1125,6 +1140,7 @@ public class StockReleaseServiceImpl implements StockReleaseService, PrintableVo
         return this.reportMeta;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<StockReleaseDocumentDto> findAllApprovedForAccountSettingPaged(String query, Pageable pageable) {
 

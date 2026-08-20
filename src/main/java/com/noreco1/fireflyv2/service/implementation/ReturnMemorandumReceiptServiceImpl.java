@@ -25,6 +25,8 @@ import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -60,26 +62,31 @@ public class ReturnMemorandumReceiptServiceImpl implements ReturnMemorandumRecei
     @Autowired
     private ReturnMemorandumReceiptDetailRepo returnMemorandumReceiptDetailRepo;
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<ReturnMemorandumReceipt> findAll(String startDate, String endDate, Pageable pageable) {
         return returnMemorandumReceiptRepo.findAllByDateBetweenOrderByDateAscCodeAsc(DateHelper.strToDate(startDate, "yyyy-MM-dd"), DateHelper.strToDate(endDate, "yyyy-MM-dd"), pageable);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<ReturnMemorandumReceipt> findAllByQuery(String query, String startDate, String endDate, Pageable pageable) {
         return returnMemorandumReceiptRepo.findAllByCodeContainsAndDateBetweenOrderByDateAscCodeAsc(query, DateHelper.strToDate(startDate, "yyyy-MM-dd"), DateHelper.strToDate(endDate, "yyyy-MM-dd"), pageable);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<ReturnMemorandumReceipt> findAllByEmployee(Integer employeeAccountNo, String startDate, String endDate, Pageable pageable) {
         return returnMemorandumReceiptRepo.findAllByMemorandumReceiptEmployeeAccountNoAndDateBetweenOrderByDateAscCodeAsc(employeeAccountNo, DateHelper.strToDate(startDate, "yyyy-MM-dd"), DateHelper.strToDate(endDate, "yyyy-MM-dd"), pageable);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<ReturnMemorandumReceipt> findAllByQueryAndEmployee(String query, Integer employeeAccountNo, String startDate, String endDate, Pageable pageable) {
         return returnMemorandumReceiptRepo.findAllByCodeContainsAndMemorandumReceiptEmployeeAccountNoAndDateBetweenOrderByDateAscCodeAsc(query, employeeAccountNo, DateHelper.strToDate(startDate, "yyyy-MM-dd"), DateHelper.strToDate(endDate, "yyyy-MM-dd"), pageable);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public ReturnMemorandumReceiptDto findById(Integer id) {
 
@@ -287,11 +294,13 @@ public class ReturnMemorandumReceiptServiceImpl implements ReturnMemorandumRecei
 
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<ReturnMemorandumReceipt> findAllForReassignment(String query, Pageable pageable) {
         return returnMemorandumReceiptRepo.findAllForMemorandumReceipt(query, pageable);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public ArrayList<ReturnMemorandumReceiptDetail> findAllByReturnMR(Integer id) {
         return returnMemorandumReceiptDetailRepo.findAllByReturnMemorandumReceiptIdAndUsableTrueOrderByStockWithdrawalDetailItemDescriptionAsc(id);

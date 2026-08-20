@@ -24,6 +24,8 @@ import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -98,6 +100,7 @@ public class StockWithdrawalServiceImpl implements StockWithdrawalService, Print
     @Autowired
     StockWithdrawalEmployeeRepo stockWithdrawalEmployeeRepo;
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public StockWithdrawal findById(Integer id) {
 
@@ -154,6 +157,7 @@ public class StockWithdrawalServiceImpl implements StockWithdrawalService, Print
         return ret;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public StockWithdrawal findByCode(String code) {
 
@@ -164,21 +168,25 @@ public class StockWithdrawalServiceImpl implements StockWithdrawalService, Print
         } else return null;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<StockWithdrawal> findAll() {
         return stockWithdrawalRepo.findAll();
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<StockWithdrawal> findAll(Pageable pageable) {
         return stockWithdrawalRepo.findAll(pageable);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<StockWithdrawal> findByQuery(String query, Pageable pageable) {
         return null;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<Map> getDetails(int id) {
         List<Map> data = new ArrayList<>();
@@ -213,6 +221,7 @@ public class StockWithdrawalServiceImpl implements StockWithdrawalService, Print
         return data;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<Map> findByDateRangeAndStatusId(String from, String to, Integer docStatusId, Integer officeId) {
         try {
@@ -237,6 +246,7 @@ public class StockWithdrawalServiceImpl implements StockWithdrawalService, Print
         return null;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<Map> findByDateRangePending(String from, String to, Integer officeId) {
         try {
@@ -268,6 +278,7 @@ public class StockWithdrawalServiceImpl implements StockWithdrawalService, Print
         return null;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<InventoryDocumentDto> findAllForReleasingByQuery(String query, Pageable pageable) {
         Page<StockWithdrawal> stockWithdrawals;
@@ -312,6 +323,7 @@ public class StockWithdrawalServiceImpl implements StockWithdrawalService, Print
         });
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<StockWithdrawal> getListForSummaryReport(String from, String to, HttpServletRequest request) {
         List<StockWithdrawal> list = new ArrayList<>();
@@ -368,6 +380,7 @@ public class StockWithdrawalServiceImpl implements StockWithdrawalService, Print
         return list;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<StockWithdrawalDetailDto> getItems(Integer withdrawalId) {
         List<StockWithdrawalDetailDto> data = new ArrayList<>();
@@ -393,6 +406,7 @@ public class StockWithdrawalServiceImpl implements StockWithdrawalService, Print
         return data;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<Object[]> findAllSpecialEquipmentsForWithdrawal(String query, Integer inventoryLocationId, Integer inventoryCategoryId, Pageable pageable) {
 
@@ -404,6 +418,7 @@ public class StockWithdrawalServiceImpl implements StockWithdrawalService, Print
         }
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<Object[]> findAllTurnOnOrderForWithdrawalPaged(String startDate, String endDate, Pageable pageable) {
         Page<Object[]> turnOnOrdersForWithdrawal;
@@ -411,11 +426,13 @@ public class StockWithdrawalServiceImpl implements StockWithdrawalService, Print
         return turnOnOrdersForWithdrawal;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<StockWithdrawal> findAllForSpecialEquipmentAssignment(Pageable pageable) {
         return stockWithdrawalRepo.findAllForSpecialEquipmentAssignment(InventoryCategory.SPECIAL_EQUIPMENT.getId(), pageable);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<StockWithdrawal> findAllByQueryForSpecialEquipmentAssignment(String query, Pageable pageable) {
         query = "%" + query + "%";

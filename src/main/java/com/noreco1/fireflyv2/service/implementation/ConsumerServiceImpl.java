@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -21,26 +23,31 @@ public class ConsumerServiceImpl implements ConsumerService {
     @Autowired
     ConsumerRepo consumerRepo;
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Consumer findOne(Integer id) {
         return consumerRepo.findById(id).orElse(null);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<Consumer> findAll(Pageable pageable) {
         return consumerRepo.findAll(pageable);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<Consumer> findAllByQuery(String query, Pageable pageable) {
         return consumerRepo.findAllByQuery(query.trim(), pageable);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<Consumer> findByConsumerIds(List<Integer> ids, Pageable pageable) {
         return consumerRepo.findByConsumerIds(ids, pageable);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<Consumer> findAllByQueryAndConsumerIds(List<Integer> ids, String query, Pageable pageable) {
         return consumerRepo.findAllByQueryAndConsumerIds(ids, query.trim(), pageable);

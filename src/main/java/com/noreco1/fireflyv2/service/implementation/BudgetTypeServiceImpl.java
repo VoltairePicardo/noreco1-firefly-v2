@@ -10,6 +10,8 @@ import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -77,27 +79,32 @@ public class BudgetTypeServiceImpl implements BudgetTypeService {
         return response;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<BudgetType> findAll(Pageable pageable) {
         return budgetTypeRepo.findAll(pageable);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<BudgetType> find(String query, Pageable pageable) {
         query = "%"+query.trim()+"%";
         return budgetTypeRepo.findByDescriptionContainingIgnoreCase(query, pageable);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public BudgetType findById(Integer id) {
         return budgetTypeRepo.findById(id).orElse(null);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public BudgetType findByDescription(String query) {
         return budgetTypeRepo.findByDescriptionContainingIgnoreCase(query.trim());
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<BudgetType> findAll() {
         return budgetTypeRepo.findByOrderByDescriptionAsc();

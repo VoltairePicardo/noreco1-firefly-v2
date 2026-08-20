@@ -19,6 +19,8 @@ import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 
 import java.util.ArrayList;
@@ -36,6 +38,7 @@ public class AssemblyUnitServiceImpl implements AssemblyUnitService {
     @Autowired
     AssemblyUnitDetailRepo assemblyUnitDetailRepo;
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<AssemblyUnit> findAll(Pageable pageable, String query) {
         Page<AssemblyUnit> assemblyUnits;
@@ -47,11 +50,13 @@ public class AssemblyUnitServiceImpl implements AssemblyUnitService {
         return assemblyUnits;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<AssemblyUnit> findAll() {
         return assemblyUnitRepo.findAll();
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public AssemblyUnit findById(Integer id) {
         AssemblyUnit assemblyUnit = assemblyUnitRepo.findById(id).orElse(null);
@@ -137,16 +142,19 @@ public class AssemblyUnitServiceImpl implements AssemblyUnitService {
         return response;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<AssemblyType> findAllAssemblyType() {
         return assemblyTypeRepo.findAll();
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public AssemblyType findAssemblyType(Integer id) {
         return assemblyTypeRepo.findById(id).orElse(null);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<AssemblyUnit> findAllForAssemblyUnitBrowser(Pageable pageable, String query) {
         Page<AssemblyUnit> assemblyUnits;

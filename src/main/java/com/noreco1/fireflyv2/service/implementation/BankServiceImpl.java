@@ -11,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
@@ -25,6 +26,7 @@ public class BankServiceImpl implements BankService {
     @Autowired
     private AuthenticationFacade authFacade;
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<Bank> list(String q, int page, int size) {
         PageRequest pageable = PageRequest.of(page, size, Sort.by("name").ascending());
@@ -33,11 +35,13 @@ public class BankServiceImpl implements BankService {
                 : bankRepo.findByNameContainingIgnoreCase(q, pageable);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<Bank> listAll() {
         return bankRepo.findByOrderByNameAsc();
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Bank findById(Integer id) {
         return bankRepo.findById(id).orElse(null);

@@ -10,6 +10,8 @@ import com.noreco1.fireflyv2.controller.response.QuotationItemDto;
 import com.noreco1.fireflyv2.service.QuotationDetailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -35,6 +37,7 @@ public class QuotationDetailServiceImpl implements QuotationDetailService {
     @Autowired
     QuotationTermRepo quotationTermRepo;
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<QuotationItemDto> getQuotationDetails(Integer quotationId) {
 
@@ -193,6 +196,7 @@ public class QuotationDetailServiceImpl implements QuotationDetailService {
 //        return quotationDetailDtos;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public BigDecimal getItemQuotationPrice(Integer supplierAccountNo, Integer rvDetailId) {
         Supplier supplier = supplierRepo.findOneByAccountNumber(supplierAccountNo);
@@ -206,6 +210,7 @@ public class QuotationDetailServiceImpl implements QuotationDetailService {
         return BigDecimal.ZERO;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Map itemDetailForPO(Integer rvDetailId) {
         Map data = new HashMap();

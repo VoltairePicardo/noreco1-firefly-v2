@@ -47,6 +47,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -2384,6 +2385,7 @@ public class ReportsServiceImpl implements ReportsService, Bir1601E {
         }
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<DepreciationDetail> findAllDepreciationSummary(Integer year, Integer month) {
         List<DepreciationDetail> data = new ArrayList<>();
@@ -2473,6 +2475,7 @@ public class ReportsServiceImpl implements ReportsService, Bir1601E {
         }
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<DepreciationScheduleDetail> findAllDepreciationSchedule(Integer year) {
         List<DepreciationScheduleDetail> data = new ArrayList<>();
@@ -2535,6 +2538,7 @@ public class ReportsServiceImpl implements ReportsService, Bir1601E {
         return this.accountInquiryParams(accountId, from, to, statusId, request);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<Map> findAllGLAccountInquiry(Integer accountId, String from, String to, Integer statusId) {
         List<Map> data = new ArrayList<>();
@@ -2646,6 +2650,7 @@ public class ReportsServiceImpl implements ReportsService, Bir1601E {
         }
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<Map> findAllGLAccountInquirySummary(Integer accountId, String from, String to, Integer statusId) {
         List<Map> data = new ArrayList<>();
@@ -3455,6 +3460,7 @@ public class ReportsServiceImpl implements ReportsService, Bir1601E {
         return new JRBeanCollectionDataSource(reportDetails);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<Map> dataForAssetLedger(String from, String to, Integer accountId, Integer assetAccountNo, Integer assetVoucherLinkTypeId) {
 
@@ -4770,6 +4776,7 @@ public class ReportsServiceImpl implements ReportsService, Bir1601E {
         return new JRBeanCollectionDataSource(this.dataForPendingPurchaseRequests(from, to, status));
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<Map> findAllBudgetMonitoring(Integer year, Integer departmentId, Integer divisionId, Integer userAccount) {
         List<Map> data = new ArrayList<>();
@@ -4851,6 +4858,7 @@ public class ReportsServiceImpl implements ReportsService, Bir1601E {
         return params;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<Map> findAllSLAccountInquiry(Integer accountId, Integer accountNo, String from, String to) {
         List<Map> data = new ArrayList<>();
@@ -5394,6 +5402,7 @@ public class ReportsServiceImpl implements ReportsService, Bir1601E {
         return new JRBeanCollectionDataSource(datasource);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<CheckVoucherIncomePaymentDto> findAllCheckVoucherIncomePayment(Integer year, Integer month) {
         List<CheckVoucherIncomePaymentDto> data = new ArrayList<>();

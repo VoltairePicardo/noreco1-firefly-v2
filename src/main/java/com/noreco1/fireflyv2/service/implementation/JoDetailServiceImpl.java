@@ -6,6 +6,8 @@ import com.noreco1.fireflyv2.controller.response.JoDetailDto;
 import com.noreco1.fireflyv2.service.JoDetailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +20,7 @@ public class JoDetailServiceImpl implements JoDetailService {
     @Autowired
     JoDetailRepo joDetailRepo;
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<JoDetailDto> getJoDetails(Integer joId) {
         List<JoDetail> joDetails = joDetailRepo.findByJobOrderId(joId);
@@ -53,6 +56,7 @@ public class JoDetailServiceImpl implements JoDetailService {
         return joDetailDtos;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<JoDetailDto> getJoDetailsForJoa(Integer joId) {
         List<JoDetail> joDetails = joDetailRepo.findJoDetailsForJoa(joId, com.noreco1.fireflyv2.model.enums.DocumentStatus.APPROVED.getId());

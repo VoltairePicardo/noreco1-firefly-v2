@@ -19,6 +19,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -50,6 +51,7 @@ public class UserServiceImpl implements UserService {
 
     User existingUser;
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public User findByUsername(String username) {
         User user =  userRepo.findOneByUsername(username);
@@ -62,6 +64,7 @@ public class UserServiceImpl implements UserService {
         } else return null;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public User findById(Integer id) {
         User user = userRepo.findById(id).orElse(null);
@@ -274,6 +277,7 @@ public class UserServiceImpl implements UserService {
 
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public User findByEmailLike(String email) {
         return userRepo.findByEmailLike(email);
@@ -293,6 +297,7 @@ public class UserServiceImpl implements UserService {
         return userRepo.findAllWithAccountNo(q, PageRequest.of(page, size));
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Department getUserDepartment() {
         try {

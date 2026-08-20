@@ -5,6 +5,8 @@ import com.noreco1.fireflyv2.repo.TownRepo;
 import com.noreco1.fireflyv2.service.TownService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Comparator;
 import java.util.List;
@@ -15,6 +17,7 @@ public class TownServiceImpl implements TownService {
     @Autowired
     private TownRepo townRepo;
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<Town> list() {
         return townRepo.findAll().stream()

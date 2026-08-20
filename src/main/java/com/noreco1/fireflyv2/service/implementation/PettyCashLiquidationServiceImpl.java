@@ -22,6 +22,8 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import com.noreco1.fireflyv2.model.enums.WorkflowAction;
 
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 import jakarta.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.util.*;
@@ -84,6 +86,7 @@ public class PettyCashLiquidationServiceImpl implements PettyCashLiquidationServ
     @Autowired
     EmployeeRepo employeeRepo;
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public HashMap findById(Integer id) {
         HashMap map = new HashMap();
@@ -96,6 +99,7 @@ public class PettyCashLiquidationServiceImpl implements PettyCashLiquidationServ
         return map;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<HashMap> findAll() {
         List<HashMap> mapList = new ArrayList<>();

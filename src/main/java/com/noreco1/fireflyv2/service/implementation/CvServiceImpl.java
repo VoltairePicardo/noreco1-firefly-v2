@@ -29,6 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -446,6 +447,7 @@ public class CvServiceImpl implements CvService, PrintableVoucher, PrintableCheq
         return this.makeCvListDto(vouchers);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public CvDto findById(Integer id) {
 
@@ -704,6 +706,7 @@ public class CvServiceImpl implements CvService, PrintableVoucher, PrintableCheq
         return response;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public CheckDto findForPrintCheckDetails(Integer transId, Integer bankAccountId) {
         CheckVoucher checkVoucher = cvRepo.findOneByTransactionId(transId);
@@ -917,6 +920,7 @@ public class CvServiceImpl implements CvService, PrintableVoucher, PrintableCheq
         return par;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<Map> findCvChecks(Integer transId) {
         List<CheckVoucherCheque> cheques = chequeRepo.findByTransactionId(transId);
@@ -948,6 +952,7 @@ public class CvServiceImpl implements CvService, PrintableVoucher, PrintableCheq
         return map;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<Map> findChequeNumbersForCheckReleasing(Integer transId) {
         List<Map> map = new ArrayList<>();
@@ -981,6 +986,7 @@ public class CvServiceImpl implements CvService, PrintableVoucher, PrintableCheq
         return map;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<CvListDto> findByDateRangeAndStatusId(String from, String to, Integer id) {
         try {
@@ -1003,6 +1009,7 @@ public class CvServiceImpl implements CvService, PrintableVoucher, PrintableCheq
         return null;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<CvListDto> findByDateRange(String from, String to) {
         try {
@@ -1032,6 +1039,7 @@ public class CvServiceImpl implements CvService, PrintableVoucher, PrintableCheq
         return null;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<Map> findCvForReplenish(String from, String to) {
         try {
@@ -1118,6 +1126,7 @@ public class CvServiceImpl implements CvService, PrintableVoucher, PrintableCheq
 
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<Map> findReleasedChecks(String from, String to, String searchText) {
 
@@ -1166,6 +1175,7 @@ public class CvServiceImpl implements CvService, PrintableVoucher, PrintableCheq
 
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Map findCheckById(Integer id) {
 
@@ -1208,6 +1218,7 @@ public class CvServiceImpl implements CvService, PrintableVoucher, PrintableCheq
 
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Map getNextCheckNumber(Integer bankAccountId) {
 
@@ -1239,6 +1250,7 @@ public class CvServiceImpl implements CvService, PrintableVoucher, PrintableCheq
 
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<CheckVoucherBudgetDetail> findAllByCheckVoucherId(Integer cvId) {
         return checkVoucherBudgetDetailRepo.findAllByCheckVoucherId(cvId);
@@ -1318,6 +1330,7 @@ public class CvServiceImpl implements CvService, PrintableVoucher, PrintableCheq
         return signatoryFacade.defaultSignatories(com.noreco1.fireflyv2.model.enums.DocumentType.CV);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<Map> findCheckVouchersForReleasing() {
         List<Map> map = new ArrayList<>();

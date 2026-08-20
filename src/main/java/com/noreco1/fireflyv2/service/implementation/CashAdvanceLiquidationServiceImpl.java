@@ -20,6 +20,8 @@ import org.springframework.context.MessageSource;
 import org.springframework.data.domain.*;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
@@ -68,6 +70,7 @@ public class CashAdvanceLiquidationServiceImpl implements CashAdvanceLiquidation
     @Autowired
     UserRepo userRepo;
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public CashAdvanceLiquidation findById(Integer id) {
         CashAdvanceLiquidation cashAdvanceLiquidation = cashAdvanceLiquidationRepo.findById(id).orElse(null);
@@ -84,6 +87,7 @@ public class CashAdvanceLiquidationServiceImpl implements CashAdvanceLiquidation
         return cashAdvanceLiquidation;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<HashMap> findAll() {
 
@@ -92,6 +96,7 @@ public class CashAdvanceLiquidationServiceImpl implements CashAdvanceLiquidation
         return  this.makeCashAdvanceLiquidationList(cashAdvanceLiquidations);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<HashMap> findByStatusId(Integer id) {
         try {
@@ -105,6 +110,7 @@ public class CashAdvanceLiquidationServiceImpl implements CashAdvanceLiquidation
         return null;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<HashMap> findByDateRangeAndStatusId(String from, String to, Integer id, Integer officeId) {
         try {
@@ -133,6 +139,7 @@ public class CashAdvanceLiquidationServiceImpl implements CashAdvanceLiquidation
         return null;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<HashMap> findByDateRange(String from, String to, Integer officeId) {
         try {
@@ -168,6 +175,7 @@ public class CashAdvanceLiquidationServiceImpl implements CashAdvanceLiquidation
         return null;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<CashAdvanceLiquidation> findAllForJv(String query, Pageable pageable) {
         if (Checker.isStringNullAndEmpty(query)) {
@@ -422,6 +430,7 @@ public class CashAdvanceLiquidationServiceImpl implements CashAdvanceLiquidation
         return response;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<DocumentStatus> getDocumentsStatuses() {
         CashAdvanceLiquidation cal = cashAdvanceLiquidationRepo.findFirstByOrderByIdAsc();

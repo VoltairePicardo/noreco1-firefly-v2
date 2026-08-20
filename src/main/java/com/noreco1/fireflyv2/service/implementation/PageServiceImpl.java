@@ -8,6 +8,7 @@ import com.noreco1.fireflyv2.controller.response.PageComponentDto;
 import com.noreco1.fireflyv2.service.PageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
@@ -28,6 +29,7 @@ public class PageServiceImpl implements PageService {
         return pageRepo.findAllWithComponents();
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<Page> findAllAssigned(Integer roleId) {
         return pageRepo.findAllAssigned(roleId);

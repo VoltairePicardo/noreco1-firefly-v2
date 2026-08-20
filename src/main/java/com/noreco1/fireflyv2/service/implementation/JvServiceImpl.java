@@ -25,6 +25,7 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.*;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -350,7 +351,6 @@ public class JvServiceImpl implements JvService, PrintableVoucher {
             }
         }catch (Exception ex) {
             Logger.getLogger(JvServiceImpl.class.getName()).log(Level.SEVERE, null, ex);
-            throw new RuntimeException(ex);
         }
         return response;
     }
@@ -370,12 +370,14 @@ public class JvServiceImpl implements JvService, PrintableVoucher {
         }
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<Map> findAll() {
         List<JournalVoucher> vouchers = jvRepo.findAll();
         return this.makeJvListMap(vouchers);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Map findById(Integer id) {
         Map map = new HashMap();
@@ -388,6 +390,7 @@ public class JvServiceImpl implements JvService, PrintableVoucher {
         return map;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<Map> findByDateRangeAndStatusId(String from, String to, Integer id) {
         try {
@@ -410,6 +413,7 @@ public class JvServiceImpl implements JvService, PrintableVoucher {
         return null;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<Map> findByDateRange(String from, String to) {
         try {
@@ -484,6 +488,7 @@ public class JvServiceImpl implements JvService, PrintableVoucher {
 
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<CvVoucherDto> findAllApprovedForCvPaged(String query, Pageable pageable) {
 
@@ -513,6 +518,7 @@ public class JvServiceImpl implements JvService, PrintableVoucher {
 
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<JournalVoucherBudgetLineItemDetail> getJournalVoucherBudgetLineItemDetails(Integer jvId) {
 
@@ -530,6 +536,7 @@ public class JvServiceImpl implements JvService, PrintableVoucher {
 
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<JournalVoucherBudgetSubItemDetail> getJournalVoucherBudgetSubItemDetails(Integer jvId) {
 

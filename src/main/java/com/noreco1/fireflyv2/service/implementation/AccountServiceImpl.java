@@ -20,6 +20,7 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 
@@ -107,6 +108,7 @@ public class AccountServiceImpl implements AccountService {
         return accountsDtoList;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<AccountDto> findAll(String classification) {
         List<AccountDto> list = new ArrayList<>();
@@ -152,6 +154,7 @@ public class AccountServiceImpl implements AccountService {
         return this.accountsDtoList;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<SegmentAccountDto> findAllBySegment(String[] segmentIds) {
         List<SegmentAccountDto> list = new ArrayList<>();
@@ -177,6 +180,7 @@ public class AccountServiceImpl implements AccountService {
         return list;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<AccountDto> findAllWithSegment() {
         List<AccountDto> list = new ArrayList<>();
@@ -190,6 +194,7 @@ public class AccountServiceImpl implements AccountService {
         return list;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<AccountDto> findAllWithSegmentAndAllocationFactor() {
         List<AccountDto> list = new ArrayList<>();
@@ -203,6 +208,7 @@ public class AccountServiceImpl implements AccountService {
         return list;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<AccountDto> findAllWithSegmentAndAllocationFactor(String classification) {
         List<AccountDto> list = new ArrayList<>();
@@ -216,6 +222,7 @@ public class AccountServiceImpl implements AccountService {
         return list;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<AccountDto> findAllWithSegmentAndAllocationFactorAndDate(String classification, String date) {
 
@@ -313,6 +320,7 @@ public class AccountServiceImpl implements AccountService {
         return accountDto;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Map findWTax() {
         return settingFacade.getByCode(SettingCode.WTAX_ACCOUNT.toString());
@@ -412,7 +420,6 @@ public class AccountServiceImpl implements AccountService {
             }
         } catch (Exception ex) {
             Logger.getLogger(AccountServiceImpl.class.getName()).log(Level.SEVERE, null, ex);
-            throw new RuntimeException(ex);
         }
 
         return response;
@@ -424,6 +431,7 @@ public class AccountServiceImpl implements AccountService {
         return accountRepo.findByTitle(title);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<Account> findByIdNotIn(Integer... accountId) {
         return accountRepo.findByIdNotInOrderByTitleAsc(accountId);
@@ -434,6 +442,7 @@ public class AccountServiceImpl implements AccountService {
         return processCreate(account, bindingResult, messageSource);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<AccountDto> findAllWithSegmentAndHasSL() {
         List<AccountDto> list = new ArrayList<>();
@@ -447,6 +456,7 @@ public class AccountServiceImpl implements AccountService {
         return list;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public SegmentAccountDto findSegmentAccountById(Integer segmentId) {
         SegmentAccountDto segmentAccountDto = new SegmentAccountDto();
@@ -467,6 +477,7 @@ public class AccountServiceImpl implements AccountService {
         return segmentAccountDto;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<Map> findAllTreeMap() {
 
@@ -491,6 +502,7 @@ public class AccountServiceImpl implements AccountService {
         return this.accountsMapList;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<Map> findAllTreeMapByCode(String query) {
 
@@ -515,16 +527,19 @@ public class AccountServiceImpl implements AccountService {
         return this.accountsMapList;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Map findVat() {
         return settingFacade.getByCode(SettingCode.VAT_ACCOUNT.toString());
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Map findSupplierAccount() {
         return settingFacade.getByCode(SettingCode.SUPPLIER_ACCOUNT.toString());
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public SegmentAccount findByBusinessSegmentIdAndAccountId(int bsegmentId, int accountId) {
         return segmentAccountRepo.findOneByAccountIdAndBusinessSegmentId(accountId, bsegmentId);
@@ -535,11 +550,13 @@ public class AccountServiceImpl implements AccountService {
         return !this.generalLedgerRepo.findBySegmentAccountId(segmentAccountId).isEmpty();
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Account find(int accountId) {
         return accountRepo.findById(accountId).orElse(null);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public AllocationFactor findAllocationFactor(int accountId) {
         return this.allocationFactorRepo.findOneByAccountId(accountId);

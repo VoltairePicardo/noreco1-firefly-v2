@@ -23,6 +23,8 @@ import org.springframework.context.MessageSource;
 import org.springframework.data.domain.*;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import com.noreco1.fireflyv2.common.helpers.CurrencyIntoWords;
@@ -110,6 +112,7 @@ public class PettyCashTransServiceImpl implements PettyCashTransService, Printab
     @Autowired
     CheckVoucherRepo checkVoucherRepo;
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public HashMap findById(Integer id) {
         HashMap map = new HashMap();
@@ -135,6 +138,7 @@ public class PettyCashTransServiceImpl implements PettyCashTransService, Printab
         return map;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<HashMap> findAll() {
         List<HashMap> mapList = new ArrayList<>();
@@ -151,16 +155,19 @@ public class PettyCashTransServiceImpl implements PettyCashTransService, Printab
         return mapList;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public PettyCashBatch findByBatchStatus(Boolean status) {
         return pettyCashBatchRepo.findByStatus(status);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public PettyCashBatch findByBatchStatusAndOffice(Boolean status, int officeId) {
         return pettyCashBatchRepo.findByStatusAndOfficeId(status, officeId);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<HashMap> findAllBatches() {
         List<HashMap> mapList = new ArrayList<>();
@@ -175,6 +182,7 @@ public class PettyCashTransServiceImpl implements PettyCashTransService, Printab
         return mapList;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<HashMap> findAllBatchesByAreaOffice() {
         List<HashMap> mapList = new ArrayList<>();
@@ -190,6 +198,7 @@ public class PettyCashTransServiceImpl implements PettyCashTransService, Printab
         return mapList;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<HashMap> findAllBatchesByAreaOfficeAndDateRange(String from, String to, Integer officeId) {
         List<HashMap> mapList = new ArrayList<>();
@@ -319,6 +328,7 @@ public class PettyCashTransServiceImpl implements PettyCashTransService, Printab
         return response;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<Object[]> findAllForSummary(Integer batch, Integer documentStatusId, Integer officeId, Pageable pageable) {
 
@@ -706,11 +716,13 @@ public class PettyCashTransServiceImpl implements PettyCashTransService, Printab
         return signatoryFacade.defaultSignatories(com.noreco1.fireflyv2.model.enums.DocumentType.PCV, signMap);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public BigDecimal findOtherAmounts() {
         return pettyCashTransRepo.findSumOtherAmounts();
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<PettyCashTrans> findByStatusAndFilter(Integer documentStatusId, String filter, Pageable pageable) {
         if (filter == null) {
@@ -817,6 +829,7 @@ public class PettyCashTransServiceImpl implements PettyCashTransService, Printab
         return pettyCashTransBudgetDetails;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<HashMap> findCheckVouchers(String from, String to, String code) {
         List<HashMap> list = new ArrayList<>();

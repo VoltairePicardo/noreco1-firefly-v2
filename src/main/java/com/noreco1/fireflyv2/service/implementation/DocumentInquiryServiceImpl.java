@@ -14,6 +14,7 @@ import com.noreco1.fireflyv2.controller.response.DocInqListDto;
 import com.noreco1.fireflyv2.service.DocumentInquiryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
@@ -87,6 +88,7 @@ public class DocumentInquiryServiceImpl implements DocumentInquiryService {
         return this.documentsToDTO(apvList, canvassList, cashReceiptsList, cvList, joAcceptanceList, joList, jvList, mirList, poList, rvList, salesVoucherList);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<DocInqDetailDto> findDocDetailsByIdAndTypeId(Integer docId, Integer docTypeId) {
         List<DocInqDetailDto> returnDocuments = new ArrayList<>();
@@ -106,6 +108,7 @@ public class DocumentInquiryServiceImpl implements DocumentInquiryService {
         return returnDocuments;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<DocInqListDto> findDocumentsByTypeIdStartDateEndDate(Integer docTypeId, String tableName,
                                                                      Date startDate, Date endDate, String particulars,
@@ -530,6 +533,7 @@ public class DocumentInquiryServiceImpl implements DocumentInquiryService {
         return returnDocuments;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<DocInqListDto> findDocumentsByRvdId(Integer rvdId) {
         List<DocInqListDto> returnDocuments = new ArrayList<>();
@@ -546,6 +550,7 @@ public class DocumentInquiryServiceImpl implements DocumentInquiryService {
         return returnDocuments;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<DocInqListDto> findDocumentsByTransId(Integer transId) {
 
@@ -575,6 +580,7 @@ public class DocumentInquiryServiceImpl implements DocumentInquiryService {
         return new ArrayList<>();
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<DocInqListDto> findDocumentsByUserId(Integer userId, Integer docTypeId, String tableName,
                                                      Date startDate, Date endDate, String particulars) {
@@ -653,6 +659,7 @@ public class DocumentInquiryServiceImpl implements DocumentInquiryService {
         }
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<DocInqListDto> findDocumentsByStatusId(Integer status) {
         List<AccountsPayableVoucher> apvList = apvRepo.findByDocumentStatusId(status);
@@ -670,6 +677,7 @@ public class DocumentInquiryServiceImpl implements DocumentInquiryService {
         return this.documentsToDTO(apvList, canvassList, cashReceiptsList, cvList, joAcceptanceList, joList, jvList, mirList, poList, rvList, salesVoucherList);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<DocInqListDto> findDocumentsPending() {
         Integer[] nonPendingStatusIds = { // override this inside switch/case statement
@@ -692,6 +700,7 @@ public class DocumentInquiryServiceImpl implements DocumentInquiryService {
         return this.documentsToDTO(apvList, canvassList, cashReceiptsList, cvList, joAcceptanceList, joList, jvList, mirList, poList, rvList, salesVoucherList);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<DocInqListDto> findDocumentsByQuery(String query) {
 
@@ -738,6 +747,7 @@ public class DocumentInquiryServiceImpl implements DocumentInquiryService {
         return returnDocuments;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<DocInqListDto> findInventoryDocumentsByTransId(Integer transId) {
         List<DocInqListDto> returnDocuments = new ArrayList<>();

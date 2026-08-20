@@ -22,6 +22,8 @@ import net.sf.jasperreports.engine.JRDataSource;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
 import jakarta.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
@@ -52,6 +54,7 @@ public class PettyCashTransDetailServiceImpl implements PettyCashTransDetailServ
     @Autowired
     OfficeRepo officeRepo;
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public HashMap findById(Integer id) {
         HashMap map = new HashMap();
@@ -64,6 +67,7 @@ public class PettyCashTransDetailServiceImpl implements PettyCashTransDetailServ
         return map;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<HashMap> findAll() {
         List<HashMap> mapList = new ArrayList<>();
@@ -78,6 +82,7 @@ public class PettyCashTransDetailServiceImpl implements PettyCashTransDetailServ
         return mapList;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<PettyCashTransDetail> findByPCVId(Integer pcvId) {
         List<PettyCashTransDetail> transDetails = pettyCashTransDetailRepo.findByPettyCashTransId(pcvId);

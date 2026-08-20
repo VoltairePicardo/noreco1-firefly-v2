@@ -13,6 +13,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
@@ -31,12 +32,14 @@ public class NeaPriceIndexServiceImpl implements NeaPriceIndexService {
     @Autowired
     private NeaPriceIndexDetailRepo neaPriceIndexDetailRepo;
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<NeaPriceIndex> list(String q, int page, int size) {
         PageRequest pageable = PageRequest.of(page, size, Sort.by("effectivityDate").descending());
         return neaPriceIndexRepo.findAllByOrderByEffectivityDateDesc(pageable);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public NeaPriceIndex findById(Integer id) {
         NeaPriceIndex neaPriceIndex = neaPriceIndexRepo.findById(id).orElse(null);
@@ -49,6 +52,7 @@ public class NeaPriceIndexServiceImpl implements NeaPriceIndexService {
         return neaPriceIndex;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public NeaPriceIndex findByIdWithPrice(Integer id) {
         NeaPriceIndex neaPriceIndex = neaPriceIndexRepo.findById(id).orElse(null);
@@ -61,6 +65,7 @@ public class NeaPriceIndexServiceImpl implements NeaPriceIndexService {
         return neaPriceIndex;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public NeaPriceIndexDetail getItemNeaPriceIndex(Integer itemId) {
         return neaPriceIndexDetailRepo.findFirstByItemId(itemId);

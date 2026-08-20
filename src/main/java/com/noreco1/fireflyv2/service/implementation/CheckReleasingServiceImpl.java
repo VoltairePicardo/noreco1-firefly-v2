@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -59,12 +60,14 @@ public class CheckReleasingServiceImpl implements CheckReleasingService {
     // Query / read methods
     // -----------------------------------------------------------------------
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<Map<String, Object>> getUnreleased() {
         List<Object[]> rows = chequeRepo.findByReleasedWithCheckVoucherAndAmount(false);
         return mapChequeRows(rows);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<Map<String, Object>> getReleased(String from, String to) {
         List<Object[]> rows = releasedCheckRepo.findReleasedWithDateRange(from, to);
@@ -88,6 +91,7 @@ public class CheckReleasingServiceImpl implements CheckReleasingService {
         return result;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Map<String, Object> getDetailById(Integer id) {
         // Enriched query: includes computed checkAmount, accountTitle, payee
@@ -137,6 +141,7 @@ public class CheckReleasingServiceImpl implements CheckReleasingService {
         return map;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<Map<String, Object>> getFilesById(Integer id) {
         ReleasedCheque rc = releasedCheckRepo.findById(id).orElse(null);

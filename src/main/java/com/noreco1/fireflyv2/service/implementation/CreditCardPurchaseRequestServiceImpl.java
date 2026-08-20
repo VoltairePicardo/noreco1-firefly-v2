@@ -24,6 +24,8 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -260,6 +262,7 @@ public class CreditCardPurchaseRequestServiceImpl implements CreditCardPurchaseR
         return signatoryFacade.defaultSignatories(com.noreco1.fireflyv2.model.enums.DocumentType.CCPR);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<DocumentStatus> getDocumentsStatuses() {
         CreditCardPurchaseRequest voucher = creditCardPurchaseRequestRepo.findFirstByOrderByIdAsc();
@@ -270,6 +273,7 @@ public class CreditCardPurchaseRequestServiceImpl implements CreditCardPurchaseR
         return null;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<CreditCardPurchaseRequest> findByDateRangeAndStatusId(String from, String to, Integer docStatusId) {
 
@@ -308,6 +312,7 @@ public class CreditCardPurchaseRequestServiceImpl implements CreditCardPurchaseR
 
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public CreditCardPurchaseRequestDto findById(Integer id) {
 
@@ -405,6 +410,7 @@ public class CreditCardPurchaseRequestServiceImpl implements CreditCardPurchaseR
         return response;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<Map<String, Object>> findAllBatchesByAreaOffice() {
 
@@ -473,6 +479,7 @@ public class CreditCardPurchaseRequestServiceImpl implements CreditCardPurchaseR
 
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<Map<String, Object>> findAllBatchesForJv() {
 
@@ -490,6 +497,7 @@ public class CreditCardPurchaseRequestServiceImpl implements CreditCardPurchaseR
 
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<CreditCardPurchaseRequestDto> getCreditCardPurchaseRequestByBatch(Integer id) {
 

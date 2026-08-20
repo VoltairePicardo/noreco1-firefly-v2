@@ -22,6 +22,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -95,6 +96,7 @@ public class SiteInspectionReportServiceImpl implements SiteInspectionReportServ
         return siteInspectionReportRepo.findByDateBetweenAndDocumentStatusIdNotIn(fromDate, toDate, Arrays.asList(this.getNonPendingStatusIds()), pageable);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<SiteInspectionReport> findAll(String from, String to, int statusId, Pageable pageable) {
 
@@ -104,6 +106,7 @@ public class SiteInspectionReportServiceImpl implements SiteInspectionReportServ
         return siteInspectionReportRepo.findByDateBetweenAndDocumentStatusId(fromDate, toDate, statusId, pageable);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<SiteInspectionReport> findAll(String from, String to, String query, Pageable pageable) {
 
@@ -116,6 +119,7 @@ public class SiteInspectionReportServiceImpl implements SiteInspectionReportServ
                                                                     Arrays.asList(this.getNonPendingStatusIds()), pageable);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<SiteInspectionReport> findAll(String from, String to, int statusId, String query, Pageable pageable) {
 
@@ -126,6 +130,7 @@ public class SiteInspectionReportServiceImpl implements SiteInspectionReportServ
         return siteInspectionReportRepo.findByDateBetweenAndDocumentStatusIdAndQuery(fromDate, toDate, statusId, query, pageable);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<DocumentStatus> getDocumentsStatuses() {
         SiteInspectionReport report = siteInspectionReportRepo.findFirstByOrderByIdAsc();
@@ -392,6 +397,7 @@ public class SiteInspectionReportServiceImpl implements SiteInspectionReportServ
         return this.filesNotFoundMessage();
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<Map> findDetailBySiteInspectionReportTransId(Integer transId) {
 

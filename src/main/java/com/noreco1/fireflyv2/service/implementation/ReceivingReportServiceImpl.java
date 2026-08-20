@@ -23,6 +23,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -342,6 +343,7 @@ public class ReceivingReportServiceImpl implements ReceivingReportService, Print
         return signatoryFacade.defaultSignatories(DocumentType.RR);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<Map> findByDateRangeAndStatusId(String from, String to, Integer statusId) {
 
@@ -366,6 +368,7 @@ public class ReceivingReportServiceImpl implements ReceivingReportService, Print
         return null;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<Map> findByDateRangePending(String from, String to) {
 
@@ -397,6 +400,7 @@ public class ReceivingReportServiceImpl implements ReceivingReportService, Print
         return null;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<Map> getRRDetails(Integer rrId) {
 
@@ -442,6 +446,7 @@ public class ReceivingReportServiceImpl implements ReceivingReportService, Print
         return data;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Map findById(Integer id) {
         Map rr = new HashMap();
@@ -904,6 +909,7 @@ public class ReceivingReportServiceImpl implements ReceivingReportService, Print
         });
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<ApvPurchasingDocumentDto> findAllApprovedForApvWithAccountSettingPaged(String query, Integer supplierAcctNo, Pageable pageable) {
 
@@ -960,16 +966,19 @@ public class ReceivingReportServiceImpl implements ReceivingReportService, Print
 
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<InventoryLocation> getAllInventoryLocations() {
         return inventoryLocationRepo.findAll();
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<ReceivingReportDetail> getAllReceivingReportDetail(Integer id) {
         return receivingReportDetailRepo.findByReceivingReportId(id);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<CvVoucherDto> findAllApprovedForCvPaged(String query, Pageable pageable) {
 
@@ -1011,6 +1020,7 @@ public class ReceivingReportServiceImpl implements ReceivingReportService, Print
 
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<ReceivingReportDocumentDto> findAllForJv(String query, Pageable pageable) {
         Page<ReceivingReport> receivingReports;
@@ -1039,6 +1049,7 @@ public class ReceivingReportServiceImpl implements ReceivingReportService, Print
 
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Map findByApvId(Integer apvId) {
         Map m = null;

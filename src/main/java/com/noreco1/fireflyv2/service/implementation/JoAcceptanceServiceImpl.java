@@ -21,6 +21,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.data.domain.*;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -306,6 +307,7 @@ public class JoAcceptanceServiceImpl implements JoAcceptanceService, PrintableVo
         });
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<CvVoucherDto> findAllApprovedForCvPaged(String query, Pageable pageable) {
 
@@ -405,6 +407,7 @@ public class JoAcceptanceServiceImpl implements JoAcceptanceService, PrintableVo
         return null;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<JoAcceptanceListDto> findByPayReq() {
 
@@ -433,6 +436,7 @@ public class JoAcceptanceServiceImpl implements JoAcceptanceService, PrintableVo
         return null;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Map findByApvId(Integer apvId) {
         Map m = null;
@@ -454,6 +458,7 @@ public class JoAcceptanceServiceImpl implements JoAcceptanceService, PrintableVo
         return m;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<Map> findByDateRangeAndStatusId(String from, String to, Integer id) {
 
@@ -478,6 +483,7 @@ public class JoAcceptanceServiceImpl implements JoAcceptanceService, PrintableVo
         return null;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<Map> findByDateRangePending(String from, String to) {
 
@@ -509,6 +515,7 @@ public class JoAcceptanceServiceImpl implements JoAcceptanceService, PrintableVo
         return null;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public JoAcceptanceDto findById(Integer id) {
         JoAcceptance joa =  joAcceptanceRepo.findById(id).orElse(null);

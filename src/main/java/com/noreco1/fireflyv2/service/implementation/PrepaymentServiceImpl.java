@@ -21,6 +21,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.data.domain.*;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 
@@ -323,6 +324,7 @@ public class PrepaymentServiceImpl implements PrepaymentService {
         return  ppDtos;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<PrepaymentDto> findByMonthAndYear(String month, String year) {
         List<Prepayment> ppList = prepaymentRepo.findByMonthAndYear(month, year);
@@ -359,6 +361,7 @@ public class PrepaymentServiceImpl implements PrepaymentService {
         return  ppDtos;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public PrepaymentDto findById(Integer id) {
         Prepayment pp =  prepaymentRepo.findById(id).orElse(null);
@@ -522,6 +525,7 @@ public class PrepaymentServiceImpl implements PrepaymentService {
         return response;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<PrepaymentListDto> findByStatusAndDateRange(String status, String start, String end) {
 

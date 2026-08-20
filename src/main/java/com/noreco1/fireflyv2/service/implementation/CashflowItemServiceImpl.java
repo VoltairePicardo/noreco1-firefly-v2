@@ -14,6 +14,8 @@ import com.noreco1.fireflyv2.validator.CashflowAccountValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 
 import java.util.*;
@@ -30,11 +32,13 @@ public class CashflowItemServiceImpl implements CashflowItemService {
     @Autowired
     CashflowItemLoggerFacade cashflowItemLoggerFacade;
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<CashflowItem> findAll() {
         return cashflowItemRepo.findAllByOrderByIdAscNameAsc();
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<CashflowItem> findByIdNotIn() {
         List<CashflowItem> cashflowItems = cashflowItemRepo.findByParentCashflowItemNotNull();
@@ -47,11 +51,13 @@ public class CashflowItemServiceImpl implements CashflowItemService {
         return cashflowItemRepo.findByIdNotIn(ids);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public CashflowItem findById(Integer id) {
         return cashflowItemRepo.findById(id).orElse(null);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<CashflowItemLog> getLogs(Integer id) {
         return cashflowItemLoggerFacade.getLogs(id);

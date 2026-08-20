@@ -20,6 +20,8 @@ import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -97,6 +99,7 @@ public class StockReceiveServiceImpl implements StockReceiveService, PrintableVo
     @Autowired
     ItemStockDetailRepo itemStockDetailRepo;
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public StockReceive findById(Integer id) {
         StockReceive ret = stockReceiveRepo.findById(id).orElse(null);
@@ -129,6 +132,7 @@ public class StockReceiveServiceImpl implements StockReceiveService, PrintableVo
         return ret;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public StockReceive findByCode(String code) {
 
@@ -139,21 +143,25 @@ public class StockReceiveServiceImpl implements StockReceiveService, PrintableVo
         } else return null;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<StockReceive> findAll() {
         return stockReceiveRepo.findAll();
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<StockReceive> findAll(Pageable pageable) {
         return null;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<StockReceive> findByQuery(String query, Pageable pageable) {
         return null;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<Map> getDetails(int id) {
         List<Map> data = new ArrayList<>();
@@ -187,6 +195,7 @@ public class StockReceiveServiceImpl implements StockReceiveService, PrintableVo
         return data;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<Map> findByDateRangeAndStatusId(String from, String to, Integer docStatusId, Integer officeId) {
         try {
@@ -211,6 +220,7 @@ public class StockReceiveServiceImpl implements StockReceiveService, PrintableVo
         return null;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<Map> findByDateRangePending(String from, String to, Integer officeId) {
         try {
@@ -241,6 +251,7 @@ public class StockReceiveServiceImpl implements StockReceiveService, PrintableVo
         return null;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<StockReceive> getListForSummaryReport(String from, String to, HttpServletRequest request) {
         List<StockReceive> list = new ArrayList<>();
@@ -286,6 +297,7 @@ public class StockReceiveServiceImpl implements StockReceiveService, PrintableVo
         return list;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<ItemTransactionDetailDto> getItems(Integer transId) {
         List<ItemTransactionDetailDto> data = new ArrayList<>();
@@ -311,6 +323,7 @@ public class StockReceiveServiceImpl implements StockReceiveService, PrintableVo
         return data;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<StockReceiveDocumentDto> findAllApprovedForAccountSettingPaged(String query, Pageable pageable) {
 
@@ -354,6 +367,7 @@ public class StockReceiveServiceImpl implements StockReceiveService, PrintableVo
 
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<StockReceiveDocumentDto> findAllApprovedForJVPaged(String query, Pageable pageable) {
 

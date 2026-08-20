@@ -10,6 +10,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
@@ -18,11 +19,13 @@ public class ItemServiceImpl implements ItemService {
     @Autowired
     private ItemRepo itemRepo;
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<Item> findAll(Pageable pageable) {
         return itemRepo.findAllByOrderByDescriptionAsc(pageable);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<Item> list(String q, Integer accountId, Integer categoryId, int page, int size) {
         PageRequest pageable = PageRequest.of(page, size, Sort.by("description").ascending());
@@ -39,11 +42,13 @@ public class ItemServiceImpl implements ItemService {
                 : itemRepo.findByDescriptionContainingIgnoreCaseOrCodeContainingIgnoreCaseOrderByDescriptionAsc(q, q, pageable);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Item findById(Integer id) {
         return itemRepo.findById(id).orElse(null);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     public Item findByDescription(String desc) {
         return itemRepo.findOneByDescription(desc);
     }

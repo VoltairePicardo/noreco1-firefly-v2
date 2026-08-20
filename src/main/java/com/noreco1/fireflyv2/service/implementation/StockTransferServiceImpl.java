@@ -20,6 +20,8 @@ import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -79,6 +81,7 @@ public class StockTransferServiceImpl implements StockTransferService, Printable
     @Autowired
     ItemStockRepo itemStockRepo;
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public StockTransfer findById(Integer id) {
 
@@ -95,21 +98,25 @@ public class StockTransferServiceImpl implements StockTransferService, Printable
         return ret;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<StockTransfer> findAll() {
         return stockTransferRepo.findAll();
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<StockTransfer> findAll(Pageable pageable) {
         return stockTransferRepo.findAll(pageable);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<StockTransfer> findByQuery(String query, Pageable pageable) {
         return null;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<Map> getDetails(Integer id) {
         List<Map> data = new ArrayList<>();
@@ -146,6 +153,7 @@ public class StockTransferServiceImpl implements StockTransferService, Printable
         return data;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<Map> findByDateRangeAndStatusId(String from, String to, Integer docStatusId, Integer officeId) {
         try {
@@ -170,6 +178,7 @@ public class StockTransferServiceImpl implements StockTransferService, Printable
         return null;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<Map> findByDateRangePending(String from, String to, Integer officeId) {
         try {
@@ -256,6 +265,7 @@ public class StockTransferServiceImpl implements StockTransferService, Printable
         return response;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<InventoryDocumentDto> findAllForReleasingByQuery(String query, Pageable pageable) {
         Page<StockTransfer> stockTransfers;
@@ -279,6 +289,7 @@ public class StockTransferServiceImpl implements StockTransferService, Printable
         }
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<InventoryDocumentDto> findAllForReleasing(Pageable pageable) {
         Page<StockTransfer> stockTransfers;
@@ -289,6 +300,7 @@ public class StockTransferServiceImpl implements StockTransferService, Printable
         });
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<InventoryDocumentDto> findAllForReceivingByQuery(String query, Integer invLocId, Pageable pageable) {
         Page<StockTransfer> stockTransfers;
@@ -303,6 +315,7 @@ public class StockTransferServiceImpl implements StockTransferService, Printable
         });
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<StockTransfer> getListForSummaryReport(String from, String to, HttpServletRequest request) {
         List<StockTransfer> list = new ArrayList<>();
@@ -348,6 +361,7 @@ public class StockTransferServiceImpl implements StockTransferService, Printable
         return list;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<ItemTransactionDetailDto> getItems(Integer transId) {
         List<ItemTransactionDetailDto> data = new ArrayList<>();

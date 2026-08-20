@@ -667,7 +667,6 @@ public class WorkOrderServiceImpl implements WorkOrderService {
             }
         }catch (Exception ex) {
             Logger.getLogger(AssetServiceImpl.class.getName()).log(Level.SEVERE, null, ex);
-            throw  new RuntimeException(ex);
         }
         return response;
     }
@@ -688,7 +687,6 @@ public class WorkOrderServiceImpl implements WorkOrderService {
             }
         }catch (Exception ex) {
             Logger.getLogger(WorkOrderServiceImpl.class.getName()).log(Level.SEVERE, null, ex);
-            throw new RuntimeException(ex);
         }
         return response;
     }
@@ -714,7 +712,6 @@ public class WorkOrderServiceImpl implements WorkOrderService {
             }
         }catch (Exception ex) {
             Logger.getLogger(WorkOrderServiceImpl.class.getName()).log(Level.SEVERE, null, ex);
-            throw new RuntimeException(ex);
         }
         return response;
     }

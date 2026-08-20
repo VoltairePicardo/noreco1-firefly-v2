@@ -24,6 +24,7 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -267,7 +268,6 @@ public class AjServiceImpl implements AjService, PrintableVoucher {
             }
         }catch (Exception ex) {
             Logger.getLogger(AjServiceImpl.class.getName()).log(Level.SEVERE, null, ex);
-            throw new RuntimeException(ex);
         }
         return response;
     }
@@ -287,12 +287,14 @@ public class AjServiceImpl implements AjService, PrintableVoucher {
         }
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<Map> findAll() {
         List<AdjustmentJournal> vouchers = ajRepo.findAll();
         return this.makeAjListMap(vouchers);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Map findById(Integer id) {
         Map map = new HashMap();
@@ -305,6 +307,7 @@ public class AjServiceImpl implements AjService, PrintableVoucher {
         return map;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<Map> findByDateRangeAndStatusId(String from, String to, Integer id) {
         try {
@@ -327,6 +330,7 @@ public class AjServiceImpl implements AjService, PrintableVoucher {
         return null;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<Map> findByDateRange(String from, String to) {
         try {

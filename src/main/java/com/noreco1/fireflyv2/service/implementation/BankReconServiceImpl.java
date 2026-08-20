@@ -18,6 +18,7 @@ import com.noreco1.fireflyv2.validator.OdValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 
@@ -274,6 +275,7 @@ public class BankReconServiceImpl implements BankReconService {
         return returnVouchers;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public OtherDepositDto findByOdId(Integer odId) {
         OtherDeposit otherDeposit =  otherDepositRepo.findById(odId).orElse(null);

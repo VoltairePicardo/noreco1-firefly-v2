@@ -23,6 +23,8 @@ import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -92,6 +94,7 @@ public class CostEstimateServiceImpl implements CostEstimateService, PrintableVo
     @Autowired
     EmployeeRepo employeeRepo;
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public CostEstimate findById(Integer id) {
         CostEstimate ret = costEstimateRepo.findById(id).orElse(null);
@@ -107,21 +110,25 @@ public class CostEstimateServiceImpl implements CostEstimateService, PrintableVo
         return ret;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<CostEstimate> findAll() {
         return costEstimateRepo.findAll();
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<CostEstimate> findAll(Pageable pageable) {
         return costEstimateRepo.findAll(pageable);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<CostEstimate> findByQuery(String query, Pageable pageable) {
         return costEstimateRepo.findByCode(query, pageable);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<CostEstimate> findAllForPurchaseRequest(String query, Pageable pageable) {
         if (Checker.isStringNullAndEmpty(query)) {
@@ -131,11 +138,13 @@ public class CostEstimateServiceImpl implements CostEstimateService, PrintableVo
         }
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<DocumentStatus> getDocumentsStatuses() {
         return documentDtoer.getDocumentStatuses(com.noreco1.fireflyv2.model.enums.Workflow.CE.getId());
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<CostEstimate> getListForSummaryReport(String from, String to, HttpServletRequest request) {
         List<CostEstimate> list = new ArrayList<>();
@@ -176,6 +185,7 @@ public class CostEstimateServiceImpl implements CostEstimateService, PrintableVo
         return list;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<CostEstimateDetailDto> findDetailByAssemblyUnitId(Integer assemblyUnitId, Integer invLocId) {
         List<CostEstimateDetailDto> data = new ArrayList<>();
@@ -205,6 +215,7 @@ public class CostEstimateServiceImpl implements CostEstimateService, PrintableVo
         return data;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<CostEstimateDetailDto> findDetailByCostEstimateTransId(Integer transId) {
 
@@ -278,11 +289,13 @@ public class CostEstimateServiceImpl implements CostEstimateService, PrintableVo
         return response;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<CostEstimateAssemblyUnitItem> findItemsByCostEstimate(Integer id) {
         return costEstimateAssemblyUnitItemRepo.findAllByCostEstimateAssemblyUnitCostEstimateId(id);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<CostEstimate> getCostEstimateForStockWithdrawal(String query, Integer invLocId, Pageable pageable) {
         if(Checker.isStringNullOrEmpty(query)){
@@ -292,6 +305,7 @@ public class CostEstimateServiceImpl implements CostEstimateService, PrintableVo
         }
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<CostEstimateDetailDto> findAllDetailByCostEstimateTransId(Integer transId) {
 
@@ -691,6 +705,7 @@ public class CostEstimateServiceImpl implements CostEstimateService, PrintableVo
         return signatoryFacade.defaultSignatories(com.noreco1.fireflyv2.model.enums.DocumentType.CE);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<Map> findByDateRangeAndStatusId(String from, String to, Integer docStatusId) {
         try {
@@ -715,6 +730,7 @@ public class CostEstimateServiceImpl implements CostEstimateService, PrintableVo
         return null;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<Map> findByDateRangePending(String from, String to) {
         try {

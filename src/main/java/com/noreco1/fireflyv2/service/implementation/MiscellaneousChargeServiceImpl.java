@@ -13,6 +13,8 @@ import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 
 import java.util.ArrayList;
@@ -35,6 +37,7 @@ public class MiscellaneousChargeServiceImpl implements MiscellaneousChargeServic
 
     private MiscellaneousCharge model;
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public HashMap findById(Integer id) {
         HashMap map = new HashMap();
@@ -47,11 +50,13 @@ public class MiscellaneousChargeServiceImpl implements MiscellaneousChargeServic
         return map;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public MiscellaneousCharge findOne(Integer id) {
         return miscellaneousChargeRepo.findById(id).orElse(null);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<HashMap> findAll() {
         List<HashMap> mapList = new ArrayList<>();
@@ -66,6 +71,7 @@ public class MiscellaneousChargeServiceImpl implements MiscellaneousChargeServic
         return mapList;
     }
     
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<MiscellaneousCharge> findAll(Pageable pageable) {
         return miscellaneousChargeRepo.findAll(pageable);

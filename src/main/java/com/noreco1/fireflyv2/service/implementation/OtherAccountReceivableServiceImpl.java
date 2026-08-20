@@ -19,6 +19,8 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import com.noreco1.fireflyv2.common.helpers.CurrencyIntoWords;
 
@@ -90,6 +92,7 @@ public class OtherAccountReceivableServiceImpl implements OtherAccountReceivable
     @Autowired
     EmployeeRepo employeeRepo;
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<OtherAccountReceivableListDto> findAll() {
         List<OtherAccountReceivable> vouchers = oarRepo.findAll();
@@ -114,6 +117,7 @@ public class OtherAccountReceivableServiceImpl implements OtherAccountReceivable
         return null;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public OtherAccountReceivableDto findById(Integer id) {
         OtherAccountReceivable oar =  oarRepo.findById(id).orElse(null);
@@ -142,6 +146,7 @@ public class OtherAccountReceivableServiceImpl implements OtherAccountReceivable
         return  oarDto;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<OtherAccountReceivableListDto> findByStatusId(Integer id) {
         List<OtherAccountReceivable> vouchers = oarRepo.findByDocumentStatusId(id);

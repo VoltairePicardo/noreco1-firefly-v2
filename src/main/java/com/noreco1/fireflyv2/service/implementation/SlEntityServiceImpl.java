@@ -15,6 +15,8 @@ import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,31 +35,37 @@ public class SlEntityServiceImpl implements SlEntityService {
     @Autowired
     GeneratorFacade generatorFacade;
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<SlEntity> findAll() {
         return slEntityRepo.findAllByOrderByNameAsc();
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<SlEntity> findAllByType(Integer[] entityTypes) {
         return slEntityRepo.findByMarkers(Arrays.asList(entityTypes));
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<SubLedgerEntity> findAllStrong() {
         return subLedgerEntityRepo.findAllByOrderByNameAsc();
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<SlEntity> findAll(Pageable pageable) {
         return slEntityRepo.findAllByOrderByNameAsc(pageable);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<SlEntity> findByQuery(String query, Pageable pageable) {
         return slEntityRepo.findByNameContainingIgnoreCaseOrAddressContainingIgnoreCaseOrSlEntityClassificationContainingIgnoreCaseOrderByNameAsc(query, query, query, pageable);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<SlEntity> findByQueryAndTypes(String query, Integer[] entityTypes, Pageable pageable) {
         List<Integer> markers = Arrays.asList(entityTypes);
@@ -68,6 +76,7 @@ public class SlEntityServiceImpl implements SlEntityService {
         }
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<SlEntity> findByClassificationQueryAndTypes(String classification, String query, Integer[] entityTypes, Pageable pageable) {
         List<Integer> markers = Arrays.asList(entityTypes);
@@ -78,6 +87,7 @@ public class SlEntityServiceImpl implements SlEntityService {
         }
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<SlEntity> findByClassificationQuery(String classification, String query, Pageable pageable) {
         Page<SlEntity> entities;
@@ -89,16 +99,19 @@ public class SlEntityServiceImpl implements SlEntityService {
         return entities;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<SubLedgerEntity> findAllStrong(Pageable pageable) {
         return subLedgerEntityRepo.findAllByOrderByNameAsc(pageable);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<SubLedgerEntity> findStrongByQuery(String query, Pageable pageable) {
         return subLedgerEntityRepo.findByNameContainingIgnoreCaseOrAddressContainingIgnoreCaseOrSlEntityClassificationDescriptionContainingIgnoreCaseOrderByNameAsc(query, query, query, pageable);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<SubLedgerEntity> findStrongByClassificationQuery(String classification, String query, Pageable pageable) {
         Page<SubLedgerEntity> entities;
@@ -110,6 +123,7 @@ public class SlEntityServiceImpl implements SlEntityService {
         return entities;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<SlEntity> findAllByClassificationQueryLevel(String classification, Integer level, String query, Pageable pageable) {
         return slEntityRepo.findAllByParams(classification, level, "%" + (Checker.isStringNullOrEmpty(query) ? "" : query) + "%", pageable);

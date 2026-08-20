@@ -15,6 +15,8 @@ import com.noreco1.fireflyv2.validator.AccountSettingValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 
 import java.math.BigDecimal;
@@ -40,6 +42,7 @@ public class AccountSettingServiceImpl implements AccountSettingService {
     @Autowired
     private ReceivingReportRepo receivingReportRepo;
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<AccountSetting> findByDateRangeAndStatusId(String from, String to) {
 
@@ -106,6 +109,7 @@ public class AccountSettingServiceImpl implements AccountSettingService {
 
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public AccountSetting findById(Integer id) {
 
@@ -332,6 +336,7 @@ public class AccountSettingServiceImpl implements AccountSettingService {
         return this.processCreate(accountSetting, bindingResult, messageSource);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public ArrayList<AccountSettingDetailDto> getAllAccountSettingDetail(Integer transactionId) {
 
@@ -368,6 +373,7 @@ public class AccountSettingServiceImpl implements AccountSettingService {
 
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Map getAccountSettingRRlinkedDetail(Integer rrId) {
         Map rrDetailMap = new HashMap();
