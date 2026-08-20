@@ -114,7 +114,15 @@ export class WorkOrderAddEditComponent {
                 { size: 'lg', centered: true }
             );
             if (result?.action === 'select') {
-                this.project = result.data;
+                this.project     = result.data;
+                this.description = result.data.name     || this.description;
+                this.location    = result.data.location || this.location;
+                if (result.data.periodCoveredFrom) {
+                    this.startDate = new Date(result.data.periodCoveredFrom).toISOString().substring(0, 10);
+                }
+                if (result.data.periodCoveredTo) {
+                    this.endDate = new Date(result.data.periodCoveredTo).toISOString().substring(0, 10);
+                }
             }
         } catch (_) {}
     }
@@ -128,10 +136,10 @@ export class WorkOrderAddEditComponent {
             this.alertService.warning(this.module, 'Validation', 'Town is required.');
             return;
         }
-        if (!this.type) {
+        /*if (!this.type) {
             this.alertService.warning(this.module, 'Validation', 'Work Order Type is required.');
             return;
-        }
+        }*/
 
         this.isLoading.set(true);
 

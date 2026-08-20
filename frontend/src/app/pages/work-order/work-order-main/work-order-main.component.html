@@ -46,7 +46,7 @@
                         <select class="form-select" [ngModel]="selectedStatusId()"
                                 (ngModelChange)="selectedStatusId.set($event); load(0)">
                             <option [ngValue]="null">All Statuses</option>
-                            @for (s of documentStatuses(); track s.id) {
+                            @for (s of documentStatuses; track s.id) {
                                 <option [ngValue]="s.id">{{ s.status }}</option>
                             }
                         </select>
@@ -93,8 +93,12 @@
                                             <td class="text-nowrap">{{ rec.createdAt | date:'MM/dd/yyyy' }}</td>
                                             <td>{{ typeLabel(rec.type) }}</td>
                                             <td>
-                                                <span class="badge bg-secondary bg-opacity-25 text-dark border">
-                                                    {{ rec.documentStatus?.status || '—' }}
+                                                <span class="badge border"
+                                                      [class.bg-success]="!rec.isClosed"
+                                                      [class.bg-secondary]="rec.isClosed"
+                                                      [class.bg-opacity-25]="true"
+                                                      [class.text-dark]="true">
+                                                    {{ rec.isClosed ? 'Closed' : 'Open' }}
                                                 </span>
                                             </td>
                                             <td class="text-nowrap">

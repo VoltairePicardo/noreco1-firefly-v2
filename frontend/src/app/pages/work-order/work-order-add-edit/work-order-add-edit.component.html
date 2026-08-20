@@ -16,14 +16,14 @@
                     <div class="col-xl-12 p-3" card-body>
                         <div class="row g-3">
 
-                            <div class="col-md-12">
+                            <div class="col-md-6">
                                 <label class="form-label fw-bold">Project</label>
                                 <div class="input-group">
                                     <input type="text" class="form-control" readonly
                                            [value]="project ? (project.code + ' — ' + project.name) : ''"
                                            placeholder="No project selected"/>
                                     <button type="button" class="btn btn-success fw-bold" (click)="browseProject()">
-                                        <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
+                                        <ng-icon name="tablerSearch" class="ps-0  pe-3 fw-bold"></ng-icon>Browse
                                     </button>
                                 </div>
                             </div>
@@ -78,7 +78,7 @@
                             <div class="col-md-12">
                                 <label class="form-label fw-bold">Description</label>
                                 <textarea class="form-control" [(ngModel)]="description" name="description"
-                                          rows="4" maxlength="1024" placeholder="Describe the work to be done"></textarea>
+                                          rows="2" maxlength="1024" placeholder="Describe the work to be done"></textarea>
                             </div>
 
                         </div>

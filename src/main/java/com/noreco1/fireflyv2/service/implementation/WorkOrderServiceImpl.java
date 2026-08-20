@@ -9,6 +9,7 @@ import com.noreco1.fireflyv2.common.helpers.Checker;
 import com.noreco1.fireflyv2.common.helpers.MessageFormatter;
 import com.noreco1.fireflyv2.common.helpers.ServiceUtil;
 import com.noreco1.fireflyv2.common.helpers.StringFormatter;
+import org.springframework.data.domain.*;
 import com.noreco1.fireflyv2.model.*;
 import com.noreco1.fireflyv2.model.AssetVoucherLinkType;
 import com.noreco1.fireflyv2.model.DocumentType;
@@ -23,7 +24,9 @@ import com.noreco1.fireflyv2.validator.AssetValidator;
 import com.noreco1.fireflyv2.validator.WorkOrderValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 
 import java.math.BigDecimal;
@@ -100,6 +103,7 @@ public class WorkOrderServiceImpl implements WorkOrderService {
     @Autowired
     private ProjectRepo projectRepo;
 
+    @Transactional
     @Override
     public PostResponse processUpdate(Object entity, BindingResult bindingResult, MessageSource messageSource) {
         WorkOrder workOrder = (WorkOrder) entity;
@@ -154,6 +158,7 @@ public class WorkOrderServiceImpl implements WorkOrderService {
         return response;
     }
 
+    @Transactional
     @Override
     public PostResponse processCreate(Object entity, BindingResult bindingResult, MessageSource messageSource) {
         PostResponse response = new PostResponse();
@@ -205,6 +210,7 @@ public class WorkOrderServiceImpl implements WorkOrderService {
         return response;
     }
 
+    @Transactional(readOnly = true)
     @Override
     public List<WorkOrder> findByStatus(Integer status) {
         if(status == null || status == -1) {
@@ -214,6 +220,7 @@ public class WorkOrderServiceImpl implements WorkOrderService {
         }
     }
 
+    @Transactional(readOnly = true)
     @Override
     public List<WorkOrder> findByStatus(Integer status, String y, String m) {
         Integer year = -1;
@@ -249,6 +256,7 @@ public class WorkOrderServiceImpl implements WorkOrderService {
         }
     }
 
+    @Transactional(readOnly = true)
     @Override
     public WorkOrder findById(Integer id) {
         WorkOrder workOrder = workOrderRepo.findById(id).orElse(null);
@@ -258,6 +266,7 @@ public class WorkOrderServiceImpl implements WorkOrderService {
         return workOrder;
     }
 
+    @Transactional(readOnly = true)
     @Override
     public List<Map> findVoucherForPosting(Integer workOrderAccountNo) {
         List<Map> data = new ArrayList<>();
@@ -288,6 +297,7 @@ public class WorkOrderServiceImpl implements WorkOrderService {
 
     }
 
+    @Transactional(readOnly = true)
     @Override
     public List<Map> getPostedVouchers(Integer id) {
         List<Map> data = new ArrayList<>();
@@ -309,6 +319,7 @@ public class WorkOrderServiceImpl implements WorkOrderService {
         return data;
     }
 
+    @Transactional(readOnly = true)
     @Override
     public WorkOrderDetail getWorkOrderDetailsByWoId(Integer workOrderId) {
         WorkOrderDetail workOrderDetail = new WorkOrderDetail();
@@ -346,6 +357,7 @@ public class WorkOrderServiceImpl implements WorkOrderService {
         return workOrderDetail;
     }
 
+    @Transactional
     @Override
     public PostResponse close(Asset asset, Integer id, BindingResult bindingResult, MessageSource messageSource) {
         PostResponse response = new PostResponse();
@@ -660,6 +672,7 @@ public class WorkOrderServiceImpl implements WorkOrderService {
         return response;
     }
 
+    @Transactional
     @Override
     public PostResponse createDetail(WorkOrderDetail workOrderDetail, BindingResult bindingResult, MessageSource messageSource) {
         PostResponse response = new PostResponse();
@@ -680,6 +693,7 @@ public class WorkOrderServiceImpl implements WorkOrderService {
         return response;
     }
 
+    @Transactional
     @Override
     public PostResponse updateDetail(WorkOrderDetail workOrderDetail, BindingResult bindingResult, MessageSource messageSource) {
         PostResponse response = new PostResponse();
@@ -705,6 +719,7 @@ public class WorkOrderServiceImpl implements WorkOrderService {
         return response;
     }
 
+    @Transactional(readOnly = true)
     @Override
     public List<com.noreco1.fireflyv2.controller.response.reports.WorkOrderDetail> getWorkOrderReportDetails(String asOf) {
 
@@ -754,11 +769,13 @@ public class WorkOrderServiceImpl implements WorkOrderService {
         return reportDetails;
     }
 
+    @Transactional(readOnly = true)
     @Override
     public List<WorkOrder> findAll() {
         return workOrderRepo.findAll();
     }
 
+    @Transactional(readOnly = true)
     @Override
     public List<Map> getProjectCostEstimateDetail(Integer workOrderId, Integer invLocId, Integer invCatId) {
         List<Map> data = new ArrayList<>();
@@ -786,6 +803,7 @@ public class WorkOrderServiceImpl implements WorkOrderService {
         return data;
     }
 
+    @Transactional(readOnly = true)
     @Override
     public List<Map> getProjectCostEstimateDetail(Integer workOrderId) {
         List<Map> data = new ArrayList<>();
@@ -812,6 +830,354 @@ public class WorkOrderServiceImpl implements WorkOrderService {
         }
 
         return data;
+    }
+
+    // -------------------------------------------------------------------------
+    // REST API implementations
+    // -------------------------------------------------------------------------
+
+    @Transactional(readOnly = true)
+    @Override
+    public Page<WorkOrder> list(Integer statusId, String year, String month, String search, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
+        List<WorkOrder> all = workOrderRepo.findAll(Sort.by("id").descending());
+
+        if (statusId != null) {
+            boolean closed = statusId == 1;
+            all = all.stream().filter(w -> Boolean.TRUE.equals(w.getIsClosed()) == closed).toList();
+        }
+        if (year != null && !year.isBlank()) {
+            try {
+                int y = Integer.parseInt(year);
+                all = all.stream().filter(w -> w.getYear() != null && w.getYear() == y).toList();
+            } catch (NumberFormatException ignored) {}
+        }
+        if (month != null && !month.isBlank()) {
+            try {
+                int m = Integer.parseInt(month);
+                all = all.stream().filter(w -> w.getMonth() != null && w.getMonth() == m).toList();
+            } catch (NumberFormatException ignored) {}
+        }
+        if (search != null && !search.isBlank()) {
+            String q = search.toLowerCase();
+            all = all.stream().filter(w ->
+                (w.getCode()        != null && w.getCode().toLowerCase().contains(q)) ||
+                (w.getDescription() != null && w.getDescription().toLowerCase().contains(q))
+            ).toList();
+        }
+
+        int total = all.size();
+        int start = (int) pageable.getOffset();
+        int end   = Math.min(start + pageable.getPageSize(), total);
+        List<WorkOrder> content = start > total ? Collections.emptyList() : all.subList(start, end);
+        return new PageImpl<>(content, pageable, total);
+    }
+
+    @Transactional
+    @Override
+    public PostResponse createFromPayload(Map<String, Object> payload) {
+        PostResponse response = new PostResponse();
+        try {
+            WorkOrder wo = buildWorkOrderFromPayload(payload, null);
+            WorkOrder saved = workOrderRepo.save(wo);
+            if (saved != null) {
+                updateProjectTown(saved.getProject(), saved.getTown());
+                response.setSuccessMessage("Work Order successfully created.");
+                response.setModelId(saved.getId());
+            } else {
+                response.setFailureMessage("Failed to create Work Order.");
+            }
+        } catch (Exception e) {
+            response.setFailureMessage("Failed to create Work Order: " + e.getMessage());
+        }
+        return response;
+    }
+
+    @Transactional
+    @Override
+    public PostResponse updateFromPayload(Map<String, Object> payload) {
+        PostResponse response = new PostResponse();
+        Object idObj = payload.get("id");
+        if (idObj == null) {
+            response.setFailureMessage("ID is required for update.");
+            return response;
+        }
+        Integer id = ((Number) idObj).intValue();
+        WorkOrder existing = workOrderRepo.findById(id).orElse(null);
+        if (existing == null) {
+            response.setFailureMessage("Work Order not found.");
+            return response;
+        }
+
+        Object dateObj = payload.get("date");
+        if (dateObj instanceof String dateStr && !dateStr.isEmpty()) {
+            try {
+                java.util.Date d = java.sql.Date.valueOf(dateStr);
+                existing.setDate(d);
+                Calendar cal = Calendar.getInstance();
+                cal.setTime(d);
+                existing.setYear(cal.get(Calendar.YEAR));
+                existing.setMonth(cal.get(Calendar.MONTH) + 1);
+            } catch (Exception ignored) {}
+        }
+
+        if (payload.get("description") != null) existing.setDescription((String) payload.get("description"));
+        if (payload.get("location")    != null) existing.setLocation((String) payload.get("location"));
+
+        Object pcFrom = payload.get("periodCoveredFrom");
+        if (pcFrom instanceof String s && !s.isBlank()) {
+            try { existing.setPeriodCoveredFrom(java.sql.Date.valueOf(s)); } catch (Exception ignored) {}
+        }
+        Object pcTo = payload.get("periodCoveredTo");
+        if (pcTo instanceof String s && !s.isBlank()) {
+            try { existing.setPeriodCoveredTo(java.sql.Date.valueOf(s)); } catch (Exception ignored) {}
+        }
+
+        String typeStr = (String) payload.get("type");
+        if (typeStr != null) existing.setType(mapWorkOrderType(typeStr));
+
+        Object projectObj = payload.get("project");
+        if (projectObj instanceof Map<?, ?> pm && pm.get("id") != null) {
+            Project p = new Project();
+            p.setId(((Number) pm.get("id")).intValue());
+            existing.setProject(p);
+        }
+
+        Object townObj = payload.get("town");
+        if (townObj instanceof Map<?, ?> tm && tm.get("id") != null) {
+            Town t = new Town();
+            t.setId(((Number) tm.get("id")).intValue());
+            existing.setTown(t);
+        }
+
+        existing.setUpdatedAt(new java.util.Date());
+        WorkOrder saved = workOrderRepo.save(existing);
+        if (saved != null) {
+            updateProjectTown(saved.getProject(), saved.getTown());
+            response.setSuccessMessage("Work Order successfully updated.");
+            response.setModelId(saved.getId());
+        } else {
+            response.setFailureMessage("Failed to update Work Order.");
+        }
+        return response;
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public List<Map<String, Object>> getPostedVouchersMap(Integer id) {
+        List<Object[]> rows = workOrderRepo.findPostedVouchers(id);
+        List<Map<String, Object>> result = new ArrayList<>();
+        if (rows != null) {
+            for (Object[] row : rows) {
+                Map<String, Object> m = new HashMap<>();
+                m.put("id",          row[0]);
+                m.put("code",        row[1]);
+                m.put("date",        row[2]);
+                m.put("amount",      row[3]);
+                m.put("description", row[4]);
+                result.add(m);
+            }
+        }
+        return result;
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public WorkOrderDetail getWorkOrderDetailSummary(Integer id) {
+        WorkOrderDetail summary = new WorkOrderDetail();
+        List<WorkOrderDetail> details = workOrderDetailRepo.findByWorkOrderId(id);
+        if (details == null || details.isEmpty()) return summary;
+
+        BigDecimal labor = BigDecimal.ZERO, overhead = BigDecimal.ZERO,
+                   materials = BigDecimal.ZERO, tax = BigDecimal.ZERO,
+                   houseConnection = BigDecimal.ZERO;
+
+        for (WorkOrderDetail d : details) {
+            labor           = labor.add(d.getLabor()           != null ? d.getLabor()           : BigDecimal.ZERO);
+            overhead        = overhead.add(d.getOverhead()      != null ? d.getOverhead()        : BigDecimal.ZERO);
+            materials       = materials.add(d.getMaterials()    != null ? d.getMaterials()       : BigDecimal.ZERO);
+            tax             = tax.add(d.getTax()               != null ? d.getTax()             : BigDecimal.ZERO);
+            houseConnection = houseConnection.add(d.getHouseConnection() != null ? d.getHouseConnection() : BigDecimal.ZERO);
+            summary.setId(d.getId());
+        }
+        summary.setLabor(labor);
+        summary.setOverhead(overhead);
+        summary.setMaterials(materials);
+        summary.setTax(tax);
+        summary.setHouseConnection(houseConnection);
+        return summary;
+    }
+
+    @Transactional
+    @Override
+    public PostResponse postWorkOrder(Map<String, Object> payload) {
+        PostResponse response = new PostResponse();
+        try {
+            Object woIdObj = payload.get("workOrderId");
+            Object txIdObj = payload.get("voucherId");
+
+            if (woIdObj == null || txIdObj == null) {
+                response.setFailureMessage("Work Order and Voucher are required.");
+                return response;
+            }
+
+            java.util.Date now = new java.util.Date();
+
+            WorkOrderDetail detail = new WorkOrderDetail();
+
+            WorkOrder wo = new WorkOrder();
+            wo.setId(((Number) woIdObj).intValue());
+            detail.setWorkOrder(wo);
+
+            Transaction tx = new Transaction();
+            tx.setId(((Number) txIdObj).intValue());
+            detail.setTransaction(tx);
+
+            detail.setMaterials(parseBigDecimalValue(payload.get("materials")));
+            detail.setLabor(parseBigDecimalValue(payload.get("labor")));
+            detail.setOverhead(parseBigDecimalValue(payload.get("overhead")));
+            detail.setHouseConnection(parseBigDecimalValue(payload.get("houseConnection")));
+            detail.setTax(parseBigDecimalValue(payload.get("inputTax")));
+            detail.setCreatedBy(authenticationFacade.getLoggedIn());
+            detail.setCreatedAt(now);
+            detail.setUpdatedAt(now);
+
+            WorkOrderDetail saved = workOrderDetailRepo.save(detail);
+            if (saved != null) {
+                response.setSuccessMessage("Work Order posting successfully saved.");
+                response.setModelId(saved.getId());
+            } else {
+                response.setFailureMessage("Failed to save work order posting.");
+            }
+        } catch (Exception e) {
+            response.setFailureMessage("Failed to post work order: " + e.getMessage());
+        }
+        return response;
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public List<Map<String, Object>> getLogs(Integer id) {
+        List<Map<String, Object>> result = new ArrayList<>();
+        WorkOrder wo = workOrderRepo.findById(id).orElse(null);
+        if (wo == null) return result;
+
+        if (wo.getCreatedBy() != null || wo.getCreatedAt() != null) {
+            Map<String, Object> created = new HashMap<>();
+            created.put("id",        1);
+            created.put("action",    "Created");
+            created.put("createdAt", wo.getCreatedAt());
+            created.put("createdBy", wo.getCreatedBy());
+            created.put("remarks",   "Work order created");
+            result.add(created);
+        }
+
+        if (Boolean.TRUE.equals(wo.getIsClosed()) && wo.getClosedDatetime() != null) {
+            Map<String, Object> closed = new HashMap<>();
+            closed.put("id",        2);
+            closed.put("action",    "Closed Out");
+            closed.put("createdAt", wo.getClosedDatetime());
+            closed.put("createdBy", wo.getClosedBy());
+            closed.put("remarks",   "Work order closed out");
+            result.add(closed);
+        }
+
+        return result;
+    }
+
+    // -------------------------------------------------------------------------
+    // Private helpers
+    // -------------------------------------------------------------------------
+
+    private WorkOrder buildWorkOrderFromPayload(Map<String, Object> payload, Integer id) {
+        WorkOrder wo = new WorkOrder();
+        if (id != null) wo.setId(id);
+
+        java.util.Date now = new java.util.Date();
+
+        Object dateObj = payload.get("date");
+        java.util.Date woDate = now;
+        if (dateObj instanceof String dateStr && !dateStr.isEmpty()) {
+            try { woDate = java.sql.Date.valueOf(dateStr); } catch (Exception ignored) {}
+        }
+        wo.setDate(woDate);
+        wo.setTargetDate(woDate);
+
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(woDate);
+        wo.setYear(cal.get(Calendar.YEAR));
+        wo.setMonth(cal.get(Calendar.MONTH) + 1);
+
+        if (payload.get("description") != null) wo.setDescription((String) payload.get("description"));
+        if (payload.get("location")    != null) wo.setLocation((String) payload.get("location"));
+
+        Object pcFrom = payload.get("periodCoveredFrom");
+        if (pcFrom instanceof String s && !s.isBlank()) {
+            try { wo.setPeriodCoveredFrom(java.sql.Date.valueOf(s)); } catch (Exception ignored) {}
+        }
+        Object pcTo = payload.get("periodCoveredTo");
+        if (pcTo instanceof String s && !s.isBlank()) {
+            try { wo.setPeriodCoveredTo(java.sql.Date.valueOf(s)); } catch (Exception ignored) {}
+        }
+
+        String typeStr = (String) payload.get("type");
+        wo.setType(mapWorkOrderType(typeStr));
+
+        Object projectObj = payload.get("project");
+        if (projectObj instanceof Map<?, ?> pm && pm.get("id") != null) {
+            Project p = new Project();
+            p.setId(((Number) pm.get("id")).intValue());
+            wo.setProject(p);
+        }
+
+        Object townObj = payload.get("town");
+        if (townObj instanceof Map<?, ?> tm && tm.get("id") != null) {
+            Town t = new Town();
+            t.setId(((Number) tm.get("id")).intValue());
+            wo.setTown(t);
+        }
+
+        Object latestCode = workOrderRepo.findLatestVvCodeByYear(cal.get(Calendar.YEAR));
+        String code = generatorFacade.voucherCodeNoOffice(
+                "WO", latestCode == null ? "" : String.valueOf(latestCode),
+                woDate, GlobalConstant.COUNTER_PAD_4);
+        wo.setCode(code);
+
+        wo.setAccountNumber(generatorFacade.entityAccountNumber());
+        wo.setCreatedAt(now);
+        wo.setUpdatedAt(now);
+        wo.setCreatedBy(authenticationFacade.getLoggedIn());
+        wo.setIsClosed(false);
+
+        SLEntityClassification slClass = new SLEntityClassification();
+        slClass.setId(com.noreco1.fireflyv2.model.enums.SLEntityClassification.WORK_ORDER.getId());
+        wo.setSlEntityClassification(slClass);
+
+        return wo;
+    }
+
+    private Integer mapWorkOrderType(String typeStr) {
+        if (typeStr == null) return null;
+        return switch (typeStr.toUpperCase()) {
+            case "LABOR"     -> 1;
+            case "MATERIALS" -> 2;
+            case "BOTH"      -> 3;
+            default          -> null;
+        };
+    }
+
+    private BigDecimal parseBigDecimalValue(Object val) {
+        if (val == null) return BigDecimal.ZERO;
+        try { return new BigDecimal(val.toString()); }
+        catch (Exception e) { return BigDecimal.ZERO; }
+    }
+
+    private void updateProjectTown(Project project, Town town) {
+        if (project == null || project.getId() == null || town == null) return;
+        projectRepo.findById(project.getId()).ifPresent(p -> {
+            p.setTown(town);
+            projectRepo.save(p);
+        });
     }
 
     private Map setRemainingValue(Map accountDetailMap, Integer accountId, BigDecimal value) {
