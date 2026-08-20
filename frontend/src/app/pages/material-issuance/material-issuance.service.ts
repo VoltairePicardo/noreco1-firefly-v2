@@ -5,7 +5,6 @@ import { environment } from '@/environments/environment';
 import { DownloadService } from '@/app/core/services/download.service';
 
 const BASE_API = environment.get('baseApiUrl');
-const BASE_URL = environment.get('baseUrl');
 const httpOptions = { headers: new HttpHeaders({ 'Content-Type': 'application/json' }) };
 
 @Injectable({ providedIn: 'root' })
@@ -42,7 +41,7 @@ export class MaterialIssuanceService {
     }
 
     getWorkflowActions(transId: number): Observable<any[]> {
-        return this.http.get<any[]>(`${BASE_URL}/json/workflow-actions/${transId}`);
+        return this.http.get<any[]>(`${BASE_API}/json/workflow-actions/${transId}`);
     }
 
     process(payload: any): Observable<any> {
@@ -55,7 +54,7 @@ export class MaterialIssuanceService {
 
     getEntities(q: string = '', page = 0, size = 10): Observable<any> {
         const params = new HttpParams().set('q', q).set('page', page).set('size', size);
-        return this.http.get(`${BASE_URL}/json/entities/search`, { params });
+        return this.http.get(`${BASE_API}/json/entities/search`, { params });
     }
 
     searchAccounts(q: string = '', page = 0, size = 10): Observable<any> {
@@ -73,11 +72,12 @@ export class MaterialIssuanceService {
     }
 
     approveAll(ids: number[]): Observable<any> {
-        return this.http.post<any>(`${BASE_API}/material-issuance/approve-all`, { ids }, httpOptions);
+        const payloads = ids.map(id => ({ documentId: id, remarks: '', documentType: 'MR' }));
+        return this.http.post<any>(`${BASE_API}/approve-vouchers/process-all`, payloads, httpOptions);
     }
 
     getDocumentLogs(transId: number): Observable<any[]> {
-        return this.http.get<any[]>(`${BASE_URL}/json/document-logs/${transId}`);
+        return this.http.get<any[]>(`${BASE_API}/json/document-logs/${transId}`);
     }
 
     print(id: number): void {

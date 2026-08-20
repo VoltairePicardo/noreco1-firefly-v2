@@ -47,6 +47,6 @@ export class CheckReleasingService {
     }
 
     getLogs(transId: number | string): Observable<any[]> {
-        return this.http.get<any[]>(`${BASE_API}/document-logs/${transId}`);
+        return this.http.get<any[]>(`${BASE_API}/json/document-logs/${transId}`);
     }
 }

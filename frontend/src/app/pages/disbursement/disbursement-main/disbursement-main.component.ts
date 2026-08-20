@@ -48,7 +48,7 @@ export class DisbursementMainComponent {
 
     fromDate       = '';
     toDate         = '';
-    selectedStatus = signal<number | null>(null);
+    selectedStatus = signal<number | 0>(0);
 
     private service      = inject(DisbursementService);
     private alertService = inject(AlertService);
@@ -91,7 +91,7 @@ export class DisbursementMainComponent {
 
     reset(): void {
         this.setDefaultDates();
-        this.selectedStatus.set(null);
+        this.selectedStatus.set(0);
         this.searchText = '';
         this.load();
     }

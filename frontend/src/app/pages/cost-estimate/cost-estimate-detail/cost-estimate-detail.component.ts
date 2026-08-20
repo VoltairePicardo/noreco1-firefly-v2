@@ -5,6 +5,8 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { AlertService } from '@/app/shared/services/alert.service';
 import { SharedModule } from '@/app/shared/shared.module';
+import { provideIcons } from '@ng-icons/core';
+import { tablerArrowLeft, tablerEdit, tablerCheck, tablerPrinter, tablerEye, tablerEyeOff } from '@ng-icons/tabler-icons';
 import { CostEstimateService } from '../cost-estimate.service';
 
 const TERMINAL_STATUSES = ['Approved', 'Denied', 'Cancelled'];
@@ -12,6 +14,7 @@ const TERMINAL_STATUSES = ['Approved', 'Denied', 'Cancelled'];
 @Component({
     selector: 'app-cost-estimate-detail',
     imports: [...COMMON_ALL_PAGE_IMPORTS, SharedModule, FormsModule, RouterLink],
+    providers: [provideIcons({ tablerArrowLeft, tablerEdit, tablerCheck, tablerPrinter, tablerEye, tablerEyeOff })],
     templateUrl: './cost-estimate-detail.component.html'
 })
 export class CostEstimateDetailComponent {
@@ -48,20 +51,27 @@ export class CostEstimateDetailComponent {
         });
     }
 
-    loadData(): void {
+    loadData(reloadLogs = false): void {
         this.isLoading.set(true);
         this.service.getData(this.id).subscribe({
             next: (data) => {
                 this.isLoading.set(false);
                 if (data?.id) {
                     this.data          = data;
-                    this.assemblies    = data.assemblies    || data.costEstimateAssemblyUnits || [];
-                    this.detailsAccess = data.detailsAccess || [];
-                    this.detailsMeter  = data.detailsMeter  || [];
-                    this.miscCharges   = data.miscCharges   || data.miscellaneousCharges     || [];
-                    this.logs          = [];
-                    this.showLogs      = false;
+                    this.assemblies    = data.costEstimateAssemblyUnits || [];
+                    const allDetails: any[] = data.details || [];
+                    this.detailsAccess = allDetails.filter((d: any) => d.category === 1);
+                    this.detailsMeter  = allDetails.filter((d: any) => d.category === 2);
+                    this.miscCharges   = data.miscellaneousCharges || [];
+                    if (!reloadLogs) {
+                        this.logs     = [];
+                        this.showLogs = false;
+                    }
                     this.loadWorkflowActions();
+                    if (reloadLogs) {
+                        this.logs = [];
+                        this.loadLogs();
+                    }
                 } else {
                     this.alertService.error(this.module, 'Not Found', '');
                     this.router.navigate(['/' + this.menuLink]);
@@ -76,9 +86,9 @@ export class CostEstimateDetailComponent {
     }
 
     loadWorkflowActions(): void {
-        if (!this.data?.transId || this.isTerminal()) return;
-        this.service.getWorkflowActions(this.data.transId).subscribe({
-            next: (actions) => { this.workflowActions = actions || []; },
+        if (!this.data?.transaction?.id || this.isTerminal()) return;
+        this.service.getWorkflowActions(this.data.transaction.id).subscribe({
+            next: (actions) => { this.workflowActions = actions || []; this.selectedAction = null; this.remarks = ''; },
             error: () => { this.workflowActions = []; }
         });
     }
@@ -98,14 +108,15 @@ export class CostEstimateDetailComponent {
 
         this.service.process({
             documentId:         this.data.id,
-            remarks:            this.remarks,
-            workflowActionsDto: { actionMapId: this.selectedAction.actionMapId }
+            transId:            this.data.transaction?.id,
+            workflowActionsDto: this.selectedAction,
+            remarks:            this.remarks || ''
         }).subscribe({
             next: (res) => {
                 this.processingWorkflow = false;
                 if (res?.success) {
                     this.alertService.success(this.module, res.successMessage || 'Processed.', '');
-                    this.loadData();
+                    this.loadData(this.showLogs);
                 } else {
                     this.alertService.error(this.module, res?.failureMessage || 'Processing failed.', '');
                 }
@@ -119,13 +130,18 @@ export class CostEstimateDetailComponent {
 
     toggleLogs(): void {
         this.showLogs = !this.showLogs;
-        if (this.showLogs && this.logs.length === 0) {
-            this.logsLoading = true;
-            this.service.getDocumentLogs(this.data.transId).subscribe({
-                next: (logs) => { this.logs = logs || []; this.logsLoading = false; },
-                error: () => { this.logsLoading = false; }
-            });
+        if (this.showLogs && this.logs.length === 0 && !this.logsLoading) {
+            this.loadLogs();
         }
+    }
+
+    loadLogs(): void {
+        if (!this.data?.transaction?.id || this.logsLoading) return;
+        this.logsLoading = true;
+        this.service.getDocumentLogs(this.data.transaction.id).subscribe({
+            next: (logs) => { this.logs = logs || []; this.logsLoading = false; },
+            error: () => { this.logsLoading = false; }
+        });
     }
 
     get grandTotal(): number {

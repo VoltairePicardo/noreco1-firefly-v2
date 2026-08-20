@@ -8,9 +8,7 @@ import { AlertService } from '@/app/shared/services/alert.service';
 import { SharedModule } from '@/app/shared/shared.module';
 import { WorkOrderService } from '../work-order.service';
 import { ModalService } from '@/app/shared/modals/modal-service';
-import { WorkOrderCloseOutModalComponent } from '../work-order-close-out-modal/work-order-close-out-modal.component';
-
-const TERMINAL_STATUSES = ['Approved', 'Denied', 'Cancelled'];
+import { WorkOrderCloseOutModalComponent } from '@/app/shared/modals/work-order-close-out-modal/work-order-close-out-modal.component';
 
 @Component({
     selector: 'app-work-order-detail',
@@ -26,11 +24,6 @@ export class WorkOrderDetailComponent {
     id: any   = 0;
     data: any = {};
     isLoading = signal(false);
-
-    workflowActions:   any[] = [];
-    selectedAction:    any   = null;
-    remarks            = '';
-    processingWorkflow = false;
 
     postedVouchers: any[] = [];
 
@@ -51,18 +44,23 @@ export class WorkOrderDetailComponent {
         });
     }
 
-    loadData(): void {
+    loadData(reloadLogs = false): void {
         this.isLoading.set(true);
         this.service.getData(this.id).subscribe({
             next: (data) => {
                 this.isLoading.set(false);
                 if (data?.id) {
                     this.data           = data;
-                    this.logs           = [];
-                    this.showLogs       = false;
                     this.postedVouchers = [];
-                    this.loadWorkflowActions();
+                    if (!reloadLogs) {
+                        this.logs     = [];
+                        this.showLogs = false;
+                    }
                     this.loadPostedVouchers();
+                    if (reloadLogs) {
+                        this.logs = [];
+                        this.loadLogs();
+                    }
                 } else {
                     this.alertService.error(this.module, 'Not Found', '');
                     this.router.navigate(['/' + this.menuLink]);
@@ -83,50 +81,12 @@ export class WorkOrderDetailComponent {
         });
     }
 
-    loadWorkflowActions(): void {
-        if (!this.data?.transId || this.isTerminal()) return;
-        this.service.getWorkflowActions(this.data.transId).subscribe({
-            next: (actions) => { this.workflowActions = actions || []; },
-            error: () => { this.workflowActions = []; }
-        });
-    }
-
-    isTerminal(): boolean {
-        return TERMINAL_STATUSES.includes(this.data?.documentStatus?.status || '');
-    }
-
     isEditable(): boolean {
-        const s = this.data?.documentStatus?.status || '';
-        return s === 'Document Created' || s === 'For Revision';
+        return !this.data?.isClosed;
     }
 
     isCloseable(): boolean {
         return !this.data?.isClosed && this.data?.project?.documentStatus?.id === 47;
-    }
-
-    processWorkflow(): void {
-        if (!this.selectedAction) return;
-        this.processingWorkflow = true;
-
-        this.service.process({
-            documentId:         this.data.id,
-            remarks:            this.remarks,
-            workflowActionsDto: { actionMapId: this.selectedAction.actionMapId }
-        }).subscribe({
-            next: (res) => {
-                this.processingWorkflow = false;
-                if (res?.success) {
-                    this.alertService.success(this.module, res.successMessage || 'Processed.', '');
-                    this.loadData();
-                } else {
-                    this.alertService.error(this.module, res?.failureMessage || 'Processing failed.', '');
-                }
-            },
-            error: () => {
-                this.processingWorkflow = false;
-                this.alertService.error(this.module, 'An error occurred.', '');
-            }
-        });
     }
 
     async openCloseOut(): Promise<void> {
@@ -143,21 +103,25 @@ export class WorkOrderDetailComponent {
             );
             if (result?.action === 'closed') {
                 this.alertService.success(this.module, 'Work order closed out successfully.', '');
-                this.loadData();
+                this.loadData(this.showLogs);
             }
         } catch (_) {}
     }
 
     toggleLogs(): void {
         this.showLogs = !this.showLogs;
-        if (this.showLogs && this.logs.length === 0) {
-            this.logsLoading = true;
-            this.service.getDocumentLogs(this.data.transId).subscribe({
-                next: (logs) => { this.logs = logs || []; this.logsLoading = false; },
-                error: () => { this.logsLoading = false; }
-            });
+        if (this.showLogs && this.logs.length === 0 && !this.logsLoading) {
+            this.loadLogs();
         }
     }
 
-    print(): void { this.service.print(this.data.id); }
+    loadLogs(): void {
+        if (!this.data?.id || this.logsLoading) return;
+        this.logsLoading = true;
+        this.service.getLogs(this.data.id).subscribe({
+            next: (logs) => { this.logs = logs || []; this.logsLoading = false; },
+            error: () => { this.logsLoading = false; }
+        });
+    }
+
 }

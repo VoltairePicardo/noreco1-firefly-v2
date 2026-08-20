@@ -310,35 +310,17 @@ public class BudgetLineItemServiceImpl implements BudgetLineItemService {
 
         List<BudgetLineItem> budgetLineItems;
 
-        List<Integer> defaultStatuses = Arrays.asList(
-                com.noreco1.fireflyv2.model.enums.DocumentStatus.APPROVED.getId(),
-                com.noreco1.fireflyv2.model.enums.DocumentStatus.DENIED.getId(),
-                com.noreco1.fireflyv2.model.enums.DocumentStatus.CANCELLED.getId()
-        );
-
         boolean isGeneralManager = this.isCurrentUserGeneralManager();
         boolean isFsdManager = this.isCurrentUserFsdManager();
         boolean hasValidStatus = Checker.isValidId(status);
 
         if(isGeneralManager){
-            if(hasValidStatus){
-                budgetLineItems = this.budgetLineItemRepo.findAllForGeneralManager(year, department, division, status);
-            } else {
-                budgetLineItems = this.budgetLineItemRepo.findAllForGeneralManager(year, department, division, com.noreco1.fireflyv2.model.enums.DocumentStatus.FOR_APPROVAL.getId());
-            }
+            budgetLineItems = this.budgetLineItemRepo.findAllForGeneralManager(year, department, division, hasValidStatus ? status : null);
         } else if (isFsdManager){
-            if(hasValidStatus){
-                budgetLineItems = this.budgetLineItemRepo.findAllForFsdManager(year, department, division, status);
-            } else {
-                budgetLineItems = this.budgetLineItemRepo.findAllPendingForFsdManager(year, department, division, defaultStatuses);
-            }
+            budgetLineItems = this.budgetLineItemRepo.findAllForFsdManager(year, department, division, hasValidStatus ? status : null);
         } else {
             Integer userId = this.authenticationFacade.getLoggedIn().getId();
-            if(hasValidStatus){
-                budgetLineItems = this.budgetLineItemRepo.findAllBySelectedYearAndSelectedDivisionId(year, department, division, status, userId);
-            } else {
-                budgetLineItems = this.budgetLineItemRepo.findAllPendingBySelectedYearAndSelectedDivisionId(year, department, division, defaultStatuses, userId);
-            }
+            budgetLineItems = this.budgetLineItemRepo.findAllBySelectedYearAndSelectedDivisionId(year, department, division, hasValidStatus ? status : null, userId);
         }
 
         for (BudgetLineItem lineItem : budgetLineItems){
@@ -731,7 +713,16 @@ public class BudgetLineItemServiceImpl implements BudgetLineItemService {
 
     @Override
     public PostResponse processUpdate(Document v, BindingResult bindingResult, MessageSource messageSource, HttpServletRequest request, List<Map> filesToRemove) {
-        return null;
+        PostResponse response = this.processCreate(v, bindingResult, messageSource);
+
+        if (request instanceof MultipartHttpServletRequest) {
+            MultipartHttpServletRequest mRequest = (MultipartHttpServletRequest) request;
+            if (this.model != null && mRequest.getFileMap() != null) {
+                fileFacade.saveDocumentAttachment(mRequest.getFileMap(), this.model.getTransaction().getId());
+            }
+        }
+
+        return response;
     }
 
     @Override

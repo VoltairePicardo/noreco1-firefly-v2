@@ -250,9 +250,9 @@ export class BudgetLineItemAddEditComponent {
             forSupplementalBudget: this.forSupplementalBudget,
             division:              this.selectedDivision      ? { id: this.selectedDivision.id }      : null,
             department:            this.selectedDepartment    ? { id: this.selectedDepartment.id }    : null,
-            checkedBy:             this.checkedBy             ? { id: this.checkedBy.id }             : null,
-            verifiedBy:            this.verifiedBy            ? { id: this.verifiedBy.id }            : null,
-            approvingOfficer:      this.approvingOfficer      ? { id: this.approvingOfficer.id }      : null,
+            checkedBy:             this.checkedBy        ? { accountNo: this.checkedBy.accountNo }        : null,
+            verifiedBy:            this.verifiedBy       ? { accountNo: this.verifiedBy.accountNo }       : null,
+            approvingOfficer:      this.approvingOfficer ? { accountNo: this.approvingOfficer.accountNo } : null,
             budgetLineItemDetails: this.details.map(d => ({
                 id:                  d.id || null,
                 title:               d.title,

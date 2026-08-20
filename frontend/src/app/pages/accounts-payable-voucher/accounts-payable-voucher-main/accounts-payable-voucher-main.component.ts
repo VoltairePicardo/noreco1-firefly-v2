@@ -31,7 +31,7 @@ export class AccountsPayableVoucherMainComponent {
     page     = 1;
     pageSize = 10;
 
-    selectedStatusId: number | null = null;
+    selectedStatusId = 0;
     dateFrom = '';
     dateTo   = '';
 
@@ -75,7 +75,7 @@ export class AccountsPayableVoucherMainComponent {
         const now = new Date();
         this.dateFrom        = this.fmt(new Date(now.getFullYear(), now.getMonth(), 1));
         this.dateTo          = this.fmt(new Date(now.getFullYear(), now.getMonth() + 1, 0));
-        this.selectedStatusId = null;
+        this.selectedStatusId = 0;
         this.searchText = '';
         this.items.set([]);
         this.page = 1;

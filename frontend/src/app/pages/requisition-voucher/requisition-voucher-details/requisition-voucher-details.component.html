@@ -328,13 +328,13 @@
                                 @for (log of logs; track log.id) {
                                     <tr class="align-middle">
                                         <td class="text-nowrap text-muted fs-xs">{{ log.createdAt | date:'MM/dd/yyyy hh:mm a' }}</td>
-                                        <td class="text-nowrap">{{ log.loggedBy?.fullName || log.loggedBy?.name || '—' }}</td>
+                                        <td class="text-nowrap">{{ log.createdBy?.fullName || '—' }}</td>
                                         <td class="text-nowrap">
                                             <span class="badge bg-secondary bg-opacity-25 text-dark border">
-                                                {{ getLogField(log.newValue, 'documentStatus') }}
+                                                {{ log.action || '—' }}
                                             </span>
                                         </td>
-                                        <td>{{ getLogField(log.newValue, 'remarks') }}</td>
+                                        <td>{{ log.remarks || '—' }}</td>
                                     </tr>
                                 }
                             </tbody>

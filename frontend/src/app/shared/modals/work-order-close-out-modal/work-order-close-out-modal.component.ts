@@ -2,7 +2,7 @@ import { Component, inject, Input, OnInit } from '@angular/core';
 import { COMMON_ALL_PAGE_IMPORTS, COMMON_MAIN_PAGE_IMPORTS, SHARED_PROVIDERS } from '@/app/shared/providers/shared-providers';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { AlertService } from '@/app/shared/services/alert.service';
-import { WorkOrderService } from '../work-order.service';
+import { WorkOrderService } from '@/app/pages/work-order/work-order.service';
 import { ModalService } from '@/app/shared/modals/modal-service';
 import { BrowseCOAModalComponent } from '@/app/shared/modals/browse-coa-modal/browse-coa-modal.component';
 import { AssetTypeService } from '@/app/pages/asset-type/asset-type.service';

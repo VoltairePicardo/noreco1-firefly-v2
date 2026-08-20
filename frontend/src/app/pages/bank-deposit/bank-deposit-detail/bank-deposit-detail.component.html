@@ -2,119 +2,111 @@
     <app-page-title [title]="module" [subTitle]="subModule" [menuLink]="menuLink"/>
 </div>
 
-<div class="container-fluid">
-    @if (isLoading()) {
-        <div class="d-flex align-items-center gap-2 text-muted py-4">
-            <span class="spinner-border spinner-border-sm" role="status"></span> Loading...
+@if (isLoading()) {
+    <div class="card"><div class="card-body text-center py-4">
+        <span class="spinner-border spinner-border-sm me-2" role="status"></span>Loading...
+    </div></div>
+} @else {
+
+<div class="card mb-3">
+    <div class="card-body">
+
+        <!-- Actions -->
+        <div class="d-flex gap-2 justify-content-end align-items-center pt-3 border-top mt-3">
+            <a [routerLink]="['/' + menuLink]" class="btn btn-light fw-bold">
+                <ng-icon name="tablerArrowLeft" class="ps-0 pe-3 fw-bold"></ng-icon>Back
+            </a>
+            <button type="button" class="btn btn-success fw-bold" (click)="print()">
+                <ng-icon name="tablerPrinter" class="ps-0 pe-3 fw-bold"></ng-icon>Print
+            </button>
+            <a [routerLink]="['/' + menuLink, id, 'edit']" class="btn btn-primary fw-bold">
+                <ng-icon name="tablerEdit" class="ps-0 pe-3 fw-bold"></ng-icon>Edit
+            </a>
         </div>
-    } @else {
 
-    <div class="row g-3">
+        <hr class="my-3"/>
 
-        <!-- Deposit Information -->
-        <div class="col-xl-12">
-            <app-ui-card title="Deposit Information">
-                <div class="col-xl-12 p-3" card-body>
-                    <div class="row g-3">
-                        <div class="col-md-3">
-                            <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Code</div>
-                            <div class="fw-bold">{{ data.code || data.localCode || '—' }}</div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Deposit Date</div>
-                            <div>{{ data.depositDate | date:'MMMM d, yyyy' }}</div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Posting Date</div>
-                            <div>{{ data.postingDate ? (data.postingDate | date:'MMMM d, yyyy') : '—' }}</div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Collection Date</div>
-                            <div>{{ data.collectionDate ? (data.collectionDate | date:'MMMM d, yyyy') : '—' }}</div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Reference Number</div>
-                            <div>{{ data.referenceNumber || '—' }}</div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Bank Account</div>
-                            <div>
-                                <span class="fw-bold">{{ data.bankAccount?.bank?.name || data.bankAccount?.accountName || data.bankAccountName || '—' }}</span>
-                                @if (data.bankAccount?.accountNumber) {
-                                    &nbsp;<span class="text-muted">— {{ data.bankAccount.accountNumber }}</span>
-                                }
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Collector</div>
-                            <div>{{ data.collector || '—' }}</div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Cash Amount</div>
-                            <div>{{ data.cashAmount | number:'1.2-2' }}</div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Check Amount</div>
-                            <div>{{ data.checkAmount | number:'1.2-2' }}</div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Total Amount</div>
-                            <div class="fw-bold">{{ totalAmount | number:'1.2-2' }}</div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Prepared By</div>
-                            <div>{{ data.createdBy?.fullName || '—' }}</div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Created At</div>
-                            <div>{{ data.createdAt | date:'MMM dd, yyyy HH:mm' }}</div>
-                        </div>
-                    </div>
+        <!-- Document Information -->
+        <div class="fs-xs text-uppercase fw-semibold text-muted mb-2">Document Information</div>
+        <div class="row g-3">
+            <div class="col-md-3">
+                <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Code</div>
+                <div class="fw-bold fs-5">{{ data.localCode || data.code || '—' }}</div>
+            </div>
+            <div class="col-md-3">
+                <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Deposit Date</div>
+                <div>{{ data.depositDate | date:'MMMM d, yyyy' }}</div>
+            </div>
+            <div class="col-md-3">
+                <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Collection Date</div>
+                <div>{{ data.collectionDate ? (data.collectionDate | date:'MMMM d, yyyy') : '—' }}</div>
+            </div>
+            <div class="col-md-3">
+                <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Posting Date</div>
+                <div>{{ data.postingDate ? (data.postingDate | date:'MMMM d, yyyy') : '—' }}</div>
+            </div>
+            <div class="col-md-3">
+                <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Reference Number</div>
+                <div>{{ data.referenceNumber || '—' }}</div>
+            </div>
+            <div class="col-md-6">
+                <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Bank Account</div>
+                <div>
+                    <span class="fw-bold">{{ data.bankAccount?.bank?.name || '—' }}</span>
+                    @if (data.bankAccount?.description) {
+                        <span class="text-muted"> — {{ data.bankAccount.description }}</span>
+                    }
+                    @if (data.bankAccount?.accountNumber) {
+                        <div class="text-muted fs-xs">{{ data.bankAccount.accountNumber }}</div>
+                    }
                 </div>
-            </app-ui-card>
+            </div>
+            <div class="col-md-3">
+                <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Prepared By</div>
+                <div>{{ data.preparedBy?.fullName || '—' }}</div>
+            </div>
+            <div class="col-md-3">
+                <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Last Updated</div>
+                <div>{{ data.lastUpdated | date:'MMM dd, yyyy HH:mm' }}</div>
+            </div>
+        </div>
+
+        <hr class="my-3"/>
+
+        <!-- Amounts -->
+        <div class="fs-xs text-uppercase fw-semibold text-muted mb-2">Amounts</div>
+        <div class="row g-3">
+            <div class="col-md-3">
+                <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Cash Amount</div>
+                <div>{{ data.cashAmount | number:'1.2-2' }}</div>
+            </div>
+            <div class="col-md-3">
+                <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Check Amount</div>
+                <div>{{ data.checkAmount | number:'1.2-2' }}</div>
+            </div>
+            <div class="col-md-3">
+                <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Total Amount</div>
+                <div class="fw-bold fs-5">{{ totalAmount | number:'1.2-2' }}</div>
+            </div>
         </div>
 
         <!-- Attachments -->
         @if (attachments.length > 0) {
-            <div class="col-xl-12">
-                <app-ui-card title="Attachments">
-                    <div class="col-xl-12 p-3" card-body>
-                        <ul class="list-unstyled mb-0">
-                            @for (f of attachments; track $index) {
-                                <li class="mb-1">
-                                    <a [href]="fileUrl(f.id)" target="_blank" class="text-primary">
-                                        {{ f.originalFilename || f.oFile || f.name || 'File' }}
-                                    </a>
-                                </li>
-                            }
-                        </ul>
-                    </div>
-                </app-ui-card>
-            </div>
+            <hr class="my-3"/>
+            <div class="fs-xs text-uppercase fw-semibold text-muted mb-2">Attachments</div>
+            <ul class="list-unstyled mb-0">
+                @for (f of attachments; track $index) {
+                    <li class="mb-1">
+                        <a [href]="fileUrl(f.id)" target="_blank" class="text-primary">
+                            {{ f.originalFilename || f.oFile || f.name || 'File' }}
+                        </a>
+                    </li>
+                }
+            </ul>
         }
 
-        <!-- Footer Actions -->
-        <div class="col-xl-12">
-            <div class="d-flex gap-2 justify-content-end align-items-center py-2">
-                <button type="button" class="btn btn-light fw-bold" [routerLink]="['/' + menuLink]">
-                    <ng-icon name="tablerArrowLeft" class="ps-0 pe-2 fw-bold"></ng-icon>Back
-                </button>
-                <div class="d-flex gap-2 justify-content-end">
-                    <a class="btn btn-primary fw-bold" [routerLink]="['/' + menuLink + '/create']">
-                        <ng-icon name="tablerPlus" class="ps-0 pe-2 fw-bold"></ng-icon>Create New
-                    </a>
-                    <button type="button" class="btn btn-success fw-bold" (click)="print()">
-                        <ng-icon name="tablerPrinter" class="ps-0 pe-2 fw-bold"></ng-icon>Print
-                    </button>
-                    @if (isEditable()) {
-                        <a class="btn btn-primary fw-bold" [routerLink]="['/' + menuLink, id, 'edit']">
-                            <ng-icon name="tablerEdit" class="ps-0 pe-2 fw-bold"></ng-icon>Edit
-                        </a>
-                    }
-                </div>
-            </div>
-        </div>
-
     </div>
-    }
 </div>
+
+
+} <!-- end !isLoading -->

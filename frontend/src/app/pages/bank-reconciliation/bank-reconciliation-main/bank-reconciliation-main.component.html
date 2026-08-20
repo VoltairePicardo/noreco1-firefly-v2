@@ -59,11 +59,6 @@
                                 <button type="button" class="btn btn-success fw-bold" (click)="openAccBrowse()">
                                     <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
                                 </button>
-                                @if (selectedAccount) {
-                                    <button type="button" class="btn btn-danger fw-bold" (click)="clearAccount()">
-                                        <ng-icon name="tablerX" class="ps-0 pe-0 fw-bold"></ng-icon>
-                                    </button>
-                                }
                             </div>
                         </div>
                         <div class="col-md-2">
@@ -129,17 +124,17 @@
                                                     }
                                                     @if (isCleared(rec)) {
                                                         <button type="button"
-                                                                class="btn btn-light btn-sm fw-bold"
+                                                                class="btn btn-danger btn-icon btn-sm rounded-circle"
                                                                 ngbTooltip="Mark as Not Cleared"
                                                                 (click)="toggleCleared(rec)">
-                                                            <ng-icon name="tablerX" class="ps-0 pe-3 fw-bold"></ng-icon>UnClear
+                                                            <ng-icon name="tablerX"></ng-icon>
                                                         </button>
                                                     } @else {
                                                         <button type="button"
-                                                                class="btn btn-success btn-sm fw-bold"
+                                                                class="btn btn-success btn-icon btn-sm rounded-circle"
                                                                 ngbTooltip="Mark as Cleared"
                                                                 (click)="toggleCleared(rec)">
-                                                            <ng-icon name="tablerCheck" class="ps-0 pe-3 fw-bold"></ng-icon>Clear
+                                                            <ng-icon name="tablerCheck"></ng-icon>
                                                         </button>
                                                     }
                                                 </div>

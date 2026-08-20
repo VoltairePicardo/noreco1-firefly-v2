@@ -33,7 +33,7 @@
                         <label class="form-label fw-bold mb-1 fs-xs text-uppercase">Status</label>
                         <select class="form-select" [ngModel]="selectedStatus()"
                                 (ngModelChange)="selectedStatus.set($event)">
-                            <option [ngValue]="null">— Pending MIV —</option>
+                            <option [ngValue]="0">All</option>
                             @for (s of documentStatuses(); track s.id) {
                                 <option [ngValue]="s.id">{{ s.status || s.description }}</option>
                             }
@@ -42,7 +42,7 @@
                     <div class="col-md-2">
                         <label class="form-label fw-bold mb-1 fs-xs text-uppercase">Inventory Doc Type</label>
                         <select class="form-select" [(ngModel)]="selectedDocType" [ngModelOptions]="{ standalone: true }">
-                            <option [ngValue]="null">— All Types —</option>
+                            <option [ngValue]="0">All</option>
                             @for (d of inventoryDocTypes; track d.type) {
                                 <option [value]="d.type">{{ d.desc }}</option>
                             }

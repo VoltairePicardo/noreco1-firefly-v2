@@ -9,8 +9,8 @@
 
                 <!-- Filters -->
                 <div class="row mb-3 align-items-end g-2">
-                    <div class="col-md-auto ms-auto d-flex gap-2">
-                        <button type="button" class="btn btn-primary fw-bold"
+                    <div class="col-md-12 justify-content-end d-flex gap-2">
+                        <button type="button" class="btn btn-success fw-bold"
                                 (click)="approveAll()" [disabled]="approvingAll || isLoading()">
                             <ng-icon name="tablerChecks" class="ps-0 pe-3 fw-bold"></ng-icon>
                             {{ approvingAll ? 'Approving...' : 'Approve All' }}
@@ -21,7 +21,7 @@
                     </div>
                 </div>
 
-                <div class="row mb-3 align-items-end g-2">
+                <div class="row mb-3 align-items-end g-2 mt-1">
                     <div class="col-md-1">
                         <label class="form-label fw-bold mb-1 fs-xs text-uppercase">Year</label>
                         <input type="number" class="form-control" [(ngModel)]="yearFilter" placeholder="Year"/>
@@ -29,7 +29,7 @@
                     <div class="col-md-2">
                         <label class="form-label fw-bold mb-1 fs-xs text-uppercase">Department</label>
                         <select class="form-select" [(ngModel)]="selectedDepartment" [compareWith]="compareById">
-                            <option [ngValue]="null">— All —</option>
+                            <option [ngValue]="null">All</option>
                             @for (d of departments(); track d.id) {
                                 <option [ngValue]="d">{{ d.name || d.description }}</option>
                             }
@@ -38,7 +38,7 @@
                     <div class="col-md-2">
                         <label class="form-label fw-bold mb-1 fs-xs text-uppercase">Division</label>
                         <select class="form-select" [(ngModel)]="selectedDivision" [compareWith]="compareById">
-                            <option [ngValue]="null">— All —</option>
+                            <option [ngValue]="null">All</option>
                             @for (d of divisions(); track d.id) {
                                 <option [ngValue]="d">{{ d.name || d.abbreviation }}</option>
                             }
@@ -47,7 +47,7 @@
                     <div class="col-md-2">
                         <label class="form-label fw-bold mb-1 fs-xs text-uppercase">Document Status</label>
                         <select class="form-select" [(ngModel)]="selectedStatus" [compareWith]="compareById">
-                            <option [ngValue]="null">Pending</option>
+                            <option [ngValue]="null">All</option>
                             @for (s of documentStatuses(); track s.id) {
                                 <option [ngValue]="s">{{ s.status }}</option>
                             }
@@ -58,7 +58,7 @@
                         <input type="text" class="form-control" [(ngModel)]="searchQuery"
                                placeholder="Code, department, division..."/>
                     </div>
-                    <div class="col-auto d-flex gap-2">
+                    <div class="col-md-2 d-flex gap-2">
                         <button type="button" class="btn btn-success fw-bold" (click)="load()">
                             <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Search
                         </button>

@@ -100,6 +100,7 @@ export class CheckReleasingMainComponent {
 
     loadUnreleased(): void {
         this.unreleasedLoading.set(true);
+        this.unreleased.set([]);
         this.service.getUnreleased().subscribe({
             next: (data) => {
                 this.unreleased.set(data || []);
@@ -115,6 +116,7 @@ export class CheckReleasingMainComponent {
 
     loadReleased(): void {
         this.releasedLoading.set(true);
+        this.released.set([]);
         this.service.getReleased(this.fromDate, this.toDate).subscribe({
             next: (data) => {
                 this.released.set(data || []);

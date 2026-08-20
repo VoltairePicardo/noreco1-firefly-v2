@@ -16,18 +16,7 @@ public interface PrepaymentRepo extends JpaRepository<Prepayment, Integer> {
     public List<Prepayment> findByDescription(String description);
     Prepayment findByAccountNo(Integer accountNo);
 
-    @Query(value = "SELECT " +
-            "pp.*, " +
-            "pp.FK_prepaymentAccountId, " +
-            "pp.FK_expenseAccountId, " +
-            "(SELECT " +
-            "title " +
-            "FROM Account a " +
-            "WHERE a.id = pp.FK_prepaymentAccountId LIMIT 1) AS prepayment_acct, " +
-            "(SELECT " +
-            "title " +
-            "FROM Account a " +
-            "WHERE a.id = pp.FK_expenseAccountId) AS expense_acct " +
+    @Query(value = "SELECT pp.* " +
             "FROM Prepayment AS pp " +
             "WHERE (DATE(:startDateCreated) BETWEEN DATE_ADD(DATE_FORMAT(pp.datePaid, '%Y-%m-01'), INTERVAL 1 MONTH) " +
             "AND ADDDATE(DATE_FORMAT(pp.datePaid, '%Y-%m-01'), INTERVAL pp.noOfMonths MONTH)) " +
@@ -39,22 +28,13 @@ public interface PrepaymentRepo extends JpaRepository<Prepayment, Integer> {
             "AND pp.FK_accountNo IN " +
             "(SELECT sl.FK_accountNo " +
             "FROM SubLedger sl " +
-            "WHERE sl.FK_accountNo = pp.FK_accountNo);", nativeQuery = true)
+            "WHERE sl.FK_accountNo = pp.FK_accountNo)", nativeQuery = true)
     public List<Prepayment> findByStartDateCreatedAndMonthYear(@Param("startDateCreated") String startDateCreated, @Param("concatYearMonth") String concatYearMonth);
 
     @Query(value = "SELECT e.code FROM Prepayment e WHERE year = :year  AND code LIKE '%PP%' AND code LIKE :offAcro ORDER BY id DESC LIMIT 1", nativeQuery = true)
     Object findLatestPpCodeByYear(@Param("year") Integer year, @Param("offAcro") String offAcro);
 
-    @Query(value = "SELECT " +
-            "pp.*, " +
-            "(SELECT " +
-            "title " +
-            "FROM Account a " +
-            "WHERE a.id = pp.FK_prepaymentAccountId LIMIT 1) AS prepayment_acct, " +
-            "(SELECT " +
-            "title " +
-            "FROM Account a " +
-            "WHERE a.id = pp.FK_expenseAccountId) AS expense_acct " +
+    @Query(value = "SELECT pp.* " +
             "FROM Prepayment AS pp " +
             "INNER JOIN PrepaymentDetail as ppd ON ppd.FK_prepaymentId = pp.id " +
             "WHERE ppd.month = :month AND ppd.year = :year", nativeQuery = true)

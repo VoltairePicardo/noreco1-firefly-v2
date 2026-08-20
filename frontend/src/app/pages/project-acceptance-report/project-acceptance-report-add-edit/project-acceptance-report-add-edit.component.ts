@@ -138,12 +138,12 @@ export class ProjectAcceptanceReportAddEditComponent {
 
         const payload: any = {
             project:       { id: this.project.id },
-            inspector1:    this.inspector1    ? { id: this.inspector1.id }    : null,
-            inspector2:    this.inspector2    ? { id: this.inspector2.id }    : null,
-            inspector3:    this.inspector3    ? { id: this.inspector3.id }    : null,
-            notedBy:       this.notedBy       ? { id: this.notedBy.id }       : null,
-            recommendedBy: this.recommendedBy ? { id: this.recommendedBy.id } : null,
-            approvedBy:    this.approvedBy    ? { id: this.approvedBy.id }    : null
+            inspector1:    this.inspector1    ? { accountNo: this.inspector1.accountNo }    : null,
+            inspector2:    this.inspector2    ? { accountNo: this.inspector2.accountNo }    : null,
+            inspector3:    this.inspector3    ? { accountNo: this.inspector3.accountNo }    : null,
+            notedBy:       this.notedBy       ? { accountNo: this.notedBy.accountNo }       : null,
+            recommendedBy: this.recommendedBy ? { accountNo: this.recommendedBy.accountNo } : null,
+            approvedBy:    this.approvedBy    ? { accountNo: this.approvedBy.accountNo }    : null
         };
 
         if (this.editMode) payload.id = this.id;

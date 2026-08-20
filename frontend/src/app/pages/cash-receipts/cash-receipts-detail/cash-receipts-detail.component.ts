@@ -3,11 +3,13 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { AlertService } from '@/app/shared/services/alert.service';
 import { COMMON_ALL_PAGE_IMPORTS, COMMON_MAIN_PAGE_IMPORTS, SHARED_PROVIDERS } from '@/app/shared/providers/shared-providers';
 import { CashReceiptsService } from '../cash-receipts.service';
+import { provideIcons } from '@ng-icons/core';
+import { tablerArrowLeft, tablerPrinter, tablerEdit, tablerEye, tablerEyeOff, tablerCheck } from '@ng-icons/tabler-icons';
 
 @Component({
     selector: 'app-cash-receipts-detail',
     imports: [...COMMON_ALL_PAGE_IMPORTS, ...COMMON_MAIN_PAGE_IMPORTS],
-    providers: [...SHARED_PROVIDERS],
+    providers: [...SHARED_PROVIDERS, provideIcons({ tablerArrowLeft, tablerPrinter, tablerEdit, tablerEye, tablerEyeOff, tablerCheck })],
     templateUrl: './cash-receipts-detail.component.html'
 })
 export class CashReceiptsDetailComponent {
@@ -16,9 +18,9 @@ export class CashReceiptsDetailComponent {
     menuLink  = 'cash-receipts';
     id: any   = 0;
     data: any = {};
-    journalEntries: any[] = [];
-    isLoading  = signal(false);
-    formSubmit = false;
+    journalEntries: any[]    = [];
+    isLoading          = signal(false);
+    processingWorkflow = false;
 
     workflowActions: any[] = [];
     selectedAction: any    = null;
@@ -46,8 +48,9 @@ export class CashReceiptsDetailComponent {
             next: (data) => {
                 this.isLoading.set(false);
                 if (data?.id) {
-                    this.data           = data;
-                    this.journalEntries = data.journalEntries || data.details || [];
+                    this.data = data;
+                    const rawEntries = data.journalEntries || data.details || [];
+                    this.journalEntries = rawEntries.filter((e: any) => e.accountCode);
                     this.loadWorkflowActions();
                 } else {
                     this.alertService.error(this.module, 'Not Found', '');
@@ -68,7 +71,7 @@ export class CashReceiptsDetailComponent {
 
     processWorkflow(): void {
         if (!this.selectedAction) return;
-        this.formSubmit = true;
+        this.processingWorkflow = true;
         const payload = {
             documentId:         this.data.id,
             transId:            this.data.transId,
@@ -77,11 +80,11 @@ export class CashReceiptsDetailComponent {
         };
         this.service.process(payload).subscribe({
             next: (res) => {
-                this.formSubmit = false;
+                this.processingWorkflow = false;
                 if (res.success) { this.alertService.success(this.module, 'Processed', ''); this.loadData(); }
                 else { this.alertService.error(this.module, 'Process', res.failureMessage || ''); }
             },
-            error: () => { this.formSubmit = false; this.alertService.error(this.module, 'Process', ''); }
+            error: () => { this.processingWorkflow = false; this.alertService.error(this.module, 'Process', ''); }
         });
     }
 
@@ -91,11 +94,11 @@ export class CashReceiptsDetailComponent {
     }
 
     get totalDebit(): number {
-        return this.journalEntries.reduce((sum, e) => sum + (Number(e.debitAmount) || 0), 0);
+        return this.journalEntries.reduce((sum, e) => sum + (Number(e.glDebitAmount) || 0), 0);
     }
 
     get totalCredit(): number {
-        return this.journalEntries.reduce((sum, e) => sum + (Number(e.creditAmount) || 0), 0);
+        return this.journalEntries.reduce((sum, e) => sum + (Number(e.glCreditAmount) || 0), 0);
     }
 
     toggleLogs(): void {

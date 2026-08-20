@@ -33,7 +33,7 @@
                         <label class="form-label fw-bold mb-1 fs-xs text-uppercase">Status</label>
                         <select class="form-select" [ngModel]="selectedStatus()"
                                 (ngModelChange)="selectedStatus.set($event)">
-                            <option [ngValue]="null">— Pending CV —</option>
+                            <option [ngValue]="0">All</option>
                             @for (s of documentStatuses(); track s.id) {
                                 <option [ngValue]="s.id">{{ s.status || s.description }}</option>
                             }

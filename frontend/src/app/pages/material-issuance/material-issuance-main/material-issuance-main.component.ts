@@ -43,8 +43,8 @@ export class MaterialIssuanceMainComponent {
 
     fromDate         = '';
     toDate           = '';
-    selectedStatus   = signal<number | null>(null);
-    selectedDocType  : string | null = null;
+    selectedStatus   = signal<number>(0);
+    selectedDocType  : any = 0;
 
     readonly inventoryDocTypes = [
         { desc: 'Material Charge Ticket',   type: 'MCT'  },
@@ -95,8 +95,8 @@ export class MaterialIssuanceMainComponent {
 
     reset(): void {
         this.setDefaultDates();
-        this.selectedStatus.set(null);
-        this.selectedDocType = null;
+        this.selectedStatus.set(0);
+        this.selectedDocType = 0;
         this.searchText = '';
         this.load();
     }

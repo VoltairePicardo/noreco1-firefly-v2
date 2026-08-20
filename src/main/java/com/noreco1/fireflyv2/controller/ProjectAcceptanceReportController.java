@@ -7,10 +7,12 @@ import com.noreco1.fireflyv2.controller.response.PostResponse;
 import com.noreco1.fireflyv2.controller.response.ProcessDocumentDto;
 import com.noreco1.fireflyv2.controller.response.ProjectAcceptanceReportDto;
 import com.noreco1.fireflyv2.model.DocumentStatus;
+import com.noreco1.fireflyv2.model.Project;
 import com.noreco1.fireflyv2.model.ProjectAcceptanceReport;
 import com.noreco1.fireflyv2.model.User;
 import com.noreco1.fireflyv2.model.Workflow;
 import com.noreco1.fireflyv2.repo.ProjectAcceptanceReportRepo;
+import com.noreco1.fireflyv2.repo.UserRepo;
 import com.noreco1.fireflyv2.service.DownloadService;
 import com.noreco1.fireflyv2.service.PrintableVoucher;
 import com.noreco1.fireflyv2.service.ProjectAcceptanceReportService;
@@ -24,6 +26,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -44,10 +47,19 @@ public class ProjectAcceptanceReportController {
     private ProjectAcceptanceReportRepo projectAcceptanceReportRepo;
 
     @Autowired
+    private UserRepo userRepo;
+
+    @Autowired
     private AuthenticationFacade authenticationFacade;
 
     @Autowired
     private GeneratorFacade generatorFacade;
+
+    @Autowired
+    private com.noreco1.fireflyv2.common.facade.DocumentProcessingFacade documentProcessingFacade;
+
+    @Autowired
+    private com.noreco1.fireflyv2.common.facade.DocumentLoggerFacade documentLoggerFacade;
 
     @Autowired
     private MessageSource messageSource;
@@ -85,6 +97,7 @@ public class ProjectAcceptanceReportController {
         return projectAcceptanceReportService.getDocumentsStatuses();
     }
 
+    @Transactional
     @PostMapping("/create")
     public PostResponse create(@RequestBody Map<String, Object> payload) {
         PostResponse response = new PostResponse();
@@ -92,6 +105,9 @@ public class ProjectAcceptanceReportController {
             ProjectAcceptanceReport par = buildPar(payload, null);
             ProjectAcceptanceReport saved = projectAcceptanceReportRepo.save(par);
             if (saved != null) {
+                documentProcessingFacade.processAction(saved.getTransaction(), null, saved.getWorkflow(), saved.getCreatedBy());
+                java.util.Map newMap = documentLoggerFacade.makeLog(saved);
+                documentLoggerFacade.log(saved.getTransaction(), authenticationFacade.getLoggedIn(), null, newMap);
                 response.setSuccessMessage("Project Acceptance Report successfully saved.");
                 response.setModelId(saved.getId());
             } else {
@@ -127,13 +143,13 @@ public class ProjectAcceptanceReportController {
             // remarks is not in entity - store in notes if available, or skip
         }
 
+        existing.setProject(projectRef(payload, "project"));
         existing.setInspector1(userRef(payload, "inspector1"));
         existing.setInspector2(userRef(payload, "inspector2"));
         existing.setInspector3(userRef(payload, "inspector3"));
-        // signatory1/2/3 → notedBy, recommendedBy, approvedBy
-        existing.setNotedBy(userRef(payload, "signatory1"));
-        existing.setRecommendedBy(userRef(payload, "signatory2"));
-        existing.setApprovedBy(userRef(payload, "signatory3"));
+        existing.setNotedBy(userRef(payload, "notedBy"));
+        existing.setRecommendedBy(userRef(payload, "recommendedBy"));
+        existing.setApprovedBy(userRef(payload, "approvedBy"));
 
         existing.setUpdatedAt(new Date());
         ProjectAcceptanceReport saved = projectAcceptanceReportRepo.save(existing);
@@ -163,13 +179,13 @@ public class ProjectAcceptanceReportController {
         }
         par.setDate(parDate);
 
+        par.setProject(projectRef(payload, "project"));
         par.setInspector1(userRef(payload, "inspector1"));
         par.setInspector2(userRef(payload, "inspector2"));
         par.setInspector3(userRef(payload, "inspector3"));
-        // signatory1/2/3 → notedBy, recommendedBy, approvedBy
-        par.setNotedBy(userRef(payload, "signatory1"));
-        par.setRecommendedBy(userRef(payload, "signatory2"));
-        par.setApprovedBy(userRef(payload, "signatory3"));
+        par.setNotedBy(userRef(payload, "notedBy"));
+        par.setRecommendedBy(userRef(payload, "recommendedBy"));
+        par.setApprovedBy(userRef(payload, "approvedBy"));
 
         // Generate code
         int year = Integer.parseInt(GlobalConstant.YYYY_DATE_FORMAT.format(parDate));
@@ -200,10 +216,18 @@ public class ProjectAcceptanceReportController {
 
     private User userRef(Map<String, Object> payload, String key) {
         Object obj = payload.get(key);
+        if (obj instanceof Map<?, ?> m && m.get("accountNo") != null) {
+            return userRepo.findOneByAccountNo(((Number) m.get("accountNo")).intValue());
+        }
+        return null;
+    }
+
+    private Project projectRef(Map<String, Object> payload, String key) {
+        Object obj = payload.get(key);
         if (obj instanceof Map<?, ?> m && m.get("id") != null) {
-            User u = new User();
-            u.setId(((Number) m.get("id")).intValue());
-            return u;
+            Project p = new Project();
+            p.setId(((Number) m.get("id")).intValue());
+            return p;
         }
         return null;
     }

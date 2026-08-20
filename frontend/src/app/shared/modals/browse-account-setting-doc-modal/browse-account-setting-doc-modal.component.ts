@@ -20,23 +20,12 @@ export class BrowseAccountSettingDocModalComponent implements OnInit {
     @Input() docType = '';
 
     readonly docTypes = [
-        { key: 'rr',            label: 'Receiving Report' },
-        { key: 'stockReceive',  label: 'Stock Receiving' },
-        { key: 'mct',           label: 'MCT (Material Transfer)' },
-        { key: 'stockRelease',  label: 'Stock Release' },
-        { key: 'mst',           label: 'MST (Material/Store Transfer)' },
-        { key: 'stockAdjust',   label: 'Stock Adjustment' },
-        { key: 'rv',            label: 'Requisition Voucher' },
-        { key: 'canvass',       label: 'Canvass' },
-        { key: 'quotation',     label: 'Quotation' },
-        { key: 'po',            label: 'Purchase Order' },
-        { key: 'jo',            label: 'Job Order' },
-        { key: 'joa',           label: 'JO Acceptance' },
-        { key: 'paymentReq',    label: 'Payment Request' },
-        { key: 'ccpr',          label: 'Credit Card Purchase Request' },
-        { key: 'apv',           label: 'Accounts Payable Voucher' },
-        { key: 'disbursement',  label: 'Disbursement (Check Voucher)' },
-        { key: 'generalJournal', label: 'General Journal' },
+        { key: 'rr',           label: 'Receiving Report' },
+        { key: 'stockReceive', label: 'Receive Stock Transfer' },
+        { key: 'mct',          label: 'Material Credit Ticket' },
+        { key: 'stockRelease', label: 'Stock Release' },
+        { key: 'mst',          label: 'Material Salvage Ticket' },
+        { key: 'stockAdjust',  label: 'Stock Adjustment' },
     ];
 
     selectedDocType = '';

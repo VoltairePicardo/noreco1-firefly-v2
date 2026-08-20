@@ -47,15 +47,8 @@
                                        placeholder="Select document..."/>
                                 <button type="button" class="btn btn-success fw-bold"
                                         (click)="openDocBrowse()">
-                                    <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
+                                    <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
                                 </button>
-                                @if (selectedDocument) {
-                                    <button type="button" class="btn btn-danger fw-bold"
-                                            ngbTooltip="Clear selection"
-                                            (click)="clearDocument()">
-                                        <ng-icon name="tablerX" class="ps-0 pe-0 fw-bold"></ng-icon>
-                                    </button>
-                                }
                             </div>
                             @if (submitted && !selectedDocument) {
                                 <div class="text-danger small mt-1">Please select a document.</div>
@@ -164,16 +157,16 @@
                                                [value]="getAccountLabel(batchDebitAccount)"
                                                readonly
                                                placeholder="Select debit account..."/>
-                                        <button type="button" class="btn btn-success btn-sm fw-bold"
+                                        <button type="button" class="btn btn-success   fw-bold"
                                                 (click)="openBatchAccBrowse('debit')">
-                                            <ng-icon name="tablerSearch" class="ps-0 pe-1 fw-bold"></ng-icon>Browse
+                                            <ng-icon name="tablerSearch" class="ps-0  pe-3 fw-bold"></ng-icon>Browse
                                         </button>
                                     </div>
                                 </div>
                                 <div class="col-auto">
-                                    <button type="button" class="btn btn-primary btn-sm fw-bold"
+                                    <button type="button" class="btn btn-primary   fw-bold"
                                             [disabled]="!batchDebitAccount || !anySelected"
-                                            (click)="applyBatchDebit()">
+                                            (click)="applyBatchDebit()"> <ng-icon name="tablerCheck" class="ps-0  pe-3 fw-bold"></ng-icon>
                                         Apply Debit
                                     </button>
                                 </div>
@@ -184,16 +177,16 @@
                                                [value]="getAccountLabel(batchCreditAccount)"
                                                readonly
                                                placeholder="Select credit account..."/>
-                                        <button type="button" class="btn btn-success btn-sm fw-bold"
+                                        <button type="button" class="btn btn-success   fw-bold"
                                                 (click)="openBatchAccBrowse('credit')">
-                                            <ng-icon name="tablerSearch" class="ps-0 pe-1 fw-bold"></ng-icon>Browse
+                                            <ng-icon name="tablerSearch" class="ps-0  pe-3 fw-bold"></ng-icon>Browse
                                         </button>
                                     </div>
                                 </div>
                                 <div class="col-auto">
-                                    <button type="button" class="btn btn-primary btn-sm fw-bold"
+                                    <button type="button" class="btn btn-primary   fw-bold"
                                             [disabled]="!batchCreditAccount || !anySelected"
-                                            (click)="applyBatchCredit()">
+                                            (click)="applyBatchCredit()"> <ng-icon name="tablerCheck" class="ps-0  pe-3 fw-bold"></ng-icon>
                                         Apply Credit
                                     </button>
                                 </div>
@@ -234,17 +227,11 @@
                                                            [value]="getAccountLabel(item.debitAccount)"
                                                            readonly
                                                            placeholder="Select debit..."/>
-                                                    <button type="button" class="btn btn-success btn-sm fw-bold"
+                                                    <button type="button" class="btn btn-success   fw-bold"
                                                             ngbTooltip="Browse debit account"
                                                             (click)="openAccBrowse(i, 'debit')">
                                                         <ng-icon name="tablerSearch" class="ps-0 pe-0 fw-bold"></ng-icon>
                                                     </button>
-                                                    @if (item.debitAccount) {
-                                                        <button type="button" class="btn btn-danger btn-sm"
-                                                                (click)="lineItems[i].debitAccount = null">
-                                                            <ng-icon name="tablerX" class="ps-0 pe-0"></ng-icon>
-                                                        </button>
-                                                    }
                                                 </div>
                                             </td>
                                             <td style="min-width:220px">
@@ -253,17 +240,11 @@
                                                            [value]="getAccountLabel(item.creditAccount)"
                                                            readonly
                                                            placeholder="Select credit..."/>
-                                                    <button type="button" class="btn btn-success btn-sm fw-bold"
+                                                    <button type="button" class="btn btn-success   fw-bold"
                                                             ngbTooltip="Browse credit account"
                                                             (click)="openAccBrowse(i, 'credit')">
                                                         <ng-icon name="tablerSearch" class="ps-0 pe-0 fw-bold"></ng-icon>
                                                     </button>
-                                                    @if (item.creditAccount) {
-                                                        <button type="button" class="btn btn-danger btn-sm"
-                                                                (click)="lineItems[i].creditAccount = null">
-                                                            <ng-icon name="tablerX" class="ps-0 pe-0"></ng-icon>
-                                                        </button>
-                                                    }
                                                 </div>
                                             </td>
                                         </tr>
@@ -282,7 +263,7 @@
                                 [disabled]="formSubmit"
                                 (click)="save()">
                             <ng-icon name="tablerCheck" class="ps-0 pe-3 fw-bold"></ng-icon>
-                            {{ editMode ? 'Update' : 'Save' }}
+                            {{ editMode ? 'Update' : 'Save ' + module }}
                         </button>
                     </div>
 

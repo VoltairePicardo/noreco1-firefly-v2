@@ -206,7 +206,7 @@ public class StockAdjustmentServiceImpl implements StockAdjustmentService, Print
                 dto.setLocalCode(entity.getCode());
                 dto.setParticulars(entity.getRemarks());
                 dto.setId(entity.getId());
-                dto.setPreparedBy(entity.getCreatedBy().getFullName());
+                dto.setPreparedBy(entity.getCreatedBy() != null ? entity.getCreatedBy().getFullName() : null);
                 dto.setTransactionId(entity.getTransaction().getId());
 
                 ArrayList<StockTransactionDetail> stockTransactionDetails = stockTransactionDetailRepo.findByStockTransactionTransactionId(entity.getTransaction().getId());

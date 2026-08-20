@@ -3,7 +3,6 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '@/environments/environment';
 
-const BASE_URL = environment.get('baseUrl');
 const BASE_API = environment.get('baseApiUrl');
 const httpOptions = { headers: new HttpHeaders({ 'Content-Type': 'application/json' }) };
 
@@ -17,39 +16,39 @@ export class BudgetLineItemService {
         if (deptId)   params = params.set('dep', deptId.toString());
         if (divId)    params = params.set('div', divId.toString());
         if (statusId) params = params.set('s',   statusId.toString());
-        return this.http.get<any[]>(`${BASE_URL}/budget-line-item/list`, { params });
+        return this.http.get<any[]>(`${BASE_API}/budget-line-item/list`, { params });
     }
 
     getData(id: number): Observable<any> {
-        return this.http.get(`${BASE_URL}/budget-line-item/${id}`);
+        return this.http.get(`${BASE_API}/budget-line-item/${id}`);
     }
 
     create(form: any): Observable<any> {
         const fd = new FormData();
         fd.append('model', new Blob([JSON.stringify(form)], { type: 'application/json' }));
-        return this.http.post(`${BASE_URL}/budget-line-item/create`, fd);
+        return this.http.post(`${BASE_API}/budget-line-item/create`, fd);
     }
 
     update(form: any): Observable<any> {
         const fd = new FormData();
         fd.append('model', new Blob([JSON.stringify(form)], { type: 'application/json' }));
-        return this.http.post(`${BASE_URL}/budget-line-item/update`, fd);
+        return this.http.post(`${BASE_API}/budget-line-item/update`, fd);
     }
 
     process(payload: any): Observable<any> {
-        return this.http.post(`${BASE_URL}/budget-line-item/process`, payload, httpOptions);
+        return this.http.post(`${BASE_API}/budget-line-item/process`, payload, httpOptions);
     }
 
     delete(id: number): Observable<any> {
-        return this.http.delete(`${BASE_URL}/budget-line-item/${id}`);
+        return this.http.delete(`${BASE_API}/budget-line-item/${id}`);
     }
 
     getDocumentStatuses(): Observable<any[]> {
-        return this.http.get<any[]>(`${BASE_URL}/budget-line-item/document-statuses`);
+        return this.http.get<any[]>(`${BASE_API}/budget-line-item/document-statuses`);
     }
 
     getDefaultSignatories(): Observable<any> {
-        return this.http.get(`${BASE_URL}/budget-line-item/default-signatories`);
+        return this.http.get(`${BASE_API}/budget-line-item/default-signatories`);
     }
 
     getWorkflowActions(transId: number): Observable<any[]> {

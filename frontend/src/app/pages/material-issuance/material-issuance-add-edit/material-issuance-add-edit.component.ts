@@ -193,10 +193,10 @@ export class MaterialIssuanceAddEditComponent {
             this.alertService.warning(this.module, 'Validation', 'Please enter a voucher date.');
             return;
         }
-        if (!this.selectedInventoryDoc) {
+       /* if (!this.selectedInventoryDoc) {
             this.alertService.warning(this.module, 'Validation', 'Please select an inventory document.');
             return;
-        }
+        }*/
         if (this.journalEntries.length === 0) {
             this.alertService.warning(this.module, 'Validation', 'Please add at least one journal entry.');
             return;

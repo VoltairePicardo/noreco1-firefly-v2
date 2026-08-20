@@ -18,10 +18,12 @@ export class BudgetSubItemMainComponent {
     treeData  = signal<any[]>([]);
     isLoading = signal(false);
 
-    searchQuery  = '';
-    yearFilter   = new Date().getFullYear();
+    searchQuery    = '';
+    yearFilter     = new Date().getFullYear();
     divisionFilter: any = null;
     divisions: any[] = [];
+
+    private collapsedRows = new Set<number>();
 
     private service      = inject(BudgetSubItemService);
     private alertService = inject(AlertService);
@@ -41,10 +43,20 @@ export class BudgetSubItemMainComponent {
 
     load(): void {
         this.isLoading.set(true);
+        this.collapsedRows.clear();
         const divId = this.divisionFilter?.id || null;
         this.service.getTreeData(this.yearFilter, divId, this.searchQuery).subscribe({
             next: (data) => {
-                this.treeData.set(data || []);
+                // Enrich each child row with _parentId so collapse filtering works
+                let currentParentId: number | null = null;
+                const enriched = (data || []).map((row, idx) => {
+                    if (row.isHeader) {
+                        currentParentId = row.id;
+                        return { ...row, _idx: idx };
+                    }
+                    return { ...row, _parentId: currentParentId, _idx: idx };
+                });
+                this.treeData.set(enriched);
                 this.isLoading.set(false);
             },
             error: () => {
@@ -54,13 +66,32 @@ export class BudgetSubItemMainComponent {
         });
     }
 
+    get visibleRows(): any[] {
+        return this.treeData().filter(row => {
+            if (row.isHeader) return true;
+            return !this.collapsedRows.has(row._parentId);
+        });
+    }
+
+    toggleRow(parentId: number): void {
+        if (this.collapsedRows.has(parentId)) {
+            this.collapsedRows.delete(parentId);
+        } else {
+            this.collapsedRows.add(parentId);
+        }
+    }
+
+    isCollapsed(parentId: number): boolean {
+        return this.collapsedRows.has(parentId);
+    }
+
     onSearch(): void {
         this.load();
     }
 
     reset(): void {
-        this.searchQuery   = '';
-        this.yearFilter    = new Date().getFullYear();
+        this.searchQuery    = '';
+        this.yearFilter     = new Date().getFullYear();
         this.divisionFilter = null;
         this.load();
     }

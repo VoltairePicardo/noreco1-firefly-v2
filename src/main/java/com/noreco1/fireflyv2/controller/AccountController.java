@@ -49,6 +49,7 @@ public class AccountController {
             m.put("accountCode",  a.getCode());
             m.put("accountTitle", a.getTitle());
             m.put("accountType",  a.getAccountType() != null ? a.getAccountType().getDescription() : null);
+            m.put("hasSL",        a.getHasSL() == 1);
             return m;
         });
     }

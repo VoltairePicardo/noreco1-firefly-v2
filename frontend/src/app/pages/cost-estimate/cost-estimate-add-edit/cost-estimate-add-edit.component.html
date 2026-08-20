@@ -53,7 +53,7 @@
                                    [value]="project ? (project.code + ' — ' + project.name) : ''"
                                    placeholder="No project selected"/>
                             <button type="button" class="btn btn-success fw-bold" (click)="browseProject()">
-                                <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
+                                <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
                             </button>
                         </div>
                     </div>
@@ -82,7 +82,7 @@
                 <div class="d-flex align-items-center justify-content-between mb-3">
                     <p class="fs-xs text-uppercase fw-semibold text-muted mb-0">Assemblies</p>
                     <button type="button" class="btn btn-success fw-bold" (click)="browseAssemblyUnit()">
-                        <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse Assembly Unit
+                        <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse Assembly Unit
                     </button>
                 </div>
                 <div class="table-responsive">
@@ -148,7 +148,7 @@
                 <div class="d-flex align-items-center justify-content-between mb-3">
                     <p class="fs-xs text-uppercase fw-semibold text-muted mb-0">Accessories</p>
                     <button type="button" class="btn btn-success fw-bold" (click)="browseAccessoryItem()">
-                        <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse Item
+                        <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse Item
                     </button>
                 </div>
                 <div class="table-responsive">
@@ -211,7 +211,7 @@
                 <div class="d-flex align-items-center justify-content-between mb-3">
                     <p class="fs-xs text-uppercase fw-semibold text-muted mb-0">Metering</p>
                     <button type="button" class="btn btn-success fw-bold" (click)="browseMeterItem()">
-                        <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse Item
+                        <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse Item
                     </button>
                 </div>
                 <div class="table-responsive">
@@ -274,7 +274,7 @@
                 <div class="d-flex align-items-center justify-content-between mb-3">
                     <p class="fs-xs text-uppercase fw-semibold text-muted mb-0">Miscellaneous Charges</p>
                     <button type="button" class="btn btn-success fw-bold" (click)="browseMiscCharge()">
-                        <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse Misc Charge
+                        <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse Misc Charge
                     </button>
                 </div>
                 <div class="table-responsive">
@@ -449,13 +449,8 @@
                                        readonly placeholder="Select signatory..."/>
                                 <button type="button" class="btn btn-success fw-bold"
                                         (click)="openEntityBrowse(key)">
-                                    <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
+                                    <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
                                 </button>
-                                @if (signatories[key]) {
-                                    <button type="button" class="btn btn-light" (click)="clearSignatory(key)">
-                                        <ng-icon name="tablerX" class="fw-bold"></ng-icon>
-                                    </button>
-                                }
                             </div>
                             @if (signatories[key]?.position) {
                                 <small class="text-muted">{{ signatories[key].position }}</small>

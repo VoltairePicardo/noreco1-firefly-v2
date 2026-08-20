@@ -124,11 +124,11 @@
                     @for (entry of journalEntries; track $index; let i = $index) {
                         <tr>
                             <td>{{ i + 1 }}</td>
-                            <td class="fw-bold">{{ entry.code || entry.account?.accountCode || '—' }}</td>
-                            <td>{{ entry.description || entry.account?.accountTitle || entry.account?.accountDescription || '—' }}</td>
+                            <td class="fw-bold">{{ entry.accountCode || '—' }}</td>
+                            <td>{{ entry.accountTitle || '—' }}</td>
                             <td>{{ entry.particulars || '—' }}</td>
-                            <td class="text-end">{{ (entry.debit ?? entry.debitAmount) | number:'1.2-2' }}</td>
-                            <td class="text-end">{{ (entry.credit ?? entry.creditAmount) | number:'1.2-2' }}</td>
+                            <td class="text-end">{{ (entry.glDebitAmount ?? 0) | number:'1.2-2' }}</td>
+                            <td class="text-end">{{ (entry.glCreditAmount ?? 0) | number:'1.2-2' }}</td>
                         </tr>
                     }
                     @if (journalEntries.length === 0) {

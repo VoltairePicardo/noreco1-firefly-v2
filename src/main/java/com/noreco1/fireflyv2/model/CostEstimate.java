@@ -22,6 +22,7 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CostEstimate extends Document implements Serializable {
+
     @Column
     private Date voucherDate;
 

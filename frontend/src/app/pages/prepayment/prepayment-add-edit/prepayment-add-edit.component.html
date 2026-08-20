@@ -73,19 +73,19 @@
 
                     <!-- Row 3: Monthly Cost (readonly), Applied Cost, Balance (readonly) -->
                     <div class="row g-3 mt-1">
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <label class="form-label fw-bold">Monthly Cost</label>
                             <input type="number" class="form-control text-end" [value]="monthlyCost"
                                    readonly placeholder="0.00"/>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <label class="form-label fw-bold">Applied Cost</label>
                             <input type="number" class="form-control text-end"
                                    [(ngModel)]="appliedCost" [ngModelOptions]="{ standalone: true }"
                                    min="0" step="0.01" placeholder="0.00"
                                    (ngModelChange)="onCostChange()" [disabled]="hasPpd"/>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <label class="form-label fw-bold">Balance</label>
                             <input type="number" class="form-control text-end" [value]="balance"
                                    readonly placeholder="0.00"/>
@@ -98,7 +98,7 @@
                             <label class="form-label fw-bold">Prepayment Account <span class="text-danger">*</span></label>
                             <div class="input-group">
                                 <input type="text" class="form-control"
-                                       [value]="prepaymentAccount?.accountTitle || ''"
+                                       [value]="prepaymentAccount?.accountTitle || prepaymentAccount?.title || ''"
                                        readonly placeholder="Select Account"/>
                                 @if (!hasPpd) {
                                     <button type="button" class="btn btn-success fw-bold"
@@ -108,14 +108,14 @@
                                 }
                             </div>
                             @if (prepaymentAccount) {
-                                <small class="text-muted">{{ prepaymentAccount.accountCode }}</small>
+                                <small class="text-muted">{{ prepaymentAccount.accountCode || prepaymentAccount.code }}</small>
                             }
                         </div>
                         <div class="col-md-6">
                             <label class="form-label fw-bold">Expense Account <span class="text-danger">*</span></label>
                             <div class="input-group">
                                 <input type="text" class="form-control"
-                                       [value]="expenseAccount?.accountTitle || ''"
+                                       [value]="expenseAccount?.accountTitle || expenseAccount?.title || ''"
                                        readonly placeholder="Select Account"/>
                                 @if (!hasPpd) {
                                     <button type="button" class="btn btn-success fw-bold"
@@ -125,7 +125,7 @@
                                 }
                             </div>
                             @if (expenseAccount) {
-                                <small class="text-muted">{{ expenseAccount.accountCode }}</small>
+                                <small class="text-muted">{{ expenseAccount.accountCode || expenseAccount.code }}</small>
                             }
                         </div>
                     </div>

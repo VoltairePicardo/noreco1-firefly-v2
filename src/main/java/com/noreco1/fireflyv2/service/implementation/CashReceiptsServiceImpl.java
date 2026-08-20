@@ -262,6 +262,8 @@ public class CashReceiptsServiceImpl implements CashReceiptsService, PrintableVo
             if(cashReceipts.getPostedBy() != null) {
                 cashReceiptsDto.setPostedBy(slEntityRepo.findById(cashReceipts.getPostedBy().getAccountNo()).orElse(null));
             }
+
+            cashReceiptsDto.setJournalEntries(ledgerDtoers.getVoucherLedgerLines(cashReceipts.getTransaction().getId()));
         }
 
         return  cashReceiptsDto;

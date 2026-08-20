@@ -6,22 +6,26 @@
     <div class="card-body">
 
         <ul ngbNav #nav="ngbNav" [activeId]="activeTab" (activeIdChange)="onTabChange($event)"
-            class="nav-tabs mb-3">
+            class="nav nav-tabs nav-justified nav-bordered nav-bordered-primary mb-0">
 
             <!-- Tab 1: Check Releasing (Not Released) -->
             <li [ngbNavItem]="1">
                 <button ngbNavLink class="fw-semibold">Check Releasing</button>
                 <ng-template ngbNavContent>
 
-                    <div class="row mb-3 align-items-end g-2">
+                    <div class="row mb-3 align-items-end g-2 mt-2">
                         <div class="col-md-4">
                             <label class="form-label fw-bold mb-1 fs-xs text-uppercase">Search</label>
                             <input type="text" class="form-control" placeholder="Search by code, check #, account, particulars..."
                                    [(ngModel)]="unreleasedSearch" (ngModelChange)="unreleasedPage = 1"/>
                         </div>
                         <div class="col-md-auto ms-auto">
-                            <button type="button" class="btn btn-success fw-bold" (click)="loadUnreleased()">
-                                <ng-icon name="tablerRefresh" class="ps-0 pe-3 fw-bold"></ng-icon>Refresh
+                            <button type="button" class="btn btn-success fw-bold" (click)="loadUnreleased()" [disabled]="unreleasedLoading()">
+                                @if (unreleasedLoading()) {
+                                    <span class="spinner-border spinner-border-sm me-2" role="status"></span>Loading...
+                                } @else {
+                                    <ng-icon name="tablerRefresh" class="ps-0 pe-3 fw-bold"></ng-icon>Refresh
+                                }
                             </button>
                         </div>
                     </div>
@@ -57,11 +61,6 @@
                                                        (click)="releaseCheck(item)"
                                                        class="btn btn-light btn-icon btn-sm rounded-circle">
                                                         <ng-icon name="tablerSend" class="fs-lg"></ng-icon>
-                                                    </a>
-                                                    <a href="javascript:void(0)" ngbTooltip="View"
-                                                       [routerLink]="['/' + menuLink, item.id, 'detail']"
-                                                       class="btn btn-light btn-icon btn-sm rounded-circle">
-                                                        <ng-icon name="tablerEye" class="fs-lg"></ng-icon>
                                                     </a>
                                                 </div>
                                             </td>
@@ -100,7 +99,7 @@
                 <ng-template ngbNavContent>
 
                     <!-- Filters -->
-                    <div class="row mb-3 align-items-end g-2">
+                    <div class="row mb-3 align-items-end g-2 mt-2">
                         <div class="col-md-2">
                             <label class="form-label fw-bold mb-1 fs-xs text-uppercase">From</label>
                             <input type="text" mwlFlatpickr [options]="flatpickrOptions"
@@ -117,10 +116,14 @@
                                    [(ngModel)]="releasedSearch" (ngModelChange)="releasedPage = 1"/>
                         </div>
                         <div class="col-auto d-flex gap-2">
-                            <button type="button" class="btn btn-success fw-bold" (click)="searchReleased()">
-                                <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Search
+                            <button type="button" class="btn btn-success fw-bold" (click)="searchReleased()" [disabled]="releasedLoading()">
+                                @if (releasedLoading()) {
+                                    <span class="spinner-border spinner-border-sm me-2" role="status"></span>Loading...
+                                } @else {
+                                    <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Search
+                                }
                             </button>
-                            <button type="button" class="btn btn-danger fw-bold" (click)="resetReleased()">
+                            <button type="button" class="btn btn-danger fw-bold" (click)="resetReleased()" [disabled]="releasedLoading()">
                                 <ng-icon name="tablerRefresh" class="ps-0 pe-3 fw-bold"></ng-icon>Reset
                             </button>
                         </div>

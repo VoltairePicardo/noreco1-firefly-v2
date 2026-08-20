@@ -23,7 +23,7 @@ export class EnergySalesService {
 
     listByDateRange(from: string, to: string, statusId: number | null = null): Observable<any[]> {
         let params = new HttpParams().set('from', from).set('to', to);
-        if (statusId != null) params = params.set('statusId', statusId);
+        if (statusId != null && statusId !== 0) params = params.set('statusId', statusId);
         return this.http.get<any[]>(`${BASE_API}/sales-voucher/list/date-range`, { params });
     }
 
@@ -65,7 +65,8 @@ export class EnergySalesService {
     }
 
     approveAll(ids: number[]): Observable<any> {
-        return this.http.post<any>(`${BASE_API}/sales-voucher/approve-all`, { ids }, httpOptions);
+        const payloads = ids.map(id => ({ documentId: id, remarks: '', documentType: 'SV' }));
+        return this.http.post<any>(`${BASE_API}/approve-vouchers/process-all`, payloads, httpOptions);
     }
 
     print(id: number): void {

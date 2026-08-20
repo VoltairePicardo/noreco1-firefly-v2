@@ -493,6 +493,174 @@ public class SiteInspectionReportServiceImpl implements SiteInspectionReportServ
         return new JRBeanCollectionDataSource(details);
     }
 
+    @Transactional
+    @Override
+    public PostResponse createFromPayload(Map<String, Object> payload) {
+        PostResponse response = new PostResponse();
+        try {
+            SiteInspectionReport sir = new SiteInspectionReport();
+
+            Date sirDate = new Date();
+            Object dateObj = payload.get("date");
+            if (dateObj instanceof String dateStr && !dateStr.isEmpty()) {
+                try { sirDate = java.sql.Date.valueOf(dateStr); } catch (Exception ignored) {}
+            }
+            sir.setDate(sirDate);
+            sir.setYear(Integer.parseInt(GlobalConstant.YYYY_DATE_FORMAT.format(sirDate)));
+
+            Object projectObj = payload.get("project");
+            if (projectObj instanceof Map<?, ?> pm && pm.get("id") != null) {
+                Project p = new Project();
+                p.setId(((Number) pm.get("id")).intValue());
+                sir.setProject(p);
+            }
+
+            Object checkerObj = payload.get("checker");
+            if (checkerObj instanceof Map<?, ?> cm && cm.get("accountNo") != null) {
+                sir.setChecker(userRepo.findOneByAccountNo(((Number) cm.get("accountNo")).intValue()));
+            }
+
+            Object notedByObj = payload.get("notedBy");
+            if (notedByObj instanceof Map<?, ?> nm && nm.get("accountNo") != null) {
+                sir.setNotedBy(userRepo.findOneByAccountNo(((Number) nm.get("accountNo")).intValue()));
+            }
+
+            Object approvedByObj = payload.get("approvedBy");
+            if (approvedByObj instanceof Map<?, ?> am && am.get("accountNo") != null) {
+                sir.setApprovedBy(userRepo.findOneByAccountNo(((Number) am.get("accountNo")).intValue()));
+            }
+
+            if (sir.getProject() != null && sir.getProject().getId() != null) {
+                WorkOrder wo = workOrderRepo.findByProjectId(sir.getProject().getId());
+                if (wo != null) sir.setWorkOrder(wo);
+            }
+
+            Object latestCode = siteInspectionReportRepo.findLatestCodeByYear(sir.getYear());
+            String code = generatorFacade.voucherCodeNoOffice(
+                    "IR", latestCode == null ? "" : String.valueOf(latestCode),
+                    sirDate, GlobalConstant.COUNTER_PAD_3);
+            sir.setCode(code);
+
+            Date now = new Date();
+            sir.setCreatedAt(now);
+            sir.setUpdatedAt(now);
+            sir.setCreatedBy(authenticationFacade.getLoggedIn());
+
+            DocumentStatus ds = new DocumentStatus();
+            ds.setId(com.noreco1.fireflyv2.model.enums.DocumentStatus.DOCUMENT_CREATED.getId());
+            sir.setDocumentStatus(ds);
+
+            Workflow wf = new Workflow();
+            wf.setId(com.noreco1.fireflyv2.model.enums.Workflow.SITE_INSPECTION_REPORT.getId());
+            sir.setWorkflow(wf);
+
+            sir.setTransaction(generatorFacade.transaction());
+
+            SiteInspectionReport saved = siteInspectionReportRepo.save(sir);
+
+            Object findingsObj = payload.get("findings");
+            if (findingsObj instanceof List<?> findingsList) {
+                for (Object fObj : findingsList) {
+                    if (fObj instanceof Map<?, ?> fm) {
+                        String desc   = fm.get("description") != null ? fm.get("description").toString() : "";
+                        String remark = fm.get("remarks")     != null ? fm.get("remarks").toString()     : "";
+                        if (!desc.isBlank()) {
+                            SiteInspectionReportDescription d = new SiteInspectionReportDescription();
+                            d.setDescription(desc);
+                            d.setRemark(remark);
+                            d.setSiteInspectionReport(saved);
+                            siteInspectionReportDescriptionRepo.save(d);
+                        }
+                    }
+                }
+            }
+
+            // Initialize workflow log — required for workflow actions and document processing to load
+            documentProcessingFacade.processAction(saved.getTransaction(), null, saved.getWorkflow(), saved.getCreatedBy());
+
+            // Create initial document log — required for document logs to appear
+            Map newMap = documentLoggerFacade.makeLog(saved);
+            documentLoggerFacade.log(saved.getTransaction(), authenticationFacade.getLoggedIn(), null, newMap);
+
+            response.setSuccessMessage("Site Inspection Report successfully saved.");
+            response.setModelId(saved.getId());
+        } catch (Exception e) {
+            response.setFailureMessage("Failed to save Site Inspection Report: " + e.getMessage());
+        }
+        return response;
+    }
+
+    @Override
+    public PostResponse updateFromPayload(Map<String, Object> payload) {
+        PostResponse response = new PostResponse();
+        try {
+            Object idObj = payload.get("id");
+            if (idObj == null) { response.setFailureMessage("ID is required for update."); return response; }
+            Integer id = ((Number) idObj).intValue();
+            SiteInspectionReport existing = siteInspectionReportRepo.findById(id).orElse(null);
+            if (existing == null) { response.setFailureMessage("Site Inspection Report not found."); return response; }
+
+            Object dateObj = payload.get("date");
+            if (dateObj instanceof String dateStr && !dateStr.isEmpty()) {
+                try { existing.setDate(java.sql.Date.valueOf(dateStr)); } catch (Exception ignored) {}
+            }
+
+            Object projectObj = payload.get("project");
+            if (projectObj instanceof Map<?, ?> pm && pm.get("id") != null) {
+                Project p = new Project();
+                p.setId(((Number) pm.get("id")).intValue());
+                existing.setProject(p);
+            }
+
+            Object checkerObj = payload.get("checker");
+            if (checkerObj instanceof Map<?, ?> cm && cm.get("accountNo") != null) {
+                existing.setChecker(userRepo.findOneByAccountNo(((Number) cm.get("accountNo")).intValue()));
+            }
+
+            Object notedByObj = payload.get("notedBy");
+            if (notedByObj instanceof Map<?, ?> nm && nm.get("accountNo") != null) {
+                existing.setNotedBy(userRepo.findOneByAccountNo(((Number) nm.get("accountNo")).intValue()));
+            }
+
+            Object approvedByObj = payload.get("approvedBy");
+            if (approvedByObj instanceof Map<?, ?> am && am.get("accountNo") != null) {
+                existing.setApprovedBy(userRepo.findOneByAccountNo(((Number) am.get("accountNo")).intValue()));
+            }
+
+            if (existing.getProject() != null && existing.getProject().getId() != null) {
+                WorkOrder wo = workOrderRepo.findByProjectId(existing.getProject().getId());
+                if (wo != null) existing.setWorkOrder(wo);
+            }
+
+            existing.setUpdatedAt(new Date());
+            SiteInspectionReport saved = siteInspectionReportRepo.save(existing);
+
+            Object findingsObj = payload.get("findings");
+            if (findingsObj instanceof List<?> findingsList) {
+                siteInspectionReportDescriptionRepo.deleteBySiteInspectionReportId(saved.getId());
+                for (Object fObj : findingsList) {
+                    if (fObj instanceof Map<?, ?> fm) {
+                        String desc   = fm.get("description") != null ? fm.get("description").toString() : "";
+                        String remark = fm.get("remarks")     != null ? fm.get("remarks").toString()     : "";
+                        if (!desc.isBlank()) {
+                            SiteInspectionReportDescription d = new SiteInspectionReportDescription();
+                            d.setDescription(desc);
+                            d.setRemark(remark);
+                            d.setSiteInspectionReport(saved);
+                            siteInspectionReportDescriptionRepo.save(d);
+                        }
+                    }
+                }
+            }
+
+            response.setSuccessMessage("Site Inspection Report successfully updated.");
+            response.setModelId(saved.getId());
+        } catch (Exception e) {
+            response.setFailureMessage("Failed to update Site Inspection Report: " + e.getMessage());
+        }
+        return response;
+    }
+
     private PostResponse filesNotFoundMessage() {
         PostResponse response = new PostResponse();
         response.setFailureMessage("Please attach needed files");

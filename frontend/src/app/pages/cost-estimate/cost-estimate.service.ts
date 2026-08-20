@@ -5,7 +5,6 @@ import { environment } from '@/environments/environment';
 import { DownloadService } from '@/app/core/services/download.service';
 
 const BASE_API = environment.get('baseApiUrl');
-const BASE_URL = environment.get('baseUrl');
 const httpOptions = {
     headers: new HttpHeaders({ 'Content-Type': 'application/json' })
 };
@@ -45,22 +44,22 @@ export class CostEstimateService {
     }
 
     getWorkflowActions(transId: number): Observable<any[]> {
-        return this.http.get<any[]>(`${BASE_URL}/json/workflow-actions/${transId}`);
+        return this.http.get<any[]>(`${BASE_API}/json/workflow-actions/${transId}`);
     }
 
     getDocumentLogs(transId: number): Observable<any[]> {
-        return this.http.post<any[]>(`${BASE_URL}/document/${transId}/logs`, {}, httpOptions);
+        return this.http.get<any[]>(`${BASE_API}/json/document-logs/${transId}`);
     }
 
     getInventoryLocations(): Observable<any[]> {
-        return this.http.get<any[]>(`${BASE_URL}/json/inventory-locations`);
+        return this.http.get<any[]>(`${BASE_API}/json/inventory-locations`);
     }
 
     getSetting(code: string): Observable<any> {
-        return this.http.get<any>(`${BASE_URL}/json/setting/${code}`);
+        return this.http.get<any>(`${BASE_API}/json/setting/${code}`);
     }
 
     print(id: number): void {
-        this.downloadService.print(`${BASE_URL}/cost-estimate/export/${id}`, { type: 'pdf' });
+        this.downloadService.print(`${BASE_API}/cost-estimate/export/${id}`, { type: 'pdf' });
     }
 }

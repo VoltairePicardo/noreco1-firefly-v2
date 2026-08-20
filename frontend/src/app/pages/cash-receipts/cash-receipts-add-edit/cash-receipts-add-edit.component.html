@@ -17,10 +17,10 @@
                     <!-- Temporary GL Selection -->
                     <div class="alert mb-3" [class.alert-warning]="!tempBatch" [class.alert-success]="tempBatch">
                         @if (!tempBatch) {
-                            <div class="d-flex align-items-center gap-2">
+                            <div class="d-flex align-items-center gap-2 justify-content-end">
                                 <span class="text-muted fs-sm">You may select from temporary GL entries.</span>
-                                <button type="button" class="btn btn-success fw-bold btn-sm" (click)="openTempGLBrowse()">
-                                    <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse Temp GL
+                                <button type="button" class="btn btn-success fw-bold  " (click)="openTempGLBrowse()">
+                                    <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse Temp GL
                                 </button>
                             </div>
                         } @else {
@@ -43,7 +43,7 @@
                                         <div>{{ tempBatch.remarks }}</div>
                                     </div>
                                 </div>
-                                <button type="button" class="btn btn-danger btn-sm fw-bold" (click)="clearTempGL()">
+                                <button type="button" class="btn btn-danger   fw-bold" (click)="clearTempGL()">
                                     <ng-icon name="tablerX" class="fw-bold"></ng-icon>
                                 </button>
                             </div>
@@ -95,13 +95,8 @@
                                        readonly placeholder="Select approving officer..."/>
                                 <button type="button" class="btn btn-success fw-bold"
                                         (click)="openEntityBrowse()">
-                                    <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
+                                    <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
                                 </button>
-                                @if (approvingOfficer) {
-                                    <button type="button" class="btn btn-light" (click)="approvingOfficer = null">
-                                        <ng-icon name="tablerX" class="fw-bold"></ng-icon>
-                                    </button>
-                                }
                             </div>
                             @if (approvingOfficer?.position) {
                                 <small class="text-muted">{{ approvingOfficer.position }}</small>
@@ -115,8 +110,13 @@
                         </a>
                         <button type="button" class="btn btn-primary fw-bold"
                                 [disabled]="formSubmit" (click)="save()">
-                            <ng-icon name="tablerCheck" class="ps-0 pe-3 fw-bold"></ng-icon>
-                            {{ editMode ? 'Update' : 'Save' }}
+                            @if (formSubmit) {
+                                <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                                {{ editMode ? 'Updating...' : 'Saving...' }}
+                            } @else {
+                                <ng-icon name="tablerCheck" class="ps-0 pe-3 fw-bold"></ng-icon>
+                                {{ editMode ? 'Update' : 'Save ' + module }}
+                            }
                         </button>
                     </div>
 

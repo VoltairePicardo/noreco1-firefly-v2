@@ -61,7 +61,7 @@
                         <div class="col-12">
                             <div class="d-flex justify-content-between align-items-center mb-2">
                                 <span class="fw-semibold fs-xs text-uppercase text-muted">Budget Line Item Details</span>
-                                <button type="button" class="btn btn-success btn-sm fw-bold" (click)="addDetail()">
+                                <button type="button" class="btn btn-primary fw-bold" (click)="addDetail()">
                                     <ng-icon name="tablerPlus" class="ps-0 pe-3 fw-bold"></ng-icon>Add Detail
                                 </button>
                             </div>
@@ -144,7 +144,7 @@
                                                 @if (!d.item) {
                                                     <button type="button" class="btn btn-success fw-bold"
                                                             (click)="openItemBrowse($index)">
-                                                        <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
+                                                        <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
                                                     </button>
                                                 } @else {
                                                     <button type="button" class="btn btn-danger fw-bold"
@@ -248,14 +248,8 @@
                                        readonly placeholder="Browse checking officer..."/>
                                 <button type="button" class="btn btn-success fw-bold"
                                         (click)="openSignatoryBrowse('checkedBy')">
-                                    <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
+                                    <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
                                 </button>
-                                @if (checkedBy) {
-                                    <button type="button" class="btn btn-danger fw-bold"
-                                            (click)="clearSignatory('checkedBy')">
-                                        <ng-icon name="tablerX" class="ps-0 fw-bold"></ng-icon>
-                                    </button>
-                                }
                             </div>
                             @if (submit && !checkedBy) {
                                 <div class="text-danger fs-xs mt-1">Please select a Checking Officer.</div>
@@ -264,25 +258,43 @@
 
                         <div class="col-md-4">
                             <label class="form-label fw-bold">Verifying Officer</label>
-                            <input type="text" class="form-control"
-                                   [value]="verifiedBy ? (verifiedBy.name || verifiedBy.fullName || '') : ''"
-                                   readonly placeholder="Verifying officer"/>
+                            <div class="input-group">
+                                <input type="text" class="form-control"
+                                       [value]="verifiedBy ? (verifiedBy.name || verifiedBy.fullName || '') : ''"
+                                       readonly placeholder="Browse verifying officer..."/>
+                                <button type="button" class="btn btn-success fw-bold"
+                                        (click)="openSignatoryBrowse('verifiedBy')">
+                                    <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
+                                </button>
+                            </div>
                         </div>
 
                         <div class="col-md-4">
                             <label class="form-label fw-bold">Approving Officer</label>
-                            <input type="text" class="form-control"
-                                   [value]="approvingOfficer ? (approvingOfficer.name || approvingOfficer.fullName || '') : ''"
-                                   readonly placeholder="Approving officer"/>
+                            <div class="input-group">
+                                <input type="text" class="form-control"
+                                       [value]="approvingOfficer ? (approvingOfficer.name || approvingOfficer.fullName || '') : ''"
+                                       readonly placeholder="Browse approving officer..."/>
+                                <button type="button" class="btn btn-success fw-bold"
+                                        (click)="openSignatoryBrowse('approvingOfficer')">
+                                    <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
+                                </button>
+                            </div>
                         </div>
 
                         <div class="d-flex gap-2 justify-content-end align-items-center pt-3 border-top mt-3">
                             <a [routerLink]="['/' + menuLink]" class="btn btn-light fw-bold">
                                 <ng-icon name="tablerArrowLeft" class="ps-0 pe-3 fw-bold"></ng-icon>Back
                             </a>
-                            <button type="submit" class="btn btn-primary fw-bold" [disabled]="formSubmit">
-                                <ng-icon name="tablerCheck" class="ps-0 pe-3 fw-bold"></ng-icon>
-                                {{ editMode ? 'Update' : 'Save ' + module }}
+                            <button type="button" class="btn btn-primary fw-bold"
+                                    [disabled]="formSubmit" (click)="save()">
+                                @if (formSubmit) {
+                                    <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                                    {{ editMode ? 'Updating...' : 'Saving...' }}
+                                } @else {
+                                    <ng-icon name="tablerCheck" class="ps-0 pe-3 fw-bold"></ng-icon>
+                                    {{ editMode ? 'Update' : 'Save ' + module }}
+                                }
                             </button>
                         </div>
 

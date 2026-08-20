@@ -48,7 +48,7 @@ export class GeneralJournalMainComponent {
 
     fromDate       = '';
     toDate         = '';
-    selectedStatus = signal<number | null>(null);
+    selectedStatus = signal<number | 0>(0);
 
     private service      = inject(GeneralJournalService);
     private alertService = inject(AlertService);
@@ -91,7 +91,7 @@ export class GeneralJournalMainComponent {
 
     reset(): void {
         this.setDefaultDates();
-        this.selectedStatus.set(null);
+        this.selectedStatus.set(0);
         this.searchText = '';
         this.load();
     }

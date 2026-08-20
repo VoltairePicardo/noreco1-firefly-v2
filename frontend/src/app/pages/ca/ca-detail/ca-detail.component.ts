@@ -1,38 +1,36 @@
 import { Component, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import {
-    COMMON_ALL_PAGE_IMPORTS,
-    COMMON_ADD_EDIT_PAGE_IMPORTS,
-    COMMON_MAIN_PAGE_IMPORTS,
-    SHARED_PROVIDERS
-} from '@/app/shared/providers/shared-providers';
+import { COMMON_ALL_PAGE_IMPORTS } from '@/app/shared/providers/shared-providers';
+import { SharedModule } from '@/app/shared/shared.module';
+import { FormsModule } from '@angular/forms';
 import { AlertService } from '@/app/shared/services/alert.service';
 import { CaService } from '../ca.service';
 import Swal from 'sweetalert2';
 
 @Component({
     selector: 'app-ca-detail',
-    imports: [...COMMON_ALL_PAGE_IMPORTS, ...COMMON_ADD_EDIT_PAGE_IMPORTS, ...COMMON_MAIN_PAGE_IMPORTS],
-    providers: [...SHARED_PROVIDERS],
+    imports: [...COMMON_ALL_PAGE_IMPORTS, SharedModule, FormsModule],
+    providers: [],
     templateUrl: './ca-detail.component.html'
 })
 export class CaDetailComponent {
     module    = 'Cash Advance';
-    subModule = 'Detail';
+    subModule = 'Details';
     menuLink  = 'ca';
 
     id: any = null;
     data: any = {};
-    isLoading  = signal(false);
-    formSubmit = false;
+    isLoading          = signal(false);
+    processingWorkflow = false;
+    settingLiquidated  = false;
 
     workflowActions: any[] = [];
     selectedAction: any    = null;
     remarks = '';
 
-    logs        = signal<any[]>([]);
-    logsLoaded  = false;
-    logsLoading = false;
+    logs: any[]  = [];
+    showLogs     = false;
+    logsLoading  = false;
 
     private service      = inject(CaService);
     private route        = inject(ActivatedRoute);
@@ -42,7 +40,7 @@ export class CaDetailComponent {
     ngOnInit(): void {
         this.route.paramMap.subscribe(params => {
             const idParam = params.get('id');
-            if (idParam) {
+            if (idParam && /^\d+$/.test(idParam)) {
                 this.id = Number(idParam);
                 this.load();
             }
@@ -56,6 +54,8 @@ export class CaDetailComponent {
                 this.isLoading.set(false);
                 if (data?.id) {
                     this.data = data;
+                    this.logs = [];
+                    this.showLogs = false;
                     this.loadWorkflowActions();
                 } else {
                     this.alertService.error(this.module, 'Not Found', '');
@@ -81,7 +81,7 @@ export class CaDetailComponent {
 
     processWorkflow(): void {
         if (!this.selectedAction) return;
-        this.formSubmit = true;
+        this.processingWorkflow = true;
         const transId = this.data?.transId || this.data?.transaction?.id;
         const payload = {
             documentId:         this.data.id,
@@ -91,7 +91,7 @@ export class CaDetailComponent {
         };
         this.service.process(payload).subscribe({
             next: (res) => {
-                this.formSubmit = false;
+                this.processingWorkflow = false;
                 if (res?.success) {
                     this.alertService.success(this.module, 'Processed', '');
                     this.load();
@@ -99,7 +99,7 @@ export class CaDetailComponent {
                     this.alertService.error(this.module, 'Process', res?.failureMessage || '');
                 }
             },
-            error: () => { this.formSubmit = false; this.alertService.error(this.module, 'Process Error', ''); }
+            error: () => { this.processingWorkflow = false; this.alertService.error(this.module, 'Process Error', ''); }
         });
     }
 
@@ -131,10 +131,10 @@ export class CaDetailComponent {
         });
         if (!result.isConfirmed) return;
 
-        this.formSubmit = true;
+        this.settingLiquidated = true;
         this.service.setAsLiquidated(this.id).subscribe({
             next: (res) => {
-                this.formSubmit = false;
+                this.settingLiquidated = false;
                 if (res?.success) {
                     this.alertService.success(this.module, 'Set as Liquidated.', '');
                     this.load();
@@ -142,19 +142,29 @@ export class CaDetailComponent {
                     this.alertService.error(this.module, 'Failed', res?.failureMessage || '');
                 }
             },
-            error: () => { this.formSubmit = false; this.alertService.error(this.module, 'Error', ''); }
+            error: () => { this.settingLiquidated = false; this.alertService.error(this.module, 'Error', ''); }
         });
+    }
+
+    toggleLogs(): void {
+        this.showLogs = !this.showLogs;
+        if (this.showLogs && this.logs.length === 0 && !this.logsLoading) {
+            this.loadLogs();
+        }
     }
 
     loadLogs(): void {
         const transId = this.data?.transId || this.data?.transaction?.id;
-        if (!transId) return;
-        this.logsLoaded  = true;
+        if (!transId || this.logsLoading) return;
         this.logsLoading = true;
         this.service.getDocumentLogs(transId).subscribe({
-            next:  (data) => { this.logs.set(data || []); this.logsLoading = false; },
+            next: (data) => { this.logs = data || []; this.logsLoading = false; },
             error: ()     => { this.logsLoading = false; }
         });
+    }
+
+    getLogField(value: string, key: string): string {
+        try { return JSON.parse(value)?.[key] || '—'; } catch { return value || '—'; }
     }
 
     get particulars(): any[] {

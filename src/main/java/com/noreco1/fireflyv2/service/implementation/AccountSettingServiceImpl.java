@@ -275,6 +275,7 @@ public class AccountSettingServiceImpl implements AccountSettingService {
 
             if (insertMode) { // insert mode
                 existingAccountSetting.setCreatedBy(authenticationFacade.getLoggedIn());
+                existingAccountSetting.setCreatedAt(new Date());
             } else {
                 existingAccountSetting = accountSettingRepo.findById(accountSetting.getId()).orElse(null);
             }
@@ -306,19 +307,12 @@ public class AccountSettingServiceImpl implements AccountSettingService {
             }
 
             if(accountSetting.getReceivingReport() != null){
-
-                ReceivingReport receivingReport = receivingReportRepo.findById(accountSetting.getReceivingReport().getId()).orElse(null);
-                if(receivingReport != null){
-                    if(accountSetting.getRrConfirmedForJv()){
-                        receivingReport.setConfirmedForJv(true);
-                    } else {
-                        receivingReport.setConfirmedForJv(false);
-                    }
-                    receivingReportRepo.save(receivingReport);
-                }
-
+                receivingReportRepo.updateConfirmedForJv(
+                        accountSetting.getReceivingReport().getId(),
+                        Boolean.TRUE.equals(accountSetting.getRrConfirmedForJv()));
             }
 
+            existingAccountSetting.setUpdatedAt(new Date());
             this.model = accountSettingRepo.save(existingAccountSetting);
 
             if (Checker.isValidId(this.model.getId())) {

@@ -12,14 +12,13 @@ import { FlatpickrDefaults, FlatpickrModule } from 'angularx-flatpickr';
 import { AccountSettingService } from '../account-setting.service';
 import { provideIcons } from '@ng-icons/core';
 import { tablerSearch, tablerX, tablerArrowLeft, tablerCheck } from '@ng-icons/tabler-icons';
-import { forkJoin } from 'rxjs';
 import { ModalService } from '@/app/shared/modals/modal-service';
 import { BrowseAccountSettingDocModalComponent } from '@/app/shared/modals/browse-account-setting-doc-modal/browse-account-setting-doc-modal.component';
-import { BrowseAccountSettingAccModalComponent } from '@/app/shared/modals/browse-account-setting-acc-modal/browse-account-setting-acc-modal.component';
+import { BrowseCOAModalComponent } from '@/app/shared/modals/browse-coa-modal/browse-coa-modal.component';
 
 export const DOC_TYPE_OPTIONS = [
     { label: 'Receiving Report',        value: 'rr',           field: 'receivingReport' },
-    { label: 'Stock Receive',           value: 'stockReceive', field: 'stockReceive' },
+    { label: 'Receive Stock Transfer',   value: 'stockReceive', field: 'stockReceive' },
     { label: 'Material Credit Ticket',  value: 'mct',          field: 'materialCreditTicket' },
     { label: 'Stock Release',           value: 'stockRelease', field: 'stockRelease' },
     { label: 'Material Salvage Ticket', value: 'mst',          field: 'materialSalvageTicket' },
@@ -104,11 +103,8 @@ export class AccountSettingAddEditComponent {
 
     getData(): void {
         this.isLoading.set(true);
-        forkJoin({
-            header:  this.service.getData(this.id),
-            details: this.service.getDetails(this.id)
-        }).subscribe({
-            next: ({ header, details }) => {
+        this.service.getData(this.id).subscribe({
+            next: (header) => {
                 this.isLoading.set(false);
                 if (header?.id) {
                     this.date             = header.date ? new Date(header.date).toISOString().substring(0, 10) : '';
@@ -133,7 +129,7 @@ export class AccountSettingAddEditComponent {
                         });
                     }
 
-                    this.lineItems = (details || []).map((d: any) => ({
+                    this.lineItems = (header.accountSettingDetails || []).map((d: any) => ({
                         itemStockDetailId: d.itemStockDetailId,
                         itemCode:          d.itemCode,
                         itemDescription:   d.itemDescription,
@@ -202,7 +198,7 @@ export class AccountSettingAddEditComponent {
                     itemCode:          d.itemCode,
                     itemDescription:   d.itemDescription,
                     unitCode:          d.unitCode,
-                    debitAccount:      d.debitAccount || null,
+                    debitAccount:      isRR ? (d.debitAccount || null) : null,
                     creditAccount:     isRR       ? (this.supplierAccount || null)
                                      : isMctOrMst ? (d.creditAccount || null)
                                      : null,
@@ -238,7 +234,7 @@ export class AccountSettingAddEditComponent {
 
     async openAccBrowse(rowIndex: number, col: 'debit' | 'credit'): Promise<void> {
         try {
-            const result = await this.modalService.openModal(BrowseAccountSettingAccModalComponent, {}, { size: 'lg', centered: true });
+            const result = await this.modalService.openModal(BrowseCOAModalComponent, {}, { size: 'lg', centered: true });
             if (result?.action === 'select' && result?.data) {
                 if (col === 'debit') {
                     this.lineItems[rowIndex].debitAccount = result.data;
@@ -251,7 +247,7 @@ export class AccountSettingAddEditComponent {
 
     async openBatchAccBrowse(col: 'debit' | 'credit'): Promise<void> {
         try {
-            const result = await this.modalService.openModal(BrowseAccountSettingAccModalComponent, {}, { size: 'lg', centered: true });
+            const result = await this.modalService.openModal(BrowseCOAModalComponent, {}, { size: 'lg', centered: true });
             if (result?.action === 'select' && result?.data) {
                 if (col === 'debit') {
                     this.batchDebitAccount = result.data;
@@ -290,7 +286,7 @@ export class AccountSettingAddEditComponent {
 
     getAccountLabel(account: any): string {
         if (!account) return '';
-        return `${account.code || ''} — ${account.title || ''}`.trim();
+        return `${account.accountCode || account.code || ''} — ${account.accountTitle || account.title || ''}`.trim();
     }
 
     // ── Save ───────────────────────────────────────────────────────────────

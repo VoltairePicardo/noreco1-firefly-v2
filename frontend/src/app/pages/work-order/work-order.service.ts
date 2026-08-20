@@ -2,18 +2,15 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '@/environments/environment';
-import { DownloadService } from '@/app/core/services/download.service';
 
 const BASE_API = environment.get('baseApiUrl');
-const BASE_URL = environment.get('baseUrl');
 const httpOptions = {
     headers: new HttpHeaders({ 'Content-Type': 'application/json' })
 };
 
 @Injectable({ providedIn: 'root' })
 export class WorkOrderService {
-    private http            = inject(HttpClient);
-    private downloadService = inject(DownloadService);
+    private http = inject(HttpClient);
 
     list(statusId: any = null, year: any = null, month: any = null, page = 0, size = 10, search = ''): Observable<any> {
         let params = new HttpParams().set('page', page).set('size', size);
@@ -45,11 +42,15 @@ export class WorkOrderService {
     }
 
     getWorkflowActions(transId: number): Observable<any[]> {
-        return this.http.get<any[]>(`${BASE_URL}/json/workflow-actions/${transId}`);
+        return this.http.get<any[]>(`${BASE_API}/json/workflow-actions/${transId}`);
     }
 
     getDocumentLogs(transId: number): Observable<any[]> {
-        return this.http.post<any[]>(`${BASE_URL}/document/${transId}/logs`, {}, httpOptions);
+        return this.http.post<any[]>(`${BASE_API}/document/${transId}/logs`, {}, httpOptions);
+    }
+
+    getLogs(id: number): Observable<any[]> {
+        return this.http.get<any[]>(`${BASE_API}/work-order/${id}/logs`);
     }
 
     getPostedVouchers(id: number): Observable<any[]> {
@@ -68,7 +69,4 @@ export class WorkOrderService {
         return this.http.post(`${BASE_API}/work-order/post`, payload, httpOptions);
     }
 
-    print(id: number): void {
-        this.downloadService.print(`${BASE_URL}/work-order/export/${id}`, { type: 'pdf' });
-    }
 }

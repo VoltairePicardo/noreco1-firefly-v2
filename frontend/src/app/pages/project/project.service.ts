@@ -5,7 +5,6 @@ import { environment } from '@/environments/environment';
 import { DownloadService } from '@/app/core/services/download.service';
 
 const BASE_API = environment.get('baseApiUrl');
-const BASE_URL = environment.get('baseUrl');
 const httpOptions = {
     headers: new HttpHeaders({ 'Content-Type': 'application/json' })
 };
@@ -33,11 +32,11 @@ export class ProjectService {
     }
 
     getOffices(): Observable<any[]> {
-        return this.http.get<any[]>(`${BASE_URL}/json/offices/`);
+        return this.http.get<any[]>(`${BASE_API}/json/offices`);
     }
 
     getDepartments(): Observable<any[]> {
-        return this.http.get<any[]>(`${BASE_URL}/json/departments/`);
+        return this.http.get<any[]>(`${BASE_API}/json/departments`);
     }
 
     create(form: any): Observable<any> {
@@ -53,11 +52,11 @@ export class ProjectService {
     }
 
     getWorkflowActions(transId: number): Observable<any[]> {
-        return this.http.get<any[]>(`${BASE_URL}/json/workflow-actions/${transId}`);
+        return this.http.get<any[]>(`${BASE_API}/json/workflow-actions/${transId}`);
     }
 
     getDocumentLogs(transId: number): Observable<any[]> {
-        return this.http.post<any[]>(`${BASE_URL}/document/${transId}/logs`, {}, httpOptions);
+        return this.http.get<any[]>(`${BASE_API}/json/document-logs/${transId}`);
     }
 
     uploadFiles(id: number, formData: FormData): Observable<any> {
@@ -73,6 +72,6 @@ export class ProjectService {
     }
 
     print(id: number): void {
-        this.downloadService.print(`${BASE_URL}/project/export/${id}`, { type: 'pdf' });
+        this.downloadService.print(`${BASE_API}/project/export/${id}`, { type: 'pdf' });
     }
 }

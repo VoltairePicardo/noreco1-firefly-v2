@@ -26,7 +26,11 @@ export class WorkOrderMainComponent {
     selectedStatusId = signal<number | null>(null);
     selectedYear     = signal<number | null>(null);
     selectedMonth    = signal<number | null>(null);
-    documentStatuses = signal<any[]>([]);
+
+    readonly documentStatuses = [
+        { id: 0, status: 'Open'   },
+        { id: 1, status: 'Closed' }
+    ];
 
     searchText = '';
 
@@ -41,15 +45,7 @@ export class WorkOrderMainComponent {
         for (let y = currentYear - 5; y <= currentYear + 1; y++) this.years.push(y);
         this.selectedYear.set(currentYear);
         this.selectedMonth.set(new Date().getMonth() + 1);
-        this.loadStatuses();
         this.load();
-    }
-
-    loadStatuses(): void {
-        this.service.getDocumentStatuses().subscribe({
-            next: (data) => this.documentStatuses.set(data || []),
-            error: () => {}
-        });
     }
 
     load(page = 0): void {

@@ -68,6 +68,14 @@ public class PettyCashTransController {
         return pettyCashTransService.findAllBatches();
     }
 
+    @GetMapping(value = "/check-vouchers")
+    public List<HashMap> getCheckVouchers(
+            @RequestParam(value = "from", required = false) String from,
+            @RequestParam(value = "to",   required = false) String to,
+            @RequestParam(value = "code", required = false) String code) {
+        return pettyCashTransService.findCheckVouchers(from, to, code);
+    }
+
     @PostMapping(value = "/batch/create")
     public PostResponse createBatch(@RequestBody PettyCashBatchDto dto, BindingResult bindingResult) {
         return pettyCashTransService.createBatch(dto);

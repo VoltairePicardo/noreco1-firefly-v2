@@ -168,9 +168,9 @@ public interface BudgetLineItemDetailRepo extends JpaRepository<BudgetLineItemDe
             "FROM BudgetLineItemDetail blid " +
             "INNER JOIN BudgetLineItem bli ON bli.id = blid.FK_budgetLineItemId " +
             "LEFT JOIN BudgetSubItem bsi ON bsi.FK_budgetLineItemDetailId = blid.id " +
-            "WHERE bli.`year` = :yearParam " +
-            "  AND bli.FK_divisionId = :divisionParam " +
-            "  AND (blid.title LIKE :searchText OR bsi.description LIKE :searchText)" +
+            "WHERE (:yearParam IS NULL OR bli.`year` = :yearParam) " +
+            "  AND (:divisionParam IS NULL OR bli.FK_divisionId = :divisionParam) " +
+            "  AND (:searchText IS NULL OR blid.title LIKE :searchText OR bsi.description LIKE :searchText)" +
             "  ORDER BY blid.title ", nativeQuery = true)
     List<BudgetLineItemDetail> getAllBudgetLineItemByParam(@Param("yearParam") Integer yearParam,
                                                            @Param("divisionParam") Integer divisionParam,

@@ -8,9 +8,56 @@
     </div></div>
 } @else {
 
-<!-- Header Info -->
 <div class="card mb-3">
     <div class="card-body">
+
+        <!-- Footer Actions -->
+        <div class="d-flex gap-2 justify-content-end align-items-center">
+            <a [routerLink]="['/' + menuLink]" class="btn btn-light fw-bold">
+                <ng-icon name="tablerArrowLeft" class="ps-0 pe-3 fw-bold"></ng-icon>Back
+            </a>
+            @if (isEditable()) {
+                <a [routerLink]="['/' + menuLink, id, 'edit']" class="btn btn-primary fw-bold">
+                    <ng-icon name="tablerEdit" class="ps-0 pe-3 fw-bold"></ng-icon>Edit
+                </a>
+            }
+        </div>
+
+        <!-- Workflow Actions -->
+        @if (workflowActions.length > 0) {
+            <hr class="my-3"/>
+            <div class="fs-xs text-uppercase fw-semibold text-muted mb-2">Process Document</div>
+            <div class="row g-3 align-items-end">
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Action</label>
+                    <select class="form-select" [(ngModel)]="selectedAction" [compareWith]="compareById">
+                        <option [ngValue]="null">— Select Action —</option>
+                        @for (a of workflowActions; track a.actionMapId) {
+                            <option [ngValue]="a">{{ a.action }}</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-5">
+                    <label class="form-label fw-bold">Remarks <span class="text-muted fw-normal">(optional)</span></label>
+                    <input type="text" class="form-control" [(ngModel)]="remarks" placeholder="Enter remarks"/>
+                </div>
+                <div class="col-md-auto">
+                    <button type="button" class="btn btn-primary fw-bold"
+                            [disabled]="!selectedAction || processingWorkflow"
+                            (click)="processWorkflow()">
+                        @if (processingWorkflow) {
+                            <span class="spinner-border spinner-border-sm me-2" role="status"></span>Processing...
+                        } @else {
+                            <ng-icon name="tablerCheck" class="ps-0 pe-3 fw-bold"></ng-icon>Process
+                        }
+                    </button>
+                </div>
+            </div>
+        }
+
+        <hr class="my-3"/>
+
+        <!-- Header Info -->
         <div class="row g-3">
             <div class="col-md-2">
                 <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Year</div>
@@ -60,45 +107,10 @@
                 <div>{{ data.updatedAt | date:'MMMM d, yyyy HH:mm' }}</div>
             </div>
         </div>
-    </div>
-</div>
 
-<!-- Workflow Actions -->
-@if (workflowActions.length > 0) {
-    <div class="card mb-3">
-        <div class="card-body">
-            <div class="fw-semibold fs-xs text-uppercase text-muted mb-2">Process Document</div>
-            <div class="row g-2 align-items-end">
-                <div class="col-md-4">
-                    <label class="form-label fw-bold mb-1">Action</label>
-                    <select class="form-select" [(ngModel)]="selectedAction" [compareWith]="compareById">
-                        <option [ngValue]="null">— Select Action —</option>
-                        @for (a of workflowActions; track a.actionMapId) {
-                            <option [ngValue]="a">{{ a.action }}</option>
-                        }
-                    </select>
-                </div>
-                <div class="col-md-5">
-                    <label class="form-label fw-bold mb-1">Remarks</label>
-                    <input type="text" class="form-control" [(ngModel)]="remarks" placeholder="Enter remarks"/>
-                </div>
-                <div class="col-auto">
-                    <button type="button" class="btn btn-primary fw-bold"
-                            [disabled]="!selectedAction || processingWorkflow"
-                            (click)="processWorkflow()">
-                        <ng-icon name="tablerCheck" class="ps-0 pe-3 fw-bold"></ng-icon>
-                        {{ processingWorkflow ? 'Processing...' : 'Process' }}
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-}
-
-<!-- Budget Line Item Details -->
-<div class="card mb-3">
-    <div class="card-body">
-        <div class="fw-semibold fs-xs text-uppercase text-muted mb-3">Budget Line Item Details</div>
+        <!-- Budget Line Item Details -->
+        <hr class="my-3"/>
+        <div class="fs-xs text-uppercase fw-semibold text-muted mb-3">Budget Line Item Details</div>
 
         @for (d of details; track d.id) {
             <div class="border rounded p-3 mb-3">
@@ -158,63 +170,56 @@
                 </div>
             </div>
         }
+
     </div>
 </div>
 
 <!-- Document Logs -->
-<div class="card mb-3">
-    <div class="card-body">
-        <div class="d-flex justify-content-between align-items-center mb-2">
-            <span class="fw-semibold fs-xs text-uppercase text-muted">Document Logs</span>
-            <button type="button" class="btn btn-light btn-sm fw-bold" (click)="toggleLogs()">
-                {{ showLogs ? 'Hide Logs' : 'Show Logs' }}
-            </button>
-        </div>
-        @if (showLogs) {
-            @if (logsLoading) {
-                <div class="text-muted fs-xs"><span class="spinner-border spinner-border-sm me-1"></span>Loading...</div>
-            } @else if (logs.length === 0) {
-                <div class="text-muted fs-xs">No logs found.</div>
-            } @else {
-                <div class="table-responsive">
-                    <table class="table table-sm table-bordered mb-0">
-                        <thead class="bg-light thead-sm">
-                            <tr class="text-uppercase fs-xxs">
-                                <th style="width:160px">Timestamp</th>
-                                <th>Log</th>
-                                <th style="width:160px">User</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @for (log of logs; track log.id) {
-                                <tr>
-                                    <td class="fs-xs">{{ log.createdAt | date:'yyyy-MM-dd h:mma' }}</td>
-                                    <td class="fs-xs">{{ log.newValue }}</td>
-                                    <td class="fs-xs">{{ log.loggedBy?.fullName || '—' }}</td>
+<div class="mt-3">
+    <button type="button" class="btn btn-light fw-bold" (click)="toggleLogs()">
+        <ng-icon [name]="showLogs ? 'tablerEyeOff' : 'tablerEye'" class="ps-0 pe-3 fw-bold"></ng-icon>
+        {{ showLogs ? 'Hide' : 'Show' }} Document Logs
+    </button>
+    @if (showLogs) {
+        <div class="card mt-2">
+            <div class="card-body">
+                @if (logsLoading) {
+                    <div class="text-center py-3">
+                        <span class="spinner-border spinner-border-sm me-2"></span>Loading logs...
+                    </div>
+                } @else if (logs.length === 0) {
+                    <p class="text-muted mb-0">No logs found.</p>
+                } @else {
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover w-100 mb-0">
+                            <thead class="bg-light bg-opacity-50">
+                                <tr class="text-uppercase fs-xxs text-muted">
+                                    <th class="text-nowrap">Date</th>
+                                    <th class="text-nowrap">By</th>
+                                    <th class="text-nowrap">Status</th>
+                                    <th>Remarks</th>
                                 </tr>
-                            }
-                        </tbody>
-                    </table>
-                </div>
-            }
-        }
-    </div>
-</div>
-
-<!-- Footer Actions -->
-<div class="card">
-    <div class="card-body">
-        <div class="d-flex gap-2 justify-content-end align-items-center">
-            <a [routerLink]="['/' + menuLink]" class="btn btn-light fw-bold">
-                <ng-icon name="tablerArrowLeft" class="ps-0 pe-3 fw-bold"></ng-icon>Back
-            </a>
-            @if (isEditable()) {
-                <a [routerLink]="['/' + menuLink, id, 'edit']" class="btn btn-primary fw-bold">
-                    <ng-icon name="tablerEdit" class="ps-0 pe-3 fw-bold"></ng-icon>Edit
-                </a>
-            }
+                            </thead>
+                            <tbody>
+                                @for (log of logs; track log.id) {
+                                    <tr class="align-middle">
+                                        <td class="text-nowrap text-muted fs-xs">{{ log.createdAt | date:'MM/dd/yyyy hh:mm a' }}</td>
+                                        <td class="text-nowrap">{{ log.createdBy?.fullName || '—' }}</td>
+                                        <td class="text-nowrap">
+                                            <span class="badge bg-secondary bg-opacity-25 text-dark border">
+                                                {{ log.action || '—' }}
+                                            </span>
+                                        </td>
+                                        <td>{{ log.remarks || '—' }}</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
         </div>
-    </div>
+    }
 </div>
 
-}
+} <!-- end !isLoading -->

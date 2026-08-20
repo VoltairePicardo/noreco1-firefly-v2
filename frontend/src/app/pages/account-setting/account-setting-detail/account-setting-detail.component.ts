@@ -43,18 +43,17 @@ export class AccountSettingDetailComponent {
         this.isLoading.set(true);
         this.service.getData(this.id).pipe(
             switchMap(header => {
-                const details$ = this.service.getDetails(this.id);
                 const rrLinked$ = header?.receivingReport?.id
                     ? this.service.getRrLinkedDetails(header.receivingReport.id)
                     : of(null);
-                return forkJoin({ header: of(header), details: details$, rrLinked: rrLinked$ });
+                return forkJoin({ header: of(header), rrLinked: rrLinked$ });
             })
         ).subscribe({
-            next: ({ header, details, rrLinked }) => {
+            next: ({ header, rrLinked }) => {
                 this.isLoading.set(false);
                 if (header?.id) {
                     this.header       = header;
-                    this.details      = details || [];
+                    this.details      = header.accountSettingDetails || [];
                     this.rrLinkedData = rrLinked;
                 } else {
                     this.alertService.error(this.module, 'Not Found', '');
@@ -70,16 +69,18 @@ export class AccountSettingDetailComponent {
     }
 
     getLinkedDoc(): any {
-        if (!this.header) return null;
+        if (!this.header?.documentDetail) return null;
         for (const opt of DOC_TYPE_OPTIONS) {
-            const doc = this.header[opt.field];
-            if (doc) return { ...doc, typeLabel: opt.label };
+            if (this.header[opt.field]) {
+                return { ...this.header.documentDetail, typeLabel: opt.label };
+            }
         }
         return null;
     }
 
     accountLabel(account: any): string {
         if (!account) return '—';
-        return `${account.code || ''} — ${account.title || ''}`.trim();
+        return `${account.accountCode || account.code || ''} — ${account.accountTitle || account.title || ''}`.trim();
     }
+
 }

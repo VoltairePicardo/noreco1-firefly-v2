@@ -27,7 +27,7 @@
                                    [value]="project ? (project.code + ' — ' + project.name) : ''"
                                    placeholder="No project selected"/>
                             <button type="button" class="btn btn-success fw-bold" (click)="browseProject()">
-                                <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
+                                <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
                             </button>
                         </div>
                     </div>
@@ -39,7 +39,7 @@
                                    [value]="concurredBy ? (concurredBy.fullName || concurredBy.name) : ''"
                                    placeholder="No signatory selected"/>
                             <button type="button" class="btn btn-success fw-bold" (click)="browseSignatory('concurredBy')">
-                                <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
+                                <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
                             </button>
                         </div>
                     </div>
@@ -51,7 +51,7 @@
                                    [value]="recommendedBy ? (recommendedBy.fullName || recommendedBy.name) : ''"
                                    placeholder="No signatory selected"/>
                             <button type="button" class="btn btn-success fw-bold" (click)="browseSignatory('recommendedBy')">
-                                <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
+                                <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
                             </button>
                         </div>
                     </div>
@@ -63,7 +63,7 @@
                                    [value]="approvedBy ? (approvedBy.fullName || approvedBy.name) : ''"
                                    placeholder="No signatory selected"/>
                             <button type="button" class="btn btn-success fw-bold" (click)="browseSignatory('approvedBy')">
-                                <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
+                                <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
                             </button>
                         </div>
                     </div>
@@ -73,8 +73,8 @@
                 <hr/>
                 <div class="d-flex align-items-center justify-content-between mb-3">
                     <p class="fs-xs text-uppercase fw-semibold text-muted mb-0">Findings</p>
-                    <button type="button" class="btn btn-success fw-bold btn-sm" (click)="addFinding()">
-                        <ng-icon name="tablerPlus" class="ps-0 pe-2 fw-bold"></ng-icon>Add Finding
+                    <button type="button" class="btn btn-primary fw-bold" (click)="addFinding()">
+                        <ng-icon name="tablerPlus" class="ps-0 pe-3 fw-bold"></ng-icon>Add Finding
                     </button>
                 </div>
                 <div class="table-responsive">
@@ -120,7 +120,7 @@
                 <p class="fs-xs text-uppercase fw-semibold text-muted mb-3">As Built Staking Sheet</p>
                 <div class="mb-3">
                     <button type="button" class="btn btn-success fw-bold" (click)="openFilePicker()">
-                        <ng-icon name="tablerPaperclip" class="ps-0 pe-2 fw-bold"></ng-icon>Attach Files
+                        <ng-icon name="tablerPaperclip" class="ps-0 pe-3 fw-bold"></ng-icon>Attach Files
                     </button>
                     <input #fileInput type="file" multiple accept=".jpg,.jpeg,.png,.pdf"
                            style="display:none" (change)="onFileSelect($event)"/>

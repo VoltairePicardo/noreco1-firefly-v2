@@ -10,6 +10,7 @@ import java.util.List;
 public interface PettyCashBatchRepo extends JpaRepository<PettyCashBatch, Integer> {
     PettyCashBatch findByStatus(Boolean status);
     PettyCashBatch findByStatusAndOfficeId(Boolean status, int officeId);
+    PettyCashBatch findFirstByStatusAndOfficeIdOrderByCreatedAtDesc(Boolean status, int officeId);
 
     List<PettyCashBatch> findAllByOfficeId(Integer officeId);
 

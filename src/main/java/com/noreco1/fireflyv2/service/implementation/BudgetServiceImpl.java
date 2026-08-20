@@ -76,7 +76,12 @@ public class BudgetServiceImpl implements BudgetService, PrintableVoucher, Print
 
     @Override
     public List<Budget> findAll() {
-        return budgetRepo.findAll();
+        List<Budget> budgets = budgetRepo.findAll();
+        for (Budget b : budgets) {
+            BigDecimal total = budgetDetailRepo.sumAmountByBudgetId(b.getId());
+            b.setAmount(total != null ? total : BigDecimal.ZERO);
+        }
+        return budgets;
     }
 
     @Override
@@ -175,6 +180,7 @@ public class BudgetServiceImpl implements BudgetService, PrintableVoucher, Print
 //                    v.setWorkflow(wf);
 
                     existingBudget = v;
+                    existingBudget.setCreatedAt(new Date());
                 } else {
                     List<Integer> statusAllowed = new ArrayList<>();
                     existingBudget = budgetRepo.findById(v.getId()).orElse(null);
@@ -211,14 +217,24 @@ public class BudgetServiceImpl implements BudgetService, PrintableVoucher, Print
                     }*/
                 }
 
+                // Compute total from submitted details
+                ArrayList<BudgetDetail> budgetDetailDtos = v.getBudgetDetails();
+                BigDecimal total = BigDecimal.ZERO;
+                if (budgetDetailDtos != null) {
+                    for (BudgetDetail d : budgetDetailDtos) {
+                        total = total.add(d.getAmount() != null ? d.getAmount() : BigDecimal.ZERO);
+                    }
+                }
+
                 // Editable fields.
-                existingBudget.setAmount(v.getAmount());
+                existingBudget.setAmount(total);
 //                existingBudget.setWorkflow(wf);
 //                existingBudget.setVoucherDate(v.getVoucherDate());
 //                existingBudget.setChecker(checkedBy);
                 existingBudget.setCreatedBy(createdBy);
 //                existingBudget.setApprovingOfficer(approvedBy);
                 existingBudget.setYear(v.getYear());
+                existingBudget.setUpdatedAt(new Date());
 
                 Budget newBudg = budgetRepo.save(existingBudget);
 
@@ -230,8 +246,6 @@ public class BudgetServiceImpl implements BudgetService, PrintableVoucher, Print
                     if (!insertMode) {
                         budgetDetailRepo.deleteByBudgetId(newBudg.getId());
                     }
-
-                    ArrayList<BudgetDetail> budgetDetailDtos = v.getBudgetDetails();
 
                     // Log action only when adding document.
 //                    if (insertMode) {

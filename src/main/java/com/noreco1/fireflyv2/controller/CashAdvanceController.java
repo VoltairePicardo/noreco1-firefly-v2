@@ -64,6 +64,17 @@ public class CashAdvanceController {
         return cashAdvanceService.findByStatusId(statusId);
     }
 
+    @GetMapping("/list/date-range")
+    public List<HashMap> listByDateRange(@RequestParam String from,
+                                         @RequestParam String to,
+                                         @RequestParam(required = false) Integer statusId,
+                                         @RequestParam(required = false) Integer officeId) {
+        if (statusId != null) {
+            return cashAdvanceService.findByDateRangeAndStatusId(from, to, statusId, officeId);
+        }
+        return cashAdvanceService.findByDateRange(from, to, officeId);
+    }
+
     @GetMapping("/document-statuses")
     public List<DocumentStatus> documentStatuses() {
         return cashAdvanceService.getDocumentsStatuses();

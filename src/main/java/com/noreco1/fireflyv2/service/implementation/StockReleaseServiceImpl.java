@@ -1194,7 +1194,7 @@ public class StockReleaseServiceImpl implements StockReleaseService, PrintableVo
             dto.setLocalCode(entity.getCode());
             dto.setParticulars(entity.getDescription());
             dto.setId(entity.getId());
-            dto.setPreparedBy(entity.getCreatedBy().getFullName());
+            dto.setPreparedBy(entity.getCreatedBy() != null ? entity.getCreatedBy().getFullName() : null);
             dto.setTransactionId(entity.getTransaction().getId());
 
             ArrayList<StockTransactionDetail> stockTransactionDetails = stockTransactionDetailRepo.findByStockTransactionTransactionId(entity.getTransaction().getId());

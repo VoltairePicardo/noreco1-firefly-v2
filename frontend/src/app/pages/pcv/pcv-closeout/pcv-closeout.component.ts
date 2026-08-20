@@ -1,10 +1,10 @@
-import { Component, TemplateRef, ViewChild, inject, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { COMMON_ALL_PAGE_IMPORTS, COMMON_MAIN_PAGE_IMPORTS, SHARED_PROVIDERS } from '@/app/shared/providers/shared-providers';
 import { FlatpickrDirective, provideFlatpickrDefaults } from 'angularx-flatpickr';
 import { AlertService } from '@/app/shared/services/alert.service';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ModalService } from '@/app/shared/modals/modal-service';
 import { BrowseEntityModalComponent } from '@/app/shared/modals/browse-entity-modal/browse-entity-modal.component';
+import { ReplenishCvModalComponent } from '@/app/shared/modals/replenish-cv-modal/replenish-cv-modal.component';
 import { PcvService } from '../pcv.service';
 import Swal from 'sweetalert2';
 
@@ -36,25 +36,14 @@ export class PcvCloseoutComponent {
     // Batch management
     batches       : any[] = [];
     selectedBatch : any   = null;
-    activeOnly            = false;
+    activeOnly            = true;
 
     // Officers
     checkedBy    : any = null;
     replenishedBy: any = null;
 
-    // Replenish modal state
-    @ViewChild('replenishModal') replenishModalRef!: TemplateRef<any>;
-    cvs                : any[] = [];
-    cvsLoading                 = false;
-    selectedCv         : any   = null;
-    replenishFrom              = '';
-    replenishTo                = '';
-    replenishCode              = '';
-    replenishProcessing        = false;
-
     private service      = inject(PcvService);
     private alertService = inject(AlertService);
-    private ngbModal     = inject(NgbModal);
     private modalService = inject(ModalService);
 
     ngOnInit(): void {
@@ -128,13 +117,16 @@ export class PcvCloseoutComponent {
     }
 
     get filteredBatches(): any[] {
-        if (!this.activeOnly) return this.batches;
-        const s = (b: any) => (b.status || '').toLowerCase();
-        return this.batches.filter(b => s(b).includes('open') || s(b).includes('active'));
+        const status = this.activeOnly ? 'active' : 'closed';
+        return this.batches.filter(b => (b.status || '').toLowerCase() === status);
     }
 
     compareBatch(a: any, b: any): boolean {
         return a && b ? a.id === b.id : a === b;
+    }
+
+    onActiveOnlyChange(): void {
+        this.selectedBatch = null;
     }
 
     createBatch(): void {
@@ -176,44 +168,14 @@ export class PcvCloseoutComponent {
         });
     }
 
-    // ─── Replenish modal ─────────────────────────────────────────────
+    // ─── Replenish ───────────────────────────────────────────────────
 
-    openReplenish(): void {
-        this.replenishFrom       = '';
-        this.replenishTo         = '';
-        this.replenishCode       = '';
-        this.cvs                 = [];
-        this.selectedCv          = null;
-        this.replenishProcessing = false;
-        this.ngbModal.open(this.replenishModalRef, { size: 'lg', centered: true });
-    }
-
-    loadCheckVouchers(): void {
-        this.cvsLoading = true;
-        this.service.getCheckVouchers(this.replenishFrom, this.replenishTo, this.replenishCode).subscribe({
-            next: (data) => { this.cvs = data || []; this.cvsLoading = false; },
-            error: () => { this.cvsLoading = false; }
-        });
-    }
-
-    selectCv(cv: any): void {
-        this.selectedCv = cv;
-    }
-
-    async confirmReplenish(modal: any): Promise<void> {
-        if (!this.selectedCv) return;
-        this.replenishProcessing = true;
-        this.service.replenish({ cvId: this.selectedCv.id, batchId: this.selectedBatch?.id }).subscribe({
-            next: (res) => {
-                this.replenishProcessing = false;
-                if (res?.success) {
-                    this.alertService.success(this.module, 'Replenished successfully.', '');
-                    modal.close();
-                } else {
-                    this.alertService.error(this.module, 'Replenish failed.', res?.failureMessage || '');
-                }
-            },
-            error: () => { this.replenishProcessing = false; this.alertService.error(this.module, 'Error.', ''); }
-        });
+    async openReplenish(): Promise<void> {
+        try {
+            const result = await this.modalService.openModal(ReplenishCvModalComponent, {}, { size: 'lg', centered: true });
+            if (result?.action === 'replenished') {
+                this.alertService.success(this.module, 'Replenished successfully.', '');
+            }
+        } catch { }
     }
 }

@@ -106,7 +106,8 @@ export class BankReconciliationOdAddEditComponent {
             voucherDate: this.voucherDate,
             particulars: this.particulars.trim(),
             amount:      Number(this.amount) || 0,
-            account:     { id: this.account.id }
+            account:     { id: this.account.id },
+            checkNumber: ''
         };
 
         const req$ = this.editMode ? this.service.updateOd(payload) : this.service.createOd(payload);

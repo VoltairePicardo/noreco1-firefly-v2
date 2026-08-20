@@ -69,6 +69,7 @@ export class CostEstimateAddEditComponent {
 
     // Assemblies — browse-selected from BrowseAssemblyUnitModal
     assemblies: {
+        id: number;
         code: string;
         description: string;
         laborCost: number;
@@ -78,6 +79,7 @@ export class CostEstimateAddEditComponent {
 
     // Accessories — browse-selected from BrowseItemModal
     detailsAccess: {
+        id: number;
         code: string;
         description: string;
         unitCost: number;
@@ -86,6 +88,7 @@ export class CostEstimateAddEditComponent {
 
     // Metering — browse-selected from BrowseItemModal
     detailsMeter: {
+        id: number;
         code: string;
         description: string;
         unitCost: number;
@@ -94,6 +97,7 @@ export class CostEstimateAddEditComponent {
 
     // Misc Charges — browse-selected from BrowseMiscChargeModal
     miscCharges: {
+        id: number;
         description: string;
         unitCost: number;
         quantity: number;
@@ -181,13 +185,14 @@ export class CostEstimateAddEditComponent {
             next: (data) => {
                 this.isLoading.set(false);
                 if (data?.id) {
-                    this.date          = data.date ? new Date(data.date).toISOString().substring(0, 10) : '';
-                    this.project       = data.project       || null;
-                    this.notes = data.notes || '';
+                    this.date    = data.voucherDate ? new Date(data.voucherDate).toISOString().substring(0, 10) : '';
+                    this.project = data.project || null;
+                    this.notes   = data.notes   || '';
+
                     this.signatories = {
-                        concurredBy:   data.concurredBy   || null,
-                        recommendedBy: data.recommendedBy || null,
-                        approvedBy:    data.approvedBy    || null,
+                        concurredBy:   data.checker          || null,
+                        recommendedBy: data.recommendedBy    || null,
+                        approvedBy:    data.approvingOfficer || null,
                     };
 
                     // Inventory location
@@ -196,53 +201,58 @@ export class CostEstimateAddEditComponent {
                         this.selectedInventoryLocation = found || data.inventoryLocation;
                     }
 
-                    // Type
-                    if (data.type?.id || data.typeText) {
-                        this.selectedType = CE_TYPES.find(t =>
-                            t.id === data.type?.id || t.description === data.typeText
-                        ) ?? CE_TYPES[0];
+                    // Type — comes back as an int from the API, not an object
+                    if (data.type) {
+                        this.selectedType = CE_TYPES.find(t => t.id === data.type) ?? CE_TYPES[0];
                     }
 
                     // Labor/freight/contingency
-                    this.laborCostPercentage    = Number(data.laborCostPercentage)    || this.laborCostPercentage;
-                    this.isTotalLaborCalculated = data.isTotalLaborCalculated  ?? true;
-                    this.totalLaborCostManual   = Number(data.laborCost)        || 0;
+                    this.laborCostPercentage    = Number(data.laborCostPercentage)  || this.laborCostPercentage;
+                    this.isTotalLaborCalculated = true;
+                    this.totalLaborCostManual   = Number(data.laborCost)            || 0;
 
-                    this.freightHandlingPercentage   = Number(data.freightHandlingPercentage)   || this.freightHandlingPercentage;
-                    this.isFreightHandlingCalculated = data.isFreightHandlingCalculated ?? true;
-                    this.freightHandlingManual       = Number(data.freightHandling)     || 0;
+                    this.freightHandlingPercentage   = Number(data.freightHandlingPercentage) || this.freightHandlingPercentage;
+                    this.isFreightHandlingCalculated = true;
+                    this.freightHandlingManual       = Number(data.freightHandling)  || 0;
 
-                    this.contingencyPercentage   = Number(data.contingencyPercentage)   || this.contingencyPercentage;
-                    this.isContingencyCalculated = data.isContingencyCalculated ?? true;
-                    this.contingencyManual       = Number(data.contingency)     || 0;
+                    this.contingencyPercentage   = Number(data.contingencyPercentage) || this.contingencyPercentage;
+                    this.isContingencyCalculated = true;
+                    this.contingencyManual       = Number(data.contingency)           || 0;
 
-                    // Assemblies
-                    this.assemblies = (data.assemblies || data.costEstimateAssemblyUnits || []).map((a: any) => ({
+                    // Assemblies — API field: costEstimateAssemblyUnits
+                    this.assemblies = (data.costEstimateAssemblyUnits || []).map((a: any) => ({
+                        id:           Number(a.assemblyUnit?.id || 0),
                         code:         a.assemblyUnit?.code        || a.code        || '',
                         description:  a.assemblyUnit?.description || a.description || '',
-                        laborCost:    Number(a.laborCost || a.unitCost)  || 0,
-                        isCalculated: a.isCalculated ?? true,
+                        laborCost:    Number(a.laborCost || a.unitCost) || 0,
+                        isCalculated: true,
                         quantity:     Number(a.quantity) || 0,
                     }));
 
-                    // Accessories
-                    this.detailsAccess = (data.detailsAccess || []).map((d: any) => ({
-                        code:        d.itemCode     || d.code        || '',
-                        description: d.itemDescription || d.description || '',
-                        unitCost:    Number(d.unitCost)  || 0,
-                        quantity:    Number(d.quantity)  || 0,
-                    }));
+                    // Accessories (category=1) and Metering (category=2) — both in data.details
+                    const allDetails: any[] = data.details || [];
+                    this.detailsAccess = allDetails
+                        .filter((d: any) => d.category === 1)
+                        .map((d: any) => ({
+                            id:          Number(d.itemId || 0),
+                            code:        d.itemCode        || d.code        || '',
+                            description: d.itemDescription || d.description || '',
+                            unitCost:    Number(d.unitCost)  || 0,
+                            quantity:    Number(d.quantity)  || 0,
+                        }));
+                    this.detailsMeter = allDetails
+                        .filter((d: any) => d.category === 2)
+                        .map((d: any) => ({
+                            id:          Number(d.itemId || 0),
+                            code:        d.itemCode        || d.code        || '',
+                            description: d.itemDescription || d.description || '',
+                            unitCost:    Number(d.unitCost)  || 0,
+                            quantity:    Number(d.quantity)  || 0,
+                        }));
 
-                    // Metering
-                    this.detailsMeter = (data.detailsMeter || []).map((d: any) => ({
-                        code:        d.itemCode     || d.code        || '',
-                        description: d.itemDescription || d.description || '',
-                        unitCost:    Number(d.unitCost)  || 0,
-                        quantity:    Number(d.quantity)  || 0,
-                    }));
-
-                    // Misc Charges
-                    this.miscCharges = (data.miscCharges || data.miscellaneousCharges || []).map((m: any) => ({
+                    // Misc Charges — API field: miscellaneousCharges
+                    this.miscCharges = (data.miscellaneousCharges || []).map((m: any) => ({
+                        id:          Number(m.miscellaneousCharge?.id || 0),
                         description: m.miscellaneousCharge?.description || m.description || '',
                         unitCost:    Number(m.unitCost) || 0,
                         quantity:    Number(m.quantity) || 0,
@@ -276,6 +286,7 @@ export class CostEstimateAddEditComponent {
             if (result?.action === 'select' && result.data) {
                 const a = result.data;
                 this.assemblies.push({
+                    id:           Number(a.id)    || 0,
                     code:         a.code         || '',
                     description:  a.description  || '',
                     laborCost:    Number(a.laborCost) || 0,
@@ -295,6 +306,7 @@ export class CostEstimateAddEditComponent {
             if (result?.action === 'select' && result.data) {
                 const item = result.data;
                 this.detailsAccess.push({
+                    id:          Number(item.id)  || 0,
                     code:        item.code        || '',
                     description: item.description || item.name || '',
                     unitCost:    Number(item.unitCost || item.price || 0),
@@ -313,6 +325,7 @@ export class CostEstimateAddEditComponent {
             if (result?.action === 'select' && result.data) {
                 const item = result.data;
                 this.detailsMeter.push({
+                    id:          Number(item.id)  || 0,
                     code:        item.code        || '',
                     description: item.description || item.name || '',
                     unitCost:    Number(item.unitCost || item.price || 0),
@@ -331,6 +344,7 @@ export class CostEstimateAddEditComponent {
             if (result?.action === 'select' && result.data) {
                 const m = result.data;
                 this.miscCharges.push({
+                    id:          Number(m.id)    || 0,
                     description: m.description || '',
                     unitCost:    Number(m.amount || 0),
                     quantity:    1,
