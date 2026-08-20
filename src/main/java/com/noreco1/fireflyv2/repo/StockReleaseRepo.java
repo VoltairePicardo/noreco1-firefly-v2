@@ -11,6 +11,7 @@ import org.springframework.data.repository.query.Param;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by lenovo on 5/4/2017.
@@ -257,5 +258,56 @@ public interface StockReleaseRepo extends JpaRepository<StockRelease, Integer> {
                     "AND StockRelease.id NOT IN (SELECT COALESCE(AccountSetting.FK_stockReleaseId, 0) FROM AccountSetting) GROUP BY StockRelease.id",
             nativeQuery = true)
     Page<StockRelease> findAllForAccountSetting(@Param("documentStatusId") Integer documentStatusId, Pageable pageable);
+
+    @Query(value = "SELECT " +
+            " sr.id AS id, " +
+            " sr.code AS code, " +
+            " sr.voucherDate AS voucherDate, " +
+            " sr.`description` AS description, " +
+            " u.fullname AS preparedBy, " +
+            " ds.status AS status " +
+            "FROM StockRelease sr " +
+            "INNER JOIN User u ON u.id = sr.fk_createdbyuserid " +
+            "INNER JOIN DocumentStatus ds ON ds.id = sr.fk_documentstatusid " +
+            "WHERE sr.voucherDate >= :startDate " +
+            "   AND sr.voucherDate <= :endDate " +
+            "   AND (:statusId IS NULL OR sr.FK_documentStatusId = :statusId) " +
+            "   AND (:query IS NULL OR :query = '' OR " +
+            "       sr.code LIKE CONCAT('%', :query, '%') " +
+            "       OR sr.description LIKE CONCAT('%', :query, '%') " +
+            "       OR u.fullname LIKE CONCAT('%', :query, '%')) " +
+            "   AND (sr.FK_createdByUserId = :userId " +
+            "       OR sr.FK_approvedByUserId = :userId " +
+            "       OR sr.FK_checkedByUserId = :userId " +
+            "       OR sr.FK_issuedByUserId = :userId " +
+            "       OR sr.FK_receivedByUserId = :userId " +
+            "       OR sr.FK_auditedByUserId = :userId) " +
+            "   AND sr.fk_documentstatusid not in (:notInStatusId) " +
+            "ORDER BY sr.voucherDate DESC, sr.id DESC",
+            countQuery = "SELECT COUNT(*) " +
+                    "FROM StockRelease sr " +
+                    "INNER JOIN User u ON u.id = sr.fk_createdbyuserid " +
+                    "WHERE sr.voucherDate >= :startDate " +
+                    "   AND sr.voucherDate <= :endDate " +
+                    "   AND (:statusId IS NULL OR sr.FK_documentStatusId = :statusId) " +
+                    "   AND (:query IS NULL OR :query = '' OR " +
+                    "       sr.code LIKE CONCAT('%', :query, '%') " +
+                    "       OR sr.description LIKE CONCAT('%', :query, '%') " +
+                    "       OR u.fullname LIKE CONCAT('%', :query, '%')) " +
+                    "   AND (sr.FK_createdByUserId = :userId " +
+                    "       OR sr.FK_approvedByUserId = :userId " +
+                    "       OR sr.FK_checkedByUserId = :userId " +
+                    "       OR sr.FK_issuedByUserId = :userId " +
+                    "       OR sr.FK_receivedByUserId = :userId " +
+                    "       OR sr.FK_auditedByUserId = :userId) " +
+                    "   AND sr.fk_documentstatusid not in (:notInStatusId) ",
+            nativeQuery = true)
+    Page<Map<String, Object>> getStockReleasePaged(@Param("startDate") String startDate,
+                                                    @Param("endDate") String endDate,
+                                                    @Param("statusId") Integer statusId,
+                                                    @Param("query") String query,
+                                                    @Param("userId") Integer userId,
+                                                    @Param("notInStatusId") Collection<Integer> notInStatusId,
+                                                    Pageable pageable);
 
 }

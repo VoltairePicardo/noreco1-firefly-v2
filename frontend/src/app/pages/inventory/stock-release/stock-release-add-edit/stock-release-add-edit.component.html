@@ -1,156 +1,151 @@
 <div class="container-fluid">
     <app-page-title [title]="module" [subTitle]="subModule" [menuLink]="menuLink"/>
-</div>
 
-<div class="container-fluid">
     @if (isLoading() && editMode) {
         <div class="d-flex align-items-center gap-2 text-muted py-4">
             <span class="spinner-border spinner-border-sm" role="status"></span> Loading...
         </div>
     } @else {
-    <form (ngSubmit)="save()" #f="ngForm">
-        <div class="row g-3">
-            <div class="col-xl-12">
-                <app-ui-card title="Stock Release Information">
-                    <div class="col-xl-12 p-3" card-body>
+        <form (ngSubmit)="save()" #f="ngForm">
+            <div class="row g-3">
+                <div class="col-xl-12">
+                    <app-ui-card title="Stock Release Information">
+                        <div class="col-xl-12 p-3" card-body>
 
-                        <div class="row g-3">
-                            <div class="col-md-3">
-                                <label class="form-label fw-bold">Voucher Date <span class="text-danger">*</span></label>
-                                <input type="text" mwlFlatpickr [options]="flatpickrOptions"
-                                       class="form-control" [(ngModel)]="voucherDate"
-                                       name="voucherDate" placeholder="Select date" required/>
+                            <div class="row g-3">
+                                <div class="col-md-3">
+                                    <label class="form-label fw-bold">Date <span class="text-danger">*</span></label>
+                                    <input type="text" mwlFlatpickr [options]="flatpickrOptions"
+                                           class="form-control" [(ngModel)]="voucherDate"
+                                           name="voucherDate" placeholder="Select date" required/>
+                                </div>
                             </div>
-                        </div>
 
-                        <hr/>
-                        <div class="col-12 fs-xs text-uppercase fw-semibold text-muted mb-2">Source Withdrawal Document</div>
-
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold">Withdrawal Document <span class="text-danger">*</span></label>
-                                @if (editMode) {
-                                    <div class="form-control bg-light">{{ selectedWithdrawal()?.code || '—' }}</div>
-                                } @else {
-                                    <div class="input-group">
-                                        <input type="text" class="form-control"
-                                               [value]="selectedWithdrawal()?.code || ''"
-                                               readonly placeholder="Browse withdrawal document..."/>
-                                        <button type="button" class="btn btn-success fw-bold"
+                            <hr class="border-dashed mx-n3 mt-3"/>
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                <span class="fs-sm fw-semibold">Document Details</span>
+                                @if (!editMode) {
+                                    <div class="d-flex gap-2">
+                                        <button type="button" class="btn btn-primary fw-bold"
                                                 (click)="openWithdrawalBrowse()">
-                                            <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
+                                            <ng-icon name="tablerPlus" class="me-1 fs-lg fw-bold"></ng-icon>Browse Releasing Document
                                         </button>
                                         @if (selectedWithdrawal()) {
                                             <button type="button" class="btn btn-danger fw-bold"
-                                                    (click)="clearWithdrawal()">
-                                                <ng-icon name="tablerTrash" class="ps-0 pe-0 fw-bold"></ng-icon>
+                                                    (click)="clearWithdrawal()" aria-label="Clear withdrawal document">
+                                                <ng-icon name="tablerTrash" class="fs-lg fw-bold"></ng-icon>
                                             </button>
                                         }
                                     </div>
                                 }
                             </div>
-                        </div>
 
-                        <hr/>
-                        <div class="col-12 fs-xs text-uppercase fw-semibold text-muted mb-2">Items</div>
+                            @if (selectedWithdrawal()) {
+                                <div class="row g-1">
+                                    <div class="col-12 d-flex"><span style="width:110px">Code:</span> <span class="fw-bold">{{ selectedWithdrawal()?.code || '—' }}</span></div>
+                                    <div class="col-12 d-flex"><span style="width:110px">Date:</span> <span class="fw-bold">{{ selectedWithdrawal()?.date ? (selectedWithdrawal()?.date | date:'MMM dd, yyyy') : '—' }}</span></div>
+                                    <div class="col-12 d-flex"><span style="width:110px">Requested By:</span> <span class="fw-bold">{{ selectedWithdrawal()?.createdByUser?.fullName || selectedWithdrawal()?.createdBy || '—' }}</span></div>
+                                </div>
+                            }
 
-                        <div class="table-responsive">
-                            <table class="table table-custom table-centered table-hover w-100 mb-0">
-                                <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                            <hr class="border-dashed mx-n3 mt-3"/>
+                            <div class="col-12 fs-sm fw-semibold mb-2">Requested Items</div>
+
+                            <div class="table-responsive">
+                                <table class="table table-custom table-centered table-hover w-100 mb-0 text-center">
+                                    <thead class="bg-light align-middle bg-opacity-25 thead-sm">
                                     <tr class="text-uppercase fs-xxs">
-                                        <th style="width:40px">#</th>
-                                        <th style="width:80px">Code</th>
+                                        <th>#</th>
+                                        <th>Code</th>
                                         <th>Description</th>
-                                        <th class="text-center" style="width:120px">Qty Ordered</th>
-                                        <th class="text-center" style="width:120px">Qty Released</th>
-                                        <th class="text-center" style="width:140px">Release Qty <span class="text-danger">*</span></th>
-                                        <th style="width:70px">Unit</th>
+                                        <th>Qty Ordered</th>
+                                        <th>Qty Released</th>
+                                        <th>Release Qty <span class="text-danger">*</span></th>
+                                        <th>Unit</th>
                                     </tr>
-                                </thead>
-                                <tbody>
-                                    @if (details().length === 0) {
-                                        <tr>
-                                            <td colspan="7" class="text-center text-muted py-3">
-                                                Browse and select a <strong>Withdrawal Document</strong> to load items.
-                                            </td>
-                                        </tr>
-                                    }
-                                    @for (row of details(); track $index) {
-                                        <tr>
-                                            <td class="text-center text-muted">{{ $index + 1 }}</td>
-                                            <td class="fw-bold">{{ row.itemCode }}</td>
-                                            <td>{{ row.itemDescription }}</td>
-                                            <td class="text-center fw-bold">{{ row.quantityOrdered | number:'1.0-3' }}</td>
-                                            <td class="text-center fw-bold text-muted">{{ row.quantityReleased | number:'1.0-3' }}</td>
-                                            <td>
-                                                <input type="number"
-                                                       class="form-control form-control-sm text-center fw-bold"
-                                                       [(ngModel)]="row.releaseQuantity"
-                                                       [name]="'rqty_' + $index"
-                                                       (ngModelChange)="onReleaseQuantityChange($index)"
-                                                       min="0" step="0.01" placeholder="0"/>
-                                            </td>
-                                            <td>{{ row.unitCode }}</td>
-                                        </tr>
-                                    }
-                                    @if (details().length > 0) {
-                                        <tr class="fw-bold bg-light bg-opacity-50">
-                                            <td colspan="5" class="text-end text-uppercase fs-xxs">Total Release Qty:</td>
-                                            <td class="text-center">{{ totalReleaseQuantity() | number:'1.0-3' }}</td>
-                                            <td></td>
-                                        </tr>
-                                    }
-                                </tbody>
-                            </table>
-                        </div>
-
-                        <hr/>
-                        <div class="col-12 fs-xs text-uppercase fw-semibold text-muted mb-2">Remarks</div>
-                        <div class="row g-3">
-                            <div class="col-md-12">
-                                <label class="form-label fw-bold">Description / Remarks</label>
-                                <textarea class="form-control" [(ngModel)]="description" name="description"
-                                          rows="2" placeholder="Optional remarks" maxlength="1024"></textarea>
+                                    </thead>
+                                    <tbody>
+                                        @if (details().length === 0) {
+                                            <tr>
+                                                <td colspan="7" class="text-center text-muted py-3">
+                                                    Browse and select a <strong>Withdrawal Document</strong> to load items.
+                                                </td>
+                                            </tr>
+                                        }
+                                        @for (row of details(); track $index) {
+                                            <tr>
+                                                <td class="ttext-muted">{{ $index + 1 }}</td>
+                                                <td class="fw-bold">{{ row.itemCode }}</td>
+                                                <td>{{ row.itemDescription }}</td>
+                                                <td class="fw-bold">{{ row.quantityOrdered | number:'1.0-3' }}</td>
+                                                <td class="fw-bold text-muted">{{ row.quantityReleased | number:'1.0-3' }}</td>
+                                                <td>
+                                                    <input type="number"
+                                                           class="form-control form-control-sm fw-bold"
+                                                           [(ngModel)]="row.releaseQuantity"
+                                                           [name]="'rqty_' + $index"
+                                                           (ngModelChange)="onReleaseQuantityChange($index)"
+                                                           min="0" step="0.01" placeholder="0"/>
+                                                </td>
+                                                <td>{{ row.unitCode }}</td>
+                                            </tr>
+                                        }
+                                        @if (details().length > 0) {
+                                            <tr class="fw-bold bg-light bg-opacity-50">
+                                                <td colspan="5" class="text-end text-uppercase fs-xxs">Total Release Qty:</td>
+                                                <td>{{ totalReleaseQuantity() | number:'1.0-3' }}</td>
+                                                <td></td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
                             </div>
-                        </div>
 
-                        <hr/>
-                        <div class="col-12 fs-xs text-uppercase fw-semibold text-muted mb-2">Signatories</div>
-
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold">Received By <span class="text-danger">*</span></label>
-                                <div class="input-group">
-                                    <input type="text" class="form-control"
-                                           [value]="receivedBy() ? (receivedBy().fullName || receivedBy().name || '') : ''"
-                                           readonly placeholder="Browse receiving officer..."/>
-                                    <button type="button" class="btn btn-success fw-bold"
-                                            (click)="openReceivedByBrowse()">
-                                        <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
-                                    </button>
+                            <hr class="border-dashed mx-n3 mt-3"/>
+                            <div class="col-12 fs-sm fw-semibold mb-2">Remarks</div>
+                            <div class="row g-3">
+                                <div class="col-md-12">
+                                    <textarea class="form-control" [(ngModel)]="description" name="description"
+                                              rows="2" placeholder="Optional remarks" maxlength="1024"></textarea>
                                 </div>
                             </div>
-                        </div>
 
-                        <div class="d-flex gap-2 justify-content-end align-items-center pt-3 border-top mt-3">
-                            <a [routerLink]="['/' + menuLink]" class="btn btn-light fw-bold">
-                                <ng-icon name="tablerArrowLeft" class="ps-0 pe-3 fw-bold"></ng-icon>Back
-                            </a>
-                            <button type="submit" class="btn btn-primary fw-bold" [disabled]="isLoading()">
-                                @if (isLoading()) {
-                                    <span class="spinner-border spinner-border-sm me-2" role="status"></span>
-                                    {{ editMode ? 'Updating...' : 'Saving...' }}
-                                } @else {
-                                    <ng-icon name="tablerCheck" class="ps-0 pe-3 fw-bold"></ng-icon>
-                                    {{ editMode ? 'Update' : 'Save ' + module }}
-                                }
-                            </button>
-                        </div>
+                            <hr class="border-dashed mx-n3 mt-3"/>
+                            <div class="col-12 fs-sm fw-semibold mb-2">Received by</div>
 
-                    </div>
-                </app-ui-card>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control"
+                                               [value]="receivedBy() ? (receivedBy().fullName || receivedBy().name || '') : ''"
+                                               readonly placeholder="Browse receiving officer..."/>
+                                        <button type="button" class="btn btn-primary fw-bold"
+                                                (click)="openReceivedByBrowse()">
+                                            <ng-icon name="tablerSearch" class="fs-lg me-1 fw-bold"></ng-icon>Browse
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <hr class="border-dashed mx-n3 mt-3"/>
+                            <div class="d-flex gap-2 justify-content-end align-items-center mt-3">
+                                <a [routerLink]="['/' + menuLink]" class="btn btn-light fw-bold">
+                                    <ng-icon name="tablerArrowLeft" class="ps-0 pe-3 fs-lg fw-bold"></ng-icon>Back
+                                </a>
+                                <button type="submit" class="btn btn-primary fw-bold" [disabled]="isLoading()">
+                                    @if (isLoading()) {
+                                        <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                                        {{ editMode ? 'Updating...' : 'Saving...' }}
+                                    } @else {
+                                        {{ editMode ? 'Update' : 'Save ' + module }}
+                                    }
+                                </button>
+                            </div>
+
+                        </div>
+                    </app-ui-card>
+                </div>
             </div>
-        </div>
-    </form>
+        </form>
     }
 </div>

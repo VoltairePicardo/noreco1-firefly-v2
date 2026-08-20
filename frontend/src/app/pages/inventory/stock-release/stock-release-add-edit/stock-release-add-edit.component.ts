@@ -6,9 +6,12 @@ import { FlatpickrDirective, provideFlatpickrDefaults } from 'angularx-flatpickr
 import { StockReleaseService } from '../stock-release.service';
 import { ModalService } from '@/app/shared/modals/modal-service';
 import { BrowseEntityModalComponent } from '@/app/shared/modals/browse-entity-modal/browse-entity-modal.component';
-import { BrowseWithdrawalDocumentModalComponent } from '@/app/shared/modals/browse-withdrawal-document-modal/browse-withdrawal-document-modal.component';
+import { BrowseReleasingDocumentsModalComponent } from '@/app/shared/modals/browse-releasing-documents/browse-releasing-documents.component';
+import { InventoryDocumentDto, ReleasingDocumentType } from '@/app/models/inventory-document.model';
 import { provideIcons } from '@ng-icons/core';
-import { tablerSearch, tablerTrash, tablerArrowLeft, tablerCheck } from '@ng-icons/tabler-icons';
+import { tablerSearch, tablerTrash, tablerArrowLeft, tablerCheck, tablerPlus } from '@ng-icons/tabler-icons';
+
+const RELEASING_DOCUMENT_TYPE_CODE: Record<ReleasingDocumentType, number> = { SW: 1, ST: 2, MR: 3 };
 
 @Component({
     selector: 'app-stock-release-add-edit',
@@ -22,7 +25,7 @@ import { tablerSearch, tablerTrash, tablerArrowLeft, tablerCheck } from '@ng-ico
     providers: [
         provideFlatpickrDefaults(),
         ...SHARED_PROVIDERS,
-        provideIcons({ tablerSearch, tablerTrash, tablerArrowLeft, tablerCheck })
+        provideIcons({ tablerSearch, tablerTrash, tablerArrowLeft, tablerCheck, tablerPlus })
     ],
     templateUrl: './stock-release-add-edit.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush
@@ -42,6 +45,9 @@ export class StockReleaseAddEditComponent implements OnInit {
     description = '';
 
     selectedWithdrawal = signal<any>(null);
+
+    releaseType: number | null = null;
+    releaseDocumentType: number | null = null;
 
     receivedBy = signal<any>(null);
 
@@ -96,6 +102,8 @@ export class StockReleaseAddEditComponent implements OnInit {
                 this.description  = data.description || '';
                 this.receivedBy.set(data.receivedBy || null);
                 this.details.set((data.details || []).map((d: any) => ({ ...d, releaseQuantity: Number(d.releaseQuantity ?? d.quantityReleased) || 0 })));
+                this.releaseType = data.type ?? null;
+                this.releaseDocumentType = data.documentType ?? null;
                 if (data.documentTransaction) {
                     this.selectedWithdrawal.set({ id: data.documentTransaction.id, transId: data.documentTransaction.id, code: data.withdrawalCode || '—' });
                 }
@@ -111,21 +119,24 @@ export class StockReleaseAddEditComponent implements OnInit {
     async openWithdrawalBrowse(): Promise<void> {
         try {
             const result = await this.modalService.openModal(
-                BrowseWithdrawalDocumentModalComponent, {}, { size: 'xl', centered: true }
+                BrowseReleasingDocumentsModalComponent, { documentType: 'SW' }, { size: 'xl', centered: true }
             );
             if (result?.action === 'select' && result?.data) {
+                const documentType = result.documentType as ReleasingDocumentType | undefined;
+                this.releaseDocumentType = documentType ? RELEASING_DOCUMENT_TYPE_CODE[documentType] ?? null : null;
                 this.onWithdrawalSelected(result.data);
             }
         } catch { }
     }
 
-    private onWithdrawalSelected(withdrawal: any): void {
-        this.selectedWithdrawal.set(withdrawal);
-        this.description = withdrawal.purpose?.description || withdrawal.purpose?.name || this.description;
-        if (withdrawal.createdBy) {
-            this.receivedBy.set({ accountNo: withdrawal.createdBy.accountNo, fullName: withdrawal.createdBy.fullName });
+    private onWithdrawalSelected(document: InventoryDocumentDto): void {
+        this.selectedWithdrawal.set(document);
+        this.releaseType = document.inventoryCategoryTypeId ?? null;
+        this.description = document.purpose || this.description;
+        if (document.createdByUser) {
+            this.receivedBy.set({ accountNo: document.createdByUser.accountNo, fullName: document.createdByUser.fullName });
         }
-        this.details.set((withdrawal.details || []).map((d: any) => ({
+        this.details.set((document.withdrawalDetails || []).map(d => ({
             itemId:              d.itemId             || null,
             itemCode:            d.itemCode            || '',
             unitId:              d.unitId              || null,
@@ -140,6 +151,8 @@ export class StockReleaseAddEditComponent implements OnInit {
 
     clearWithdrawal(): void {
         this.selectedWithdrawal.set(null);
+        this.releaseType = null;
+        this.releaseDocumentType = null;
         this.details.set([]);
     }
 
@@ -174,9 +187,19 @@ export class StockReleaseAddEditComponent implements OnInit {
             return;
         }
         const selectedWithdrawal = this.selectedWithdrawal();
-        if (!selectedWithdrawal?.transId && !this.editMode) {
-            this.alertService.warning(this.module, 'Validation', 'Please browse and select a Withdrawal Document.');
-            return;
+        if (!this.editMode) {
+            if (!selectedWithdrawal?.transId) {
+                this.alertService.warning(this.module, 'Validation', 'Please browse and select a Withdrawal Document.');
+                return;
+            }
+            if (!this.releaseType) {
+                this.alertService.warning(this.module, 'Validation', 'Selected withdrawal document has no inventory category type configured.');
+                return;
+            }
+            if (!this.releaseDocumentType) {
+                this.alertService.warning(this.module, 'Validation', 'Unable to determine the source document type. Please browse and select the document again.');
+                return;
+            }
         }
         const details = this.details();
         if (details.length === 0) {
@@ -199,6 +222,8 @@ export class StockReleaseAddEditComponent implements OnInit {
         const payload: any = {
             voucherDate:         this.voucherDate,
             description:         this.description.trim() || null,
+            type:                this.releaseType,
+            documentType:        this.releaseDocumentType,
             documentTransaction: { id: selectedWithdrawal?.transId ?? selectedWithdrawal?.id },
             receivedBy:          { accountNo: receivedBy.accountNo, fullName: receivedBy.fullName },
             details:             details.map(d => ({

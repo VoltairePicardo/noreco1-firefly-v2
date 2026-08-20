@@ -10,7 +10,7 @@ import {NgbCollapse} from '@ng-bootstrap/ng-bootstrap';
     template: `
         <div class="card" *ngIf="isVisible">
             <div class="card-header justify-content-between align-items-center" [class]="{'border-0':isCollapsed}">
-                <h5 class="card-title">{{ title }}</h5>
+                <h4 class="card-title">{{ title }}</h4>
                 <div class="d-flex align-items-center">
                     <ng-content select="[header-actions]"></ng-content> <!-- <-- added slot -->
 

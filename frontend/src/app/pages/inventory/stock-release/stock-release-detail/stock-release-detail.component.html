@@ -1,173 +1,175 @@
 <div class="container-fluid">
     <app-page-title [title]="module" [subTitle]="subModule" [menuLink]="menuLink"/>
-</div>
 
-@if (isLoading()) {
-    <div class="card"><div class="card-body text-center py-4">
-        <span class="spinner-border spinner-border-sm me-2" role="status"></span>Loading...
-    </div></div>
-} @else {
+    @if (isLoading()) {
+        <div class="card"><div class="card-body text-center py-4">
+            <span class="spinner-border spinner-border-sm me-2" role="status"></span>Loading...
+        </div></div>
+    } @else {
 
-<div class="card mb-3">
-    <div class="card-body">
-        <div class="row g-3">
-            <div class="col-md-3">
-                <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Code</div>
-                <div class="fw-bold fs-5">{{ data().code || '—' }}</div>
-            </div>
-            <div class="col-md-3">
-                <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Voucher Date</div>
-                <div>{{ data().voucherDate | date:'MMMM d, yyyy' }}</div>
-            </div>
-            <div class="col-md-3">
-                <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Status</div>
-                <span class="badge bg-secondary bg-opacity-25 text-dark border">
+        <div class="card mb-3">
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Code</div>
+                        <div class="fw-bold fs-5">{{ data().code || '—' }}</div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Voucher Date</div>
+                        <div>{{ data().voucherDate | date:'MMMM d, yyyy' }}</div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Status</div>
+                        <span class="badge bg-secondary bg-opacity-25 text-dark border">
                     {{ data().documentStatus?.status || '—' }}
                 </span>
-            </div>
-            <div class="col-md-3">
-                <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Prepared By</div>
-                <div>{{ data().createdBy?.fullName || '—' }}</div>
-            </div>
-            <div class="col-md-3">
-                <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Inventory Location</div>
-                <div>{{ data().inventoryLocation?.description || data().inventoryLocation?.name || '—' }}</div>
-            </div>
-            <div class="col-md-3">
-                <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Received By</div>
-                <div>{{ data().receivedBy?.fullName || data().receivedBy?.name || '—' }}</div>
-            </div>
-            @if (data().description) {
-                <div class="col-md-12">
-                    <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Description</div>
-                    <div>{{ data().description }}</div>
-                </div>
-            }
-        </div>
-    </div>
-</div>
-
-@if (data().details?.length > 0) {
-<div class="card mb-3">
-    <div class="card-header">
-        <h6 class="fw-semibold text-uppercase fs-xs mb-0">Items Released</h6>
-    </div>
-    <div class="card-body p-0">
-        <div class="table-responsive">
-            <table class="table table-custom table-centered w-100 mb-0">
-                <thead class="bg-light bg-opacity-25 thead-sm">
-                    <tr class="text-uppercase fs-xxs">
-                        <th>#</th>
-                        <th>Description</th>
-                        <th class="text-center">Qty Ordered</th>
-                        <th>Unit</th>
-                        <th class="text-center">Qty Released</th>
-                        <th class="text-end">Unit Cost</th>
-                        <th class="text-end">Total Cost</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @for (item of data().details; track $index; let i = $index) {
-                        <tr>
-                            <td class="text-center">{{ i + 1 }}</td>
-                            <td>{{ item.itemDescription }}</td>
-                            <td class="text-center fw-bold">{{ item.quantityOrdered | number:'1.0-3' }}</td>
-                            <td>{{ item.unitCode }}</td>
-                            <td class="text-center fw-bold text-primary">{{ item.quantityReleased | number:'1.0-3' }}</td>
-                            <td class="text-end">{{ item.unitCost | number:'1.2-2' }}</td>
-                            <td class="text-end fw-bold">{{ item.totalCost | number:'1.2-2' }}</td>
-                        </tr>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Prepared By</div>
+                        <div>{{ data().createdBy?.fullName || '—' }}</div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Inventory Location</div>
+                        <div>{{ data().inventoryLocation?.description || data().inventoryLocation?.name || '—' }}</div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Received By</div>
+                        <div>{{ data().receivedBy?.fullName || data().receivedBy?.name || '—' }}</div>
+                    </div>
+                    @if (data().description) {
+                        <div class="col-md-12">
+                            <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Description</div>
+                            <div>{{ data().description }}</div>
+                        </div>
                     }
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>
-}
-
-@if (!isTerminal() && workflowActions().length > 0) {
-    <div class="card mb-3">
-        <div class="card-body">
-            <h6 class="fw-semibold text-uppercase fs-xs mb-3">Process Document</h6>
-            <div class="row g-3 align-items-end">
-                <div class="col-md-4">
-                    <label class="form-label fw-bold">Action</label>
-                    <select class="form-select" [(ngModel)]="selectedAction">
-                        <option [ngValue]="null">— Select action —</option>
-                        @for (a of workflowActions(); track a.actionMapId) {
-                            <option [ngValue]="a">{{ a.action }}</option>
-                        }
-                    </select>
-                </div>
-                <div class="col-md-5">
-                    <label class="form-label fw-bold">Remarks</label>
-                    <input type="text" class="form-control" [(ngModel)]="remarks" placeholder="Optional remarks"/>
-                </div>
-                <div class="col-md-auto">
-                    <button type="button" class="btn btn-primary fw-bold"
-                            [disabled]="!selectedAction || processingWorkflow()"
-                            (click)="processWorkflow()">
-                        @if (processingWorkflow()) {
-                            <span class="spinner-border spinner-border-sm me-2" role="status"></span>
-                        }
-                        Process
-                    </button>
                 </div>
             </div>
         </div>
-    </div>
-}
 
-<div class="card">
-    <div class="card-body d-flex gap-2 justify-content-end align-items-center">
-        <a [routerLink]="['/' + menuLink]" class="btn btn-light fw-bold">Back</a>
-        <div class="d-flex gap-2">
-            <button type="button" class="btn btn-success fw-bold" (click)="print()">
-                <ng-icon name="tablerPrinter" class="ps-0 pe-3 fw-bold"></ng-icon>Print
-            </button>
-            @if (isEditable()) {
-                <a [routerLink]="['/' + menuLink, data().id, 'edit']" class="btn btn-primary fw-bold">
-                    <ng-icon name="tablerEdit" class="ps-0 pe-3 fw-bold"></ng-icon>Edit
-                </a>
-            }
+        @if (data().details?.length > 0) {
+            <div class="card mb-3">
+                <div class="card-header">
+                    <h6 class="fw-semibold text-uppercase fs-xs mb-0">Items Released</h6>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-custom table-centered w-100 mb-0">
+                            <thead class="bg-light bg-opacity-25 thead-sm">
+                            <tr class="text-uppercase fs-xxs">
+                                <th>#</th>
+                                <th>Description</th>
+                                <th class="text-center">Qty Ordered</th>
+                                <th>Unit</th>
+                                <th class="text-center">Qty Released</th>
+                                <th class="text-end">Unit Cost</th>
+                                <th class="text-end">Total Cost</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                                @for (item of data().details; track $index; let i = $index) {
+                                    <tr>
+                                        <td class="text-center">{{ i + 1 }}</td>
+                                        <td>{{ item.itemDescription }}</td>
+                                        <td class="text-center fw-bold">{{ item.quantityOrdered | number:'1.0-3' }}</td>
+                                        <td>{{ item.unitCode }}</td>
+                                        <td class="text-center fw-bold text-primary">{{ item.quantityReleased | number:'1.0-3' }}</td>
+                                        <td class="text-end">{{ item.unitCost | number:'1.2-2' }}</td>
+                                        <td class="text-end fw-bold">{{ item.totalCost | number:'1.2-2' }}</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        }
+
+        @if (!isTerminal() && workflowActions().length > 0) {
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h6 class="fw-semibold text-uppercase fs-xs mb-3">Process Document</h6>
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">Action</label>
+                            <select class="form-select" [(ngModel)]="selectedAction">
+                                <option [ngValue]="null">— Select action —</option>
+                                @for (a of workflowActions(); track a.actionMapId) {
+                                    <option [ngValue]="a">{{ a.action }}</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-5">
+                            <label class="form-label fw-bold">Remarks</label>
+                            <input type="text" class="form-control" [(ngModel)]="remarks" placeholder="Optional remarks"/>
+                        </div>
+                        <div class="col-md-auto">
+                            <button type="button" class="btn btn-primary fw-bold"
+                                    [disabled]="!selectedAction || processingWorkflow()"
+                                    (click)="processWorkflow()">
+                                @if (processingWorkflow()) {
+                                    <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                                }
+                                Process
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+
+        <div class="card">
+            <div class="card-body d-flex gap-2 justify-content-end align-items-center">
+                <a [routerLink]="['/' + menuLink]" class="btn btn-light fw-bold">Back</a>
+                <div class="d-flex gap-2">
+                    <button type="button" class="btn btn-success fw-bold" (click)="print()">
+                        <ng-icon name="tablerPrinter" class="ps-0 pe-3 fw-bold"></ng-icon>Print
+                    </button>
+                    @if (isEditable()) {
+                        <a [routerLink]="['/' + menuLink, data().id, 'edit']" class="btn btn-primary fw-bold">
+                            <ng-icon name="tablerEdit" class="ps-0 pe-3 fw-bold"></ng-icon>Edit
+                        </a>
+                    }
+                </div>
+            </div>
         </div>
-    </div>
-</div>
 
-<div class="card mt-3">
-    <div class="card-header d-flex justify-content-between align-items-center">
-        <h6 class="fw-semibold text-uppercase fs-xs mb-0">Document Logs</h6>
-        <button type="button" class="btn btn-light btn-sm fw-bold" (click)="toggleLogs()">
-            {{ showLogs ? 'Hide' : 'Show' }}
-        </button>
-    </div>
-    @if (showLogs) {
-        <div class="card-body">
-            @if (logsLoading()) {
-                <div class="text-center py-3"><span class="spinner-border spinner-border-sm me-2"></span>Loading logs...</div>
-            } @else if (logs().length === 0) {
-                <p class="text-muted mb-0">No logs found.</p>
-            } @else {
-                <div class="table-responsive">
-                    <table class="table table-sm w-100 mb-0">
-                        <thead><tr class="text-uppercase fs-xxs text-muted">
-                            <th>Date</th><th>Action</th><th>By</th><th>Remarks</th>
-                        </tr></thead>
-                        <tbody>
-                            @for (log of logs(); track log.id) {
-                                <tr>
-                                    <td class="text-nowrap">{{ log.createdAt | date:'MM/dd/yyyy hh:mm a' }}</td>
-                                    <td>{{ log.action }}</td>
-                                    <td>{{ log.createdBy?.fullName }}</td>
-                                    <td>{{ log.remarks }}</td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
+        <div class="card mt-3">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h6 class="fw-semibold text-uppercase fs-xs mb-0">Document Logs</h6>
+                <button type="button" class="btn btn-light btn-sm fw-bold" (click)="toggleLogs()">
+                    {{ showLogs ? 'Hide' : 'Show' }}
+                </button>
+            </div>
+            @if (showLogs) {
+                <div class="card-body">
+                    @if (logsLoading()) {
+                        <div class="text-center py-3"><span class="spinner-border spinner-border-sm me-2"></span>Loading logs...</div>
+                    } @else if (logs().length === 0) {
+                        <p class="text-muted mb-0">No logs found.</p>
+                    } @else {
+                        <div class="table-responsive">
+                            <table class="table table-sm w-100 mb-0">
+                                <thead><tr class="text-uppercase fs-xxs text-muted">
+                                    <th>Date</th><th>Action</th><th>By</th><th>Remarks</th>
+                                </tr></thead>
+                                <tbody>
+                                    @for (log of logs(); track log.id) {
+                                        <tr>
+                                            <td class="text-nowrap">{{ log.createdAt | date:'MM/dd/yyyy hh:mm a' }}</td>
+                                            <td>{{ log.action }}</td>
+                                            <td>{{ log.createdBy?.fullName }}</td>
+                                            <td>{{ log.remarks }}</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
                 </div>
             }
         </div>
+
     }
 </div>
 
-}
+

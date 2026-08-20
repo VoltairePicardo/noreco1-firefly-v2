@@ -1,8 +1,11 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { environment } from '@/environments/environment';
 import { DownloadService } from '@/app/core/services/download.service';
+import { HalPage, toPagedResult } from '@/app/models/hal-page.model';
+import { InventoryDocumentDto, ReleasingDocumentType } from '@/app/models/inventory-document.model';
 
 const BASE_API = environment.get('baseApiUrl');
 const BASE_URL = environment.get('baseUrl');
@@ -13,15 +16,11 @@ export class StockReleaseService {
     private http            = inject(HttpClient);
     private downloadService = inject(DownloadService);
 
-    list(): Observable<any[]> {
-        return this.http.get<any[]>(`${BASE_API}/stock-release/list`);
-    }
-
-    listByDateRange(from: string, to: string, statusId?: number | null): Observable<any[]> {
-        const url = statusId
-            ? `${BASE_API}/stock-release/list/${from}/${to}/${statusId}`
-            : `${BASE_API}/stock-release/list/${from}/${to}`;
-        return this.http.get<any[]>(url);
+    listPaged(from: string, to: string, statusId: number | null, query: string, page: number, size: number): Observable<any> {
+        let params = new HttpParams().set('from', from).set('to', to).set('page', page).set('size', size);
+        if (statusId != null) params = params.set('statusId', statusId);
+        if (query) params = params.set('query', query);
+        return this.http.get(`${BASE_API}/stock-release/list-paged`, { params });
     }
 
     getDocumentStatuses(): Observable<any[]> {
@@ -48,19 +47,20 @@ export class StockReleaseService {
         return this.http.get<any[]>(`${BASE_URL}/json/workflow-actions/${transId}`);
     }
 
-    getDocumentLogs(transId: number): Observable<any[]> {
-        return this.http.post<any[]>(`${BASE_URL}/document/${transId}/logs`, {}, httpOptions);
-    }
-
     print(id: number): void {
-        this.downloadService.print(`${BASE_URL}/stock-release/export/${id}`, { type: 'pdf' });
+        this.downloadService.print(`${BASE_API}/stock-release/export/${id}`, { type: 'pdf' });
     }
 
     getDefaultSignatories(): Observable<any> {
         return this.http.get(`${BASE_API}/stock-release/default-signatories`);
     }
 
-    getWithdrawalDocuments(): Observable<any[]> {
-        return this.http.get<any[]>(`${BASE_API}/stock-release/withdrawal-documents`);
+    getReleasingDocuments(
+        type: ReleasingDocumentType, query: string, page: number, size: number
+    ): Observable<{ content: InventoryDocumentDto[]; totalElements: number }> {
+        let params = new HttpParams().set('t', type).set('page', page).set('size', size);
+        if (query) params = params.set('q', query);
+        return this.http.get<HalPage<InventoryDocumentDto>>(`${BASE_API}/stock-release/documents`, { params })
+            .pipe(map(toPagedResult));
     }
 }

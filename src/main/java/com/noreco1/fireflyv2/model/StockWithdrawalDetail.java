@@ -62,7 +62,18 @@ public class StockWithdrawalDetail implements Serializable {
     }
 
     public StockWithdrawalDetailDto toDto(){
-        return new StockWithdrawalDetailDto(getItem().getId(), getItem().getCode(), getUnit().getId(), getUnit().getCode(), getItem().getDescription(), getQuantity(), getQuantityReleased(), getQuantity(), getIsSpecialEquipment());
+        Item item = getItem();
+        UnitMeasure unit = getUnit();
+        return new StockWithdrawalDetailDto(
+                item != null ? item.getId() : null,
+                item != null ? item.getCode() : null,
+                unit != null ? unit.getId() : null,
+                unit != null ? unit.getCode() : null,
+                item != null ? item.getDescription() : null,
+                getQuantity(),
+                getQuantityReleased(),
+                getQuantity(),
+                Boolean.TRUE.equals(getIsSpecialEquipment()));
     }
 
 }

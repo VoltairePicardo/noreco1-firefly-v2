@@ -8,6 +8,7 @@ import { SharedModule } from '@/app/shared/shared.module';
 import { WithdrawalService } from '../withdrawal.service';
 import { provideIcons } from '@ng-icons/core';
 import { tablerPrinter, tablerEdit, tablerArrowLeft } from '@ng-icons/tabler-icons';
+import {DocumentLogsService} from '@/app/shared/services/document-logs.service';
 
 const TERMINAL_STATUSES = ['Approved', 'Denied', 'Cancelled'];
 
@@ -40,8 +41,9 @@ export class WithdrawalDetailComponent implements OnInit {
     private route        = inject(ActivatedRoute);
     private router       = inject(Router);
     private alertService = inject(AlertService);
+    private documentLogsService = inject(DocumentLogsService);
 
-    private transactionId = computed<any>(() => this.data()?.transId);
+    private transactionId = computed<any>(() => this.data()?.transaction?.id);
 
     ngOnInit(): void {
         this.route.paramMap.subscribe(params => {
@@ -71,6 +73,19 @@ export class WithdrawalDetailComponent implements OnInit {
         });
     }
 
+    /** Semantic color for a workflow action (approve = success, reject/deny = danger, everything else = secondary). */
+    actionColor(action: any): string {
+        const name = (action?.action || '').toLowerCase();
+        if (name.includes('approve')) return 'success';
+        if (name.includes('reject') || name.includes('deny')) return 'danger';
+        return 'secondary';
+    }
+
+    /** Button class for an action pill: filled with its semantic color when selected, plain outline otherwise. */
+    actionButtonClass(action: any): string {
+        return this.selectedAction === action ? `btn-${this.actionColor(action)}` : 'btn-outline-secondary';
+    }
+
     isTerminal(): boolean { return TERMINAL_STATUSES.includes(this.data()?.documentStatus?.status || ''); }
     isEditable(): boolean {
         const s = this.data()?.documentStatus?.status || '';
@@ -94,7 +109,7 @@ export class WithdrawalDetailComponent implements OnInit {
         this.showLogs = !this.showLogs;
         if (this.showLogs && this.logs().length === 0) {
             this.logsLoading.set(true);
-            this.service.getDocumentLogs(this.transactionId()).subscribe({
+            this.documentLogsService.getLogs(this.transactionId()).subscribe({
                 next: (logs) => { this.logs.set(logs || []); this.logsLoading.set(false); },
                 error: () => { this.logsLoading.set(false); }
             });

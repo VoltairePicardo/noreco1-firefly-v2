@@ -4,6 +4,7 @@ import com.noreco1.fireflyv2.common.GlobalConstant;
 import com.noreco1.fireflyv2.common.facade.*;
 import com.noreco1.fireflyv2.common.helpers.*;
 import com.noreco1.fireflyv2.dtoers.DocumentDtoer;
+import com.noreco1.fireflyv2.exception.BusinessException;
 import com.noreco1.fireflyv2.model.*;
 import com.noreco1.fireflyv2.model.DocumentStatus;
 import com.noreco1.fireflyv2.model.Workflow;
@@ -312,22 +313,31 @@ public class StockWithdrawalServiceImpl implements StockWithdrawalService, Print
                     detailsDto.add(d.toDto());
                 }
 
+
                 dto.setDate(entity.getVoucherDate());
                 dto.setCode(entity.getCode());
-                dto.setPurpose(Checker.isStringNullOrEmpty(entity.getDescription()) ? entity.getPurpose().getDescription() : entity.getDescription());
+                dto.setPurpose(Checker.isStringNullOrEmpty(entity.getDescription())
+                        ? (entity.getPurpose() != null ? entity.getPurpose().getDescription() : null)
+                        : entity.getDescription());
                 dto.setWithdrawalDetails(detailsDto);
                 dto.setTransId(entity.getTransaction().getId());
-                dto.setCreatedBy(entity.getCreatedBy().getFullName());
 
-                User user = new User();
-                user.setId(entity.getCreatedBy().getId());
-                user.setFullName(entity.getCreatedBy().getFullName());
-                user.setAccountNo(entity.getCreatedBy().getAccountNo());
+                if (entity.getCreatedBy() != null) {
+                    dto.setCreatedBy(entity.getCreatedBy().getFullName());
 
-                dto.setCreatedByUser(user);
+                    User user = new User();
+                    user.setId(entity.getCreatedBy().getId());
+                    user.setFullName(entity.getCreatedBy().getFullName());
+                    user.setAccountNo(entity.getCreatedBy().getAccountNo());
+                    dto.setCreatedByUser(user);
+                }
 
-                dto.setDepartmentName(entity.getDepartment().getName());
-                dto.setInventoryCategoryTypeId(entity.getInventoryCategory().getType());
+                if (entity.getDepartment() != null) {
+                    dto.setDepartmentName(entity.getDepartment().getName());
+                }
+                if (entity.getInventoryCategory() != null) {
+                    dto.setInventoryCategoryTypeId(entity.getInventoryCategory().getType());
+                }
 
                 return dto;
         });

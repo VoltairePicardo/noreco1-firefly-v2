@@ -4,6 +4,7 @@ import { COMMON_ALL_PAGE_IMPORTS } from '@/app/shared/providers/shared-providers
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { AlertService } from '@/app/shared/services/alert.service';
+import { DocumentLogsService } from '@/app/shared/services/document-logs.service';
 import { SharedModule } from '@/app/shared/shared.module';
 import { StockReleaseService } from '../stock-release.service';
 import { provideIcons } from '@ng-icons/core';
@@ -36,10 +37,11 @@ export class StockReleaseDetailComponent implements OnInit {
     showLogs    = false;
     logsLoading = signal(false);
 
-    private service      = inject(StockReleaseService);
-    private route        = inject(ActivatedRoute);
-    private router       = inject(Router);
-    private alertService = inject(AlertService);
+    private service              = inject(StockReleaseService);
+    private documentLogsService  = inject(DocumentLogsService);
+    private route                = inject(ActivatedRoute);
+    private router               = inject(Router);
+    private alertService         = inject(AlertService);
 
     ngOnInit(): void {
         this.route.paramMap.subscribe(params => {
@@ -92,7 +94,7 @@ export class StockReleaseDetailComponent implements OnInit {
         this.showLogs = !this.showLogs;
         if (this.showLogs && this.logs().length === 0) {
             this.logsLoading.set(true);
-            this.service.getDocumentLogs(this.data().transId).subscribe({
+            this.documentLogsService.getLogs(this.data()?.transaction.id).subscribe({
                 next: (logs) => { this.logs.set(logs || []); this.logsLoading.set(false); },
                 error: () => { this.logsLoading.set(false); }
             });
