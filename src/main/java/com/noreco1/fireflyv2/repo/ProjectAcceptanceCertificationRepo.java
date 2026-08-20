@@ -18,6 +18,7 @@ public interface ProjectAcceptanceCertificationRepo extends JpaRepository<Projec
     @Query(value = "SELECT p.code FROM ProjectAcceptanceCertification p WHERE year(p.date) = :year ORDER BY id DESC LIMIT 1", nativeQuery = true)
     Object findLatestCodeByYear(@Param("year") Integer year);
 
+    Page<ProjectAcceptanceCertification> findByDateBetween(Date from, Date to, Pageable pageable);
     Page<ProjectAcceptanceCertification> findByDateBetweenAndDocumentStatusIdNotIn(Date from, Date to, Collection<Integer> documentStatusIds, Pageable pageable);
     Page<ProjectAcceptanceCertification> findByDocumentStatusIdAndDateBetween(Integer statusId, Date from, Date to, Pageable pageable);
 

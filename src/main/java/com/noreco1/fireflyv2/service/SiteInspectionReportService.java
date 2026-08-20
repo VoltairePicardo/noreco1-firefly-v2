@@ -47,4 +47,9 @@ public interface SiteInspectionReportService {
 
     List<Map> findDetailBySiteInspectionReportTransId(Integer transId);
 
+    @Transactional
+    PostResponse createFromPayload(Map<String, Object> payload);
+
+    @Transactional
+    PostResponse updateFromPayload(Map<String, Object> payload);
 }

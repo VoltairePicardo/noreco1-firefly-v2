@@ -70,4 +70,8 @@ public class DocumentNoApproval implements Serializable {
     @JoinColumn(name = "FK_officeId")
     private Office office;
 
+    public Integer getTransId() {
+        return transaction != null ? transaction.getId() : null;
+    }
+
 }

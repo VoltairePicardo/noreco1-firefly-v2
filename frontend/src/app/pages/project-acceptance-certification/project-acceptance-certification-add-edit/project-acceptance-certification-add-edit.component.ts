@@ -114,8 +114,8 @@ export class ProjectAcceptanceCertificationAddEditComponent {
 
         const payload: any = {
             project:       { id: this.project.id },
-            recommendedBy: this.recommendedBy ? { id: this.recommendedBy.id } : null,
-            approvedBy:    this.approvedBy    ? { id: this.approvedBy.id }    : null
+            recommendedBy: this.recommendedBy ? { accountNo: this.recommendedBy.accountNo } : null,
+            approvedBy:    this.approvedBy    ? { accountNo: this.approvedBy.accountNo }    : null
         };
 
         if (this.editMode) payload.id = this.id;

@@ -8,16 +8,67 @@
     </div></div>
 } @else {
 
-<!-- Header Info -->
 <div class="card mb-3">
     <div class="card-body">
+
+        <!-- Footer Actions -->
+        <div class="d-flex gap-2 justify-content-end align-items-center pt-3 border-top mt-3">
+            <a [routerLink]="['/' + menuLink]" class="btn btn-light fw-bold">
+                <ng-icon name="tablerArrowLeft" class="ps-0 pe-3 fw-bold"></ng-icon>Back
+            </a>
+            <button type="button" class="btn btn-success fw-bold" (click)="print()">
+                <ng-icon name="tablerPrinter" class="ps-0 pe-3 fw-bold"></ng-icon>Print
+            </button>
+            @if (isEditable()) {
+                <a [routerLink]="['/' + menuLink, data.id, 'edit']" class="btn btn-primary fw-bold">
+                    <ng-icon name="tablerEdit" class="ps-0 pe-3 fw-bold"></ng-icon>Edit
+                </a>
+            }
+        </div>
+
+        <!-- Workflow Processing -->
+        @if (workflowActions.length > 0) {
+            <hr class="my-3"/>
+            <div class="fs-xs text-uppercase fw-semibold text-muted mb-2">Process Document</div>
+            <div class="row g-3 align-items-end">
+                <div class="col-md-3">
+                    <label class="form-label fw-bold">Action</label>
+                    <select class="form-select" [(ngModel)]="selectedAction">
+                        <option [ngValue]="null">— Select Action —</option>
+                        @for (a of workflowActions; track a.actionMapId) {
+                            <option [ngValue]="a">{{ a.action }}</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-bold">Remarks <span class="text-muted fw-normal">(optional)</span></label>
+                    <textarea rows="1" class="form-control" [(ngModel)]="remarks" placeholder="Enter remarks"></textarea>
+                </div>
+                <div class="col-md-2">
+                    <button type="button" class="btn btn-primary fw-bold"
+                            (click)="processWorkflow()"
+                            [disabled]="!selectedAction || processingWorkflow">
+                        @if (processingWorkflow) {
+                            <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                        } @else {
+                            <ng-icon name="tablerCheck" class="ps-0 pe-3 fw-bold"></ng-icon>
+                        }
+                        Process
+                    </button>
+                </div>
+            </div>
+        }
+
+        <hr class="my-3"/>
+
+        <!-- Header Info -->
         <div class="row g-3">
             <div class="col-md-3">
                 <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Code</div>
                 <div class="fw-bold fs-5">{{ data.code || '—' }}</div>
             </div>
             <div class="col-md-3">
-                <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Acceptance Report Date</div>
+                <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Date</div>
                 <div>{{ data.date | date:'MMMM d, yyyy' }}</div>
             </div>
             <div class="col-md-3">
@@ -27,13 +78,10 @@
                 </span>
             </div>
         </div>
-    </div>
-</div>
 
-<!-- Project Details -->
-<div class="card mb-3">
-    <div class="card-body">
-        <h6 class="fw-semibold text-uppercase fs-xs mb-3">Project</h6>
+        <!-- Project -->
+        <hr class="my-3"/>
+        <div class="fs-xs text-uppercase fw-semibold text-muted mb-2">Project</div>
         <div class="row g-3">
             <div class="col-md-3">
                 <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Project Code</div>
@@ -60,15 +108,12 @@
                 <div>{{ data.workOrderCode || data.workOrder?.code || '—' }}</div>
             </div>
         </div>
-    </div>
-</div>
 
-<!-- Inspectorate Team & Signatories -->
-<div class="card mb-3">
-    <div class="card-body">
+        <!-- Inspectorate Team & Signatories -->
+        <hr class="my-3"/>
         <div class="row g-4">
             <div class="col-md-6">
-                <h6 class="fw-semibold text-uppercase fs-xs mb-3">Inspectorate Team</h6>
+                <div class="fs-xs text-uppercase fw-semibold text-muted mb-2">Inspectorate Team</div>
                 <div class="d-flex flex-column gap-2">
                     @if (data.inspector1) {
                         <div>{{ data.inspector1?.fullName || data.inspector1?.name }}</div>
@@ -85,82 +130,31 @@
                 </div>
             </div>
             <div class="col-md-6">
-                <h6 class="fw-semibold text-uppercase fs-xs mb-3">Signatories</h6>
+                <div class="fs-xs text-uppercase fw-semibold text-muted mb-2">Signatories</div>
                 <div class="row g-2">
                     <div class="col-md-12">
-                        <div class="fs-xs text-muted">Noted By</div>
+                        <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Noted By</div>
                         <div>{{ data.notedBy?.fullName || data.notedBy?.name || '—' }}</div>
                     </div>
                     <div class="col-md-12">
-                        <div class="fs-xs text-muted">Recommended By</div>
+                        <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Recommended By</div>
                         <div>{{ data.recommendedBy?.fullName || data.recommendedBy?.name || '—' }}</div>
                     </div>
                     <div class="col-md-12">
-                        <div class="fs-xs text-muted">Approved By</div>
+                        <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Approved By</div>
                         <div>{{ data.approvedBy?.fullName || data.approvedBy?.name || '—' }}</div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-</div>
 
-<!-- Workflow Processing -->
-@if (!isTerminal() && workflowActions.length > 0) {
-    <div class="card mb-3">
-        <div class="card-body">
-            <h6 class="fw-semibold text-uppercase fs-xs mb-3">Process Document</h6>
-            <div class="row g-3 align-items-end">
-                <div class="col-md-4">
-                    <label class="form-label fw-bold">Action</label>
-                    <select class="form-select" [(ngModel)]="selectedAction">
-                        <option [ngValue]="null">— Select action —</option>
-                        @for (a of workflowActions; track a.actionMapId) {
-                            <option [ngValue]="a">{{ a.action }}</option>
-                        }
-                    </select>
-                </div>
-                <div class="col-md-5">
-                    <label class="form-label fw-bold">Remarks</label>
-                    <input type="text" class="form-control" [(ngModel)]="remarks" placeholder="Optional remarks"/>
-                </div>
-                <div class="col-md-auto">
-                    <button type="button" class="btn btn-primary fw-bold"
-                            [disabled]="!selectedAction || processingWorkflow"
-                            (click)="processWorkflow()">
-                        @if (processingWorkflow) {
-                            <span class="spinner-border spinner-border-sm me-2" role="status"></span>
-                        }
-                        Process
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-}
-
-<!-- Footer Actions -->
-<div class="card">
-    <div class="card-body d-flex gap-2 justify-content-end align-items-center">
-        <a [routerLink]="['/' + menuLink]" class="btn btn-light fw-bold">
-            <ng-icon name="tablerArrowLeft" class="ps-0 pe-3 fw-bold"></ng-icon>Back
-        </a>
-        <div class="d-flex gap-2">
-            <button type="button" class="btn btn-success fw-bold" (click)="print()">
-                <ng-icon name="tablerPrinter" class="ps-0 pe-3 fw-bold"></ng-icon>Print
-            </button>
-            @if (isEditable()) {
-                <a [routerLink]="['/' + menuLink, data.id, 'edit']" class="btn btn-primary fw-bold">
-                    <ng-icon name="tablerEdit" class="ps-0 pe-3 fw-bold"></ng-icon>Edit
-                </a>
-            }
-        </div>
     </div>
 </div>
 
 <!-- Document Logs -->
 <div class="mt-3">
-    <button type="button" class="btn btn-light btn-sm fw-bold" (click)="toggleLogs()">
+    <button type="button" class="btn btn-light fw-bold" (click)="toggleLogs()">
+        <ng-icon [name]="showLogs ? 'tablerEyeOff' : 'tablerEye'" class="ps-0 pe-3 fw-bold"></ng-icon>
         {{ showLogs ? 'Hide' : 'Show' }} Document Logs
     </button>
     @if (showLogs) {
@@ -174,17 +168,26 @@
                     <p class="text-muted mb-0">No logs found.</p>
                 } @else {
                     <div class="table-responsive">
-                        <table class="table table-sm w-100 mb-0">
-                            <thead><tr class="text-uppercase fs-xxs text-muted">
-                                <th>Date</th><th>Action</th><th>By</th><th>Remarks</th>
-                            </tr></thead>
+                        <table class="table table-sm table-hover w-100 mb-0">
+                            <thead class="bg-light bg-opacity-50">
+                                <tr class="text-uppercase fs-xxs text-muted">
+                                    <th class="text-nowrap">Date</th>
+                                    <th class="text-nowrap">By</th>
+                                    <th class="text-nowrap">Status</th>
+                                    <th>Remarks</th>
+                                </tr>
+                            </thead>
                             <tbody>
                                 @for (log of logs; track log.id) {
-                                    <tr>
-                                        <td class="text-nowrap">{{ log.createdAt | date:'MM/dd/yyyy hh:mm a' }}</td>
-                                        <td>{{ log.action }}</td>
-                                        <td>{{ log.createdBy?.fullName }}</td>
-                                        <td>{{ log.remarks }}</td>
+                                    <tr class="align-middle">
+                                        <td class="text-nowrap text-muted fs-xs">{{ log.createdAt | date:'MM/dd/yyyy hh:mm a' }}</td>
+                                        <td class="text-nowrap">{{ log.createdBy?.fullName || '—' }}</td>
+                                        <td class="text-nowrap">
+                                            <span class="badge bg-secondary bg-opacity-25 text-dark border">
+                                                {{ log.action || '—' }}
+                                            </span>
+                                        </td>
+                                        <td>{{ log.remarks || '—' }}</td>
                                     </tr>
                                 }
                             </tbody>

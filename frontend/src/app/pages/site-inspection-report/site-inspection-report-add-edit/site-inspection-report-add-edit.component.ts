@@ -170,15 +170,18 @@ export class SiteInspectionReportAddEditComponent {
             this.alertService.warning(this.module, 'Validation', 'Date is required.');
             return;
         }
-
+        if (!this.project) {
+            this.alertService.warning(this.module, 'Validation', 'Project is required.');
+            return;
+        }
         this.isLoading.set(true);
 
         const payload: any = {
             date:       this.date,
-            project:    this.project       ? { id: this.project.id }       : null,
-            checker:    this.concurredBy   ? { id: this.concurredBy.id }   : null,
-            notedBy:    this.recommendedBy ? { id: this.recommendedBy.id } : null,
-            approvedBy: this.approvedBy    ? { id: this.approvedBy.id }    : null,
+            project:    this.project       ? { id: this.project.id }                       : null,
+            checker:    this.concurredBy   ? { accountNo: this.concurredBy.accountNo }     : null,
+            notedBy:    this.recommendedBy ? { accountNo: this.recommendedBy.accountNo }   : null,
+            approvedBy: this.approvedBy    ? { accountNo: this.approvedBy.accountNo }      : null,
             findings:   this.findings.filter(f => f.description?.trim())
         };
 

@@ -873,91 +873,79 @@ public class WorkOrderServiceImpl implements WorkOrderService {
         return new PageImpl<>(content, pageable, total);
     }
 
-    @Transactional
     @Override
     public PostResponse createFromPayload(Map<String, Object> payload) {
         PostResponse response = new PostResponse();
         try {
             WorkOrder wo = buildWorkOrderFromPayload(payload, null);
             WorkOrder saved = workOrderRepo.save(wo);
-            if (saved != null) {
-                updateProjectTown(saved.getProject(), saved.getTown());
-                response.setSuccessMessage("Work Order successfully created.");
-                response.setModelId(saved.getId());
-            } else {
-                response.setFailureMessage("Failed to create Work Order.");
-            }
+            updateProjectTown(saved.getProject(), saved.getTown());
+            response.setSuccessMessage("Work Order successfully created.");
+            response.setModelId(saved.getId());
         } catch (Exception e) {
             response.setFailureMessage("Failed to create Work Order: " + e.getMessage());
         }
         return response;
     }
 
-    @Transactional
     @Override
     public PostResponse updateFromPayload(Map<String, Object> payload) {
         PostResponse response = new PostResponse();
-        Object idObj = payload.get("id");
-        if (idObj == null) {
-            response.setFailureMessage("ID is required for update.");
-            return response;
-        }
-        Integer id = ((Number) idObj).intValue();
-        WorkOrder existing = workOrderRepo.findById(id).orElse(null);
-        if (existing == null) {
-            response.setFailureMessage("Work Order not found.");
-            return response;
-        }
+        try {
+            Object idObj = payload.get("id");
+            if (idObj == null) { response.setFailureMessage("ID is required for update."); return response; }
+            Integer id = ((Number) idObj).intValue();
+            WorkOrder existing = workOrderRepo.findById(id).orElse(null);
+            if (existing == null) { response.setFailureMessage("Work Order not found."); return response; }
 
-        Object dateObj = payload.get("date");
-        if (dateObj instanceof String dateStr && !dateStr.isEmpty()) {
-            try {
-                java.util.Date d = java.sql.Date.valueOf(dateStr);
-                existing.setDate(d);
-                Calendar cal = Calendar.getInstance();
-                cal.setTime(d);
-                existing.setYear(cal.get(Calendar.YEAR));
-                existing.setMonth(cal.get(Calendar.MONTH) + 1);
-            } catch (Exception ignored) {}
-        }
+            Object dateObj = payload.get("date");
+            if (dateObj instanceof String dateStr && !dateStr.isEmpty()) {
+                try {
+                    java.util.Date d = java.sql.Date.valueOf(dateStr);
+                    existing.setDate(d);
+                    Calendar cal = Calendar.getInstance();
+                    cal.setTime(d);
+                    existing.setYear(cal.get(Calendar.YEAR));
+                    existing.setMonth(cal.get(Calendar.MONTH) + 1);
+                } catch (Exception ignored) {}
+            }
 
-        if (payload.get("description") != null) existing.setDescription((String) payload.get("description"));
-        if (payload.get("location")    != null) existing.setLocation((String) payload.get("location"));
+            if (payload.get("description") != null) existing.setDescription((String) payload.get("description"));
+            if (payload.get("location")    != null) existing.setLocation((String) payload.get("location"));
 
-        Object pcFrom = payload.get("periodCoveredFrom");
-        if (pcFrom instanceof String s && !s.isBlank()) {
-            try { existing.setPeriodCoveredFrom(java.sql.Date.valueOf(s)); } catch (Exception ignored) {}
-        }
-        Object pcTo = payload.get("periodCoveredTo");
-        if (pcTo instanceof String s && !s.isBlank()) {
-            try { existing.setPeriodCoveredTo(java.sql.Date.valueOf(s)); } catch (Exception ignored) {}
-        }
+            Object pcFrom = payload.get("periodCoveredFrom");
+            if (pcFrom instanceof String s && !s.isBlank()) {
+                try { existing.setPeriodCoveredFrom(java.sql.Date.valueOf(s)); } catch (Exception ignored) {}
+            }
+            Object pcTo = payload.get("periodCoveredTo");
+            if (pcTo instanceof String s && !s.isBlank()) {
+                try { existing.setPeriodCoveredTo(java.sql.Date.valueOf(s)); } catch (Exception ignored) {}
+            }
 
-        String typeStr = (String) payload.get("type");
-        if (typeStr != null) existing.setType(mapWorkOrderType(typeStr));
+            String typeStr = (String) payload.get("type");
+            if (typeStr != null) existing.setType(mapWorkOrderType(typeStr));
 
-        Object projectObj = payload.get("project");
-        if (projectObj instanceof Map<?, ?> pm && pm.get("id") != null) {
-            Project p = new Project();
-            p.setId(((Number) pm.get("id")).intValue());
-            existing.setProject(p);
-        }
+            Object projectObj = payload.get("project");
+            if (projectObj instanceof Map<?, ?> pm && pm.get("id") != null) {
+                Project p = new Project();
+                p.setId(((Number) pm.get("id")).intValue());
+                existing.setProject(p);
+            }
 
-        Object townObj = payload.get("town");
-        if (townObj instanceof Map<?, ?> tm && tm.get("id") != null) {
-            Town t = new Town();
-            t.setId(((Number) tm.get("id")).intValue());
-            existing.setTown(t);
-        }
+            Object townObj = payload.get("town");
+            if (townObj instanceof Map<?, ?> tm && tm.get("id") != null) {
+                Town t = new Town();
+                t.setId(((Number) tm.get("id")).intValue());
+                existing.setTown(t);
+            }
 
-        existing.setUpdatedAt(new java.util.Date());
-        WorkOrder saved = workOrderRepo.save(existing);
-        if (saved != null) {
+            existing.setUpdatedAt(new java.util.Date());
+            WorkOrder saved = workOrderRepo.save(existing);
             updateProjectTown(saved.getProject(), saved.getTown());
             response.setSuccessMessage("Work Order successfully updated.");
             response.setModelId(saved.getId());
-        } else {
-            response.setFailureMessage("Failed to update Work Order.");
+        } catch (Exception e) {
+            response.setFailureMessage("Failed to update Work Order: " + e.getMessage());
         }
         return response;
     }
@@ -1008,21 +996,18 @@ public class WorkOrderServiceImpl implements WorkOrderService {
         return summary;
     }
 
-    @Transactional
     @Override
     public PostResponse postWorkOrder(Map<String, Object> payload) {
         PostResponse response = new PostResponse();
         try {
             Object woIdObj = payload.get("workOrderId");
             Object txIdObj = payload.get("voucherId");
-
             if (woIdObj == null || txIdObj == null) {
                 response.setFailureMessage("Work Order and Voucher are required.");
                 return response;
             }
 
             java.util.Date now = new java.util.Date();
-
             WorkOrderDetail detail = new WorkOrderDetail();
 
             WorkOrder wo = new WorkOrder();
@@ -1043,14 +1028,10 @@ public class WorkOrderServiceImpl implements WorkOrderService {
             detail.setUpdatedAt(now);
 
             WorkOrderDetail saved = workOrderDetailRepo.save(detail);
-            if (saved != null) {
-                response.setSuccessMessage("Work Order posting successfully saved.");
-                response.setModelId(saved.getId());
-            } else {
-                response.setFailureMessage("Failed to save work order posting.");
-            }
+            response.setSuccessMessage("Work Order posting successfully saved.");
+            response.setModelId(saved.getId());
         } catch (Exception e) {
-            response.setFailureMessage("Failed to post work order: " + e.getMessage());
+            response.setFailureMessage("Failed to post Work Order: " + e.getMessage());
         }
         return response;
     }

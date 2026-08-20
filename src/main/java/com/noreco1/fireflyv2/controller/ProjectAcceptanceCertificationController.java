@@ -7,10 +7,12 @@ import com.noreco1.fireflyv2.controller.response.PostResponse;
 import com.noreco1.fireflyv2.controller.response.ProcessDocumentDto;
 import com.noreco1.fireflyv2.controller.response.ProjectAcceptanceCertificationDto;
 import com.noreco1.fireflyv2.model.DocumentStatus;
+import com.noreco1.fireflyv2.model.Project;
 import com.noreco1.fireflyv2.model.ProjectAcceptanceCertification;
 import com.noreco1.fireflyv2.model.User;
 import com.noreco1.fireflyv2.model.Workflow;
 import com.noreco1.fireflyv2.repo.ProjectAcceptanceCertificationRepo;
+import com.noreco1.fireflyv2.repo.UserRepo;
 import com.noreco1.fireflyv2.service.DownloadService;
 import com.noreco1.fireflyv2.service.PrintableVoucher;
 import com.noreco1.fireflyv2.service.ProjectAcceptanceCertificationService;
@@ -24,6 +26,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -41,10 +44,19 @@ public class ProjectAcceptanceCertificationController {
     private ProjectAcceptanceCertificationRepo certificationRepo;
 
     @Autowired
+    private UserRepo userRepo;
+
+    @Autowired
     private AuthenticationFacade authenticationFacade;
 
     @Autowired
     private GeneratorFacade generatorFacade;
+
+    @Autowired
+    private com.noreco1.fireflyv2.common.facade.DocumentProcessingFacade documentProcessingFacade;
+
+    @Autowired
+    private com.noreco1.fireflyv2.common.facade.DocumentLoggerFacade documentLoggerFacade;
 
     @Autowired
     private MessageSource messageSource;
@@ -69,13 +81,7 @@ public class ProjectAcceptanceCertificationController {
         if (statusId != null) {
             return certificationRepo.findByDocumentStatusIdAndDateBetween(statusId, fromDate, toDate, pageable);
         }
-
-        Integer[] nonPending = {
-                com.noreco1.fireflyv2.model.enums.DocumentStatus.APPROVED.getId(),
-                com.noreco1.fireflyv2.model.enums.DocumentStatus.DENIED.getId(),
-                com.noreco1.fireflyv2.model.enums.DocumentStatus.CANCELLED.getId()
-        };
-        return certificationRepo.findByDateBetweenAndDocumentStatusIdNotIn(fromDate, toDate, Arrays.asList(nonPending), pageable);
+        return certificationRepo.findByDateBetween(fromDate, toDate, pageable);
     }
 
     @GetMapping("/{id}")
@@ -88,6 +94,7 @@ public class ProjectAcceptanceCertificationController {
         return certificationService.getDocumentsStatuses();
     }
 
+    @Transactional
     @PostMapping("/create")
     public PostResponse create(@RequestBody Map<String, Object> payload) {
         PostResponse response = new PostResponse();
@@ -95,6 +102,9 @@ public class ProjectAcceptanceCertificationController {
             ProjectAcceptanceCertification pac = buildPac(payload, null);
             ProjectAcceptanceCertification saved = certificationRepo.save(pac);
             if (saved != null) {
+                documentProcessingFacade.processAction(saved.getTransaction(), null, saved.getWorkflow(), saved.getCreatedBy());
+                java.util.Map newMap = documentLoggerFacade.makeLog(saved);
+                documentLoggerFacade.log(saved.getTransaction(), authenticationFacade.getLoggedIn(), null, newMap);
                 response.setSuccessMessage("Project Acceptance Certification successfully saved.");
                 response.setModelId(saved.getId());
             } else {
@@ -126,13 +136,9 @@ public class ProjectAcceptanceCertificationController {
             try { existing.setDate(java.sql.Date.valueOf(dateStr)); } catch (Exception ignored) {}
         }
 
-        // certifiedBy → recommendedBy (best-effort mapping)
-        Object certifiedByObj = payload.get("certifiedBy");
-        if (certifiedByObj instanceof Map<?, ?> cbm && cbm.get("id") != null) {
-            User u = new User();
-            u.setId(((Number) cbm.get("id")).intValue());
-            existing.setRecommendedBy(u);
-        }
+        existing.setProject(projectRef(payload, "project"));
+        existing.setRecommendedBy(userRef(payload, "recommendedBy"));
+        existing.setApprovingOfficer(userRef(payload, "approvedBy"));
 
         existing.setUpdatedAt(new Date());
         ProjectAcceptanceCertification saved = certificationRepo.save(existing);
@@ -162,13 +168,9 @@ public class ProjectAcceptanceCertificationController {
         }
         pac.setDate(pacDate);
 
-        // certifiedBy → recommendedBy
-        Object certifiedByObj = payload.get("certifiedBy");
-        if (certifiedByObj instanceof Map<?, ?> cbm && cbm.get("id") != null) {
-            User u = new User();
-            u.setId(((Number) cbm.get("id")).intValue());
-            pac.setRecommendedBy(u);
-        }
+        pac.setProject(projectRef(payload, "project"));
+        pac.setRecommendedBy(userRef(payload, "recommendedBy"));
+        pac.setApprovingOfficer(userRef(payload, "approvedBy"));
 
         // Generate code
         int year = Integer.parseInt(GlobalConstant.YYYY_DATE_FORMAT.format(pacDate));
@@ -183,7 +185,6 @@ public class ProjectAcceptanceCertificationController {
         pac.setCreatedAt(now);
         pac.setUpdatedAt(now);
         pac.setCreatedBy(authenticationFacade.getLoggedIn());
-        pac.setApprovingOfficer(authenticationFacade.getLoggedIn());
 
         DocumentStatus ds = new DocumentStatus();
         ds.setId(com.noreco1.fireflyv2.model.enums.DocumentStatus.DOCUMENT_CREATED.getId());
@@ -196,6 +197,24 @@ public class ProjectAcceptanceCertificationController {
         pac.setTransaction(generatorFacade.transaction());
 
         return pac;
+    }
+
+    private User userRef(Map<String, Object> payload, String key) {
+        Object obj = payload.get(key);
+        if (obj instanceof Map<?, ?> m && m.get("accountNo") != null) {
+            return userRepo.findOneByAccountNo(((Number) m.get("accountNo")).intValue());
+        }
+        return null;
+    }
+
+    private Project projectRef(Map<String, Object> payload, String key) {
+        Object obj = payload.get(key);
+        if (obj instanceof Map<?, ?> m && m.get("id") != null) {
+            Project p = new Project();
+            p.setId(((Number) m.get("id")).intValue());
+            return p;
+        }
+        return null;
     }
 
     private Date parseDate(String dateStr) {

@@ -49,6 +49,7 @@ export class BrowseEntityModalComponent implements OnInit {
                 this.items = res.content ?? res ?? [];
                 this.total = res.totalElements ?? res.page?.totalElements ?? this.items.length;
                 this.loading = false;
+                if (this.items.length === 1) { this.select(this.items[0]); return; }
                 this.cdr.markForCheck();
             },
             error: () => {

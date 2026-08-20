@@ -1,16 +1,10 @@
 package com.noreco1.fireflyv2.controller;
 
 import com.noreco1.fireflyv2.common.GlobalConstant;
-import com.noreco1.fireflyv2.common.facade.AuthenticationFacade;
-import com.noreco1.fireflyv2.common.facade.GeneratorFacade;
 import com.noreco1.fireflyv2.controller.response.PostResponse;
 import com.noreco1.fireflyv2.controller.response.ProcessDocumentDto;
 import com.noreco1.fireflyv2.model.DocumentStatus;
 import com.noreco1.fireflyv2.model.SiteInspectionReport;
-import com.noreco1.fireflyv2.model.User;
-import com.noreco1.fireflyv2.model.WorkOrder;
-import com.noreco1.fireflyv2.model.Workflow;
-import com.noreco1.fireflyv2.repo.SiteInspectionReportRepo;
 import com.noreco1.fireflyv2.service.DownloadService;
 import com.noreco1.fireflyv2.service.PrintableVoucher;
 import com.noreco1.fireflyv2.service.SiteInspectionReportService;
@@ -28,7 +22,6 @@ import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,15 +32,6 @@ public class SiteInspectionReportController {
 
     @Autowired
     private SiteInspectionReportService siteInspectionReportService;
-
-    @Autowired
-    private SiteInspectionReportRepo siteInspectionReportRepo;
-
-    @Autowired
-    private AuthenticationFacade authenticationFacade;
-
-    @Autowired
-    private GeneratorFacade generatorFacade;
 
     @Autowired
     private MessageSource messageSource;
@@ -88,127 +72,18 @@ public class SiteInspectionReportController {
 
     @PostMapping("/create")
     public PostResponse create(@RequestBody Map<String, Object> payload) {
-        PostResponse response = new PostResponse();
-        try {
-            SiteInspectionReport sir = buildSiteInspectionReport(payload, null);
-            SiteInspectionReport saved = siteInspectionReportRepo.save(sir);
-            if (saved != null) {
-                response.setSuccessMessage("Site Inspection Report successfully saved.");
-                response.setModelId(saved.getId());
-            } else {
-                response.setFailureMessage("Failed to save Site Inspection Report.");
-            }
-        } catch (Exception e) {
-            response.setFailureMessage("Failed to save Site Inspection Report: " + e.getMessage());
-        }
-        return response;
+        return siteInspectionReportService.createFromPayload(payload);
     }
 
     @PostMapping("/update")
     public PostResponse update(@RequestBody Map<String, Object> payload) {
-        PostResponse response = new PostResponse();
-        Object idObj = payload.get("id");
-        if (idObj == null) {
-            response.setFailureMessage("ID is required for update.");
-            return response;
-        }
-        Integer id = ((Number) idObj).intValue();
-        SiteInspectionReport existing = siteInspectionReportRepo.findById(id).orElse(null);
-        if (existing == null) {
-            response.setFailureMessage("Site Inspection Report not found.");
-            return response;
-        }
-
-        Object dateObj = payload.get("date");
-        if (dateObj instanceof String dateStr && !dateStr.isEmpty()) {
-            try {
-                existing.setDate(java.sql.Date.valueOf(dateStr));
-            } catch (Exception ignored) {}
-        }
-
-        // inspectedBy → checker (best-effort mapping)
-        Object inspectedByObj = payload.get("inspectedBy");
-        if (inspectedByObj instanceof Map<?, ?> ibm && ibm.get("id") != null) {
-            User u = new User();
-            u.setId(((Number) ibm.get("id")).intValue());
-            existing.setChecker(u);
-        }
-
-        Object workOrderObj = payload.get("workOrder");
-        if (workOrderObj instanceof Map<?, ?> wom && wom.get("id") != null) {
-            WorkOrder wo = new WorkOrder();
-            wo.setId(((Number) wom.get("id")).intValue());
-            existing.setWorkOrder(wo);
-        }
-
-        existing.setUpdatedAt(new Date());
-        SiteInspectionReport saved = siteInspectionReportRepo.save(existing);
-        if (saved != null) {
-            response.setSuccessMessage("Site Inspection Report successfully updated.");
-            response.setModelId(saved.getId());
-        } else {
-            response.setFailureMessage("Failed to update Site Inspection Report.");
-        }
-        return response;
+        return siteInspectionReportService.updateFromPayload(payload);
     }
 
     @PostMapping("/process")
     public PostResponse process(@RequestBody ProcessDocumentDto dto) {
         BindingResult bindingResult = new BeanPropertyBindingResult(dto, "processDocumentDto");
         return siteInspectionReportService.process(dto, bindingResult, messageSource);
-    }
-
-    private SiteInspectionReport buildSiteInspectionReport(Map<String, Object> payload, Integer id) {
-        SiteInspectionReport sir = new SiteInspectionReport();
-        if (id != null) sir.setId(id);
-
-        Object dateObj = payload.get("date");
-        Date sirDate = new Date();
-        if (dateObj instanceof String dateStr && !dateStr.isEmpty()) {
-            try { sirDate = java.sql.Date.valueOf(dateStr); } catch (Exception ignored) {}
-        }
-        sir.setDate(sirDate);
-        sir.setYear(Integer.parseInt(GlobalConstant.YYYY_DATE_FORMAT.format(sirDate)));
-
-        // inspectedBy → checker
-        Object inspectedByObj = payload.get("inspectedBy");
-        if (inspectedByObj instanceof Map<?, ?> ibm && ibm.get("id") != null) {
-            User u = new User();
-            u.setId(((Number) ibm.get("id")).intValue());
-            sir.setChecker(u);
-        }
-
-        Object workOrderObj = payload.get("workOrder");
-        if (workOrderObj instanceof Map<?, ?> wom && wom.get("id") != null) {
-            WorkOrder wo = new WorkOrder();
-            wo.setId(((Number) wom.get("id")).intValue());
-            sir.setWorkOrder(wo);
-        }
-
-        // Generate code
-        Object latestCode = siteInspectionReportRepo.findLatestCodeByYear(sir.getYear());
-        String code = generatorFacade.voucherCodeNoOffice(
-                "IR", latestCode == null ? "" : String.valueOf(latestCode),
-                sirDate, GlobalConstant.COUNTER_PAD_3);
-        sir.setCode(code);
-
-        // Required audit fields
-        Date now = new Date();
-        sir.setCreatedAt(now);
-        sir.setUpdatedAt(now);
-        sir.setCreatedBy(authenticationFacade.getLoggedIn());
-
-        DocumentStatus ds = new DocumentStatus();
-        ds.setId(com.noreco1.fireflyv2.model.enums.DocumentStatus.DOCUMENT_CREATED.getId());
-        sir.setDocumentStatus(ds);
-
-        Workflow wf = new Workflow();
-        wf.setId(com.noreco1.fireflyv2.model.enums.Workflow.SITE_INSPECTION_REPORT.getId());
-        sir.setWorkflow(wf);
-
-        sir.setTransaction(generatorFacade.transaction());
-
-        return sir;
     }
 
     @Autowired
