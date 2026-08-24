@@ -52,14 +52,8 @@
                                            readonly placeholder="Browse employee..."/>
                                     <button type="button" class="btn btn-success fw-bold"
                                             (click)="openEmployeeBrowse()">
-                                        <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
+                                        <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
                                     </button>
-                                    @if (selectedEmployee) {
-                                        <button type="button" class="btn btn-danger fw-bold"
-                                                (click)="resetEmployee()" title="Remove Employee">
-                                            <ng-icon name="tablerX" class="ps-0 pe-0 fw-bold"></ng-icon>
-                                        </button>
-                                    }
                                 </div>
                             </div>
                         </div>

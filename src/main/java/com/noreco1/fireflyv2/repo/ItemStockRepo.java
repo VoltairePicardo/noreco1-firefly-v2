@@ -270,6 +270,8 @@ public interface ItemStockRepo extends JpaRepository<ItemStock, Integer> {
 
     List<ItemStock> findAllByInventoryLocationIdAndItemInventoryCategoryIdOrderByItemInventoryCategoryIdAscItemDescriptionAsc(Integer inventoryLocationId, Integer inventoryCategoryId);
 
+    List<ItemStock> findAllByInventoryLocationIdAndItemInventoryCategoryIdAndTotalQuantityGreaterThanOrderByItemCode(Integer invLocId, Integer invCatId, BigDecimal qty);
+
     List<ItemStock> findAllByInventoryLocationIdOrderByItemInventoryCategoryIdAscItemDescriptionAsc(Integer inventoryLocationId);
 
     List<ItemStock> findAllByItemIdAndInventoryLocationIdNot(Integer itemId, Integer invLocId);

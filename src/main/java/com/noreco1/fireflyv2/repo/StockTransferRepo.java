@@ -47,6 +47,17 @@ public interface StockTransferRepo extends JpaRepository<StockTransfer, Integer>
                                                                                                @Param("to") Date to,
                                                                                                @Param("documentStatusId") Integer documentStatusId);
 
+    @Query(value = "SELECT la.* FROM StockTransfer la " +
+            "LEFT JOIN `User` approveUser on la.FK_approvedByUserId = approveUser.id " +
+            "LEFT JOIN `User` createUser on la.FK_createdByUserId = createUser.id " +
+            "WHERE la.voucherDate BETWEEN :from AND :to " +
+            "AND (approveUser.id = :userId OR createUser.id = :userId) " +
+            "ORDER BY la.voucherDate DESC",
+            nativeQuery = true)
+    List<StockTransfer> findByAllowedUserVoucherDateBetween(@Param("userId") Integer userId,
+                                                            @Param("from") Date from,
+                                                            @Param("to") Date to);
+
     Page<StockTransfer> findByCodeContainingIgnoreCaseOrRemarksContainingIgnoreCaseOrderByCodeAsc(String query, String query1, Pageable pageable);
 
     @Query(value = "SELECT * FROM StockTransfer " +

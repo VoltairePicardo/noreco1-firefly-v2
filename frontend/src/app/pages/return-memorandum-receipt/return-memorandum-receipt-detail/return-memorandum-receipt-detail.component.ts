@@ -6,13 +6,16 @@ import { RouterLink } from '@angular/router';
 import { AlertService } from '@/app/shared/services/alert.service';
 import { SharedModule } from '@/app/shared/shared.module';
 import { ReturnMemorandumReceiptService } from '../return-memorandum-receipt.service';
+import { provideIcons } from '@ng-icons/core';
+import { tablerPrinter, tablerEdit, tablerArrowLeft, tablerCheck, tablerEye, tablerEyeOff } from '@ng-icons/tabler-icons';
 
 const TERMINAL_STATUSES = ['Approved', 'Denied', 'Cancelled'];
 
 @Component({
     selector: 'app-return-memorandum-receipt-detail',
     imports: [...COMMON_ALL_PAGE_IMPORTS, SharedModule, FormsModule, RouterLink],
-    templateUrl: './return-memorandum-receipt-detail.component.html'
+    templateUrl: './return-memorandum-receipt-detail.component.html',
+    providers: [provideIcons({ tablerPrinter, tablerEdit, tablerArrowLeft, tablerCheck, tablerEye, tablerEyeOff })]
 })
 export class ReturnMemorandumReceiptDetailComponent {
     module = 'Return Memorandum Receipt'; subModule = 'Details'; menuLink = 'return-memorandum-receipt';

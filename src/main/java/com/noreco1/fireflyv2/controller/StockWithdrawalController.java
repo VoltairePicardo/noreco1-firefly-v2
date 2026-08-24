@@ -3,15 +3,27 @@ package com.noreco1.fireflyv2.controller;
 import com.noreco1.fireflyv2.common.GlobalConstant;
 import com.noreco1.fireflyv2.common.facade.AuthenticationFacade;
 import com.noreco1.fireflyv2.common.facade.GeneratorFacade;
+import com.noreco1.fireflyv2.controller.response.CostEstimateDetailDto;
 import com.noreco1.fireflyv2.controller.response.PostResponse;
 import com.noreco1.fireflyv2.controller.response.ProcessDocumentDto;
 import com.noreco1.fireflyv2.model.DocumentStatus;
+import com.noreco1.fireflyv2.model.InventoryCategory;
+import com.noreco1.fireflyv2.model.InventoryLocation;
+import com.noreco1.fireflyv2.model.ItemStock;
+import com.noreco1.fireflyv2.model.Purpose;
 import com.noreco1.fireflyv2.model.StockWithdrawal;
 import com.noreco1.fireflyv2.model.Workflow;
+import com.noreco1.fireflyv2.repo.InventoryCategoryRepo;
+import com.noreco1.fireflyv2.repo.InventoryLocationRepo;
+import com.noreco1.fireflyv2.repo.ItemStockRepo;
+import com.noreco1.fireflyv2.repo.PurposeRepo;
 import com.noreco1.fireflyv2.repo.StockWithdrawalRepo;
+import com.noreco1.fireflyv2.service.CostEstimateService;
 import com.noreco1.fireflyv2.service.DownloadService;
 import com.noreco1.fireflyv2.service.PrintableVoucher;
+import com.noreco1.fireflyv2.service.PurchaseRequestDetailService;
 import com.noreco1.fireflyv2.service.StockWithdrawalService;
+import com.noreco1.fireflyv2.service.WorkOrderService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import net.sf.jasperreports.engine.JRDataSource;
@@ -22,6 +34,7 @@ import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -37,6 +50,29 @@ public class StockWithdrawalController {
 
     @Autowired
     private StockWithdrawalRepo withdrawalRepo;
+
+    @Autowired
+    private InventoryLocationRepo inventoryLocationRepo;
+
+    @Autowired
+    private InventoryCategoryRepo inventoryCategoryRepo;
+
+    @Autowired
+    private PurposeRepo purposeRepo;
+
+    @Autowired
+    private ItemStockRepo itemStockRepo;
+
+    @Autowired
+    private PurchaseRequestDetailService purchaseRequestDetailService;
+
+    @Autowired
+    @Qualifier("workOrderServiceImpl")
+    private WorkOrderService workOrderService;
+
+    @Autowired
+    @Qualifier("costEstimateServiceImpl")
+    private CostEstimateService costEstimateService;
 
     @Autowired
     private AuthenticationFacade authenticationFacade;
@@ -67,6 +103,52 @@ public class StockWithdrawalController {
     @GetMapping("/document-statuses")
     public List<DocumentStatus> documentStatuses() {
         return withdrawalService.getDocumentsStatuses();
+    }
+
+    @GetMapping("/inventory-locations")
+    public List<InventoryLocation> inventoryLocations() {
+        return inventoryLocationRepo.findAllByOrderByDescriptionAsc();
+    }
+
+    @GetMapping("/inventory-categories")
+    public List<InventoryCategory> inventoryCategories() {
+        return inventoryCategoryRepo.findAll();
+    }
+
+    @GetMapping("/purposes")
+    public List<Purpose> purposes() {
+        return purposeRepo.findAll();
+    }
+
+    @GetMapping("/default-signatories")
+    public Map defaultSignatories() {
+        return withdrawalService.defaultSignatories();
+    }
+
+    @GetMapping("/item-stocks/{locationId}/{categoryId}")
+    public List<ItemStock> itemStocksForWithdrawal(@PathVariable Integer locationId,
+                                                    @PathVariable Integer categoryId) {
+        return itemStockRepo.findAllByInventoryLocationIdAndItemInventoryCategoryIdAndTotalQuantityGreaterThanOrderByItemCode(
+                locationId, categoryId, BigDecimal.ZERO);
+    }
+
+    @GetMapping("/rv-details/{rvId}/{locationId}/{categoryId}")
+    public List<Map> rvDetailsForWithdrawal(@PathVariable Integer rvId,
+                                             @PathVariable Integer locationId,
+                                             @PathVariable Integer categoryId) {
+        return purchaseRequestDetailService.getRvDetailsForWithdrawal(rvId, locationId, categoryId);
+    }
+
+    @GetMapping("/work-order-details/{workOrderId}/{locationId}/{categoryId}")
+    public List<Map> workOrderDetailsForWithdrawal(@PathVariable Integer workOrderId,
+                                                    @PathVariable Integer locationId,
+                                                    @PathVariable Integer categoryId) {
+        return workOrderService.getProjectCostEstimateDetail(workOrderId, locationId, categoryId);
+    }
+
+    @GetMapping("/cost-estimate-details/{transactionId}")
+    public List<CostEstimateDetailDto> costEstimateDetailsForWithdrawal(@PathVariable Integer transactionId) {
+        return costEstimateService.findAllDetailByCostEstimateTransId(transactionId);
     }
 
     @GetMapping("/{id}")

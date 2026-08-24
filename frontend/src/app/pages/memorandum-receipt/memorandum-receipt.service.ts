@@ -38,11 +38,11 @@ export class MemorandumReceiptService {
     }
 
     getWorkflowActions(transId: number): Observable<any[]> {
-        return this.http.get<any[]>(`${BASE_URL}/json/workflow-actions/${transId}`);
+        return this.http.get<any[]>(`${BASE_API}/json/workflow-actions/${transId}`);
     }
 
     getDocumentLogs(transId: number): Observable<any[]> {
-        return this.http.post<any[]>(`${BASE_URL}/document/${transId}/logs`, {}, httpOptions);
+        return this.http.get<any[]>(`${BASE_API}/json/document-logs/${transId}`);
     }
 
     print(id: number): void {

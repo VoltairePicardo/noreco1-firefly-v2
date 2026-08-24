@@ -6,13 +6,16 @@ import { RouterLink } from '@angular/router';
 import { AlertService } from '@/app/shared/services/alert.service';
 import { SharedModule } from '@/app/shared/shared.module';
 import { ItemTestingService } from '../item-testing.service';
+import { provideIcons } from '@ng-icons/core';
+import { tablerPrinter, tablerEdit, tablerArrowLeft, tablerEye, tablerEyeOff } from '@ng-icons/tabler-icons';
 
 const TERMINAL_STATUSES = ['Approved', 'Denied', 'Cancelled'];
 
 @Component({
     selector: 'app-item-testing-detail',
     imports: [...COMMON_ALL_PAGE_IMPORTS, SharedModule, FormsModule, RouterLink],
-    templateUrl: './item-testing-detail.component.html'
+    templateUrl: './item-testing-detail.component.html',
+    providers: [provideIcons({ tablerPrinter, tablerEdit, tablerArrowLeft, tablerEye, tablerEyeOff })]
 })
 export class ItemTestingDetailComponent {
     module = 'Item Testing'; subModule = 'Details'; menuLink = 'item-testing';
@@ -53,7 +56,7 @@ export class ItemTestingDetailComponent {
     }
 
     isTerminal(): boolean { return TERMINAL_STATUSES.includes(this.data?.documentStatus?.status || ''); }
-    isEditable(): boolean { const s = this.data?.documentStatus?.status || ''; return s === 'Document Created' || s === 'For Revision'; }
+    isEditable(): boolean { return !!this.data?.id; }
 
     processWorkflow(): void {
         if (!this.selectedAction) return;

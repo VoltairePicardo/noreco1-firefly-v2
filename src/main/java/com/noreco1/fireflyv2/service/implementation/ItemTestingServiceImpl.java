@@ -52,6 +52,18 @@ public class ItemTestingServiceImpl implements ItemTestingService, PrintableVouc
     @Autowired
     EmployeeRepo employeeRepo;
 
+    @Autowired
+    private com.noreco1.fireflyv2.repo.InventoryLocationRepo inventoryLocationRepo;
+
+    @Autowired
+    private com.noreco1.fireflyv2.repo.PoDetailRepo poDetailRepo;
+
+    @Autowired
+    private com.noreco1.fireflyv2.repo.ItemRepo itemRepo;
+
+    @Autowired
+    private com.noreco1.fireflyv2.repo.PurchaseOrderRepo purchaseOrderRepo;
+
     @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<ItemTesting> findAll(String startDate, String endDate, Pageable pageable) {
@@ -93,6 +105,14 @@ public class ItemTestingServiceImpl implements ItemTestingService, PrintableVouc
                 }
 
                 itemTesting.setSupplier(supplier);
+
+                // Resolve transient associations to managed entities before saving
+                if (itemTesting.getInventoryLocation() != null && itemTesting.getInventoryLocation().getId() != null) {
+                    itemTesting.setInventoryLocation(inventoryLocationRepo.findById(itemTesting.getInventoryLocation().getId()).orElse(null));
+                }
+                if (itemTesting.getPurchaseOrder() != null && itemTesting.getPurchaseOrder().getId() != null) {
+                    itemTesting.setPurchaseOrder(purchaseOrderRepo.findById(itemTesting.getPurchaseOrder().getId()).orElse(null));
+                }
 
                 if (toBeInserted) {
 
@@ -175,25 +195,32 @@ public class ItemTestingServiceImpl implements ItemTestingService, PrintableVouc
                 List<ItemTestingDetail> itemTestingDetails = new ArrayList<>();
 
                 for(ItemTestingDetail itemTestingDetail : items){
+                    Item item       = itemTestingDetail.getItem();
+                    PoDetail pod    = itemTestingDetail.getPoDetail();
+                    if (item == null) continue;
+
                     ItemTestingDetail detail = new ItemTestingDetail();
 
                     BigDecimal balance = BigDecimal.ZERO;
-                    ItemStock itemStock = itemStockRepo.findByItemIdAndInventoryLocationId(itemTestingDetail.getItem().getId(), itemTesting.getInventoryLocation().getId());
-                    if(itemStock != null){
-                        balance = itemStock.getQuantity();
+                    if (itemTesting.getInventoryLocation() != null) {
+                        ItemStock itemStock = itemStockRepo.findByItemIdAndInventoryLocationId(item.getId(), itemTesting.getInventoryLocation().getId());
+                        if (itemStock != null) balance = itemStock.getQuantity();
                     }
 
-                    BigDecimal totalItemQuantityTested = itemTestingDetailRepo.getTotalQuantityTestedByPoDetailId(itemTestingDetail.getPoDetail().getId());
+                    BigDecimal totalItemQuantityTested = (pod != null)
+                            ? itemTestingDetailRepo.getTotalQuantityTestedByPoDetailId(pod.getId())
+                            : BigDecimal.ZERO;
+                    if (totalItemQuantityTested == null) totalItemQuantityTested = BigDecimal.ZERO;
 
                     detail.setId(itemTestingDetail.getId());
-                    detail.setItem(itemTestingDetail.getItem());
+                    detail.setItem(item);
                     detail.setItemTesting(itemTestingDetail.getItemTesting());
                     detail.setBalance(balance);
-                    detail.setItemCode(itemTestingDetail.getItem().getCode());
-                    detail.setUnitCode(itemTestingDetail.getItem().getUnit().getCode());
-                    detail.setItemDescription(itemTestingDetail.getItem().getDescription());
-                    detail.setPoDetail(itemTestingDetail.getPoDetail());
-                    detail.setQuantity(itemTestingDetail.getPoDetail().getQuantity());
+                    detail.setItemCode(item.getCode());
+                    detail.setUnitCode(item.getUnit() != null ? item.getUnit().getCode() : null);
+                    detail.setItemDescription(item.getDescription());
+                    detail.setPoDetail(pod);
+                    detail.setQuantity(pod != null ? pod.getQuantity() : BigDecimal.ZERO);
                     detail.setQuantityReceived(itemTestingDetail.getQuantity());
                     detail.setDeliveredQuantity(totalItemQuantityTested);
                     detail.setUnitsReceivedQuantity(itemTestingDetail.getUnitsReceivedQuantity());
@@ -254,7 +281,12 @@ public class ItemTestingServiceImpl implements ItemTestingService, PrintableVouc
 
                     for (ItemTestingDetail detail:itemTestingDetails) {
 
+                        if (detail.getItem() == null) continue;
+
                         Map detailMap = new HashMap();
+
+                        String poNo = (detail.getPoDetail() != null && detail.getPoDetail().getPurchaseOrder() != null)
+                                ? detail.getPoDetail().getPurchaseOrder().getCode() : "";
 
                         detailMap.put("id", counter++);
                         detailMap.put("code", detail.getItem().getCode());
@@ -263,6 +295,7 @@ public class ItemTestingServiceImpl implements ItemTestingService, PrintableVouc
                         detailMap.put("unitReceivedQuantity", detail.getUnitsReceivedQuantity());
                         detailMap.put("unitRejectedQuantity", detail.getUnitsRejectedQuantity());
                         detailMap.put("remarks", detail.getRemarks());
+                        detailMap.put("poNo", poNo);
 
                         data.add(detailMap);
 
@@ -280,13 +313,41 @@ public class ItemTestingServiceImpl implements ItemTestingService, PrintableVouc
 
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED, readOnly = true)
+    @Override
+    public List<com.noreco1.fireflyv2.model.InventoryLocation> getInventoryLocations() {
+        return inventoryLocationRepo.findAllByOrderByDescriptionAsc();
+    }
+
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED, readOnly = true)
+    @Override
+    public List<com.noreco1.fireflyv2.model.PoDetail> getPurchaseOrderDetailsForItemTesting(Integer poId) {
+        return poDetailRepo.findByPurchaseOrderId(poId);
+    }
+
     private void saveItemTestingDetail(ItemTesting savedItemTesting, List<ItemTestingDetail> itemTestingDetails) {
         if (Checker.collectionIsNotEmpty(itemTestingDetails)) {
-            for (ItemTestingDetail itemTestingDetail : itemTestingDetails) {
-                itemTestingDetail.setItemTesting(savedItemTesting);
-                itemTestingDetail.setQuantity(itemTestingDetail.getQuantityReceived());
-                itemTestingDetail.setUnitsRejectedQuantity(itemTestingDetail.getUnitsReceivedQuantity().subtract(itemTestingDetail.getQuantityReceived()));
-                itemTestingDetailRepo.save(itemTestingDetail);
+            for (ItemTestingDetail incoming : itemTestingDetails) {
+                // Build a fresh entity to avoid transient reference issues from deserialized JSON objects
+                ItemTestingDetail fresh = new ItemTestingDetail();
+                fresh.setItemTesting(savedItemTesting);
+
+                if (incoming.getItem() != null && incoming.getItem().getId() != null) {
+                    fresh.setItem(itemRepo.findById(incoming.getItem().getId()).orElse(null));
+                }
+                if (incoming.getPoDetail() != null && incoming.getPoDetail().getId() != null) {
+                    fresh.setPoDetail(poDetailRepo.findById(incoming.getPoDetail().getId()).orElse(null));
+                }
+
+                BigDecimal unitsReceived = incoming.getUnitsReceivedQuantity() != null ? incoming.getUnitsReceivedQuantity() : BigDecimal.ZERO;
+                BigDecimal accepted      = incoming.getQuantityReceived()      != null ? incoming.getQuantityReceived()      : BigDecimal.ZERO;
+
+                fresh.setQuantity(accepted);
+                fresh.setUnitsReceivedQuantity(unitsReceived);
+                fresh.setUnitsRejectedQuantity(unitsReceived.subtract(accepted));
+                fresh.setRemarks(incoming.getRemarks());
+
+                itemTestingDetailRepo.save(fresh);
             }
         }
     }
@@ -302,18 +363,26 @@ public class ItemTestingServiceImpl implements ItemTestingService, PrintableVouc
 
             params.put("TITLE", "ITEM TESTING ACKNOWLEDGEMENT");
             params.put("ITEM_TESTING_DATE", itemTesting.getDate());
-            params.put("INV_LOCATION", itemTesting.getInventoryLocation().getDescription());
-            params.put("PO_NO", itemTesting.getPurchaseOrder().getCode());
+            params.put("INV_LOCATION", itemTesting.getInventoryLocation() != null ? itemTesting.getInventoryLocation().getDescription() : "");
+            params.put("PO_NO", itemTesting.getPurchaseOrder() != null ? itemTesting.getPurchaseOrder().getCode() : "");
 
-            Supplier supplier = supplierRepo.findById(itemTesting.getSupplier().getId()).orElse(null);
+            if (itemTesting.getSupplier() != null) {
+                Supplier supplier = supplierRepo.findById(itemTesting.getSupplier().getId()).orElse(null);
+                params.put("SUPPLIER", supplier != null ? supplier.getName() : "");
+                params.put("SUPPLIER_ADDRESS", supplier != null ? supplier.getAddress() : "");
+            } else {
+                params.put("SUPPLIER", "");
+                params.put("SUPPLIER_ADDRESS", "");
+            }
 
-            params.put("SUPPLIER", supplier.getName());
-            params.put("SUPPLIER_ADDRESS", supplier.getAddress());
-
-            Employee preparar = employeeRepo.findOneByAccountNumber(itemTesting.getCreatedBy().getAccountNo());
-
-            params.put("PREPARAR", preparar.getName());
-            params.put("PREPARAR_POS", preparar.getPosition() == null ? "":preparar.getPosition().getName());
+            if (itemTesting.getCreatedBy() != null) {
+                Employee preparar = employeeRepo.findOneByAccountNumber(itemTesting.getCreatedBy().getAccountNo());
+                params.put("PREPARAR", preparar != null ? preparar.getName() : "");
+                params.put("PREPARAR_POS", preparar != null && preparar.getPosition() != null ? preparar.getPosition().getName() : "");
+            } else {
+                params.put("PREPARAR", "");
+                params.put("PREPARAR_POS", "");
+            }
 
         }
 

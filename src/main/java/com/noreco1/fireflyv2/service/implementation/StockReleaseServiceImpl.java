@@ -547,6 +547,8 @@ public class StockReleaseServiceImpl implements StockReleaseService, PrintableVo
                     StockTransaction stockTransaction = new StockTransaction();
                     stockTransaction.setTransaction(model.getTransaction());
                     stockTransaction.setCreatedBy(model.getCreatedBy());
+                    stockTransaction.setCreatedAt(new Date());
+                    stockTransaction.setUpdatedAt(new Date());
 
                     stockTransaction = stockTransactionRepo.save(stockTransaction);
 
@@ -917,6 +919,8 @@ public class StockReleaseServiceImpl implements StockReleaseService, PrintableVo
                         StockTransaction stockTransaction = new StockTransaction();
                         stockTransaction.setTransaction(model.getTransaction());
                         stockTransaction.setCreatedBy(model.getCreatedBy());
+                        stockTransaction.setCreatedAt(new Date());
+                        stockTransaction.setUpdatedAt(new Date());
                         stockTransaction = stockTransactionRepo.save(stockTransaction);
                         for (ItemTransactionDetailDto itemTransactionDetailDto : details) {
                             if(itemTransactionDetailDto.getReleaseQuantity() != null && itemTransactionDetailDto.getReleaseQuantity().compareTo(BigDecimal.ZERO) == 1) {

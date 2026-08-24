@@ -571,6 +571,8 @@ public class StockReceiveServiceImpl implements StockReceiveService, PrintableVo
                     StockTransaction stockTransaction = new StockTransaction();
                     stockTransaction.setTransaction(model.getTransaction());
                     stockTransaction.setCreatedBy(model.getCreatedBy());
+                    stockTransaction.setCreatedAt(new Date());
+                    stockTransaction.setUpdatedAt(new Date());
                     stockTransaction = stockTransactionRepo.save(stockTransaction);
                     for (ItemTransactionDetailDto itemTransactionDetailDto : details) {
                         if(itemTransactionDetailDto.getReceiveQuantity() != null && itemTransactionDetailDto.getReceiveQuantity().compareTo(BigDecimal.ZERO) == 1) {
@@ -589,6 +591,8 @@ public class StockReceiveServiceImpl implements StockReceiveService, PrintableVo
                                 item.setId(itemTransactionDetailDto.getItemId());
                                 itemStock.setItem(item);
                                 itemStock.setInventoryLocation(inventoryLocation);
+                                itemStock.setCreatedAt(new java.sql.Date(System.currentTimeMillis()));
+                                itemStock.setUpdatedAt(new java.sql.Date(System.currentTimeMillis()));
                             }
 
                             ItemStock newItemStock = itemStockRepo.save(itemStock);

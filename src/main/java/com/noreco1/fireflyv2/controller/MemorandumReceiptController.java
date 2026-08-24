@@ -1,15 +1,15 @@
 package com.noreco1.fireflyv2.controller;
 
 import com.noreco1.fireflyv2.common.GlobalConstant;
-import com.noreco1.fireflyv2.common.facade.AuthenticationFacade;
-import com.noreco1.fireflyv2.common.facade.GeneratorFacade;
 import com.noreco1.fireflyv2.controller.response.MemorandumReceiptDto;
 import com.noreco1.fireflyv2.controller.response.PostResponse;
 import com.noreco1.fireflyv2.controller.response.ProcessDocumentDto;
-import com.noreco1.fireflyv2.model.DocumentStatus;
 import com.noreco1.fireflyv2.model.MemorandumReceipt;
-import com.noreco1.fireflyv2.model.Workflow;
-import com.noreco1.fireflyv2.repo.MemorandumReceiptRepo;
+import com.noreco1.fireflyv2.model.MemorandumReceiptDetail;
+import com.noreco1.fireflyv2.model.SlEntity;
+import com.noreco1.fireflyv2.model.StockWithdrawal;
+import com.noreco1.fireflyv2.model.StockWithdrawalDetail;
+import com.noreco1.fireflyv2.model.User;
 import com.noreco1.fireflyv2.service.DownloadService;
 import com.noreco1.fireflyv2.service.MemorandumReceiptService;
 import com.noreco1.fireflyv2.service.PrintableVoucher;
@@ -26,6 +26,8 @@ import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -38,15 +40,6 @@ public class MemorandumReceiptController {
     @Autowired
     @Qualifier("memorandumReceiptServiceImpl")
     private MemorandumReceiptService mrService;
-
-    @Autowired
-    private MemorandumReceiptRepo mrRepo;
-
-    @Autowired
-    private AuthenticationFacade authenticationFacade;
-
-    @Autowired
-    private GeneratorFacade generatorFacade;
 
     @Autowired
     private MessageSource messageSource;
@@ -66,6 +59,31 @@ public class MemorandumReceiptController {
         return page.getContent();
     }
 
+    @GetMapping("/stock-withdrawals")
+    public List<StockWithdrawal> stockWithdrawals(@RequestParam(required = false, defaultValue = "") String q) {
+        return mrService.getStockWithdrawals(q);
+    }
+
+    @GetMapping("/stock-withdrawal-balance/{detailId}")
+    public List<Map> stockWithdrawalBalance(@PathVariable Integer detailId) {
+        return mrService.getStockWithdrawalBalance(detailId);
+    }
+
+    @GetMapping("/default-signatories")
+    public Map defaultSignatories() {
+        return mrService.defaultSignatories();
+    }
+
+    @GetMapping("/sw-employees/{swId}")
+    public ArrayList<SlEntity> swEmployees(@PathVariable Integer swId) {
+        return mrService.getStockWithdrawalEmployees(swId);
+    }
+
+    @GetMapping("/returned-memos/{accountNo}")
+    public ArrayList<MemorandumReceipt> returnedMemos(@PathVariable Integer accountNo) {
+        return mrService.getAllEmployeesMemorandumReceipt(accountNo, false);
+    }
+
     @GetMapping("/{id}")
     public MemorandumReceiptDto getById(@PathVariable Integer id) {
         return mrService.findById(id);
@@ -75,32 +93,9 @@ public class MemorandumReceiptController {
     public PostResponse create(@RequestBody Map<String, Object> payload) {
         PostResponse response = new PostResponse();
         try {
-            MemorandumReceipt mr = new MemorandumReceipt();
-            Object dateObj = payload.get("voucherDate");
-            if (dateObj instanceof String dateStr && !dateStr.isEmpty()) {
-                Date date = java.sql.Date.valueOf(dateStr);
-                mr.setDate(date);
-                int year = Integer.parseInt(GlobalConstant.YYYY_DATE_FORMAT.format(date));
-                Object latestCode = mrRepo.findLatestCodeByYear(year);
-                String code = generatorFacade.voucherCodeNoOffice("MRTE",
-                        latestCode == null ? "" : String.valueOf(latestCode),
-                        date, GlobalConstant.COUNTER_PAD_4);
-                mr.setCode(code);
-            }
-            Date now = new Date();
-            mr.setCreatedAt(now);
-            mr.setUpdatedAt(now);
-            mr.setCreatedBy(authenticationFacade.getLoggedIn());
-            DocumentStatus ds = new DocumentStatus();
-            ds.setId(com.noreco1.fireflyv2.model.enums.DocumentStatus.DOCUMENT_CREATED.getId());
-            mr.setDocumentStatus(ds);
-            Workflow wf = new Workflow();
-            wf.setId(com.noreco1.fireflyv2.model.enums.Workflow.MRTE.getId());
-            mr.setWorkflow(wf);
-            mr.setTransaction(generatorFacade.transaction());
-            MemorandumReceipt saved = mrRepo.save(mr);
-            response.setSuccessMessage("Memorandum Receipt saved.");
-            response.setModelId(saved.getId());
+            MemorandumReceipt mr = buildMrFromPayload(payload);
+            BindingResult br = new BeanPropertyBindingResult(mr, "mr");
+            response = mrService.create(mr, br, messageSource);
         } catch (Exception e) {
             response.setFailureMessage("Failed to save: " + e.getMessage());
         }
@@ -112,22 +107,57 @@ public class MemorandumReceiptController {
         PostResponse response = new PostResponse();
         Object idObj = payload.get("id");
         if (idObj == null) { response.setFailureMessage("ID is required."); return response; }
-        Integer id = ((Number) idObj).intValue();
-        MemorandumReceipt mr = mrRepo.findById(id).orElse(null);
-        if (mr == null) { response.setFailureMessage("Record not found."); return response; }
         try {
-            Object dateObj = payload.get("voucherDate");
-            if (dateObj instanceof String dateStr && !dateStr.isEmpty()) {
-                mr.setDate(java.sql.Date.valueOf(dateStr));
-            }
-            mr.setUpdatedAt(new Date());
-            MemorandumReceipt saved = mrRepo.save(mr);
-            response.setSuccessMessage("Memorandum Receipt updated.");
-            response.setModelId(saved.getId());
+            MemorandumReceipt mr = buildMrFromPayload(payload);
+            mr.setId(((Number) idObj).intValue());
+            BindingResult br = new BeanPropertyBindingResult(mr, "mr");
+            response = mrService.update(mr, br, messageSource);
         } catch (Exception e) {
             response.setFailureMessage("Failed to update: " + e.getMessage());
         }
         return response;
+    }
+
+    private MemorandumReceipt buildMrFromPayload(Map<String, Object> payload) {
+        MemorandumReceipt mr = new MemorandumReceipt();
+        Object dateObj = payload.get("date");
+        if (dateObj instanceof String dateStr && !dateStr.isEmpty()) {
+            mr.setDate(java.sql.Date.valueOf(dateStr));
+        }
+        Object swObj = payload.get("stockWithdrawal");
+        if (swObj instanceof Map swMap && swMap.get("id") != null) {
+            StockWithdrawal sw = new StockWithdrawal();
+            sw.setId(((Number) swMap.get("id")).intValue());
+            mr.setStockWithdrawal(sw);
+        }
+        Object aoObj = payload.get("approvingOfficer");
+        if (aoObj instanceof Map aoMap && aoMap.get("accountNo") != null) {
+            User ao = new User();
+            ao.setAccountNo(((Number) aoMap.get("accountNo")).intValue());
+            mr.setApprovingOfficer(ao);
+        }
+        Object detailsObj = payload.get("memorandumReceiptDetails");
+        if (detailsObj instanceof List<?> detailsList) {
+            List<MemorandumReceiptDetail> details = new ArrayList<>();
+            for (Object item : detailsList) {
+                if (item instanceof Map<?, ?> dm) {
+                    MemorandumReceiptDetail d = new MemorandumReceiptDetail();
+                    Object swdObj = dm.get("stockWithdrawalDetail");
+                    if (swdObj instanceof Map<?, ?> swdMap && swdMap.get("id") != null) {
+                        StockWithdrawalDetail swd = new StockWithdrawalDetail();
+                        swd.setId(((Number) swdMap.get("id")).intValue());
+                        d.setStockWithdrawalDetail(swd);
+                    }
+                    Object qty = dm.get("quantity");
+                    if (qty != null) d.setQuantity(((Number) qty).intValue());
+                    Object reassigned = dm.get("reassignedQuantity");
+                    d.setReassignedQuantity(reassigned != null ? new BigDecimal(String.valueOf(reassigned)) : BigDecimal.ZERO);
+                    details.add(d);
+                }
+            }
+            mr.setMemorandumReceiptDetails(details);
+        }
+        return mr;
     }
 
     @PostMapping("/process")

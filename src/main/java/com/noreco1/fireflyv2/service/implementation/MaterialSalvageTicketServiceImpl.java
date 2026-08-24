@@ -320,6 +320,8 @@ public class MaterialSalvageTicketServiceImpl implements MaterialSalvageTicketSe
                         StockTransaction stockTransaction = new StockTransaction();
                         stockTransaction.setTransaction(materialSalvageTicket.getTransaction());
                         stockTransaction.setCreatedBy(processedBy);
+                        stockTransaction.setCreatedAt(new Date());
+                        stockTransaction.setUpdatedAt(new Date());
                         stockTransaction = stockTransactionRepo.save(stockTransaction);
 
                         for (ItemTransactionDetailDto detailDto : materialSalvageTicket.getDetails()) {
@@ -343,6 +345,8 @@ public class MaterialSalvageTicketServiceImpl implements MaterialSalvageTicketSe
                                     itemStock.setInventoryLocation(inventoryLocation);
                                     itemStock.setTotalQuantity(detailDto.getQuantity());
                                     itemStock.setTotalItemCost(detailDto.getTotalCost());
+                                    itemStock.setCreatedAt(new java.sql.Date(System.currentTimeMillis()));
+                                    itemStock.setUpdatedAt(new java.sql.Date(System.currentTimeMillis()));
                                 }
                                 ItemStock newItemStock = itemStockRepo.save(itemStock);
 

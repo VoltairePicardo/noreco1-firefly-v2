@@ -148,26 +148,25 @@ public interface StockWithdrawalRepo extends JpaRepository<StockWithdrawal, Inte
 
     @Query(value = "SELECT sw.* FROM StockWithdrawal sw " +
             "LEFT JOIN StockWithdrawalDetail swd ON sw.id = swd.FK_stockWithdrawalId " +
-            "LEFT JOIN StockWithdrawalEmployee swe ON sw.id = swe.FK_stockWithdrawalId  " +
+            "LEFT JOIN StockWithdrawalEmployee swe ON sw.id = swe.FK_stockWithdrawalId " +
             "WHERE sw.type = 3 " + //OFE
             "AND sw.FK_documentStatusId = 7 " +
             "AND sw.FK_transactionId IN (SELECT sr.FK_documentTransactionId FROM StockRelease sr WHERE sr.FK_documentStatusId = 7) " + // Approved
             "AND swd.quantity > (SELECT IF(sum(quantity) IS NOT NULL, sum(quantity), 0) FROM MemorandumReceiptDetail WHERE MemorandumReceiptDetail.FK_stockWithdrawalDetailId = swd.id) " +
             "AND IF(LENGTH(:query) > 0, (sw.code LIKE CONCAT('%', :query, '%') OR sw.description LIKE CONCAT('%', :query, '%')), 1) " +
             "AND swe.id IS NULL " +
-            "GROUP BY sw.code " +
+            "GROUP BY sw.id " +
             "ORDER BY sw.code \n#pageable\n",
-            countQuery = "SELECT count(*) FROM StockWithdrawal sw " +
+            countQuery = "SELECT count(*) FROM (SELECT sw.id FROM StockWithdrawal sw " +
                     "LEFT JOIN StockWithdrawalDetail swd ON sw.id = swd.FK_stockWithdrawalId " +
-                    "LEFT JOIN StockWithdrawalEmployee swe ON sw.id = swe.FK_stockWithdrawalId  " +
+                    "LEFT JOIN StockWithdrawalEmployee swe ON sw.id = swe.FK_stockWithdrawalId " +
                     "WHERE sw.type = 3 " + //OFE
                     "AND sw.FK_documentStatusId = 7 " +
                     "AND sw.FK_transactionId IN (SELECT sr.FK_documentTransactionId FROM StockRelease sr WHERE sr.FK_documentStatusId = 7) " + // Approved
                     "AND swd.quantity > (SELECT IF(sum(quantity) IS NOT NULL, sum(quantity), 0) FROM MemorandumReceiptDetail WHERE MemorandumReceiptDetail.FK_stockWithdrawalDetailId = swd.id) " +
                     "AND IF(LENGTH(:query) > 0, (sw.code LIKE CONCAT('%', :query, '%') OR sw.description LIKE CONCAT('%', :query, '%')), 1) " +
                     "AND swe.id IS NULL " +
-                    "GROUP BY sw.code " +
-                    "ORDER BY sw.code ",
+                    "GROUP BY sw.id) AS cnt",
             nativeQuery = true)
     Page<StockWithdrawal> findAllForMemorandumReceipt(@Param("query") String query, Pageable paging);
 

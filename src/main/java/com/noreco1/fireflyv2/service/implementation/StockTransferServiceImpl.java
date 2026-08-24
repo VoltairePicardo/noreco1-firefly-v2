@@ -155,6 +155,23 @@ public class StockTransferServiceImpl implements StockTransferService, Printable
 
     @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
+    public List<Map> findByDateRangeAll(String from, String to) {
+        try {
+            Date fromDate = DateHelper.strToDate(from, "yyyy-MM-dd");
+            Date toDate   = DateHelper.strToDate(to,   "yyyy-MM-dd");
+            if (fromDate == null) fromDate = new Date(0);
+            if (toDate   == null) toDate   = new Date();
+            User loggedIn = authenticationFacade.getLoggedIn();
+            List<StockTransfer> docs = stockTransferRepo.findByAllowedUserVoucherDateBetween(loggedIn.getId(), fromDate, toDate);
+            return this.makeStockTransferListMap(docs);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return null;
+    }
+
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
+    @Override
     public List<Map> findByDateRangeAndStatusId(String from, String to, Integer docStatusId, Integer officeId) {
         try {
             Date fromDate = DateHelper.strToDate(from, "yyyy-MM-dd");

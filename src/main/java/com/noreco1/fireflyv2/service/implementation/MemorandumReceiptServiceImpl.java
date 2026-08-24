@@ -87,6 +87,9 @@ public class MemorandumReceiptServiceImpl implements MemorandumReceiptService, P
     @Autowired
     private SignatureFacade signatureFacade;
 
+    @Autowired
+    private StockWithdrawalRepo stockWithdrawalRepo;
+
     @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<MemorandumReceipt> findAll(String startDate, String endDate, Pageable pageable) {
@@ -174,6 +177,12 @@ public class MemorandumReceiptServiceImpl implements MemorandumReceiptService, P
 
                 } else {
                     existingMemorandumReceipt = memorandumReceiptRepo.findById(memorandumReceipt.getId()).orElse(null);
+                    if (memorandumReceipt.getDate() != null) existingMemorandumReceipt.setDate(memorandumReceipt.getDate());
+                    if (memorandumReceipt.getStockWithdrawal() != null) existingMemorandumReceipt.setStockWithdrawal(memorandumReceipt.getStockWithdrawal());
+                    if (memorandumReceipt.getApprovingOfficer() != null && memorandumReceipt.getApprovingOfficer().getAccountNo() != null) {
+                        User approvedBy = userRepo.findOneByAccountNo(memorandumReceipt.getApprovingOfficer().getAccountNo());
+                        existingMemorandumReceipt.setApprovingOfficer(approvedBy);
+                    }
                 }
                 // use for document logging
                 Map oldMap = this.forLogMapMain(existingMemorandumReceipt);
@@ -445,6 +454,15 @@ public class MemorandumReceiptServiceImpl implements MemorandumReceiptService, P
     @Override
     public Map defaultSignatories() {
         return signatoryFacade.defaultSignatories(com.noreco1.fireflyv2.model.enums.DocumentType.MRTE);
+    }
+
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED, readOnly = true)
+    @Override
+    public List<StockWithdrawal> getStockWithdrawals(String query) {
+        return stockWithdrawalRepo.findAllForMemorandumReceipt(
+                query == null ? "" : query,
+                org.springframework.data.domain.PageRequest.of(0, 500))
+            .getContent();
     }
 
     @Transactional(isolation = Isolation.READ_UNCOMMITTED)

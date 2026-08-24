@@ -343,6 +343,8 @@ public class StockAdjustmentServiceImpl implements StockAdjustmentService, Print
                         StockTransaction stockTransaction = new StockTransaction();
                         stockTransaction.setTransaction(stockAdjustment.getTransaction());
                         stockTransaction.setCreatedBy(processedBy);
+                        stockTransaction.setCreatedAt(new Date());
+                        stockTransaction.setUpdatedAt(new Date());
 
                         stockTransaction = stockTransactionRepo.save(stockTransaction);
 

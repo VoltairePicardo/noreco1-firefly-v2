@@ -1,6 +1,8 @@
 package com.noreco1.fireflyv2.service;
 
+import com.noreco1.fireflyv2.model.InventoryLocation;
 import com.noreco1.fireflyv2.model.ItemTesting;
+import com.noreco1.fireflyv2.model.PoDetail;
 import com.noreco1.fireflyv2.controller.response.ItemTestingDto;
 import com.noreco1.fireflyv2.controller.response.PostResponse;
 import org.springframework.context.MessageSource;
@@ -31,5 +33,9 @@ public interface ItemTestingService {
 
     @Transactional(readOnly = true)
     List<Map> getItemTestingDetails(Integer id);
+
+    List<InventoryLocation> getInventoryLocations();
+
+    List<PoDetail> getPurchaseOrderDetailsForItemTesting(Integer poId);
 
 }
