@@ -1,15 +1,16 @@
 package com.noreco1.fireflyv2.controller;
 
 import com.noreco1.fireflyv2.common.GlobalConstant;
-import com.noreco1.fireflyv2.common.facade.AuthenticationFacade;
-import com.noreco1.fireflyv2.common.facade.GeneratorFacade;
 import com.noreco1.fireflyv2.controller.response.PostResponse;
 import com.noreco1.fireflyv2.controller.response.ProcessDocumentDto;
-import com.noreco1.fireflyv2.model.DocumentStatus;
-import com.noreco1.fireflyv2.model.StockReceive;
-import com.noreco1.fireflyv2.model.Workflow;
-import com.noreco1.fireflyv2.repo.StockReceiveRepo;
+import com.noreco1.fireflyv2.model.*;
+import com.noreco1.fireflyv2.controller.response.ItemTransactionDetailDto;
+import com.noreco1.fireflyv2.repo.InventoryLocationRepo;
+import com.noreco1.fireflyv2.repo.ItemTransactionDetailRepo;
+import com.noreco1.fireflyv2.repo.StockTransferRepo;
 import com.noreco1.fireflyv2.service.DownloadService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import com.noreco1.fireflyv2.service.PrintableVoucher;
 import com.noreco1.fireflyv2.service.StockReceiveService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -22,6 +23,7 @@ import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -36,13 +38,13 @@ public class StockReceiveController {
     private StockReceiveService stockReceiveService;
 
     @Autowired
-    private StockReceiveRepo stockReceiveRepo;
+    private InventoryLocationRepo inventoryLocationRepo;
 
     @Autowired
-    private AuthenticationFacade authenticationFacade;
+    private StockTransferRepo stockTransferRepo;
 
     @Autowired
-    private GeneratorFacade generatorFacade;
+    private ItemTransactionDetailRepo itemTransactionDetailRepo;
 
     @Autowired
     private MessageSource messageSource;
@@ -69,70 +71,58 @@ public class StockReceiveController {
         return stockReceiveService.getDocumentsStatuses();
     }
 
+    @GetMapping("/inventory-locations")
+    public List<InventoryLocation> inventoryLocations() {
+        return inventoryLocationRepo.findAllByOrderByDescriptionAsc();
+    }
+
+    @GetMapping("/default-signatories")
+    public Map defaultSignatories() {
+        return stockReceiveService.defaultSignatories();
+    }
+
+    @GetMapping("/receiving-documents/{locationId}")
+    public Page<StockTransfer> receivingDocuments(
+            @PathVariable Integer locationId,
+            @RequestParam(defaultValue = "") String q,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        PageRequest pageable = PageRequest.of(page, size);
+        Integer approved = com.noreco1.fireflyv2.model.enums.DocumentStatus.APPROVED.getId();
+        Page<StockTransfer> result = q.isBlank()
+            ? stockTransferRepo.findForReceiving(approved, locationId, pageable)
+            : stockTransferRepo.findForReceivingByQuery("%" + q + "%", locationId, approved, pageable);
+        for (StockTransfer st : result.getContent()) {
+            if (st.getTransaction() != null) {
+                ArrayList<ItemTransactionDetail> items =
+                    itemTransactionDetailRepo.findByTransactionId(st.getTransaction().getId());
+                ArrayList<ItemTransactionDetailDto> dtos = new ArrayList<>();
+                for (ItemTransactionDetail d : items) {
+                    ItemTransactionDetailDto dto = d.toReceiveDto();
+                    dto.setQuantityOrdered(d.getQuantity());
+                    dtos.add(dto);
+                }
+                st.setDetails(dtos);
+            }
+        }
+        return result;
+    }
+
     @GetMapping("/{id}")
     public StockReceive getById(@PathVariable Integer id) {
         return stockReceiveService.findById(id);
     }
 
     @PostMapping("/create")
-    public PostResponse create(@RequestBody Map<String, Object> payload) {
-        PostResponse response = new PostResponse();
-        try {
-            StockReceive sr = new StockReceive();
-            Object dateObj = payload.get("voucherDate");
-            if (dateObj instanceof String dateStr && !dateStr.isEmpty()) {
-                Date voucherDate = java.sql.Date.valueOf(dateStr);
-                sr.setVoucherDate(voucherDate);
-                int year = Integer.parseInt(GlobalConstant.YYYY_DATE_FORMAT.format(voucherDate));
-                sr.setYear(year);
-                Object latestCode = stockReceiveRepo.findLatestCodeByYear(year);
-                String code = generatorFacade.voucherCode("SRC",
-                        latestCode == null ? "" : String.valueOf(latestCode), voucherDate);
-                sr.setCode(code);
-            }
-            sr.setDescription(payload.get("remarks") != null ? String.valueOf(payload.get("remarks")) : null);
-            Date now = new Date();
-            sr.setCreatedAt(now);
-            sr.setUpdatedAt(now);
-            sr.setCreatedBy(authenticationFacade.getLoggedIn());
-            DocumentStatus ds = new DocumentStatus();
-            ds.setId(com.noreco1.fireflyv2.model.enums.DocumentStatus.DOCUMENT_CREATED.getId());
-            sr.setDocumentStatus(ds);
-            Workflow wf = new Workflow();
-            wf.setId(com.noreco1.fireflyv2.model.enums.Workflow.STOCK_RECEIVE.getId());
-            sr.setWorkflow(wf);
-            sr.setTransaction(generatorFacade.transaction());
-            StockReceive saved = stockReceiveRepo.save(sr);
-            response.setSuccessMessage("Stock Receive saved.");
-            response.setModelId(saved.getId());
-        } catch (Exception e) {
-            response.setFailureMessage("Failed to save: " + e.getMessage());
-        }
-        return response;
+    public PostResponse create(@RequestBody StockReceive stockReceive) {
+        BindingResult br = new BeanPropertyBindingResult(stockReceive, "stockReceive");
+        return stockReceiveService.processCreate(stockReceive, br, messageSource);
     }
 
     @PostMapping("/update")
-    public PostResponse update(@RequestBody Map<String, Object> payload) {
-        PostResponse response = new PostResponse();
-        Object idObj = payload.get("id");
-        if (idObj == null) { response.setFailureMessage("ID is required."); return response; }
-        Integer id = ((Number) idObj).intValue();
-        StockReceive sr = stockReceiveRepo.findById(id).orElse(null);
-        if (sr == null) { response.setFailureMessage("Record not found."); return response; }
-        try {
-            Object dateObj = payload.get("voucherDate");
-            if (dateObj instanceof String dateStr && !dateStr.isEmpty()) {
-                sr.setVoucherDate(java.sql.Date.valueOf(dateStr));
-            }
-            sr.setDescription(payload.get("remarks") != null ? String.valueOf(payload.get("remarks")) : null);
-            sr.setUpdatedAt(new Date());
-            StockReceive saved = stockReceiveRepo.save(sr);
-            response.setSuccessMessage("Stock Receive updated.");
-            response.setModelId(saved.getId());
-        } catch (Exception e) {
-            response.setFailureMessage("Failed to update: " + e.getMessage());
-        }
-        return response;
+    public PostResponse update(@RequestBody StockReceive stockReceive) {
+        BindingResult br = new BeanPropertyBindingResult(stockReceive, "stockReceive");
+        return stockReceiveService.processUpdate(stockReceive, br, messageSource);
     }
 
     @PostMapping("/process")

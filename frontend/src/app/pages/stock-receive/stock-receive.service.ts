@@ -5,7 +5,6 @@ import { environment } from '@/environments/environment';
 import { DownloadService } from '@/app/core/services/download.service';
 
 const BASE_API = environment.get('baseApiUrl');
-const BASE_URL = environment.get('baseUrl');
 const httpOptions = { headers: new HttpHeaders({ 'Content-Type': 'application/json' }) };
 
 @Injectable({ providedIn: 'root' })
@@ -45,15 +44,15 @@ export class StockReceiveService {
     }
 
     getWorkflowActions(transId: number): Observable<any[]> {
-        return this.http.get<any[]>(`${BASE_URL}/json/workflow-actions/${transId}`);
+        return this.http.get<any[]>(`${BASE_API}/json/workflow-actions/${transId}`);
     }
 
     getDocumentLogs(transId: number): Observable<any[]> {
-        return this.http.post<any[]>(`${BASE_URL}/document/${transId}/logs`, {}, httpOptions);
+        return this.http.get<any[]>(`${BASE_API}/json/document-logs/${transId}`);
     }
 
     print(id: number): void {
-        this.downloadService.print(`${BASE_URL}/stock-receive/export/${id}`, { type: 'pdf' });
+        this.downloadService.print(`${BASE_API}/stock-receive/export/${id}`, { type: 'pdf' });
     }
 
     getDefaultSignatories(): Observable<any> {
@@ -64,7 +63,8 @@ export class StockReceiveService {
         return this.http.get<any[]>(`${BASE_API}/stock-receive/inventory-locations`);
     }
 
-    getReceivingDocuments(locationId: number): Observable<any[]> {
-        return this.http.get<any[]>(`${BASE_API}/stock-receive/receiving-documents/${locationId}`);
+    getReceivingDocuments(locationId: number, q = '', page = 0, size = 10): Observable<any> {
+        const params = new HttpParams().set('q', q).set('page', page).set('size', size);
+        return this.http.get(`${BASE_API}/stock-receive/receiving-documents/${locationId}`, { params });
     }
 }

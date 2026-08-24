@@ -3,6 +3,7 @@ import { COMMON_ALL_PAGE_IMPORTS, COMMON_MAIN_PAGE_IMPORTS, SHARED_PROVIDERS } f
 import { AlertService } from '@/app/shared/services/alert.service';
 import { FlatpickrDirective, provideFlatpickrDefaults } from 'angularx-flatpickr';
 import { SpecialEquipmentAssignmentService } from '../special-equipment-assignment.service';
+import { monthStart, monthEnd } from '@/app/shared/utils/date.utils';
 
 @Component({
     selector: 'app-special-equipment-assignment-main',
@@ -34,9 +35,8 @@ export class SpecialEquipmentAssignmentMainComponent {
     ngOnInit(): void { this.setDefaultDates(); this.load(); }
 
     setDefaultDates(): void {
-        const now = new Date(), first = new Date(now.getFullYear(), now.getMonth(), 1);
-        this.fromDate = first.toISOString().substring(0, 10);
-        this.toDate   = now.toISOString().substring(0, 10);
+        this.fromDate = monthStart();
+        this.toDate   = monthEnd();
     }
 
     load(): void {

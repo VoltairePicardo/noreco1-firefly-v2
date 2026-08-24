@@ -19,7 +19,7 @@ import java.util.HashMap;
  * Created by Personal on 3/17/2015.
  */
 @RestController
-@RequestMapping(value = "/canvass-rv")
+@RequestMapping(value = "/api/canvass-rv")
 public class CanvassManagementController {
 
     @Autowired

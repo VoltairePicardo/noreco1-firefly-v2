@@ -22,7 +22,7 @@ import java.util.Map;
  * Created by tonyc on 6/26/2023.
  */
 @RestController
-@RequestMapping(value = "/petty-cash-liquidation")
+@RequestMapping(value = "/api/petty-cash-liquidation")
 public class PettyCashLiquidationController {
 
     @Autowired

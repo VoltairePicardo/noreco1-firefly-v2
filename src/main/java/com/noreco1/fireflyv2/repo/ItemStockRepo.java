@@ -14,6 +14,7 @@ public interface ItemStockRepo extends JpaRepository<ItemStock, Integer> {
     ItemStock findByItemIdAndInventoryLocationId(Integer itemId, Integer invLocId);
     ItemStock findFirstByItemIdAndInventoryLocationIdOrderByIdAsc(Integer itemId, Integer invLocId);
     Page<ItemStock> findAllByInventoryLocationIdAndTotalQuantityGreaterThanOrderByItemCode(Integer invLocId, BigDecimal qty, Pageable paging);
+    List<ItemStock> findAllByInventoryLocationIdAndTotalQuantityGreaterThanOrderByItemCode(Integer invLocId, BigDecimal qty);
     Page<ItemStock> findAllByInventoryLocationIdNotAndQuantityGreaterThanOrderByItemCode(Integer invLocId, BigDecimal qty, Pageable paging);
 
     @Query(value = "SELECT * " +

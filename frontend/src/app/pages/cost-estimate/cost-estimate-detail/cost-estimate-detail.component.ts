@@ -86,7 +86,11 @@ export class CostEstimateDetailComponent {
     }
 
     loadWorkflowActions(): void {
-        if (!this.data?.transaction?.id || this.isTerminal()) return;
+        if (!this.data?.transaction?.id || this.isTerminal()) {
+            this.workflowActions = [];
+            this.selectedAction  = null;
+            return;
+        }
         this.service.getWorkflowActions(this.data.transaction.id).subscribe({
             next: (actions) => { this.workflowActions = actions || []; this.selectedAction = null; this.remarks = ''; },
             error: () => { this.workflowActions = []; }
@@ -115,6 +119,9 @@ export class CostEstimateDetailComponent {
             next: (res) => {
                 this.processingWorkflow = false;
                 if (res?.success) {
+                    this.workflowActions = [];
+                    this.selectedAction  = null;
+                    this.remarks         = '';
                     this.alertService.success(this.module, res.successMessage || 'Processed.', '');
                     this.loadData(this.showLogs);
                 } else {

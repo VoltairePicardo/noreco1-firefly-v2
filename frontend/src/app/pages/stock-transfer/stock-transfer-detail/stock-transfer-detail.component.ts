@@ -1,36 +1,46 @@
 import { Component, inject, signal } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { COMMON_ALL_PAGE_IMPORTS } from '@/app/shared/providers/shared-providers';
-import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { COMMON_ALL_PAGE_IMPORTS, COMMON_MAIN_PAGE_IMPORTS, SHARED_PROVIDERS } from '@/app/shared/providers/shared-providers';
 import { AlertService } from '@/app/shared/services/alert.service';
-import { SharedModule } from '@/app/shared/shared.module';
 import { StockTransferService } from '../stock-transfer.service';
 import { provideIcons } from '@ng-icons/core';
-import { tablerPrinter, tablerEdit, tablerArrowLeft } from '@ng-icons/tabler-icons';
-
-const TERMINAL_STATUSES = ['Approved', 'Denied', 'Cancelled'];
+import { tablerArrowLeft, tablerPrinter, tablerEdit, tablerEye, tablerEyeOff, tablerCheck } from '@ng-icons/tabler-icons';
 
 @Component({
     selector: 'app-stock-transfer-detail',
-    imports: [...COMMON_ALL_PAGE_IMPORTS, SharedModule, FormsModule, RouterLink],
-    templateUrl: './stock-transfer-detail.component.html',
-    providers: [provideIcons({ tablerPrinter, tablerEdit, tablerArrowLeft })]
+    imports: [...COMMON_ALL_PAGE_IMPORTS, ...COMMON_MAIN_PAGE_IMPORTS, RouterLink],
+    providers: [...SHARED_PROVIDERS, provideIcons({ tablerArrowLeft, tablerPrinter, tablerEdit, tablerEye, tablerEyeOff, tablerCheck })],
+    templateUrl: './stock-transfer-detail.component.html'
 })
 export class StockTransferDetailComponent {
-    module = 'Stock Transfer'; subModule = 'Details'; menuLink = 'stock-transfer';
-    id: any = 0; data: any = {}; isLoading = signal(false);
-    workflowActions: any[] = []; selectedAction: any = null; remarks = ''; processingWorkflow = false;
-    logs: any[] = []; showLogs = false; logsLoading = false;
+    module    = 'Stock Transfer';
+    subModule = 'Detail';
+    menuLink  = 'stock-transfer';
 
-    private service = inject(StockTransferService);
-    private route = inject(ActivatedRoute); private router = inject(Router);
+    id: any   = 0;
+    data: any = {};
+    isLoading = signal(false);
+
+    // Workflow
+    workflowActions: any[] = [];
+    selectedAction: any    = null;
+    remarks                = '';
+    processingWorkflow     = false;
+
+    // Logs
+    logs        : any[] = [];
+    showLogs    = false;
+    logsLoading = false;
+
+    private service      = inject(StockTransferService);
+    private route        = inject(ActivatedRoute);
+    private router       = inject(Router);
     private alertService = inject(AlertService);
 
     ngOnInit(): void {
         this.route.paramMap.subscribe(params => {
             this.id = params.get('id');
-            if (this.id && /^\d+$/.test(String(this.id))) this.loadData();
+            if (this.id && /^\d+$/.test(String(this.id))) { this.loadData(); }
         });
     }
 
@@ -39,36 +49,74 @@ export class StockTransferDetailComponent {
         this.service.getData(this.id).subscribe({
             next: (data) => {
                 this.isLoading.set(false);
-                if (data?.id) { this.data = data; this.loadWorkflowActions(); }
-                else { this.alertService.error(this.module, 'Not Found', ''); this.router.navigate(['/' + this.menuLink]); }
+                if (data?.id) {
+                    this.data = data;
+                    this.loadWorkflowActions();
+                } else {
+                    this.alertService.error(this.module, 'Not Found', '');
+                    this.router.navigate(['/' + this.menuLink]);
+                }
             },
-            error: () => { this.isLoading.set(false); this.alertService.error(this.module, 'Error.', ''); this.router.navigate(['/' + this.menuLink]); }
+            error: () => {
+                this.isLoading.set(false);
+                this.alertService.error(this.module, 'Error', '');
+                this.router.navigate(['/' + this.menuLink]);
+            }
         });
     }
 
-    loadWorkflowActions(): void {
-        if (!this.data?.transId || this.isTerminal()) return;
-        this.service.getWorkflowActions(this.data.transId).subscribe({ next: (a) => { this.workflowActions = a || []; }, error: () => { this.workflowActions = []; } });
+    private get transId(): number | undefined {
+        return this.data?.transId || this.data?.transaction?.id;
     }
 
-    isTerminal(): boolean { return TERMINAL_STATUSES.includes(this.data?.documentStatus?.status || ''); }
-    isEditable(): boolean { const s = this.data?.documentStatus?.status || ''; return s === 'Document Created' || s === 'Returned to Creator'; }
+    loadWorkflowActions(): void {
+        if (!this.transId) return;
+        this.service.getWorkflowActions(this.transId).subscribe({
+            next: (actions) => { this.workflowActions = actions || []; this.selectedAction = null; this.remarks = ''; },
+            error: () => { this.workflowActions = []; }
+        });
+    }
 
     processWorkflow(): void {
         if (!this.selectedAction) return;
         this.processingWorkflow = true;
-        this.service.process({ documentId: this.data.id, remarks: this.remarks, workflowActionsDto: { actionMapId: this.selectedAction.actionMapId } }).subscribe({
-            next: (res) => { this.processingWorkflow = false; if (res?.success) { this.alertService.success(this.module, res.successMessage || 'Processed.', ''); this.loadData(); } else { this.alertService.error(this.module, res?.failureMessage || 'Failed.', ''); } },
+        const payload = {
+            documentId:         this.data.id,
+            transId:            this.transId,
+            workflowActionsDto: this.selectedAction,
+            remarks:            this.remarks || ''
+        };
+        this.service.process(payload).subscribe({
+            next: (res) => {
+                this.processingWorkflow = false;
+                if (res?.success) {
+                    this.alertService.success(this.module, res.successMessage || 'Processed.', '');
+                    this.loadData();
+                } else {
+                    this.alertService.error(this.module, 'Process', res?.failureMessage || 'Failed.');
+                }
+            },
             error: () => { this.processingWorkflow = false; this.alertService.error(this.module, 'Error.', ''); }
         });
     }
 
+    isEditable(): boolean {
+        const s = this.data?.documentStatus?.status || '';
+        return s === 'Document Created' || s === 'Returned to Creator';
+    }
+
     toggleLogs(): void {
         this.showLogs = !this.showLogs;
-        if (this.showLogs && this.logs.length === 0) {
-            this.logsLoading = true;
-            this.service.getDocumentLogs(this.data.transId).subscribe({ next: (l) => { this.logs = l || []; this.logsLoading = false; }, error: () => { this.logsLoading = false; } });
-        }
+        if (this.showLogs && this.logs.length === 0 && !this.logsLoading) { this.loadLogs(); }
+    }
+
+    loadLogs(): void {
+        if (!this.transId || this.logsLoading) return;
+        this.logsLoading = true;
+        this.service.getDocumentLogs(this.transId).subscribe({
+            next: (logs) => { this.logs = logs || []; this.logsLoading = false; },
+            error: () => { this.logsLoading = false; }
+        });
     }
 
     print(): void { this.service.print(this.data.id); }

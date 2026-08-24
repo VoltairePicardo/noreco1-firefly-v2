@@ -47,8 +47,12 @@ export class MemorandumReceiptDetailComponent {
     }
 
     loadWorkflowActions(): void {
-        if (!this.transactionId || this.isTerminal()) return;
-        this.service.getWorkflowActions(this.transactionId).subscribe({ next: (a) => { this.workflowActions = a || []; }, error: () => { this.workflowActions = []; } });
+        if (!this.transactionId || this.isTerminal()) {
+            this.workflowActions = [];
+            this.selectedAction  = null;
+            return;
+        }
+        this.service.getWorkflowActions(this.transactionId).subscribe({ next: (a) => { this.workflowActions = a || []; this.selectedAction = null; this.remarks = ''; }, error: () => { this.workflowActions = []; } });
     }
 
     private get transactionId(): number | undefined {
@@ -62,7 +66,7 @@ export class MemorandumReceiptDetailComponent {
         if (!this.selectedAction) return;
         this.processingWorkflow = true;
         this.service.process({ documentId: this.data.id, remarks: this.remarks, workflowActionsDto: { actionMapId: this.selectedAction.actionMapId } }).subscribe({
-            next: (res) => { this.processingWorkflow = false; if (res?.success) { this.alertService.success(this.module, res.successMessage || 'Processed.', ''); this.loadData(); } else { this.alertService.error(this.module, res?.failureMessage || 'Failed.', ''); } },
+            next: (res) => { this.processingWorkflow = false; if (res?.success) { this.workflowActions = []; this.selectedAction = null; this.remarks = ''; this.alertService.success(this.module, res.successMessage || 'Processed.', ''); this.loadData(); } else { this.alertService.error(this.module, res?.failureMessage || 'Failed.', ''); } },
             error: () => { this.processingWorkflow = false; this.alertService.error(this.module, 'Error.', ''); }
         });
     }

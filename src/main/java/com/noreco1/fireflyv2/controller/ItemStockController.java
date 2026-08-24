@@ -25,7 +25,7 @@ import java.util.Base64;
 import java.util.List;
 
 @RestController
-@RequestMapping("/item-stock")
+@RequestMapping("/api/item-stock")
 public class ItemStockController {
 
     @Autowired

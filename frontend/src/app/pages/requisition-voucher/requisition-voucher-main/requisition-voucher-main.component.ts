@@ -3,6 +3,7 @@ import { COMMON_ALL_PAGE_IMPORTS, COMMON_MAIN_PAGE_IMPORTS, SHARED_PROVIDERS } f
 import { AlertService } from '@/app/shared/services/alert.service';
 import { FlatpickrDefaults, FlatpickrModule } from 'angularx-flatpickr';
 import { RequisitionVoucherService } from '../requisition-voucher.service';
+import { fmtDate, monthStart, monthEnd } from '@/app/shared/utils/date.utils';
 
 @Component({
     selector: 'app-requisition-voucher-main',
@@ -52,18 +53,12 @@ export class RequisitionVoucherMainComponent {
     }
 
     setDefaultDates(): void {
-        const now   = new Date();
-        const first = new Date(now.getFullYear(), now.getMonth(), 1);
-        const last  = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-        this.fromDate = this.toDateString(first);
-        this.toDate   = this.toDateString(last);
+        this.fromDate = monthStart();
+        this.toDate   = monthEnd();
     }
 
     toDateString(d: Date): string {
-        const y = d.getFullYear();
-        const m = String(d.getMonth() + 1).padStart(2, '0');
-        const day = String(d.getDate()).padStart(2, '0');
-        return `${y}-${m}-${day}`;
+        return fmtDate(d);
     }
 
     loadStatuses(): void {

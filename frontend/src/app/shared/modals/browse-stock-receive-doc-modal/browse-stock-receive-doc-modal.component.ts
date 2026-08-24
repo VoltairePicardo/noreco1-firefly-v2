@@ -13,28 +13,12 @@ export class BrowseStockReceiveDocModalComponent {
     locationId: number = 0;
 
     records:  any[] = [];
-    isLoading       = false;
-    searchText      = '';
+    total     = 0;
+    isLoading = false;
+    searchText = '';
 
     page     = 1;
     pageSize = 10;
-
-    get filtered(): any[] {
-        const q = this.searchText.toLowerCase();
-        return q
-            ? this.records.filter(r =>
-                (r.code                               || '').toLowerCase().includes(q) ||
-                (r.fromInventoryLocation?.description || '').toLowerCase().includes(q) ||
-                (r.toInventoryLocation?.description   || '').toLowerCase().includes(q))
-            : this.records;
-    }
-
-    get filteredTotal(): number { return this.filtered.length; }
-
-    get pagedRecords(): any[] {
-        const start = (this.page - 1) * this.pageSize;
-        return this.filtered.slice(start, start + this.pageSize);
-    }
 
     private activeModal = inject(NgbActiveModal);
     private service     = inject(StockReceiveService);
@@ -45,11 +29,26 @@ export class BrowseStockReceiveDocModalComponent {
     }
 
     load(): void {
+        if (this.isLoading) return;
         this.isLoading = true;
-        this.service.getReceivingDocuments(this.locationId).subscribe({
-            next: (data) => { this.records = data || []; this.isLoading = false; this.cdr.markForCheck(); },
+        this.service.getReceivingDocuments(this.locationId, this.searchText, this.page - 1, this.pageSize).subscribe({
+            next: (res) => {
+                this.records   = res.content ?? res ?? [];
+                this.total     = res.totalElements ?? res.page?.totalElements ?? this.records.length;
+                this.isLoading = false;
+                this.cdr.markForCheck();
+            },
             error: () => { this.isLoading = false; this.cdr.markForCheck(); }
         });
+    }
+
+    onSearchChange(): void {
+        this.page = 1;
+        this.load();
+    }
+
+    onPageChange(): void {
+        this.load();
     }
 
     select(doc: any): void {

@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 
 @RestController
-@RequestMapping("/pctd")
+@RequestMapping("/api/pctd")
 public class PettyCashTransDetailController {
 
     @Autowired

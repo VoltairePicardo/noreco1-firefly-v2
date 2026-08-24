@@ -129,12 +129,6 @@
                                                                 (click)="browseAccount('asset', i)">
                                                             <ng-icon name="tablerSearch" class="fw-bold"></ng-icon>
                                                         </button>
-                                                        @if (row.assetAccount) {
-                                                            <button type="button" class="btn btn-light"
-                                                                    (click)="clearAccount('asset', i)">
-                                                                <ng-icon name="tablerX" class="fw-bold"></ng-icon>
-                                                            </button>
-                                                        }
                                                     </div>
                                                 </td>
                                                 <!-- Expense Account -->
@@ -147,12 +141,6 @@
                                                                 (click)="browseAccount('expense', i)">
                                                             <ng-icon name="tablerSearch" class="fw-bold"></ng-icon>
                                                         </button>
-                                                        @if (row.expenseAccount) {
-                                                            <button type="button" class="btn btn-light"
-                                                                    (click)="clearAccount('expense', i)">
-                                                                <ng-icon name="tablerX" class="fw-bold"></ng-icon>
-                                                            </button>
-                                                        }
                                                     </div>
                                                 </td>
                                                 <!-- Accum. Dep. Account -->
@@ -165,12 +153,6 @@
                                                                 (click)="browseAccount('accumDep', i)">
                                                             <ng-icon name="tablerSearch" class="fw-bold"></ng-icon>
                                                         </button>
-                                                        @if (row.accumDepAccount) {
-                                                            <button type="button" class="btn btn-light"
-                                                                    (click)="clearAccount('accumDep', i)">
-                                                                <ng-icon name="tablerX" class="fw-bold"></ng-icon>
-                                                            </button>
-                                                        }
                                                     </div>
                                                 </td>
                                                 <!-- Value -->
@@ -227,16 +209,20 @@
                         </div>
                     </div>
 
-                    <div class="d-flex gap-2 justify-content-end align-items-center pt-3 border-top mt-3">
-                        <a [routerLink]="['/' + menuLink]" class="btn btn-light fw-bold">
-                            <ng-icon name="tablerArrowLeft" class="ps-0 pe-3 fw-bold"></ng-icon>Back
-                        </a>
-                        <button type="button" class="btn btn-primary fw-bold"
-                                [disabled]="formSubmit" (click)="save()">
-                            <ng-icon name="tablerCheck" class="ps-0 pe-3 fw-bold"></ng-icon>
-                            {{ editMode ? 'Update' : 'Save' }}
-                        </button>
-                    </div>
+                        <div class="d-flex gap-2 justify-content-end align-items-center pt-3 border-top mt-3">
+                            <a [routerLink]="['/' + menuLink]" class="btn btn-light fw-bold">
+                                <ng-icon name="tablerArrowLeft" class="ps-0 pe-3 fw-bold"></ng-icon>Back
+                            </a>
+                            <button type="submit" class="btn btn-primary fw-bold" [disabled]="formSubmit">
+                                @if (formSubmit) {
+                                    <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                                    {{ editMode ? 'Updating...' : 'Saving...' }}
+                                } @else {
+                                    <ng-icon name="tablerCheck" class="ps-0 pe-3 fw-bold"></ng-icon>
+                                    {{ editMode ? 'Update' : 'Save ' + module }}
+                                }
+                            </button>
+                        </div>
 
                     }
                 </div>

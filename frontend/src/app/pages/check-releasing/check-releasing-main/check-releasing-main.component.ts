@@ -5,6 +5,7 @@ import { AlertService } from '@/app/shared/services/alert.service';
 import { FlatpickrDirective, provideFlatpickrDefaults } from 'angularx-flatpickr';
 import { NgbNavModule } from '@ng-bootstrap/ng-bootstrap';
 import { CheckReleasingService } from '../check-releasing.service';
+import { fmtDate, monthStart, monthEnd } from '@/app/shared/utils/date.utils';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -81,14 +82,12 @@ export class CheckReleasingMainComponent {
     }
 
     setDefaultDates(): void {
-        const now   = new Date();
-        const first = new Date(now.getFullYear(), now.getMonth(), 1);
-        this.fromDate = this.toDateString(first);
-        this.toDate   = this.toDateString(now);
+        this.fromDate = monthStart();
+        this.toDate   = monthEnd();
     }
 
     toDateString(d: Date): string {
-        return d.toISOString().substring(0, 10);
+        return fmtDate(d);
     }
 
     onTabChange(tabId: number): void {

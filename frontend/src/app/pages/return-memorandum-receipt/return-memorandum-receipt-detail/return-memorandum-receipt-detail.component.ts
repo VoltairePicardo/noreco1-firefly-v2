@@ -44,8 +44,12 @@ export class ReturnMemorandumReceiptDetailComponent {
     }
 
     loadWorkflowActions(): void {
-        if (!this.data?.transId || this.isTerminal()) return;
-        this.service.getWorkflowActions(this.data.transId).subscribe({ next: (a) => { this.workflowActions = a || []; }, error: () => { this.workflowActions = []; } });
+        if (!this.data?.transId || this.isTerminal()) {
+            this.workflowActions = [];
+            this.selectedAction  = null;
+            return;
+        }
+        this.service.getWorkflowActions(this.data.transId).subscribe({ next: (a) => { this.workflowActions = a || []; this.selectedAction = null; this.remarks = ''; }, error: () => { this.workflowActions = []; } });
     }
 
     isTerminal(): boolean { return TERMINAL_STATUSES.includes(this.data?.documentStatus?.status || ''); }
@@ -55,7 +59,7 @@ export class ReturnMemorandumReceiptDetailComponent {
         if (!this.selectedAction) return;
         this.processingWorkflow = true;
         this.service.process({ documentId: this.data.id, remarks: this.remarks, workflowActionsDto: { actionMapId: this.selectedAction.actionMapId } }).subscribe({
-            next: (res) => { this.processingWorkflow = false; if (res?.success) { this.alertService.success(this.module, res.successMessage || 'Processed.', ''); this.loadData(); } else { this.alertService.error(this.module, res?.failureMessage || 'Failed.', ''); } },
+            next: (res) => { this.processingWorkflow = false; if (res?.success) { this.workflowActions = []; this.selectedAction = null; this.remarks = ''; this.alertService.success(this.module, res.successMessage || 'Processed.', ''); this.loadData(); } else { this.alertService.error(this.module, res?.failureMessage || 'Failed.', ''); } },
             error: () => { this.processingWorkflow = false; this.alertService.error(this.module, 'Error.', ''); }
         });
     }

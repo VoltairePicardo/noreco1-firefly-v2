@@ -4,6 +4,7 @@ import { AlertService } from '@/app/shared/services/alert.service';
 import { FlatpickrDefaults, FlatpickrModule } from 'angularx-flatpickr';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { DocumentCancellationService } from '../document-cancellation.service';
+import { monthStart, monthEnd } from '@/app/shared/utils/date.utils';
 import { provideIcons } from '@ng-icons/core';
 import { tablerSearch, tablerRefresh, tablerBan, tablerInfoCircle, tablerRotateClockwise, tablerX } from '@ng-icons/tabler-icons';
 
@@ -53,10 +54,8 @@ export class DocumentCancellationMainComponent {
     private modalService = inject(NgbModal);
 
     ngOnInit(): void {
-        const now   = new Date();
-        const first = new Date(now.getFullYear(), now.getMonth(), 1);
-        this.fromDate = first.toISOString().substring(0, 10);
-        this.toDate   = now.toISOString().substring(0, 10);
+        this.fromDate = monthStart();
+        this.toDate   = monthEnd();
         this.loadDocumentTypes();
     }
 
@@ -92,10 +91,8 @@ export class DocumentCancellationMainComponent {
     }
 
     reset(): void {
-        const now   = new Date();
-        const first = new Date(now.getFullYear(), now.getMonth(), 1);
-        this.fromDate        = first.toISOString().substring(0, 10);
-        this.toDate          = now.toISOString().substring(0, 10);
+        this.fromDate        = monthStart();
+        this.toDate          = monthEnd();
         this.selectedDocType = null;
         this.cancelledOnly   = false;
         this.records.set([]);

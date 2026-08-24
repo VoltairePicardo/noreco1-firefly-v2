@@ -9,6 +9,7 @@ import { FormsModule } from '@angular/forms';
 import { AlertService } from '@/app/shared/services/alert.service';
 import { AccountsPayableVoucherService } from '../accounts-payable-voucher.service';
 import { FlatpickrDirective, provideFlatpickrDefaults } from 'angularx-flatpickr';
+import { monthStart, monthEnd } from '@/app/shared/utils/date.utils';
 import { provideIcons } from '@ng-icons/core';
 import { tablerSearch, tablerRefresh, tablerPlus, tablerEye, tablerEdit, tablerThumbUp } from '@ng-icons/tabler-icons';
 
@@ -49,9 +50,8 @@ export class AccountsPayableVoucherMainComponent {
             next: (data) => this.statuses.set(data || []),
             error: () => {}
         });
-        const now = new Date();
-        this.dateFrom = this.fmt(new Date(now.getFullYear(), now.getMonth(), 1));
-        this.dateTo   = this.fmt(new Date(now.getFullYear(), now.getMonth() + 1, 0));
+        this.dateFrom = monthStart();
+        this.dateTo   = monthEnd();
         this.load();
     }
 
@@ -72,9 +72,8 @@ export class AccountsPayableVoucherMainComponent {
     }
 
     reset(): void {
-        const now = new Date();
-        this.dateFrom        = this.fmt(new Date(now.getFullYear(), now.getMonth(), 1));
-        this.dateTo          = this.fmt(new Date(now.getFullYear(), now.getMonth() + 1, 0));
+        this.dateFrom        = monthStart();
+        this.dateTo          = monthEnd();
         this.selectedStatusId = 0;
         this.searchText = '';
         this.items.set([]);

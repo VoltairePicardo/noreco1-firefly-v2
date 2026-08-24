@@ -17,7 +17,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 
 @RestController
-@RequestMapping(value = "/petty-cash-voucher")
+@RequestMapping(value = "/api/petty-cash-voucher")
 public class PettyCashVoucherController {
 
     @Autowired

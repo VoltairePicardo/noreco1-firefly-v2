@@ -3,6 +3,7 @@ import { COMMON_ALL_PAGE_IMPORTS, COMMON_MAIN_PAGE_IMPORTS, SHARED_PROVIDERS } f
 import { FlatpickrDefaults, FlatpickrModule } from 'angularx-flatpickr';
 import { AlertService } from '@/app/shared/services/alert.service';
 import { CostEstimateService } from '../cost-estimate.service';
+import { monthStart, monthEnd } from '@/app/shared/utils/date.utils';
 
 @Component({
     selector: 'app-cost-estimate-main',
@@ -39,11 +40,8 @@ export class CostEstimateMainComponent {
     }
 
     setDefaultDates(): void {
-        const now   = new Date();
-        const first = new Date(now.getFullYear(), now.getMonth(), 1);
-        const last  = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-        this.fromDate = first.toISOString().substring(0, 10);
-        this.toDate   = last.toISOString().substring(0, 10);
+        this.fromDate = monthStart();
+        this.toDate   = monthEnd();
     }
 
     loadStatuses(): void {

@@ -79,6 +79,7 @@ export class MaintenanceRecordAddEditComponent {
             } else {
                 this.subModule = 'Create';
                 this.addWorkItem();
+                this.addOtherItem();
             }
         });
     }

@@ -27,7 +27,7 @@ import { tablerSearch, tablerArrowLeft, tablerCheck } from '@ng-icons/tabler-ico
     templateUrl: './stock-receive-add-edit.component.html'
 })
 export class StockReceiveAddEditComponent {
-    module    = 'Receive Stock Transfer';
+    module    = 'Stock Receive';
     subModule = 'Create';
     menuLink  = 'stock-receive';
 
@@ -125,10 +125,10 @@ export class StockReceiveAddEditComponent {
             );
             if (result?.action === 'select' && result?.data) {
                 const doc = result.data;
-                this.documentTransaction  = { id: doc.transId || doc.id };
+                this.documentTransaction  = { id: doc.transId || doc.transaction?.id || doc.id };
                 this.selectedDocCode      = doc.code || '';
                 this.selectedDocDate      = doc.date || doc.voucherDate || '';
-                this.selectedDocCreatedBy = doc.createdBy || '';
+                this.selectedDocCreatedBy = doc.createdBy?.fullName || doc.createdBy || '';
                 this.documentType         = doc.type || null;
                 this.details = (doc.details || []).map((d: any) => ({
                     itemId:              d.itemId,

@@ -2,6 +2,7 @@ package com.noreco1.fireflyv2.model;
 
 import lombok.*;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.noreco1.fireflyv2.controller.response.DocInqListDto;
@@ -34,6 +35,7 @@ public class BudgetLineItemDetail implements Serializable {
     @Column
     private Integer id;
 
+    @JsonIgnore
     @NotFound(action = NotFoundAction.IGNORE)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="FK_budgetLineItemId")

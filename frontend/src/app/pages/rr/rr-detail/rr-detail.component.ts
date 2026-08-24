@@ -60,9 +60,13 @@ export class RrDetailComponent {
     }
 
     loadWorkflowActions(): void {
-        if (!this.data?.transId || this.isTerminal()) return;
+        if (!this.data?.transId || this.isTerminal()) {
+            this.workflowActions = [];
+            this.selectedAction  = null;
+            return;
+        }
         this.service.getWorkflowActions(this.data.transId).subscribe({
-            next: (actions) => { this.workflowActions = actions || []; },
+            next: (actions) => { this.workflowActions = actions || []; this.selectedAction = null; this.remarks = ''; },
             error: () => { this.workflowActions = []; }
         });
     }
@@ -79,8 +83,8 @@ export class RrDetailComponent {
         this.service.process({ documentId: this.data.id, remarks: this.remarks, workflowActionsDto: { actionMapId: this.selectedAction.actionMapId } }).subscribe({
             next: (res) => {
                 this.processingWorkflow = false;
-                if (res?.success) { this.alertService.success(this.module, res.successMessage || 'Processed.', ''); this.loadData(); }
-                else { this.alertService.error(this.module, res?.failureMessage || 'Processing failed.', ''); }
+                if (res?.success) { this.workflowActions = []; this.selectedAction = null; this.remarks = ''; this.alertService.success(this.module, res.successMessage || 'Processed.', ''); this.loadData(); }
+                else { this.alertService.error(this.module, 'Process', res?.failureMessage || 'Processing failed.'); }
             },
             error: () => { this.processingWorkflow = false; this.alertService.error(this.module, 'An error occurred.', ''); }
         });

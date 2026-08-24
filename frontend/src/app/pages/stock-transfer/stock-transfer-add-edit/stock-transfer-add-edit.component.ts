@@ -27,6 +27,7 @@ import { tablerSearch, tablerTrash, tablerArrowLeft, tablerCheck, tablerPlus } f
     templateUrl: './stock-transfer-add-edit.component.html'
 })
 export class StockTransferAddEditComponent {
+
     module    = 'Stock Transfer';
     subModule = 'Create';
     menuLink  = 'stock-transfer';

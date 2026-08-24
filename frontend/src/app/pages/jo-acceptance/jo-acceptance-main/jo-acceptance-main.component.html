@@ -5,6 +5,16 @@
 <div class="card">
     <div class="card-body">
 
+        <div class="row mb-3 align-items-end g-2">
+            <div class="col-md-auto ms-auto">
+                <button type="button" class="btn btn-primary fw-bold d-flex align-items-center gap-2"
+                        [routerLink]="['/' + menuLink + '/create']">
+                    <ng-icon name="tablerPlus" class="fw-bold"></ng-icon>
+                    Create {{ module }}
+                </button>
+            </div>
+        </div>
+
         <!-- Filters -->
         <div class="row mb-3 align-items-end g-2">
             <div class="col-md-2">
@@ -38,13 +48,6 @@
                 </button>
                 <button type="button" class="btn btn-danger fw-bold" (click)="reset()">
                     <ng-icon name="tablerRefresh" class="ps-0 pe-3 fw-bold"></ng-icon>Reset
-                </button>
-            </div>
-            <div class="col-md-auto ms-auto">
-                <button type="button" class="btn btn-primary fw-bold d-flex align-items-center gap-2"
-                        [routerLink]="['/' + menuLink + '/create']">
-                    <ng-icon name="tablerPlus" class="fw-bold"></ng-icon>
-                    Create {{ module }}
                 </button>
             </div>
         </div>

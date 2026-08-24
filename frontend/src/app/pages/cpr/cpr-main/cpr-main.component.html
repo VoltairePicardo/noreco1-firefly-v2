@@ -27,7 +27,7 @@
                     <div class="col-md-2">
                         <label class="form-label fw-bold mb-1 fs-xs text-uppercase">Asset Type</label>
                         <select class="form-select" [(ngModel)]="selectedAssetType">
-                            <option value="">— All Types —</option>
+                            <option value="">All Types</option>
                             @for (at of assetTypes(); track at.id) {
                                 <option [value]="at.id">{{ at.description }}</option>
                             }
@@ -36,7 +36,7 @@
                     <div class="col-md-2">
                         <label class="form-label fw-bold mb-1 fs-xs text-uppercase">Depreciation Status</label>
                         <select class="form-select" [(ngModel)]="fullyDepreciated">
-                            <option value="">— All —</option>
+                            <option value="">All</option>
                             <option value="true">Fully Depreciated</option>
                             <option value="false">Not Fully Depreciated</option>
                         </select>
@@ -44,7 +44,7 @@
                     <div class="col-md-2">
                         <label class="form-label fw-bold mb-1 fs-xs text-uppercase">Asset Status</label>
                         <select class="form-select" [(ngModel)]="assetStatus">
-                            <option value="">— All —</option>
+                            <option value="">All</option>
                             <option value="ACTIVE">Active</option>
                             <option value="RETIRED">Retired</option>
                         </select>

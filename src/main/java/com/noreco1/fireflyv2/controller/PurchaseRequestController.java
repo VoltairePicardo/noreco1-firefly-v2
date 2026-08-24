@@ -15,7 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 
 @RestController
-@RequestMapping(value = "/requisition-voucher")
+@RequestMapping(value = "/api/requisition-voucher")
 public class PurchaseRequestController {
 
     @Autowired
