@@ -4,11 +4,15 @@ import { AlertService } from '@/app/shared/services/alert.service';
 import { COMMON_ALL_PAGE_IMPORTS, COMMON_ADD_EDIT_PAGE_IMPORTS, COMMON_MAIN_PAGE_IMPORTS, SHARED_PROVIDERS } from '@/app/shared/providers/shared-providers';
 import { FlatpickrDirective, provideFlatpickrDefaults } from 'angularx-flatpickr';
 import { MctService } from '../mct.service';
+import { StockReleaseService } from '@/app/pages/inventory/stock-release/stock-release.service';
 import { ModalService } from '@/app/shared/modals/modal-service';
 import { BrowseEntityModalComponent } from '@/app/shared/modals/browse-entity-modal/browse-entity-modal.component';
-import { BrowseMctStockReleaseModalComponent } from '@/app/shared/modals/browse-mct-stock-release-modal/browse-mct-stock-release-modal.component';
+import { BrowseStockReleaseListModalComponent } from '@/app/shared/modals/browse-stock-release-list-modal/browse-stock-release-list-modal.component';
 import { provideIcons } from '@ng-icons/core';
-import { tablerSearch, tablerArrowLeft, tablerCheck } from '@ng-icons/tabler-icons';
+import { tablerSearch, tablerArrowLeft, tablerCheck, tablerTrash } from '@ng-icons/tabler-icons';
+import {InventoryLocation} from '@/app/models/dropdown.model';
+import {InventoryLocationService} from '@/app/pages/inventory-location/inventory-location.service';
+import {StockRelease} from '@/app/models/stock-release.model';
 
 @Component({
     selector: 'app-mct-add-edit',
@@ -22,7 +26,7 @@ import { tablerSearch, tablerArrowLeft, tablerCheck } from '@ng-icons/tabler-ico
     providers: [
         provideFlatpickrDefaults(),
         ...SHARED_PROVIDERS,
-        provideIcons({ tablerSearch, tablerArrowLeft, tablerCheck })
+        provideIcons({ tablerSearch, tablerArrowLeft, tablerCheck, tablerTrash })
     ],
     templateUrl: './mct-add-edit.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush
@@ -41,22 +45,22 @@ export class MctAddEditComponent implements OnInit {
     voucherDate = '';
     remarks     = '';
 
-    inventoryLocations = signal<any[]>([]);
+    inventoryLocations = signal<InventoryLocation[]>([]);
     selectedLocation   = signal<any>(null);
 
-    selectedStockRelease = signal<any>(null);
-
+    selectedStockRelease = signal<StockRelease | null>(null);
     approvingOfficer = signal<any>(null);
 
     details = signal<any[]>([]);
-
     totalQuantity = computed(() => this.details().reduce((s, r) => s + (Number(r.quantity) || 0), 0));
 
-    private service      = inject(MctService);
+    private service             = inject(MctService);
+    private stockReleaseService = inject(StockReleaseService);
     private modalService = inject(ModalService);
     private route        = inject(ActivatedRoute);
     private router       = inject(Router);
     private alertService = inject(AlertService);
+    private invLocationService = inject(InventoryLocationService);
 
     ngOnInit(): void {
         this.loadInventoryLocations();
@@ -78,7 +82,7 @@ export class MctAddEditComponent implements OnInit {
     }
 
     private loadInventoryLocations(): void {
-        this.service.getInventoryLocations().subscribe({
+        this.invLocationService.getAllLocations().subscribe({
             next: (d) => this.inventoryLocations.set(d || []),
             error: () => {}
         });
@@ -132,7 +136,7 @@ export class MctAddEditComponent implements OnInit {
     async openStockReleaseBrowse(): Promise<void> {
         try {
             const result = await this.modalService.openModal(
-                BrowseMctStockReleaseModalComponent, {}, { size: 'xl', centered: true }
+                BrowseStockReleaseListModalComponent, { title: 'Material Charge Ticket' }, { size: 'xl', centered: true }
             );
             if (result?.action === 'select' && result?.data) {
                 this.onStockReleaseSelected(result.data);
@@ -140,16 +144,14 @@ export class MctAddEditComponent implements OnInit {
         } catch { }
     }
 
-    private onStockReleaseSelected(sr: any): void {
+    private onStockReleaseSelected(sr: StockRelease): void {
         this.selectedStockRelease.set(sr);
-        if (sr.inventoryLocation?.id) {
-            this.selectedLocation.set(this.inventoryLocations().find(l => l.id === sr.inventoryLocation.id) ?? sr.inventoryLocation);
-        }
         this.isLoading.set(true);
-        this.service.getStockReleaseDetails(sr.id).subscribe({
-            next: (items) => {
+        this.stockReleaseService.getData(sr.id).subscribe({
+            next: (data) => {
                 this.isLoading.set(false);
-                this.details.set((items || []).map((item: any) => ({
+                const items = data?.details || [];
+                this.details.set(items.map((item: any) => ({
                     itemId:           item.itemId    || item.id    || null,
                     itemCode:         item.itemCode  || item.code  || '',
                     unitId:           item.unitId                  || null,

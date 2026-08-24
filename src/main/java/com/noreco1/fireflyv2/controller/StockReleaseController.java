@@ -21,6 +21,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.PagedModel;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -126,5 +128,15 @@ public class StockReleaseController {
         return stockReleaseService.findInventoryDocumentsForReleasing(type, query, pageable)
                 .map(documents -> ResponseEntity.ok(assembler.toModel(documents, InventoryDocumentResource::new)))
                 .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+
+    @RequestMapping(value = "/list-paged/{from}/{to}")
+    public Page<StockRelease> getStockReleasePaged(@PathVariable String from, @PathVariable String to,
+                                                   @RequestParam(value = "type", required = false) Integer type,
+                                                   @RequestParam(value = "q", required = false) String query,
+                                                   Pageable pageable) {
+
+        return stockReleaseService.findByDateRangeAndCodeAndType(from, to, type, query, pageable);
     }
 }

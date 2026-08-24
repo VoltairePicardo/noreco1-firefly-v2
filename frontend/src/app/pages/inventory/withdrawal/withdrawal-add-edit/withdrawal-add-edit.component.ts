@@ -14,26 +14,7 @@ import { BrowseRvCostEstimateModalComponent } from '@/app/shared/modals/browse-r
 import { provideIcons } from '@ng-icons/core';
 import { tablerSearch, tablerTrash, tablerPlus, tablerArrowLeft, tablerCheck } from '@ng-icons/tabler-icons';
 import { ItemStock } from '@/app/models/item-stock.model';
-
-interface InventoryLocation {
-    id: number;
-    description?: string;
-    name?: string;
-}
-
-interface InventoryCategory {
-    id: number;
-    description?: string;
-    name?: string;
-    type?: number;
-}
-
-interface Purpose {
-    id: number;
-    description?: string;
-    name?: string;
-    type?: string;
-}
+import {InventoryCategory, InventoryLocation, Purpose} from '@/app/models/dropdown.model';
 
 interface SlEntity {
     accountNo: string;
@@ -49,9 +30,7 @@ interface WorkOrder {
 
 interface RvCostEstimateRef {
     type: 'rv' | 'ce';
-    /** PurchaseRequest.id (rv) or CostEstimate.id (ce) — sent to the server as the reference. */
     id: number;
-    /** Key used to fetch line items: PurchaseRequest.id for rv, CostEstimate.transaction.id for ce. */
     detailKey: number;
     code: string;
 }

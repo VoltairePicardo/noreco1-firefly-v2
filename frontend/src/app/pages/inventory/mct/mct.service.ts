@@ -19,8 +19,8 @@ export class MctService {
 
     listByDateRange(from: string, to: string, statusId?: number | null): Observable<any[]> {
         const url = statusId
-            ? `${BASE_API}/mct/list/${from}/${to}/${statusId}`
-            : `${BASE_API}/mct/list/${from}/${to}`;
+            ? `${BASE_API}/mct/list/${from}/${to}/${statusId}/0`
+            : `${BASE_API}/mct/list/${from}/${to}/0`;
         return this.http.get<any[]>(url);
     }
 
@@ -66,9 +66,5 @@ export class MctService {
 
     getStockReleasesForMct(): Observable<any[]> {
         return this.http.get<any[]>(`${BASE_API}/mct/stock-releases`);
-    }
-
-    getStockReleaseDetails(id: number): Observable<any[]> {
-        return this.http.get<any[]>(`${BASE_API}/mct/stock-release-details/${id}`);
     }
 }

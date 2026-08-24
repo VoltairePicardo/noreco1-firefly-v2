@@ -23,6 +23,14 @@ export class StockReleaseService {
         return this.http.get(`${BASE_API}/stock-release/list-paged`, { params });
     }
 
+    /** Backs the reusable BrowseStockReleaseListModalComponent — GET /stock-release/list-paged/{from}/{to}. */
+    getStockReleasePaged(from: string, to: string, type: number | null, query: string, page: number, size: number): Observable<any> {
+        let params = new HttpParams().set('page', page).set('size', size);
+        if (type != null) params = params.set('type', type);
+        if (query) params = params.set('q', query);
+        return this.http.get(`${BASE_API}/stock-release/list-paged/${from}/${to}`, { params });
+    }
+
     getDocumentStatuses(): Observable<any[]> {
         return this.http.get<any[]>(`${BASE_API}/stock-release/document-statuses`);
     }

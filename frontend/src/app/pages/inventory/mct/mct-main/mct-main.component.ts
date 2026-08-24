@@ -82,6 +82,10 @@ export class MctMainComponent implements OnInit {
         });
     }
 
+    onPageChange(page: number): void {
+        this.page.set(page);
+    }
+
     reset(): void {
         this.setDefaultDates();
         this.selectedStatus.set(null);

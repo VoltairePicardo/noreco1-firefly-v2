@@ -105,12 +105,14 @@ public interface StockReleaseRepo extends JpaRepository<StockRelease, Integer> {
 
     @Query(value = "SELECT * FROM StockRelease " +
             "WHERE voucherDate BETWEEN :start AND :end " +
-            "AND type = :type OR UPPER(code) LIKE :query " +
+            "AND (:type IS NULL OR type = :type) " +
+            "AND (:query IS NULL OR UPPER(code) LIKE :query) " +
             "AND id NOT IN (SELECT FK_stockReleaseId FROM MaterialCreditTicket) " +
-            "ORDER BY voucherDate, code \n#pageable\n",
+            "ORDER BY voucherDate, code ",
             countQuery = "SELECT count(*) FROM StockRelease " +
-                    "WHERE voucherDate BETWEEN :start AND :end LIKE :query " +
-                    "AND type = :type OR UPPER(code) LIKE :query " +
+                    "WHERE voucherDate BETWEEN :start AND :end " +
+                    "AND (:type IS NULL OR type = :type) " +
+                    "AND (:query IS NULL OR UPPER(code) LIKE :query) " +
                     "AND id NOT IN (SELECT FK_stockReleaseId FROM MaterialCreditTicket)",
             nativeQuery = true)
     Page<StockRelease> findAllByVoucherDateBetweenAndCodeContainingIgnoreCaseAndTypeOrderByVoucherDateAscCodeAsc(@Param("start") Date start,
@@ -119,12 +121,12 @@ public interface StockReleaseRepo extends JpaRepository<StockRelease, Integer> {
                                                                                                                  @Param("type") Integer type, Pageable pageable);
     @Query(value = "SELECT * FROM StockRelease " +
             "WHERE voucherDate BETWEEN :start AND :end " +
-            "AND type = :type " +
+            "AND (:type IS NULL OR type = :type) " +
             "AND id NOT IN (SELECT FK_stockReleaseId FROM MaterialCreditTicket) " +
-            "ORDER BY voucherDate, code \n#pageable\n",
+            "ORDER BY voucherDate, code ",
             countQuery = "SELECT count(*) FROM StockRelease " +
                     "WHERE voucherDate BETWEEN :start AND :end " +
-                    "AND type = :type " +
+                    "AND (:type IS NULL OR type = :type) " +
                     "AND id NOT IN (SELECT FK_stockReleaseId FROM MaterialCreditTicket)",
             nativeQuery = true)
     Page<StockRelease> findAllByVoucherDateBetweenAndTypeOrderByVoucherDateAscCodeAsc(@Param("start") Date start,
