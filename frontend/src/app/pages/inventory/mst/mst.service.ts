@@ -17,6 +17,13 @@ export class MstService {
         return this.http.get<any[]>(`${BASE_API}/mst/list`);
     }
 
+    listPaged(from: string, to: string, statusId: number | null, query: string, page: number, size: number): Observable<any> {
+        let params = new HttpParams().set('from', from).set('to', to).set('page', page).set('size', size);
+        if (statusId != null) params = params.set('statusId', statusId);
+        if (query) params = params.set('query', query);
+        return this.http.get(`${BASE_API}/mst/list-paged`, { params });
+    }
+
     listByDateRange(from: string, to: string, statusId?: number | null): Observable<any[]> {
         const url = statusId
             ? `${BASE_API}/mst/list/${from}/${to}/${statusId}`

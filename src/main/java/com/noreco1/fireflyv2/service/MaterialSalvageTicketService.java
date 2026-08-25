@@ -21,6 +21,7 @@ public interface MaterialSalvageTicketService extends DocumentService {
     List<MaterialSalvageTicket> findAll();
     Page<MaterialSalvageTicket> findAll(Pageable pageable);
     Page<MaterialSalvageTicket> findByQuery(String query, Pageable pageable);
+    Page<Map<String, Object>> getMaterialSalvageTicketPaged(String from, String to, Integer statusId, String query, Pageable pageable);
     List<Map> findByDateRangePending(String from, String to, Integer officeId);
     List<Map> findByDateRangeAndStatusId(String from, String to, Integer status, Integer officeId);
     List<DocumentStatus> getDocumentsStatuses();

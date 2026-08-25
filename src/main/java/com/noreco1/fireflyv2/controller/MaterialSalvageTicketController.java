@@ -61,6 +61,15 @@ public class MaterialSalvageTicketController {
         return materialSalvageTicketService.findAll();
     }
 
+    @GetMapping(value = "/list-paged")
+    @ResponseBody
+    public Page<Map<String, Object>> listPaged(@RequestParam String from, @RequestParam String to,
+                                                @RequestParam(required = false) Integer statusId,
+                                                @RequestParam(required = false) String query,
+                                                Pageable pageable) {
+        return materialSalvageTicketService.getMaterialSalvageTicketPaged(from, to, statusId, query, pageable);
+    }
+
     @GetMapping(value = "/list/{from}/{to}/{officeId}")
     @ResponseBody
     public List<Map> listByDateAndStatusPending(@PathVariable String from, @PathVariable String to, @PathVariable Integer officeId) {

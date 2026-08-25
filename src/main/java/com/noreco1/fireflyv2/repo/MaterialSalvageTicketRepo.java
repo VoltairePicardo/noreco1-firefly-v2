@@ -10,6 +10,7 @@ import org.springframework.data.repository.query.Param;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 public interface MaterialSalvageTicketRepo extends JpaRepository<MaterialSalvageTicket, Integer> {
 //    MaterialSalvageTicket findByDocId(Integer docId);
@@ -19,6 +20,50 @@ public interface MaterialSalvageTicketRepo extends JpaRepository<MaterialSalvage
     Page<MaterialSalvageTicket> findAll(Pageable paging);
 
     Page<MaterialSalvageTicket> findByCode(String code, Pageable paging);
+
+    @Query(value = "SELECT " +
+            " mst.id AS id, " +
+            " mst.code AS code, " +
+            " d.name as department, " +
+            " mst.voucherDate AS voucherDate, " +
+            " mst.purpose AS purpose, " +
+            " u.fullname AS preparedBy, " +
+            " ds.status AS status " +
+            "FROM MaterialSalvageTicket mst " +
+            "INNER JOIN User u ON u.id = mst.fk_createdbyuserid " +
+            "INNER JOIN DocumentStatus ds ON ds.id = mst.fk_documentstatusid " +
+            "INNER JOIN Department d on d.id = mst.FK_departmentId " +
+            "WHERE mst.voucherDate >= :startDate " +
+            "   AND mst.voucherDate <= :endDate " +
+            "   AND (:statusId IS NULL OR mst.FK_documentStatusId = :statusId) " +
+            "   AND (:query IS NULL OR :query = '' OR " +
+            "       mst.code LIKE CONCAT('%', :query, '%') " +
+            "       OR mst.purpose LIKE CONCAT('%', :query, '%') " +
+            "       OR u.fullname LIKE CONCAT('%', :query, '%')) " +
+            "   AND (mst.FK_createdByUserId = :userId " +
+            "       OR mst.FK_returnedByUserId = :userId " +
+            "       OR mst.FK_receivedByUserId = :userId) " +
+            "ORDER BY mst.voucherDate DESC, mst.id DESC",
+            countQuery = "SELECT COUNT(*) " +
+                    "FROM MaterialSalvageTicket mst " +
+                    "INNER JOIN User u ON u.id = mst.fk_createdbyuserid " +
+                    "WHERE mst.voucherDate >= :startDate " +
+                    "   AND mst.voucherDate <= :endDate " +
+                    "   AND (:statusId IS NULL OR mst.FK_documentStatusId = :statusId) " +
+                    "   AND (:query IS NULL OR :query = '' OR " +
+                    "       mst.code LIKE CONCAT('%', :query, '%') " +
+                    "       OR mst.purpose LIKE CONCAT('%', :query, '%') " +
+                    "       OR u.fullname LIKE CONCAT('%', :query, '%')) " +
+                    "   AND (mst.FK_createdByUserId = :userId " +
+                    "       OR mst.FK_returnedByUserId = :userId " +
+                    "       OR mst.FK_receivedByUserId = :userId) ",
+            nativeQuery = true)
+    Page<Map<String, Object>> getMaterialSalvageTicketPaged(@Param("startDate") String startDate,
+                                                              @Param("endDate") String endDate,
+                                                              @Param("statusId") Integer statusId,
+                                                              @Param("query") String query,
+                                                              @Param("userId") Integer userId,
+                                                              Pageable pageable);
 
     @Query(value = "SELECT e.code FROM MaterialSalvageTicket e WHERE year = :year ORDER BY id DESC LIMIT 1", nativeQuery = true)
     Object findLatestCodeByYear(@Param("year") Integer year);
