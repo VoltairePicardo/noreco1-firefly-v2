@@ -101,7 +101,8 @@
       "Read(//c/Users/buena/AppData/Local/Temp/claude/C--Users-buena-Documents-Github-noreco1-firefly-v2/c30d8ee7-07e7-45f8-bc98-5a5b87afa0ad/scratchpad/**)",
       "PowerShell($env:JAVA_HOME)",
       "PowerShell(Get-Process *)",
-      "PowerShell(Get-NetTCPConnection *)"
+      "PowerShell(Get-NetTCPConnection *)",
+      "Bash(xargs -I{} echo {})"
     ]
   }
 }

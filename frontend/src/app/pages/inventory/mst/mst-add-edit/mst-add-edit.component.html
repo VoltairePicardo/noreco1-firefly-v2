@@ -49,10 +49,6 @@
                                     <small class="text-muted">Clear items to change location.</small>
                                 }
                             </div>
-                        </div>
-
-                        <hr/>
-                        <div class="row g-3">
                             <div class="col-md-12">
                                 <label class="form-label fw-bold">Purpose <span class="text-danger">*</span></label>
                                 <textarea class="form-control" [(ngModel)]="purpose" name="purpose"
@@ -60,33 +56,33 @@
                             </div>
                         </div>
 
-                        <hr/>
+                        <hr class="border-dashed mx-n3 mt-3"/>
                         <div class="d-flex justify-content-between align-items-center mb-2">
-                            <div class="fs-xs text-uppercase fw-semibold text-muted">Items</div>
-                            <button type="button" class="btn btn-success fw-bold btn-sm"
+                            <div class="fs-sm fw-semibold mb-2">Items</div>
+                            <button type="button" class="btn btn-primary fw-bold btn-sm"
                                     (click)="openItemStockBrowse()">
-                                <ng-icon name="tablerPlus" class="ps-0 pe-2 fw-bold"></ng-icon>Add Item
+                                <ng-icon name="tablerPlus" class="me-1 fs-lg fw-bold"></ng-icon>Add Item
                             </button>
                         </div>
 
                         <div class="table-responsive">
-                            <table class="table table-custom table-centered table-hover w-100 mb-0">
+                            <table class="table table-custom table-centered table-hover w-100 mb-0 text-center">
                                 <thead class="bg-light align-middle bg-opacity-25 thead-sm">
                                     <tr class="text-uppercase fs-xxs">
-                                        <th style="width:40px">#</th>
-                                        <th style="width:80px">Code</th>
-                                        <th>Description</th>
+                                        <th>#</th>
+                                        <th class="text-start">Code</th>
+                                        <th class="text-start">Description</th>
                                         <th>Unit</th>
-                                        <th class="text-center" style="width:110px">Quantity</th>
-                                        <th class="text-center" style="width:120px">Unit Cost</th>
-                                        <th class="text-center" style="width:80px">Usable?</th>
-                                        <th style="width:50px"></th>
+                                        <th style="width: 8rem;">Unit Cost</th>
+                                        <th style="width: 8rem;">To Receive</th>
+                                        <th>Usable?</th>
+                                        <th></th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @if (details().length === 0) {
                                         <tr>
-                                            <td colspan="8" class="text-center text-muted py-3">
+                                            <td colspan="9" class="text-center text-muted py-3">
                                                 Select an <strong>Inventory Location</strong> then click <strong>Add Item</strong> to add items.
                                             </td>
                                         </tr>
@@ -94,8 +90,8 @@
                                     @for (row of details(); track $index) {
                                         <tr>
                                             <td class="text-center text-muted">{{ $index + 1 }}</td>
-                                            <td class="fw-bold">{{ row.itemCode }}</td>
-                                            <td>{{ row.itemDescription }}</td>
+                                            <td class="fw-bold text-start">{{ row.itemCode }}</td>
+                                            <td class="text-start">{{ row.itemDescription }}</td>
                                             <td>{{ row.unitCode }}</td>
                                             <td>
                                                 <input type="number"
@@ -103,14 +99,16 @@
                                                        [(ngModel)]="row.quantity"
                                                        [name]="'qty_' + $index"
                                                        (ngModelChange)="onQuantityChange($index)"
-                                                       step="0.01" min="0" placeholder="0"/>
+                                                       step="0.01" min="0" placeholder="0"
+                                                       appSelectOnFocus/>
                                             </td>
                                             <td>
                                                 <input type="number"
                                                        class="form-control form-control-sm text-end"
                                                        [(ngModel)]="row.unitCost"
                                                        [name]="'uc_' + $index"
-                                                       step="0.01" min="0" placeholder="0.00"/>
+                                                       step="0.01" min="0" placeholder="0.00"
+                                                       appSelectOnFocus/>
                                             </td>
                                             <td class="text-center">
                                                 <input type="checkbox"
@@ -118,7 +116,13 @@
                                                        [(ngModel)]="row.isUsable"
                                                        [name]="'usable_' + $index"/>
                                             </td>
-                                            <td class="text-center">
+                                            <td class="text-center d-flex justify-content-center gap-2">
+                                                <button type="button"
+                                                        class="btn btn-light btn-icon btn-sm rounded-circle"
+                                                        (click)="openSerialNumbersModal($index)">
+                                                    <ng-icon name="tablerBarcode" class="fs-lg fw-bold"></ng-icon>
+                                                </button>
+
                                                 <button type="button"
                                                         class="btn btn-light btn-icon btn-sm rounded-circle"
                                                         (click)="removeRow($index)"
@@ -132,8 +136,8 @@
                             </table>
                         </div>
 
-                        <hr/>
-                        <div class="col-12 fs-xs text-uppercase fw-semibold text-muted mb-2">Signatories</div>
+                        <hr class="border-dashed mx-n3 mt-3"/>
+                        <div class="fs-sm fw-semibold mb-2">Signatories</div>
 
                         <div class="row g-3">
                             <div class="col-md-6">
@@ -142,9 +146,9 @@
                                     <input type="text" class="form-control"
                                            [value]="returnedBy() ? (returnedBy().fullName || returnedBy().name || '') : ''"
                                            readonly placeholder="Browse returned by..."/>
-                                    <button type="button" class="btn btn-success fw-bold"
+                                    <button type="button" class="btn btn-primary fw-bold"
                                             (click)="openReturnedByBrowse()">
-                                        <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
+                                        <ng-icon name="tablerSearch" class="me-1 fs-lg fw-bold"></ng-icon>Browse
                                     </button>
                                 </div>
                             </div>
@@ -154,24 +158,24 @@
                                     <input type="text" class="form-control"
                                            [value]="receivedBy() ? (receivedBy().fullName || receivedBy().name || '') : ''"
                                            readonly placeholder="Browse received by..."/>
-                                    <button type="button" class="btn btn-success fw-bold"
+                                    <button type="button" class="btn btn-primary fw-bold"
                                             (click)="openReceivedByBrowse()">
-                                        <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
+                                        <ng-icon name="tablerSearch" class="me-1 fs-lg fw-bold"></ng-icon>Browse
                                     </button>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="d-flex gap-2 justify-content-end align-items-center pt-3 border-top mt-3">
+                        <hr class="border-dashed mx-n3 mt-3"/>
+                        <div class="d-flex gap-2 justify-content-end align-items-center mt-3">
                             <a [routerLink]="['/' + menuLink]" class="btn btn-light fw-bold">
-                                <ng-icon name="tablerArrowLeft" class="ps-0 pe-3 fw-bold"></ng-icon>Back
+                                <ng-icon name="tablerArrowLeft" class="me-1 fs-lg fw-bold"></ng-icon>Back
                             </a>
                             <button type="submit" class="btn btn-primary fw-bold" [disabled]="isLoading()">
                                 @if (isLoading()) {
                                     <span class="spinner-border spinner-border-sm me-2" role="status"></span>
                                     {{ editMode ? 'Updating...' : 'Saving...' }}
                                 } @else {
-                                    <ng-icon name="tablerCheck" class="ps-0 pe-3 fw-bold"></ng-icon>
                                     {{ editMode ? 'Update' : 'Save ' + module }}
                                 }
                             </button>

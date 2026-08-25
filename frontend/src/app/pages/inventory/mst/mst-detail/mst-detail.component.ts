@@ -8,6 +8,9 @@ import { SharedModule } from '@/app/shared/shared.module';
 import { MstService } from '../mst.service';
 import { provideIcons } from '@ng-icons/core';
 import { tablerPrinter, tablerEdit, tablerArrowLeft } from '@ng-icons/tabler-icons';
+import { AnyJSONService } from '@/app/shared/services/any-json.service';
+import { MaterialSalvageTicket } from '@/app/models/inventory-modules/mst.model';
+import {WorkflowAction} from '@/app/models/workflow-action.model';
 
 const TERMINAL_STATUSES = ['Approved', 'Denied', 'Cancelled'];
 
@@ -24,21 +27,22 @@ export class MstDetailComponent implements OnInit {
     menuLink  = 'mst';
 
     id: any   = 0;
-    data      = signal<any>({});
+    data      = signal<MaterialSalvageTicket>({} as MaterialSalvageTicket);
     isLoading = signal(false);
 
-    workflowActions     = signal<any[]>([]);
-    selectedAction: any = null;
+    workflowActions     = signal<WorkflowAction[]>([]);
+    selectedAction: WorkflowAction | null = null;
     remarks             = '';
     processingWorkflow  = signal(false);
     logs                = signal<any[]>([]);
     showLogs            = false;
     logsLoading         = signal(false);
 
-    private service      = inject(MstService);
-    private route        = inject(ActivatedRoute);
-    private router       = inject(Router);
-    private alertService = inject(AlertService);
+    private service        = inject(MstService);
+    private anyJSONService = inject(AnyJSONService);
+    private route          = inject(ActivatedRoute);
+    private router         = inject(Router);
+    private alertService   = inject(AlertService);
 
     private transactionId = computed<number | undefined>(() => this.data()?.transId ?? this.data()?.transaction?.id);
 
@@ -68,8 +72,8 @@ export class MstDetailComponent implements OnInit {
             this.selectedAction  = null;
             return;
         }
-        this.service.getWorkflowActions(transactionId).subscribe({
-            next: (a) => { this.workflowActions.set(a || []); this.selectedAction = null; this.remarks = ''; }, error: () => { this.workflowActions.set([]); }
+        this.anyJSONService.getWorkflowActions(transactionId).subscribe({
+            next: (a: WorkflowAction[]) => { this.workflowActions.set(a || []); this.selectedAction = null; this.remarks = ''; }, error: () => { this.workflowActions.set([]); }
         });
     }
 
@@ -82,7 +86,12 @@ export class MstDetailComponent implements OnInit {
     processWorkflow(): void {
         if (!this.selectedAction) return;
         this.processingWorkflow.set(true);
-        this.service.process({ documentId: this.data().id, remarks: this.remarks, workflowActionsDto: { actionMapId: this.selectedAction.actionMapId } }).subscribe({
+        this.service.process(
+            {
+                documentId: this.data().id,
+                remarks: this.remarks,
+                workflowActionsDto: this.selectedAction
+            }).subscribe({
             next: (res) => {
                 this.processingWorkflow.set(false);
                 if (res?.success) { this.workflowActions.set([]); this.selectedAction = null; this.remarks = ''; this.alertService.success(this.module, res.successMessage || 'Processed.', ''); this.loadData(); }
@@ -96,7 +105,7 @@ export class MstDetailComponent implements OnInit {
         this.showLogs = !this.showLogs;
         if (this.showLogs && this.logs().length === 0) {
             this.logsLoading.set(true);
-            this.service.getDocumentLogs(this.transactionId()!).subscribe({
+            this.anyJSONService.getLogs(this.transactionId()!).subscribe({
                 next: (l) => { this.logs.set(l || []); this.logsLoading.set(false); },
                 error: () => { this.logsLoading.set(false); }
             });

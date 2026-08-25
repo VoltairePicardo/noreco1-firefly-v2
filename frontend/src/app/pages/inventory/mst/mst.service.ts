@@ -44,16 +44,8 @@ export class MstService {
         return this.http.post(`${BASE_API}/mst/process`, payload, httpOptions);
     }
 
-    getWorkflowActions(transId: number): Observable<any[]> {
-        return this.http.get<any[]>(`${BASE_URL}/json/workflow-actions/${transId}`);
-    }
-
-    getDocumentLogs(transId: number): Observable<any[]> {
-        return this.http.post<any[]>(`${BASE_URL}/document/${transId}/logs`, {}, httpOptions);
-    }
-
     print(id: number): void {
-        this.downloadService.print(`${BASE_URL}/mst/export/${id}`, { type: 'pdf' });
+        this.downloadService.print(`${BASE_API}/mst/export/${id}`, { type: 'pdf' });
     }
 
     getDefaultSignatories(): Observable<any> {
@@ -61,7 +53,7 @@ export class MstService {
     }
 
     getDepartments(): Observable<any[]> {
-        return this.http.get<any[]>(`${BASE_API}/mst/departments`);
+        return this.http.get<any[]>(`${BASE_API}/department/list`);
     }
 
     getInventoryLocations(): Observable<any[]> {

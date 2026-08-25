@@ -6,9 +6,19 @@ import { FlatpickrDirective, provideFlatpickrDefaults } from 'angularx-flatpickr
 import { MstService } from '../mst.service';
 import { ModalService } from '@/app/shared/modals/modal-service';
 import { BrowseEntityModalComponent } from '@/app/shared/modals/browse-entity-modal/browse-entity-modal.component';
-import { BrowseMstItemStockModalComponent } from '@/app/shared/modals/browse-mst-item-stock-modal/browse-mst-item-stock-modal.component';
+import { SelectOnFocusDirective } from '@/app/core/directive/select-on-focus.directive';
 import { provideIcons } from '@ng-icons/core';
 import { tablerSearch, tablerTrash, tablerArrowLeft, tablerCheck, tablerPlus } from '@ng-icons/tabler-icons';
+import {InventoryLocation} from '@/app/models/dropdown.model';
+import {InventoryLocationService} from '@/app/pages/inventory-location/inventory-location.service';
+import {
+    BrowseItemStockModalComponent
+} from '@/app/shared/modals/browse-item-stock-modal/browse-item-stock-modal.component';
+import {ItemStock} from '@/app/models/inventory-modules/item-stock.model';
+import {ItemTransactionDetailDto, SpecialEquipment} from '@/app/models/inventory-modules/stock-release.model';
+import {SerialNumbersModalComponent} from '@/app/shared/modals/serial-numbers-modal/serial-numbers-modal.component';
+
+const EMPLOYEE_CLASSIFICATION_ID = 1;
 
 @Component({
     selector: 'app-mst-add-edit',
@@ -17,7 +27,8 @@ import { tablerSearch, tablerTrash, tablerArrowLeft, tablerCheck, tablerPlus } f
         ...COMMON_ADD_EDIT_PAGE_IMPORTS,
         ...COMMON_MAIN_PAGE_IMPORTS,
         FlatpickrDirective,
-        RouterLink
+        RouterLink,
+        SelectOnFocusDirective
     ],
     providers: [
         provideFlatpickrDefaults(),
@@ -42,16 +53,17 @@ export class MstAddEditComponent implements OnInit {
     purpose     = '';
 
     departments        = signal<any[]>([]);
-    inventoryLocations = signal<any[]>([]);
+    inventoryLocations = signal<InventoryLocation[]>([]);
     selectedDepartment = signal<any>(null);
-    selectedLocation   = signal<any>(null);
+    selectedLocation   = signal<InventoryLocation | null>(null);
 
     returnedBy = signal<any>(null);
     receivedBy = signal<any>(null);
 
-    details = signal<any[]>([]);
+    details = signal<ItemTransactionDetailDto[]>([]);
 
     private service      = inject(MstService);
+    private locationService      = inject(InventoryLocationService);
     private modalService = inject(ModalService);
     private route        = inject(ActivatedRoute);
     private router       = inject(Router);
@@ -85,7 +97,7 @@ export class MstAddEditComponent implements OnInit {
     }
 
     private loadInventoryLocations(): void {
-        this.service.getInventoryLocations().subscribe({
+        this.locationService.getAllLocations().subscribe({
             next: (d) => this.inventoryLocations.set(d || []),
             error: () => {}
         });
@@ -145,24 +157,24 @@ export class MstAddEditComponent implements OnInit {
     }
 
     async openItemStockBrowse(): Promise<void> {
-        const location = this.selectedLocation();
-        if (!location?.id) {
+        const locationId = this.selectedLocation()?.id;
+        if (!locationId) {
             this.alertService.warning(this.module, 'Validation', 'Please select an Inventory Location first.');
             return;
         }
         try {
             const result = await this.modalService.openModal(
-                BrowseMstItemStockModalComponent,
-                { locationId: location.id },
+                BrowseItemStockModalComponent,
+                { locationId, type: 'INV_LOCATION' },
                 { size: 'xl', centered: true }
             );
             if (result?.action === 'select' && result?.data) {
-                this.onItemStockSelected(result.data);
+                this.onItemStockSelected(result.data as ItemStock);
             }
         } catch { }
     }
 
-    private onItemStockSelected(itemStock: any): void {
+    private onItemStockSelected(itemStock: ItemStock): void {
         const itemStockId = itemStock.id;
         const isDuplicate = this.details().some(d => d.itemStockId === itemStockId);
         if (isDuplicate) {
@@ -172,15 +184,36 @@ export class MstAddEditComponent implements OnInit {
         const location = this.selectedLocation();
         this.details.update(list => [...list, {
             itemStockId:         itemStockId,
-            itemId:              itemStock.item?.id          ?? null,
-            itemCode:            itemStock.item?.code        ?? itemStock.code ?? '',
-            unitCode:            itemStock.item?.unit?.code  ?? itemStock.unitCode ?? '',
-            unitCost:            Number(itemStock.unitCost)  || 0,
-            itemDescription:     itemStock.item?.description ?? itemStock.description ?? '',
+            itemId:              itemStock.item?.id            ?? undefined,
+            itemCode:            itemStock.item?.code          ?? '',
+            unitCode:            itemStock.item?.unit?.code    ?? '',
+            unitCost:            Number(itemStock.unitCost)    || 0,
+            itemDescription:     itemStock.item?.description   ?? '',
             quantity:            0,
-            inventoryLocationId: itemStock.inventoryLocation?.id ?? location?.id ?? null,
-            isUsable:            true
+            inventoryLocationId: itemStock.inventoryLocation?.id ?? location?.id ?? undefined,
+            isUsable:            true,
+            serialNumbers:       []
         }]);
+    }
+
+    async openSerialNumbersModal(index: number): Promise<void> {
+        const row = this.details()[index];
+        if (!row) return;
+        try {
+            const result = await this.modalService.openModal(
+                SerialNumbersModalComponent,
+                {
+                    itemDescription: row.itemDescription,
+                    quantity:        Number(row.quantity) || 0,
+                    serialNumbers:   row.serialNumbers ?? []
+                },
+                { size: 'lg', centered: true }
+            );
+            if (result?.action === 'save') {
+                this.details.update(list => list.map((d, i) =>
+                    i === index ? { ...d, serialNumbers: result.data as SpecialEquipment[] } : d));
+            }
+        } catch { }
     }
 
     onQuantityChange(index: number): void {
@@ -201,7 +234,7 @@ export class MstAddEditComponent implements OnInit {
     async openReturnedByBrowse(): Promise<void> {
         try {
             const result = await this.modalService.openModal(
-                BrowseEntityModalComponent, {}, { size: 'lg', centered: true }
+                BrowseEntityModalComponent, { defaultClassificationId: EMPLOYEE_CLASSIFICATION_ID }, { size: 'lg', centered: true }
             );
             if (result?.action === 'select' && result?.data) {
                 const e = result.data;
@@ -213,7 +246,7 @@ export class MstAddEditComponent implements OnInit {
     async openReceivedByBrowse(): Promise<void> {
         try {
             const result = await this.modalService.openModal(
-                BrowseEntityModalComponent, {}, { size: 'lg', centered: true }
+                BrowseEntityModalComponent, { defaultClassificationId: EMPLOYEE_CLASSIFICATION_ID }, { size: 'lg', centered: true }
             );
             if (result?.action === 'select' && result?.data) {
                 const e = result.data;
@@ -282,7 +315,8 @@ export class MstAddEditComponent implements OnInit {
                 itemDescription:     d.itemDescription     || '',
                 quantity:            Number(d.quantity)    || 0,
                 inventoryLocationId: d.inventoryLocationId || null,
-                isUsable:            d.isUsable !== false
+                isUsable:            d.isUsable !== false,
+                serialNumbers:       d.serialNumbers || []
             }))
         };
         if (this.editMode) payload.id = this.id;

@@ -1,11 +1,8 @@
 <div class="container-fluid">
     <app-page-title [title]="module" [subTitle]="subModule" [menuLink]="menuLink"/>
-</div>
 
-<div class="container-fluid">
     <div class="card">
-        <div class="card-body">
-
+        <div class="card-header">
             <div class="row g-2 align-items-end mb-3">
                 <div class="col-md-auto ms-auto">
                     <a [routerLink]="['/' + menuLink, 'create']" class="btn btn-primary d-flex align-items-center gap-2 fw-bold">
@@ -14,7 +11,7 @@
                 </div>
             </div>
 
-            <div class="row g-2 align-items-end mb-3">
+            <div class="row g-2 align-items-end">
                 <div class="col-md-2">
                     <label class="form-label fw-bold mb-1 fs-xs text-uppercase">From</label>
                     <input type="text" mwlFlatpickr [options]="flatpickrOptions"
@@ -48,63 +45,74 @@
                     </button>
                 </div>
             </div>
+        </div>
 
-            <div class="table-responsive">
-                <table class="table table-custom table-centered table-select table-hover w-100 mb-0">
-                    <thead class="bg-light align-middle bg-opacity-25 thead-sm">
-                        <tr class="text-uppercase fs-xxs">
-                            <th>Code</th><th>Date</th><th>Description</th><th>Prepared By</th><th>Status</th><th>Actions</th>
+        <div class="table-responsive">
+            <table class="table table-custom table-centered table-select table-hover w-100 mb-0">
+                <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                    <tr class="text-uppercase fs-xxs">
+                        <th>Code</th><th>Date</th><th>Description</th><th>Prepared By</th><th>Status</th><th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (isLoading()) {
+                        <tr class="no-results">
+                            <td colspan="6" class="text-center text-muted py-3">
+                                <span class="spinner-border spinner-border-sm me-2" role="status"></span>Loading...
+                            </td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        @if (pagedRecords().length > 0) {
-                            @for (rec of pagedRecords(); track rec.id) {
-                                <tr>
-                                    <td class="fw-bold">{{ rec.code }}</td>
-                                    <td>{{ rec.voucherDate | date:'MM/dd/yyyy' }}</td>
-                                    <td>{{ rec.description || rec.remarks || '—' }}</td>
-                                    <td>{{ rec.createdBy?.fullName || rec.preparedBy || '—' }}</td>
-                                    <td><span class="badge bg-secondary bg-opacity-25 text-dark border">{{ rec.documentStatus?.status || '—' }}</span></td>
-                                    <td class="text-nowrap">
-                                        <div class="d-flex justify-content-end gap-1">
-                                            <a [routerLink]="['/' + menuLink, rec.id, 'detail']"
-                                               class="btn btn-light btn-icon btn-sm rounded-circle" ngbTooltip="View">
-                                                <ng-icon name="tablerEye" class="fs-lg"></ng-icon>
+                    } @else if (pagedRecords().length > 0) {
+                        @for (rec of pagedRecords(); track rec.id) {
+                            <tr>
+                                <td class="fw-bold">{{ rec.code }}</td>
+                                <td>{{ rec.voucherDate | date:'MM/dd/yyyy' }}</td>
+                                <td>{{ rec.description || rec.remarks || '—' }}</td>
+                                <td>{{ rec.createdBy?.fullName || rec.preparedBy || '—' }}</td>
+                                <td><span class="badge bg-secondary bg-opacity-25 text-dark border">{{ rec.documentStatus?.status || '—' }}</span></td>
+                                <td class="text-nowrap">
+                                    <div class="d-flex justify-content-end gap-1">
+                                        <a [routerLink]="['/' + menuLink, rec.id, 'detail']"
+                                           class="btn btn-light btn-icon btn-sm rounded-circle" ngbTooltip="View">
+                                            <ng-icon name="tablerEye" class="fs-lg"></ng-icon>
+                                        </a>
+                                        @if (isEditable(rec)) {
+                                            <a [routerLink]="['/' + menuLink, rec.id, 'edit']"
+                                               class="btn btn-light btn-icon btn-sm rounded-circle" ngbTooltip="Edit">
+                                                <ng-icon name="tablerEdit" class="fs-lg"></ng-icon>
                                             </a>
-                                            @if (isEditable(rec)) {
-                                                <a [routerLink]="['/' + menuLink, rec.id, 'edit']"
-                                                   class="btn btn-light btn-icon btn-sm rounded-circle" ngbTooltip="Edit">
-                                                    <ng-icon name="tablerEdit" class="fs-lg"></ng-icon>
-                                                </a>
-                                            }
-                                        </div>
-                                    </td>
-                                </tr>
-                            }
-                        } @else {
-                            <tr class="no-results">
-                                <td colspan="6" class="text-center text-muted py-3">
-                                    @if (isLoading()) {
-                                        <span class="spinner-border spinner-border-sm me-2" role="status"></span>Loading...
-                                    } @else { Nothing found. }
+                                        }
+                                    </div>
                                 </td>
                             </tr>
                         }
-                    </tbody>
-                </table>
-            </div>
+                    } @else {
+                        <tr class="no-results">
+                            <td colspan="6" class="text-center text-muted py-3">Nothing found.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
 
-            @if (filteredTotal() > pageSize) {
-                <div class="d-flex justify-content-center mt-3">
+        @if (filteredTotal() > pageSize) {
+            <div class="card-footer d-flex justify-content-center">
+                <div class="pagination-boxed align-items-center mt-2 mb-0">
                     <ngb-pagination
                         [collectionSize]="filteredTotal()"
                         [page]="page()"
                         (pageChange)="page.set($event)"
                         [pageSize]="pageSize"
-                        [maxSize]="5">
+                        [maxSize]="5"
+                        [rotate]="true">
+                        <ng-template ngbPaginationPrevious>
+                            <ng-icon name="tablerChevronLeft"/>
+                        </ng-template>
+                        <ng-template ngbPaginationNext>
+                            <ng-icon name="tablerChevronRight"/>
+                        </ng-template>
                     </ngb-pagination>
                 </div>
-            }
-        </div>
+            </div>
+        }
     </div>
 </div>

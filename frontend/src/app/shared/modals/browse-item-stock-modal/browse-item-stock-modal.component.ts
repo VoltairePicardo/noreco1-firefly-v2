@@ -7,7 +7,7 @@ import { Observable } from 'rxjs';
 import { ItemStockService } from '@/app/shared/services/item-stock.service';
 import { ItemStock } from '@/app/models/inventory-modules/item-stock.model';
 
-export type ItemStockBrowseType = 'WITHDRAWAL' | 'ADJUSTMENT';
+export type ItemStockBrowseType = 'INV_LOCATION_CATEGORY' | 'INV_LOCATION';
 
 @Component({
     selector: 'app-browse-item-stock-modal',
@@ -19,9 +19,7 @@ export type ItemStockBrowseType = 'WITHDRAWAL' | 'ADJUSTMENT';
 export class BrowseItemStockModalComponent implements OnInit {
     @Input() locationId!: number;
     @Input() categoryId!: number;
-    // Plain @Input(), not a signal input() — ModalService.openModal wires modal inputs via a raw
-    // `componentInstance[key] = value` assignment, which would clobber a signal input's function value.
-    @Input() type: ItemStockBrowseType = 'WITHDRAWAL';
+    @Input() type: ItemStockBrowseType = 'INV_LOCATION_CATEGORY';
 
     activeModal                = inject(NgbActiveModal);
     private itemStockService   = inject(ItemStockService);
@@ -41,11 +39,11 @@ export class BrowseItemStockModalComponent implements OnInit {
 
     private fetchItemStocks(): Observable<any> {
         switch (this.type) {
-            case 'ADJUSTMENT':
+            case 'INV_LOCATION':
                 return this.itemStockService.getItemStocksInvLocWithZeroQuantity(
                     this.locationId, this.searchText, this.page() - 1, this.pageSize
                 );
-            case 'WITHDRAWAL':
+            case 'INV_LOCATION_CATEGORY':
             default:
                 return this.itemStockService.getItemStocksWithZeroQuantityInvLocInvCat(
                     this.locationId, this.categoryId, this.searchText, this.page() - 1, this.pageSize

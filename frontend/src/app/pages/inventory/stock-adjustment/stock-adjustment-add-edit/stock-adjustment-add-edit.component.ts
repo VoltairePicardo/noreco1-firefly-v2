@@ -166,7 +166,7 @@ export class StockAdjustmentAddEditComponent implements OnInit {
         try {
             const result = await this.modalService.openModal(
                 BrowseItemStockModalComponent,
-                { locationId, type: 'ADJUSTMENT' },
+                { locationId, type: 'INV_LOCATION' },
                 { size: 'xl', centered: true }
             );
             if (result?.action === 'select' && result?.data) {
