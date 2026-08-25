@@ -92,7 +92,16 @@
       "Bash(echo \"EXIT:$?\")",
       "Bash(JAVA_HOME=\"/c/Program Files/Java/jdk-21\" ./mvnw -q -o compile)",
       "Bash(JAVA_HOME=\"/c/Program Files/Java/jdk-21\" ./mvnw -o compile)",
-      "Bash(JAVA_HOME=\"/c/Program Files/Java/jdk-21\" ./mvnw -o clean compile)"
+      "Bash(JAVA_HOME=\"/c/Program Files/Java/jdk-21\" ./mvnw -o clean compile)",
+      "Bash(sc query *)",
+      "Bash(net start *)",
+      "Bash(powershell -NoProfile -Command \"Test-NetConnection -ComputerName 192.168.254.200 -Port 3306 | Select-Object -Property ComputerName,RemotePort,TcpTestSucceeded\")",
+      "Bash(mvn -q -o spring-boot:run)",
+      "Bash(echo \"started with pid $!\")",
+      "Read(//c/Users/buena/AppData/Local/Temp/claude/C--Users-buena-Documents-Github-noreco1-firefly-v2/c30d8ee7-07e7-45f8-bc98-5a5b87afa0ad/scratchpad/**)",
+      "PowerShell($env:JAVA_HOME)",
+      "PowerShell(Get-Process *)",
+      "PowerShell(Get-NetTCPConnection *)"
     ]
   }
 }

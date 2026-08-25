@@ -83,8 +83,8 @@ export class StockReceiveDetailComponent {
         });
     }
 
-    isTerminal(): boolean { return TERMINAL_STATUSES.includes(this.data()?.documentStatus?.status || ''); }
-    isEditable(): boolean { const s = this.data()?.documentStatus?.status || ''; return s === 'Document Created' || s === 'Returned to Creator'; }
+    isTerminal(): boolean { return TERMINAL_STATUSES.includes(this.data?.documentStatus?.status || ''); }
+    isEditable(): boolean { const s = this.data?.documentStatus?.status || ''; return s === 'Document Created' || s === 'Returned to Creator'; }
 
     processWorkflow(): void {
         if (!this.selectedAction) return;
@@ -125,5 +125,5 @@ export class StockReceiveDetailComponent {
         });
     }
 
-    print(): void { this.service.print(this.data().id); }
+    print(): void { this.service.print(this.data.id); }
 }

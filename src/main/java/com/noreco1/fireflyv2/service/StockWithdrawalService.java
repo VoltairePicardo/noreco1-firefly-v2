@@ -7,6 +7,7 @@ import com.noreco1.fireflyv2.controller.response.PostResponse;
 import com.noreco1.fireflyv2.controller.response.StockWithdrawalDetailDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -28,6 +29,10 @@ public interface StockWithdrawalService extends VoucherService {
     List<Map> getDetails(int id);
     @Transactional(readOnly = true)
     Page<Map<String, Object>> getStockWithdrawalPaged(String from, String to, Integer statusId, String query, Pageable pageable);
+
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
+    List<Map> findByDateRangePending(String from, String to, Integer officeId);
+
     Page<InventoryDocumentDto> findAllForReleasingByQuery(String query, Pageable pageable);
     List<StockWithdrawal> getListForSummaryReport(String from, String to, HttpServletRequest request);
     List<StockWithdrawalDetailDto> getItems(Integer withdrawalId);

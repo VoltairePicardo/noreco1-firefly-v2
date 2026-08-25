@@ -3,7 +3,6 @@ import { COMMON_ALL_PAGE_IMPORTS, COMMON_MAIN_PAGE_IMPORTS, SHARED_PROVIDERS } f
 import { AlertService } from '@/app/shared/services/alert.service';
 import { FlatpickrDirective, provideFlatpickrDefaults } from 'angularx-flatpickr';
 import { ReceivingReportService } from '../receiving-report.service';
-import { RrService } from '../rr.service';
 import { monthStart, monthEnd } from '@/app/shared/utils/date.utils';
 
 @Component({

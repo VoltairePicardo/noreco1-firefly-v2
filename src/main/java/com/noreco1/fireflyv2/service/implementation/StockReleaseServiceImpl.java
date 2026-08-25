@@ -213,7 +213,7 @@ public class StockReleaseServiceImpl implements StockReleaseService, PrintableVo
 
     }
 
-    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
+    
     @Override
     @Transactional(readOnly = true)
     public StockRelease findByCode(String code) {
@@ -225,28 +225,28 @@ public class StockReleaseServiceImpl implements StockReleaseService, PrintableVo
         } else return null;
     }
 
-    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
+    
     @Override
     @Transactional(readOnly = true)
     public List<StockRelease> findAll() {
         return stockReleaseRepo.findAll();
     }
 
-    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
+    
     @Override
     @Transactional(readOnly = true)
     public Page<StockRelease> findAll(Pageable pageable) {
         return null;
     }
 
-    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
+    
     @Override
     @Transactional(readOnly = true)
     public Page<StockRelease> findByQuery(String query, Pageable pageable) {
         return null;
     }
 
-    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
+    
     @Override
     @Transactional(readOnly = true)
     public List<Map> getDetails(int id) {
@@ -283,7 +283,7 @@ public class StockReleaseServiceImpl implements StockReleaseService, PrintableVo
         return data;
     }
 
-    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
+    
     @Override
     @Transactional(readOnly = true)
     public List<Map> findByDateRangeAndStatusId(String from, String to, Integer docStatusId, Integer officeId) {
@@ -309,7 +309,7 @@ public class StockReleaseServiceImpl implements StockReleaseService, PrintableVo
         return null;
     }
 
-    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
+    
     @Override
     @Transactional(readOnly = true)
     public List<Map> findByDateRangePending(String from, String to, Integer officeId) {
@@ -344,14 +344,14 @@ public class StockReleaseServiceImpl implements StockReleaseService, PrintableVo
         return null;
     }
 
-    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
+    
     @Override
     @Transactional(readOnly = true)
     public List<StockWithdrawal> findStockWithdrawalByDocumentStatusId(Integer documentStatusId) {
         return stockReleaseRepo.findStockWithdrawalByDocumentStatusId(documentStatusId);
     }
 
-    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
+    
     @Override
     @Transactional(readOnly = true)
     public List<Map> getAvailableItemStock(Integer itemId) {
@@ -744,7 +744,7 @@ public class StockReleaseServiceImpl implements StockReleaseService, PrintableVo
 
     }
 
-    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
+    
     @Override
     @Transactional(readOnly = true)
     public List<StockRelease> getListForSummaryReport(String from, String to, HttpServletRequest request) {
@@ -802,7 +802,7 @@ public class StockReleaseServiceImpl implements StockReleaseService, PrintableVo
         return list;
     }
 
-    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
+    
     @Override
     @Transactional(readOnly = true)
     public List<StockWithdrawalDetailDto> getItems(Integer docTransId) {
@@ -1016,7 +1016,7 @@ public class StockReleaseServiceImpl implements StockReleaseService, PrintableVo
         return response;
     }
 
-    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
+    
     @Override
     @Transactional(readOnly = true)
     public Page<StockRelease> findByDateRangeAndCodeAndType(String from, String to, Integer type, String query, Pageable pageable) {
@@ -1187,7 +1187,7 @@ public class StockReleaseServiceImpl implements StockReleaseService, PrintableVo
         return this.reportMeta;
     }
 
-    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
+    
     @Override
     @Transactional(readOnly = true)
     public Page<StockReleaseDocumentDto> findAllApprovedForAccountSettingPaged(String query, Pageable pageable) {

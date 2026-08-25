@@ -6,6 +6,7 @@ import com.noreco1.fireflyv2.controller.response.*;
 import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 
@@ -47,7 +48,10 @@ public interface PurchaseRequestService extends VoucherService {
     @Transactional
     PostResponse setModeOfProcurement(SetModeOfProcurementDto postData, BindingResult bindingResult, MessageSource messageSource);
 
-    Page<Object[]> getRequisitionVoucherForRR(String query, Pageable pageable);
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
+    Page<Map<String, Object>> getRequisitionVoucherForStockWithdrawal(String query, Integer invLocId, Pageable pageable);
+
+    Page<Map<String, Object>> getRequisitionVoucherForRR(String query, Pageable pageable);
 
     List<PurchaseRequest> getPurchaseRequestForPOBudgetAmountBalance();
 

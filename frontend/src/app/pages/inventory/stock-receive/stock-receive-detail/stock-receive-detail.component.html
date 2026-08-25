@@ -37,7 +37,7 @@
                     <label class="form-label fw-bold">Action</label>
                     <select class="form-select" [(ngModel)]="selectedAction">
                         <option [ngValue]="null">— Select action —</option>
-                        @for (a of workflowActions(); track a.actionMapId) {
+                        @for (a of workflowActions; track a.actionMapId) {
                             <option [ngValue]="a">{{ a.action }}</option>
                         }
                     </select>

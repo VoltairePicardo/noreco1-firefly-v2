@@ -127,12 +127,12 @@ export class StockReceiveAddEditComponent {
             );
             if (result?.action === 'select' && result?.data) {
                 const doc = result.data;
-                this.documentTransaction  = { id: doc.transId || doc.transaction?.id || doc.id };
-                this.selectedDocCode      = doc.code || '';
-                this.selectedDocDate      = doc.date || doc.voucherDate || '';
-                this.selectedDocCreatedBy = doc.createdBy?.fullName || doc.createdBy || '';
-                this.documentType         = doc.type || null;
-                this.details = (doc.details || []).map((d: any) => ({
+                this.documentTransaction.set({ id: doc.transId || doc.transaction?.id || doc.id });
+                this.selectedDocCode.set(doc.code || '');
+                this.selectedDocDate.set(doc.date || doc.voucherDate || '');
+                this.selectedDocCreatedBy.set(doc.createdBy?.fullName || doc.createdBy || '');
+                this.documentType.set(doc.type || null);
+                this.details.set((doc.details || []).map((d: any) => ({
                     itemId:              d.itemId,
                     itemCode:            d.itemCode,
                     unitId:              d.unitId,

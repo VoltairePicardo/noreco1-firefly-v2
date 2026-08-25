@@ -37,8 +37,6 @@ export class StockTransferDetailComponent {
     private router       = inject(Router);
     private alertService = inject(AlertService);
 
-    private transactionId = computed<number | undefined>(() => this.data()?.transId);
-
     ngOnInit(): void {
         this.route.paramMap.subscribe(params => {
             this.id = params.get('id');
@@ -121,5 +119,5 @@ export class StockTransferDetailComponent {
         });
     }
 
-    print(): void { this.service.print(this.data().id); }
+    print(): void { this.service.print(this.data.id); }
 }

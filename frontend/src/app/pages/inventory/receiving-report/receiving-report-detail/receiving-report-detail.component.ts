@@ -63,14 +63,15 @@ export class ReceivingReportDetailComponent implements OnInit {
     }
 
     loadWorkflowActions(): void {
-        if (!this.data?.transId || this.isTerminal()) {
-            this.workflowActions = [];
+        const transactionId = this.transactionId();
+        if (!transactionId || this.isTerminal()) {
+            this.workflowActions.set([]);
             this.selectedAction  = null;
             return;
         }
-        this.service.getWorkflowActions(this.data.transId).subscribe({
-            next: (actions) => { this.workflowActions = actions || []; this.selectedAction = null; this.remarks = ''; },
-            error: () => { this.workflowActions = []; }
+        this.service.getWorkflowActions(transactionId).subscribe({
+            next: (actions) => { this.workflowActions.set(actions || []); this.selectedAction = null; this.remarks = ''; },
+            error: () => { this.workflowActions.set([]); }
         });
     }
 
@@ -85,8 +86,8 @@ export class ReceivingReportDetailComponent implements OnInit {
         this.processingWorkflow.set(true);
         this.service.process({ documentId: this.data().id, remarks: this.remarks, workflowActionsDto: { actionMapId: this.selectedAction.actionMapId } }).subscribe({
             next: (res) => {
-                this.processingWorkflow = false;
-                if (res?.success) { this.workflowActions = []; this.selectedAction = null; this.remarks = ''; this.alertService.success(this.module, res.successMessage || 'Processed.', ''); this.loadData(); }
+                this.processingWorkflow.set(false);
+                if (res?.success) { this.workflowActions.set([]); this.selectedAction = null; this.remarks = ''; this.alertService.success(this.module, res.successMessage || 'Processed.', ''); this.loadData(); }
                 else { this.alertService.error(this.module, 'Process', res?.failureMessage || 'Processing failed.'); }
             },
             error: () => { this.processingWorkflow.set(false); this.alertService.error(this.module, 'An error occurred.', ''); }

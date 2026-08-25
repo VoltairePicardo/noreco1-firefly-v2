@@ -37,7 +37,7 @@
                 <div class="col-md-3">
                     <label class="form-label fw-bold mb-1 fs-xs text-uppercase">Search</label>
                     <input type="text" class="form-control" [(ngModel)]="searchText"
-                           placeholder="Search..." (ngModelChange)="page = 1"/>
+                           placeholder="Search..." (ngModelChange)="page.set(1)"/>
                 </div>
                 <div class="col-auto d-flex gap-2">
                     <button type="button" class="btn btn-success fw-bold" (click)="load()">
@@ -57,8 +57,8 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @if (pagedRecords.length > 0) {
-                            @for (rec of pagedRecords; track rec.id) {
+                        @if (pagedRecords().length > 0) {
+                            @for (rec of pagedRecords(); track rec.id) {
                                 <tr>
                                     <td class="fw-bold">{{ rec.code }}</td>
                                     <td>{{ rec.voucherDate | date:'MM/dd/yyyy' }}</td>
@@ -94,9 +94,15 @@
                 </table>
             </div>
 
-            @if (filteredTotal > pageSize) {
+            @if (filteredTotal() > pageSize) {
                 <div class="d-flex justify-content-center mt-3">
-                    <ngb-pagination [(page)]="page" [pageSize]="pageSize" [collectionSize]="filteredTotal" [maxSize]="5"/>
+                    <ngb-pagination
+                        [collectionSize]="filteredTotal()"
+                        [page]="page()"
+                        (pageChange)="page.set($event)"
+                        [pageSize]="pageSize"
+                        [maxSize]="5">
+                    </ngb-pagination>
                 </div>
             }
         </div>

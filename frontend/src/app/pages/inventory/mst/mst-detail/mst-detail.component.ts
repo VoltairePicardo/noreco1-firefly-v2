@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { COMMON_ALL_PAGE_IMPORTS } from '@/app/shared/providers/shared-providers';
 import { FormsModule } from '@angular/forms';
@@ -40,6 +40,8 @@ export class MstDetailComponent implements OnInit {
     private router       = inject(Router);
     private alertService = inject(AlertService);
 
+    private transactionId = computed<number | undefined>(() => this.data()?.transId ?? this.data()?.transaction?.id);
+
     ngOnInit(): void {
         this.route.paramMap.subscribe(params => {
             this.id = params.get('id');
@@ -60,13 +62,14 @@ export class MstDetailComponent implements OnInit {
     }
 
     loadWorkflowActions(): void {
-        if (!this.data?.transId || this.isTerminal()) {
-            this.workflowActions = [];
+        const transactionId = this.transactionId();
+        if (!transactionId || this.isTerminal()) {
+            this.workflowActions.set([]);
             this.selectedAction  = null;
             return;
         }
-        this.service.getWorkflowActions(this.data.transId).subscribe({
-            next: (a) => { this.workflowActions = a || []; this.selectedAction = null; this.remarks = ''; }, error: () => { this.workflowActions = []; }
+        this.service.getWorkflowActions(transactionId).subscribe({
+            next: (a) => { this.workflowActions.set(a || []); this.selectedAction = null; this.remarks = ''; }, error: () => { this.workflowActions.set([]); }
         });
     }
 
@@ -81,8 +84,8 @@ export class MstDetailComponent implements OnInit {
         this.processingWorkflow.set(true);
         this.service.process({ documentId: this.data().id, remarks: this.remarks, workflowActionsDto: { actionMapId: this.selectedAction.actionMapId } }).subscribe({
             next: (res) => {
-                this.processingWorkflow = false;
-                if (res?.success) { this.workflowActions = []; this.selectedAction = null; this.remarks = ''; this.alertService.success(this.module, res.successMessage || 'Processed.', ''); this.loadData(); }
+                this.processingWorkflow.set(false);
+                if (res?.success) { this.workflowActions.set([]); this.selectedAction = null; this.remarks = ''; this.alertService.success(this.module, res.successMessage || 'Processed.', ''); this.loadData(); }
                 else { this.alertService.error(this.module, res?.failureMessage || 'Failed.', ''); }
             },
             error: () => { this.processingWorkflow.set(false); this.alertService.error(this.module, 'Error.', ''); }
@@ -93,7 +96,7 @@ export class MstDetailComponent implements OnInit {
         this.showLogs = !this.showLogs;
         if (this.showLogs && this.logs().length === 0) {
             this.logsLoading.set(true);
-            this.service.getDocumentLogs(this.data().transId).subscribe({
+            this.service.getDocumentLogs(this.transactionId()!).subscribe({
                 next: (l) => { this.logs.set(l || []); this.logsLoading.set(false); },
                 error: () => { this.logsLoading.set(false); }
             });

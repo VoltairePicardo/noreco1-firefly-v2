@@ -4,7 +4,6 @@ import com.noreco1.fireflyv2.common.GlobalConstant;
 import com.noreco1.fireflyv2.common.facade.*;
 import com.noreco1.fireflyv2.common.helpers.*;
 import com.noreco1.fireflyv2.dtoers.DocumentDtoer;
-import com.noreco1.fireflyv2.exception.BusinessException;
 import com.noreco1.fireflyv2.model.*;
 import com.noreco1.fireflyv2.model.DocumentStatus;
 import com.noreco1.fireflyv2.model.Workflow;
@@ -169,9 +168,8 @@ public class StockWithdrawalServiceImpl implements StockWithdrawalService, Print
         } else return null;
     }
 
-    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
-    @Transactional
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     public PostResponse create(Map<String, Object> payload) {
         PostResponse response = new PostResponse();
         StockWithdrawal sw = new StockWithdrawal();
@@ -301,32 +299,32 @@ public class StockWithdrawalServiceImpl implements StockWithdrawalService, Print
     @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<Map> findByDateRangePending(String from, String to, Integer officeId) {
-        try {
-            Date fromDate = DateHelper.strToDate(from, "yyyy-MM-dd");
-            Date toDate = DateHelper.strToDate(to, "yyyy-MM-dd");
-
-            if (fromDate == null) {
-                fromDate = new Date(0);
-            }
-
-            if (toDate == null) {
-                toDate = new Date();
-            }
-
-            Integer[] ids = {
-                    com.noreco1.fireflyv2.model.enums.DocumentStatus.APPROVED.getId(),
-                    com.noreco1.fireflyv2.model.enums.DocumentStatus.DENIED.getId(),
-                    com.noreco1.fireflyv2.model.enums.DocumentStatus.CANCELLED.getId()
-            };
-
-            User loggedIn = authenticationFacade.getLoggedIn();
-
-            List<StockWithdrawal> docs = stockWithdrawalRepo.findByAllowedUserVoucherDateBetweenAndDocumentStatusIdNotInAndOfficeId(loggedIn.getId(), fromDate, toDate, Arrays.asList(ids));
-            return this.makeWithdrawalListMap(docs);
-
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
+//        try {
+//            Date fromDate = DateHelper.strToDate(from, "yyyy-MM-dd");
+//            Date toDate = DateHelper.strToDate(to, "yyyy-MM-dd");
+//
+//            if (fromDate == null) {
+//                fromDate = new Date(0);
+//            }
+//
+//            if (toDate == null) {
+//                toDate = new Date();
+//            }
+//
+//            Integer[] ids = {
+//                    com.noreco1.fireflyv2.model.enums.DocumentStatus.APPROVED.getId(),
+//                    com.noreco1.fireflyv2.model.enums.DocumentStatus.DENIED.getId(),
+//                    com.noreco1.fireflyv2.model.enums.DocumentStatus.CANCELLED.getId()
+//            };
+//
+//            User loggedIn = authenticationFacade.getLoggedIn();
+//
+//            List<StockWithdrawal> docs = stockWithdrawalRepo.findByAllowedUserVoucherDateBetweenAndDocumentStatusIdNotInAndOfficeId(loggedIn.getId(), fromDate, toDate, Arrays.asList(ids));
+//            return this.makeWithdrawalListMap(docs);
+//
+//        } catch (Exception ex) {
+//            ex.printStackTrace();
+//        }
         return null;
     }
 

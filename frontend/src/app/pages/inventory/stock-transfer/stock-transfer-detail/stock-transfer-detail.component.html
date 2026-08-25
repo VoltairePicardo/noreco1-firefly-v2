@@ -20,7 +20,7 @@
                 <ng-icon name="tablerPrinter" class="ps-0 pe-3 fw-bold"></ng-icon>Print
             </button>
             @if (isEditable()) {
-                <a [routerLink]="['/' + menuLink, data().id, 'edit']" class="btn btn-primary fw-bold">
+                <a [routerLink]="['/' + menuLink, data.id, 'edit']" class="btn btn-primary fw-bold">
                     <ng-icon name="tablerEdit" class="ps-0 pe-3 fw-bold"></ng-icon>Edit
                 </a>
             }
