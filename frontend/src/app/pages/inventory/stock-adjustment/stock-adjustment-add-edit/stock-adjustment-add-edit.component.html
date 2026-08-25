@@ -1,73 +1,66 @@
 <div class="container-fluid">
     <app-page-title [title]="module" [subTitle]="subModule" [menuLink]="menuLink"/>
-</div>
 
-<div class="container-fluid">
     @if (isLoading() && editMode) {
         <div class="d-flex align-items-center gap-2 text-muted py-4">
             <span class="spinner-border spinner-border-sm" role="status"></span> Loading...
         </div>
-    } @else {
-    <form (ngSubmit)="save()" #f="ngForm">
-        <div class="row g-3">
-            <div class="col-xl-12">
-                <app-ui-card title="Stock Adjustment Information">
-                    <div class="col-xl-12 p-3" card-body>
+    } @else if (validationForm) {
+        <form (ngSubmit)="save()" [formGroup]="validationForm">
+            <div class="row g-3">
+                <div class="col-xl-12">
+                    <app-ui-card title="Stock Adjustment Information">
+                        <div class="col-xl-12 p-3" card-body>
 
-                        <div class="row g-3">
-                            <div class="col-md-3">
-                                <label class="form-label fw-bold">Date <span class="text-danger">*</span></label>
-                                <input type="text" mwlFlatpickr [options]="flatpickrOptions"
-                                       class="form-control" [(ngModel)]="voucherDate"
-                                       name="voucherDate" placeholder="Select date" required/>
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label fw-bold">Type</label>
-                                <select class="form-select" [(ngModel)]="type" name="type">
-                                    <option value="">— Select type —</option>
-                                    <option value="Increase">Increase</option>
-                                    <option value="Decrease">Decrease</option>
-                                </select>
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label fw-bold">Inventory Location <span class="text-danger">*</span></label>
-                                <select class="form-select"
-                                        [ngModel]="selectedLocation()" (ngModelChange)="selectedLocation.set($event)"
-                                        name="inventoryLocation"
-                                        [compareWith]="compareById"
-                                        [disabled]="details().length > 0">
-                                    <option [ngValue]="null">— Select Location —</option>
-                                    @for (loc of inventoryLocations(); track loc.id) {
-                                        <option [ngValue]="loc">{{ loc.description || loc.name }}</option>
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <label class="form-label fw-bold">Date <span class="text-danger">*</span></label>
+                                    <input type="text" mwlFlatpickr [options]="flatpickrOptions"
+                                           class="form-control" placeholder="Select date"
+                                           formControlName="voucherDate"
+                                           [class]="submit && form.get('voucherDate')?.errors ? 'is-invalid' : submit && !form.get('voucherDate')?.errors ? 'is-valid' : ''"/>
+                                    <div class="invalid-feedback">Please select a date.</div>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label fw-bold">Inventory Location <span class="text-danger">*</span></label>
+                                    <select class="form-select" formControlName="inventoryLocationId"
+                                            [class]="submit && form.get('inventoryLocationId')?.errors ? 'is-invalid' : submit && !form.get('inventoryLocationId')?.errors ? 'is-valid' : ''">
+                                        <option [ngValue]="null">— Select Location —</option>
+                                        @for (loc of inventoryLocations(); track loc.id) {
+                                            <option [ngValue]="loc.id">{{ loc.description || loc.name }}</option>
+                                        }
+                                    </select>
+                                    <div class="invalid-feedback">Please select an inventory location.</div>
+                                    @if (details().length > 0) {
+                                        <small class="text-muted">Clear items to change location.</small>
                                     }
-                                </select>
-                                @if (details().length > 0) {
-                                    <small class="text-muted">Clear items to change location.</small>
-                                }
+                                </div>
                             </div>
-                        </div>
 
-                        <hr/>
-                        <div class="row g-3">
-                            <div class="col-md-12">
-                                <label class="form-label fw-bold">Remarks <span class="text-danger">*</span></label>
-                                <textarea class="form-control" [(ngModel)]="remarks" name="remarks"
-                                          rows="2" placeholder="Required remarks" maxlength="1024"></textarea>
+                            <hr class="border-dashed mx-n3 mt-3"/>
+                            <div class="col-12 fs-sm fw-semibold mb-2">Remarks</div>
+
+                            <div class="row g-3">
+                                <div class="col-md-12">
+                                    <textarea class="form-control" formControlName="remarks"
+                                              rows="2" placeholder="Required remarks" maxlength="1024"
+                                              [class]="submit && form.get('remarks')?.errors ? 'is-invalid' : submit && !form.get('remarks')?.errors ? 'is-valid' : ''"></textarea>
+                                    <div class="invalid-feedback">Please enter remarks.</div>
+                                </div>
                             </div>
-                        </div>
 
-                        <hr/>
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <div class="fs-xs text-uppercase fw-semibold text-muted">Items</div>
-                            <button type="button" class="btn btn-success fw-bold btn-sm"
-                                    (click)="openItemStockBrowse()">
-                                <ng-icon name="tablerPlus" class="ps-0 pe-2 fw-bold"></ng-icon>Add Item
-                            </button>
-                        </div>
+                            <hr class="border-dashed mx-n3 mt-3"/>
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <div class="fs-sm fw-semibold mb-2">Items</div>
+                                <button type="button" class="btn btn-primary fw-bold btn-sm"
+                                        (click)="openItemStockBrowse()">
+                                    <ng-icon name="tablerPlus" class="fs-lg me-1 fw-bold"></ng-icon>Add Item
+                                </button>
+                            </div>
 
-                        <div class="table-responsive">
-                            <table class="table table-custom table-centered table-hover w-100 mb-0">
-                                <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                            <div class="table-responsive">
+                                <table class="table table-custom table-centered table-hover w-100 mb-0">
+                                    <thead class="bg-light align-middle bg-opacity-25 thead-sm">
                                     <tr class="text-uppercase fs-xxs">
                                         <th style="width:40px">#</th>
                                         <th style="width:80px">Code</th>
@@ -77,93 +70,105 @@
                                         <th class="text-center" style="width:130px">Adjustment (+/-)</th>
                                         <th style="width:50px"></th>
                                     </tr>
-                                </thead>
-                                <tbody>
-                                    @if (details().length === 0) {
-                                        <tr>
-                                            <td colspan="7" class="text-center text-muted py-3">
-                                                Select an <strong>Inventory Location</strong> then click <strong>Add Item</strong> to add items.
-                                            </td>
-                                        </tr>
-                                    }
-                                    @for (row of details(); track $index) {
-                                        <tr>
-                                            <td class="text-center text-muted">{{ $index + 1 }}</td>
-                                            <td class="fw-bold">{{ row.itemCode }}</td>
-                                            <td>{{ row.itemDescription }}</td>
-                                            <td>{{ row.unitCode }}</td>
-                                            <td class="text-center fw-bold text-muted">{{ row.quantity | number:'1.0-3' }}</td>
-                                            <td>
-                                                <input type="number"
-                                                       class="form-control form-control-sm text-center fw-bold"
-                                                       [(ngModel)]="row.adjustment"
-                                                       [name]="'adj_' + $index"
-                                                       (ngModelChange)="onAdjustmentChange($index)"
-                                                       step="0.01" placeholder="0"/>
-                                            </td>
-                                            <td class="text-center">
-                                                <button type="button"
-                                                        class="btn btn-light btn-icon btn-sm rounded-circle"
-                                                        (click)="removeRow($index)"
-                                                        ngbTooltip="Remove">
-                                                    <ng-icon name="tablerTrash" class="fs-lg text-danger"></ng-icon>
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    }
-                                </tbody>
-                            </table>
-                        </div>
+                                    </thead>
+                                    <tbody>
+                                        @if (details().length === 0) {
+                                            <tr>
+                                                <td colspan="7" class="text-center text-muted py-3">
+                                                    Select an <strong>Inventory Location</strong> then click <strong>Add Item</strong> to add items.
+                                                </td>
+                                            </tr>
+                                        }
+                                        @for (row of details(); track $index) {
+                                            <tr>
+                                                <td class="text-center text-muted">{{ $index + 1 }}</td>
+                                                <td class="fw-bold">{{ row.itemCode }}</td>
+                                                <td>{{ row.itemDescription }}</td>
+                                                <td>{{ row.unitCode }}</td>
+                                                <td class="text-center fw-bold text-muted">{{ row.quantity | number:'1.0-3' }}</td>
+                                                <td>
+                                                    <input type="number"
+                                                           class="form-control form-control-sm text-center fw-bold"
+                                                           [(ngModel)]="row.adjustment"
+                                                           [ngModelOptions]="{ standalone: true }"
+                                                           [name]="'adj_' + $index"
+                                                           (ngModelChange)="onAdjustmentChange($index)"
+                                                           step="0.01" placeholder="0"/>
+                                                </td>
+                                                <td class="text-center">
+                                                    <button type="button"
+                                                            class="btn btn-light btn-icon btn-sm rounded-circle"
+                                                            (click)="removeRow($index)"
+                                                            ngbTooltip="Remove">
+                                                        <ng-icon name="tablerTrash" class="fs-lg text-danger"></ng-icon>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                            @if (submit && details().length === 0) {
+                                <div class="text-danger fs-xs mt-1">No items selected. Please add at least one item.</div>
+                            }
 
-                        <hr/>
-                        <div class="col-12 fs-xs text-uppercase fw-semibold text-muted mb-2">Signatories</div>
+                            <hr class="border-dashed mx-n3 mt-3"/>
+                            <div class="fs-sm fw-semibold mb-2">Signatories</div>
 
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold">Checked By <span class="text-danger">*</span></label>
-                                <div class="input-group">
-                                    <input type="text" class="form-control"
-                                           [value]="checker() ? (checker().fullName || checker().name || '') : ''"
-                                           readonly placeholder="Browse checker..."/>
-                                    <button type="button" class="btn btn-success fw-bold"
-                                            (click)="openCheckerBrowse()">
-                                        <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
-                                    </button>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold">Checked By <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control"
+                                               [value]="signatoryNames['checkerAccountNo'] || ''"
+                                               [class]="submit && form.get('checkerAccountNo')?.errors ? 'is-invalid' : submit && form.get('checkerAccountNo')?.value ? 'is-valid' : ''"
+                                               readonly placeholder="Browse checker..."/>
+                                        <button type="button" class="btn btn-primary fw-bold"
+                                                (click)="openCheckerBrowse()">
+                                            <ng-icon name="tablerSearch" class="fs-lg me-1 fw-bold"></ng-icon>Browse
+                                        </button>
+                                    </div>
+                                    @if (submit && form.get('checkerAccountNo')?.errors) {
+                                        <div class="text-danger small mt-1">Please select a Checked By signatory.</div>
+                                    }
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold">Approved By <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control"
+                                               [value]="signatoryNames['approvedByAccountNo'] || ''"
+                                               [class]="submit && form.get('approvedByAccountNo')?.errors ? 'is-invalid' : submit && form.get('approvedByAccountNo')?.value ? 'is-valid' : ''"
+                                               readonly placeholder="Browse approving officer..."/>
+                                        <button type="button" class="btn btn-primary fw-bold"
+                                                (click)="openApprovedByBrowse()">
+                                            <ng-icon name="tablerSearch" class="fs-lg me-1 fw-bold"></ng-icon>Browse
+                                        </button>
+                                    </div>
+                                    @if (submit && form.get('approvedByAccountNo')?.errors) {
+                                        <div class="text-danger small mt-1">Please select an Approved By signatory.</div>
+                                    }
                                 </div>
                             </div>
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold">Approved By <span class="text-danger">*</span></label>
-                                <div class="input-group">
-                                    <input type="text" class="form-control"
-                                           [value]="approvedBy() ? (approvedBy().fullName || approvedBy().name || '') : ''"
-                                           readonly placeholder="Browse approving officer..."/>
-                                    <button type="button" class="btn btn-success fw-bold"
-                                            (click)="openApprovedByBrowse()">
-                                        <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
-                                    </button>
-                                </div>
+
+                            <hr class="border-dashed mx-n3 mt-3"/>
+                            <div class="d-flex gap-2 justify-content-end align-items-center mt-3">
+                                <a [routerLink]="['/' + menuLink]" class="btn btn-light fw-bold">
+                                    <ng-icon name="tablerArrowLeft" class="me-1 fs-lg fw-bold"></ng-icon>Back
+                                </a>
+                                <button type="submit" class="btn btn-primary fw-bold" [disabled]="formSubmit">
+                                    @if (formSubmit) {
+                                        <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                                        {{ editMode ? 'Updating...' : 'Saving...' }}
+                                    } @else {
+                                        {{ editMode ? 'Update' : 'Save ' + module }}
+                                    }
+                                </button>
                             </div>
-                        </div>
 
-                        <div class="d-flex gap-2 justify-content-end align-items-center pt-3 border-top mt-3">
-                            <a [routerLink]="['/' + menuLink]" class="btn btn-light fw-bold">
-                                <ng-icon name="tablerArrowLeft" class="ps-0 pe-3 fw-bold"></ng-icon>Back
-                            </a>
-                            <button type="submit" class="btn btn-primary fw-bold" [disabled]="isLoading()">
-                                @if (isLoading()) {
-                                    <span class="spinner-border spinner-border-sm me-2" role="status"></span>
-                                    {{ editMode ? 'Updating...' : 'Saving...' }}
-                                } @else {
-                                    <ng-icon name="tablerCheck" class="ps-0 pe-3 fw-bold"></ng-icon>
-                                    {{ editMode ? 'Update' : 'Save ' + module }}
-                                }
-                            </button>
                         </div>
-
-                    </div>
-                </app-ui-card>
+                    </app-ui-card>
+                </div>
             </div>
-        </div>
-    </form>
+        </form>
     }
 </div>

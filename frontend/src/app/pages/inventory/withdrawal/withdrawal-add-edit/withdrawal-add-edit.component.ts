@@ -13,7 +13,7 @@ import { BrowseItemStockModalComponent } from '@/app/shared/modals/browse-item-s
 import { BrowseRvCostEstimateModalComponent } from '@/app/shared/modals/browse-rv-cost-estimate-modal/browse-rv-cost-estimate-modal.component';
 import { provideIcons } from '@ng-icons/core';
 import { tablerSearch, tablerTrash, tablerPlus, tablerArrowLeft, tablerCheck } from '@ng-icons/tabler-icons';
-import { ItemStock } from '@/app/models/item-stock.model';
+import { ItemStock } from '@/app/models/inventory-modules/item-stock.model';
 import {InventoryCategory, InventoryLocation, Purpose} from '@/app/models/dropdown.model';
 
 interface SlEntity {

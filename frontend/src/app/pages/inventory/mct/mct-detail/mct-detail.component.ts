@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { COMMON_ALL_PAGE_IMPORTS } from '@/app/shared/providers/shared-providers';
 import { FormsModule } from '@angular/forms';
@@ -8,6 +8,8 @@ import { SharedModule } from '@/app/shared/shared.module';
 import { MctService } from '../mct.service';
 import { provideIcons } from '@ng-icons/core';
 import { tablerPrinter, tablerEdit, tablerArrowLeft } from '@ng-icons/tabler-icons';
+import { AnyJSONService } from '@/app/shared/services/any-json.service';
+import { MaterialCreditTicket } from '@/app/models/inventory-modules/mct.model';
 
 const TERMINAL_STATUSES = ['Approved', 'Denied', 'Cancelled'];
 
@@ -24,19 +26,25 @@ export class MctDetailComponent implements OnInit {
     menuLink  = 'mct';
 
     id: any = 0;
-    data = signal<any>({});
+    data = signal<MaterialCreditTicket>({} as MaterialCreditTicket);
     isLoading = signal(false);
 
-    workflowActions    = signal<any[]>([]);
-    selectedAction: any = null;
-    remarks             = '';
-    processingWorkflow  = signal(false);
-    logs = signal<any[]>([]); showLogs = false; logsLoading = signal(false);
+    workflowActions     = signal<any[]>([]);
+    selectedAction:    any   = null;
+    remarks            = '';
+    processingWorkflow = signal(false);
+
+    logs        = signal<any[]>([]);
+    showLogs    = false;
+    logsLoading = signal(false);
 
     private service      = inject(MctService);
     private route        = inject(ActivatedRoute);
     private router       = inject(Router);
     private alertService = inject(AlertService);
+    private anyJSONService = inject(AnyJSONService);
+
+    private transactionId = computed<any>(() => this.data()?.transaction?.id);
 
     ngOnInit(): void {
         this.route.paramMap.subscribe(params => {
@@ -50,18 +58,36 @@ export class MctDetailComponent implements OnInit {
         this.service.getData(this.id).subscribe({
             next: (data) => {
                 this.isLoading.set(false);
-                if (data?.id) { this.data.set(data); this.loadWorkflowActions(); }
-                else { this.alertService.error(this.module, 'Not Found', ''); this.router.navigate(['/' + this.menuLink]); }
+                if (data?.id) {
+                    this.data.set(data);
+                    this.loadWorkflowActions();
+                }
+                else {
+                    this.alertService.error(this.module, 'Not Found', ''); this.router.navigate(['/' + this.menuLink]);
+                }
             },
             error: () => { this.isLoading.set(false); this.alertService.error(this.module, 'Error.', ''); this.router.navigate(['/' + this.menuLink]); }
         });
     }
 
     loadWorkflowActions(): void {
-        if (!this.data()?.transId || this.isTerminal()) return;
-        this.service.getWorkflowActions(this.data().transId).subscribe({
-            next: (a) => { this.workflowActions.set(a || []); }, error: () => { this.workflowActions.set([]); }
+        const transactionId = this.transactionId();
+        if (!transactionId || this.isTerminal()) return;
+        this.anyJSONService.getWorkflowActions(transactionId).subscribe({
+            next: (actions) => { this.workflowActions.set(actions || []); },
+            error: () => { this.workflowActions.set([]); }
         });
+    }
+
+    actionColor(action: any): string {
+        const name = (action?.action || '').toLowerCase();
+        if (name.includes('approve')) return 'success';
+        if (name.includes('reject') || name.includes('deny')) return 'danger';
+        return 'secondary';
+    }
+
+    actionButtonClass(action: any): string {
+        return this.selectedAction === action ? `btn-${this.actionColor(action)}` : 'btn-outline-secondary';
     }
 
     isTerminal(): boolean { return TERMINAL_STATUSES.includes(this.data()?.documentStatus?.status || ''); }
@@ -87,8 +113,8 @@ export class MctDetailComponent implements OnInit {
         this.showLogs = !this.showLogs;
         if (this.showLogs && this.logs().length === 0) {
             this.logsLoading.set(true);
-            this.service.getDocumentLogs(this.data().transId).subscribe({
-                next: (l) => { this.logs.set(l || []); this.logsLoading.set(false); },
+            this.anyJSONService.getLogs(this.transactionId()).subscribe({
+                next: (logs) => { this.logs.set(logs || []); this.logsLoading.set(false); },
                 error: () => { this.logsLoading.set(false); }
             });
         }

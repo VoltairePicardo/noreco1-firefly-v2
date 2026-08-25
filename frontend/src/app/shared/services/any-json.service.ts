@@ -18,18 +18,16 @@ export interface DocumentLog {
     remarks: string;
 }
 
-/**
- * Centralized client for the workflow/document audit trail exposed by
- * `AnyJsonController#logs` (`GET /api/json/document-logs/{transId}`).
- * Every module's document-detail page (stock release, vouchers, purchase
- * orders, etc.) should use this instead of redeclaring `getDocumentLogs`
- * on its own feature service.
- */
+
 @Injectable({ providedIn: 'root' })
-export class DocumentLogsService {
+export class AnyJSONService {
     private http = inject(HttpClient);
 
-    getLogs(transId: number): Observable<DocumentLog[]> {
-        return this.http.get<DocumentLog[]>(`${BASE_API}/json/document-logs/${transId}`);
+    getLogs(transactionId: number): Observable<DocumentLog[]> {
+        return this.http.get<DocumentLog[]>(`${BASE_API}/json/document-logs/${transactionId}`);
+    }
+
+    getWorkflowActions(transactionId: number): Observable<any[]> {
+        return this.http.get<any[]>(`${BASE_API}/json/workflow-actions/${transactionId}`);
     }
 }

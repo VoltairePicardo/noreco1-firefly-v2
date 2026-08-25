@@ -8,7 +8,7 @@ import { SharedModule } from '@/app/shared/shared.module';
 import { WithdrawalService } from '../withdrawal.service';
 import { provideIcons } from '@ng-icons/core';
 import { tablerPrinter, tablerEdit, tablerArrowLeft } from '@ng-icons/tabler-icons';
-import {DocumentLogsService} from '@/app/shared/services/document-logs.service';
+import {AnyJSONService} from '@/app/shared/services/any-json.service';
 
 const TERMINAL_STATUSES = ['Approved', 'Denied', 'Cancelled'];
 
@@ -41,7 +41,7 @@ export class WithdrawalDetailComponent implements OnInit {
     private route        = inject(ActivatedRoute);
     private router       = inject(Router);
     private alertService = inject(AlertService);
-    private documentLogsService = inject(DocumentLogsService);
+    private anyJSONService = inject(AnyJSONService);
 
     private transactionId = computed<any>(() => this.data()?.transaction?.id);
 
@@ -67,13 +67,12 @@ export class WithdrawalDetailComponent implements OnInit {
     loadWorkflowActions(): void {
         const transactionId = this.transactionId();
         if (!transactionId || this.isTerminal()) return;
-        this.service.getWorkflowActions(transactionId).subscribe({
+        this.anyJSONService.getWorkflowActions(transactionId).subscribe({
             next: (actions) => { this.workflowActions.set(actions || []); },
             error: () => { this.workflowActions.set([]); }
         });
     }
 
-    /** Semantic color for a workflow action (approve = success, reject/deny = danger, everything else = secondary). */
     actionColor(action: any): string {
         const name = (action?.action || '').toLowerCase();
         if (name.includes('approve')) return 'success';
@@ -81,7 +80,6 @@ export class WithdrawalDetailComponent implements OnInit {
         return 'secondary';
     }
 
-    /** Button class for an action pill: filled with its semantic color when selected, plain outline otherwise. */
     actionButtonClass(action: any): string {
         return this.selectedAction === action ? `btn-${this.actionColor(action)}` : 'btn-outline-secondary';
     }
@@ -109,7 +107,7 @@ export class WithdrawalDetailComponent implements OnInit {
         this.showLogs = !this.showLogs;
         if (this.showLogs && this.logs().length === 0) {
             this.logsLoading.set(true);
-            this.documentLogsService.getLogs(this.transactionId()).subscribe({
+            this.anyJSONService.getLogs(this.transactionId()).subscribe({
                 next: (logs) => { this.logs.set(logs || []); this.logsLoading.set(false); },
                 error: () => { this.logsLoading.set(false); }
             });

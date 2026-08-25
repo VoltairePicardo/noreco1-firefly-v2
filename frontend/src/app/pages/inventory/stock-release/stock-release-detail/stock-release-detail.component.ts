@@ -4,7 +4,7 @@ import { COMMON_ALL_PAGE_IMPORTS } from '@/app/shared/providers/shared-providers
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { AlertService } from '@/app/shared/services/alert.service';
-import { DocumentLogsService } from '@/app/shared/services/document-logs.service';
+import { AnyJSONService } from '@/app/shared/services/any-json.service';
 import { SharedModule } from '@/app/shared/shared.module';
 import { StockReleaseService } from '../stock-release.service';
 import { provideIcons } from '@ng-icons/core';
@@ -38,7 +38,7 @@ export class StockReleaseDetailComponent implements OnInit {
     logsLoading = signal(false);
 
     private service              = inject(StockReleaseService);
-    private documentLogsService  = inject(DocumentLogsService);
+    private anyJSONService  = inject(AnyJSONService);
     private route                = inject(ActivatedRoute);
     private router               = inject(Router);
     private alertService         = inject(AlertService);
@@ -94,7 +94,7 @@ export class StockReleaseDetailComponent implements OnInit {
         this.showLogs = !this.showLogs;
         if (this.showLogs && this.logs().length === 0) {
             this.logsLoading.set(true);
-            this.documentLogsService.getLogs(this.data()?.transaction.id).subscribe({
+            this.anyJSONService.getLogs(this.data()?.transaction.id).subscribe({
                 next: (logs) => { this.logs.set(logs || []); this.logsLoading.set(false); },
                 error: () => { this.logsLoading.set(false); }
             });

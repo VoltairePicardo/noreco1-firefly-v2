@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
+import { FormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AlertService } from '@/app/shared/services/alert.service';
 import { COMMON_ALL_PAGE_IMPORTS, COMMON_ADD_EDIT_PAGE_IMPORTS, COMMON_MAIN_PAGE_IMPORTS, SHARED_PROVIDERS } from '@/app/shared/providers/shared-providers';
@@ -6,9 +7,10 @@ import { FlatpickrDirective, provideFlatpickrDefaults } from 'angularx-flatpickr
 import { StockAdjustmentService } from '../stock-adjustment.service';
 import { ModalService } from '@/app/shared/modals/modal-service';
 import { BrowseEntityModalComponent } from '@/app/shared/modals/browse-entity-modal/browse-entity-modal.component';
-import { BrowseSaItemStockModalComponent } from '@/app/shared/modals/browse-sa-item-stock-modal/browse-sa-item-stock-modal.component';
+import { BrowseItemStockModalComponent } from '@/app/shared/modals/browse-item-stock-modal/browse-item-stock-modal.component';
 import { provideIcons } from '@ng-icons/core';
 import { tablerSearch, tablerTrash, tablerArrowLeft, tablerCheck, tablerPlus } from '@ng-icons/tabler-icons';
+import {InventoryLocationService} from '@/app/pages/inventory-location/inventory-location.service';
 
 @Component({
     selector: 'app-stock-adjustment-add-edit',
@@ -32,29 +34,27 @@ export class StockAdjustmentAddEditComponent implements OnInit {
     subModule = 'Create';
     menuLink  = 'stock-adjustment';
 
-    id: any  = null;
-    editMode = false;
-    isLoading = signal(false);
+    id: any    = null;
+    editMode   = false;
+    submit     = false;
+    formSubmit = false;
+    isLoading  = signal(false);
 
     flatpickrOptions = { dateFormat: 'Y-m-d', altInput: true, altFormat: 'F j, Y' };
 
-    voucherDate = '';
-    type        = '';
-    remarks     = '';
-
     inventoryLocations = signal<any[]>([]);
-    selectedLocation   = signal<any>(null);
+    details            = signal<any[]>([]);
+    signatoryNames: { [key: string]: string } = {};
 
-    checker    = signal<any>(null);
-    approvedBy = signal<any>(null);
-
-    details = signal<any[]>([]);
+    validationForm!: UntypedFormGroup;
 
     private service      = inject(StockAdjustmentService);
+    private locationService      = inject(InventoryLocationService);
     private modalService = inject(ModalService);
     private route        = inject(ActivatedRoute);
     private router       = inject(Router);
     private alertService = inject(AlertService);
+    private fb           = inject(FormBuilder);
 
     ngOnInit(): void {
         this.loadInventoryLocations();
@@ -68,15 +68,39 @@ export class StockAdjustmentAddEditComponent implements OnInit {
                 this.loadForEdit();
             } else {
                 this.subModule = 'Create';
-                const today = new Date().toISOString().substring(0, 10);
-                this.voucherDate = today;
+                this.initForm();
                 this.loadDefaultSignatories();
             }
         });
     }
 
+    private today(): string {
+        return new Date().toISOString().substring(0, 10);
+    }
+
+    toDateInput(val: any): string {
+        if (!val) return '';
+        return new Date(val).toISOString().substring(0, 10);
+    }
+
+    get form(): UntypedFormGroup { return this.validationForm; }
+
+    initForm(data?: any): void {
+        this.validationForm = this.fb.group({
+            voucherDate:         [data?.voucherDate ? this.toDateInput(data.voucherDate) : this.today(), Validators.required],
+            inventoryLocationId: [data?.inventoryLocation?.id || null, Validators.required],
+            remarks:             [data?.remarks || '', Validators.required],
+            checkerAccountNo:    [data?.checker?.accountNo          || null, Validators.required],
+            approvedByAccountNo: [data?.approvingOfficer?.accountNo || null, Validators.required],
+        });
+
+        this.signatoryNames = {};
+        if (data?.checker?.fullName          || data?.checker?.name)          this.signatoryNames['checkerAccountNo']    = data.checker.fullName          || data.checker.name;
+        if (data?.approvingOfficer?.fullName  || data?.approvingOfficer?.name) this.signatoryNames['approvedByAccountNo'] = data.approvingOfficer.fullName || data.approvingOfficer.name;
+    }
+
     private loadInventoryLocations(): void {
-        this.service.getInventoryLocations().subscribe({
+        this.locationService.getAllLocations().subscribe({
             next: (d) => this.inventoryLocations.set(d || []),
             error: () => {}
         });
@@ -85,10 +109,11 @@ export class StockAdjustmentAddEditComponent implements OnInit {
     private loadDefaultSignatories(): void {
         this.service.getDefaultSignatories().subscribe({
             next: (data) => {
-                if (data) {
-                    this.checker.set(data.checker || null);
-                    this.approvedBy.set(data.approvedBy || null);
-                }
+                if (!data) return;
+                const patch: any = {};
+                if (data.checker?.accountNo)      { patch['checkerAccountNo']    = data.checker.accountNo;      this.signatoryNames['checkerAccountNo']    = data.checker.fullName      || data.checker.name; }
+                if (data.approvedBy?.accountNo)   { patch['approvedByAccountNo'] = data.approvedBy.accountNo;   this.signatoryNames['approvedByAccountNo'] = data.approvedBy.fullName   || data.approvedBy.name; }
+                this.form.patchValue(patch);
             },
             error: () => {}
         });
@@ -104,21 +129,9 @@ export class StockAdjustmentAddEditComponent implements OnInit {
                     this.router.navigate(['/' + this.menuLink]);
                     return;
                 }
-                const toYmd = (v: any) => v ? new Date(v).toISOString().substring(0, 10) : '';
-                this.voucherDate = toYmd(data.voucherDate);
-                this.type        = data.type    || '';
-                this.remarks     = data.remarks || '';
-                this.checker.set(data.checker          || null);
-                this.approvedBy.set(data.approvingOfficer || null);
+                this.initForm(data);
                 this.details.set((data.details || []).map((d: any) => ({ ...d })));
-
-                const tryMatch = () => {
-                    if (data.inventoryLocation?.id) {
-                        this.selectedLocation.set(this.inventoryLocations().find(l => l.id === data.inventoryLocation.id) ?? data.inventoryLocation);
-                    }
-                };
-                tryMatch();
-                setTimeout(tryMatch, 400);
+                this.syncLocationLock();
             },
             error: () => {
                 this.isLoading.set(false);
@@ -128,15 +141,24 @@ export class StockAdjustmentAddEditComponent implements OnInit {
         });
     }
 
+    /** Locks the Inventory Location control once items have been added — it can't change without clearing the list first. */
+    private syncLocationLock(): void {
+        const ctrl = this.form.get('inventoryLocationId');
+        if (!ctrl) return;
+        if (this.details().length > 0) ctrl.disable({ emitEvent: false });
+        else ctrl.enable({ emitEvent: false });
+    }
+
     async openItemStockBrowse(): Promise<void> {
-        if (!this.selectedLocation()?.id) {
+        const locationId = this.form.get('inventoryLocationId')?.value;
+        if (!locationId) {
             this.alertService.warning(this.module, 'Validation', 'Please select an Inventory Location first.');
             return;
         }
         try {
             const result = await this.modalService.openModal(
-                BrowseSaItemStockModalComponent,
-                { locationId: this.selectedLocation().id },
+                BrowseItemStockModalComponent,
+                { locationId, type: 'ADJUSTMENT' },
                 { size: 'xl', centered: true }
             );
             if (result?.action === 'select' && result?.data) {
@@ -152,7 +174,7 @@ export class StockAdjustmentAddEditComponent implements OnInit {
             this.alertService.error(this.module, 'Duplicate Item', 'This item is already in the list.');
             return;
         }
-        const location = this.selectedLocation();
+        const locationId = this.form.get('inventoryLocationId')?.value;
         this.details.update(list => [...list, {
             itemStockId:         itemStockId,
             itemId:              itemStock.item?.id            ?? null,
@@ -161,9 +183,10 @@ export class StockAdjustmentAddEditComponent implements OnInit {
             unitCost:            Number(itemStock.unitCost)    || 0,
             itemDescription:     itemStock.item?.description   ?? itemStock.description ?? '',
             quantity:            Number(itemStock.totalQuantity ?? itemStock.quantity) || 0,
-            inventoryLocationId: itemStock.inventoryLocation?.id ?? location?.id ?? null,
+            inventoryLocationId: itemStock.inventoryLocation?.id ?? locationId ?? null,
             adjustment:          0
         }]);
+        this.syncLocationLock();
     }
 
     onAdjustmentChange(index: number): void {
@@ -182,6 +205,7 @@ export class StockAdjustmentAddEditComponent implements OnInit {
 
     removeRow(index: number): void {
         this.details.update(list => list.filter((_, i) => i !== index));
+        this.syncLocationLock();
     }
 
     async openCheckerBrowse(): Promise<void> {
@@ -191,7 +215,8 @@ export class StockAdjustmentAddEditComponent implements OnInit {
             );
             if (result?.action === 'select' && result?.data) {
                 const e = result.data;
-                this.checker.set({ accountNo: e.accountNo, fullName: e.fullName || e.name });
+                this.form.get('checkerAccountNo')?.setValue(e.accountNo);
+                this.signatoryNames['checkerAccountNo'] = e.fullName || e.name;
             }
         } catch { }
     }
@@ -203,46 +228,29 @@ export class StockAdjustmentAddEditComponent implements OnInit {
             );
             if (result?.action === 'select' && result?.data) {
                 const e = result.data;
-                this.approvedBy.set({ accountNo: e.accountNo, fullName: e.fullName || e.name });
+                this.form.get('approvedByAccountNo')?.setValue(e.accountNo);
+                this.signatoryNames['approvedByAccountNo'] = e.fullName || e.name;
             }
         } catch { }
     }
 
     save(): void {
-        if (!this.voucherDate) {
-            this.alertService.warning(this.module, 'Validation', 'Date is required.');
-            return;
-        }
-        if (!this.remarks?.trim()) {
-            this.alertService.warning(this.module, 'Validation', 'Remarks is required.');
-            return;
-        }
-        if (!this.selectedLocation()?.id) {
-            this.alertService.warning(this.module, 'Validation', 'Inventory Location is required.');
-            return;
-        }
+        this.submit = true;
+        if (this.form.invalid) return;
         if (this.details().length === 0) {
             this.alertService.warning(this.module, 'Validation', 'No items selected. Please add at least one item.');
             return;
         }
-        if (!this.checker()?.accountNo) {
-            this.alertService.warning(this.module, 'Validation', 'Checked By is required.');
-            return;
-        }
-        if (!this.approvedBy()?.accountNo) {
-            this.alertService.warning(this.module, 'Validation', 'Approved By is required.');
-            return;
-        }
 
-        this.isLoading.set(true);
+        this.formSubmit = true;
 
+        const v = this.form.getRawValue();
         const payload: any = {
-            voucherDate:       this.voucherDate,
-            type:              this.type || null,
-            remarks:           this.remarks.trim(),
-            inventoryLocation: { id: this.selectedLocation().id },
-            checker:           { accountNo: this.checker().accountNo,    fullName: this.checker().fullName },
-            approvingOfficer:  { accountNo: this.approvedBy().accountNo, fullName: this.approvedBy().fullName },
+            voucherDate:       v.voucherDate,
+            remarks:           v.remarks.trim(),
+            inventoryLocation: { id: v.inventoryLocationId },
+            checker:           { accountNo: v.checkerAccountNo,    fullName: this.signatoryNames['checkerAccountNo'] },
+            approvingOfficer:  { accountNo: v.approvedByAccountNo, fullName: this.signatoryNames['approvedByAccountNo'] },
             details:           this.details().map(d => ({
                 itemStockId:         d.itemStockId         || null,
                 itemId:              d.itemId              || null,
@@ -261,7 +269,7 @@ export class StockAdjustmentAddEditComponent implements OnInit {
 
         request$.subscribe({
             next: (data) => {
-                this.isLoading.set(false);
+                this.formSubmit = false;
                 if (data?.success === false) {
                     this.alertService.error(this.module, 'Save', data.failureMessage || '');
                 } else {
@@ -275,13 +283,9 @@ export class StockAdjustmentAddEditComponent implements OnInit {
                 }
             },
             error: () => {
-                this.isLoading.set(false);
+                this.formSubmit = false;
                 this.alertService.error(this.module, 'Save', 'An error occurred.');
             }
         });
-    }
-
-    compareById(a: any, b: any): boolean {
-        return a && b ? a.id === b.id : a === b;
     }
 }

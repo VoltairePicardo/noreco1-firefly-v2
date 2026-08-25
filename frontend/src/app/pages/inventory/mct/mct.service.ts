@@ -44,16 +44,8 @@ export class MctService {
         return this.http.post(`${BASE_API}/mct/process`, payload, httpOptions);
     }
 
-    getWorkflowActions(transId: number): Observable<any[]> {
-        return this.http.get<any[]>(`${BASE_URL}/json/workflow-actions/${transId}`);
-    }
-
-    getDocumentLogs(transId: number): Observable<any[]> {
-        return this.http.post<any[]>(`${BASE_URL}/document/${transId}/logs`, {}, httpOptions);
-    }
-
     print(id: number): void {
-        this.downloadService.print(`${BASE_URL}/mct/export/${id}`, { type: 'pdf' });
+        this.downloadService.print(`${BASE_API}/inventory/mct-mgt/export/${id}`, { type: 'pdf' });
     }
 
     getDefaultSignatories(): Observable<any> {

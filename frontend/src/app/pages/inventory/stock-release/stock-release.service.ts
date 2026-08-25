@@ -5,7 +5,7 @@ import { map } from 'rxjs/operators';
 import { environment } from '@/environments/environment';
 import { DownloadService } from '@/app/core/services/download.service';
 import { HalPage, toPagedResult } from '@/app/models/hal-page.model';
-import { InventoryDocumentDto, ReleasingDocumentType } from '@/app/models/inventory-document.model';
+import { InventoryDocumentDto, ReleasingDocumentType } from '@/app/models/inventory-modules/inventory-document.model';
 
 const BASE_API = environment.get('baseApiUrl');
 const BASE_URL = environment.get('baseUrl');

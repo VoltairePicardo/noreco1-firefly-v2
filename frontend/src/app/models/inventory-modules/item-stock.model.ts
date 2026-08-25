@@ -63,3 +63,23 @@ export interface ItemStock {
     base64Image?: string;
     balance?: number;
 }
+
+export interface ItemStockDto {
+    id: number;
+    item?: Item;
+    inventoryLocation?: InventoryLocation;
+    totalQuantity?: number;
+    totalItemCost?: number;
+    createdAt?: string;
+    updatedAt?: string;
+}
+
+export interface ItemStockPage<T> {
+    content: T[];
+    page?: {
+        size?: number;
+        number?: number;
+        totalElements?: number;
+        totalPages?: number;
+    };
+}

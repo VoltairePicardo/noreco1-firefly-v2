@@ -6,7 +6,7 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { NG_ICON_DIRECTIVES, provideIcons } from '@ng-icons/core';
 import { tablerChevronLeft, tablerChevronRight, tablerSearch } from '@ng-icons/tabler-icons';
 import { StockReleaseService } from '@/app/pages/inventory/stock-release/stock-release.service';
-import { InventoryDocumentDto, ReleasingDocumentType } from '@/app/models/inventory-document.model';
+import { InventoryDocumentDto, ReleasingDocumentType } from '@/app/models/inventory-modules/inventory-document.model';
 
 const DOCUMENT_TYPE_LABELS: Record<ReleasingDocumentType, string> = {
     ST: 'Stock Transfer',

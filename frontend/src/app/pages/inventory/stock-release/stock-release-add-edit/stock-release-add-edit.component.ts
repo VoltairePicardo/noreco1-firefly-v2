@@ -7,7 +7,7 @@ import { StockReleaseService } from '../stock-release.service';
 import { ModalService } from '@/app/shared/modals/modal-service';
 import { BrowseEntityModalComponent } from '@/app/shared/modals/browse-entity-modal/browse-entity-modal.component';
 import { BrowseReleasingDocumentsModalComponent } from '@/app/shared/modals/browse-releasing-documents/browse-releasing-documents.component';
-import { InventoryDocumentDto, ReleasingDocumentType } from '@/app/models/inventory-document.model';
+import { InventoryDocumentDto, ReleasingDocumentType } from '@/app/models/inventory-modules/inventory-document.model';
 import { provideIcons } from '@ng-icons/core';
 import { tablerSearch, tablerTrash, tablerArrowLeft, tablerCheck, tablerPlus } from '@ng-icons/tabler-icons';
 

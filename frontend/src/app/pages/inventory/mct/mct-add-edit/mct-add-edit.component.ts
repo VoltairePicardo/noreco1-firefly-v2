@@ -12,7 +12,7 @@ import { provideIcons } from '@ng-icons/core';
 import { tablerSearch, tablerArrowLeft, tablerCheck, tablerTrash } from '@ng-icons/tabler-icons';
 import {InventoryLocation} from '@/app/models/dropdown.model';
 import {InventoryLocationService} from '@/app/pages/inventory-location/inventory-location.service';
-import {StockRelease} from '@/app/models/stock-release.model';
+import {StockRelease} from '@/app/models/inventory-modules/stock-release.model';
 
 @Component({
     selector: 'app-mct-add-edit',
@@ -237,7 +237,7 @@ export class MctAddEditComponent implements OnInit {
         const payload: any = {
             voucherDate:       this.voucherDate,
             remarks:           this.remarks.trim() || null,
-            stockRelease:      { id: selectedStockRelease?.id },
+            stockRelease:      selectedStockRelease,
             inventoryLocation: { id: selectedLocation.id },
             approvingOfficer:  { accountNo: approvingOfficer.accountNo, fullName: approvingOfficer.fullName },
             details:           details.map(d => ({

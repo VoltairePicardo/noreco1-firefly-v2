@@ -6,7 +6,7 @@ import { provideIcons } from '@ng-icons/core';
 import { tablerChevronLeft, tablerChevronRight, tablerSearch } from '@ng-icons/tabler-icons';
 import { FlatpickrDirective, provideFlatpickrDefaults } from 'angularx-flatpickr';
 import { StockReleaseService } from '@/app/pages/inventory/stock-release/stock-release.service';
-import { StockRelease } from '@/app/models/stock-release.model';
+import { StockRelease } from '@/app/models/inventory-modules/stock-release.model';
 import { DateHelper } from '@/app/helpers/date-helper';
 
 @Component({
