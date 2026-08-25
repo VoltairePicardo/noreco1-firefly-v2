@@ -2,6 +2,7 @@ export interface User {
     id: number;
     fullName?: string;
     username?: string;
+    accountNo?: number;
 }
 
 export interface Transaction {

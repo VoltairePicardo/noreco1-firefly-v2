@@ -17,6 +17,13 @@ export class StockAdjustmentService {
         return this.http.get<any[]>(`${BASE_API}/stock-adjustment/list`);
     }
 
+    listPaged(from: string, to: string, statusId: number | null, query: string, page: number, size: number): Observable<any> {
+        let params = new HttpParams().set('from', from).set('to', to).set('page', page).set('size', size);
+        if (statusId != null) params = params.set('statusId', statusId);
+        if (query) params = params.set('query', query);
+        return this.http.get(`${BASE_API}/stock-adjustment/list-paged`, { params });
+    }
+
     listByDateRange(from: string, to: string, statusId?: number | null): Observable<any[]> {
         const url = statusId
             ? `${BASE_API}/stock-adjustment/list/${from}/${to}/${statusId}`
@@ -44,16 +51,8 @@ export class StockAdjustmentService {
         return this.http.post(`${BASE_API}/stock-adjustment/process`, payload, httpOptions);
     }
 
-    getWorkflowActions(transId: number): Observable<any[]> {
-        return this.http.get<any[]>(`${BASE_URL}/json/workflow-actions/${transId}`);
-    }
-
-    getDocumentLogs(transId: number): Observable<any[]> {
-        return this.http.post<any[]>(`${BASE_URL}/document/${transId}/logs`, {}, httpOptions);
-    }
-
     print(id: number): void {
-        this.downloadService.print(`${BASE_URL}/stock-adjustment/export/${id}`, { type: 'pdf' });
+        this.downloadService.print(`${BASE_API}/stock-adjustment/export/${id}`, { type: 'pdf' });
     }
 
     getDefaultSignatories(): Observable<any> {

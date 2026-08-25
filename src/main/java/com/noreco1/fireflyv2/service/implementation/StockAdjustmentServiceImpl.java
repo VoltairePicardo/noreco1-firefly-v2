@@ -118,6 +118,19 @@ public class StockAdjustmentServiceImpl implements StockAdjustmentService, Print
     }
 
     @Override
+    public Page<Map<String, Object>> getStockAdjustmentPaged(String from, String to, Integer statusId, String query, Pageable pageable) {
+        User loggedIn = authenticationFacade.getLoggedIn();
+        Integer[] ids = {
+                0
+//                com.noreco1.fireflyv2.model.enums.DocumentStatus.APPROVED.getId(),
+//                com.noreco1.fireflyv2.model.enums.DocumentStatus.DENIED.getId(),
+//                com.noreco1.fireflyv2.model.enums.DocumentStatus.CANCELLED.getId()
+        };
+
+        return stockAdjustmentRepo.getStockAdjustmentPaged(from, to, statusId, query, loggedIn.getId(), Arrays.asList(ids), pageable);
+    }
+
+    @Override
     public List<StockAdjustment> getListForSummaryReport(String from, String to, HttpServletRequest request) {
         List<StockAdjustment> list = new ArrayList<>();
         try {
@@ -324,10 +337,10 @@ public class StockAdjustmentServiceImpl implements StockAdjustmentService, Print
                 documentLoggerFacade.log(stockAdjustment.getTransaction(), authenticationFacade.getLoggedIn(), oldRrMap, newRrMap);
 
                 // insert to itemstock & stocktrans tables if approved
-                if (postData.getWorkflowActionsDto().getActionId() == 5) {
+                if (stockAdjustment.getDocumentStatus().getId() == 7) {
                     if (!Checker.collectionIsEmpty(details)) {
 
-                        InventoryLocation inventoryLocation = model.getInventoryLocation();
+                        InventoryLocation inventoryLocation = stockAdjustment.getInventoryLocation();
 
                         StockTransaction stockTransaction = new StockTransaction();
                         stockTransaction.setTransaction(stockAdjustment.getTransaction());

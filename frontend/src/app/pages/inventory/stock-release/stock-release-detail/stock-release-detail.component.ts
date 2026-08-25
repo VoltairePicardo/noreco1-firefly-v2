@@ -64,7 +64,7 @@ export class StockReleaseDetailComponent implements OnInit {
 
     loadWorkflowActions(): void {
         if (!this.data()?.transId || this.isTerminal()) return;
-        this.service.getWorkflowActions(this.data().transId).subscribe({
+        this.anyJSONService.getWorkflowActions(this.data().transId).subscribe({
             next: (actions) => { this.workflowActions.set(actions || []); },
             error: () => { this.workflowActions.set([]); }
         });

@@ -89,7 +89,10 @@
       "Bash(JAVA_HOME=\"/c/Program Files/Java/jdk-21\" ./mvnw.cmd -q -o compile -DskipTests)",
       "WebFetch(domain:localhost)",
       "Bash(timeout 300 npx tsc -p tsconfig.app.json --noEmit)",
-      "Bash(echo \"EXIT:$?\")"
+      "Bash(echo \"EXIT:$?\")",
+      "Bash(JAVA_HOME=\"/c/Program Files/Java/jdk-21\" ./mvnw -q -o compile)",
+      "Bash(JAVA_HOME=\"/c/Program Files/Java/jdk-21\" ./mvnw -o compile)",
+      "Bash(JAVA_HOME=\"/c/Program Files/Java/jdk-21\" ./mvnw -o clean compile)"
     ]
   }
 }

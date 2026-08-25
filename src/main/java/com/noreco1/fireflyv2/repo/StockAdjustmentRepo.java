@@ -10,11 +10,57 @@ import org.springframework.data.repository.query.Param;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 public interface StockAdjustmentRepo extends JpaRepository<StockAdjustment, Integer> {
     StockAdjustment findByDocumentStatusId(Integer docId);
 
     Page<StockAdjustment> findAll(Pageable paging);
+
+    @Query(value = "SELECT " +
+            " sa.id AS id, " +
+            " sa.code AS code, " +
+            " sa.voucherDate AS voucherDate, " +
+            " sa.remarks AS remarks, " +
+            " u.fullname AS preparedBy, " +
+            " ds.status AS status " +
+            "FROM StockAdjustment sa " +
+            "INNER JOIN User u ON u.id = sa.fk_createdbyuserid " +
+            "INNER JOIN DocumentStatus ds ON ds.id = sa.fk_documentstatusid " +
+            "WHERE sa.voucherDate >= :startDate " +
+            "   AND sa.voucherDate <= :endDate " +
+            "   AND (:statusId IS NULL OR sa.FK_documentStatusId = :statusId) " +
+            "   AND (:query IS NULL OR :query = '' OR " +
+            "       sa.code LIKE CONCAT('%', :query, '%') " +
+            "       OR sa.remarks LIKE CONCAT('%', :query, '%') " +
+            "       OR u.fullname LIKE CONCAT('%', :query, '%')) " +
+            "   AND (sa.FK_createdByUserId = :userId " +
+            "       OR sa.FK_approvedByUserId = :userId " +
+            "       OR sa.FK_checkedByUserId = :userId) " +
+            "   AND sa.fk_documentstatusid not in (:notInStatusId) " +
+            "ORDER BY sa.voucherDate DESC, sa.id DESC",
+            countQuery = "SELECT COUNT(*) " +
+                    "FROM StockAdjustment sa " +
+                    "INNER JOIN User u ON u.id = sa.fk_createdbyuserid " +
+                    "WHERE sa.voucherDate >= :startDate " +
+                    "   AND sa.voucherDate <= :endDate " +
+                    "   AND (:statusId IS NULL OR sa.FK_documentStatusId = :statusId) " +
+                    "   AND (:query IS NULL OR :query = '' OR " +
+                    "       sa.code LIKE CONCAT('%', :query, '%') " +
+                    "       OR sa.remarks LIKE CONCAT('%', :query, '%') " +
+                    "       OR u.fullname LIKE CONCAT('%', :query, '%')) " +
+                    "   AND (sa.FK_createdByUserId = :userId " +
+                    "       OR sa.FK_approvedByUserId = :userId " +
+                    "       OR sa.FK_checkedByUserId = :userId) " +
+                    "   AND sa.fk_documentstatusid not in (:notInStatusId) ",
+            nativeQuery = true)
+    Page<Map<String, Object>> getStockAdjustmentPaged(@Param("startDate") String startDate,
+                                                       @Param("endDate") String endDate,
+                                                       @Param("statusId") Integer statusId,
+                                                       @Param("query") String query,
+                                                       @Param("userId") Integer userId,
+                                                       @Param("notInStatusId") Collection<Integer> notInStatusId,
+                                                       Pageable pageable);
 
     Page<StockAdjustment> findByCode(String code, Pageable paging);
 

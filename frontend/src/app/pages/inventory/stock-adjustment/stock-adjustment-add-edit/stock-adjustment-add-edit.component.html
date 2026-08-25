@@ -65,8 +65,8 @@
                                         <th style="width:40px">#</th>
                                         <th style="width:80px">Code</th>
                                         <th>Description</th>
-                                        <th>Unit</th>
                                         <th class="text-center" style="width:110px">Quantity</th>
+                                        <th>Unit</th>
                                         <th class="text-center" style="width:130px">Adjustment (+/-)</th>
                                         <th style="width:50px"></th>
                                     </tr>
@@ -84,8 +84,8 @@
                                                 <td class="text-center text-muted">{{ $index + 1 }}</td>
                                                 <td class="fw-bold">{{ row.itemCode }}</td>
                                                 <td>{{ row.itemDescription }}</td>
+                                                <td class="text-center fw-bold">{{ row.quantity | number:'1.0-3' }}</td>
                                                 <td>{{ row.unitCode }}</td>
-                                                <td class="text-center fw-bold text-muted">{{ row.quantity | number:'1.0-3' }}</td>
                                                 <td>
                                                     <input type="number"
                                                            class="form-control form-control-sm text-center fw-bold"
@@ -93,7 +93,8 @@
                                                            [ngModelOptions]="{ standalone: true }"
                                                            [name]="'adj_' + $index"
                                                            (ngModelChange)="onAdjustmentChange($index)"
-                                                           step="0.01" placeholder="0"/>
+                                                           step="0.01" placeholder="0"
+                                                    appSelectOnFocus />
                                                 </td>
                                                 <td class="text-center">
                                                     <button type="button"

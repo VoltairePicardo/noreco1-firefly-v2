@@ -18,6 +18,7 @@ public interface StockAdjustmentService extends DocumentService {
     Page<StockAdjustment> findByQuery(String query, Pageable pageable);
     List<Map> findByDateRangePending(String from, String to, Integer officeId);
     List<Map> findByDateRangeAndStatusId(String from, String to, Integer status, Integer officeId);
+    Page<Map<String, Object>> getStockAdjustmentPaged(String from, String to, Integer statusId, String query, Pageable pageable);
     List<DocumentStatus> getDocumentsStatuses();
 
     List<StockAdjustment> getListForSummaryReport(String from, String to, HttpServletRequest request);

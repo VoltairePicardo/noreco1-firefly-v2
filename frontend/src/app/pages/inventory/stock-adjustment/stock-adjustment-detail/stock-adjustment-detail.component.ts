@@ -8,6 +8,8 @@ import { SharedModule } from '@/app/shared/shared.module';
 import { StockAdjustmentService } from '../stock-adjustment.service';
 import { provideIcons } from '@ng-icons/core';
 import { tablerPrinter, tablerEdit, tablerArrowLeft } from '@ng-icons/tabler-icons';
+import { AnyJSONService } from '@/app/shared/services/any-json.service';
+import { StockAdjustment } from '@/app/models/inventory-modules/stock-adjustment.model';
 
 const TERMINAL_STATUSES = ['Approved', 'Denied', 'Cancelled'];
 
@@ -23,17 +25,26 @@ export class StockAdjustmentDetailComponent implements OnInit {
     subModule = 'Details';
     menuLink  = 'stock-adjustment';
 
-    id: any = 0; data = signal<any>({}); isLoading = signal(false);
+    id: any = 0;
+    data = signal<StockAdjustment>({} as StockAdjustment);
+    isLoading = signal(false);
 
-    workflowActions = signal<any[]>([]); selectedAction: any = null; remarks = ''; processingWorkflow = signal(false);
-    logs = signal<any[]>([]); showLogs = false; logsLoading = signal(false);
+    workflowActions     = signal<any[]>([]);
+    selectedAction:    any   = null;
+    remarks            = '';
+    processingWorkflow = signal(false);
 
-    private service      = inject(StockAdjustmentService);
-    private route        = inject(ActivatedRoute);
-    private router       = inject(Router);
-    private alertService = inject(AlertService);
+    logs        = signal<any[]>([]);
+    showLogs    = false;
+    logsLoading = signal(false);
 
-    private transactionId = computed<number | undefined>(() => this.data()?.transId);
+    private service         = inject(StockAdjustmentService);
+    private route           = inject(ActivatedRoute);
+    private router          = inject(Router);
+    private alertService    = inject(AlertService);
+    private anyJSONService  = inject(AnyJSONService);
+
+    private transactionId = computed<any>(() => this.data()?.transaction?.id);
 
     ngOnInit(): void {
         this.route.paramMap.subscribe(params => {
@@ -57,8 +68,9 @@ export class StockAdjustmentDetailComponent implements OnInit {
     loadWorkflowActions(): void {
         const transactionId = this.transactionId();
         if (!transactionId || this.isTerminal()) return;
-        this.service.getWorkflowActions(transactionId).subscribe({
-            next: (a) => { this.workflowActions.set(a || []); }, error: () => { this.workflowActions.set([]); }
+        this.anyJSONService.getWorkflowActions(transactionId).subscribe({
+            next: (actions) => { this.workflowActions.set(actions || []); },
+            error: () => { this.workflowActions.set([]); }
         });
     }
 
@@ -85,8 +97,8 @@ export class StockAdjustmentDetailComponent implements OnInit {
         this.showLogs = !this.showLogs;
         if (this.showLogs && this.logs().length === 0) {
             this.logsLoading.set(true);
-            this.service.getDocumentLogs(this.transactionId()!).subscribe({
-                next: (l) => { this.logs.set(l || []); this.logsLoading.set(false); },
+            this.anyJSONService.getLogs(this.transactionId()).subscribe({
+                next: (logs) => { this.logs.set(logs || []); this.logsLoading.set(false); },
                 error: () => { this.logsLoading.set(false); }
             });
         }
