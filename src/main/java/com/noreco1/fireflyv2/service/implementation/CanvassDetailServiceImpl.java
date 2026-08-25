@@ -7,6 +7,8 @@ import com.noreco1.fireflyv2.controller.response.CanvassDetailDto;
 import com.noreco1.fireflyv2.service.CanvassDetailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -19,6 +21,7 @@ public class CanvassDetailServiceImpl implements CanvassDetailService {
     @Autowired
     CanvassDetailRepo canvassDetailRepo;
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<CanvassDetailDto> getCanvassDetails(Integer canvassId) {
         List<CanvassDetail> canvassDetails = canvassDetailRepo.findByCanvassId(canvassId);

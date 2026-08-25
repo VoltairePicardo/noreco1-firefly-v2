@@ -7,6 +7,7 @@ import com.noreco1.fireflyv2.service.BusinessSegmentService;
 import org.springframework.data.domain.*;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,11 +32,13 @@ public class BusinessSegmentServiceImpl implements BusinessSegmentService {
         return null;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<BusinessSegment> findAll() {
         return businessSegmentRepo.findAll();
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<Map> findAllFs() { // for financial statements
         List<Map> data = new ArrayList<>();
@@ -59,6 +62,7 @@ public class BusinessSegmentServiceImpl implements BusinessSegmentService {
         return null;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public BusinessSegment findById(Integer id) {
         return null;

@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -251,7 +252,6 @@ public class PaymentRequestServiceImpl implements PaymentRequestService, Printab
 
         }catch (Exception e) {
             e.printStackTrace();
-            throw  new RuntimeException(e);
         }
         return response;
     }
@@ -423,6 +423,7 @@ public class PaymentRequestServiceImpl implements PaymentRequestService, Printab
         });
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public PayReqDto findById(Integer id) {
 
@@ -606,6 +607,7 @@ public class PaymentRequestServiceImpl implements PaymentRequestService, Printab
         return null;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Map findByApvId(Integer apvId) {
         Map m = null;
@@ -627,6 +629,7 @@ public class PaymentRequestServiceImpl implements PaymentRequestService, Printab
         return m;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<Map> findByDateRangeAndStatusId(String from, String to, Integer id) {
         try {
@@ -650,6 +653,7 @@ public class PaymentRequestServiceImpl implements PaymentRequestService, Printab
         return null;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<Map> findByDateRangePending(String from, String to) {
         try {

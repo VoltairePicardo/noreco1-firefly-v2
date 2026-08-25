@@ -20,6 +20,8 @@ import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -102,6 +104,7 @@ public class MaterialCreditTicketServiceImpl implements MaterialCreditTicketServ
 
     private Map reportMeta;
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public MaterialCreditTicket findById(Integer id) {
 
@@ -164,26 +167,31 @@ public class MaterialCreditTicketServiceImpl implements MaterialCreditTicketServ
 
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<MaterialCreditTicket> findAll() {
         return materialCreditTicketRepo.findAll();
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<MaterialCreditTicket> findAll(Pageable pageable) {
         return materialCreditTicketRepo.findAll(pageable);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<MaterialCreditTicket> findByQuery(String query, Pageable pageable) {
         return materialCreditTicketRepo.findByCode(query, pageable);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<DocumentStatus> getDocumentsStatuses() {
         return documentDtoer.getDocumentStatuses(com.noreco1.fireflyv2.model.enums.Workflow.MATERIAL_CREDIT_TICKET.getId());
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<MaterialCreditTicket> getListForSummaryReport(String from, String to, HttpServletRequest request) {
         List<MaterialCreditTicket> list = new ArrayList<>();
@@ -223,6 +231,7 @@ public class MaterialCreditTicketServiceImpl implements MaterialCreditTicketServ
         return list;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<ItemTransactionDetailDto> getItems(Integer transId) {
         List<ItemTransactionDetailDto> data = new ArrayList<>();
@@ -585,6 +594,7 @@ public class MaterialCreditTicketServiceImpl implements MaterialCreditTicketServ
         return signatoryFacade.defaultSignatories(com.noreco1.fireflyv2.model.enums.DocumentType.MCT);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<Map> findByDateRangeAndStatusId(String from, String to, Integer docStatusId, Integer officeId) {
         try {
@@ -609,6 +619,7 @@ public class MaterialCreditTicketServiceImpl implements MaterialCreditTicketServ
         return null;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<Map> findByDateRangePending(String from, String to, Integer officeId) {
         try {
@@ -755,11 +766,13 @@ public class MaterialCreditTicketServiceImpl implements MaterialCreditTicketServ
         return this.reportMeta;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<InventoryLocation> getAllInventoryLocations() {
         return inventoryLocationRepo.findAll();
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<MaterialCreditTicketDocumentDto> findAllApprovedForAccountSettingPaged(String query, Pageable pageable) {
 

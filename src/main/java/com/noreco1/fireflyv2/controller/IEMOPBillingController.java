@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
-@RequestMapping(value = "/iemop-billing")
+@RequestMapping(value = "/api/iemop-billing")
 public class IEMOPBillingController {
 
     @Autowired

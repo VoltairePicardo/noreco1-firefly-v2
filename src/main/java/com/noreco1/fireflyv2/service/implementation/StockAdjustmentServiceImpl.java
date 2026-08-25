@@ -20,6 +20,8 @@ import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -82,6 +84,7 @@ public class StockAdjustmentServiceImpl implements StockAdjustmentService, Print
     @Autowired
     ItemStockDetailRepo itemStockDetailRepo;
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public StockAdjustment findById(Integer id) {
         StockAdjustment ret = stockAdjustmentRepo.findById(id).orElse(null);
@@ -97,26 +100,31 @@ public class StockAdjustmentServiceImpl implements StockAdjustmentService, Print
         return ret;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<StockAdjustment> findAll() {
         return stockAdjustmentRepo.findAll();
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<StockAdjustment> findAll(Pageable pageable) {
         return stockAdjustmentRepo.findAll(pageable);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<StockAdjustment> findByQuery(String query, Pageable pageable) {
         return stockAdjustmentRepo.findByCode(query, pageable);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<DocumentStatus> getDocumentsStatuses() {
         return documentDtoer.getDocumentStatuses(com.noreco1.fireflyv2.model.enums.Workflow.STOCK_ADJUSTMENT.getId());
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<Map<String, Object>> getStockAdjustmentPaged(String from, String to, Integer statusId, String query, Pageable pageable) {
         User loggedIn = authenticationFacade.getLoggedIn();
@@ -175,6 +183,7 @@ public class StockAdjustmentServiceImpl implements StockAdjustmentService, Print
         return list;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<ItemTransactionDetailDto> getItems(Integer transId) {
         List<ItemTransactionDetailDto> data = new ArrayList<>();
@@ -200,6 +209,7 @@ public class StockAdjustmentServiceImpl implements StockAdjustmentService, Print
         return data;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<StockAdjustmentDocumentDto> findAllApprovedForAccountSettingPaged(String query, Pageable pageable) {
 
@@ -244,6 +254,7 @@ public class StockAdjustmentServiceImpl implements StockAdjustmentService, Print
 
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<StockAdjustmentDocumentDto> findAllApprovedForJVPaged(String query, Pageable pageable) {
 
@@ -660,6 +671,7 @@ public class StockAdjustmentServiceImpl implements StockAdjustmentService, Print
         return signatoryFacade.defaultSignatories(com.noreco1.fireflyv2.model.enums.DocumentType.SA);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<Map> findByDateRangeAndStatusId(String from, String to, Integer docStatusId, Integer officeId) {
         try {
@@ -684,6 +696,7 @@ public class StockAdjustmentServiceImpl implements StockAdjustmentService, Print
         return null;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<Map> findByDateRangePending(String from, String to, Integer officeId) {
         try {

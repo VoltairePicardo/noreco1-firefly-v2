@@ -17,6 +17,8 @@ import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -71,6 +73,7 @@ public class MaintenanceRecordServiceImpl implements MaintenanceRecordService, P
     @Autowired
     StockReleaseRepo stockReleaseRepo;
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<MaintenanceRecord> findAll(String startDate, String endDate, Pageable pageable) {
         Date fromDate = DateHelper.strToDate(startDate, "yyyy-MM-dd");
@@ -78,6 +81,7 @@ public class MaintenanceRecordServiceImpl implements MaintenanceRecordService, P
         return maintenanceRecordRepo.findAllByMaintenanceDateBetweenOrderByCode(fromDate, toDate, pageable);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<MaintenanceRecord> findAllByQuery(String query, String startDate, String endDate, Pageable pageable) {
         Date fromDate = DateHelper.strToDate(startDate, "yyyy-MM-dd");
@@ -85,6 +89,7 @@ public class MaintenanceRecordServiceImpl implements MaintenanceRecordService, P
         return maintenanceRecordRepo.findAllByMaintenanceDateBetweenAndAssetDescriptionContainsIgnoreCaseOrderByCode(fromDate, toDate, query, pageable);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<MaintenanceRecord> findAllByDateRangeAndAssetTypeId(String startDate, String endDate, Integer assetTypeId, Pageable pageable) {
         Date fromDate = DateHelper.strToDate(startDate, "yyyy-MM-dd");
@@ -92,6 +97,7 @@ public class MaintenanceRecordServiceImpl implements MaintenanceRecordService, P
         return maintenanceRecordRepo.findAllByMaintenanceDateBetweenAndAssetAssetTypeId(fromDate, toDate, assetTypeId, pageable);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public MaintenanceRecord findById(Integer id) {
 
@@ -223,6 +229,7 @@ public class MaintenanceRecordServiceImpl implements MaintenanceRecordService, P
         return response;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public MaintenanceRecordDto findOne(Integer id) {
         MaintenanceRecord maintenanceRecord =  maintenanceRecordRepo.findById(id).orElse(null);

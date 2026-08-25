@@ -38,7 +38,7 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 @RestController
-@RequestMapping(value = "/reports")
+@RequestMapping(value = "/api/reports")
 public class ReportsController {
 
     private final String COMMON_REGISTER_REPORT_PATH = "/registers/CommonVoucherRegister.jrxml";

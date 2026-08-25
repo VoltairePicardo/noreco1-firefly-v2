@@ -6,6 +6,7 @@ import com.noreco1.fireflyv2.repo.SectionRepo;
 import com.noreco1.fireflyv2.service.SectionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -16,11 +17,13 @@ public class SectionServiceImpl implements SectionService {
     @Autowired
     private SectionRepo sectionRepo;
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<Section> list() {
         return sectionRepo.findAll();
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Section findById(Integer id) {
         return sectionRepo.findById(id).orElse(null);

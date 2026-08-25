@@ -20,6 +20,7 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import com.noreco1.fireflyv2.common.helpers.CurrencyIntoWords;
@@ -236,6 +237,7 @@ public class CashReceiptsServiceImpl implements CashReceiptsService, PrintableVo
         return this.makeCRVListDto(vouchers);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public CashReceiptsDto findById(Integer id) {
 
@@ -269,6 +271,7 @@ public class CashReceiptsServiceImpl implements CashReceiptsService, PrintableVo
         return  cashReceiptsDto;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public  List<CashReceiptsListDto> findByStatusId(Integer id) {
         List<CashReceipts> vouchers = crRepo.findByDocumentStatusId(id);
@@ -293,6 +296,7 @@ public class CashReceiptsServiceImpl implements CashReceiptsService, PrintableVo
         return null;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<CashReceiptsListDto> findByDateRangeAndStatusId(String from, String to, Integer id) {
         try {
@@ -315,6 +319,7 @@ public class CashReceiptsServiceImpl implements CashReceiptsService, PrintableVo
         return null;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<CashReceiptsListDto> findByDateRange(String from, String to) {
         try {
@@ -475,6 +480,7 @@ public class CashReceiptsServiceImpl implements CashReceiptsService, PrintableVo
         return this.processCreate(v, bindingResult, messageSource);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<DocumentStatus> getDocumentsStatuses() {
         CashReceipts voucher = crRepo.findFirstByOrderByIdAsc();

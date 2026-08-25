@@ -5,7 +5,6 @@ import { environment } from '@/environments/environment';
 import { DownloadService } from '@/app/core/services/download.service';
 
 const BASE_API = environment.get('baseApiUrl');
-const BASE_URL = environment.get('baseUrl');
 const httpOptions = { headers: new HttpHeaders({ 'Content-Type': 'application/json' }) };
 
 @Injectable({ providedIn: 'root' })
@@ -45,15 +44,15 @@ export class StockTransferService {
     }
 
     getWorkflowActions(transId: number): Observable<any[]> {
-        return this.http.get<any[]>(`${BASE_URL}/json/workflow-actions/${transId}`);
+        return this.http.get<any[]>(`${BASE_API}/json/workflow-actions/${transId}`);
     }
 
     getDocumentLogs(transId: number): Observable<any[]> {
-        return this.http.post<any[]>(`${BASE_URL}/document/${transId}/logs`, {}, httpOptions);
+        return this.http.get<any[]>(`${BASE_API}/json/document-logs/${transId}`);
     }
 
     print(id: number): void {
-        this.downloadService.print(`${BASE_URL}/stock-transfer/export/${id}`, { type: 'pdf' });
+        this.downloadService.print(`${BASE_API}/stock-transfer/export/${id}`, { type: 'pdf' });
     }
 
     getDefaultSignatories(): Observable<any> {

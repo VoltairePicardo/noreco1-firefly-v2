@@ -19,7 +19,7 @@ import java.util.Map;
  * Created by TSI on 7/1/2019.
  */
 @RestController
-@RequestMapping("/quotation-detail")
+@RequestMapping("/api/quotation-detail")
 public class QuotationDetailController {
 
     @Autowired

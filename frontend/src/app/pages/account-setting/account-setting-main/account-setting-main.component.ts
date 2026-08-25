@@ -6,6 +6,7 @@ import { FlatpickrDefaults, FlatpickrModule } from 'angularx-flatpickr';
 import { provideIcons } from '@ng-icons/core';
 import { tablerSearch, tablerRefresh, tablerPlus, tablerEye, tablerEdit } from '@ng-icons/tabler-icons';
 import { AccountSettingService } from '../account-setting.service';
+import { monthStart, monthEnd } from '@/app/shared/utils/date.utils';
 
 @Component({
     selector: 'app-account-setting-main',
@@ -44,9 +45,8 @@ export class AccountSettingMainComponent {
     private service = inject(AccountSettingService);
 
     ngOnInit(): void {
-        const now = new Date();
-        this.fromDate = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().substring(0, 10);
-        this.toDate   = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().substring(0, 10);
+        this.fromDate = monthStart();
+        this.toDate   = monthEnd();
         this.load();
     }
 
@@ -60,9 +60,8 @@ export class AccountSettingMainComponent {
     }
 
     reset(): void {
-        const now = new Date();
-        this.fromDate  = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().substring(0, 10);
-        this.toDate    = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().substring(0, 10);
+        this.fromDate   = monthStart();
+        this.toDate     = monthEnd();
         this.searchText = '';
         this.records.set([]);
         this.page = 1;

@@ -18,6 +18,8 @@ import com.noreco1.fireflyv2.validator.BudgetSubItemValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 
 import java.math.BigDecimal;
@@ -37,6 +39,7 @@ public class BudgetSubItemServiceImpl implements BudgetSubItemService {
     @Autowired
     private BudgetSubItemRepo budgetSubItemRepo;
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<Map> getTreeData(Integer year, Integer divisionId, String searchText) {
 
@@ -59,6 +62,7 @@ public class BudgetSubItemServiceImpl implements BudgetSubItemService {
 
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<BudgetSubItem> getAllByBudgetLineItemDetail(Integer budgetLineItemDetailId) {
 
@@ -162,6 +166,7 @@ public class BudgetSubItemServiceImpl implements BudgetSubItemService {
 
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public BigDecimal getBudgetLineSubItemAmountBalanceByType(Integer budgetSubItemDetailId, String type) {
 

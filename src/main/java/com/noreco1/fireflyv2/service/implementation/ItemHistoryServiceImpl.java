@@ -6,6 +6,8 @@ import com.noreco1.fireflyv2.service.ItemHistoryService;
 import com.noreco1.fireflyv2.mysql_repo.TurnOnOrderRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
@@ -18,6 +20,7 @@ public class ItemHistoryServiceImpl implements ItemHistoryService {
     @Autowired
     TurnOnOrderRepo turnOnOrderRepo;
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<Map> getItemHistory(String serialNumber) {
 

@@ -21,6 +21,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -80,6 +81,7 @@ public class BudgetLineItemServiceImpl implements BudgetLineItemService {
     @Autowired
     private SettingFacade settingFacade;
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<BudgetLineItem> findAll(Pageable pageable) {
 
@@ -98,16 +100,19 @@ public class BudgetLineItemServiceImpl implements BudgetLineItemService {
         return null;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<BudgetLineItem> findAllByYear(Integer year, Pageable pageable) {
         return this.budgetLineItemRepo.findAllByYear(year, authenticationFacade.getLoggedIn().getId(), pageable);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<BudgetLineItem> findAllByYearAndDivision(Integer year, Integer division, Pageable pageable) {
         return this.budgetLineItemRepo.findAllByYearAndDivisionId(year, division, authenticationFacade.getLoggedIn().getId(), pageable);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public BudgetLineItem findById(Integer id) {
 
@@ -205,6 +210,7 @@ public class BudgetLineItemServiceImpl implements BudgetLineItemService {
 
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<BudgetLineItemDetail> getBudgetLineItemDetailForRV(Boolean isFromPR) {
 
@@ -234,6 +240,7 @@ public class BudgetLineItemServiceImpl implements BudgetLineItemService {
 
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public BigDecimal getBudgetLineItemDetailQuantityBalance(Integer budgetLineItemDetailId) {
 
@@ -255,6 +262,7 @@ public class BudgetLineItemServiceImpl implements BudgetLineItemService {
 
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public BigDecimal getBudgetLineItemDetailAmountBalance(Integer budgetLineItemDetailId) {
         BigDecimal balance = BigDecimal.ZERO;
@@ -274,6 +282,7 @@ public class BudgetLineItemServiceImpl implements BudgetLineItemService {
         return balance;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public BigDecimal getBudgetLineItemDetailAmountBalanceByType(Integer budgetLineItemDetailId, String type) {
         BigDecimal balance = BigDecimal.ZERO;
@@ -305,6 +314,7 @@ public class BudgetLineItemServiceImpl implements BudgetLineItemService {
         return balance;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<BudgetLineItem> findAllByYearAndDivisionParams(Integer year, Integer department, Integer division, Integer status) {
 
@@ -376,6 +386,7 @@ public class BudgetLineItemServiceImpl implements BudgetLineItemService {
         }
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public BudgetLineItemDetail findBudgetLineItemDetailById(Integer id) {
         return this.budgetLineItemDetailRepo.findById(id).orElse(null);
@@ -741,6 +752,7 @@ public class BudgetLineItemServiceImpl implements BudgetLineItemService {
         return response;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<DocumentStatus> getDocumentsStatuses() {
         BudgetLineItem budgetLineItem = budgetLineItemRepo.findFirstByOrderByIdAsc();

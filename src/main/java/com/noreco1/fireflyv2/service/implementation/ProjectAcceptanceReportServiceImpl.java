@@ -21,6 +21,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 
@@ -83,6 +84,7 @@ public class ProjectAcceptanceReportServiceImpl implements ProjectAcceptanceRepo
     @Autowired
     ProjectContractorRepo projectContractorRepo;
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<ProjectAcceptanceReport> findAll(String startDate, String endDate, Pageable pageable) {
 
@@ -92,6 +94,7 @@ public class ProjectAcceptanceReportServiceImpl implements ProjectAcceptanceRepo
         return projectAcceptanceReportRepo.findAllByDateBetween(fromDate, toDate, pageable);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<ProjectAcceptanceReport> findAllByStatusId(String startDate, String endDate, int statusId, Pageable pageable) {
 
@@ -101,6 +104,7 @@ public class ProjectAcceptanceReportServiceImpl implements ProjectAcceptanceRepo
         return projectAcceptanceReportRepo.findAllByDateBetweenAndDocumentStatusId(fromDate, toDate, statusId, pageable);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public ProjectAcceptanceReportDto findById(Integer id) {
 

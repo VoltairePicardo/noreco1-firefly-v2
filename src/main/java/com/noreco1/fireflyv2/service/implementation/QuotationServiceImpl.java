@@ -20,6 +20,7 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -104,6 +105,7 @@ public class QuotationServiceImpl implements QuotationService, PrintableVoucher 
 
     Map meta = new HashMap();
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public QuotationDto findById(Integer quotationId) {
 
@@ -184,6 +186,7 @@ public class QuotationServiceImpl implements QuotationService, PrintableVoucher 
         return null;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<QuotationListDto> findByDateRangeAndStatusId(String from, String to, Integer id) {
         try {
@@ -224,6 +227,7 @@ public class QuotationServiceImpl implements QuotationService, PrintableVoucher 
         return null;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<QuotationListDto> findByDateRangePending(String from, String to) {
         try {
@@ -270,6 +274,7 @@ public class QuotationServiceImpl implements QuotationService, PrintableVoucher 
         return null;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<com.noreco1.fireflyv2.controller.response.reports.QuotationDetail> getForQuotationSummary(Integer id) {
 
@@ -380,6 +385,7 @@ public class QuotationServiceImpl implements QuotationService, PrintableVoucher 
         return data;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<com.noreco1.fireflyv2.controller.response.reports.QuotationDetail> getRvDetailByRvId(Integer rivId) {
         DecimalFormat decimalFormat = new DecimalFormat("#,##0.00");
@@ -483,6 +489,7 @@ public class QuotationServiceImpl implements QuotationService, PrintableVoucher 
         return data;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<com.noreco1.fireflyv2.controller.response.reports.QuotationDetail> getRvItemsForQuotation(Integer rivId) {
 
@@ -628,11 +635,13 @@ public class QuotationServiceImpl implements QuotationService, PrintableVoucher 
         return data;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<QuotationTerm> getTerms(Integer id) {
         return this.quotationTermRepo.findAllByQuotationId(id);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Map getDefaultSignatoryMoreThen100k() {
 
@@ -658,6 +667,7 @@ public class QuotationServiceImpl implements QuotationService, PrintableVoucher 
 
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Map getDefaultSignatoryMoreThen300k() {
 

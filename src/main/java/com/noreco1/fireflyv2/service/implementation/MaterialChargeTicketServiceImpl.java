@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
@@ -22,6 +24,7 @@ public class MaterialChargeTicketServiceImpl implements MaterialChargeTicketServ
     @Autowired
     MaterialChargeTicketDetailRepo materialChargeTicketDetailRepo;
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<MaterialChargeTicket> findByDateRangeAndCode(String from, String to, String query, Pageable pageable) {
         String format = "yyyy-MM-dd";
@@ -36,6 +39,7 @@ public class MaterialChargeTicketServiceImpl implements MaterialChargeTicketServ
         return ret;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<Map> getDetails(Integer id) {
         List<Map> data = new ArrayList<>();

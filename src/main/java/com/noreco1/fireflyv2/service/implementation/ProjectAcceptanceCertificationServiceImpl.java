@@ -20,6 +20,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -89,6 +91,7 @@ public class ProjectAcceptanceCertificationServiceImpl implements ProjectAccepta
     @Autowired
     ProjectContractorRepo projectContractorRepo;
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<ProjectAcceptanceCertification> findByDateRangeAndStatusId(String from, String to, Integer id, Pageable pageable) {
 
@@ -98,6 +101,7 @@ public class ProjectAcceptanceCertificationServiceImpl implements ProjectAccepta
         return certificationRepo.findByDocumentStatusIdAndDateBetween(id, fromDate, toDate, pageable);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<ProjectAcceptanceCertification> findByDateRangePending(String from, String to, Pageable pageable) {
 
@@ -107,6 +111,7 @@ public class ProjectAcceptanceCertificationServiceImpl implements ProjectAccepta
         return certificationRepo.findByDateBetweenAndDocumentStatusIdNotIn(fromDate, toDate, Arrays.asList(this.getNonPendingStatusIds()), pageable);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public ProjectAcceptanceCertificationDto findById(Integer id) {
         ProjectAcceptanceCertification projectAcceptanceCertification =  certificationRepo.findById(id).orElse(null);

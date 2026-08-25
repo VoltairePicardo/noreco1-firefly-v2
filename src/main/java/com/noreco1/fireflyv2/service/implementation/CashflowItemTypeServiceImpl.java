@@ -7,6 +7,8 @@ import com.noreco1.fireflyv2.service.CashflowItemTypeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 
 import java.util.List;
@@ -17,11 +19,13 @@ public class CashflowItemTypeServiceImpl implements CashflowItemTypeService {
     @Autowired
     CashflowItemTypeRepo cashflowItemTypeRepo;
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<CashflowItemType> findAll() {
         return cashflowItemTypeRepo.findAll();
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public CashflowItemType findById(Integer id) {
         return cashflowItemTypeRepo.findById(id).orElse(null);

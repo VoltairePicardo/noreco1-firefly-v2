@@ -12,6 +12,7 @@ import com.noreco1.fireflyv2.validator.EffectivityDateValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 
@@ -72,6 +73,7 @@ public class EffectivityDateServiceImpl implements EffectivityDateService {
         return response;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<DateRange> findByStartRange(Date start, Date end) {
         List<DateRange> dateRanges = new ArrayList<>();
@@ -87,6 +89,7 @@ public class EffectivityDateServiceImpl implements EffectivityDateService {
         return dateRanges;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<DateRange> findByEndRange(Date start, Date end) {
         List<DateRange> dateRanges = new ArrayList<>();
@@ -102,6 +105,7 @@ public class EffectivityDateServiceImpl implements EffectivityDateService {
         return dateRanges;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<DateRange> findOverlapping(Date start, Date end) {
         List<DateRange> dateRanges = new ArrayList<>();
@@ -115,11 +119,13 @@ public class EffectivityDateServiceImpl implements EffectivityDateService {
         return dateRanges;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public DateRange findById(Integer id) {
         return dateRangeRepo.findById(id).orElse(null);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<DateRange> findAll() {
         return dateRangeRepo.findAllByOrderByEndDescStartDesc();

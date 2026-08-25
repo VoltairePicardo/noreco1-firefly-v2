@@ -22,6 +22,8 @@ import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -91,6 +93,7 @@ public class BillOfMaterialServiceImpl implements BillOfMaterialService, Printab
     @Autowired
     EmployeeRepo employeeRepo;
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public BillOfMaterial findById(Integer id) {
         BillOfMaterial ret = billOfMaterialRepo.findById(id).orElse(null);
@@ -106,26 +109,31 @@ public class BillOfMaterialServiceImpl implements BillOfMaterialService, Printab
         return ret;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<BillOfMaterial> findAll() {
         return billOfMaterialRepo.findAll();
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<BillOfMaterial> findAll(Pageable pageable) {
         return billOfMaterialRepo.findAll(pageable);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<BillOfMaterial> findByQuery(String query, Pageable pageable) {
         return billOfMaterialRepo.findByCode(query, pageable);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<DocumentStatus> getDocumentsStatuses() {
         return documentDtoer.getDocumentStatuses(com.noreco1.fireflyv2.model.enums.Workflow.BOM.getId());
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<BillOfMaterial> getListForSummaryReport(String from, String to, HttpServletRequest request) {
         List<BillOfMaterial> list = new ArrayList<>();
@@ -166,6 +174,7 @@ public class BillOfMaterialServiceImpl implements BillOfMaterialService, Printab
         return list;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<BillOfMaterialDetailDto> findDetailByAssemblyUnitId(Integer assemblyUnitId, Integer invLocId) {
         List<BillOfMaterialDetailDto> data = new ArrayList<>();
@@ -195,6 +204,7 @@ public class BillOfMaterialServiceImpl implements BillOfMaterialService, Printab
         return data;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<BillOfMaterialDetailDto> findDetailByBillOfMaterialTransId(Integer transId) {
 
@@ -601,6 +611,7 @@ public class BillOfMaterialServiceImpl implements BillOfMaterialService, Printab
         return signatoryFacade.defaultSignatories(com.noreco1.fireflyv2.model.enums.DocumentType.BOM);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<Map> findByDateRangeAndStatusId(String from, String to, Integer docStatusId) {
         try {
@@ -625,6 +636,7 @@ public class BillOfMaterialServiceImpl implements BillOfMaterialService, Printab
         return null;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<Map> findByDateRangePending(String from, String to) {
         try {

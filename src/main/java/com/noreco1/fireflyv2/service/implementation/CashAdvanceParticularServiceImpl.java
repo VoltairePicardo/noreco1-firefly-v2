@@ -6,6 +6,8 @@ import com.noreco1.fireflyv2.repo.CashAdvanceParticularRepo;
 import com.noreco1.fireflyv2.service.CashAdvanceParticularService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -20,6 +22,7 @@ public class CashAdvanceParticularServiceImpl implements CashAdvanceParticularSe
     @Autowired
     CashAdvanceParticularRepo cashAdvanceParticularRepo;
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public HashMap findById(Integer id) {
         HashMap map = new HashMap();
@@ -32,6 +35,7 @@ public class CashAdvanceParticularServiceImpl implements CashAdvanceParticularSe
         return map;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<HashMap> findAll() {
         List<HashMap> mapList = new ArrayList<>();
@@ -46,6 +50,7 @@ public class CashAdvanceParticularServiceImpl implements CashAdvanceParticularSe
         return mapList;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<HashMap> findByCAId(Integer caId) {
         List<HashMap> mapList = new ArrayList<>();
@@ -60,6 +65,7 @@ public class CashAdvanceParticularServiceImpl implements CashAdvanceParticularSe
         return mapList;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<HashMap> findByCAIdForLiquidation(Integer id, Integer calId) {
         List<HashMap> mapList = new ArrayList<>();

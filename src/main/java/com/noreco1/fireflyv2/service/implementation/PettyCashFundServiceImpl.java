@@ -14,6 +14,8 @@ import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 
 import java.util.ArrayList;
@@ -34,6 +36,7 @@ public class PettyCashFundServiceImpl implements PettyCashFundService {
 
     private PettyCashFund model;
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public HashMap findById(Integer id) {
         HashMap map = new HashMap();
@@ -46,16 +49,19 @@ public class PettyCashFundServiceImpl implements PettyCashFundService {
         return map;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public PettyCashFund findOne(Integer id) {
         return pettyCashFundRepo.findById(id).orElse(null);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public PettyCashFund findByOfficeId(Integer officeId) {
         return pettyCashFundRepo.findOneByOfficeId(officeId);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<HashMap> findAll() {
         List<HashMap> mapList = new ArrayList<>();
@@ -70,11 +76,13 @@ public class PettyCashFundServiceImpl implements PettyCashFundService {
         return mapList;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<PettyCashFund> findAll(Pageable pageable) {
         return pettyCashFundRepo.findAll(pageable);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<PettyCashFund> find(String query, Pageable pageable) {
         query = "%"+query.trim()+"%";

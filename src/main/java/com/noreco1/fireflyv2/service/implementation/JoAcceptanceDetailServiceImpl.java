@@ -6,6 +6,8 @@ import com.noreco1.fireflyv2.controller.response.JoAcceptanceDetailDto;
 import com.noreco1.fireflyv2.service.JoAcceptanceDetailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +20,7 @@ public class JoAcceptanceDetailServiceImpl implements JoAcceptanceDetailService 
     @Autowired
     JoAcceptanceDetailRepo joAcceptanceDetailRepo;
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<JoAcceptanceDetailDto> getJoaDetails(Integer joId) {
         List<JoAcceptanceDetail> joAcceptanceDetails = joAcceptanceDetailRepo.findAllByJoAcceptanceId(joId);

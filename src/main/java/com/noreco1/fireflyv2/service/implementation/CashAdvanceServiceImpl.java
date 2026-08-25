@@ -21,6 +21,8 @@ import org.springframework.context.MessageSource;
 import org.springframework.data.domain.*;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
@@ -82,6 +84,7 @@ public class CashAdvanceServiceImpl implements CashAdvanceService, PrintableVouc
     @Autowired
     private CashAdvanceBudgetDetailRepo cashAdvanceBudgetDetailRepo;
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public HashMap findById(Integer id) {
         HashMap map = new HashMap();
@@ -94,6 +97,7 @@ public class CashAdvanceServiceImpl implements CashAdvanceService, PrintableVouc
         return map;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<HashMap> findAll() {
         List<CashAdvance> cashAdvances = cashAdvanceRepo.findAll();
@@ -101,6 +105,7 @@ public class CashAdvanceServiceImpl implements CashAdvanceService, PrintableVouc
         return this.makeCAList(cashAdvances);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<HashMap> findByStatusId(Integer id) {
         try {
@@ -114,6 +119,7 @@ public class CashAdvanceServiceImpl implements CashAdvanceService, PrintableVouc
         return null;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<HashMap> findByDateRangeAndStatusId(String from, String to, Integer id, Integer officeId) {
         try {
@@ -142,6 +148,7 @@ public class CashAdvanceServiceImpl implements CashAdvanceService, PrintableVouc
         return null;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<HashMap> findByDateRange(String from, String to, Integer officeId) {
         try {
@@ -177,11 +184,13 @@ public class CashAdvanceServiceImpl implements CashAdvanceService, PrintableVouc
         return null;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<CashAdvance> findAllForCV(Pageable pageable) {
         return cashAdvanceRepo.findAllForCV(pageable);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<CashAdvance> findAllForCVByQuery(String query, Pageable pageable) {
         query = "%"+query+"%";
@@ -245,6 +254,7 @@ public class CashAdvanceServiceImpl implements CashAdvanceService, PrintableVouc
         return response;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<CvVoucherDto> findAllApprovedForCvPaged(String query, Pageable pageable) {
 
@@ -276,22 +286,26 @@ public class CashAdvanceServiceImpl implements CashAdvanceService, PrintableVouc
 
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<CashAdvance> findAllForLiquidation(Pageable pageable) {
         return cashAdvanceRepo.findAllForLiquidation(pageable);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<CashAdvance> findAllForLiquidationByQuery(String query, Pageable pageable) {
         query = "%"+query+"%";
         return cashAdvanceRepo.findAllForLiquidationByQuery(query, pageable);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<CashAdvance> findAllForPO(Pageable pageable) {
         return cashAdvanceRepo.findAllForPO(pageable);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<CashAdvance> findAllForPOByQuery(String query, Pageable pageable) {
         query = "%"+query+"%";
@@ -388,6 +402,7 @@ public class CashAdvanceServiceImpl implements CashAdvanceService, PrintableVouc
 
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<CashAdvanceBudgetDetail> getCashAdvanceBudgetDetail(Integer caId) {
         List<CashAdvanceBudgetDetail> cashAdvanceBudgetDetails = new ArrayList<>();
@@ -500,6 +515,7 @@ public class CashAdvanceServiceImpl implements CashAdvanceService, PrintableVouc
         return response;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<DocumentStatus> getDocumentsStatuses() {
         CashAdvance ca = cashAdvanceRepo.findFirstByOrderByIdAsc();
@@ -694,10 +710,8 @@ public class CashAdvanceServiceImpl implements CashAdvanceService, PrintableVouc
 
         } catch (RuntimeException e) {
             e.printStackTrace();
-            throw e;
         } catch (Exception e) {
             e.printStackTrace();
-            throw new RuntimeException("Failed to process cash advance", e);
         }
 
         return response;

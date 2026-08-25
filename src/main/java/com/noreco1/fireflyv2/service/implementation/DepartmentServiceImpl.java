@@ -6,6 +6,7 @@ import com.noreco1.fireflyv2.repo.DepartmentRepo;
 import com.noreco1.fireflyv2.service.DepartmentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -16,11 +17,13 @@ public class DepartmentServiceImpl implements DepartmentService {
     @Autowired
     private DepartmentRepo departmentRepo;
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<Department> list() {
         return departmentRepo.findAll();
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Department findById(Integer id) {
         return departmentRepo.findById(id).orElse(null);

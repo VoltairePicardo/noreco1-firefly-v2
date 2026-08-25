@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping(value = "/cash-advance-liquidation")
+@RequestMapping(value = "/api/cash-advance-liquidation")
 public class CashAdvanceLiquidationController {
 
     @Autowired

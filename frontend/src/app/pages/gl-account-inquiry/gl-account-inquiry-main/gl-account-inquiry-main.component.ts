@@ -7,6 +7,7 @@ import { DownloadService } from '@/app/services/download.service';
 import { BrowseCOAModalComponent } from '@/app/shared/modals/browse-coa-modal/browse-coa-modal.component';
 import { BrowseEntityModalComponent } from '@/app/shared/modals/browse-entity-modal/browse-entity-modal.component';
 import { AlertService } from '@/app/shared/services/alert.service';
+import { monthStart, monthEnd } from '@/app/shared/utils/date.utils';
 
 @Component({
     selector: 'app-gl-account-inquiry-main',
@@ -55,10 +56,8 @@ export class GlAccountInquiryMainComponent {
     }
 
     ngOnInit(): void {
-        const now = new Date();
-        const first = new Date(now.getFullYear(), now.getMonth(), 1);
-        this.fromDate = first.toISOString().substring(0, 10);
-        this.toDate   = now.toISOString().substring(0, 10);
+        this.fromDate = monthStart();
+        this.toDate   = monthEnd();
 
         this.service.getDocumentStatuses().subscribe({
             next: (data) => {

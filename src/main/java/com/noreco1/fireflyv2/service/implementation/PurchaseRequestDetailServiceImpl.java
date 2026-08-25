@@ -10,6 +10,8 @@ import com.noreco1.fireflyv2.controller.response.RvDetailDto;
 import com.noreco1.fireflyv2.service.PurchaseRequestDetailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -41,6 +43,7 @@ public class PurchaseRequestDetailServiceImpl implements PurchaseRequestDetailSe
     @Autowired
     QuotationDetailRepo quotationDetailRepo;
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<RvDetailDto> getRvDetails(Integer rvId) {
         List<PurchaseRequestDetail> purchaseRequestDetails = purchaseRequestDetailRepo.findByPurchaseRequestId(rvId);
@@ -71,6 +74,7 @@ public class PurchaseRequestDetailServiceImpl implements PurchaseRequestDetailSe
         return rvDetailDtos;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<RvDetailDto> getRvDetailsByStatus(Integer statusId) {
         List<PurchaseRequestDetail> purchaseRequestDetails = purchaseRequestDetailRepo.findPurchaseRequestDetailsByPurchaseRequestDocumentStatusId(statusId);
@@ -103,6 +107,7 @@ public class PurchaseRequestDetailServiceImpl implements PurchaseRequestDetailSe
         return rvDetailDtos;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<RvDetailDto> getRvDetailsForPo(Integer cancelledPoId) {
         List<PurchaseRequestDetail> purchaseRequestDetails = this.purchaseRequestDetailRepo.findPurchaseRequestDetailsByCancelledPOId(cancelledPoId);
@@ -111,6 +116,7 @@ public class PurchaseRequestDetailServiceImpl implements PurchaseRequestDetailSe
         return rvDetailDtos;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<RvDetailDto> getPrDetailsForPo(Integer prId, Integer supplierAccountNumber) {
 
@@ -149,6 +155,7 @@ public class PurchaseRequestDetailServiceImpl implements PurchaseRequestDetailSe
 
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<RvDetailDto> getPrDetailsForCanvass(Integer prId) {
 
@@ -213,6 +220,7 @@ public class PurchaseRequestDetailServiceImpl implements PurchaseRequestDetailSe
         return rvDetailDtos;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<RvDetailDto> getRvDetailsForPo() {
         List<PurchaseRequestDetail> rvDetails = purchaseRequestDetailRepo.findRvDetailsByTypesAndStatusId(RvType.FOR_PO.getId(), RvType.FOR_IT.getId());
@@ -249,6 +257,7 @@ public class PurchaseRequestDetailServiceImpl implements PurchaseRequestDetailSe
         return rvDetailDtos;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<RvDetailDto> getRvDetailsForPoRo(Integer supplierAcctNo) {
 
@@ -301,6 +310,7 @@ public class PurchaseRequestDetailServiceImpl implements PurchaseRequestDetailSe
         return rvDetailDtos;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<Map<String, Object>> getPurchaseRequestsForJo() {
         List<Integer> types = List.of(RvType.FOR_REP.getId(), RvType.FOR_LAB.getId());
@@ -321,6 +331,7 @@ public class PurchaseRequestDetailServiceImpl implements PurchaseRequestDetailSe
         return result;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<Map<String, Object>> getPurchaseRequestsForPo() {
         List<Integer> types = List.of(RvType.FOR_PO.getId(), RvType.FOR_IT.getId());
@@ -341,6 +352,7 @@ public class PurchaseRequestDetailServiceImpl implements PurchaseRequestDetailSe
         return result;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<RvDetailDto> getRvDetailsForJo() {
         List<Integer> types = List.of(RvType.FOR_REP.getId(), RvType.FOR_LAB.getId());
@@ -375,6 +387,7 @@ public class PurchaseRequestDetailServiceImpl implements PurchaseRequestDetailSe
         return rvDetailDtos;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<RvDetailDto> getRvDetailsForCanvass() {
 
@@ -427,6 +440,7 @@ public class PurchaseRequestDetailServiceImpl implements PurchaseRequestDetailSe
         return dto;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<RvDetailDto> getRvDetailsWithItemGroup(Integer rvId) {
         List<PurchaseRequestDetail> purchaseRequestDetails = purchaseRequestDetailRepo.findByPurchaseRequestIdOrderByItemGroupAndId(rvId);
@@ -457,6 +471,7 @@ public class PurchaseRequestDetailServiceImpl implements PurchaseRequestDetailSe
         return rvDetailDtos;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<RvDetailDto> getRvDetailsForQuotation() {
         List<RvDetailDto> rvDetailDtos = new ArrayList<>();
@@ -481,6 +496,7 @@ public class PurchaseRequestDetailServiceImpl implements PurchaseRequestDetailSe
         return rvDetailDtos;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<Map> getRvDetailsForWithdrawal(Integer rvId, Integer invLocId, Integer invCatId) {
         List<Map> data = new ArrayList<>();
@@ -519,6 +535,7 @@ public class PurchaseRequestDetailServiceImpl implements PurchaseRequestDetailSe
         return data;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<Map> getRvDetailsForRR(Integer rvId) {
         List<Map> data = new ArrayList<>();

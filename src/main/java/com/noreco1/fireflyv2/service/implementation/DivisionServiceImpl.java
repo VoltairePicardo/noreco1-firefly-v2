@@ -6,6 +6,7 @@ import com.noreco1.fireflyv2.repo.DivisionRepo;
 import com.noreco1.fireflyv2.service.DivisionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -16,11 +17,13 @@ public class DivisionServiceImpl implements DivisionService {
     @Autowired
     private DivisionRepo divisionRepo;
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<Division> list() {
         return divisionRepo.findAllByOrderByNameAsc();
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Division findById(Integer id) {
         return divisionRepo.findById(id).orElse(null);

@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -18,11 +19,13 @@ public class UnitMeasureServiceImpl implements UnitMeasureService {
     @Autowired
     private UnitMeasureRepo unitMeasureRepo;
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<UnitMeasure> listAll() {
         return unitMeasureRepo.findAllByOrderByCodeAsc();
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<UnitMeasure> list(String q, int page, int size) {
         PageRequest pageable = PageRequest.of(page, size);
@@ -31,16 +34,19 @@ public class UnitMeasureServiceImpl implements UnitMeasureService {
                 : unitMeasureRepo.findByDescriptionContainingIgnoreCaseOrCodeContainingIgnoreCaseOrderByCodeAsc(q, q, pageable);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public UnitMeasure findById(Integer id) {
         return unitMeasureRepo.findById(id).orElse(null);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public UnitMeasure findByCode(String code) {
         return unitMeasureRepo.findOneByCodeIgnoreCase(code.trim());
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public UnitMeasure findByDescription(String description) {
         return unitMeasureRepo.findOneByDescriptionIgnoreCase(description.trim());

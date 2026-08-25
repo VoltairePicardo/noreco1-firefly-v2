@@ -12,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
@@ -28,6 +29,7 @@ public class SupplierServiceImpl implements SupplierService {
     @Autowired
     private GeneratorFacade generatorFacade;
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<Supplier> list(String q, int page, int size) {
         PageRequest pageable = PageRequest.of(page, size, Sort.by("name").ascending());
@@ -36,6 +38,7 @@ public class SupplierServiceImpl implements SupplierService {
                 : supplierRepo.findByNameContainingIgnoreCaseOrderByName(q, pageable);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Supplier findById(Integer id) {
         return supplierRepo.findById(id).orElse(null);

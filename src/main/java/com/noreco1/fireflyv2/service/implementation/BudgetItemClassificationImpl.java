@@ -9,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -19,6 +20,7 @@ public class BudgetItemClassificationImpl implements BudgetItemClassificationSer
     @Autowired
     private BudgetItemClassificationRepo budgetItemClassificationRepo;
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<BudgetItemClassification> list(String q, int page, int size) {
         PageRequest pageable = PageRequest.of(page, size, Sort.by("description").ascending());
@@ -27,16 +29,19 @@ public class BudgetItemClassificationImpl implements BudgetItemClassificationSer
                 : budgetItemClassificationRepo.findByDescriptionContainingIgnoreCase(q, pageable);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<BudgetItemClassification> listAll() {
         return budgetItemClassificationRepo.findByOrderByDescriptionAsc();
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public BudgetItemClassification findById(Integer id) {
         return budgetItemClassificationRepo.findById(id).orElse(null);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public BudgetItemClassification findByDescription(String description) {
         return budgetItemClassificationRepo.findByDescriptionContainingIgnoreCase(description.trim());

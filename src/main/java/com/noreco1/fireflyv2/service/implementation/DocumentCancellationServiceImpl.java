@@ -11,6 +11,7 @@ import com.noreco1.fireflyv2.controller.response.PostResponse;
 import com.noreco1.fireflyv2.service.DocumentCancellationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
@@ -1172,6 +1173,7 @@ public class DocumentCancellationServiceImpl implements DocumentCancellationServ
         return response;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Map getCancellationDetails(Integer transId) {
         Map map = new HashMap();

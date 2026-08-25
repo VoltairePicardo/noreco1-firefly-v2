@@ -23,6 +23,7 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import com.noreco1.fireflyv2.common.helpers.CurrencyIntoWords;
@@ -240,6 +241,7 @@ public class SalesVoucherServiceImpl implements SalesVoucherService, PrintableVo
         return this.makeSVListDto(vouchers);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public SalesVoucherDto findById(Integer id) {
 
@@ -273,6 +275,7 @@ public class SalesVoucherServiceImpl implements SalesVoucherService, PrintableVo
         return  svDto;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public  List<SalesVoucherListDto> findByStatusId(Integer id) {
         List<SalesVoucher> vouchers = svRepo.findByDocumentStatusId(id);
@@ -297,6 +300,7 @@ public class SalesVoucherServiceImpl implements SalesVoucherService, PrintableVo
         return null;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<SalesVoucherListDto> findByDateRangeAndStatusId(String from, String to, Integer id) {
         try {
@@ -319,6 +323,7 @@ public class SalesVoucherServiceImpl implements SalesVoucherService, PrintableVo
         return null;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<SalesVoucherListDto> findByDateRange(String from, String to) {
         try {

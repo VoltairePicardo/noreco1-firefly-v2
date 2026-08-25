@@ -23,6 +23,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.data.domain.*;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -378,6 +379,7 @@ public class ApvServiceImpl implements ApvService, PrintableVoucher {
         return returnVouchers;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public ApvDto findById(Integer id) {
 
@@ -489,6 +491,7 @@ public class ApvServiceImpl implements ApvService, PrintableVoucher {
         return  apvDto;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public  List<ApvListDto> findByStatusId(Integer id) {
         try {
@@ -502,6 +505,7 @@ public class ApvServiceImpl implements ApvService, PrintableVoucher {
         return null;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<ApvListDto> findByDateRangeAndStatusId(String from, String to, Integer id) {
 
@@ -525,6 +529,7 @@ public class ApvServiceImpl implements ApvService, PrintableVoucher {
         return null;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<ApvListDto> findByDateRange(String from, String to) {
 
@@ -555,6 +560,7 @@ public class ApvServiceImpl implements ApvService, PrintableVoucher {
         return null;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<CvVoucherDto> findAllApprovedForCvPaged(String query, Pageable pageable) {
 

@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 
@@ -300,6 +301,7 @@ public class CanvassServiceImpl implements CanvassService, PrintableVoucher {
         return null;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<Map> findByDateRangeAndStatusId(String from, String to, Integer id) {
         try {
@@ -322,6 +324,7 @@ public class CanvassServiceImpl implements CanvassService, PrintableVoucher {
         return null;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<Map> findByDateRangePending(String from, String to) {
         try {
@@ -350,6 +353,7 @@ public class CanvassServiceImpl implements CanvassService, PrintableVoucher {
         return null;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public CanvassDto findById(Integer id) {
         Canvass canvass =  canvassRepo.findById(id).orElse(null);
@@ -493,6 +497,7 @@ public class CanvassServiceImpl implements CanvassService, PrintableVoucher {
         return this.processCreate(v, bindingResult, messageSource);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<DocumentStatus> getDocumentsStatuses() {
         Canvass voucher = canvassRepo.findFirstByOrderByIdAsc();

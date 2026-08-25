@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 
 @RestController
-@RequestMapping("/cap")
+@RequestMapping("/api/cap")
 public class CashAdvanceParticularController {
 
     @Autowired

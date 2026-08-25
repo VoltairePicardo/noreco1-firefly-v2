@@ -10,6 +10,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
@@ -23,6 +24,7 @@ public class BrandServiceImpl implements BrandService {
     @Autowired
     private AuthenticationFacade authFacade;
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<Brand> list(String q, int page, int size) {
         PageRequest pageable = PageRequest.of(page, size, Sort.by("name").ascending());
@@ -31,6 +33,7 @@ public class BrandServiceImpl implements BrandService {
                 : brandRepo.findByNameContainingIgnoreCase(q, pageable);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Brand findById(Integer id) {
         return brandRepo.findById(id).orElse(null);

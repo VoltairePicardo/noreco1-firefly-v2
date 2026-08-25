@@ -22,6 +22,8 @@ import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 
 import java.io.IOException;
@@ -80,6 +82,7 @@ public class SpecialEquipmentAssignmentServiceImpl implements SpecialEquipmentAs
     @Autowired
     DocumentLoggerFacade documentLoggerFacade;
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<SpecialEquipmentAssignment> findAll(String startDate, String endDate, Pageable pageable) {
         Date formattedStartDate = DateHelper.strToDate(startDate, "yyyy-MM-dd");
@@ -220,6 +223,7 @@ public class SpecialEquipmentAssignmentServiceImpl implements SpecialEquipmentAs
         return response;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public SpecialEquipmentAssignment findById(Integer id) {
         SpecialEquipmentAssignment specialEquipmentAssignment = specialEquipmentAssignmentRepo.findById(id).orElse(null);
@@ -302,6 +306,7 @@ public class SpecialEquipmentAssignmentServiceImpl implements SpecialEquipmentAs
         return specialEquipmentAssignment;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<Map> findByConsumerId(Integer consumerId) {
         List<Map> data = new ArrayList<>();
@@ -327,6 +332,7 @@ public class SpecialEquipmentAssignmentServiceImpl implements SpecialEquipmentAs
         return data;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<Map> findBySerial(String serialNo) {
         List<Map> data = new ArrayList<>();
@@ -368,6 +374,7 @@ public class SpecialEquipmentAssignmentServiceImpl implements SpecialEquipmentAs
         return data;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<SpecialEquipment> findAllSpecialEquipment(Pageable pageable) {
         Map specialEquipmentTypeMap = settingFacade.getByCode(SPECIAL_EQUIPMENT_TYPES);
@@ -376,6 +383,7 @@ public class SpecialEquipmentAssignmentServiceImpl implements SpecialEquipmentAs
         return specialEquipmentRepo.findAllSpecialEquipmentAssignmentPaged(InventoryCategory.SPECIAL_EQUIPMENT.getId(), meterSpecialEquipmentTypeId, pageable);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<SpecialEquipment> findAllSpecialEquipmentByQuery(String query, Pageable pageable) {
         Map specialEquipmentTypeMap = settingFacade.getByCode(SPECIAL_EQUIPMENT_TYPES);
@@ -385,6 +393,7 @@ public class SpecialEquipmentAssignmentServiceImpl implements SpecialEquipmentAs
         return specialEquipmentRepo.findAllSpecialEquipmentAssignmentByQueryPaged(query.trim(), InventoryCategory.SPECIAL_EQUIPMENT.getId(), meterSpecialEquipmentTypeId, pageable);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<SpecialEquipmentAssignmentDetail> setDetailsWithDefaultSpecialEquipment(Integer stockWithdrawalId) {
         List<SpecialEquipmentAssignmentDetail> specialEquipmentAssignmentDetails = new ArrayList<>();
@@ -424,16 +433,19 @@ public class SpecialEquipmentAssignmentServiceImpl implements SpecialEquipmentAs
         return specialEquipmentAssignmentDetails;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<SpecialEquipment> findAllDefaultForSpecialEquipmentAssignmentNoTurnOn(Integer itemId, Integer noOfItems) {
         return specialEquipmentRepo.findAllDefaultForSpecialEquipmentAssignmentNoTurnOn(itemId, noOfItems);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<SpecialEquipment> findAllSpecialEquipmentNoConnectOrder(Integer itemId,Pageable pageable) {
         return specialEquipmentRepo.findAllSpecialEquipmentAssignmentNoConnectOrderPaged(itemId, pageable);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<SpecialEquipment> findAllSpecialEquipmentByQueryNoConnectOrder(String query, Integer itemId, Pageable pageable) {
         query = "%"+query+"%";
@@ -441,6 +453,7 @@ public class SpecialEquipmentAssignmentServiceImpl implements SpecialEquipmentAs
 
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<SpecialEquipmentAssignmentLog> findAllLogsById(Integer id) {
         List<SpecialEquipmentAssignmentLog> logs = this.specialEquipmentAssignmentLogRepo.findBySpecialEquipmentAssignmentIdOrderByIdDesc(id);

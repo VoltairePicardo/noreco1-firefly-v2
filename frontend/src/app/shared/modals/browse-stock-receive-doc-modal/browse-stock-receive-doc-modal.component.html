@@ -4,9 +4,9 @@
 </div>
 <div class="modal-body">
     <div class="row g-2 mb-3">
-        <div class="col-md-auto">
+        <div class="col-md-6">
             <input type="text" class="form-control" [(ngModel)]="searchText"
-                   placeholder="Search by code or location..." (input)="page = 1"/>
+                   placeholder="Search by code or location..." (input)="onSearchChange()"/>
         </div>
     </div>
     <div class="table-responsive">
@@ -27,10 +27,10 @@
                     <tr><td colspan="7" class="text-center text-muted py-4">
                         <span class="spinner-border spinner-border-sm me-2" role="status"></span>Loading...
                     </td></tr>
-                } @else if (pagedRecords.length === 0) {
+                } @else if (records.length === 0) {
                     <tr><td colspan="7" class="text-center text-muted py-4">No records found.</td></tr>
                 } @else {
-                    @for (doc of pagedRecords; track doc.id; let i = $index) {
+                    @for (doc of records; track doc.id; let i = $index) {
                         <tr>
                             <td>{{ (page - 1) * pageSize + i + 1 }}</td>
                             <td class="fw-bold">{{ doc.code }}</td>
@@ -47,9 +47,10 @@
             </tbody>
         </table>
     </div>
-    @if (filteredTotal > pageSize) {
+    @if (total > pageSize) {
         <div class="d-flex justify-content-end mt-3">
-            <ngb-pagination [(page)]="page" [pageSize]="pageSize" [collectionSize]="filteredTotal" [maxSize]="5" [rotate]="true"/>
+            <ngb-pagination [(page)]="page" [pageSize]="pageSize" [collectionSize]="total" [maxSize]="5" [rotate]="true"
+                            (pageChange)="onPageChange()"/>
         </div>
     }
 </div>

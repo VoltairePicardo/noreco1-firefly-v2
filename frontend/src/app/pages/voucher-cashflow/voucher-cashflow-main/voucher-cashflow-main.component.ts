@@ -4,6 +4,7 @@ import { COMMON_ALL_PAGE_IMPORTS, COMMON_MAIN_PAGE_IMPORTS, SHARED_PROVIDERS } f
 import { AlertService } from '@/app/shared/services/alert.service';
 import { FlatpickrDefaults, FlatpickrModule } from 'angularx-flatpickr';
 import { VoucherCashflowService } from '../voucher-cashflow.service';
+import { fmtDate, monthStart, monthEnd } from '@/app/shared/utils/date.utils';
 
 @Component({
     selector: 'app-voucher-cashflow-main',
@@ -42,15 +43,12 @@ export class VoucherCashflowMainComponent {
     }
 
     setDefaultDates(): void {
-        const now   = new Date();
-        const first = new Date(now.getFullYear(), now.getMonth(), 1);
-        const last  = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-        this.fromDate = this.toDateString(first);
-        this.toDate   = this.toDateString(last);
+        this.fromDate = monthStart();
+        this.toDate   = monthEnd();
     }
 
     toDateString(d: Date): string {
-        return d.toISOString().substring(0, 10);
+        return fmtDate(d);
     }
 
     load(): void {

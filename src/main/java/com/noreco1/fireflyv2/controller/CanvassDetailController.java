@@ -13,7 +13,7 @@ import java.util.List;
  * Created by Personal on 5/14/2015.
  */
 @RestController
-@RequestMapping("/canvass-detail")
+@RequestMapping("/api/canvass-detail")
 public class CanvassDetailController {
 
     @Autowired

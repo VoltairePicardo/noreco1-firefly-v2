@@ -6,6 +6,8 @@ import com.noreco1.fireflyv2.controller.response.PrepaymentDetailDto;
 import com.noreco1.fireflyv2.service.PrepaymentDetailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +20,7 @@ public class PrepaymentDetailServiceImpl implements PrepaymentDetailService {
     @Autowired
     PrepaymentDetailRepo prepaymentDetailRepo;
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<PrepaymentDetailDto> getPrepaymentDetails(Integer ppId) {
         List<PrepaymentDetail> details = prepaymentDetailRepo.findByPrepaymentId(ppId);

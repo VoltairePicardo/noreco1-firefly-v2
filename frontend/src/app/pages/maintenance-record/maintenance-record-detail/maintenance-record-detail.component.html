@@ -8,226 +8,203 @@
             <span class="spinner-border spinner-border-sm" role="status"></span> Loading...
         </div>
     } @else {
-    <div class="row g-3">
 
-        <!-- Document Header -->
-        <div class="col-xl-12">
-            <app-ui-card title="Maintenance Record Information">
-                <div class="col-xl-12 p-3" card-body>
-                    <div class="row g-3">
-                        <div class="col-md-3">
-                            <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Code</div>
-                            <div>
-                                <span class="badge bg-secondary bg-opacity-25 text-dark border fw-bold fs-sm">
-                                    {{ data.code || '—' }}
-                                </span>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Maintenance Date</div>
-                            <div>{{ data.maintenanceDate | date:'MMMM d, yyyy' }}</div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Odometer Reading</div>
-                            <div>{{ data.odometerReading || '—' }}</div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Next PMS Date</div>
-                            <div>{{ data.nextPmsDate ? (data.nextPmsDate | date:'MMMM d, yyyy') : '—' }}</div>
-                        </div>
-                    </div>
-                </div>
-            </app-ui-card>
-        </div>
+    <div class="card">
+        <div class="card-body">
 
-        <!-- Asset Details -->
-        @if (data.asset) {
-            <div class="col-xl-12">
-                <app-ui-card title="Asset Details">
-                    <div class="col-xl-12 p-3" card-body>
-                        <div class="row g-3">
-                            <div class="col-md-3">
-                                <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Ref. No.</div>
-                                <div class="fw-bold">{{ data.asset.code || '—' }}</div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Acquisition Date</div>
-                                <div>{{ data.asset.acquisitionDate | date:'MMMM d, yyyy' }}</div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Description</div>
-                                <div>{{ data.asset.description || '—' }}</div>
-                            </div>
-                            <div class="col-md-2">
-                                <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Value</div>
-                                <div>{{ data.asset.totalValue | number:'1.2-2' }}</div>
-                            </div>
-                        </div>
-                    </div>
-                </app-ui-card>
-            </div>
-        }
-
-        <!-- Voucher Details -->
-        @if (data.voucher || data.voucherTransaction) {
-            <div class="col-xl-12">
-                <app-ui-card title="Voucher Details">
-                    <div class="col-xl-12 p-3" card-body>
-                        <div class="row g-3">
-                            <div class="col-md-3">
-                                <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Voucher Code</div>
-                                <div class="fw-bold">{{ data.voucher?.code || data.voucherTransaction?.code || '—' }}</div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Voucher Date</div>
-                                <div>{{ (data.voucher?.date || data.voucher?.voucherDate) | date:'MMMM d, yyyy' }}</div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Particulars</div>
-                                <div>{{ data.voucher?.particulars || '—' }}</div>
-                            </div>
-                        </div>
-                    </div>
-                </app-ui-card>
-            </div>
-        }
-
-        <!-- Labor / Works Needed -->
-        @if (workItems.length > 0) {
-            <div class="col-xl-12">
-                <app-ui-card title="Labor / Works Needed">
-                    <div class="col-xl-12 p-3" card-body>
-                        <div class="table-responsive">
-                            <table class="table table-custom table-centered table-hover w-100 mb-0">
-                                <thead class="bg-light align-middle bg-opacity-25 thead-sm">
-                                    <tr class="text-uppercase fs-xxs">
-                                        <th style="width:40px">#</th>
-                                        <th>Description</th>
-                                        <th class="text-end">Amount</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @for (item of workItems; track $index; let i = $index) {
-                                        <tr>
-                                            <td>{{ i + 1 }}</td>
-                                            <td>{{ item.description || '—' }}</td>
-                                            <td class="text-end">{{ item.amount | number:'1.2-2' }}</td>
-                                        </tr>
-                                    }
-                                    <tr class="fw-bold bg-light">
-                                        <td colspan="2" class="text-end fw-bold text-uppercase fs-xs">Total</td>
-                                        <td class="text-end">{{ totalWorkAmount | number:'1.2-2' }}</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </app-ui-card>
-            </div>
-        }
-
-        <!-- Materials Needed (Stock Releases) -->
-        @if (materialReleases.length > 0) {
-            <div class="col-xl-12">
-                <app-ui-card title="Materials Needed">
-                    <div class="col-xl-12 p-3" card-body>
-                        <div class="table-responsive">
-                            <table class="table table-custom table-centered table-hover w-100 mb-0">
-                                <thead class="bg-light align-middle bg-opacity-25 thead-sm">
-                                    <tr class="text-uppercase fs-xxs">
-                                        <th>Code</th>
-                                        <th>Description</th>
-                                        <th>Items</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @for (release of materialReleases; track $index) {
-                                        <tr>
-                                            <td class="fw-bold">{{ release.code || '—' }}</td>
-                                            <td>{{ release.description || '—' }}</td>
-                                            <td>
-                                                @if (release.stockReleaseItems?.length > 0) {
-                                                    <table class="table table-sm mb-0">
-                                                        <thead>
-                                                            <tr class="text-uppercase fs-xxs">
-                                                                <th>Description</th>
-                                                                <th class="text-end">Total Cost</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            @for (sri of release.stockReleaseItems; track $index) {
-                                                                <tr>
-                                                                    <td>{{ sri.description || '—' }}</td>
-                                                                    <td class="text-end">{{ sri.amount | number:'1.2-2' }}</td>
-                                                                </tr>
-                                                            }
-                                                        </tbody>
-                                                    </table>
-                                                } @else {
-                                                    <span class="text-muted fst-italic">No items</span>
-                                                }
-                                            </td>
-                                        </tr>
-                                    }
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </app-ui-card>
-            </div>
-        }
-
-        <!-- Other Items -->
-        @if (otherItems.length > 0) {
-            <div class="col-xl-12">
-                <app-ui-card title="Other Items">
-                    <div class="col-xl-12 p-3" card-body>
-                        <div class="table-responsive">
-                            <table class="table table-custom table-centered table-hover w-100 mb-0">
-                                <thead class="bg-light align-middle bg-opacity-25 thead-sm">
-                                    <tr class="text-uppercase fs-xxs">
-                                        <th style="width:40px">#</th>
-                                        <th>Description</th>
-                                        <th class="text-end">Amount</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @for (item of otherItems; track $index; let i = $index) {
-                                        <tr>
-                                            <td>{{ i + 1 }}</td>
-                                            <td>{{ item.description || '—' }}</td>
-                                            <td class="text-end">{{ item.amount | number:'1.2-2' }}</td>
-                                        </tr>
-                                    }
-                                    <tr class="fw-bold bg-light">
-                                        <td colspan="2" class="text-end fw-bold text-uppercase fs-xs">Total</td>
-                                        <td class="text-end">{{ totalOtherAmount | number:'1.2-2' }}</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </app-ui-card>
-            </div>
-        }
-
-        <!-- Footer Actions -->
-        <div class="col-xl-12">
-            <div class="d-flex gap-2 justify-content-between align-items-center py-2">
-                <button type="button" class="btn btn-light fw-bold" [routerLink]="['/' + menuLink]">
+            <!-- Actions -->
+            <div class="d-flex justify-content-end gap-2">
+                <a [routerLink]="['/' + menuLink]" class="btn btn-light fw-bold">
                     <ng-icon name="tablerArrowLeft" class="ps-0 pe-2 fw-bold"></ng-icon>Back
+                </a>
+                <button type="button" class="btn btn-success fw-bold" (click)="print()">
+                    <ng-icon name="tablerPrinter" class="ps-0 pe-2 fw-bold"></ng-icon>Print
                 </button>
-                <div class="d-flex gap-2">
-                    <button type="button" class="btn btn-success fw-bold" (click)="print()">
-                        <ng-icon name="tablerPrinter" class="ps-0 pe-2 fw-bold"></ng-icon>Print
-                    </button>
-                    <a class="btn btn-primary fw-bold" [routerLink]="['/' + menuLink, id, 'edit']">
-                        <ng-icon name="tablerEdit" class="ps-0 pe-2 fw-bold"></ng-icon>Edit
-                    </a>
+                <a class="btn btn-primary fw-bold" [routerLink]="['/' + menuLink, id, 'edit']">
+                    <ng-icon name="tablerEdit" class="ps-0 pe-2 fw-bold"></ng-icon>Edit
+                </a>
+            </div>
+
+            <hr class="my-3"/>
+
+            <!-- Maintenance Record Information -->
+            <div class="fs-xs text-uppercase fw-semibold text-muted mb-2">Maintenance Record Information</div>
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Code</div>
+                    <div>
+                        <span class="badge bg-secondary bg-opacity-25 text-dark border fw-bold fs-sm">
+                            {{ data.code || '—' }}
+                        </span>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Maintenance Date</div>
+                    <div>{{ data.maintenanceDate | date:'MMMM d, yyyy' }}</div>
+                </div>
+                <div class="col-md-3">
+                    <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Odometer Reading</div>
+                    <div>{{ data.odometerReading || '—' }}</div>
+                </div>
+                <div class="col-md-3">
+                    <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Next PMS Date</div>
+                    <div>{{ data.nextPmsDate ? (data.nextPmsDate | date:'MMMM d, yyyy') : '—' }}</div>
                 </div>
             </div>
-        </div>
 
+            <!-- Asset Details -->
+            @if (data.asset) {
+                <hr class="my-3"/>
+                <div class="fs-xs text-uppercase fw-semibold text-muted mb-2">Asset Details</div>
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Ref. No.</div>
+                        <div class="fw-bold">{{ data.asset.code || '—' }}</div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Acquisition Date</div>
+                        <div>{{ data.asset.acquisitionDate | date:'MMMM d, yyyy' }}</div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Description</div>
+                        <div>{{ data.asset.description || '—' }}</div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Value</div>
+                        <div>{{ data.asset.totalValue | number:'1.2-2' }}</div>
+                    </div>
+                </div>
+            }
+
+            <!-- Voucher Details -->
+            @if (data.voucher || data.voucherTransaction) {
+                <hr class="my-3"/>
+                <div class="fs-xs text-uppercase fw-semibold text-muted mb-2">Voucher Details</div>
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Voucher Code</div>
+                        <div class="fw-bold">{{ data.voucher?.code || data.voucherTransaction?.code || '—' }}</div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Voucher Date</div>
+                        <div>{{ (data.voucher?.date || data.voucher?.voucherDate) | date:'MMMM d, yyyy' }}</div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Particulars</div>
+                        <div>{{ data.voucher?.particulars || '—' }}</div>
+                    </div>
+                </div>
+            }
+
+            <!-- Labor / Works Needed -->
+            @if (workItems.length > 0) {
+                <hr class="my-3"/>
+                <div class="fs-xs text-uppercase fw-semibold text-muted mb-2">Labor / Works Needed</div>
+                <div class="table-responsive">
+                    <table class="table table-custom table-centered table-hover w-100 mb-0">
+                        <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                            <tr class="text-uppercase fs-xxs">
+                                <th style="width:40px">#</th>
+                                <th>Description</th>
+                                <th class="text-end">Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (item of workItems; track $index; let i = $index) {
+                                <tr>
+                                    <td>{{ i + 1 }}</td>
+                                    <td>{{ item.description || '—' }}</td>
+                                    <td class="text-end">{{ item.amount | number:'1.2-2' }}</td>
+                                </tr>
+                            }
+                            <tr class="fw-bold bg-light">
+                                <td colspan="2" class="text-end fw-bold text-uppercase fs-xs">Total</td>
+                                <td class="text-end">{{ totalWorkAmount | number:'1.2-2' }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            }
+
+            <!-- Materials Needed (Stock Releases) -->
+            @if (materialReleases.length > 0) {
+                <hr class="my-3"/>
+                <div class="fs-xs text-uppercase fw-semibold text-muted mb-2">Materials Needed</div>
+                <div class="table-responsive">
+                    <table class="table table-custom table-centered table-hover w-100 mb-0">
+                        <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                            <tr class="text-uppercase fs-xxs">
+                                <th>Code</th>
+                                <th>Description</th>
+                                <th>Items</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (release of materialReleases; track $index) {
+                                <tr>
+                                    <td class="fw-bold">{{ release.code || '—' }}</td>
+                                    <td>{{ release.description || '—' }}</td>
+                                    <td>
+                                        @if (release.stockReleaseItems?.length > 0) {
+                                            <table class="table table-sm mb-0">
+                                                <thead>
+                                                    <tr class="text-uppercase fs-xxs">
+                                                        <th>Description</th>
+                                                        <th class="text-end">Total Cost</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @for (sri of release.stockReleaseItems; track $index) {
+                                                        <tr>
+                                                            <td>{{ sri.description || '—' }}</td>
+                                                            <td class="text-end">{{ sri.amount | number:'1.2-2' }}</td>
+                                                        </tr>
+                                                    }
+                                                </tbody>
+                                            </table>
+                                        } @else {
+                                            <span class="text-muted fst-italic">No items</span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+
+            <!-- Other Items -->
+            @if (otherItems.length > 0) {
+                <hr class="my-3"/>
+                <div class="fs-xs text-uppercase fw-semibold text-muted mb-2">Other Items</div>
+                <div class="table-responsive">
+                    <table class="table table-custom table-centered table-hover w-100 mb-0">
+                        <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                            <tr class="text-uppercase fs-xxs">
+                                <th style="width:40px">#</th>
+                                <th>Description</th>
+                                <th class="text-end">Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (item of otherItems; track $index; let i = $index) {
+                                <tr>
+                                    <td>{{ i + 1 }}</td>
+                                    <td>{{ item.description || '—' }}</td>
+                                    <td class="text-end">{{ item.amount | number:'1.2-2' }}</td>
+                                </tr>
+                            }
+                            <tr class="fw-bold bg-light">
+                                <td colspan="2" class="text-end fw-bold text-uppercase fs-xs">Total</td>
+                                <td class="text-end">{{ totalOtherAmount | number:'1.2-2' }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            }
+
+        </div>
     </div>
+
     }
 </div>

@@ -19,6 +19,7 @@ import com.noreco1.fireflyv2.validator.MonthlyCycleValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 
@@ -118,16 +119,19 @@ public class MonthlyCycleClosingServiceImpl implements MonthlyCycleClosingServic
         return response;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<MonthlyCycle> findAll() {
         return monthlyCycleRepo.findAllByOrderByYearDescMonthDesc();
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public MonthlyCycle findById(Integer id) {
         return monthlyCycleRepo.findById(id).orElse(null);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<Map> findLogs(Integer id) {
         List<Map> data = new ArrayList<>();
@@ -149,6 +153,7 @@ public class MonthlyCycleClosingServiceImpl implements MonthlyCycleClosingServic
         return data;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Map findByYearAndMonth(Integer year, Integer month) {
 

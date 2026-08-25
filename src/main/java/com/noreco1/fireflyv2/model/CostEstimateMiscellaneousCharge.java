@@ -2,6 +2,7 @@ package com.noreco1.fireflyv2.model;
 
 import lombok.*;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
@@ -24,7 +25,7 @@ public class CostEstimateMiscellaneousCharge implements Serializable {
     @Column
     private Integer id;
 
-    @JsonIgnoreProperties(ignoreUnknown = true)
+    @JsonIgnore
     @NotFound(action = NotFoundAction.IGNORE)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="FK_costEstimateId", nullable = true, columnDefinition = "0")

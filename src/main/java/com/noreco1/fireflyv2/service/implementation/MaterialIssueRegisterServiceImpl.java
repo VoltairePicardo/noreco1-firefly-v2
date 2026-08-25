@@ -26,6 +26,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import com.noreco1.fireflyv2.common.helpers.CurrencyIntoWords;
@@ -321,11 +322,13 @@ public class MaterialIssueRegisterServiceImpl implements MaterialIssueRegisterSe
         return response;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<MaterialIssueRegisterDto> findAll() {
         return null;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public MaterialIssueRegisterDto findById(Integer id) {
 
@@ -476,11 +479,13 @@ public class MaterialIssueRegisterServiceImpl implements MaterialIssueRegisterSe
         return dto;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<MaterialIssueRegisterDetailDto> getDetails(Integer id) {
         return null;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<MaterialIssueRegisterDto> getAllMaterialIssueRegister() {
 
@@ -489,12 +494,14 @@ public class MaterialIssueRegisterServiceImpl implements MaterialIssueRegisterSe
         return this.makeMirListDto(regs);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<MaterialIssueRegisterBIRDto> findForRegisterByDateRange(String from, String to) {
         List<Object[]> rows = mirRepo.findForRegisterByDateRange(from, to, com.noreco1.fireflyv2.model.enums.DocumentStatus.APPROVED.getId());
         return this.makeCommonRegisterDetail(rows);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<RegisterRecapDetail> findForRegisterRecapByDateRange(String from, String to) {
         List<Object[]> rows = mirRepo.findForRegisterRecapByDateRange(from, to, com.noreco1.fireflyv2.model.enums.DocumentStatus.APPROVED.getId());
@@ -535,6 +542,7 @@ public class MaterialIssueRegisterServiceImpl implements MaterialIssueRegisterSe
 
     // End: Multiple line comment for removing IOMAS related functions/methods
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<MaterialIssueRegisterDto> findByDateRangeAndStatusId(String from, String to, Integer id) {
         try {
@@ -557,6 +565,7 @@ public class MaterialIssueRegisterServiceImpl implements MaterialIssueRegisterSe
         return null;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<MaterialIssueRegisterDto> findByDateRangeAndStatusIdAndDocType(String from, String to, Integer id, String invDocumentType) {
         try {
@@ -579,6 +588,7 @@ public class MaterialIssueRegisterServiceImpl implements MaterialIssueRegisterSe
         return null;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<MaterialIssueRegisterDto> findByDateRange(String from, String to) {
         try {
@@ -608,6 +618,7 @@ public class MaterialIssueRegisterServiceImpl implements MaterialIssueRegisterSe
         return null;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<MaterialIssueRegisterDto> findByDateRangeAndDocType(String from, String to, String invDocumentType) {
         try {
@@ -1159,11 +1170,13 @@ public class MaterialIssueRegisterServiceImpl implements MaterialIssueRegisterSe
         return hasVoucher;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<InventoryDocumentDto> findAll(Pageable pageable) {
         return null;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<InventoryDocumentDto> findByInvDocTypeQuery(String type, String query, Pageable pageable) {
         switch (type) {
@@ -1302,6 +1315,7 @@ public class MaterialIssueRegisterServiceImpl implements MaterialIssueRegisterSe
         return null;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<InventoryDocumentDto> findByQuery(String query, Pageable pageable) {
         return null;

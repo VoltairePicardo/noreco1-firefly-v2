@@ -60,9 +60,13 @@ export class MstDetailComponent implements OnInit {
     }
 
     loadWorkflowActions(): void {
-        if (!this.data()?.transId || this.isTerminal()) return;
-        this.service.getWorkflowActions(this.data().transId).subscribe({
-            next: (a) => { this.workflowActions.set(a || []); }, error: () => { this.workflowActions.set([]); }
+        if (!this.data?.transId || this.isTerminal()) {
+            this.workflowActions = [];
+            this.selectedAction  = null;
+            return;
+        }
+        this.service.getWorkflowActions(this.data.transId).subscribe({
+            next: (a) => { this.workflowActions = a || []; this.selectedAction = null; this.remarks = ''; }, error: () => { this.workflowActions = []; }
         });
     }
 
@@ -77,8 +81,8 @@ export class MstDetailComponent implements OnInit {
         this.processingWorkflow.set(true);
         this.service.process({ documentId: this.data().id, remarks: this.remarks, workflowActionsDto: { actionMapId: this.selectedAction.actionMapId } }).subscribe({
             next: (res) => {
-                this.processingWorkflow.set(false);
-                if (res?.success) { this.alertService.success(this.module, res.successMessage || 'Processed.', ''); this.loadData(); }
+                this.processingWorkflow = false;
+                if (res?.success) { this.workflowActions = []; this.selectedAction = null; this.remarks = ''; this.alertService.success(this.module, res.successMessage || 'Processed.', ''); this.loadData(); }
                 else { this.alertService.error(this.module, res?.failureMessage || 'Failed.', ''); }
             },
             error: () => { this.processingWorkflow.set(false); this.alertService.error(this.module, 'Error.', ''); }

@@ -1,14 +1,14 @@
 package com.noreco1.fireflyv2.controller;
 
 import com.noreco1.fireflyv2.common.GlobalConstant;
-import com.noreco1.fireflyv2.common.facade.AuthenticationFacade;
-import com.noreco1.fireflyv2.common.facade.GeneratorFacade;
 import com.noreco1.fireflyv2.controller.response.PostResponse;
 import com.noreco1.fireflyv2.controller.response.ProcessDocumentDto;
 import com.noreco1.fireflyv2.model.DocumentStatus;
+import com.noreco1.fireflyv2.model.InventoryLocation;
+import com.noreco1.fireflyv2.model.ItemStock;
 import com.noreco1.fireflyv2.model.StockTransfer;
-import com.noreco1.fireflyv2.model.Workflow;
-import com.noreco1.fireflyv2.repo.StockTransferRepo;
+import com.noreco1.fireflyv2.repo.InventoryLocationRepo;
+import com.noreco1.fireflyv2.repo.ItemStockRepo;
 import com.noreco1.fireflyv2.service.DownloadService;
 import com.noreco1.fireflyv2.service.PrintableVoucher;
 import com.noreco1.fireflyv2.service.StockTransferService;
@@ -22,6 +22,7 @@ import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -36,13 +37,10 @@ public class StockTransferController {
     private StockTransferService stockTransferService;
 
     @Autowired
-    private StockTransferRepo stockTransferRepo;
+    private InventoryLocationRepo inventoryLocationRepo;
 
     @Autowired
-    private AuthenticationFacade authenticationFacade;
-
-    @Autowired
-    private GeneratorFacade generatorFacade;
+    private ItemStockRepo itemStockRepo;
 
     @Autowired
     private MessageSource messageSource;
@@ -69,71 +67,36 @@ public class StockTransferController {
         return stockTransferService.getDocumentsStatuses();
     }
 
+    @GetMapping("/inventory-locations")
+    public List<InventoryLocation> inventoryLocations() {
+        return inventoryLocationRepo.findAllByOrderByDescriptionAsc();
+    }
+
+    @GetMapping("/default-signatories")
+    public Map defaultSignatories() {
+        return stockTransferService.defaultSignatories();
+    }
+
+    @GetMapping("/item-stocks/{locationId}")
+    public List<ItemStock> itemStocks(@PathVariable Integer locationId) {
+        return itemStockRepo.findAllByInventoryLocationIdAndTotalQuantityGreaterThanOrderByItemCode(locationId, BigDecimal.ZERO);
+    }
+
     @GetMapping("/{id}")
     public StockTransfer getById(@PathVariable Integer id) {
         return stockTransferService.findById(id);
     }
 
     @PostMapping("/create")
-    public PostResponse create(@RequestBody Map<String, Object> payload) {
-        PostResponse response = new PostResponse();
-        try {
-            StockTransfer st = new StockTransfer();
-            Object dateObj = payload.get("voucherDate");
-            if (dateObj instanceof String dateStr && !dateStr.isEmpty()) {
-                Date voucherDate = java.sql.Date.valueOf(dateStr);
-                st.setVoucherDate(voucherDate);
-                int year = Integer.parseInt(GlobalConstant.YYYY_DATE_FORMAT.format(voucherDate));
-                st.setYear(year);
-                Object latestCode = stockTransferRepo.findLatestCodeByYear(year);
-                String code = generatorFacade.voucherCodeNoOffice("ST",
-                        latestCode == null ? "" : String.valueOf(latestCode),
-                        voucherDate, GlobalConstant.COUNTER_PAD_4);
-                st.setCode(code);
-            }
-            st.setRemarks(payload.get("remarks") != null ? String.valueOf(payload.get("remarks")) : null);
-            Date now = new Date();
-            st.setCreatedAt(now);
-            st.setUpdatedAt(now);
-            st.setCreatedBy(authenticationFacade.getLoggedIn());
-            DocumentStatus ds = new DocumentStatus();
-            ds.setId(com.noreco1.fireflyv2.model.enums.DocumentStatus.DOCUMENT_CREATED.getId());
-            st.setDocumentStatus(ds);
-            Workflow wf = new Workflow();
-            wf.setId(com.noreco1.fireflyv2.model.enums.Workflow.STOCK_TRANSFER.getId());
-            st.setWorkflow(wf);
-            st.setTransaction(generatorFacade.transaction());
-            StockTransfer saved = stockTransferRepo.save(st);
-            response.setSuccessMessage("Stock Transfer saved.");
-            response.setModelId(saved.getId());
-        } catch (Exception e) {
-            response.setFailureMessage("Failed to save: " + e.getMessage());
-        }
-        return response;
+    public PostResponse create(@RequestBody StockTransfer stockTransfer) {
+        BindingResult br = new BeanPropertyBindingResult(stockTransfer, "stockTransfer");
+        return stockTransferService.processCreate(stockTransfer, br, messageSource);
     }
 
     @PostMapping("/update")
-    public PostResponse update(@RequestBody Map<String, Object> payload) {
-        PostResponse response = new PostResponse();
-        Object idObj = payload.get("id");
-        if (idObj == null) { response.setFailureMessage("ID is required."); return response; }
-        Integer id = ((Number) idObj).intValue();
-        StockTransfer st = stockTransferRepo.findById(id).orElse(null);
-        if (st == null) { response.setFailureMessage("Record not found."); return response; }
-        try {
-            Object dateObj = payload.get("voucherDate");
-            if (dateObj instanceof String dateStr && !dateStr.isEmpty()) {
-                st.setVoucherDate(java.sql.Date.valueOf(dateStr));
-            }
-            st.setRemarks(payload.get("remarks") != null ? String.valueOf(payload.get("remarks")) : null);
-            st.setUpdatedAt(new Date());
-            StockTransfer saved = stockTransferRepo.save(st);
-            response.setSuccessMessage("Stock Transfer updated.");
-            response.setModelId(saved.getId());
-        } catch (Exception e) {
-            response.setFailureMessage("Failed to update: " + e.getMessage());
-        }
-        return response;
+    public PostResponse update(@RequestBody StockTransfer stockTransfer) {
+        BindingResult br = new BeanPropertyBindingResult(stockTransfer, "stockTransfer");
+        return stockTransferService.processUpdate(stockTransfer, br, messageSource);
     }
 
     @PostMapping("/process")

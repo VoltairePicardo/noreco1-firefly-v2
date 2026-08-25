@@ -9,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -19,6 +20,7 @@ public class GeneralClassificationServiceImpl implements GeneralClassificationSe
     @Autowired
     private GeneralClassificationRepo generalClassificationRepo;
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<GeneralClassification> list(String q, int page, int size) {
         PageRequest pageable = PageRequest.of(page, size, Sort.by("description").ascending());
@@ -27,16 +29,19 @@ public class GeneralClassificationServiceImpl implements GeneralClassificationSe
                 : generalClassificationRepo.findByDescriptionContainingIgnoreCase(q, pageable);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<GeneralClassification> listAll() {
         return generalClassificationRepo.findByOrderByDescriptionAsc();
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public GeneralClassification findById(Integer id) {
         return generalClassificationRepo.findById(id).orElse(null);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public GeneralClassification findByDescription(String description) {
         return generalClassificationRepo.findByDescriptionContainingIgnoreCase(description.trim());

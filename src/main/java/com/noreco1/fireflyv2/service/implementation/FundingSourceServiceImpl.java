@@ -9,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -19,6 +20,7 @@ public class FundingSourceServiceImpl implements FundingSourceService {
     @Autowired
     private FundingSourceRepo fundingSourceRepo;
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<FundingSource> list(String q, int page, int size) {
         PageRequest pageable = PageRequest.of(page, size, Sort.by("description").ascending());
@@ -27,16 +29,19 @@ public class FundingSourceServiceImpl implements FundingSourceService {
                 : fundingSourceRepo.findByDescriptionContainingIgnoreCase(q, pageable);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<FundingSource> listAll() {
         return fundingSourceRepo.findByOrderByDescriptionAsc();
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public FundingSource findById(Integer id) {
         return fundingSourceRepo.findById(id).orElse(null);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public FundingSource findByDescription(String description) {
         return fundingSourceRepo.findByDescriptionContainingIgnoreCase(description.trim());

@@ -47,7 +47,7 @@ public interface StockReceiveRepo extends JpaRepository<StockReceive, Integer> {
             "LEFT JOIN `User` approveUser on la.FK_approvedByUserId = approveUser.id " +
             "LEFT JOIN `User` createUser on la.FK_createdByUserId = createUser.id " +
             "LEFT JOIN `User` checkUser on la.FK_checkedByUserId = checkUser.id " +
-            "WHERE la.voucherDate BETWEEN :from AND :to AND FK_officeId = :officeId AND FK_documentStatusId NOT IN(:documentStatusIds)",
+            "WHERE la.voucherDate BETWEEN :from AND :to AND FK_documentStatusId NOT IN(:documentStatusIds)",
             nativeQuery = true)
     List<StockReceive> findByVoucherDateBetweenAndDocumentStatusIdNotInAndOfficeId(@Param("from") Date from,
                                                                                               @Param("to") Date to,

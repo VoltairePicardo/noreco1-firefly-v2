@@ -23,6 +23,7 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -69,11 +70,13 @@ public class BudgetServiceImpl implements BudgetService, PrintableVoucher, Print
     @Autowired
     SignatureFacade signatureFacade;
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Budget findById(Integer id) {
         return budgetRepo.findById(id).orElse(null);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<Budget> findAll() {
         List<Budget> budgets = budgetRepo.findAll();
@@ -84,11 +87,13 @@ public class BudgetServiceImpl implements BudgetService, PrintableVoucher, Print
         return budgets;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<Budget> getBudgetYears() {
         return budgetRepo.getBudgetYears();
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<BudgetDetail> findBudgetDetailByBudgetId(Integer budgetId) {
         return budgetDetailRepo.findByBudgetId(budgetId);
@@ -271,11 +276,13 @@ public class BudgetServiceImpl implements BudgetService, PrintableVoucher, Print
         return response;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<BudgetDetail> findAllBudgetDetailsByYear(Integer year) {
         return this.budgetDetailRepo.findAllByBudgetYear(year);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public BigDecimal getBudgetDetailBalance(Integer budgetDetailId) {
         return this.budgetDetailRepo.getBudgetDetailBalance(budgetDetailId);

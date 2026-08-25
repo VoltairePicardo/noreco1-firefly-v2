@@ -23,6 +23,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.data.domain.*;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -296,6 +297,7 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService, Printable
         return null;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<Map> findByDateRangeAndStatusId(String from, String to, Integer id) {
         try {
@@ -318,6 +320,7 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService, Printable
         return null;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<Map> findByDateRangeAndStatusIdAndForEditing(String from, String to, Integer id, Integer officeId) {
         try {
@@ -555,6 +558,7 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService, Printable
         return purchaseOrderRepo.findAllForCreditCardPurchaseRequestByStatusAndFilter(statusId, "%"+filter+"%", pageable);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<Map> findByDateRangePending(String from, String to) {
         try {
@@ -583,6 +587,7 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService, Printable
         return null;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<PurchaseOrder> findByStatusAndFilter(Integer statusId, String filter, Pageable pageable) {
         if (filter == null) {
@@ -591,11 +596,13 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService, Printable
         return purchaseOrderRepo.findByStatusAndFilter(statusId, "%"+filter+"%", pageable);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<PurchaseOrder> findByStatusId(Integer statusId) {
         return this.purchaseOrderRepo.findByDocumentStatusIdOrderByIdDesc(statusId);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public PoDto findById(Integer id) {
         PurchaseOrder po =  purchaseOrderRepo.findById(id).orElse(null);

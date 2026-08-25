@@ -11,6 +11,8 @@ import com.noreco1.fireflyv2.controller.response.PoDetailDto;
 import com.noreco1.fireflyv2.service.PoDetailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -42,6 +44,7 @@ public class PoDetailServiceImpl implements PoDetailService {
     @Autowired
     PurchaseOrderBudgetDetailRepo purchaseOrderBudgetDetailRepo;
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<PoDetailDto> getPoDetails(Integer poId) {
         List<PoDetail> poDetails = poDetailRepo.findByPurchaseOrderId(poId);
@@ -77,6 +80,7 @@ public class PoDetailServiceImpl implements PoDetailService {
         return poDetailDtos;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<PoDetailDto> getPoDetailsForItemTesting(Integer poId) {
         List<PoDetail> poDetails = poDetailRepo.findByPurchaseOrderId(poId);
@@ -121,6 +125,7 @@ public class PoDetailServiceImpl implements PoDetailService {
         return poDetailDtos;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<PoDetailDto> getPoDetailsWithItemTesting(Integer poId) {
 
@@ -169,6 +174,7 @@ public class PoDetailServiceImpl implements PoDetailService {
 
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public BigDecimal getItemCanvassPrice(Integer supplierAccountNo, Integer rvDetailId) {
         Supplier supplier = supplierRepo.findOneByAccountNumber(supplierAccountNo);
@@ -182,6 +188,7 @@ public class PoDetailServiceImpl implements PoDetailService {
         return BigDecimal.ZERO;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<PurchaseOrderBudgetDetail> getPurchaseOrderBudgetDetail(Integer poId) {
 
@@ -205,6 +212,7 @@ public class PoDetailServiceImpl implements PoDetailService {
 
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public BigDecimal getCashFlowItemAmountBalanceByType(Integer cashFlowItemId, String type) {
 
@@ -226,6 +234,7 @@ public class PoDetailServiceImpl implements PoDetailService {
 
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public BigDecimal getDefaultEstimatedAmount(List<Integer> itemIds) {
 

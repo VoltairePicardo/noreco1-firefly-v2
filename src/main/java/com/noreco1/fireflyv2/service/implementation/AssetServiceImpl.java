@@ -31,6 +31,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.data.domain.*;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 
@@ -111,11 +112,13 @@ public class AssetServiceImpl implements AssetService {
     @Autowired
     SignatureFacade signatureFacade;
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Asset findByRefNo(String refNo) {
        return assetRepo.findOneByRefNoOrCode(refNo, refNo);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public HashMap findById(Integer id) {
         HashMap map = new HashMap();
@@ -175,6 +178,7 @@ public class AssetServiceImpl implements AssetService {
         return map;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<HashMap> findAll() {
         List<HashMap> mapList = new ArrayList<>();
@@ -189,6 +193,7 @@ public class AssetServiceImpl implements AssetService {
         return mapList;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<Map> getItems(Integer assetId) {
         List<Map> data = new ArrayList<>();
@@ -260,6 +265,7 @@ public class AssetServiceImpl implements AssetService {
         return data;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<Map> getDetails(Integer assetId, Integer voucherTransNo, Integer transType) {
         List<Map> data = new ArrayList<>();
@@ -396,6 +402,7 @@ public class AssetServiceImpl implements AssetService {
         return data;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<AssetDepreciationSchedule> findAssetDepreciationScheduleByAssetId(Integer id) {
         List<AssetDepreciationSchedule> scheduleList = assetDepreciationScheduleRepo.findByAssetId(id);
@@ -406,6 +413,7 @@ public class AssetServiceImpl implements AssetService {
         return scheduleList;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<AssetVoucherLinkType> getLinkTypes() {
         return assetVoucherLinkTypeRepo.findByOrderByDescriptionAsc();
@@ -691,6 +699,7 @@ public class AssetServiceImpl implements AssetService {
         return response;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<Asset> find(String query, Pageable pageable) {
         if(Checker.isStringNullOrEmpty(query) ){
@@ -701,6 +710,7 @@ public class AssetServiceImpl implements AssetService {
         return assetRepo.findByCodeOrDescription(query, query, pageable);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<Asset> find(String query, Pageable pageable, Integer assetTypeId) {
         if(Checker.isStringNullOrEmpty(query) ){
@@ -711,6 +721,7 @@ public class AssetServiceImpl implements AssetService {
         return assetRepo.findByAssetTypeAndCodeOrDescription(assetTypeId, query, query, pageable);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<Asset> find(String query, Pageable pageable, Integer assetTypeId, boolean isFullyDepreciated) {
         if(Checker.isStringNullOrEmpty(query) ){
@@ -730,6 +741,7 @@ public class AssetServiceImpl implements AssetService {
 
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<Asset> find(String query, Pageable pageable, Integer assetTypeId, String status) {
         if(Checker.isStringNullOrEmpty(query) ){
@@ -740,6 +752,7 @@ public class AssetServiceImpl implements AssetService {
         return assetRepo.findByAssetTypeAndStatusAndCodeOrDescription(assetTypeId, status, query, query, pageable);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<Asset> find(String query, Pageable pageable, Integer assetTypeId, boolean isFullyDepreciated, String status) {
         if(Checker.isStringNullOrEmpty(query) ){
@@ -758,6 +771,7 @@ public class AssetServiceImpl implements AssetService {
         }
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<Asset> find(String query, Pageable pageable, boolean isFullyDepreciated) {
         if(Checker.isStringNullOrEmpty(query) ) {
@@ -776,6 +790,7 @@ public class AssetServiceImpl implements AssetService {
         }
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<Asset> find(String query, Pageable pageable, boolean isFullyDepreciated, String status) {
         if(Checker.isStringNullOrEmpty(query) ) {
@@ -795,6 +810,7 @@ public class AssetServiceImpl implements AssetService {
 
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<Asset> find(String query, Pageable pageable, String status) {
         if(Checker.isStringNullOrEmpty(query) ) {
@@ -805,11 +821,13 @@ public class AssetServiceImpl implements AssetService {
         return assetRepo.findByStatusAndCodeOrDescription(status, query, query, pageable);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<Asset> findAllForMaintenanceOrder(Pageable pageable) {
         return assetRepo.findAllByStatus(AssetStatus.ACTIVE.name(), pageable);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<Asset> findAllForMaintenanceOrderByQuery(String query, Pageable pageable) {
         return assetRepo.findAllByCodeContainsOrDescriptionContainsAndStatus(query, query, AssetStatus.ACTIVE.name(), pageable);

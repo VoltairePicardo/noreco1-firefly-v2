@@ -27,7 +27,8 @@ import { tablerSearch, tablerTrash, tablerArrowLeft, tablerCheck, tablerPlus } f
     templateUrl: './stock-transfer-add-edit.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class StockTransferAddEditComponent implements OnInit {
+export class StockTransferAddEditComponent {
+
     module    = 'Stock Transfer';
     subModule = 'Create';
     menuLink  = 'stock-transfer';

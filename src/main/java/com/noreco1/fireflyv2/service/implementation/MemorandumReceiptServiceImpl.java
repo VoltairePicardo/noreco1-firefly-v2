@@ -21,6 +21,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 
@@ -86,6 +87,7 @@ public class MemorandumReceiptServiceImpl implements MemorandumReceiptService, P
     @Autowired
     private SignatureFacade signatureFacade;
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<MemorandumReceipt> findAll(String startDate, String endDate, Pageable pageable) {
         Date fromDate = DateHelper.strToDate(startDate, "yyyy-MM-dd");
@@ -93,6 +95,7 @@ public class MemorandumReceiptServiceImpl implements MemorandumReceiptService, P
         return memorandumReceiptRepo.findAllByDateBetweenOrderByDateAscCodeAsc(fromDate, toDate, pageable);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<MemorandumReceipt> findAllByQuery(String query, String startDate, String endDate, Pageable pageable) {
         Date fromDate = DateHelper.strToDate(startDate, "yyyy-MM-dd");
@@ -100,6 +103,7 @@ public class MemorandumReceiptServiceImpl implements MemorandumReceiptService, P
         return memorandumReceiptRepo.findAllByCodeContainsAndDateBetweenOrderByDateAscCodeAsc(query, fromDate, toDate, pageable);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<MemorandumReceipt> findAllByEmployee(Integer employeeAccountNo, String startDate, String endDate, Pageable pageable) {
         Date fromDate = DateHelper.strToDate(startDate, "yyyy-MM-dd");
@@ -107,6 +111,7 @@ public class MemorandumReceiptServiceImpl implements MemorandumReceiptService, P
         return memorandumReceiptRepo.findAllByEmployeeAccountNoAndDateBetweenOrderByDateAscCodeAsc(employeeAccountNo, fromDate, toDate, pageable);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<MemorandumReceipt> findAllByQueryAndEmployee(String query, Integer employeeAccountNo, String startDate, String endDate, Pageable pageable) {
         Date fromDate = DateHelper.strToDate(startDate, "yyyy-MM-dd");
@@ -442,6 +447,7 @@ public class MemorandumReceiptServiceImpl implements MemorandumReceiptService, P
         return signatoryFacade.defaultSignatories(com.noreco1.fireflyv2.model.enums.DocumentType.MRTE);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public MemorandumReceiptDto findById(Integer id) {
         MemorandumReceipt memorandumReceipt =  memorandumReceiptRepo.findById(id).orElse(null);
@@ -500,6 +506,7 @@ public class MemorandumReceiptServiceImpl implements MemorandumReceiptService, P
         return memorandumReceiptDto;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<Map> getStockWithdrawalBalance(Integer stockWithdrawalDetailId) {
         List<Map> ret = new ArrayList<>();
@@ -567,6 +574,7 @@ public class MemorandumReceiptServiceImpl implements MemorandumReceiptService, P
         return new JRBeanCollectionDataSource(memorandumReceiptDetails);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<InventoryDocumentDto> findAllForReleasingByQuery(String query, Pageable pageable) {
         Page<MemorandumReceipt> memorandumReceipts;
@@ -611,6 +619,7 @@ public class MemorandumReceiptServiceImpl implements MemorandumReceiptService, P
         });
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public ArrayList<SlEntity> getStockWithdrawalEmployees(Integer stockWithdrawalId) {
 
@@ -638,6 +647,7 @@ public class MemorandumReceiptServiceImpl implements MemorandumReceiptService, P
 
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public ArrayList<MemorandumReceipt> getAllEmployeesMemorandumReceipt(Integer accountNo, Boolean forEditing) {
 
@@ -681,6 +691,7 @@ public class MemorandumReceiptServiceImpl implements MemorandumReceiptService, P
 
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public ArrayList<MemorandumReceipt> getAllOfficesMemorandumReceipt(Integer officeId, Boolean forEditing) {
 

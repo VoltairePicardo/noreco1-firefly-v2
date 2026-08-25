@@ -19,6 +19,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -100,11 +101,13 @@ public class ProjectServiceImpl implements ProjectService {
         return projectRepo.findByDocumentStatusIdNotIn(Arrays.asList(ids), pageable);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<Project> findAll(int statusId, Pageable pageable) {
         return projectRepo.findByDocumentStatusId(statusId, pageable);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<Project> findAll(String filter, Pageable pageable) {
         Integer[] ids = {
@@ -114,6 +117,7 @@ public class ProjectServiceImpl implements ProjectService {
         return projectRepo.findByCodeContainingIgnoreCaseOrNameContainingIgnoreCaseOrLocationContainingIgnoreCaseAndDocumentStatusIdNotIn(filter, Arrays.asList(ids), pageable);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<Project> findAll(int statusId, String query, Pageable pageable) {
         query = "%"+query+"%";
@@ -131,6 +135,7 @@ public class ProjectServiceImpl implements ProjectService {
         return projectRepo.findByDateBetweenAndDocumentStatusIdNotIn(fromDate, toDate, Arrays.asList(ids), pageable);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<Project> findAll(String from, String to, int statusId, Pageable pageable) {
         Date fromDate = DateHelper.strToDate(from, "yyyy-MM-dd");
@@ -138,6 +143,7 @@ public class ProjectServiceImpl implements ProjectService {
         return projectRepo.findByDateBetweenAndDocumentStatusId(fromDate, toDate, statusId, pageable);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<Project> findAll(String from, String to, String filter, Pageable pageable) {
         Date fromDate = DateHelper.strToDate(from, "yyyy-MM-dd");
@@ -149,6 +155,7 @@ public class ProjectServiceImpl implements ProjectService {
         return projectRepo.findByDateBetweenAndCodeContainingIgnoreCaseOrNameContainingIgnoreCaseOrLocationContainingIgnoreCaseAndDocumentStatusIdNotIn(fromDate, toDate, filter, Arrays.asList(ids), pageable);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<Project> findAll(String from, String to, int statusId, String query, Pageable pageable) {
         Date fromDate = DateHelper.strToDate(from, "yyyy-MM-dd");
@@ -414,6 +421,7 @@ public class ProjectServiceImpl implements ProjectService {
         return projectFundingRepo.findAll();
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<Object[]> findForWorkOrderBrowser(String query, Pageable pageable) {
         if (Checker.isStringNullAndEmpty(query)) {
@@ -423,6 +431,7 @@ public class ProjectServiceImpl implements ProjectService {
         }
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<Object[]> findForSiteInspectionProjectBrowser(String query, Pageable pageable) {
         if (Checker.isStringNullAndEmpty(query)) {
@@ -461,6 +470,7 @@ public class ProjectServiceImpl implements ProjectService {
         return response;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<Object[]> findWithApprovedCostEstimate(String query, Pageable pageable) {
 
@@ -473,6 +483,7 @@ public class ProjectServiceImpl implements ProjectService {
         }
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<Object[]> findForCostEstimate(String query, Pageable pageable) {
         if (Checker.isStringNullAndEmpty(query)) {
@@ -482,6 +493,7 @@ public class ProjectServiceImpl implements ProjectService {
         }
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<Object[]> findForBillOfMaterial(String query, Pageable pageable) {
         if (Checker.isStringNullAndEmpty(query)) {
@@ -629,7 +641,8 @@ public class ProjectServiceImpl implements ProjectService {
 
         return data;
     }
-        @Override
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
+    @Override
     public Page<Project> findAllForAcceptance(Pageable pageable) {
 
         int statusId1 = com.noreco1.fireflyv2.model.enums.DocumentStatus.FOR_SITE_INSPECTION.getId();
@@ -638,6 +651,7 @@ public class ProjectServiceImpl implements ProjectService {
         return projectRepo.findAllForAcceptance(statusId1, statusId2, pageable);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<Project> findAllForAcceptanceByQuery(String query, Pageable pageable) {
 
@@ -648,6 +662,7 @@ public class ProjectServiceImpl implements ProjectService {
         return projectRepo.findAllForAcceptanceByQuery(statusId1, statusId2, query, pageable);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<Project> findAllForCertification(Pageable pageable) {
 
@@ -656,6 +671,7 @@ public class ProjectServiceImpl implements ProjectService {
         return projectRepo.findAllForCertificationNew(statusId, pageable);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<Project> findAllForCertificationByQuery(String query, Pageable pageable) {
 

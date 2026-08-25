@@ -9,305 +9,274 @@
         </div>
     } @else {
     <form (ngSubmit)="save()" #f="ngForm">
-        <div class="row g-3">
+        <div class="card">
+            <div class="card-body">
 
-            <!-- Main Info -->
-            <div class="col-xl-12">
-                <app-ui-card title="Maintenance Information">
-                    <div class="col-xl-12 p-3" card-body>
-                        <div class="row g-3">
+                <!-- Maintenance Information -->
+                <div class="fs-xs text-uppercase fw-semibold text-muted mb-2">Maintenance Information</div>
+                <div class="row g-3">
 
-                            <div class="col-md-3">
-                                <label class="form-label fw-bold">Maintenance Date <span class="text-danger">*</span></label>
-                                <input type="text" mwlFlatpickr [options]="flatpickrOptions"
-                                       class="form-control" [(ngModel)]="maintenanceDate"
-                                       name="maintenanceDate" placeholder="Select date" required/>
-                            </div>
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold">Maintenance Date <span class="text-danger">*</span></label>
+                        <input type="text" mwlFlatpickr [options]="flatpickrOptions"
+                               class="form-control" [(ngModel)]="maintenanceDate"
+                               name="maintenanceDate" placeholder="Select date" required/>
+                    </div>
 
-                            <div class="col-md-3">
-                                <label class="form-label fw-bold">Next PMS Date</label>
-                                <input type="text" mwlFlatpickr [options]="flatpickrOptions"
-                                       class="form-control" [(ngModel)]="nextPmsDate"
-                                       name="nextPmsDate" placeholder="Select date"/>
-                            </div>
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold">Next PMS Date</label>
+                        <input type="text" mwlFlatpickr [options]="flatpickrOptions"
+                               class="form-control" [(ngModel)]="nextPmsDate"
+                               name="nextPmsDate" placeholder="Select date"/>
+                    </div>
 
-                            <div class="col-md-3">
-                                <label class="form-label fw-bold">Odometer Reading</label>
-                                <input type="number" class="form-control" [(ngModel)]="odometerReading"
-                                       name="odometerReading" step="0.01" min="0" placeholder="0"/>
-                            </div>
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold">Odometer Reading</label>
+                        <input type="number" class="form-control" [(ngModel)]="odometerReading"
+                               name="odometerReading" step="0.01" min="0" placeholder="0"/>
+                    </div>
 
-                            <div class="col-md-12">
-                                <label class="form-label fw-bold">Asset</label>
-                                <div class="input-group">
-                                    <input type="text" class="form-control" readonly
-                                           [value]="asset ? ((asset.refNo || asset.localCode || asset.code || '') + ' — ' + (asset.description || '')) : ''"
-                                           placeholder="No asset selected"/>
-                                    <button type="button" class="btn btn-success fw-bold" (click)="browseAsset()">
-                                        <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
-                                    </button>
-                                    @if (asset) {
-                                        <button type="button" class="btn btn-light" (click)="clearAsset()">
-                                            <ng-icon name="tablerX" class="fw-bold"></ng-icon>
-                                        </button>
-                                    }
-                                </div>
-                                @if (asset) {
-                                    <div class="mt-2 p-2 border rounded bg-light fs-xs">
-                                        <div class="row g-2">
-                                            <div class="col-md-3">
-                                                <span class="fw-bold text-uppercase text-muted">Account No.</span>
-                                                <div>{{ asset.accountNo || '—' }}</div>
-                                            </div>
-                                            <div class="col-md-3">
-                                                <span class="fw-bold text-uppercase text-muted">Acquisition Date</span>
-                                                <div>{{ asset.acquisitionDate | date:'MM/dd/yyyy' }}</div>
-                                            </div>
-                                            <div class="col-md-3">
-                                                <span class="fw-bold text-uppercase text-muted">Total Value</span>
-                                                <div>{{ asset.totalValue | number:'1.2-2' }}</div>
-                                            </div>
-                                        </div>
+                    <div class="col-md-12">
+                        <label class="form-label fw-bold">Asset</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" readonly
+                                   [value]="asset ? ((asset.refNo || asset.localCode || asset.code || '') + ' — ' + (asset.description || '')) : ''"
+                                   placeholder="No asset selected"/>
+                            <button type="button" class="btn btn-success fw-bold" (click)="browseAsset()">
+                                <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
+                            </button>
+                        </div>
+                        @if (asset) {
+                            <div class="mt-2 p-2 border rounded bg-light fs-xs">
+                                <div class="row g-2">
+                                    <div class="col-md-3">
+                                        <span class="fw-bold text-uppercase text-muted">Account No.</span>
+                                        <div>{{ asset.accountNo || '—' }}</div>
                                     </div>
-                                }
-                            </div>
-
-                            <div class="col-md-12">
-                                <label class="form-label fw-bold">Link Voucher</label>
-                                <div class="input-group">
-                                    <input type="text" class="form-control" readonly
-                                           [value]="voucherTransaction ? (voucherTransaction.code || voucherTransaction.transactionId || '') : ''"
-                                           placeholder="No voucher linked"/>
-                                    <button type="button" class="btn btn-success fw-bold" (click)="browseVoucher()" [disabled]="!asset">
-                                        <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
-                                    </button>
-                                    @if (voucherTransaction) {
-                                        <button type="button" class="btn btn-light" (click)="clearVoucher()">
-                                            <ng-icon name="tablerX" class="fw-bold"></ng-icon>
-                                        </button>
-                                    }
+                                    <div class="col-md-3">
+                                        <span class="fw-bold text-uppercase text-muted">Acquisition Date</span>
+                                        <div>{{ asset.acquisitionDate | date:'MM/dd/yyyy' }}</div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <span class="fw-bold text-uppercase text-muted">Total Value</span>
+                                        <div>{{ asset.totalValue | number:'1.2-2' }}</div>
+                                    </div>
                                 </div>
                             </div>
-
-                        </div>
-                    </div>
-                </app-ui-card>
-            </div>
-
-            <!-- Labor / Works Needed -->
-            <div class="col-xl-12">
-                <app-ui-card title="Labor / Works Needed">
-                    <div class="col-xl-12 p-3" card-body>
-                        <div class="d-flex align-items-center justify-content-between mb-2">
-                            <h6 class="fw-semibold text-uppercase fs-xs mb-0">Work Items</h6>
-                            <button type="button" class="btn btn-success fw-bold" (click)="addWorkItem()">
-                                <ng-icon name="tablerPlus" class="ps-0 pe-2 fw-bold"></ng-icon>Add Row
-                            </button>
-                        </div>
-                        <div class="table-responsive">
-                            <table class="table table-custom table-centered table-hover w-100 mb-0">
-                                <thead class="bg-light align-middle bg-opacity-25 thead-sm">
-                                    <tr class="text-uppercase fs-xxs">
-                                        <th style="width:40px">#</th>
-                                        <th>Description</th>
-                                        <th class="text-end" style="width:160px">Amount</th>
-                                        <th style="width:60px"></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @for (item of workItems; track $index; let i = $index) {
-                                        <tr>
-                                            <td>{{ i + 1 }}</td>
-                                            <td>
-                                                <input type="text" class="form-control form-control-sm"
-                                                       [(ngModel)]="item.description"
-                                                       [name]="'workDesc_' + i"
-                                                       placeholder="Description"/>
-                                            </td>
-                                            <td>
-                                                <input type="number" class="form-control form-control-sm text-end"
-                                                       [(ngModel)]="item.amount"
-                                                       [name]="'workAmt_' + i"
-                                                       min="0" step="0.01" placeholder="0.00"/>
-                                            </td>
-                                            <td class="text-center">
-                                                <button type="button"
-                                                        class="btn btn-danger btn-icon btn-sm rounded-circle"
-                                                        (click)="removeWorkItem(i)"
-                                                        [disabled]="workItems.length === 1">
-                                                    <ng-icon name="tablerTrash" class="fs-sm"></ng-icon>
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    }
-                                    @if (workItems.length > 0) {
-                                        <tr class="fw-bold bg-light">
-                                            <td colspan="2" class="text-end fw-bold text-uppercase fs-xs">Total</td>
-                                            <td class="text-end">{{ totalWorkAmount | number:'1.2-2' }}</td>
-                                            <td></td>
-                                        </tr>
-                                    }
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </app-ui-card>
-            </div>
-
-            <!-- Materials (Stock Releases) -->
-            <div class="col-xl-12">
-                <app-ui-card title="Materials (Stock Releases)">
-                    <div class="col-xl-12 p-3" card-body>
-                        <div class="d-flex align-items-center justify-content-between mb-2">
-                            <h6 class="fw-semibold text-uppercase fs-xs mb-0">Stock Releases</h6>
-                            <button type="button" class="btn btn-success fw-bold" (click)="browseStockRelease()">
-                                <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse Stock Release
-                            </button>
-                        </div>
-
-                        @if (stockReleases.length > 0) {
-                            <div class="table-responsive">
-                                <table class="table table-custom table-centered table-hover w-100 mb-0">
-                                    <thead class="bg-light align-middle bg-opacity-25 thead-sm">
-                                        <tr class="text-uppercase fs-xxs">
-                                            <th style="width:180px">Code</th>
-                                            <th>Description</th>
-                                            <th>Items</th>
-                                            <th style="width:50px"></th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @for (sr of stockReleases; track $index; let srIdx = $index) {
-                                            <tr>
-                                                <td class="fw-bold align-top">{{ sr.code || '—' }}</td>
-                                                <td class="align-top">{{ sr.description || '—' }}</td>
-                                                <td>
-                                                    @if (sr.items && sr.items.length > 0) {
-                                                        <table class="table table-sm mb-0" style="background:transparent">
-                                                            <thead>
-                                                                <tr class="text-uppercase fs-xxs text-muted">
-                                                                    <th>Description</th>
-                                                                    <th class="text-end">Total Cost</th>
-                                                                    <th style="width:60px" class="text-center">Include</th>
-                                                                </tr>
-                                                            </thead>
-                                                            <tbody>
-                                                                @for (item of sr.items; track $index; let itemIdx = $index) {
-                                                                    <tr>
-                                                                        <td class="fs-xs">{{ item.itemStock?.item?.description || item.description || '—' }}</td>
-                                                                        <td class="text-end fs-xs">{{ item.totalCost | number:'1.2-2' }}</td>
-                                                                        <td class="text-center">
-                                                                            <input type="checkbox"
-                                                                                   [(ngModel)]="item.selected"
-                                                                                   [name]="'srItem_' + srIdx + '_' + itemIdx"
-                                                                                   title="Include/Exclude"/>
-                                                                        </td>
-                                                                    </tr>
-                                                                }
-                                                            </tbody>
-                                                        </table>
-                                                    } @else {
-                                                        <span class="text-muted fs-xs">No items.</span>
-                                                    }
-                                                </td>
-                                                <td class="text-center align-top">
-                                                    <button type="button"
-                                                            class="btn btn-danger btn-icon btn-sm rounded-circle"
-                                                            (click)="removeStockRelease(srIdx)"
-                                                            ngbTooltip="Remove">
-                                                        <ng-icon name="tablerTrash" class="fs-sm"></ng-icon>
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                        }
-                                    </tbody>
-                                </table>
-                            </div>
-                        } @else {
-                            <div class="text-muted fs-xs">No stock releases added.</div>
                         }
                     </div>
-                </app-ui-card>
-            </div>
 
-            <!-- Other Items -->
-            <div class="col-xl-12">
-                <app-ui-card title="Other Items">
-                    <div class="col-xl-12 p-3" card-body>
-                        <div class="d-flex align-items-center justify-content-between mb-2">
-                            <h6 class="fw-semibold text-uppercase fs-xs mb-0">Other Items</h6>
-                            <button type="button" class="btn btn-success fw-bold" (click)="addOtherItem()">
-                                <ng-icon name="tablerPlus" class="ps-0 pe-2 fw-bold"></ng-icon>Add Row
+                    <div class="col-md-12">
+                        <label class="form-label fw-bold">Link Voucher</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" readonly
+                                   [value]="voucherTransaction ? (voucherTransaction.code || voucherTransaction.transactionId || '') : ''"
+                                   placeholder="No voucher linked"/>
+                            <button type="button" class="btn btn-success fw-bold" (click)="browseVoucher()" [disabled]="!asset">
+                                <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
                             </button>
                         </div>
-                        <div class="table-responsive">
-                            <table class="table table-custom table-centered table-hover w-100 mb-0">
-                                <thead class="bg-light align-middle bg-opacity-25 thead-sm">
-                                    <tr class="text-uppercase fs-xxs">
-                                        <th style="width:40px">#</th>
-                                        <th>Description</th>
-                                        <th class="text-end" style="width:160px">Amount</th>
-                                        <th style="width:60px"></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @for (item of otherItems; track $index; let i = $index) {
-                                        <tr>
-                                            <td>{{ i + 1 }}</td>
-                                            <td>
-                                                <input type="text" class="form-control form-control-sm"
-                                                       [(ngModel)]="item.description"
-                                                       [name]="'otherDesc_' + i"
-                                                       placeholder="Description"/>
-                                            </td>
-                                            <td>
-                                                <input type="number" class="form-control form-control-sm text-end"
-                                                       [(ngModel)]="item.amount"
-                                                       [name]="'otherAmt_' + i"
-                                                       min="0" step="0.01" placeholder="0.00"/>
-                                            </td>
-                                            <td class="text-center">
-                                                <button type="button"
-                                                        class="btn btn-danger btn-icon btn-sm rounded-circle"
-                                                        (click)="removeOtherItem(i)"
-                                                        [disabled]="otherItems.length === 1">
-                                                    <ng-icon name="tablerTrash" class="fs-sm"></ng-icon>
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    }
-                                    @if (otherItems.length > 0) {
-                                        <tr class="fw-bold bg-light">
-                                            <td colspan="2" class="text-end fw-bold text-uppercase fs-xs">Total</td>
-                                            <td class="text-end">{{ totalOtherAmount | number:'1.2-2' }}</td>
-                                            <td></td>
-                                        </tr>
-                                    }
-                                </tbody>
-                            </table>
-                        </div>
                     </div>
-                </app-ui-card>
-            </div>
 
-            <!-- Footer Actions -->
-            <div class="col-xl-12">
+                </div>
+
+                <!-- Labor / Works Needed -->
+                <hr class="my-3"/>
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                    <div class="fs-xs text-uppercase fw-semibold text-muted">Labor / Works Needed</div>
+                    <button type="button" class="btn btn-success fw-bold" (click)="addWorkItem()">
+                        <ng-icon name="tablerPlus" class="ps-0 pe-2 fw-bold"></ng-icon>Add Row
+                    </button>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-custom table-centered table-hover w-100 mb-0">
+                        <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                            <tr class="text-uppercase fs-xxs">
+                                <th style="width:40px">#</th>
+                                <th>Description</th>
+                                <th class="text-end" style="width:160px">Amount</th>
+                                <th style="width:60px"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (item of workItems; track $index; let i = $index) {
+                                <tr>
+                                    <td>{{ i + 1 }}</td>
+                                    <td>
+                                        <input type="text" class="form-control form-control-sm"
+                                               [(ngModel)]="item.description"
+                                               [name]="'workDesc_' + i"
+                                               placeholder="Description"/>
+                                    </td>
+                                    <td>
+                                        <input type="number" class="form-control form-control-sm text-end"
+                                               [(ngModel)]="item.amount"
+                                               [name]="'workAmt_' + i"
+                                               min="0" step="0.01" placeholder="0.00"/>
+                                    </td>
+                                    <td class="text-center">
+                                        <button type="button"
+                                                class="btn btn-danger btn-icon btn-sm rounded-circle"
+                                                (click)="removeWorkItem(i)"
+                                                [disabled]="workItems.length === 1">
+                                            <ng-icon name="tablerTrash" class="fs-sm"></ng-icon>
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                            @if (workItems.length > 0) {
+                                <tr class="fw-bold bg-light">
+                                    <td colspan="2" class="text-end fw-bold text-uppercase fs-xs">Total</td>
+                                    <td class="text-end">{{ totalWorkAmount | number:'1.2-2' }}</td>
+                                    <td></td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Materials (Stock Releases) -->
+                <hr class="my-3"/>
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                    <div class="fs-xs text-uppercase fw-semibold text-muted">Materials (Stock Releases)</div>
+                    <button type="button" class="btn btn-success fw-bold" (click)="browseStockRelease()">
+                        <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse Stock Release
+                    </button>
+                </div>
+                @if (stockReleases.length > 0) {
+                    <div class="table-responsive">
+                        <table class="table table-custom table-centered table-hover w-100 mb-0">
+                            <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                                <tr class="text-uppercase fs-xxs">
+                                    <th style="width:180px">Code</th>
+                                    <th>Description</th>
+                                    <th>Items</th>
+                                    <th style="width:50px"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @for (sr of stockReleases; track $index; let srIdx = $index) {
+                                    <tr>
+                                        <td class="fw-bold align-top">{{ sr.code || '—' }}</td>
+                                        <td class="align-top">{{ sr.description || '—' }}</td>
+                                        <td>
+                                            @if (sr.items && sr.items.length > 0) {
+                                                <table class="table table-sm mb-0" style="background:transparent">
+                                                    <thead>
+                                                        <tr class="text-uppercase fs-xxs text-muted">
+                                                            <th>Description</th>
+                                                            <th class="text-end">Total Cost</th>
+                                                            <th style="width:60px" class="text-center">Include</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        @for (item of sr.items; track $index; let itemIdx = $index) {
+                                                            <tr>
+                                                                <td class="fs-xs">{{ item.itemStock?.item?.description || item.description || '—' }}</td>
+                                                                <td class="text-end fs-xs">{{ item.totalCost | number:'1.2-2' }}</td>
+                                                                <td class="text-center">
+                                                                    <input type="checkbox"
+                                                                           [(ngModel)]="item.selected"
+                                                                           [name]="'srItem_' + srIdx + '_' + itemIdx"
+                                                                           title="Include/Exclude"/>
+                                                                </td>
+                                                            </tr>
+                                                        }
+                                                    </tbody>
+                                                </table>
+                                            } @else {
+                                                <span class="text-muted fs-xs">No items.</span>
+                                            }
+                                        </td>
+                                        <td class="text-center align-top">
+                                            <button type="button"
+                                                    class="btn btn-danger btn-icon btn-sm rounded-circle"
+                                                    (click)="removeStockRelease(srIdx)"
+                                                    ngbTooltip="Remove">
+                                                <ng-icon name="tablerTrash" class="fs-sm"></ng-icon>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                } @else {
+                    <div class="text-muted fs-xs">No stock releases added.</div>
+                }
+
+                <!-- Other Items -->
+                <hr class="my-3"/>
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                    <div class="fs-xs text-uppercase fw-semibold text-muted">Other Items</div>
+                    <button type="button" class="btn btn-success fw-bold" (click)="addOtherItem()">
+                        <ng-icon name="tablerPlus" class="ps-0 pe-2 fw-bold"></ng-icon>Add Row
+                    </button>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-custom table-centered table-hover w-100 mb-0">
+                        <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                            <tr class="text-uppercase fs-xxs">
+                                <th style="width:40px">#</th>
+                                <th>Description</th>
+                                <th class="text-end" style="width:160px">Amount</th>
+                                <th style="width:60px"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (item of otherItems; track $index; let i = $index) {
+                                <tr>
+                                    <td>{{ i + 1 }}</td>
+                                    <td>
+                                        <input type="text" class="form-control form-control-sm"
+                                               [(ngModel)]="item.description"
+                                               [name]="'otherDesc_' + i"
+                                               placeholder="Description"/>
+                                    </td>
+                                    <td>
+                                        <input type="number" class="form-control form-control-sm text-end"
+                                               [(ngModel)]="item.amount"
+                                               [name]="'otherAmt_' + i"
+                                               min="0" step="0.01" placeholder="0.00"/>
+                                    </td>
+                                    <td class="text-center">
+                                        <button type="button"
+                                                class="btn btn-danger btn-icon btn-sm rounded-circle"
+                                                (click)="removeOtherItem(i)"
+                                                [disabled]="otherItems.length === 1">
+                                            <ng-icon name="tablerTrash" class="fs-sm"></ng-icon>
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                            @if (otherItems.length > 0) {
+                                <tr class="fw-bold bg-light">
+                                    <td colspan="2" class="text-end fw-bold text-uppercase fs-xs">Total</td>
+                                    <td class="text-end">{{ totalOtherAmount | number:'1.2-2' }}</td>
+                                    <td></td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Save / Back -->
                 <div class="d-flex gap-2 justify-content-end align-items-center pt-3 border-top mt-3">
                     <a [routerLink]="['/' + menuLink]" class="btn btn-light fw-bold">
                         <ng-icon name="tablerArrowLeft" class="ps-0 pe-3 fw-bold"></ng-icon>Back
                     </a>
-                    <button type="submit" class="btn btn-primary fw-bold" [disabled]="isLoading()">
-                        @if (isLoading()) {
+                    <button type="submit" class="btn btn-primary fw-bold" [disabled]="formSubmit">
+                        @if (formSubmit) {
                             <span class="spinner-border spinner-border-sm me-2" role="status"></span>
                             {{ editMode ? 'Updating...' : 'Saving...' }}
                         } @else {
                             <ng-icon name="tablerCheck" class="ps-0 pe-3 fw-bold"></ng-icon>
-                            {{ editMode ? 'Update' : 'Save' }}
+                            {{ editMode ? 'Update' : 'Save ' + module }}
                         }
                     </button>
                 </div>
-            </div>
 
+            </div>
         </div>
     </form>
     }

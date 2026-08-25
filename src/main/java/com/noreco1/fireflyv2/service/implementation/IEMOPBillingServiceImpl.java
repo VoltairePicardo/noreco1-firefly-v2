@@ -21,6 +21,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
@@ -41,11 +43,13 @@ public class IEMOPBillingServiceImpl implements IEMOPBillingService {
     private SubSupplierRepo subSupplierRepo;
 
     @Override
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     public IEMOPBilling findById(Integer id) {
         return iemopBillingRepo.findById(id).orElse(null);
     }
 
     @Override
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     public Page<IEMOPBilling> findAllForListing(String query, Pageable pageable) {
         if(Checker.isStringNullOrEmpty(query)){
             return iemopBillingRepo.findAll(pageable);
@@ -57,6 +61,7 @@ public class IEMOPBillingServiceImpl implements IEMOPBillingService {
     }
 
     @Override
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     public Page<IEMOPBilling> findAllForCVPaged(String query, Pageable pageable) {
         if(Checker.isStringNullOrEmpty(query)){
             return iemopBillingRepo.findIEMOPBillingNotInCV(pageable);
@@ -68,6 +73,7 @@ public class IEMOPBillingServiceImpl implements IEMOPBillingService {
     }
 
     @Override
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     public List<IEMOPBilling> findAllForCV(String query) {
         if(Checker.isStringNullOrEmpty(query)){
             return iemopBillingRepo.findIEMOPBillingNotInCV();
@@ -79,6 +85,7 @@ public class IEMOPBillingServiceImpl implements IEMOPBillingService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public PostResponse processUpload(MultipartFile excelFile, String date, String refNumber) {
         PostResponse response = new PostResponse();
         XSSFWorkbook workbook = null;
@@ -231,7 +238,10 @@ public class IEMOPBillingServiceImpl implements IEMOPBillingService {
             response.setSuccessMessage("Uploading Failed!");
             response.setSuccess(false);
             e.printStackTrace();
-            throw new RuntimeException(e);
+        } finally {
+            if (workbook != null) {
+                try { workbook.close(); } catch (Exception ignored) {}
+            }
         }
 
         return response;

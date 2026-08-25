@@ -21,6 +21,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.data.domain.*;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 
@@ -345,6 +346,7 @@ public class JobOrderServiceImpl implements JobOrderService, PrintableVoucher {
         return null;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<JoListDto> findForCV() {
         List<JobOrder> vouchers = jobOrderRepo.findJobOrdersForCV(com.noreco1.fireflyv2.model.enums.DocumentStatus.APPROVED.getId());
@@ -437,6 +439,7 @@ public class JobOrderServiceImpl implements JobOrderService, PrintableVoucher {
         return jobOrderRepo.findByStatusAndFilter(statusId, "%"+filter+"%", pageable);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<JobOrderBudgetDetail> getJobOrderBudgetDetail(Integer joId) {
 
@@ -559,6 +562,7 @@ public class JobOrderServiceImpl implements JobOrderService, PrintableVoucher {
         return map;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public JoDto findById(Integer id) {
         JobOrder jo =  jobOrderRepo.findById(id).orElse(null);

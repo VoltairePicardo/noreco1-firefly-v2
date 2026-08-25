@@ -11,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
@@ -25,6 +26,7 @@ public class BankAccountServiceImpl implements BankAccountService {
     @Autowired
     private AuthenticationFacade authFacade;
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<BankAccount> list(String q, int page, int size) {
         PageRequest pageable = PageRequest.of(page, size, Sort.by("id").ascending());
@@ -33,6 +35,7 @@ public class BankAccountServiceImpl implements BankAccountService {
                 : bankAccountRepo.findAllByBankNameContainingIgnoreCaseOrAccountNumberContainingIgnoreCase(q, q, pageable);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public BankAccount findById(Integer id) {
         return bankAccountRepo.findById(id).orElse(null);
@@ -94,16 +97,19 @@ public class BankAccountServiceImpl implements BankAccountService {
         return res;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<BankAccount> getAllBankAccountsWithCheckOnly() {
         return bankAccountRepo.getAllBankAccountsWithCheckOnly(BankTransactionType.CHECK.getId());
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<BankAccount> getAllBankAccounts() {
         return bankAccountRepo.findAll();
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<BankAccount> getAllBankAccountsForCv(Integer bankId) {
         return bankAccountRepo.findAllByBankId(bankId);

@@ -10,6 +10,7 @@ import com.noreco1.fireflyv2.validator.CheckConfigValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 
@@ -23,6 +24,7 @@ public class CheckConfigServiceImpl implements CheckConfigService {
     @Autowired
     CheckConfigRepo checkConfigRepo;
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<CheckConfig> findAll() {
         try {
@@ -39,6 +41,7 @@ public class CheckConfigServiceImpl implements CheckConfigService {
         return checkConfigRepo.findById(id).orElse(null);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public CheckConfig findByCode(String code) {
         return checkConfigRepo.findOneByCode(code);

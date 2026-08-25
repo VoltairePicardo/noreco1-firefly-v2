@@ -25,6 +25,8 @@ import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -107,6 +109,7 @@ public class MaterialSalvageTicketServiceImpl implements MaterialSalvageTicketSe
 
     private Map reportMeta = new HashMap();
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public MaterialSalvageTicket findById(Integer id) {
 
@@ -170,26 +173,31 @@ public class MaterialSalvageTicketServiceImpl implements MaterialSalvageTicketSe
 
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<MaterialSalvageTicket> findAll() {
         return materialSalvageTicketRepo.findAll();
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<MaterialSalvageTicket> findAll(Pageable pageable) {
         return materialSalvageTicketRepo.findAll(pageable);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<MaterialSalvageTicket> findByQuery(String query, Pageable pageable) {
         return materialSalvageTicketRepo.findByCode(query, pageable);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<DocumentStatus> getDocumentsStatuses() {
         return documentDtoer.getDocumentStatuses(com.noreco1.fireflyv2.model.enums.Workflow.MATERIAL_SALVAGE_TICKET.getId());
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<MaterialSalvageTicket> getListForSummaryReport(String from, String to, HttpServletRequest request) {
         List<MaterialSalvageTicket> list = new ArrayList<>();
@@ -229,6 +237,7 @@ public class MaterialSalvageTicketServiceImpl implements MaterialSalvageTicketSe
         return list;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<ItemTransactionDetailDto> getItems(Integer transId) {
         List<ItemTransactionDetailDto> data = new ArrayList<>();
@@ -626,6 +635,7 @@ public class MaterialSalvageTicketServiceImpl implements MaterialSalvageTicketSe
         return signatoryFacade.defaultSignatories(com.noreco1.fireflyv2.model.enums.DocumentType.MST);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<Map> findByDateRangeAndStatusId(String from, String to, Integer docStatusId, Integer officeId) {
         try {
@@ -650,6 +660,7 @@ public class MaterialSalvageTicketServiceImpl implements MaterialSalvageTicketSe
         return null;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<Map> findByDateRangePending(String from, String to, Integer officeId) {
         try {
@@ -783,6 +794,7 @@ public class MaterialSalvageTicketServiceImpl implements MaterialSalvageTicketSe
         return this.reportMeta;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<MaterialSalvageTicketDocumentDto> findAllApprovedForAccountSettingPaged(String query, Pageable pageable) {
 

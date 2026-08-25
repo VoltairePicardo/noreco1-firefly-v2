@@ -79,7 +79,11 @@ export class ProjectAcceptanceReportDetailComponent {
     }
 
     loadWorkflowActions(): void {
-        if (!this.data?.transId || this.isTerminal()) return;
+        if (!this.data?.transId || this.isTerminal()) {
+            this.workflowActions = [];
+            this.selectedAction  = null;
+            return;
+        }
         this.service.getWorkflowActions(this.data.transId).subscribe({
             next: (actions) => {
                 this.workflowActions = actions || [];
@@ -112,6 +116,9 @@ export class ProjectAcceptanceReportDetailComponent {
             next: (res) => {
                 this.processingWorkflow = false;
                 if (res?.success) {
+                    this.workflowActions = [];
+                    this.selectedAction  = null;
+                    this.remarks         = '';
                     this.alertService.success(this.module, res.successMessage || 'Processed.', '');
                     this.loadData(this.showLogs);
                 } else {

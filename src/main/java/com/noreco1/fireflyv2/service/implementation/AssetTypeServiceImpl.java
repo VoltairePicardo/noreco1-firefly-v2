@@ -11,6 +11,8 @@ import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -102,27 +104,32 @@ public class AssetTypeServiceImpl implements AssetTypeService {
         return response;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<AssetType> findAll(Pageable pageable) {
         return assetTypeRepo.findAll(pageable);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<AssetType> find(String query, Pageable pageable) {
         query = "%"+query.trim()+"%";
         return assetTypeRepo.findByDescriptionContainingIgnoreCase(query, pageable);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public AssetType findById(Integer id) {
         return assetTypeRepo.findById(id).orElse(null);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public AssetType findByDescription(String query) {
         return assetTypeRepo.findByDescriptionContainingIgnoreCase(query.trim());
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<AssetType> findAll() {
         return assetTypeRepo.findByOrderByDescriptionAsc();

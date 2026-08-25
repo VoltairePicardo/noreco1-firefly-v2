@@ -7,6 +7,7 @@ import { FlatpickrDirective, provideFlatpickrDefaults } from 'angularx-flatpickr
 import { FormsModule } from '@angular/forms';
 import { provideIcons } from '@ng-icons/core';
 import { tablerSearch, tablerRefresh, tablerPlus, tablerEye, tablerEdit } from '@ng-icons/tabler-icons';
+import { monthStart, monthEnd } from '@/app/shared/utils/date.utils';
 
 @Component({
     selector: 'app-payment-request-main',
@@ -54,11 +55,8 @@ export class PaymentRequestMainComponent {
             error: () => {}
         });
 
-        const now = new Date();
-        const fmt = (d: Date) =>
-            `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-        this.dateFrom = fmt(new Date(now.getFullYear(), now.getMonth(), 1));
-        this.dateTo   = fmt(new Date(now.getFullYear(), now.getMonth() + 1, 0));
+        this.dateFrom = monthStart();
+        this.dateTo   = monthEnd();
         this.load();
     }
 
@@ -84,11 +82,8 @@ export class PaymentRequestMainComponent {
     }
 
     reset(): void {
-        const now = new Date();
-        const fmt = (d: Date) =>
-            `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-        this.dateFrom        = fmt(new Date(now.getFullYear(), now.getMonth(), 1));
-        this.dateTo          = fmt(new Date(now.getFullYear(), now.getMonth() + 1, 0));
+        this.dateFrom        = monthStart();
+        this.dateTo          = monthEnd();
         this.selectedStatusId = null;
         this.searchText = '';
         this.records.set([]);

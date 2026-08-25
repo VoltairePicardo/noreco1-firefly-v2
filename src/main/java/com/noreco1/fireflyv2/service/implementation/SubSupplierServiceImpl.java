@@ -20,6 +20,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
@@ -40,16 +42,19 @@ public class SubSupplierServiceImpl implements SubSupplierService {
     @Autowired
     SupplierRepo supplierRepo;
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public SubSupplier findById(Integer id) {
         return subSupplierRepo.findById(id).orElse(null);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<SubSupplier> findAllBySupplier(Integer suppId) {
         return subSupplierRepo.findAllBySupplierIdOrderByParticipantName(suppId);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Page<SubSupplier> findAllForListing(String query, Integer suppId, Pageable pageable) {
         if(Checker.isStringNullOrEmpty(query)){
@@ -148,7 +153,6 @@ public class SubSupplierServiceImpl implements SubSupplierService {
 
         } catch (Exception e) {
             e.printStackTrace();
-            throw new RuntimeException(e);
         }
 
         return response;

@@ -17,6 +17,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 
@@ -43,6 +44,7 @@ public class RoleServiceImpl implements RoleService {
         return roleRepo.findAll();
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Role findById(Integer roleId) {
 
@@ -154,6 +156,7 @@ public class RoleServiceImpl implements RoleService {
         return response;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Role findByName(String name) {
         List<Role> roles = roleRepo.findByName(name);

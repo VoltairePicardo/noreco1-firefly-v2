@@ -27,8 +27,8 @@ import { tablerSearch, tablerArrowLeft, tablerCheck } from '@ng-icons/tabler-ico
     templateUrl: './stock-receive-add-edit.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class StockReceiveAddEditComponent implements OnInit {
-    module    = 'Receive Stock Transfer';
+export class StockReceiveAddEditComponent {
+    module    = 'Stock Receive';
     subModule = 'Create';
     menuLink  = 'stock-receive';
 
@@ -127,12 +127,12 @@ export class StockReceiveAddEditComponent implements OnInit {
             );
             if (result?.action === 'select' && result?.data) {
                 const doc = result.data;
-                this.documentTransaction.set({ id: doc.transId || doc.id });
-                this.selectedDocCode.set(doc.code || '');
-                this.selectedDocDate.set(doc.date || doc.voucherDate || '');
-                this.selectedDocCreatedBy.set(doc.createdBy || '');
-                this.documentType.set(doc.type || null);
-                this.details.set((doc.details || []).map((d: any) => ({
+                this.documentTransaction  = { id: doc.transId || doc.transaction?.id || doc.id };
+                this.selectedDocCode      = doc.code || '';
+                this.selectedDocDate      = doc.date || doc.voucherDate || '';
+                this.selectedDocCreatedBy = doc.createdBy?.fullName || doc.createdBy || '';
+                this.documentType         = doc.type || null;
+                this.details = (doc.details || []).map((d: any) => ({
                     itemId:              d.itemId,
                     itemCode:            d.itemCode,
                     unitId:              d.unitId,

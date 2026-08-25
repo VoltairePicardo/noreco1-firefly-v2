@@ -17,6 +17,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 
 import java.math.BigDecimal;
@@ -38,21 +40,25 @@ public class AllocationFactorServiceImpl implements AllocationFactorService {
     @Autowired
     GeneralLedgerRepo generalLedgerRepo;
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<AllocationFactorDto> findAll() {
         return factorDtoer.findAll();
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public AllocationFactorDto findByAccountAndEffectivityId(Integer accountId, Integer effectId) {
         return factorDtoer.findOne(accountId, effectId);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<Map> findLatestByAccount(Integer accountId) {
         return factorDtoer.findLatestOne(accountId);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<Map> findAccountAndEffectDate(Integer accountId, String voucherDate) {
         return factorDtoer.findAccountAndVoucherDate(accountId, voucherDate);
@@ -131,6 +137,7 @@ public class AllocationFactorServiceImpl implements AllocationFactorService {
         return response;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<Map> findDateRanges() {
         List<DateRange> dateRangeList = dateRangeRepo.findByOrderByEndDesc(PageRequest.of(0, 5));
@@ -268,6 +275,7 @@ public class AllocationFactorServiceImpl implements AllocationFactorService {
         return result;
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<AllocationFactorDto> findByEffectivityDateId(Integer effDateId) {
         return factorDtoer.findByEffectivityDateId(effDateId);
