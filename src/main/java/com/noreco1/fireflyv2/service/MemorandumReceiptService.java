@@ -22,6 +22,9 @@ import java.util.Map;
  */
 public interface MemorandumReceiptService {
 
+    @Transactional(readOnly = true)
+    Page<Map<String, Object>> getMemorandumReceiptPaged(String from, String to, Integer employeeAccountNo, String query, Pageable pageable);
+
     Page<MemorandumReceipt> findAll(String startDate, String endDate, Pageable pageable);
     Page<MemorandumReceipt> findAllByQuery(String query,String startDate, String endDate, Pageable pageable);
     Page<MemorandumReceipt> findAllByEmployee(Integer employeeAccountNo,String startDate, String endDate, Pageable pageable);

@@ -56,8 +56,7 @@ public interface MaterialSalvageTicketRepo extends JpaRepository<MaterialSalvage
                     "       OR u.fullname LIKE CONCAT('%', :query, '%')) " +
                     "   AND (mst.FK_createdByUserId = :userId " +
                     "       OR mst.FK_returnedByUserId = :userId " +
-                    "       OR mst.FK_receivedByUserId = :userId) ",
-            nativeQuery = true)
+                    "       OR mst.FK_receivedByUserId = :userId) ", nativeQuery = true)
     Page<Map<String, Object>> getMaterialSalvageTicketPaged(@Param("startDate") String startDate,
                                                               @Param("endDate") String endDate,
                                                               @Param("statusId") Integer statusId,

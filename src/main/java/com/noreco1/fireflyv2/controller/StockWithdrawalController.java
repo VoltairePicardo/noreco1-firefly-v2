@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -79,6 +80,16 @@ public class StockWithdrawalController {
         BindingResult br = new BeanPropertyBindingResult(dto, "dto");
         return withdrawalService.process(dto, br, messageSource);
     }
+
+
+    @GetMapping("/memorandum-receipt-vouchers")
+    public Page<StockWithdrawal> getMemorandumReceiptVouchers(@RequestParam(value = "q", required = false) String query,
+                                                              @RequestParam(value = "f", required = false) Boolean multipleEmployee,
+                                                              Pageable pageable) {
+
+        return withdrawalService.getMemorandumReceiptVouchers(query, multipleEmployee, pageable);
+    }
+
 
     @RequestMapping(value="/export/{id}")
     public void exportToPdf(@PathVariable Integer id,

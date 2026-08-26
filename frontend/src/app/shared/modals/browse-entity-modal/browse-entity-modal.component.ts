@@ -18,7 +18,7 @@ export class BrowseEntityModalComponent implements OnInit {
     private cdr = inject(ChangeDetectorRef);
 
     @Input() entityTypes?: number[];
-    @Input() defaultClassificationId?: number;
+    @Input() defaultClassificationId?: number = 1;
 
     items: any[] = [];
     classifications: any[] = [];

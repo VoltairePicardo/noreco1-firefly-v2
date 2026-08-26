@@ -9,6 +9,16 @@ import { BrowseMrStockWithdrawalModalComponent } from '@/app/shared/modals/brows
 import { BrowseEntityModalComponent } from '@/app/shared/modals/browse-entity-modal/browse-entity-modal.component';
 import { provideIcons } from '@ng-icons/core';
 import { tablerSearch, tablerTrash, tablerArrowLeft, tablerCheck } from '@ng-icons/tabler-icons';
+import { StockWithdrawal, StockWithdrawalDetail } from '@/app/models/inventory-modules/stock-withdrawal.model';
+import { AssignedItemRow, AvailableItemRow, MemorandumReceiptDto, MemorandumReceiptSource, SlEntity } from '@/app/models/inventory-modules/memorandum-receipt.model';
+
+interface MemorandumReceiptPayload {
+    id?: number;
+    date: string;
+    stockWithdrawal: { id: number };
+    approvingOfficer: { accountNo: number; fullName: string };
+    memorandumReceiptDetails: { stockWithdrawalDetail: StockWithdrawalDetail; quantity?: number; reassignedQuantity: number }[];
+}
 
 @Component({
     selector: 'app-memorandum-receipt-add-edit',
@@ -32,18 +42,18 @@ export class MemorandumReceiptAddEditComponent implements OnInit {
     subModule = 'Create';
     menuLink  = 'memorandum-receipt';
 
-    id: any  = null;
+    id: number | null = null;
     editMode = false;
     isLoading = signal(false);
 
     flatpickrOptions = { dateFormat: 'Y-m-d', altInput: true, altFormat: 'F j, Y' };
 
     date              = '';
-    selectedSW       = signal<any>(null);
+    selectedSW       = signal<MemorandumReceiptSource | null>(null);
     selectedSWCode   = signal('');
-    availableItems   = signal<any[]>([]);
-    assignedItems    = signal<any[]>([]);
-    approvingOfficer = signal<any>(null);
+    availableItems   = signal<AvailableItemRow[]>([]);
+    assignedItems    = signal<AssignedItemRow[]>([]);
+    approvingOfficer = signal<SlEntity | null>(null);
 
     private service      = inject(MemorandumReceiptService);
     private modalService = inject(ModalService);
@@ -77,16 +87,17 @@ export class MemorandumReceiptAddEditComponent implements OnInit {
     }
 
     loadForEdit(): void {
+        if (this.id == null) return;
         this.isLoading.set(true);
         this.service.getData(this.id).subscribe({
-            next: (data) => {
+            next: (data: MemorandumReceiptDto) => {
                 this.isLoading.set(false);
                 if (!data?.id) {
                     this.alertService.error(this.module, 'Not found.', '');
                     this.router.navigate(['/' + this.menuLink]);
                     return;
                 }
-                const s = data.status || '';
+                const s = data.documentStatus?.status || '';
                 if (s !== 'Document Created' && s !== 'Returned to Creator') {
                     this.alertService.warning(this.module, 'Not Editable', 'This document cannot be edited.');
                     this.router.navigate(['/' + this.menuLink, this.id, 'detail']);
@@ -96,32 +107,30 @@ export class MemorandumReceiptAddEditComponent implements OnInit {
                 this.approvingOfficer.set(data.approvingOfficer || null);
                 this.selectedSW.set(data.stockWithdrawal || null);
                 this.selectedSWCode.set(data.stockWithdrawal?.code || '');
-                const assignedItems = (data.memorandumReceiptDetails || []).map((d: any) => ({
+                const assignedItems: AssignedItemRow[] = (data.memorandumReceiptDetails || []).map(d => ({
                     stockWithdrawalDetail: d.stockWithdrawalDetail,
-                    quantity:              d.quantity,
+                    quantity:              d.quantity ?? 0,
                     reassignedQuantity:    d.reassignedQuantity || 0,
-                    oldQuantity:           d.quantity,
+                    oldQuantity:           d.quantity ?? 0,
                     itemCode:              d.stockWithdrawalDetail?.item?.code || '',
                     itemDescription:       d.stockWithdrawalDetail?.item?.description || '',
-                    unitCode:              d.stockWithdrawalDetail?.item?.unit?.code || ''
+                    unitCode:              d.stockWithdrawalDetail?.unit?.code || ''
                 }));
                 this.assignedItems.set(assignedItems);
 
-                const swItems = data.stockWithdrawal?.items || data.stockWithdrawal?.details || [];
-                this.availableItems.set(swItems.map((item: any) => {
-                    const alreadyAssigned = assignedItems.some(
-                        (a: any) => a.stockWithdrawalDetail?.id === item.id
-                    );
+                const swItems = data.stockWithdrawal?.details || [];
+                this.availableItems.set(swItems.map((item): AvailableItemRow => {
+                    const alreadyAssigned = assignedItems.some(a => a.stockWithdrawalDetail?.id === item.id);
                     return {
                         stockWithdrawalDetail: item,
                         itemCode:              item.item?.code || '',
                         itemDescription:       item.item?.description || '',
-                        unitCode:              item.item?.unit?.code || '',
-                        quantity:              item.quantity,
+                        unitCode:              item.unit?.code || '',
+                        quantity:              item.quantity ?? 0,
                         quantityReleased:      item.quantityReleased,
                         totalAssigned:         0,
-                        remaining:             item.quantity,
-                        oldRemainingBalance:   item.quantity,
+                        remaining:             item.quantity ?? 0,
+                        oldRemainingBalance:   item.quantity ?? 0,
                         oldTotalAssigned:      0,
                         insufficientBalance:   false,
                         assigned:              alreadyAssigned
@@ -161,20 +170,21 @@ export class MemorandumReceiptAddEditComponent implements OnInit {
                 BrowseMrStockWithdrawalModalComponent, {}, { size: 'xl', centered: true }
             );
             if (result?.action === 'select' && result?.data) {
-                const doc = result.data;
+                const doc = result.data as StockWithdrawal;
                 this.selectedSW.set(doc);
                 this.selectedSWCode.set(doc.code || '');
                 this.assignedItems.set([]);
-                this.availableItems.set((doc.items || doc.details || []).map((item: any) => ({
+                const swItems = doc.items || [];
+                this.availableItems.set(swItems.map((item): AvailableItemRow => ({
                     stockWithdrawalDetail: item,
-                    itemCode:              item.item?.code || item.itemCode || '',
-                    itemDescription:       item.item?.description || item.itemDescription || '',
-                    unitCode:              item.item?.unit?.code || item.unitCode || '',
-                    quantity:              item.quantity,
+                    itemCode:              item.item?.code || '',
+                    itemDescription:       item.item?.description || '',
+                    unitCode:              item.unit?.code || '',
+                    quantity:              item.quantity ?? 0,
                     quantityReleased:      item.quantityReleased,
                     totalAssigned:         0,
-                    remaining:             item.quantity,
-                    oldRemainingBalance:   item.quantity,
+                    remaining:             item.quantity ?? 0,
+                    oldRemainingBalance:   item.quantity ?? 0,
                     oldTotalAssigned:      0,
                     insufficientBalance:   false,
                     assigned:              false
@@ -184,7 +194,7 @@ export class MemorandumReceiptAddEditComponent implements OnInit {
         } catch { }
     }
 
-    assignItem(item: any): void {
+    assignItem(item: AvailableItemRow): void {
         item.assigned = true;
         const qty = 1;
         item.remaining     = item.oldRemainingBalance - qty;
@@ -197,12 +207,11 @@ export class MemorandumReceiptAddEditComponent implements OnInit {
             oldQuantity:           0,
             itemCode:              item.itemCode,
             itemDescription:       item.itemDescription,
-            unitCode:              item.unitCode,
-            _availableRef:         item
+            unitCode:              item.unitCode
         }]);
     }
 
-    removeItem(idx: number, swDetailId: number, quantity: number): void {
+    removeItem(idx: number, swDetailId: number | undefined, quantity: number): void {
         this.assignedItems.update(list => list.filter((_, i) => i !== idx));
         const avail = this.availableItems().find(a => a.stockWithdrawalDetail?.id === swDetailId);
         if (avail) {
@@ -213,7 +222,7 @@ export class MemorandumReceiptAddEditComponent implements OnInit {
         }
     }
 
-    onQtyChange(detail: any, value: string): void {
+    onQtyChange(detail: AssignedItemRow, value: string): void {
         const avail = this.availableItems().find(
             a => a.stockWithdrawalDetail?.id === detail.stockWithdrawalDetail?.id
         );
@@ -246,7 +255,7 @@ export class MemorandumReceiptAddEditComponent implements OnInit {
                 BrowseEntityModalComponent, {}, { size: 'lg', centered: true }
             );
             if (result?.action === 'select' && result?.data) {
-                const e = result.data;
+                const e = result.data as SlEntity;
                 this.approvingOfficer.set({ accountNo: e.accountNo, fullName: e.fullName || e.name });
             }
         } catch { }
@@ -267,17 +276,17 @@ export class MemorandumReceiptAddEditComponent implements OnInit {
             { this.alertService.warning(this.module, 'Validation', 'Noted By is required.'); return; }
 
         this.isLoading.set(true);
-        const payload: any = {
+        const payload: MemorandumReceiptPayload = {
             date:             this.date,
             stockWithdrawal:  { id: selectedSW.id },
             approvingOfficer: { accountNo: approvingOfficer.accountNo, fullName: approvingOfficer.fullName || approvingOfficer.name || '' },
             memorandumReceiptDetails: assignedItems.map(d => ({
-                stockWithdrawalDetail: { id: d.stockWithdrawalDetail?.id },
+                stockWithdrawalDetail: d.stockWithdrawalDetail!,
                 quantity:              d.quantity,
                 reassignedQuantity:    0
             }))
         };
-        if (this.editMode) payload.id = this.id;
+        if (this.editMode && this.id != null) payload.id = this.id;
 
         const req$ = this.editMode ? this.service.update(payload) : this.service.create(payload);
         req$.subscribe({
@@ -295,9 +304,5 @@ export class MemorandumReceiptAddEditComponent implements OnInit {
                 this.alertService.error(this.module, 'Save', 'An error occurred.');
             }
         });
-    }
-
-    compareById(a: any, b: any): boolean {
-        return a && b ? a.id === b.id : a === b;
     }
 }

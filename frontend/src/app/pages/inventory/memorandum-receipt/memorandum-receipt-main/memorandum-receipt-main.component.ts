@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
 import { COMMON_ALL_PAGE_IMPORTS, COMMON_MAIN_PAGE_IMPORTS, SHARED_PROVIDERS } from '@/app/shared/providers/shared-providers';
 import { AlertService } from '@/app/shared/services/alert.service';
 import { FlatpickrDirective, provideFlatpickrDefaults } from 'angularx-flatpickr';
@@ -8,6 +8,7 @@ import { ModalService } from '@/app/shared/modals/modal-service';
 import { BrowseEntityModalComponent } from '@/app/shared/modals/browse-entity-modal/browse-entity-modal.component';
 import { provideIcons } from '@ng-icons/core';
 import { tablerSearch, tablerRefresh, tablerPlus, tablerEye, tablerEdit, tablerUsers, tablerRepeat } from '@ng-icons/tabler-icons';
+import { MemorandumReceiptListRow, SlEntity } from '@/app/models/inventory-modules/memorandum-receipt.model';
 
 @Component({
     selector: 'app-memorandum-receipt-main',
@@ -21,34 +22,18 @@ export class MemorandumReceiptMainComponent implements OnInit {
     subModule = '';
     menuLink  = 'memorandum-receipt';
 
-    records   = signal<any[]>([]);
-    isLoading = signal(false);
+    records       = signal<MemorandumReceiptListRow[]>([]);
+    isLoading     = signal(false);
 
-    page     = signal(1);
-    pageSize = 10;
-
-    filteredRecords = computed(() => {
-        const q = this.searchText().toLowerCase();
-        return q
-            ? this.records().filter(r =>
-                (r.code        || '').toLowerCase().includes(q) ||
-                (r.employee?.name     || '').toLowerCase().includes(q) ||
-                (r.employee?.fullName || '').toLowerCase().includes(q))
-            : this.records();
-    });
-
-    filteredTotal = computed(() => this.filteredRecords().length);
-
-    pagedRecords = computed(() => {
-        const start = (this.page() - 1) * this.pageSize;
-        return this.filteredRecords().slice(start, start + this.pageSize);
-    });
+    page          = signal(1);
+    pageSize      = 10;
+    filteredTotal = signal(0);
 
     flatpickrOptions = { dateFormat: 'Y-m-d', altInput: true, altFormat: 'F j, Y' };
     fromDate   = '';
     toDate     = '';
     searchText = signal('');
-    employee   = signal<any>(null);
+    employee   = signal<SlEntity | null>(null);
 
     private service      = inject(MemorandumReceiptService);
     private modalService = inject(ModalService);
@@ -63,22 +48,39 @@ export class MemorandumReceiptMainComponent implements OnInit {
 
     load(): void {
         this.isLoading.set(true);
-        let obs;
-        const employee = this.employee();
-        if (this.fromDate && this.toDate && employee?.accountNo) {
-            obs = this.service.listByEmployee(this.fromDate, this.toDate, employee.accountNo);
-        } else if (this.fromDate && this.toDate) {
-            obs = this.service.listByDateRange(this.fromDate, this.toDate);
-        } else {
-            obs = this.service.list();
-        }
-        obs.subscribe({
-            next: (data) => { this.records.set(data || []); this.page.set(1); this.isLoading.set(false); },
-            error: () => { this.alertService.error(this.module, 'Load', ''); this.isLoading.set(false); }
-        });
+        this.service.listPaged(this.fromDate, this.toDate, null, this.employee()?.accountNo ?? null, this.searchText().trim(), this.page() - 1, this.pageSize)
+            .subscribe({
+                next: (data) => {
+                    this.records.set(data?.content ?? []);
+                    this.filteredTotal.set(data?.totalElements ?? data?.page?.totalElements ?? 0);
+                    this.isLoading.set(false);
+                },
+                error: () => {
+                    this.records.set([]);
+                    this.filteredTotal.set(0);
+                    this.alertService.error(this.module, 'Load', '');
+                    this.isLoading.set(false);
+                }
+            });
     }
 
-    reset(): void { this.setDefaultDates(); this.searchText.set(''); this.employee.set(null); this.load(); }
+    search(): void {
+        this.page.set(1);
+        this.load();
+    }
+
+    onPageChange(page: number): void {
+        this.page.set(page);
+        this.load();
+    }
+
+    reset(): void {
+        this.setDefaultDates();
+        this.searchText.set('');
+        this.employee.set(null);
+        this.page.set(1);
+        this.load();
+    }
 
     async openEmployeeBrowse(): Promise<void> {
         try {
@@ -86,12 +88,13 @@ export class MemorandumReceiptMainComponent implements OnInit {
                 BrowseEntityModalComponent, {}, { size: 'lg', centered: true }
             );
             if (result?.action === 'select' && result?.data) {
-                this.employee.set(result.data);
+                this.employee.set(result.data as SlEntity);
+                this.search();
             }
         } catch { }
     }
 
-    isEditable(rec: any): boolean {
+    isEditable(rec: MemorandumReceiptListRow): boolean {
         const s = rec?.status || '';
         return s === 'Document Created' || s === 'Returned to Creator';
     }

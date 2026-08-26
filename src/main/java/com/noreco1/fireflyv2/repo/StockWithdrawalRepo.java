@@ -157,7 +157,7 @@ public interface StockWithdrawalRepo extends JpaRepository<StockWithdrawal, Inte
             "AND IF(LENGTH(:query) > 0, (sw.code LIKE CONCAT('%', :query, '%') OR sw.description LIKE CONCAT('%', :query, '%')), 1) " +
             "AND swe.id IS NULL " +
             "GROUP BY sw.code " +
-            "ORDER BY sw.code #pageable",
+            "ORDER BY sw.code ",
             countQuery = "SELECT count(*) FROM StockWithdrawal sw " +
                     "LEFT JOIN StockWithdrawalDetail swd ON sw.id = swd.FK_stockWithdrawalId " +
                     "LEFT JOIN StockWithdrawalEmployee swe ON sw.id = swe.FK_stockWithdrawalId  " +
@@ -168,9 +168,8 @@ public interface StockWithdrawalRepo extends JpaRepository<StockWithdrawal, Inte
                     "AND IF(LENGTH(:query) > 0, (sw.code LIKE CONCAT('%', :query, '%') OR sw.description LIKE CONCAT('%', :query, '%')), 1) " +
                     "AND swe.id IS NULL " +
                     "GROUP BY sw.code " +
-                    "ORDER BY sw.code ",
-            nativeQuery = true)
-    Page<StockWithdrawal> findAllForMemorandumReceipt(@Param("query") String query, Pageable paging);
+                    "ORDER BY sw.code ", nativeQuery = true)
+    Page<StockWithdrawal> findAllForMemorandumReceipt(@Param("query") String query, Pageable pageable);
 
     @Query(value = "SELECT sw.* FROM StockWithdrawal sw " +
             "INNER JOIN StockWithdrawalDetail swd ON sw.id = swd.FK_stockWithdrawalId " +
@@ -181,7 +180,7 @@ public interface StockWithdrawalRepo extends JpaRepository<StockWithdrawal, Inte
             "AND swd.quantity > (SELECT IF(sum(quantity) IS NOT NULL, sum(quantity), 0) FROM MemorandumReceiptDetail WHERE MemorandumReceiptDetail.FK_stockWithdrawalDetailId = swd.id) " +
             "AND IF(LENGTH(:query) > 0, (sw.code LIKE CONCAT('%', :query, '%') OR sw.description LIKE CONCAT('%', :query, '%')), 1) " +
             "GROUP BY sw.code " +
-            "ORDER BY sw.code #pageable",
+            "ORDER BY sw.code ",
             countQuery = "SELECT count(*) FROM StockWithdrawal sw " +
                     "INNER JOIN StockWithdrawalDetail swd ON sw.id = swd.FK_stockWithdrawalId " +
                     "INNER JOIN StockWithdrawalEmployee swe ON sw.id = swe.FK_stockWithdrawalId " +
@@ -191,9 +190,8 @@ public interface StockWithdrawalRepo extends JpaRepository<StockWithdrawal, Inte
                     "AND swd.quantity > (SELECT IF(sum(quantity) IS NOT NULL, sum(quantity), 0) FROM MemorandumReceiptDetail WHERE MemorandumReceiptDetail.FK_stockWithdrawalDetailId = swd.id) " +
                     "AND IF(LENGTH(:query) > 0, (sw.code LIKE CONCAT('%', :query, '%') OR sw.description LIKE CONCAT('%', :query, '%')), 1) " +
                     "GROUP BY sw.code " +
-                    "ORDER BY sw.code ",
-            nativeQuery = true)
-    Page<StockWithdrawal> findAllForMemorandumReceiptMultipleEmployees(@Param("query") String query, Pageable paging);
+                    "ORDER BY sw.code ", nativeQuery = true)
+    Page<StockWithdrawal> findAllForMemorandumReceiptMultipleEmployees(@Param("query") String query, Pageable pageable);
     
     
     @Query(value = "SELECT " +

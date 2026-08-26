@@ -1,145 +1,144 @@
 <div class="container-fluid">
     <app-page-title [title]="module" [subTitle]="subModule" [menuLink]="menuLink"/>
-</div>
-<div class="container-fluid">
+
     @if (isLoading() && editMode) {
         <div class="d-flex align-items-center gap-2 text-muted py-4">
             <span class="spinner-border spinner-border-sm" role="status"></span> Loading...
         </div>
     } @else {
-    <form (ngSubmit)="save()" #f="ngForm">
-        <div class="row g-3">
-            <div class="col-xl-12">
-                <app-ui-card title="Memorandum Receipt Information">
-                    <div class="col-xl-12 p-3" card-body>
-                        <div class="row g-3">
-                            <div class="col-md-3">
-                                <label class="form-label fw-bold">Date <span class="text-danger">*</span></label>
-                                <input type="text" mwlFlatpickr [options]="flatpickrOptions"
-                                       class="form-control" [(ngModel)]="date"
-                                       name="date" placeholder="Select date" required/>
-                            </div>
-                            <div class="col-md-5">
-                                <label class="form-label fw-bold">Stock Withdrawal <span class="text-danger">*</span></label>
-                                <div class="input-group">
-                                    <input type="text" class="form-control" [value]="selectedSWCode()" readonly
-                                           placeholder="No stock withdrawal selected"/>
-                                    <button type="button" class="btn btn-success fw-bold"
-                                            [disabled]="assignedItems().length > 0" (click)="openStockWithdrawalBrowse()">
-                                        <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
-                                    </button>
+        <form (ngSubmit)="save()" #f="ngForm">
+            <div class="row g-3">
+                <div class="col-xl-12">
+                    <app-ui-card title="Memorandum Receipt Information">
+                        <div class="col-xl-12 p-3" card-body>
+                            <div class="row g-3">
+                                <div class="col-md-3">
+                                    <label class="form-label fw-bold">Date <span class="text-danger">*</span></label>
+                                    <input type="text" mwlFlatpickr [options]="flatpickrOptions"
+                                           class="form-control" [(ngModel)]="date"
+                                           name="date" placeholder="Select date" required/>
                                 </div>
-            </div>
-                            <div class="col-md-4">
-                                <label class="form-label fw-bold">Noted By <span class="text-danger">*</span></label>
-                                <div class="input-group">
-                                    <input type="text" class="form-control"
-                                           [value]="approvingOfficer()?.fullName || approvingOfficer()?.name || ''" readonly
-                                           placeholder="Browse approving officer"/>
-                                    <button type="button" class="btn btn-success fw-bold" (click)="openApprovingOfficerBrowse()">
-                                        <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
-                                    </button>
+                                <div class="col-md-5">
+                                    <label class="form-label fw-bold">Stock Withdrawal <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" [value]="selectedSWCode()" readonly
+                                               placeholder="No stock withdrawal selected"/>
+                                        <button type="button" class="btn btn-primary fw-bold gap-1"
+                                                [disabled]="assignedItems().length > 0" (click)="openStockWithdrawalBrowse()">
+                                            <ng-icon name="tablerSearch" class="fs-lg fw-bold"></ng-icon>Browse
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label fw-bold">Noted By <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control"
+                                               [value]="approvingOfficer()?.fullName || approvingOfficer()?.name || ''" readonly
+                                               placeholder="Browse approving officer"/>
+                                        <button type="button" class="btn btn-primary fw-bold gap-1" (click)="openApprovingOfficerBrowse()">
+                                            <ng-icon name="tablerSearch" class="fs-lg fw-bold"></ng-icon>Browse
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
 
-                        @if (availableItems().length > 0) {
-                        <hr class="my-3"/>
-                        <div class="fs-xs text-uppercase fw-semibold text-muted mb-2">Items to be Assigned</div>
-                        <div class="table-responsive">
-                            <table class="table table-custom table-centered w-100 mb-0">
-                                <thead class="bg-light bg-opacity-25 thead-sm">
-                                    <tr class="text-uppercase fs-xxs">
-                                        <th>#</th>
-                                        <th>Code</th>
-                                        <th>Description</th>
-                                        <th class="text-center">Quantity</th>
-                                        <th class="text-center">Assigned</th>
-                                        <th class="text-center">Remaining</th>
-                                        <th></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @for (item of availableItems(); track $index; let i = $index) {
-                                        <tr>
-                                            <td class="text-center">{{ i + 1 }}</td>
-                                            <td class="fw-bold">{{ item.itemCode }}</td>
-                                            <td>{{ item.itemDescription }}</td>
-                                            <td class="text-center">{{ item.quantity | number:'1.0-3' }}</td>
-                                            <td class="text-center text-muted">{{ item.totalAssigned | number:'1.0-3' }}</td>
-                                            <td class="text-center">{{ item.remaining | number:'1.0-3' }}</td>
-                                            <td class="text-center">
-                                                <button type="button" class="btn btn-primary btn-sm fw-bold"
-                                                        [disabled]="item.assigned || item.insufficientBalance || item.remaining <= 0"
-                                                        (click)="assignItem(item)">
-                                                    Assign Item
-                                                </button>
-                                            </td>
+                            @if (availableItems().length > 0) {
+                                <hr class="my-3"/>
+                                <div class="fs-xs text-uppercase fw-semibold text-muted mb-2">Items to be Assigned</div>
+                                <div class="table-responsive">
+                                    <table class="table table-custom table-centered w-100 mb-0">
+                                        <thead class="bg-light bg-opacity-25 thead-sm">
+                                        <tr class="text-uppercase fs-xxs">
+                                            <th>#</th>
+                                            <th>Code</th>
+                                            <th>Description</th>
+                                            <th class="text-center">Quantity</th>
+                                            <th class="text-center">Assigned</th>
+                                            <th class="text-center">Remaining</th>
+                                            <th></th>
                                         </tr>
-                                    }
-                                </tbody>
-                            </table>
-                        </div>
-                        }
+                                        </thead>
+                                        <tbody>
+                                            @for (item of availableItems(); track $index; let i = $index) {
+                                                <tr>
+                                                    <td class="text-center">{{ i + 1 }}</td>
+                                                    <td class="fw-bold">{{ item.itemCode }}</td>
+                                                    <td>{{ item.itemDescription }}</td>
+                                                    <td class="text-center">{{ item.quantity | number:'1.0-3' }}</td>
+                                                    <td class="text-center text-muted">{{ item.totalAssigned | number:'1.0-3' }}</td>
+                                                    <td class="text-center">{{ item.remaining | number:'1.0-3' }}</td>
+                                                    <td class="text-center">
+                                                        <button type="button" class="btn btn-primary btn-sm fw-bold"
+                                                                [disabled]="item.assigned || item.insufficientBalance || item.remaining <= 0"
+                                                                (click)="assignItem(item)">
+                                                            Assign Item
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            }
 
-                        @if (assignedItems().length > 0) {
-                        <hr class="my-3"/>
-                        <div class="fs-xs text-uppercase fw-semibold text-muted mb-2">Assigned Items</div>
-                        <div class="table-responsive">
-                            <table class="table table-custom table-centered w-100 mb-0">
-                                <thead class="bg-light bg-opacity-25 thead-sm">
-                                    <tr class="text-uppercase fs-xxs">
-                                        <th>#</th>
-                                        <th>Code</th>
-                                        <th>Description</th>
-                                        <th class="text-end" style="width:130px">Quantity</th>
-                                        <th></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @for (detail of assignedItems(); track $index; let i = $index) {
-                                        <tr>
-                                            <td class="text-center">{{ i + 1 }}</td>
-                                            <td class="fw-bold">{{ detail.itemCode }}</td>
-                                            <td>{{ detail.itemDescription }}</td>
-                                            <td class="text-end">
-                                                <input type="number" class="form-control form-control-sm text-end"
-                                                       [name]="'qty_' + $index"
-                                                       [value]="detail.quantity"
-                                                       (change)="onQtyChange(detail, $any($event.target).value)"
-                                                       min="1" step="1"/>
-                                            </td>
-                                            <td class="text-center">
-                                                <button type="button" class="btn btn-danger btn-icon btn-sm rounded-circle"
-                                                        (click)="removeItem(i, detail.stockWithdrawalDetail?.id, detail.quantity)">
-                                                    <ng-icon name="tablerTrash"></ng-icon>
-                                                </button>
-                                            </td>
+                            @if (assignedItems().length > 0) {
+                                <hr class="my-3"/>
+                                <div class="fs-xs text-uppercase fw-semibold text-muted mb-2">Assigned Items</div>
+                                <div class="table-responsive">
+                                    <table class="table table-custom table-centered w-100 mb-0">
+                                        <thead class="bg-light bg-opacity-25 thead-sm">
+                                        <tr class="text-uppercase fs-xxs">
+                                            <th>#</th>
+                                            <th>Code</th>
+                                            <th>Description</th>
+                                            <th class="text-end" style="width:130px">Quantity</th>
+                                            <th></th>
                                         </tr>
-                                    }
-                                </tbody>
-                            </table>
-                        </div>
-                        }
+                                        </thead>
+                                        <tbody>
+                                            @for (detail of assignedItems(); track $index; let i = $index) {
+                                                <tr>
+                                                    <td class="text-center">{{ i + 1 }}</td>
+                                                    <td class="fw-bold">{{ detail.itemCode }}</td>
+                                                    <td>{{ detail.itemDescription }}</td>
+                                                    <td class="text-end">
+                                                        <input type="number" class="form-control form-control-sm text-end"
+                                                               [name]="'qty_' + $index"
+                                                               [value]="detail.quantity"
+                                                               (change)="onQtyChange(detail, $any($event.target).value)"
+                                                               min="1" step="1"/>
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <button type="button" class="btn btn-danger btn-icon btn-sm rounded-circle"
+                                                                (click)="removeItem(i, detail.stockWithdrawalDetail?.id, detail.quantity)">
+                                                            <ng-icon name="tablerTrash"></ng-icon>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            }
 
-                        <div class="d-flex gap-2 justify-content-end align-items-center pt-3 border-top mt-3">
-                            <a [routerLink]="['/' + menuLink]" class="btn btn-light fw-bold">
-                                <ng-icon name="tablerArrowLeft" class="ps-0 pe-3 fw-bold"></ng-icon>Back
-                            </a>
-                            <button type="submit" class="btn btn-primary fw-bold" [disabled]="isLoading()">
-                                @if (isLoading()) {
-                                    <span class="spinner-border spinner-border-sm me-2" role="status"></span>
-                                    {{ editMode ? 'Updating...' : 'Saving...' }}
-                                } @else {
-                                    <ng-icon name="tablerCheck" class="ps-0 pe-3 fw-bold"></ng-icon>
-                                    {{ editMode ? 'Update' : 'Save ' + module }}
-                                }
-                            </button>
+                            <hr class="border-dashed mx-n3 mt-3"/>
+                            <div class="d-flex gap-2 justify-content-end align-items-center mt-3">
+                                <a [routerLink]="['/' + menuLink]" class="btn btn-light fw-bold">
+                                    <ng-icon name="tablerArrowLeft" class="fs-lg me-1 fw-bold"></ng-icon>Back
+                                </a>
+                                <button type="submit" class="btn btn-primary fw-bold" [disabled]="isLoading()">
+                                    @if (isLoading()) {
+                                        <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                                        {{ editMode ? 'Updating...' : 'Saving...' }}
+                                    } @else {
+                                        {{ editMode ? 'Update' : 'Save ' + module }}
+                                    }
+                                </button>
+                            </div>
                         </div>
-                    </div>
-                </app-ui-card>
+                    </app-ui-card>
+                </div>
             </div>
-        </div>
-    </form>
+        </form>
     }
 </div>

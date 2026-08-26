@@ -1,10 +1,7 @@
 package com.noreco1.fireflyv2.service;
 
+import com.noreco1.fireflyv2.controller.response.*;
 import com.noreco1.fireflyv2.model.StockWithdrawal;
-import com.noreco1.fireflyv2.controller.response.InventoryDocumentDto;
-import com.noreco1.fireflyv2.controller.response.ItemTransactionDetailDto;
-import com.noreco1.fireflyv2.controller.response.PostResponse;
-import com.noreco1.fireflyv2.controller.response.StockWithdrawalDetailDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Isolation;
@@ -43,4 +40,5 @@ public interface StockWithdrawalService extends VoucherService {
     Page<StockWithdrawal> findAllForSpecialEquipmentAssignment(Pageable pageable);
     Page<StockWithdrawal> findAllByQueryForSpecialEquipmentAssignment(String query, Pageable pageable);
 
+    Page<StockWithdrawal> getMemorandumReceiptVouchers(String query, Boolean multipleEmployee, Pageable pageable);
 }

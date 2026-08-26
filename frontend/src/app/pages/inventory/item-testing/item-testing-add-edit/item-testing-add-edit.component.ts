@@ -8,6 +8,29 @@ import { ModalService } from '@/app/shared/modals/modal-service';
 import { BrowsePurchaseOrderModalComponent } from '@/app/shared/modals/browse-purchase-order-modal/browse-purchase-order-modal.component';
 import { provideIcons } from '@ng-icons/core';
 import { tablerSearch, tablerTrash, tablerArrowLeft, tablerCheck } from '@ng-icons/tabler-icons';
+import { ItemTestingDetailRow, ItemTestingDto, PoDetailForTesting, PurchaseOrderSummary, Supplier } from '@/app/models/inventory-modules/item-testing.model';
+import {InventoryLocationService} from '@/app/pages/inventory-location/inventory-location.service';
+import {InventoryLocation} from '@/app/models/dropdown.model';
+
+interface ItemTestingPayload {
+    id?: number;
+    date: string;
+    inventoryLocation: { id: number } | null;
+    purchaseOrder: { id: number };
+    supplier: Supplier | null;
+    itemTestingDetails: {
+        id: number | null;
+        item: { id: number } | null;
+        itemDescription: string;
+        quantity: number;
+        unitCode: string;
+        deliveredQuantity: number;
+        quantityReceived: number;
+        poDetail: { id: number } | null;
+        unitsReceivedQuantity: number;
+        remarks: string;
+    }[];
+}
 
 @Component({
     selector: 'app-item-testing-add-edit',
@@ -27,27 +50,27 @@ import { tablerSearch, tablerTrash, tablerArrowLeft, tablerCheck } from '@ng-ico
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ItemTestingAddEditComponent implements OnInit {
-    module    = 'Item Testing';
+    readonly module   = 'Item Testing';
+    readonly menuLink = 'item-testing';
     subModule = 'Create';
-    menuLink  = 'item-testing';
 
-    id: any   = null;
+    id: number | null = null;
     editMode  = false;
     isLoading = signal(false);
 
-    flatpickrOptions = { dateFormat: 'Y-m-d', altInput: true, altFormat: 'F j, Y' };
+    readonly flatpickrOptions = { dateFormat: 'Y-m-d', altInput: true, altFormat: 'F j, Y' };
 
     deliveryDate = '';
 
-    inventoryLocations = signal<any[]>([]);
-    selectedInventoryLocation = signal<any>(null);
+    inventoryLocations        = signal<InventoryLocation[]>([]);
+    selectedInventoryLocation = signal<InventoryLocation | null>(null);
 
-    selectedPO = signal<any>(null);
-    poDesc = signal('');
+    selectedPO = signal<PurchaseOrderSummary | null>(null);
+    poDesc     = signal('');
 
-    supplierFromPO = signal<any>(null);
+    supplierFromPO = signal<Supplier | null>(null);
 
-    itemTestingDetails = signal<any[]>([]);
+    itemTestingDetails = signal<ItemTestingDetailRow[]>([]);
 
     totals = computed(() => {
         let qty = 0, qtyReceived = 0;
@@ -59,13 +82,14 @@ export class ItemTestingAddEditComponent implements OnInit {
     });
 
     private service      = inject(ItemTestingService);
+    private inventoryLocationService      = inject(InventoryLocationService);
     private modalService = inject(ModalService);
     private route        = inject(ActivatedRoute);
     private router       = inject(Router);
     private alertService = inject(AlertService);
 
     ngOnInit(): void {
-        this.service.getInventoryLocations().subscribe({
+        this.inventoryLocationService.getAllLocations().subscribe({
             next: (locs) => this.inventoryLocations.set(locs || []),
             error: () => {}
         });
@@ -85,9 +109,10 @@ export class ItemTestingAddEditComponent implements OnInit {
     }
 
     loadForEdit(): void {
+        if (this.id == null) return;
         this.isLoading.set(true);
         this.service.getData(this.id).subscribe({
-            next: (data) => {
+            next: (data: ItemTestingDto) => {
                 this.isLoading.set(false);
                 if (!data?.id) {
                     this.alertService.error(this.module, 'Record not found.', '');
@@ -98,7 +123,7 @@ export class ItemTestingAddEditComponent implements OnInit {
                 this.deliveryDate = data.date ? new Date(data.date).toISOString().substring(0, 10) : '';
 
                 if (data.inventoryLocation?.id) {
-                    const found = this.inventoryLocations().find(l => l.id === data.inventoryLocation.id);
+                    const found = this.inventoryLocations().find(l => l.id === data.inventoryLocation!.id);
                     this.selectedInventoryLocation.set(found ?? data.inventoryLocation);
                 }
 
@@ -128,40 +153,32 @@ export class ItemTestingAddEditComponent implements OnInit {
                 BrowsePurchaseOrderModalComponent, {}, { size: 'xl', centered: true }
             );
             if (result?.action === 'select' && result?.data) {
-                const po = result.data;
+                const po = result.data as PurchaseOrderSummary;
                 this.selectedPO.set(po);
                 this.poDesc.set((po.localCode || po.code || '') + ' : ' + (po.vendor?.name || po.supplier || ''));
                 this.supplierFromPO.set({
-                    accountNumber: po.vendor?.accountNo || '',
-                    name: po.vendor?.name || po.supplier || ''
+                    accountNumber: po.vendor?.accountNo,
+                    name:          po.vendor?.name || po.supplier || ''
                 });
                 this.itemTestingDetails.set([]);
 
                 this.service.getPurchaseOrderDetailsForItemTesting(po.id).subscribe({
-                    next: (items) => {
-                        const rows: any[] = [];
-                        if (items && items.length > 0) {
-                            for (const poDetail of items) {
-                                const row: any = {
-                                    item: { id: poDetail.itemId },
-                                    itemDescription: poDetail.itemDescription,
-                                    quantity: poDetail.quantity,
-                                    unitCode: poDetail.unitCode,
-                                    unitPrice: poDetail.unitPrice,
-                                    itemAmount: poDetail.itemAmount,
-                                    deliveredQuantity: poDetail.sentForTestingQuantity,
-                                    quantityReceived: poDetail.deliveredQuantity,
-                                    netAmount: poDetail.netAmount,
-                                    poDetail: { id: poDetail.id },
-                                    quantityOrdered: poDetail.quantity,
-                                    amount: poDetail.itemAmount,
-                                    unitsReceivedQuantity: poDetail.deliveredQuantity,
-                                    remarks: ''
-                                };
-                                this.initQuantityReceived(row);
-                                rows.push(row);
-                            }
-                        }
+                    next: (items: PoDetailForTesting[]) => {
+                        const rows = (items || []).map((poDetail): ItemTestingDetailRow => {
+                            const row: ItemTestingDetailRow = {
+                                item:                  poDetail.itemId != null ? { id: poDetail.itemId } : undefined,
+                                itemDescription:       poDetail.itemDescription || '',
+                                quantity:              poDetail.quantity ?? 0,
+                                unitCode:              poDetail.unitCode || '',
+                                deliveredQuantity:     poDetail.sentForTestingQuantity ?? 0,
+                                quantityReceived:      poDetail.deliveredQuantity ?? 0,
+                                poDetail:              { id: poDetail.id },
+                                unitsReceivedQuantity: poDetail.deliveredQuantity ?? 0,
+                                remarks:               ''
+                            };
+                            this.initQuantityReceived(row);
+                            return row;
+                        });
                         this.itemTestingDetails.set(rows);
                     },
                     error: () => this.alertService.error(this.module, 'Failed to load PO details.', '')
@@ -170,15 +187,13 @@ export class ItemTestingAddEditComponent implements OnInit {
         } catch { }
     }
 
-    initQuantityReceived(item: any): void {
+    private initQuantityReceived(item: ItemTestingDetailRow): void {
         if (!(item.quantityReceived || item.quantityReceived > 0)) {
             item.quantityReceived = item.quantity - item.deliveredQuantity;
         }
         if (!(item.unitsReceivedQuantity || item.unitsReceivedQuantity > 0)) {
             item.unitsReceivedQuantity = item.quantityReceived;
         }
-        item.quantityReceivedStatic = item.quantityReceived;
-        item.unitsReceivedQuantityStatic = item.unitsReceivedQuantity;
     }
 
     unitsReceivedQuantityChanged(index: number): void {
@@ -186,15 +201,13 @@ export class ItemTestingAddEditComponent implements OnInit {
         if (item.unitsReceivedQuantity < item.quantityReceived) {
             item.quantityReceived = item.unitsReceivedQuantity;
         }
-        item.netAmount  = (Number(item.quantityReceived) || 0) * (Number(item.unitPrice) || 0);
-        item.itemAmount = item.netAmount;
         this.itemTestingDetails.update(list => [...list]);
     }
 
     updateNetAmount(index: number): void {
-        const item = this.itemTestingDetails()[index];
-        item.netAmount  = (Number(item.quantityReceived) || 0) * (Number(item.unitPrice) || 0);
-        item.itemAmount = item.netAmount;
+        // Recomputes totals() by giving itemTestingDetails() a new array reference; the
+        // row's own quantityReceived was already updated in place via ngModel.
+        void index;
         this.itemTestingDetails.update(list => [...list]);
     }
 
@@ -202,7 +215,7 @@ export class ItemTestingAddEditComponent implements OnInit {
         this.itemTestingDetails.update(list => list.filter((_, i) => i !== index));
     }
 
-    compareById(a: any, b: any): boolean {
+    compareById(a: { id?: unknown } | null, b: { id?: unknown } | null): boolean {
         return a && b ? a.id === b.id : a === b;
     }
 
@@ -211,7 +224,8 @@ export class ItemTestingAddEditComponent implements OnInit {
             this.alertService.warning(this.module, 'Validation', 'Delivery Date is required.');
             return;
         }
-        if (!this.selectedPO()) {
+        const selectedPO = this.selectedPO();
+        if (!selectedPO) {
             this.alertService.warning(this.module, 'Validation', 'Please select a Purchase Order.');
             return;
         }
@@ -223,35 +237,29 @@ export class ItemTestingAddEditComponent implements OnInit {
         this.isLoading.set(true);
 
         const selectedInventoryLocation = this.selectedInventoryLocation();
-        const selectedPO = this.selectedPO();
 
-        const payload: any = {
+        const payload: ItemTestingPayload = {
             date: this.deliveryDate,
             inventoryLocation: selectedInventoryLocation?.id
                 ? { id: selectedInventoryLocation.id }
                 : null,
             purchaseOrder: { id: selectedPO.id },
             itemTestingDetails: this.itemTestingDetails().map(item => ({
-                id:                   item.id                  || null,
-                item:                 item.item                || null,
-                itemDescription:      item.itemDescription     || '',
-                quantity:             Number(item.quantity)             || 0,
-                unitCode:             item.unitCode             || '',
-                unitPrice:            Number(item.unitPrice)            || 0,
-                itemAmount:           Number(item.itemAmount)           || 0,
-                deliveredQuantity:    Number(item.deliveredQuantity)    || 0,
-                quantityReceived:     Number(item.quantityReceived)     || 0,
-                netAmount:            Number(item.netAmount)            || 0,
-                poDetail:             item.poDetail             || null,
-                quantityOrdered:      Number(item.quantityOrdered)      || 0,
-                amount:               Number(item.amount)               || 0,
+                id:                    item.id ?? null,
+                item:                  item.item ?? null,
+                itemDescription:       item.itemDescription || '',
+                quantity:              Number(item.quantity) || 0,
+                unitCode:              item.unitCode || '',
+                deliveredQuantity:     Number(item.deliveredQuantity) || 0,
+                quantityReceived:      Number(item.quantityReceived) || 0,
+                poDetail:              item.poDetail ?? null,
                 unitsReceivedQuantity: Number(item.unitsReceivedQuantity) || 0,
-                remarks:              item.remarks              || ''
+                remarks:               item.remarks || ''
             })),
-            supplier: this.supplierFromPO() || null
+            supplier: this.supplierFromPO()
         };
 
-        if (this.editMode) payload.id = this.id;
+        if (this.editMode && this.id != null) payload.id = this.id;
 
         const request$ = this.editMode
             ? this.service.update(payload)

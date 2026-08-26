@@ -1,54 +1,84 @@
 <div class="modal-header">
-    <h5 class="modal-title fw-bold">Browse Stock Withdrawal</h5>
-    <button type="button" class="btn-close" (click)="dismiss()"></button>
+    <h4 class="modal-title fw-bold">Browse Vouchers</h4>
+    <button type="button" class="btn-close" (click)="activeModal.dismiss()"></button>
 </div>
 <div class="modal-body">
-    <div class="row g-2 mb-3">
-        <div class="col-md-auto">
-            <input type="text" class="form-control" [(ngModel)]="searchText"
-                   placeholder="Search by code..." (input)="page = 1"/>
+    <div class="row justify-content-end mb-3">
+        <div class="col-12 col-md-5">
+            <div class="d-flex gap-2">
+
+                <div class="app-search flex-grow-1">
+                    <input ngbAutofocus
+                           [(ngModel)]="searchText"
+                           type="search"
+                           class="form-control"
+                           placeholder="Search by code or description..."
+                           (keyup.enter)="onSearchChange()"/>
+
+                    <ng-icon name="tablerSearch"
+                             class="app-search-icon text-muted"/>
+                </div>
+
+                <button type="button"
+                        class="btn btn-primary fw-bold flex-shrink-0"
+                        (click)="onSearchChange()">
+                    <ng-icon name="tablerSearch"
+                             class="me-1 fs-lg fw-bold"/>
+                    Search
+                </button>
+
+            </div>
         </div>
     </div>
-    <div class="table-responsive">
-        <table class="table table-custom table-centered table-select table-hover w-100 mb-0">
+    <div class="table-responsive" style="max-height: 420px; overflow-y: auto;">
+        <table class="table table-custom table-centered table-select table-hover w-100 mb-0 text-center">
             <thead class="bg-light align-middle bg-opacity-25 thead-sm">
                 <tr class="text-uppercase fs-xxs">
-                    <th>#</th>
-                    <th>Code</th>
-                    <th>Date</th>
-                    <th>Status</th>
-                    <th></th>
+                    <th class="position-sticky top-0 bg-light">#</th>
+                    <th class="text-start position-sticky top-0 bg-light">Code</th>
+                    <th class="position-sticky top-0 bg-light">Date</th>
+                    <th class="text-start position-sticky top-0 bg-light">Description</th>
                 </tr>
             </thead>
             <tbody>
-                @if (isLoading) {
-                    <tr><td colspan="5" class="text-center text-muted py-4">
+                @if (loading()) {
+                    <tr><td colspan="4" class="text-center text-muted py-4">
                         <span class="spinner-border spinner-border-sm me-2" role="status"></span>Loading...
                     </td></tr>
-                } @else if (pagedRecords.length === 0) {
-                    <tr><td colspan="5" class="text-center text-muted py-4">No records found.</td></tr>
+                } @else if (items().length === 0) {
+                    <tr><td colspan="4" class="text-center text-muted py-4">No records found.</td></tr>
                 } @else {
-                    @for (doc of pagedRecords; track doc.id; let i = $index) {
-                        <tr>
-                            <td>{{ (page - 1) * pageSize + i + 1 }}</td>
-                            <td class="fw-bold">{{ doc.code }}</td>
-                            <td>{{ (doc.date || doc.voucherDate) | date:'MM/dd/yyyy' }}</td>
-                            <td><span class="badge bg-secondary bg-opacity-25 text-dark border">{{ doc.documentStatus?.status || doc.status || '—' }}</span></td>
-                            <td>
-                                <button type="button" class="btn btn-primary btn-sm fw-bold" (click)="select(doc)">Select</button>
-                            </td>
+                    @for (doc of items(); track doc.id; let i = $index) {
+                        <tr style="cursor: pointer" (click)="select(doc)">
+                            <td>{{ (page() - 1) * pageSize() + i + 1 }}</td>
+                            <td class="fw-bold text-start">{{ doc.code }}</td>
+                            <td>{{ doc.voucherDate | date:'MM/dd/yyyy' }}</td>
+                            <td class="text-start">{{ doc.description }}</td>
                         </tr>
                     }
                 }
             </tbody>
         </table>
     </div>
-    @if (filteredTotal > pageSize) {
-        <div class="d-flex justify-content-end mt-3">
-            <ngb-pagination [(page)]="page" [pageSize]="pageSize" [collectionSize]="filteredTotal" [maxSize]="5" [rotate]="true"/>
+</div>
+<div class="modal-footer d-flex justify-content-center">
+    @if (total() > pageSize()) {
+        <div class="pagination-boxed align-items-center mt-2 mb-0">
+            <ngb-pagination
+                [page]="page()"
+                (pageChange)="onPageChange($event)"
+                [pageSize]="pageSize()"
+                [collectionSize]="total()"
+                [maxSize]="5"
+                [rotate]="true"
+            >
+                <ng-template ngbPaginationPrevious>
+                    <ng-icon name="tablerChevronLeft"/>
+                </ng-template>
+                <ng-template ngbPaginationNext>
+                    <ng-icon name="tablerChevronRight"/>
+                </ng-template>
+            </ngb-pagination>
         </div>
     }
-</div>
-<div class="modal-footer">
-    <button type="button" class="btn btn-light fw-bold" (click)="dismiss()">Close</button>
 </div>

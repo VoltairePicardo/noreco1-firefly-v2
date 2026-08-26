@@ -1,4 +1,5 @@
-/** Document type codes accepted by `GET /api/stock-release/documents?t=`. */
+import {User} from '@/app/models/user.model';
+
 export type ReleasingDocumentType = 'ST' | 'SW' | 'MR';
 
 export interface InventoryDocumentDetail {
@@ -12,19 +13,13 @@ export interface InventoryDocumentDetail {
     inventoryCategoryId?: number;
 }
 
-export interface CreatedByRef {
-    id?: number;
-    fullName?: string;
-    accountNo?: string;
-}
-
 export interface InventoryDocumentDto {
     transId: number;
     date?: string;
     code?: string;
     purpose?: string;
     createdBy?: string;
-    createdByUser?: CreatedByRef;
+    createdByUser?: User;
     departmentName?: string;
     inventoryCategoryTypeId?: number;
     details?: InventoryDocumentDetail[];

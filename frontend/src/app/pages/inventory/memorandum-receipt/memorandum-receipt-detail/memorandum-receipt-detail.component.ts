@@ -1,13 +1,15 @@
 import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { COMMON_ALL_PAGE_IMPORTS } from '@/app/shared/providers/shared-providers';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { COMMON_ALL_PAGE_IMPORTS } from '@/app/shared/providers/shared-providers';
 import { AlertService } from '@/app/shared/services/alert.service';
 import { SharedModule } from '@/app/shared/shared.module';
 import { MemorandumReceiptService } from '../memorandum-receipt.service';
 import { provideIcons } from '@ng-icons/core';
 import { tablerPrinter, tablerEdit, tablerArrowLeft } from '@ng-icons/tabler-icons';
+import { MemorandumReceiptDto } from '@/app/models/inventory-modules/memorandum-receipt.model';
+import { WorkflowAction } from '@/app/models/workflow-action.model';
+import {AnyJSONService, DocumentLog} from '@/app/shared/services/any-json.service';
 
 const TERMINAL_STATUSES = ['Approved', 'Denied', 'Cancelled'];
 
@@ -19,25 +21,43 @@ const TERMINAL_STATUSES = ['Approved', 'Denied', 'Cancelled'];
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class MemorandumReceiptDetailComponent implements OnInit {
-    module = 'Memorandum Receipt'; subModule = 'Details'; menuLink = 'memorandum-receipt';
-    id: any = 0; data = signal<any>({}); isLoading = signal(false);
-    workflowActions = signal<any[]>([]); selectedAction: any = null; remarks = ''; processingWorkflow = signal(false);
-    logs = signal<any[]>([]); showLogs = false; logsLoading = signal(false);
+    module    = 'Memorandum Receipt';
+    subModule = 'Details';
+    menuLink  = 'memorandum-receipt';
 
-    private service = inject(MemorandumReceiptService);
-    private route = inject(ActivatedRoute); private router = inject(Router);
-    private alertService = inject(AlertService);
+    id: number | null = null;
+    data      = signal<Partial<MemorandumReceiptDto>>({});
+    isLoading = signal(false);
 
-    private transactionId = computed<number | undefined>(() => this.data()?.transId ?? this.data()?.transaction?.id);
+    workflowActions     = signal<WorkflowAction[]>([]);
+    selectedAction: WorkflowAction | null = null;
+    remarks             = '';
+    processingWorkflow  = signal(false);
+
+    logs        = signal<DocumentLog[]>([]);
+    showLogs    = false;
+    logsLoading = signal(false);
+
+    private service      = inject(MemorandumReceiptService);
+    private route         = inject(ActivatedRoute);
+    private router        = inject(Router);
+    private alertService  = inject(AlertService);
+    private anyJSONService  = inject(AnyJSONService);
+
+    private transactionId = computed<number | undefined>(() => this.data()?.transaction?.id);
 
     ngOnInit(): void {
         this.route.paramMap.subscribe(params => {
-            this.id = params.get('id');
-            if (this.id && /^\d+$/.test(String(this.id))) this.loadData();
+            const idParam = params.get('id');
+            if (idParam != null && /^\d+$/.test(idParam)) {
+                this.id = Number(idParam);
+                this.loadData();
+            }
         });
     }
 
     loadData(): void {
+        if (this.id == null) return;
         this.isLoading.set(true);
         this.service.getData(this.id).subscribe({
             next: (data) => {
@@ -56,14 +76,17 @@ export class MemorandumReceiptDetailComponent implements OnInit {
             this.selectedAction  = null;
             return;
         }
-        this.service.getWorkflowActions(transactionId).subscribe({ next: (a) => { this.workflowActions.set(a || []); this.selectedAction = null; this.remarks = ''; }, error: () => { this.workflowActions.set([]); } });
+        this.anyJSONService.getWorkflowActions(transactionId).subscribe({
+            next: (a) => { this.workflowActions.set(a || []); this.selectedAction = null; this.remarks = ''; },
+            error: () => { this.workflowActions.set([]); }
+        });
     }
 
-    isTerminal(): boolean { return TERMINAL_STATUSES.includes(this.data()?.status || ''); }
-    isEditable(): boolean { const s = this.data()?.status || ''; return s === 'Document Created' || s === 'Returned to Creator'; }
+    isTerminal(): boolean { return TERMINAL_STATUSES.includes(this.data()?.documentStatus?.status || ''); }
+    isEditable(): boolean { const s = this.data()?.documentStatus?.status || ''; return s === 'Document Created' || s === 'Returned to Creator'; }
 
     processWorkflow(): void {
-        if (!this.selectedAction) return;
+        if (!this.selectedAction || this.data().id == null) return;
         this.processingWorkflow.set(true);
         this.service.process({ documentId: this.data().id, remarks: this.remarks, workflowActionsDto: { actionMapId: this.selectedAction.actionMapId } }).subscribe({
             next: (res) => { this.processingWorkflow.set(false); if (res?.success) { this.workflowActions.set([]); this.selectedAction = null; this.remarks = ''; this.alertService.success(this.module, res.successMessage || 'Processed.', ''); this.loadData(); } else { this.alertService.error(this.module, res?.failureMessage || 'Failed.', ''); } },
@@ -73,11 +96,15 @@ export class MemorandumReceiptDetailComponent implements OnInit {
 
     toggleLogs(): void {
         this.showLogs = !this.showLogs;
-        if (this.showLogs && this.logs().length === 0) {
+        const transactionId = this.transactionId();
+        if (this.showLogs && this.logs().length === 0 && transactionId != null) {
             this.logsLoading.set(true);
-            this.service.getDocumentLogs(this.transactionId()!).subscribe({ next: (l) => { this.logs.set(l || []); this.logsLoading.set(false); }, error: () => { this.logsLoading.set(false); } });
+            this.anyJSONService.getLogs(transactionId).subscribe({
+                next: (l) => { this.logs.set(l || []); this.logsLoading.set(false); },
+                error: () => { this.logsLoading.set(false); }
+            });
         }
     }
 
-    print(): void { this.service.print(this.data().id); }
+    print(): void { if (this.data().id != null) this.service.print(this.data().id!); }
 }

@@ -1,8 +1,11 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '@/environments/environment';
 import { DownloadService } from '@/app/core/services/download.service';
+import { MemorandumReceiptDto, MemorandumReceiptListRow, MemorandumReceiptPage, SlEntity } from '@/app/models/inventory-modules/memorandum-receipt.model';
+import { WorkflowAction } from '@/app/models/workflow-action.model';
+import { DocumentLog } from '@/app/shared/services/any-json.service';
 
 const BASE_API = environment.get('baseApiUrl');
 const BASE_URL = environment.get('baseUrl');
@@ -21,8 +24,8 @@ export class MemorandumReceiptService {
         return this.http.get<any[]>(`${BASE_API}/memorandum-receipt/list/${from}/${to}`);
     }
 
-    getData(id: number): Observable<any> {
-        return this.http.get(`${BASE_API}/memorandum-receipt/${id}`);
+    getData(id: number): Observable<MemorandumReceiptDto> {
+        return this.http.get<MemorandumReceiptDto>(`${BASE_API}/memorandum-receipt/${id}`);
     }
 
     create(form: any): Observable<any> {
@@ -37,28 +40,28 @@ export class MemorandumReceiptService {
         return this.http.post(`${BASE_API}/memorandum-receipt/process`, payload, httpOptions);
     }
 
-    getWorkflowActions(transId: number): Observable<any[]> {
-        return this.http.get<any[]>(`${BASE_URL}/json/workflow-actions/${transId}`);
+    getWorkflowActions(transId: number): Observable<WorkflowAction[]> {
+        return this.http.get<WorkflowAction[]>(`${BASE_URL}/json/workflow-actions/${transId}`);
     }
 
-    getDocumentLogs(transId: number): Observable<any[]> {
-        return this.http.post<any[]>(`${BASE_URL}/document/${transId}/logs`, {}, httpOptions);
+    getDocumentLogs(transId: number): Observable<DocumentLog[]> {
+        return this.http.post<DocumentLog[]>(`${BASE_URL}/document/${transId}/logs`, {}, httpOptions);
     }
 
     print(id: number): void {
         this.downloadService.print(`${BASE_URL}/memorandum-receipt/export/${id}`, { type: 'pdf' });
     }
 
-    getDefaultSignatories(): Observable<any> {
-        return this.http.get(`${BASE_API}/memorandum-receipt/default-signatories`);
+    getDefaultSignatories(): Observable<{ approvedBy?: SlEntity; approvingOfficer?: SlEntity }> {
+        return this.http.get<{ approvedBy?: SlEntity; approvingOfficer?: SlEntity }>(`${BASE_API}/memorandum-receipt/default-signatories`);
     }
 
     getStockWithdrawals(): Observable<any[]> {
         return this.http.get<any[]>(`${BASE_API}/memorandum-receipt/stock-withdrawals`);
     }
 
-    getStockWithdrawalBalance(detailId: number): Observable<any[]> {
-        return this.http.get<any[]>(`${BASE_API}/memorandum-receipt/stock-withdrawal-balance/${detailId}`);
+    getStockWithdrawalBalance(detailId: number): Observable<{ assigned?: number }[]> {
+        return this.http.get<{ assigned?: number }[]>(`${BASE_API}/memorandum-receipt/stock-withdrawal-balance/${detailId}`);
     }
 
     listByEmployee(from: string, to: string, accountNo: number): Observable<any[]> {
@@ -74,10 +77,18 @@ export class MemorandumReceiptService {
     }
 
     getStockWithdrawalEmployees(swId: number): Observable<any[]> {
-        return this.http.get<any[]>(`${BASE_API}/memorandum-receipt/sw-employees/${swId}`);
+        return this.http.get<any[]>(`${BASE_API}/memorandum-receipt/stock-withdrawal-employees/${swId}`);
     }
 
     getReturnedMrsByEmployee(accountNo: number): Observable<any[]> {
         return this.http.get<any[]>(`${BASE_API}/memorandum-receipt/returned-memos/${accountNo}`);
+    }
+
+    listPaged(from: string, to: string, statusId: number | null, employeeAccountNo: number | null, query: string, page: number, size: number): Observable<MemorandumReceiptPage<MemorandumReceiptListRow>> {
+        let params = new HttpParams().set('from', from).set('to', to).set('page', page).set('size', size);
+        if (statusId != null) params = params.set('statusId', statusId);
+        if (employeeAccountNo != null) params = params.set('em', employeeAccountNo);
+        if (query) params = params.set('query', query);
+        return this.http.get<MemorandumReceiptPage<MemorandumReceiptListRow>>(`${BASE_API}/memorandum-receipt/list-paged`, { params });
     }
 }

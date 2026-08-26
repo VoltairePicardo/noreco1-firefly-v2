@@ -100,6 +100,12 @@ public class StockWithdrawalServiceImpl implements StockWithdrawalService, Print
     @Autowired
     StockWithdrawalEmployeeRepo stockWithdrawalEmployeeRepo;
 
+    private final ItemTransactionDetailRepo itemTransactionDetailRepo;
+
+    public StockWithdrawalServiceImpl(ItemTransactionDetailRepo itemTransactionDetailRepo) {
+        this.itemTransactionDetailRepo = itemTransactionDetailRepo;
+    }
+
     @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public StockWithdrawal findById(Integer id) {
@@ -456,7 +462,7 @@ public class StockWithdrawalServiceImpl implements StockWithdrawalService, Print
                 detailDto.setItemDescription(detail.getItem().getDescription());
                 detailDto.setQuantity(detail.getQuantity());
                 detailDto.setQuantityReleased(detail.getQuantityReleased());
-                detailDto.setIsSpecialEquipment(detail.getIsSpecialEquipment());
+                detailDto.setSpecialEquipment(detail.getIsSpecialEquipment());
 
                 data.add(detailDto);
             }
@@ -855,4 +861,25 @@ public class StockWithdrawalServiceImpl implements StockWithdrawalService, Print
         return documentLoggerFacade.makeLog(sw);
     }
 
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<StockWithdrawal> getMemorandumReceiptVouchers(String query, Boolean multipleEmployee, Pageable pageable) {
+        Page<StockWithdrawal> data;
+
+        if (multipleEmployee) {
+            data = stockWithdrawalRepo.findAllForMemorandumReceiptMultipleEmployees(query, pageable);
+        } else {
+            data = stockWithdrawalRepo.findAllForMemorandumReceipt(query, pageable);
+        }
+
+
+        data.forEach(row -> {
+            ArrayList<StockWithdrawalDetail> items = stockWithdrawalDetailRepo.findByStockWithdrawalId(row.getId());
+
+            row.setItems(items);
+        });
+
+        return data;
+    }
 }

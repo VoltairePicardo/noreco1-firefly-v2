@@ -1,9 +1,4 @@
-export interface User {
-    id: number;
-    fullName?: string;
-    username?: string;
-    accountNo?: number;
-}
+import {User} from '@/app/models/user.model';
 
 export interface Transaction {
     id: number;

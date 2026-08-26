@@ -10,6 +10,27 @@ import { BrowseMrEmployeeItemsModalComponent } from '@/app/shared/modals/browse-
 import { BrowseEntityModalComponent } from '@/app/shared/modals/browse-entity-modal/browse-entity-modal.component';
 import { provideIcons } from '@ng-icons/core';
 import { tablerSearch, tablerArrowLeft, tablerCheck } from '@ng-icons/tabler-icons';
+import {StockWithdrawal, StockWithdrawalDetail} from '@/app/models/inventory-modules/stock-withdrawal.model';
+import { AssignedItemRow, AvailableItemRow, SlEntity } from '@/app/models/inventory-modules/memorandum-receipt.model';
+
+interface MrEmployee {
+    accountNo: number;
+    name?: string;
+    fullName?: string;
+}
+
+interface MultipleMrEntry {
+    employee: MrEmployee;
+    assignedItems: AssignedItemRow[];
+}
+
+interface MultipleMrPayload {
+    date: string;
+    stockWithdrawal: { id: number };
+    employee: { accountNo: number; name: string };
+    approvingOfficer: { accountNo: number; fullName: string };
+    memorandumReceiptDetails: { stockWithdrawalDetail: StockWithdrawalDetail; quantity: number; reassignedQuantity: number }[];
+}
 
 @Component({
     selector: 'app-memorandum-receipt-create-multiple',
@@ -29,20 +50,20 @@ import { tablerSearch, tablerArrowLeft, tablerCheck } from '@ng-icons/tabler-ico
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class MemorandumReceiptCreateMultipleComponent implements OnInit {
-    module    = 'Memorandum Receipt';
-    subModule = 'Create Multiple Employee MR';
-    menuLink  = 'memorandum-receipt';
+    readonly module    = 'Memorandum Receipt';
+    readonly subModule = 'Create Multiple Employee MR';
+    readonly menuLink  = 'memorandum-receipt';
+    readonly flatpickrOptions = { dateFormat: 'Y-m-d', altInput: true, altFormat: 'F j, Y' };
 
     isLoading = signal(false);
-    flatpickrOptions = { dateFormat: 'Y-m-d', altInput: true, altFormat: 'F j, Y' };
 
     date             = '';
-    selectedSW       = signal<any>(null);
+    selectedSW       = signal<StockWithdrawal | null>(null);
     selectedSWCode   = signal('');
-    availableItems   = signal<any[]>([]);
-    employees        = signal<any[]>([]);
-    multipleMR       = signal<{ employee: any; assignedItems: any[] }[]>([]);
-    approvingOfficer = signal<any>(null);
+    availableItems   = signal<AvailableItemRow[]>([]);
+    employees        = signal<MrEmployee[]>([]);
+    multipleMR       = signal<MultipleMrEntry[]>([]);
+    approvingOfficer = signal<SlEntity | null>(null);
 
     private service      = inject(MemorandumReceiptService);
     private modalService = inject(ModalService);
@@ -64,21 +85,26 @@ export class MemorandumReceiptCreateMultipleComponent implements OnInit {
     async openStockWithdrawalBrowse(): Promise<void> {
         try {
             const result = await this.modalService.openModal(
-                BrowseMrStockWithdrawalModalComponent, {}, { size: 'xl', centered: true }
+                BrowseMrStockWithdrawalModalComponent, { multipleEmployee: true }, { size: 'xl', centered: true }
             );
             if (result?.action === 'select' && result?.data) {
-                const doc = result.data;
+                const doc = result.data as StockWithdrawal;
                 this.selectedSW.set(doc);
                 this.selectedSWCode.set(doc.code || '');
                 this.multipleMR.set([]);
-                this.availableItems.set((doc.items || doc.details || []).map((item: any) => ({
+                this.availableItems.set((doc.items || []).map((item): AvailableItemRow => ({
                     stockWithdrawalDetail: item,
-                    itemCode:              item.item?.code || item.itemCode || '',
-                    itemDescription:       item.item?.description || item.itemDescription || '',
-                    unitCode:              item.item?.unit?.code || item.unitCode || '',
-                    quantity:              item.quantity,
-                    remaining:             item.quantity,
-                    oldRemainingBalance:   item.quantity
+                    itemCode:              item.item?.code || '',
+                    itemDescription:       item.item?.description || '',
+                    unitCode:              item.unit?.code || '',
+                    quantity:              item.quantity ?? 0,
+                    quantityReleased:      item.quantityReleased,
+                    totalAssigned:         0,
+                    remaining:             item.quantity ?? 0,
+                    oldRemainingBalance:   item.quantity ?? 0,
+                    oldTotalAssigned:      0,
+                    insufficientBalance:   false,
+                    assigned:              false
                 })));
                 this.loadBalances();
                 this.loadEmployees(doc.id);
@@ -92,9 +118,11 @@ export class MemorandumReceiptCreateMultipleComponent implements OnInit {
             if (!detailId) return;
             this.service.getStockWithdrawalBalance(detailId).subscribe({
                 next: (data) => {
-                    const assigned = data[0]?.assigned ?? 0;
-                    item.remaining           = item.quantity - assigned;
+                    item.totalAssigned       = data[0]?.assigned ?? 0;
+                    item.remaining           = item.quantity - item.totalAssigned;
                     item.oldRemainingBalance = item.remaining;
+                    item.oldTotalAssigned    = item.totalAssigned;
+                    item.insufficientBalance = item.remaining <= 0;
                     this.availableItems.update(list => [...list]);
                 },
                 error: () => {}
@@ -104,7 +132,7 @@ export class MemorandumReceiptCreateMultipleComponent implements OnInit {
 
     private loadEmployees(swId: number): void {
         this.service.getStockWithdrawalEmployees(swId).subscribe({
-            next: (employees) => {
+            next: (employees: MrEmployee[]) => {
                 this.employees.set(employees || []);
                 this.multipleMR.set(this.employees().map(emp => ({ employee: emp, assignedItems: [] })));
             },
@@ -112,14 +140,14 @@ export class MemorandumReceiptCreateMultipleComponent implements OnInit {
         });
     }
 
-    async openEmployeeItemsModal(entry: { employee: any; assignedItems: any[] }): Promise<void> {
+    async openEmployeeItemsModal(entry: MultipleMrEntry): Promise<void> {
         const multipleMR = this.multipleMR();
         const itemsForModal = this.availableItems().map(item => {
             const detailId = item.stockWithdrawalDetail?.id;
             const alreadyAssignedToOthers = multipleMR
                 .filter(e => e.employee.accountNo !== entry.employee.accountNo)
                 .reduce((sum, e) => {
-                    const found = e.assignedItems.find((a: any) => a.stockWithdrawalDetail?.id === detailId);
+                    const found = e.assignedItems.find(a => a.stockWithdrawalDetail?.id === detailId);
                     return sum + (found?.quantity || 0);
                 }, 0);
             return { ...item, remaining: item.remaining - alreadyAssignedToOthers };
@@ -132,13 +160,18 @@ export class MemorandumReceiptCreateMultipleComponent implements OnInit {
                 { size: 'xl', centered: true }
             );
             if (result?.action === 'select' && result?.data) {
-                entry.assignedItems = result.data;
+                const rows = result.data as Omit<AssignedItemRow, 'reassignedQuantity' | 'oldQuantity'>[];
+                entry.assignedItems = rows.map((row): AssignedItemRow => ({
+                    ...row,
+                    reassignedQuantity: 0,
+                    oldQuantity:        0
+                }));
                 this.multipleMR.update(list => [...list]);
             }
         } catch { }
     }
 
-    hasEmployeeAssignment(entry: { employee: any; assignedItems: any[] }): boolean {
+    hasEmployeeAssignment(entry: MultipleMrEntry): boolean {
         return entry.assignedItems.length > 0;
     }
 
@@ -148,7 +181,7 @@ export class MemorandumReceiptCreateMultipleComponent implements OnInit {
                 BrowseEntityModalComponent, {}, { size: 'lg', centered: true }
             );
             if (result?.action === 'select' && result?.data) {
-                const e = result.data;
+                const e = result.data as SlEntity;
                 this.approvingOfficer.set({ accountNo: e.accountNo, fullName: e.fullName || e.name || '' });
             }
         } catch { }
@@ -170,7 +203,7 @@ export class MemorandumReceiptCreateMultipleComponent implements OnInit {
         const unassigned = availableItems.filter(item => {
             const detailId = item.stockWithdrawalDetail?.id;
             const totalQty = multipleMR.reduce((sum, e) => {
-                const found = e.assignedItems.find((a: any) => a.stockWithdrawalDetail?.id === detailId);
+                const found = e.assignedItems.find(a => a.stockWithdrawalDetail?.id === detailId);
                 return sum + (found?.quantity || 0);
             }, 0);
             return totalQty < item.remaining;
@@ -178,15 +211,16 @@ export class MemorandumReceiptCreateMultipleComponent implements OnInit {
         if (unassigned.length > 0)
             { this.alertService.warning(this.module, 'Validation', 'All items must be fully distributed to employees.'); return; }
 
-        const forms = multipleMR
+        const officer = { accountNo: approvingOfficer.accountNo, fullName: approvingOfficer.fullName || approvingOfficer.name || '' };
+        const forms: MultipleMrPayload[] = multipleMR
             .filter(e => e.assignedItems.length > 0)
             .map(e => ({
                 date:             this.date,
                 stockWithdrawal:  { id: selectedSW.id },
                 employee:         { accountNo: e.employee.accountNo, name: e.employee.name || e.employee.fullName || '' },
-                approvingOfficer: { accountNo: approvingOfficer.accountNo, fullName: approvingOfficer.fullName || approvingOfficer.name || '' },
-                memorandumReceiptDetails: e.assignedItems.map((d: any) => ({
-                    stockWithdrawalDetail: { id: d.stockWithdrawalDetail?.id },
+                approvingOfficer: officer,
+                memorandumReceiptDetails: e.assignedItems.map(d => ({
+                    stockWithdrawalDetail: d.stockWithdrawalDetail!,
                     quantity:              d.quantity,
                     reassignedQuantity:    0
                 }))

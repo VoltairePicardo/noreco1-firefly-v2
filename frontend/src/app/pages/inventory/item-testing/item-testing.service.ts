@@ -3,6 +3,8 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '@/environments/environment';
 import { DownloadService } from '@/app/core/services/download.service';
+import { InventoryLocation } from '@/app/models/inventory-modules/item-stock.model';
+import { ItemTestingDto, PoDetailForTesting } from '@/app/models/inventory-modules/item-testing.model';
 
 const BASE_API = environment.get('baseApiUrl');
 const BASE_URL = environment.get('baseUrl');
@@ -21,8 +23,8 @@ export class ItemTestingService {
         return this.http.get<any[]>(`${BASE_API}/item-testing/list/${from}/${to}`);
     }
 
-    getData(id: number): Observable<any> {
-        return this.http.get(`${BASE_API}/item-testing/${id}`);
+    getData(id: number): Observable<ItemTestingDto> {
+        return this.http.get<ItemTestingDto>(`${BASE_API}/item-testing/${id}`);
     }
 
     create(form: any): Observable<any> {
@@ -49,12 +51,12 @@ export class ItemTestingService {
         this.downloadService.print(`${BASE_URL}/item-testing/export/${id}`, { type: 'pdf' });
     }
 
-    getInventoryLocations(): Observable<any[]> {
-        return this.http.get<any[]>(`${BASE_API}/item-testing/inventory-locations`);
+    getInventoryLocations(): Observable<InventoryLocation[]> {
+        return this.http.get<InventoryLocation[]>(`${BASE_API}/item-testing/inventory-locations`);
     }
 
-    getPurchaseOrderDetailsForItemTesting(poId: number): Observable<any[]> {
-        return this.http.get<any[]>(`${BASE_API}/item-testing/po-details/${poId}`);
+    getPurchaseOrderDetailsForItemTesting(poId: number): Observable<PoDetailForTesting[]> {
+        return this.http.get<PoDetailForTesting[]>(`${BASE_API}/item-testing/po-details/${poId}`);
     }
 
     delete(id: number): Observable<any> {

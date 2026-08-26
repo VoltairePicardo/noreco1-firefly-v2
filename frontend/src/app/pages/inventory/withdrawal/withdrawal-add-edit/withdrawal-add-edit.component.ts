@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, OnInit, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { map } from 'rxjs';
 import { FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AlertService } from '@/app/shared/services/alert.service';
@@ -162,7 +163,14 @@ export class WithdrawalAddEditComponent implements OnInit {
         return this.form.controls.details;
     }
 
-    private formValue = toSignal(this.form.valueChanges, { initialValue: this.form.getRawValue() });
+    // Use getRawValue() (not the raw valueChanges payload) so computed state below still sees
+    // inventoryLocation/inventoryCategory after the effect() disables them once items are added —
+    // FormGroup.value silently drops disabled controls, which otherwise flips showEmployeeSection()
+    // to false (hiding the whole employee section) the next time any control emits.
+    private formValue = toSignal(
+        this.form.valueChanges.pipe(map(() => this.form.getRawValue())),
+        { initialValue: this.form.getRawValue() }
+    );
 
     showPurposeInput  = computed(() => this.formValue().purpose?.id === OTHER_PURPOSE);
     showEmployeeSection = computed(() => this.formValue().inventoryCategory?.id === OFFICE_EQUIPMENT_FIXTURES_AND_FURNITURE_CATEGORY_ID);
@@ -547,6 +555,12 @@ export class WithdrawalAddEditComponent implements OnInit {
         const hasQty = value.details.some(d => (Number(d.quantity) || 0) > 0);
         if (!hasQty) {
             this.alertService.warning(this.module(), 'Validation', 'Total quantity is zero — enter quantities for items.');
+            return;
+        }
+        const missingUnit = value.details.find(d => (Number(d.quantity) || 0) > 0 && !d.unitId);
+        if (missingUnit) {
+            this.alertService.warning(this.module(), 'Validation',
+                `"${missingUnit.itemDescription || missingUnit.itemCode || 'Item'}" has no unit of measure. Please remove it or select a valid item.`);
             return;
         }
 
