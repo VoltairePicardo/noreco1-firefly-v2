@@ -10,7 +10,7 @@ import { BrowseEntityModalComponent } from '@/app/shared/modals/browse-entity-mo
 import { BrowseStockReleaseListModalComponent } from '@/app/shared/modals/browse-stock-release-list-modal/browse-stock-release-list-modal.component';
 import { provideIcons } from '@ng-icons/core';
 import { tablerSearch, tablerArrowLeft, tablerCheck, tablerTrash } from '@ng-icons/tabler-icons';
-import {InventoryLocation} from '@/app/models/dropdown.model';
+import {InventoryLocation} from '@/app/models/shared/reference.model';
 import {InventoryLocationService} from '@/app/pages/inventory-location/inventory-location.service';
 import {StockRelease} from '@/app/models/inventory-modules/stock-release.model';
 

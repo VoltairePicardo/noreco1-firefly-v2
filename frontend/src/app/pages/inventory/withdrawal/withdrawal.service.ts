@@ -3,7 +3,8 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '@/environments/environment';
 import { DownloadService } from '@/app/core/services/download.service';
-import { StockWithdrawal, StockWithdrawalPage } from '@/app/models/inventory-modules/stock-withdrawal.model';
+import { StockWithdrawal } from '@/app/models/inventory-modules/stock-withdrawal.model';
+import { InventoryPage } from '@/app/models/shared/page.model';
 
 const BASE_API = environment.get('baseApiUrl');
 const httpOptions = { headers: new HttpHeaders({ 'Content-Type': 'application/json' }) };
@@ -95,10 +96,10 @@ export class WithdrawalService {
         return this.http.get(`${BASE_API}/cost-estimate/list/stock-withdrawal/${locationId}`, { params });
     }
 
-    getMemorandumReceiptVouchers(query: string, page: number, size: number, multipleEmployee?: boolean): Observable<StockWithdrawalPage<StockWithdrawal>> {
+    getMemorandumReceiptVouchers(query: string, page: number, size: number, multipleEmployee?: boolean): Observable<InventoryPage<StockWithdrawal>> {
         let params = new HttpParams().set('page', page).set('size', size);
         if (query) params = params.set('q', query);
         if (multipleEmployee != null) params = params.set('f', multipleEmployee);
-        return this.http.get<StockWithdrawalPage<StockWithdrawal>>(`${BASE_API}/withdrawal/memorandum-receipt-vouchers`, { params });
+        return this.http.get<InventoryPage<StockWithdrawal>>(`${BASE_API}/withdrawal/memorandum-receipt-vouchers`, { params });
     }
 }

@@ -11,13 +11,13 @@ export interface UnitMeasure {
     plural?: string;
 }
 
-export interface InventoryCategory {
+export interface InventoryCategoryEntity {
     id: number;
     description?: string;
     type?: number;
 }
 
-export interface InventoryLocation {
+export interface InventoryLocationEntity {
     id: number;
     description: string;
     account?: AccountRef;
@@ -43,7 +43,7 @@ export interface Item {
     isActive?: boolean;
     assetAccount?: AccountRef;
     expenseAccount?: AccountRef;
-    inventoryCategory?: InventoryCategory;
+    inventoryCategory?: InventoryCategoryEntity;
     fileName?: string;
     hasSerialNumbers?: boolean;
     barcode?: string;
@@ -53,7 +53,7 @@ export interface Item {
 export interface ItemStock {
     id: number;
     item?: Item;
-    inventoryLocation?: InventoryLocation;
+    inventoryLocation?: InventoryLocationEntity;
     quantity?: number;
     unitCost?: number;
     totalQuantity?: number;
@@ -67,19 +67,9 @@ export interface ItemStock {
 export interface ItemStockDto {
     id: number;
     item?: Item;
-    inventoryLocation?: InventoryLocation;
+    inventoryLocation?: InventoryLocationEntity;
     totalQuantity?: number;
     totalItemCost?: number;
     createdAt?: string;
     updatedAt?: string;
-}
-
-export interface ItemStockPage<T> {
-    content: T[];
-    page?: {
-        size?: number;
-        number?: number;
-        totalElements?: number;
-        totalPages?: number;
-    };
 }

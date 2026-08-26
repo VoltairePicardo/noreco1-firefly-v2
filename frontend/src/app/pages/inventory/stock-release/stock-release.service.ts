@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { environment } from '@/environments/environment';
 import { DownloadService } from '@/app/core/services/download.service';
-import { HalPage, toPagedResult } from '@/app/models/hal-page.model';
+import { HalPage, toPagedResult } from '@/app/models/shared/page.model';
 import { InventoryDocumentDto, ReleasingDocumentType } from '@/app/models/inventory-modules/inventory-document.model';
 
 const BASE_API = environment.get('baseApiUrl');

@@ -11,7 +11,7 @@ import { BrowseItemStockModalComponent } from '@/app/shared/modals/browse-item-s
 import { provideIcons } from '@ng-icons/core';
 import { tablerSearch, tablerTrash, tablerArrowLeft, tablerCheck, tablerPlus } from '@ng-icons/tabler-icons';
 import { InventoryLocationService } from '@/app/pages/inventory-location/inventory-location.service';
-import { InventoryLocation } from '@/app/models/dropdown.model';
+import { InventoryLocation } from '@/app/models/shared/reference.model';
 import { ItemTransactionDetailDto } from '@/app/models/inventory-modules/stock-release.model';
 import { ItemStock } from '@/app/models/inventory-modules/item-stock.model';
 import { StockAdjustment, StockAdjustmentDefaultSignatories, SignatoryRef } from '@/app/models/inventory-modules/stock-adjustment.model';

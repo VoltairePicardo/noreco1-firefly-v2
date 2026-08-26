@@ -9,13 +9,13 @@ import { BrowseEntityModalComponent } from '@/app/shared/modals/browse-entity-mo
 import { SelectOnFocusDirective } from '@/app/core/directive/select-on-focus.directive';
 import { provideIcons } from '@ng-icons/core';
 import { tablerSearch, tablerTrash, tablerArrowLeft, tablerCheck, tablerPlus } from '@ng-icons/tabler-icons';
-import {InventoryLocation} from '@/app/models/dropdown.model';
+import {InventoryLocation, SpecialEquipment} from '@/app/models/shared/reference.model';
 import {InventoryLocationService} from '@/app/pages/inventory-location/inventory-location.service';
 import {
     BrowseItemStockModalComponent
 } from '@/app/shared/modals/browse-item-stock-modal/browse-item-stock-modal.component';
 import {ItemStock} from '@/app/models/inventory-modules/item-stock.model';
-import {ItemTransactionDetailDto, SpecialEquipment} from '@/app/models/inventory-modules/stock-release.model';
+import {ItemTransactionDetailDto} from '@/app/models/inventory-modules/stock-release.model';
 import {SerialNumbersModalComponent} from '@/app/shared/modals/serial-numbers-modal/serial-numbers-modal.component';
 
 const EMPLOYEE_CLASSIFICATION_ID = 1;

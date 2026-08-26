@@ -1,31 +1,10 @@
-import {
-    Transaction,
-    Workflow,
-    DocumentStatus,
-    Office,
-    InventoryLocation,
-    ItemTransactionDetailDto
-} from './stock-release.model';
-import {User} from '@/app/models/user.model';
+import { User } from '@/app/models/user.model';
+import { InventoryLocation, Department } from '@/app/models/shared/reference.model';
+import { DocumentBase } from '@/app/models/shared/document.model';
+import { ItemTransactionDetailDto } from '@/app/models/inventory-modules/stock-release.model';
 
-export interface Department {
-    id: number;
-    name?: string;
-    abbreviation?: string;
-}
-
-export interface MaterialSalvageTicket {
-    id: number;
-    code?: string;
-    transaction?: Transaction;
+export interface MaterialSalvageTicket extends DocumentBase {
     transId?: number;
-    workflow?: Workflow;
-    createdAt?: string;
-    updatedAt?: string;
-    createdBy?: User;
-    documentStatus?: DocumentStatus;
-    postedBy?: User;
-    office?: Office;
 
     voucherDate?: string;
     purpose?: string;

@@ -102,7 +102,11 @@
       "PowerShell($env:JAVA_HOME)",
       "PowerShell(Get-Process *)",
       "PowerShell(Get-NetTCPConnection *)",
-      "Bash(xargs -I{} echo {})"
+      "Bash(xargs -I{} echo {})",
+      "Bash(node -e \"const p=require\\('./package.json'\\); console.log\\(JSON.stringify\\(p.scripts,null,2\\)\\)\")",
+      "Bash(xargs -I{} sh -c 'echo ==={}===; cat {}')",
+      "Bash(kill %1)",
+      "Bash(./mvnw -q -o compile -Dmaven.compiler.showWarnings=false)"
     ]
   }
 }

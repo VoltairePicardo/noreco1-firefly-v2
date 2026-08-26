@@ -3,7 +3,8 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '@/environments/environment';
 import { DownloadService } from '@/app/core/services/download.service';
-import { MemorandumReceiptDto, MemorandumReceiptListRow, MemorandumReceiptPage, SlEntity } from '@/app/models/inventory-modules/memorandum-receipt.model';
+import { MemorandumReceiptDto, MemorandumReceiptListRow, SlEntity } from '@/app/models/inventory-modules/memorandum-receipt.model';
+import { InventoryPage } from '@/app/models/shared/page.model';
 import { WorkflowAction } from '@/app/models/workflow-action.model';
 import { DocumentLog } from '@/app/shared/services/any-json.service';
 
@@ -84,11 +85,11 @@ export class MemorandumReceiptService {
         return this.http.get<any[]>(`${BASE_API}/memorandum-receipt/returned-memos/${accountNo}`);
     }
 
-    listPaged(from: string, to: string, statusId: number | null, employeeAccountNo: number | null, query: string, page: number, size: number): Observable<MemorandumReceiptPage<MemorandumReceiptListRow>> {
+    listPaged(from: string, to: string, statusId: number | null, employeeAccountNo: number | null, query: string, page: number, size: number): Observable<InventoryPage<MemorandumReceiptListRow>> {
         let params = new HttpParams().set('from', from).set('to', to).set('page', page).set('size', size);
         if (statusId != null) params = params.set('statusId', statusId);
         if (employeeAccountNo != null) params = params.set('em', employeeAccountNo);
         if (query) params = params.set('query', query);
-        return this.http.get<MemorandumReceiptPage<MemorandumReceiptListRow>>(`${BASE_API}/memorandum-receipt/list-paged`, { params });
+        return this.http.get<InventoryPage<MemorandumReceiptListRow>>(`${BASE_API}/memorandum-receipt/list-paged`, { params });
     }
 }

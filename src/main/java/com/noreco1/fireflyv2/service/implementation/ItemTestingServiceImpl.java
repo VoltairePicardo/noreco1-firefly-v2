@@ -60,6 +60,26 @@ public class ItemTestingServiceImpl implements ItemTestingService, PrintableVouc
         return itemTestingRepo.findAllByDateBetweenOrderByDate(fromDate, toDate, pageable);
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
+    @Override
+    public Page<Map<String, Object>> getItemTestingPaged(String from, String to, Pageable pageable) {
+        Date fromDate = DateHelper.strToDate(from, "yyyy-MM-dd");
+        Date toDate = DateHelper.strToDate(to, "yyyy-MM-dd");
+        Page<ItemTesting> itemTestings = itemTestingRepo.findAllByDateBetweenOrderByDate(fromDate, toDate, pageable);
+
+        return itemTestings.map(itemTesting -> {
+            Map<String, Object> dto = new HashMap<>();
+            dto.put("id", itemTesting.getId());
+            dto.put("date", itemTesting.getDate());
+            dto.put("inventoryLocation", itemTesting.getInventoryLocation());
+            dto.put("purchaseOrder", itemTesting.getPurchaseOrder());
+            dto.put("totalItems", itemTestingDetailRepo.countAllByItemTestingId(itemTesting.getId()));
+            dto.put("createdBy", itemTesting.getCreatedBy());
+            dto.put("supplier", itemTesting.getSupplier());
+            return dto;
+        });
+    }
+
     @Override
     public PostResponse update(ItemTesting itemTesting, BindingResult bindingResult, MessageSource messageSource) {
         return this.create(itemTesting, bindingResult, messageSource);

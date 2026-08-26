@@ -5,12 +5,13 @@ import { COMMON_ALL_PAGE_IMPORTS, COMMON_ADD_EDIT_PAGE_IMPORTS, COMMON_MAIN_PAGE
 import { FlatpickrDirective, provideFlatpickrDefaults } from 'angularx-flatpickr';
 import { ItemTestingService } from '../item-testing.service';
 import { ModalService } from '@/app/shared/modals/modal-service';
-import { BrowsePurchaseOrderModalComponent } from '@/app/shared/modals/browse-purchase-order-modal/browse-purchase-order-modal.component';
+import { BrowsePurchaseOrderForTestingModalComponent } from '@/app/shared/modals/browse-purchase-order-for-testing-modal/browse-purchase-order-for-testing-modal.component';
 import { provideIcons } from '@ng-icons/core';
 import { tablerSearch, tablerTrash, tablerArrowLeft, tablerCheck } from '@ng-icons/tabler-icons';
 import { ItemTestingDetailRow, ItemTestingDto, PoDetailForTesting, PurchaseOrderSummary, Supplier } from '@/app/models/inventory-modules/item-testing.model';
+import { PurchaseOrder } from '@/app/models/inventory-modules/purchase-order.model';
 import {InventoryLocationService} from '@/app/pages/inventory-location/inventory-location.service';
-import {InventoryLocation} from '@/app/models/dropdown.model';
+import {InventoryLocation} from '@/app/models/shared/reference.model';
 
 interface ItemTestingPayload {
     id?: number;
@@ -150,15 +151,16 @@ export class ItemTestingAddEditComponent implements OnInit {
     async openPOBrowse(): Promise<void> {
         try {
             const result = await this.modalService.openModal(
-                BrowsePurchaseOrderModalComponent, {}, { size: 'xl', centered: true }
+                BrowsePurchaseOrderForTestingModalComponent, {}, { size: 'lg', centered: true }
             );
             if (result?.action === 'select' && result?.data) {
-                const po = result.data as PurchaseOrderSummary;
-                this.selectedPO.set(po);
-                this.poDesc.set((po.localCode || po.code || '') + ' : ' + (po.vendor?.name || po.supplier || ''));
+                const po = result.data as PurchaseOrder;
+                const summary: PurchaseOrderSummary = { id: po.id, code: po.code, vendor: po.vendor };
+                this.selectedPO.set(summary);
+                this.poDesc.set((po.code || '') + ' : ' + (po.vendor?.name || ''));
                 this.supplierFromPO.set({
                     accountNumber: po.vendor?.accountNo,
-                    name:          po.vendor?.name || po.supplier || ''
+                    name:          po.vendor?.name || ''
                 });
                 this.itemTestingDetails.set([]);
 
@@ -205,8 +207,6 @@ export class ItemTestingAddEditComponent implements OnInit {
     }
 
     updateNetAmount(index: number): void {
-        // Recomputes totals() by giving itemTestingDetails() a new array reference; the
-        // row's own quantityReceived was already updated in place via ngModel.
         void index;
         this.itemTestingDetails.update(list => [...list]);
     }

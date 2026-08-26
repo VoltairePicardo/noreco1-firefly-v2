@@ -1,113 +1,63 @@
 package com.noreco1.fireflyv2.controller;
 
-import com.noreco1.fireflyv2.common.GlobalConstant;
-import com.noreco1.fireflyv2.common.facade.AuthenticationFacade;
 import com.noreco1.fireflyv2.controller.response.ItemTestingDto;
 import com.noreco1.fireflyv2.controller.response.PostResponse;
-import com.noreco1.fireflyv2.controller.response.ProcessDocumentDto;
 import com.noreco1.fireflyv2.model.ItemTesting;
-import com.noreco1.fireflyv2.repo.ItemTestingRepo;
+import com.noreco1.fireflyv2.repo.ItemTestingDetailRepo;
 import com.noreco1.fireflyv2.service.ItemTestingService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Pageable;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Date;
-import java.util.List;
 import java.util.Map;
 
 @RestController
 @RequestMapping("/api/item-testing")
 public class ItemTestingController {
 
-    @Autowired
-    @Qualifier("itemTestingServiceImpl")
-    private ItemTestingService itemTestingService;
+    private final ItemTestingService itemTestingService;
+    private final MessageSource messageSource;
+    private final ItemTestingDetailRepo itemTestingDetailRepo;
 
-    @Autowired
-    private ItemTestingRepo itemTestingRepo;
-
-    @Autowired
-    private AuthenticationFacade authenticationFacade;
-
-    @GetMapping("/list")
-    public List<ItemTesting> list() {
-        Page<ItemTesting> page = itemTestingService.findAll("2000-01-01",
-                GlobalConstant.YYYY_DATE_FORMAT.format(new Date()) + "-12-31",
-                PageRequest.of(0, 1000, Sort.by("date").descending()));
-        return page.getContent();
+    public ItemTestingController(ItemTestingService itemTestingService, MessageSource messageSource, ItemTestingDetailRepo itemTestingDetailRepo) {
+        this.itemTestingService = itemTestingService;
+        this.messageSource = messageSource;
+        this.itemTestingDetailRepo = itemTestingDetailRepo;
     }
 
-    @GetMapping("/list/{from}/{to}")
-    public List<ItemTesting> listByDateRange(@PathVariable String from, @PathVariable String to) {
-        Page<ItemTesting> page = itemTestingService.findAll(from, to,
-                PageRequest.of(0, 1000, Sort.by("date").descending()));
-        return page.getContent();
-    }
-
-    @GetMapping("/{id}")
-    public ItemTestingDto getById(@PathVariable Integer id) {
+    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
+    @ResponseBody
+    public ItemTestingDto get(@PathVariable Integer id) {
         return itemTestingService.findById(id);
     }
 
-    @GetMapping("/details/{id}")
-    public List<Map> getDetails(@PathVariable Integer id) {
-        return itemTestingService.getItemTestingDetails(id);
+    @GetMapping(value = "/list-paged")
+    @ResponseBody
+    public Page<Map<String, Object>> listPaged(@RequestParam String from, @RequestParam String to, Pageable pageable) {
+        return itemTestingService.getItemTestingPaged(from, to, pageable);
     }
 
-    @PostMapping("/create")
-    public PostResponse create(@RequestBody Map<String, Object> payload) {
-        PostResponse response = new PostResponse();
-        try {
-            ItemTesting it = new ItemTesting();
-            Object dateObj = payload.get("date");
-            if (dateObj instanceof String dateStr && !dateStr.isEmpty()) {
-                it.setDate(java.sql.Date.valueOf(dateStr));
-            }
-            Date now = new Date();
-            it.setCreatedAt(now);
-            it.setUpdatedAt(now);
-            it.setCreatedBy(authenticationFacade.getLoggedIn());
-            ItemTesting saved = itemTestingRepo.save(it);
-            response.setSuccessMessage("Item Testing saved.");
-            response.setModelId(saved.getId());
-        } catch (Exception e) {
-            response.setFailureMessage("Failed to save: " + e.getMessage());
-        }
-        return response;
+    @RequestMapping(value = "/create", method = RequestMethod.POST)
+    @ResponseBody
+    public PostResponse create(@Valid @RequestBody ItemTesting itemTesting, BindingResult bindingResult) {
+        return itemTestingService.create(itemTesting, bindingResult, messageSource);
     }
 
-    @PostMapping("/update")
-    public PostResponse update(@RequestBody Map<String, Object> payload) {
-        PostResponse response = new PostResponse();
-        Object idObj = payload.get("id");
-        if (idObj == null) { response.setFailureMessage("ID is required."); return response; }
-        Integer id = ((Number) idObj).intValue();
-        ItemTesting it = itemTestingRepo.findById(id).orElse(null);
-        if (it == null) { response.setFailureMessage("Record not found."); return response; }
-        try {
-            Object dateObj = payload.get("date");
-            if (dateObj instanceof String dateStr && !dateStr.isEmpty()) {
-                it.setDate(java.sql.Date.valueOf(dateStr));
-            }
-            it.setUpdatedAt(new Date());
-            ItemTesting saved = itemTestingRepo.save(it);
-            response.setSuccessMessage("Item Testing updated.");
-            response.setModelId(saved.getId());
-        } catch (Exception e) {
-            response.setFailureMessage("Failed to update: " + e.getMessage());
-        }
-        return response;
+    @RequestMapping(value = "/update", method = RequestMethod.POST)
+    @ResponseBody
+    public PostResponse update(@Valid @RequestBody ItemTesting itemTesting, BindingResult bindingResult, HttpServletRequest request) {
+        return itemTestingService.update(itemTesting, bindingResult, messageSource);
     }
 
-    @PostMapping("/process")
-    public PostResponse process(@RequestBody ProcessDocumentDto dto) {
-        PostResponse response = new PostResponse();
-        response.setFailureMessage("Process not supported for Item Testing.");
-        return response;
+    @RequestMapping(value = "/delete/{id}", method = RequestMethod.POST)
+    @ResponseBody
+    public PostResponse delete(@PathVariable Integer id) {
+        return itemTestingService.delete(id);
     }
 
 }

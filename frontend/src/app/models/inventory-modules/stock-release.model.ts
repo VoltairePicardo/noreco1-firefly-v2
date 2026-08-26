@@ -1,48 +1,9 @@
-import {User} from '@/app/models/user.model';
+import { User } from '@/app/models/user.model';
+import { Transaction, InventoryLocation, SpecialEquipment } from '@/app/models/shared/reference.model';
+import { DocumentBase, ItemLineRef } from '@/app/models/shared/document.model';
 
-export interface Transaction {
-    id: number;
-    createdBy?: User;
-    createdAt?: string;
-}
-
-export interface Workflow {
-    id: number;
-    name?: string;
-    enabled?: boolean;
-}
-
-export interface DocumentStatus {
-    id: number;
-    status?: string;
-}
-
-export interface Office {
-    id: number;
-    name?: string;
-    acronym?: string;
-}
-
-export interface InventoryLocation {
-    id: number;
-    description?: string;
-    name?: string;
-}
-
-export interface SpecialEquipment {
-    id: number;
-    serialNo?: string;
-}
-
-export interface ItemTransactionDetailDto {
-    id?: number;
-    itemId?: number;
-    itemCode?: string;
-    unitId?: number;
-    unitCode?: string;
-    itemDescription?: string;
+export interface ItemTransactionDetailDto extends ItemLineRef {
     searchText?: string;
-    quantity?: number;
     unitCost?: number;
     totalCost?: number;
     quantityReleased?: number;
@@ -64,9 +25,7 @@ export interface ItemTransactionDetailDto {
     serialNumbers?: SpecialEquipment[];
 }
 
-export interface StockRelease {
-    id: number;
-    code?: string;
+export interface StockRelease extends DocumentBase {
     description?: string;
     voucherDate?: string;
     year?: number;
@@ -77,13 +36,4 @@ export interface StockRelease {
     auditor?: User;
     details?: ItemTransactionDetailDto[];
     documentType?: number;
-
-    transaction?: Transaction;
-    workflow?: Workflow;
-    createdAt?: string;
-    updatedAt?: string;
-    createdBy?: User;
-    documentStatus?: DocumentStatus;
-    postedBy?: User;
-    office?: Office;
 }

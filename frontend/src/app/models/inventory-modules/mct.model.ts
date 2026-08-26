@@ -1,26 +1,10 @@
-import { User } from '../user.model';
-import {
-    Transaction,
-    Workflow,
-    DocumentStatus,
-    Office,
-    InventoryLocation,
-    ItemTransactionDetailDto,
-    StockRelease
-} from './stock-release.model';
+import { User } from '@/app/models/user.model';
+import { InventoryLocation } from '@/app/models/shared/reference.model';
+import { DocumentBase } from '@/app/models/shared/document.model';
+import { StockRelease, ItemTransactionDetailDto } from '@/app/models/inventory-modules/stock-release.model';
 
-export interface MaterialCreditTicket {
-    id: number;
-    code?: string;
-    transaction?: Transaction;
+export interface MaterialCreditTicket extends DocumentBase {
     approvingOfficer?: User;
-    workflow?: Workflow;
-    createdAt?: string;
-    updatedAt?: string;
-    createdBy?: User;
-    documentStatus?: DocumentStatus;
-    postedBy?: User;
-    office?: Office;
 
     remarks?: string;
     voucherDate?: string;

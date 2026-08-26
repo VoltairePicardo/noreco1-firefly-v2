@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '@/environments/environment';
-import {InventoryLocation} from '@/app/models/dropdown.model';
+import {InventoryLocation} from '@/app/models/shared/reference.model';
 
 const BASE_API = environment.get('baseApiUrl');
 const httpOptions = {

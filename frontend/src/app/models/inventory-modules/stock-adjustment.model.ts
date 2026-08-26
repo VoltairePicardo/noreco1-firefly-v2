@@ -1,25 +1,11 @@
-import { User } from '../user.model';
-import {
-    Transaction,
-    Workflow,
-    DocumentStatus,
-    Office,
-    InventoryLocation,
-    ItemTransactionDetailDto
-} from './stock-release.model';
+import { User } from '@/app/models/user.model';
+import { InventoryLocation } from '@/app/models/shared/reference.model';
+import { DocumentBase } from '@/app/models/shared/document.model';
+import { SlEntity } from '@/app/models/shared/party.model';
+import { ItemTransactionDetailDto } from '@/app/models/inventory-modules/stock-release.model';
 
-export interface StockAdjustment {
-    id: number;
-    code?: string;
-    transaction?: Transaction;
+export interface StockAdjustment extends DocumentBase {
     approvingOfficer?: User;
-    workflow?: Workflow;
-    createdAt?: string;
-    updatedAt?: string;
-    createdBy?: User;
-    documentStatus?: DocumentStatus;
-    postedBy?: User;
-    office?: Office;
 
     remarks?: string;
     voucherDate?: string;
@@ -29,11 +15,7 @@ export interface StockAdjustment {
     details?: ItemTransactionDetailDto[];
 }
 
-export interface SignatoryRef {
-    accountNo?: number;
-    fullName?: string;
-    name?: string;
-}
+export type SignatoryRef = SlEntity;
 
 export interface StockAdjustmentDefaultSignatories {
     checker?: SignatoryRef;

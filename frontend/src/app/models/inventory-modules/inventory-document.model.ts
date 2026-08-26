@@ -1,14 +1,9 @@
-import {User} from '@/app/models/user.model';
+import { User } from '@/app/models/user.model';
+import { ItemLineRef } from '@/app/models/shared/document.model';
 
 export type ReleasingDocumentType = 'ST' | 'SW' | 'MR';
 
-export interface InventoryDocumentDetail {
-    itemId?: number;
-    itemCode?: string;
-    unitId?: number;
-    unitCode?: string;
-    itemDescription?: string;
-    quantity?: number;
+export interface InventoryDocumentDetail extends ItemLineRef {
     quantityReleased?: number;
     inventoryCategoryId?: number;
 }

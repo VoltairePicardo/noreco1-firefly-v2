@@ -3,8 +3,9 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '@/environments/environment';
 import { DownloadService } from '@/app/core/services/download.service';
-import { InventoryLocation } from '@/app/models/inventory-modules/item-stock.model';
-import { ItemTestingDto, PoDetailForTesting } from '@/app/models/inventory-modules/item-testing.model';
+import { InventoryLocationEntity } from '@/app/models/inventory-modules/item-stock.model';
+import { ItemTestingDto, ItemTestingListRow, PoDetailForTesting } from '@/app/models/inventory-modules/item-testing.model';
+import { InventoryPage } from '@/app/models/shared/page.model';
 
 const BASE_API = environment.get('baseApiUrl');
 const BASE_URL = environment.get('baseUrl');
@@ -21,6 +22,11 @@ export class ItemTestingService {
 
     listByDateRange(from: string, to: string): Observable<any[]> {
         return this.http.get<any[]>(`${BASE_API}/item-testing/list/${from}/${to}`);
+    }
+
+    listPaged(from: string, to: string, page: number, size: number): Observable<InventoryPage<ItemTestingListRow>> {
+        const params = new HttpParams().set('from', from).set('to', to).set('page', page).set('size', size);
+        return this.http.get<InventoryPage<ItemTestingListRow>>(`${BASE_API}/item-testing/list-paged`, { params });
     }
 
     getData(id: number): Observable<ItemTestingDto> {
@@ -51,12 +57,12 @@ export class ItemTestingService {
         this.downloadService.print(`${BASE_URL}/item-testing/export/${id}`, { type: 'pdf' });
     }
 
-    getInventoryLocations(): Observable<InventoryLocation[]> {
-        return this.http.get<InventoryLocation[]>(`${BASE_API}/item-testing/inventory-locations`);
+    getInventoryLocations(): Observable<InventoryLocationEntity[]> {
+        return this.http.get<InventoryLocationEntity[]>(`${BASE_API}/item-testing/inventory-locations`);
     }
 
     getPurchaseOrderDetailsForItemTesting(poId: number): Observable<PoDetailForTesting[]> {
-        return this.http.get<PoDetailForTesting[]>(`${BASE_API}/item-testing/po-details/${poId}`);
+        return this.http.get<PoDetailForTesting[]>(`${BASE_API}/po-detail/pod-for-item-testing/${poId}`);
     }
 
     delete(id: number): Observable<any> {

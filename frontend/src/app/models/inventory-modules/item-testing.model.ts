@@ -1,5 +1,8 @@
-import { InventoryLocation } from '@/app/models/inventory-modules/item-stock.model';
+import { InventoryLocationEntity } from '@/app/models/inventory-modules/item-stock.model';
 import { User } from '@/app/models/user.model';
+import { PurchaseOrderVendorEntity } from '@/app/models/inventory-modules/purchase-order.model';
+import { DocumentBase } from '@/app/models/shared/document.model';
+import { DocumentStatus } from '@/app/models/shared/reference.model';
 
 export interface Supplier {
     id?: number;
@@ -8,10 +11,7 @@ export interface Supplier {
     address?: string;
 }
 
-export interface PurchaseOrderVendor {
-    accountNo?: number;
-    name?: string;
-}
+export type PurchaseOrderVendor = Pick<PurchaseOrderVendorEntity, 'accountNo' | 'name'>;
 
 export interface PurchaseOrderSummary {
     id: number;
@@ -34,7 +34,7 @@ export interface PoDetailForTesting {
 
 export interface ItemTestingDetailRow {
     id?: number;
-    item?: { id: number };
+    item?: { id: number; code?: string; description?: string };
     poDetail?: { id: number };
     itemCode?: string;
     unitCode: string;
@@ -48,14 +48,25 @@ export interface ItemTestingDetailRow {
     balance?: number;
 }
 
-export interface ItemTestingDto {
+/** One row of `GET /item-testing/list-paged` — mirrors the map keys built in `ItemTestingServiceImpl.getItemTestingPaged`. */
+export interface ItemTestingListRow {
     id: number;
     date?: string;
-    inventoryLocation?: InventoryLocation;
+    inventoryLocation?: InventoryLocationEntity;
+    purchaseOrder?: PurchaseOrderSummary;
+    totalItems?: number;
     createdBy?: User;
+    supplier?: Supplier;
+    documentStatus?: DocumentStatus;
+}
+
+export interface ItemTestingDto extends DocumentBase {
+    date?: string;
+    transId?: number;
+    totalItems?: number;
+    preparedBy?: string;
+    inventoryLocation?: InventoryLocationEntity;
     itemTestingDetails?: ItemTestingDetailRow[];
-    createdAt?: string;
-    updatedAt?: string;
     supplier?: Supplier;
     purchaseOrder?: PurchaseOrderSummary;
 }

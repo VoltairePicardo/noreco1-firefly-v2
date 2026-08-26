@@ -15,7 +15,8 @@ import { BrowseRvCostEstimateModalComponent } from '@/app/shared/modals/browse-r
 import { provideIcons } from '@ng-icons/core';
 import { tablerSearch, tablerTrash, tablerPlus, tablerArrowLeft, tablerCheck } from '@ng-icons/tabler-icons';
 import { ItemStock } from '@/app/models/inventory-modules/item-stock.model';
-import {InventoryCategory, InventoryLocation, Purpose} from '@/app/models/dropdown.model';
+import {Purpose} from '@/app/models/dropdown.model';
+import {InventoryCategory, InventoryLocation} from '@/app/models/shared/reference.model';
 
 interface SlEntity {
     accountNo: string;

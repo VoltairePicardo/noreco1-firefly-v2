@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, Input, OnInit, computed, inject, si
 import { COMMON_ALL_PAGE_IMPORTS, COMMON_MAIN_PAGE_IMPORTS, COMMON_ADD_EDIT_PAGE_IMPORTS, SHARED_PROVIDERS } from '@/app/shared/providers/shared-providers';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { AlertService } from '@/app/shared/services/alert.service';
-import { SpecialEquipment } from '@/app/models/inventory-modules/stock-release.model';
+import { SpecialEquipment } from '@/app/models/shared/reference.model';
 
 @Component({
     selector: 'app-serial-numbers-modal',

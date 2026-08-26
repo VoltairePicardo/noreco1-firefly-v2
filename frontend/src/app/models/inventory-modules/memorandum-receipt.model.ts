@@ -1,11 +1,9 @@
 import { User } from '@/app/models/user.model';
-import { Office, StockWithdrawal, StockWithdrawalDetail, Transaction, Workflow, DocumentStatus } from '@/app/models/inventory-modules/stock-withdrawal.model';
+import { Office, Transaction, Workflow, DocumentStatus } from '@/app/models/shared/reference.model';
+import { SlEntity } from '@/app/models/shared/party.model';
+import { StockWithdrawal, StockWithdrawalDetail } from '@/app/models/inventory-modules/stock-withdrawal.model';
 
-export interface SlEntity {
-    accountNo?: number;
-    name?: string;
-    fullName?: string;
-}
+export type { SlEntity };
 
 export interface ReturnMemorandumReceipt {
     id: number;
@@ -89,18 +87,4 @@ export interface MemorandumReceiptListRow {
     officeName?: string;
     returnedMR?: string;
     preparedBy?: string;
-}
-
-export interface MemorandumReceiptPage<T> {
-    content: T[];
-    totalElements?: number;
-    totalPages?: number;
-    number?: number;
-    size?: number;
-    page?: {
-        size?: number;
-        number?: number;
-        totalElements?: number;
-        totalPages?: number;
-    };
 }

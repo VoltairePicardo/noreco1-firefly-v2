@@ -19,6 +19,8 @@ public interface ItemTestingService {
 
     Page<ItemTesting> findAll(String startDate, String endDate, Pageable pageable);
 
+    Page<Map<String, Object>> getItemTestingPaged(String from, String to, Pageable pageable);
+
     @Transactional
     PostResponse update(ItemTesting itemTesting, BindingResult bindingResult, MessageSource messageSource);
 

@@ -116,7 +116,7 @@ public interface PurchaseOrderRepo extends JpaRepository<PurchaseOrder, Integer>
 
     List<PurchaseOrder> findByDocumentStatusIdOrderByIdDesc(Integer status);
 
-    @Query(value = "SELECT * " +
+    @Query(value = "SELECT p.* " +
             "FROM PurchaseOrder p " +
             "INNER JOIN Supplier s ON s.FK_accountNo = p.FK_vendorAccountNo " +
             "WHERE p.FK_documentStatusId = :documentStatusId " +
@@ -130,8 +130,7 @@ public interface PurchaseOrderRepo extends JpaRepository<PurchaseOrder, Integer>
             "  WHERE itd.FK_poDetailId = pod.id " +
             "  ) " +
             ") " +
-            "AND (p.code LIKE :filter OR s.name LIKE :filter) " +
-            "\n#pageable\n",
+            "AND (p.code LIKE :filter OR s.name LIKE :filter) ",
             countQuery = "SELECT COUNT(*) " +
                     "FROM PurchaseOrder p " +
                     "INNER JOIN Supplier s ON s.FK_accountNo = p.FK_vendorAccountNo " +
@@ -146,8 +145,7 @@ public interface PurchaseOrderRepo extends JpaRepository<PurchaseOrder, Integer>
                     "  WHERE itd.FK_poDetailId = pod.id " +
                     "  ) " +
                     ")  " +
-                    "AND (p.code LIKE :filter OR s.name LIKE :filter) ",
-            nativeQuery = true)
+                    "AND (p.code LIKE :filter OR s.name LIKE :filter) ", nativeQuery = true)
     Page<PurchaseOrder> findPurchaseOrderForItemTestingByFilter(@Param("documentStatusId") Integer documentStatusId,
                                                                 @Param("filter") String filter, Pageable pageable);
 

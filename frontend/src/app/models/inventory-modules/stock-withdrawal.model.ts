@@ -1,35 +1,7 @@
-import {User} from '@/app/models/user.model';
-import {InventoryCategory, InventoryLocation, Item, UnitMeasure} from '@/app/models/inventory-modules/item-stock.model';
-import {Purpose} from '@/app/models/dropdown.model';
-
-export interface Transaction {
-    id: number;
-    createdBy?: User;
-    createdAt?: string;
-}
-
-export interface Workflow {
-    id: number;
-    name?: string;
-    enabled?: boolean;
-}
-
-export interface DocumentStatus {
-    id: number;
-    status?: string;
-}
-
-export interface Office {
-    id: number;
-    name?: string;
-    acronym?: string;
-}
-
-export interface Department {
-    id: number;
-    abbreviation?: string;
-    name?: string;
-}
+import { Department } from '@/app/models/shared/reference.model';
+import { DocumentBase } from '@/app/models/shared/document.model';
+import { InventoryCategoryEntity, InventoryLocationEntity, Item, UnitMeasure } from '@/app/models/inventory-modules/item-stock.model';
+import { Purpose } from '@/app/models/dropdown.model';
 
 export interface WorkOrder {
     id: number;
@@ -82,15 +54,13 @@ export interface EmployeeDto {
     accountNo?: number;
 }
 
-export interface StockWithdrawal {
-    id: number;
-    code?: string;
+export interface StockWithdrawal extends DocumentBase {
     description?: string;
     voucherDate?: string;
     year?: number;
     department?: Department;
-    inventoryLocation?: InventoryLocation;
-    inventoryCategory?: InventoryCategory;
+    inventoryLocation?: InventoryLocationEntity;
+    inventoryCategory?: InventoryCategoryEntity;
     workOrder?: WorkOrder;
     costEstimate?: CostEstimate;
     details?: StockWithdrawalDetailDto[];
@@ -101,27 +71,4 @@ export interface StockWithdrawal {
     purpose?: Purpose;
     turnOnOrderWithdrawal?: TurnOnOrderWithdrawalDto;
     employees?: EmployeeDto[];
-
-    transaction?: Transaction;
-    workflow?: Workflow;
-    createdAt?: string;
-    updatedAt?: string;
-    createdBy?: User;
-    documentStatus?: DocumentStatus;
-    postedBy?: User;
-    office?: Office;
-}
-
-export interface StockWithdrawalPage<T> {
-    content: T[];
-    totalElements?: number;
-    totalPages?: number;
-    number?: number;
-    size?: number;
-    page?: {
-        size?: number;
-        number?: number;
-        totalElements?: number;
-        totalPages?: number;
-    };
 }
