@@ -10,6 +10,16 @@ export interface ReturnMemorandumReceipt {
     code?: string;
 }
 
+/** One row of `GET /return-memorandum-receipt/list` — mirrors `ReturnMemorandumReceiptController.list()`'s dto map. */
+export interface ReturnMemorandumReceiptListRow {
+    id: number;
+    code?: string;
+    date?: string;
+    office?: Office;
+    employee?: SlEntity;
+    status?: string;
+}
+
 /** Mirrors `controller/response/StockWithdrawalDto.java` — the shape `MemorandumReceiptDto.stockWithdrawal` is returned as. */
 export interface StockWithdrawalDto {
     id: number;

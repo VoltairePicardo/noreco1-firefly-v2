@@ -106,7 +106,9 @@
       "Bash(node -e \"const p=require\\('./package.json'\\); console.log\\(JSON.stringify\\(p.scripts,null,2\\)\\)\")",
       "Bash(xargs -I{} sh -c 'echo ==={}===; cat {}')",
       "Bash(kill %1)",
-      "Bash(./mvnw -q -o compile -Dmaven.compiler.showWarnings=false)"
+      "Bash(./mvnw -q -o compile -Dmaven.compiler.showWarnings=false)",
+      "Bash(./mvnw -o compile)",
+      "Bash(tee /tmp/compile_full.log)"
     ]
   }
 }

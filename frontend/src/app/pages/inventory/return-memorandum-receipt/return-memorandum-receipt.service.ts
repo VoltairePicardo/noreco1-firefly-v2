@@ -3,6 +3,8 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '@/environments/environment';
 import { DownloadService } from '@/app/core/services/download.service';
+import { ReturnMemorandumReceiptListRow } from '@/app/models/inventory-modules/memorandum-receipt.model';
+import { InventoryPage } from '@/app/models/shared/page.model';
 
 const BASE_API = environment.get('baseApiUrl');
 const BASE_URL = environment.get('baseUrl');
@@ -13,12 +15,11 @@ export class ReturnMemorandumReceiptService {
     private http            = inject(HttpClient);
     private downloadService = inject(DownloadService);
 
-    list(): Observable<any[]> {
-        return this.http.get<any[]>(`${BASE_API}/return-memorandum-receipt/list`);
-    }
-
-    listByDateRange(from: string, to: string): Observable<any[]> {
-        return this.http.get<any[]>(`${BASE_API}/return-memorandum-receipt/list/${from}/${to}`);
+    listPaged(from: string, to: string, employeeAccountNo: number | null, query: string, page: number, size: number): Observable<InventoryPage<ReturnMemorandumReceiptListRow>> {
+        let params = new HttpParams().set('s', from).set('e', to).set('page', page).set('size', size);
+        if (employeeAccountNo != null) params = params.set('em', employeeAccountNo);
+        if (query) params = params.set('q', query);
+        return this.http.get<InventoryPage<ReturnMemorandumReceiptListRow>>(`${BASE_API}/return-memorandum-receipt/list`, { params });
     }
 
     getData(id: number): Observable<any> {

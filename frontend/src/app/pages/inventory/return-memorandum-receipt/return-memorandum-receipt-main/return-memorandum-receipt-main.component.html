@@ -3,43 +3,76 @@
 
     <div class="card">
         <div class="card-header">
-            <div class="row mb-3 align-items-end g-2">
-                <div class="col-md-2">
-                    <label class="form-label fw-bold mb-1 fs-xs text-uppercase">From</label>
-                    <input type="text" mwlFlatpickr [options]="flatpickrOptions"
-                           class="form-control" [(ngModel)]="fromDate" placeholder="From date"/>
+            <div class="col-12 d-flex align-items-end gap-3">
+                <div class="row flex-grow-1 g-2">
+                    <div class="col-md-2">
+                        <label class="form-label fw-bold mb-1 fs-xs text-uppercase">From</label>
+                        <input type="text" mwlFlatpickr [options]="flatpickrOptions"
+                               class="form-control" [(ngModel)]="fromDate" placeholder="From date"/>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label fw-bold mb-1 fs-xs text-uppercase">To</label>
+                        <input type="text" mwlFlatpickr [options]="flatpickrOptions"
+                               class="form-control" [(ngModel)]="toDate" placeholder="To date"/>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold mb-1 fs-xs text-uppercase">Employee</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control"
+                                   [value]="employee()?.name || employee()?.fullName || ''"
+                                   readonly placeholder="All employees"/>
+                            <button type="button" class="btn btn-primary fw-bold gap-1" (click)="openEmployeeBrowse()">
+                                <ng-icon name="tablerUsers" class="fs-lg fw-bold"></ng-icon>Browse
+                            </button>
+                        </div>
+                    </div>
                 </div>
-                <div class="col-md-2">
-                    <label class="form-label fw-bold mb-1 fs-xs text-uppercase">To</label>
-                    <input type="text" mwlFlatpickr [options]="flatpickrOptions"
-                           class="form-control" [(ngModel)]="toDate" placeholder="To date"/>
-                </div>
-                <div class="col-auto d-flex gap-2">
-                    <button type="button" class="btn btn-success fw-bold" (click)="load()">
-                        <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Search
-                    </button>
-                    <button type="button" class="btn btn-danger fw-bold" (click)="reset()">
-                        <ng-icon name="tablerRefresh" class="ps-0 pe-3 fw-bold"></ng-icon>Reset
-                    </button>
-                </div>
-                <div class="col-md-auto ms-auto">
-                    <button type="button" class="btn btn-primary d-flex align-items-center gap-2 fw-bold"
-                            [routerLink]="['/' + menuLink + '/create']">
-                        <ng-icon name="tablerPlus" class="fw-bold"></ng-icon>
-                        Create {{ module }}
-                    </button>
+            </div>
+
+            <div class="col-md-12">
+                <div class="row align-items-center g-2">
+                    <div class="col-md-4">
+                        <input
+                            type="text"
+                            class="form-control"
+                            [ngModel]="searchText()"
+                            name="searchText"
+                            placeholder="Code, office, employee…"
+                            (ngModelChange)="searchText.set($event); page.set(1)"
+                        />
+                    </div>
+
+                    <div class="col-md-auto d-flex gap-2">
+                        <button type="button" class="btn btn-primary fw-bold" (click)="search()">
+                            <ng-icon name="tablerSearch" class="me-1 fs-lg fw-bold"></ng-icon>
+                            Search
+                        </button>
+
+                        <button type="button" class="btn btn-danger fw-bold" (click)="reset()">
+                            <ng-icon name="tablerRefresh" class="me-1 fs-lg fw-bold"></ng-icon>
+                            Reset
+                        </button>
+                    </div>
+
+                    <div class="col-md-auto ms-md-auto">
+                        <button type="button" class="btn btn-primary d-flex align-items-center gap-2 fw-bold"
+                                [routerLink]="['/' + menuLink + '/create']">
+                            <ng-icon name="tablerPlus" class="fs-lg fw-bold"></ng-icon>
+                            Create {{ module }}
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
 
         <div class="table-responsive">
-            <table class="table table-custom table-centered table-select table-hover w-100 mb-0">
+            <table class="table table-custom table-centered table-select table-hover w-100 mb-0 text-center">
                 <thead class="bg-light align-middle bg-opacity-25 thead-sm">
                     <tr class="text-uppercase fs-xxs">
-                        <th>Code</th>
+                        <th class="text-start">Code</th>
                         <th>Date</th>
-                        <th>Office</th>
-                        <th>Employee</th>
+                        <th class="text-start">Office</th>
+                        <th class="text-start">Employee</th>
                         <th>Status</th>
                         <th></th>
                     </tr>
@@ -51,26 +84,24 @@
                                 <span class="spinner-border spinner-border-sm me-2" role="status"></span>Loading...
                             </td>
                         </tr>
-                    } @else if (pagedRecords().length > 0) {
-                        @for (rec of pagedRecords(); track rec.id) {
+                    } @else if (records().length > 0) {
+                        @for (rec of records(); track rec.id) {
                             <tr>
-                                <td class="fw-bold">{{ rec.code }}</td>
+                                <td class="fw-bold text-start">{{ rec.code }}</td>
                                 <td>{{ rec.date | date:'MM/dd/yyyy' }}</td>
-                                <td>{{ rec.office?.name || '—' }}</td>
-                                <td>{{ rec.employee?.name || rec.employee?.fullName || '—' }}</td>
+                                <td class="text-start">{{ rec.office?.name || '—' }}</td>
+                                <td class="text-start">{{ rec.employee?.name || rec.employee?.fullName || '—' }}</td>
                                 <td><span class="badge bg-secondary bg-opacity-25 text-dark border">{{ rec.status || '—' }}</span></td>
-                                <td class="text-nowrap">
-                                    <div class="d-flex justify-content-end gap-1">
-                                        <a href="javascript:void(0)" ngbTooltip="View"
-                                           [routerLink]="['/' + menuLink, rec.id, 'detail']"
-                                           class="btn btn-light btn-icon btn-sm rounded-circle">
-                                            <ng-icon name="tablerEye" class="fs-lg"></ng-icon>
+                                <td>
+                                    <div class="d-flex gap-1">
+                                        <a [routerLink]="['/' + menuLink, rec.id, 'detail']"
+                                           class="btn btn-light btn-icon btn-sm rounded-circle" ngbTooltip="View">
+                                            <ng-icon name="tablerEye"></ng-icon>
                                         </a>
-                                        @if (!rec.hasMst) {
-                                            <a href="javascript:void(0)" ngbTooltip="Edit"
-                                               [routerLink]="['/' + menuLink, rec.id, 'edit']"
-                                               class="btn btn-light btn-icon btn-sm rounded-circle">
-                                                <ng-icon name="tablerEdit" class="fs-lg"></ng-icon>
+                                        @if (isEditable(rec)) {
+                                            <a [routerLink]="['/' + menuLink, rec.id, 'edit']"
+                                               class="btn btn-light btn-icon btn-sm rounded-circle" ngbTooltip="Edit">
+                                                <ng-icon name="tablerEdit"></ng-icon>
                                             </a>
                                         }
                                     </div>
@@ -86,13 +117,13 @@
             </table>
         </div>
 
-        @if (records().length > pageSize) {
+        @if (filteredTotal() > pageSize) {
             <div class="card-footer d-flex justify-content-center">
                 <div class="pagination-boxed align-items-center mt-2 mb-0">
                     <ngb-pagination
-                        [collectionSize]="records().length"
+                        [collectionSize]="filteredTotal()"
                         [page]="page()"
-                        (pageChange)="page.set($event)"
+                        (pageChange)="onPageChange($event)"
                         [pageSize]="pageSize"
                         [maxSize]="5"
                         [rotate]="true">

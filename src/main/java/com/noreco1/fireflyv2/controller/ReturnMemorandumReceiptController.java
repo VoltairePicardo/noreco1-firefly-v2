@@ -1,160 +1,146 @@
 package com.noreco1.fireflyv2.controller;
 
-import com.noreco1.fireflyv2.common.GlobalConstant;
-import com.noreco1.fireflyv2.common.facade.AuthenticationFacade;
-import com.noreco1.fireflyv2.common.facade.GeneratorFacade;
+import com.noreco1.fireflyv2.common.helpers.Checker;
 import com.noreco1.fireflyv2.controller.response.PostResponse;
 import com.noreco1.fireflyv2.controller.response.ProcessDocumentDto;
 import com.noreco1.fireflyv2.controller.response.ReturnMemorandumReceiptDto;
-import com.noreco1.fireflyv2.model.DocumentStatus;
 import com.noreco1.fireflyv2.model.ReturnMemorandumReceipt;
-import com.noreco1.fireflyv2.model.Workflow;
-import com.noreco1.fireflyv2.repo.ReturnMemorandumReceiptRepo;
-import com.noreco1.fireflyv2.service.DownloadService;
-import com.noreco1.fireflyv2.service.PrintableVoucher;
+import com.noreco1.fireflyv2.model.ReturnMemorandumReceiptDetail;
+import com.noreco1.fireflyv2.repo.MemorandumReceiptDetailRepo;
+import com.noreco1.fireflyv2.repo.ReturnMemorandumReceiptDetailRepo;
 import com.noreco1.fireflyv2.service.ReturnMemorandumReceiptService;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import net.sf.jasperreports.engine.JRDataSource;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
+import jakarta.validation.Valid;
 import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
-import org.springframework.validation.BeanPropertyBindingResult;
+import org.springframework.data.domain.Pageable;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Date;
+import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @RestController
 @RequestMapping("/api/return-memorandum-receipt")
 public class ReturnMemorandumReceiptController {
 
-    @Autowired
-    @Qualifier("returnMemorandumReceiptServiceImpl")
-    private ReturnMemorandumReceiptService rmrService;
+    private final MessageSource messageSource;
+    private final ReturnMemorandumReceiptService returnMemorandumReceiptService;
+    private final MemorandumReceiptDetailRepo memorandumReceiptDetailRepo;
+    private final ReturnMemorandumReceiptDetailRepo returnMemorandumReceiptDetailRepo;
 
-    @Autowired
-    private ReturnMemorandumReceiptRepo rmrRepo;
-
-    @Autowired
-    private AuthenticationFacade authenticationFacade;
-
-    @Autowired
-    private GeneratorFacade generatorFacade;
-
-    @Autowired
-    private MessageSource messageSource;
-
-    @GetMapping("/list")
-    public List<ReturnMemorandumReceipt> list() {
-        Page<ReturnMemorandumReceipt> page = rmrService.findAll("2000-01-01",
-                GlobalConstant.YYYY_DATE_FORMAT.format(new Date()) + "-12-31",
-                PageRequest.of(0, 1000, Sort.by("date").descending()));
-        return page.getContent();
+    public ReturnMemorandumReceiptController(MessageSource messageSource, ReturnMemorandumReceiptService returnMemorandumReceiptService, MemorandumReceiptDetailRepo memorandumReceiptDetailRepo, ReturnMemorandumReceiptDetailRepo returnMemorandumReceiptDetailRepo) {
+        this.messageSource = messageSource;
+        this.returnMemorandumReceiptService = returnMemorandumReceiptService;
+        this.memorandumReceiptDetailRepo = memorandumReceiptDetailRepo;
+        this.returnMemorandumReceiptDetailRepo = returnMemorandumReceiptDetailRepo;
     }
 
-    @GetMapping("/list/{from}/{to}")
-    public List<ReturnMemorandumReceipt> listByDateRange(@PathVariable String from, @PathVariable String to) {
-        Page<ReturnMemorandumReceipt> page = rmrService.findAll(from, to,
-                PageRequest.of(0, 1000, Sort.by("date").descending()));
-        return page.getContent();
+    @GetMapping(value = "/{id}")
+    @ResponseBody
+    public ReturnMemorandumReceiptDto get(@PathVariable Integer id) {
+        return returnMemorandumReceiptService.findById(id);
     }
 
-    @GetMapping("/{id}")
-    public ReturnMemorandumReceiptDto getById(@PathVariable Integer id) {
-        return rmrService.findById(id);
+    @GetMapping(value = "/list")
+    @ResponseBody
+    public Page<Map<String, Object>> list(Pageable pageable,
+                                           @RequestParam(value = "s") String startDate,
+                                           @RequestParam(value = "e") String endDate,
+                                           @RequestParam(value = "q", required = false) String query,
+                                           @RequestParam(value = "em", required = false) Integer employeeAccountNo) {
+
+        Page<ReturnMemorandumReceipt> returnMemorandumReceipts = Checker.isStringNullOrEmpty(query)
+                ? (Checker.isValidId(employeeAccountNo)
+                    ? returnMemorandumReceiptService.findAllByEmployee(employeeAccountNo, startDate, endDate, pageable)
+                    : returnMemorandumReceiptService.findAll(startDate, endDate, pageable))
+                : (Checker.isValidId(employeeAccountNo)
+                    ? returnMemorandumReceiptService.findAllByQueryAndEmployee(query, employeeAccountNo, startDate, endDate, pageable)
+                    : returnMemorandumReceiptService.findAllByQuery(query, startDate, endDate, pageable));
+
+        return returnMemorandumReceipts.map(returnMemorandumReceipt -> {
+            Map<String, Object> dto = new HashMap<>();
+
+            dto.put("id", returnMemorandumReceipt.getId());
+            dto.put("code", returnMemorandumReceipt.getCode());
+            dto.put("date", returnMemorandumReceipt.getDate());
+            dto.put("office", returnMemorandumReceipt.getOffice());
+            dto.put("employee", returnMemorandumReceipt.getMemorandumReceipt().getEmployee());
+            dto.put("status", returnMemorandumReceipt.getDocumentStatus().getStatus());
+
+            return dto;
+        });
     }
 
-    @PostMapping("/create")
-    public PostResponse create(@RequestBody Map<String, Object> payload) {
-        PostResponse response = new PostResponse();
-        try {
-            ReturnMemorandumReceipt rmr = new ReturnMemorandumReceipt();
-            Object dateObj = payload.get("date");
-            if (dateObj instanceof String dateStr && !dateStr.isEmpty()) {
-                Date date = java.sql.Date.valueOf(dateStr);
-                rmr.setDate(date);
-                int year = Integer.parseInt(GlobalConstant.YYYY_DATE_FORMAT.format(date));
-                Object latestCode = rmrRepo.findLatestCodeByYear(year);
-                String code = generatorFacade.voucherCodeNoOffice("RMRTE",
-                        latestCode == null ? "" : String.valueOf(latestCode),
-                        date, GlobalConstant.COUNTER_PAD_4);
-                rmr.setCode(code);
+    @PostMapping(value = "/create")
+    @ResponseBody
+    public PostResponse create(@Valid @RequestBody ReturnMemorandumReceipt returnMemorandumReceipt, BindingResult bindingResult) {
+        return returnMemorandumReceiptService.create(returnMemorandumReceipt, bindingResult, messageSource);
+    }
+
+    @PostMapping(value = "/update")
+    @ResponseBody
+    public PostResponse update(@Valid @RequestBody ReturnMemorandumReceipt returnMemorandumReceipt, BindingResult bindingResult, HttpServletRequest request) {
+        return returnMemorandumReceiptService.update(returnMemorandumReceipt, bindingResult, messageSource);
+    }
+
+    @PostMapping(value = "/process")
+    @ResponseBody
+    public PostResponse process(@RequestBody ProcessDocumentDto postData, BindingResult bindingResult) {
+        return this.returnMemorandumReceiptService.process(postData, bindingResult, messageSource);
+    }
+
+    @GetMapping(value = "/list-for-reassignment")
+    @ResponseBody
+    public Page<Map<String, Object>> getReturnMemorandumReceiptForReassignMemorandumReceipt(@RequestParam(value = "q", required = false) String query, Pageable pageable) {
+        String trimmedQuery = query == null ? "" : query.trim();
+
+        Page<ReturnMemorandumReceipt> docs = returnMemorandumReceiptService.findAllForReassignment(trimmedQuery, pageable);
+
+        return docs.map(returnMemorandumReceipt -> {
+            Map<String, Object> dto = new HashMap<>();
+
+            dto.put("id", returnMemorandumReceipt.getId());
+            dto.put("code", returnMemorandumReceipt.getCode());
+            dto.put("date", returnMemorandumReceipt.getDate());
+            dto.put("employee", returnMemorandumReceipt.getMemorandumReceipt().getEmployee() != null ? returnMemorandumReceipt.getMemorandumReceipt().getEmployee().getName() : null);
+            dto.put("office", returnMemorandumReceipt.getOffice() != null ? returnMemorandumReceipt.getOffice().getName() : null);
+            dto.put("remarks", returnMemorandumReceipt.getRemarks());
+
+            ArrayList<ReturnMemorandumReceiptDetail> details = returnMemorandumReceiptService.findAllByReturnMR(returnMemorandumReceipt.getId());
+
+            for (ReturnMemorandumReceiptDetail detail : details) {
+                detail.setReassignedQuantity(memorandumReceiptDetailRepo.getReassignedQuantity(detail.getStockWithdrawalDetail().getId()));
             }
-            rmr.setRemarks(payload.get("remarks") != null ? String.valueOf(payload.get("remarks")) : null);
-            Date now = new Date();
-            rmr.setCreatedAt(now);
-            rmr.setUpdatedAt(now);
-            rmr.setCreatedBy(authenticationFacade.getLoggedIn());
-            DocumentStatus ds = new DocumentStatus();
-            ds.setId(com.noreco1.fireflyv2.model.enums.DocumentStatus.DOCUMENT_CREATED.getId());
-            rmr.setDocumentStatus(ds);
-            Workflow wf = new Workflow();
-            wf.setId(com.noreco1.fireflyv2.model.enums.Workflow.RMRTE.getId());
-            rmr.setWorkflow(wf);
-            rmr.setTransaction(generatorFacade.transaction());
-            ReturnMemorandumReceipt saved = rmrRepo.save(rmr);
-            response.setSuccessMessage("Return Memorandum Receipt saved.");
-            response.setModelId(saved.getId());
-        } catch (Exception e) {
-            response.setFailureMessage("Failed to save: " + e.getMessage());
-        }
-        return response;
+
+            dto.put("items", details);
+
+            return dto;
+        });
     }
 
-    @PostMapping("/update")
-    public PostResponse update(@RequestBody Map<String, Object> payload) {
-        PostResponse response = new PostResponse();
-        Object idObj = payload.get("id");
-        if (idObj == null) { response.setFailureMessage("ID is required."); return response; }
-        Integer id = ((Number) idObj).intValue();
-        ReturnMemorandumReceipt rmr = rmrRepo.findById(id).orElse(null);
-        if (rmr == null) { response.setFailureMessage("Record not found."); return response; }
-        try {
-            Object dateObj = payload.get("date");
-            if (dateObj instanceof String dateStr && !dateStr.isEmpty()) {
-                rmr.setDate(java.sql.Date.valueOf(dateStr));
-            }
-            rmr.setRemarks(payload.get("remarks") != null ? String.valueOf(payload.get("remarks")) : null);
-            rmr.setUpdatedAt(new Date());
-            ReturnMemorandumReceipt saved = rmrRepo.save(rmr);
-            response.setSuccessMessage("Return Memorandum Receipt updated.");
-            response.setModelId(saved.getId());
-        } catch (Exception e) {
-            response.setFailureMessage("Failed to update: " + e.getMessage());
-        }
-        return response;
-    }
+    @GetMapping(value = "/return-memorandum-receipt-detail-for-mst")
+    @ResponseBody
+    public Page<Map<String, Object>> getMemorandumReceiptDetailForMST(Pageable pageable, @RequestParam(value = "q", required = false) String query) {
+        Page<ReturnMemorandumReceiptDetail> returnMemorandumReceiptDetails = returnMemorandumReceiptDetailRepo.findAllForMaterialSalvageTicket(query, pageable);
 
-    @PostMapping("/process")
-    public PostResponse process(@RequestBody ProcessDocumentDto dto) {
-        BindingResult br = new BeanPropertyBindingResult(dto, "dto");
-        return rmrService.process(dto, br, messageSource);
-    }
+        return returnMemorandumReceiptDetails.map(returnMemorandumReceiptDetail -> {
+            Map<String, Object> dto = new HashMap<>();
 
-    @Autowired
-    @Qualifier("returnMemorandumReceiptServiceImpl")
-    PrintableVoucher printableVoucher;
+            BigDecimal reassignedQuantity = memorandumReceiptDetailRepo.getReassignedQuantity(returnMemorandumReceiptDetail.getStockWithdrawalDetail().getId());
+            BigDecimal balance = returnMemorandumReceiptDetail.getReturnedQuantity().subtract(reassignedQuantity);
 
-    @Autowired
-    private DownloadService downloadService;
+            dto.put("returnMemorandumReceiptDetail", returnMemorandumReceiptDetail);
+            dto.put("item", returnMemorandumReceiptDetail.getStockWithdrawalDetail().getItem());
+            dto.put("quantity", returnMemorandumReceiptDetail.getQuantity());
+            dto.put("returnedQuantity", returnMemorandumReceiptDetail.getReturnedQuantity());
+            dto.put("reassignedQuantity", reassignedQuantity);
+            dto.put("balance", balance.compareTo(BigDecimal.ZERO) < 0 ? BigDecimal.ZERO : balance);
+            dto.put("usable", returnMemorandumReceiptDetail.getUsable());
 
-    @RequestMapping(value="/export/{id}")
-    public void exportToPdf(@PathVariable Integer id,
-                            @RequestParam(value = "type") String type,
-                            @RequestParam(value = "token") String token,
-                            HttpServletResponse response, HttpServletRequest request) {
-
-        HashMap params = printableVoucher.reportParameters(id, request);
-        JRDataSource dataSource = printableVoucher.datasource(id);
-
-        String template = GlobalConstant.JASPER_BASE_PATH + "/support-modules/ReturnMemorandumReceipt.jrxml";
-        downloadService.download(type, token, response, params, template, dataSource);
+            return dto;
+        });
     }
 }
