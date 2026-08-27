@@ -3,8 +3,9 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '@/environments/environment';
 import { DownloadService } from '@/app/core/services/download.service';
-import { ReturnMemorandumReceiptListRow } from '@/app/models/inventory-modules/memorandum-receipt.model';
+import { MemorandumReceipt, ReturnMemorandumReceiptDto, ReturnMemorandumReceiptListRow } from '@/app/models/inventory-modules/memorandum-receipt.model';
 import { InventoryPage } from '@/app/models/shared/page.model';
+import { Office } from '@/app/models/shared/reference.model';
 
 const BASE_API = environment.get('baseApiUrl');
 const BASE_URL = environment.get('baseUrl');
@@ -22,8 +23,8 @@ export class ReturnMemorandumReceiptService {
         return this.http.get<InventoryPage<ReturnMemorandumReceiptListRow>>(`${BASE_API}/return-memorandum-receipt/list`, { params });
     }
 
-    getData(id: number): Observable<any> {
-        return this.http.get(`${BASE_API}/return-memorandum-receipt/${id}`);
+    getData(id: number): Observable<ReturnMemorandumReceiptDto> {
+        return this.http.get<ReturnMemorandumReceiptDto>(`${BASE_API}/return-memorandum-receipt/${id}`);
     }
 
     create(form: any): Observable<any> {
@@ -38,23 +39,11 @@ export class ReturnMemorandumReceiptService {
         return this.http.post(`${BASE_API}/return-memorandum-receipt/process`, payload, httpOptions);
     }
 
-    getWorkflowActions(transId: number): Observable<any[]> {
-        return this.http.get<any[]>(`${BASE_URL}/json/workflow-actions/${transId}`);
-    }
-
-    getDocumentLogs(transId: number): Observable<any[]> {
-        return this.http.post<any[]>(`${BASE_URL}/document/${transId}/logs`, {}, httpOptions);
-    }
-
     print(id: number): void {
         this.downloadService.print(`${BASE_URL}/return-memorandum-receipt/export/${id}`, { type: 'pdf' });
     }
 
-    getOffices(): Observable<any[]> {
-        return this.http.get<any[]>(`${BASE_URL}/json/offices/`);
-    }
-
-    getEmployeeMemorandumReceipts(accountNo: number): Observable<any[]> {
-        return this.http.get<any[]>(`${BASE_API}/return-memorandum-receipt/employee-mr/${accountNo}`);
+    getOffices(): Observable<Office[]> {
+        return this.http.get<Office[]>(`${BASE_API}/json/offices`);
     }
 }

@@ -10,7 +10,6 @@ export interface ReturnMemorandumReceipt {
     code?: string;
 }
 
-/** One row of `GET /return-memorandum-receipt/list` — mirrors `ReturnMemorandumReceiptController.list()`'s dto map. */
 export interface ReturnMemorandumReceiptListRow {
     id: number;
     code?: string;
@@ -20,7 +19,34 @@ export interface ReturnMemorandumReceiptListRow {
     status?: string;
 }
 
-/** Mirrors `controller/response/StockWithdrawalDto.java` — the shape `MemorandumReceiptDto.stockWithdrawal` is returned as. */
+/** One row of `returnMemorandumReceiptDetails` — mirrors `model/ReturnMemorandumReceiptDetail.java`. */
+export interface ReturnMemorandumReceiptDetail {
+    id?: number;
+    stockWithdrawalDetail?: StockWithdrawalDetail;
+    quantity?: number;
+    returnedQuantity?: number;
+    returnedToInventoryQuantity?: number;
+    usable?: boolean;
+    reassignedQuantity?: number;
+}
+
+/** Mirrors `controller/response/ReturnMemorandumReceiptDto.java` — the shape returned by `GET /return-memorandum-receipt/{id}`. */
+export interface ReturnMemorandumReceiptDto {
+    id: number;
+    code?: string;
+    date?: string;
+    employee?: SlEntity;
+    office?: Office;
+    stockWithdrawal?: StockWithdrawalDto;
+    user?: User;
+    returnMemorandumReceiptDetails?: ReturnMemorandumReceiptDetail[];
+    transaction?: Transaction;
+    documentStatus?: DocumentStatus;
+    workflow?: Workflow;
+    memorandumReceipt?: MemorandumReceipt;
+    remarks?: string;
+}
+
 export interface StockWithdrawalDto {
     id: number;
     code?: string;
@@ -39,8 +65,7 @@ export interface MemorandumReceiptDetail {
     returned?: number;
 }
 
-/** Mirrors `controller/response/MemorandumReceiptDto.java` — the shape returned by `GET /memorandum-receipt/{id}`. */
-export interface MemorandumReceiptDto {
+export interface MemorandumReceipt {
     id: number;
     code?: string;
     date?: string;
@@ -57,10 +82,8 @@ export interface MemorandumReceiptDto {
     workflow?: Workflow;
 }
 
-/** Voucher picked from the Browse Stock Withdrawal modal — a full `StockWithdrawal` (its `items`/`details` populate the assignable rows). */
 export type MemorandumReceiptSource = StockWithdrawal | StockWithdrawalDto;
 
-/** One item already assigned to an employee — shared row shape between the single- and multiple-employee MR create/edit screens. */
 export interface AssignedItemRow {
     stockWithdrawalDetail?: StockWithdrawalDetail;
     quantity: number;
@@ -71,7 +94,6 @@ export interface AssignedItemRow {
     unitCode: string;
 }
 
-/** One item from the selected Stock Withdrawal, with its remaining/assigned balances — shared row shape between the single- and multiple-employee MR create/edit screens. */
 export interface AvailableItemRow {
     stockWithdrawalDetail?: StockWithdrawalDetail;
     itemCode: string;
@@ -87,7 +109,6 @@ export interface AvailableItemRow {
     assigned: boolean;
 }
 
-/** One row of `GET /memorandum-receipt/list-paged` — a flat native-query projection, mirrors the column aliases in `MemorandumReceiptRepo.getMemorandumReceiptPaged`. */
 export interface MemorandumReceiptListRow {
     id: number;
     code?: string;

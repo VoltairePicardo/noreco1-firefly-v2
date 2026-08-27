@@ -21,7 +21,7 @@
             </div>
             <div class="col-md-3">
                 <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Status</div>
-                <span class="badge bg-secondary bg-opacity-25 text-dark border">{{ data().documentStatus?.status || data().status || '—' }}</span>
+                <span class="badge bg-secondary bg-opacity-25 text-dark border">{{ data().documentStatus?.status || '—' }}</span>
             </div>
             <div class="col-md-3">
                 <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Memorandum Receipt</div>
@@ -37,11 +37,11 @@
             </div>
             <div class="col-md-6">
                 <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Returned By</div>
-                <div>{{ data().office ? (data().office.name || '—') : (data().employee?.name || data().employee?.fullName || '—') }}</div>
+                <div>{{ data().office?.name || data().employee?.name || data().employee?.fullName || '—' }}</div>
             </div>
             <div class="col-md-6">
                 <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Noted By</div>
-                <div>{{ data().user?.fullName || data().createdBy?.fullName || '—' }}</div>
+                <div>{{ data().user?.fullName || '—' }}</div>
             </div>
             @if (data().remarks) {
                 <div class="col-md-12">
@@ -53,7 +53,7 @@
     </div>
 </div>
 
-@if (data().returnMemorandumReceiptDetails?.length > 0) {
+@if ((data().returnMemorandumReceiptDetails?.length ?? 0) > 0) {
 <div class="card mb-3">
     <div class="card-header">
         <h6 class="fw-semibold text-uppercase fs-xs mb-0">Returned Items</h6>
@@ -73,9 +73,9 @@
                         <tr>
                             <td>
                                 {{ (detail.returnedQuantity != null ? detail.returnedQuantity : 0) }}
-                                {{ detail.stockWithdrawalDetail?.item?.unit?.code || detail.unitCode || '' }}
+                                {{ detail.stockWithdrawalDetail?.item?.unit?.code || '' }}
                             </td>
-                            <td>{{ detail.stockWithdrawalDetail?.item?.description || detail.itemDescription || '—' }}</td>
+                            <td>{{ detail.stockWithdrawalDetail?.item?.description || '—' }}</td>
                             <td class="text-center fw-bold">{{ detail.usable ? 'YES' : 'NO' }}</td>
                         </tr>
                     }
@@ -143,7 +143,7 @@
                     <thead><tr class="text-uppercase fs-xxs text-muted"><th>Date</th><th>Action</th><th>By</th><th>Remarks</th></tr></thead>
                     <tbody>
                         @for (log of logs(); track log.id) {
-                            <tr><td class="text-nowrap">{{ log.createdAt | date:'MM/dd/yyyy hh:mm a' }}</td><td>{{ log.action }}</td><td>{{ log.createdBy?.fullName }}</td><td>{{ log.remarks }}</td></tr>
+                            <tr><td class="text-nowrap">{{ log.createdAt | date:'MM/dd/yyyy hh:mm a' }}</td><td>{{ log.action }}</td><td>{{ log.createdBy.fullName }}</td><td>{{ log.remarks }}</td></tr>
                         }
                     </tbody>
                 </table></div>

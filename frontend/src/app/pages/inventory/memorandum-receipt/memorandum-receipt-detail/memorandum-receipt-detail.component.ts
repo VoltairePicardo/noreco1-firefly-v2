@@ -7,7 +7,7 @@ import { SharedModule } from '@/app/shared/shared.module';
 import { MemorandumReceiptService } from '../memorandum-receipt.service';
 import { provideIcons } from '@ng-icons/core';
 import { tablerPrinter, tablerEdit, tablerArrowLeft } from '@ng-icons/tabler-icons';
-import { MemorandumReceiptDto } from '@/app/models/inventory-modules/memorandum-receipt.model';
+import { MemorandumReceipt } from '@/app/models/inventory-modules/memorandum-receipt.model';
 import { WorkflowAction } from '@/app/models/workflow-action.model';
 import {AnyJSONService, DocumentLog} from '@/app/shared/services/any-json.service';
 
@@ -26,7 +26,7 @@ export class MemorandumReceiptDetailComponent implements OnInit {
     menuLink  = 'memorandum-receipt';
 
     id: number | null = null;
-    data      = signal<Partial<MemorandumReceiptDto>>({});
+    data      = signal<Partial<MemorandumReceipt>>({});
     isLoading = signal(false);
 
     workflowActions     = signal<WorkflowAction[]>([]);

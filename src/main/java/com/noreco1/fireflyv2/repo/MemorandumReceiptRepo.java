@@ -64,7 +64,7 @@ public interface MemorandumReceiptRepo extends JpaRepository<MemorandumReceipt, 
 
     ArrayList<MemorandumReceipt> findAllByEmployeeAccountNoAndDocumentStatusId(Integer accountNo, Integer status);
 
-    @Query(value = "SELECT * FROM MemorandumReceipt " +
+    @Query(value = "SELECT MemorandumReceipt.* FROM MemorandumReceipt " +
             "INNER JOIN MemorandumReceiptDetail ON MemorandumReceipt.id = MemorandumReceiptDetail.FK_memorandumReceiptId " +
             "WHERE MemorandumReceiptDetail.quantity > ( " +
             "  SELECT IF(sum(returnedQuantity) IS NOT NULL, sum(returnedQuantity), 0) " +

@@ -8,6 +8,30 @@ import { ModalService } from '@/app/shared/modals/modal-service';
 import { BrowseEntityModalComponent } from '@/app/shared/modals/browse-entity-modal/browse-entity-modal.component';
 import { provideIcons } from '@ng-icons/core';
 import { tablerSearch, tablerX, tablerArrowLeft, tablerCheck } from '@ng-icons/tabler-icons';
+import { MemorandumReceipt, SlEntity } from '@/app/models/inventory-modules/memorandum-receipt.model';
+import { StockWithdrawalDetail } from '@/app/models/inventory-modules/stock-withdrawal.model';
+import { Office } from '@/app/models/shared/reference.model';
+import {MemorandumReceiptService} from '@/app/pages/inventory/memorandum-receipt/memorandum-receipt.service';
+
+interface ReturnDetailRow {
+    stockWithdrawalDetail?: StockWithdrawalDetail;
+    quantity?: number;
+    returned?: number;
+    returnedQuantity: number;
+    usable: boolean;
+    selected: boolean;
+    itemDescription?: string;
+}
+
+interface ReturnMemorandumReceiptPayload {
+    id?: number;
+    date: string;
+    employee: { accountNo: number; name?: string } | null;
+    office: { id: number } | null;
+    memorandumReceipt: { id: number } | null;
+    remarks: string;
+    returnMemorandumReceiptDetails: ReturnDetailRow[];
+}
 
 @Component({
     selector: 'app-return-memorandum-receipt-add-edit',
@@ -31,7 +55,7 @@ export class ReturnMemorandumReceiptAddEditComponent implements OnInit {
     subModule = 'Create';
     menuLink  = 'return-memorandum-receipt';
 
-    id: any   = null;
+    id: number | null = null;
     editMode  = false;
     isLoading = signal(false);
 
@@ -40,18 +64,19 @@ export class ReturnMemorandumReceiptAddEditComponent implements OnInit {
     date    = '';
     remarks = '';
 
-    selectedEmployee = signal<any>(null);
+    selectedEmployee = signal<SlEntity | null>(null);
 
-    offices = signal<any[]>([]);
-    selectedOffice = signal<any>(null);
+    offices        = signal<Office[]>([]);
+    selectedOffice = signal<Office | null>(null);
 
-    memorandumReceipts = signal<any[]>([]);
-    isLoadingMRs = signal(false);
+    memorandumReceipts = signal<MemorandumReceipt[]>([]);
+    isLoadingMRs        = signal(false);
 
-    selectedMR = signal<any>(null);
-    returnDetails = signal<any[]>([]);
+    selectedMR    = signal<MemorandumReceipt | null>(null);
+    returnDetails = signal<ReturnDetailRow[]>([]);
 
     private service      = inject(ReturnMemorandumReceiptService);
+    private memorandumReceiptService      = inject(MemorandumReceiptService);
     private modalService = inject(ModalService);
     private route        = inject(ActivatedRoute);
     private router       = inject(Router);
@@ -78,6 +103,7 @@ export class ReturnMemorandumReceiptAddEditComponent implements OnInit {
     }
 
     loadForEdit(): void {
+        if (this.id == null) return;
         this.isLoading.set(true);
         this.service.getData(this.id).subscribe({
             next: (data) => {
@@ -97,7 +123,7 @@ export class ReturnMemorandumReceiptAddEditComponent implements OnInit {
                 }
 
                 if (data.office?.id) {
-                    const found = this.offices().find(o => o.id === data.office.id);
+                    const found = this.offices().find(o => o.id === data.office!.id);
                     this.selectedOffice.set(found ?? data.office);
                 }
 
@@ -105,10 +131,13 @@ export class ReturnMemorandumReceiptAddEditComponent implements OnInit {
                     this.selectedMR.set(data.memorandumReceipt);
                 }
 
-                this.returnDetails.set((data.returnMemorandumReceiptDetails || []).map((d: any) => ({
-                    ...d,
-                    returned: d.returnedQuantity,
-                    selected: true
+                this.returnDetails.set((data.returnMemorandumReceiptDetails || []).map((d): ReturnDetailRow => ({
+                    stockWithdrawalDetail: d.stockWithdrawalDetail,
+                    quantity:              d.quantity,
+                    returned:              d.returnedQuantity,
+                    returnedQuantity:      d.returnedQuantity ?? 0,
+                    usable:                d.usable ?? false,
+                    selected:              true
                 })));
             },
             error: () => {
@@ -125,7 +154,7 @@ export class ReturnMemorandumReceiptAddEditComponent implements OnInit {
                 BrowseEntityModalComponent, {}, { size: 'lg', centered: true }
             );
             if (result?.action === 'select' && result?.data) {
-                this.selectedEmployee.set(result.data);
+                this.selectedEmployee.set(result.data as SlEntity);
                 this.memorandumReceipts.set([]);
                 this.selectedMR.set(null);
                 this.returnDetails.set([]);
@@ -145,13 +174,17 @@ export class ReturnMemorandumReceiptAddEditComponent implements OnInit {
         const employee = this.selectedEmployee();
         if (!employee?.accountNo) return;
         this.isLoadingMRs.set(true);
-        this.service.getEmployeeMemorandumReceipts(employee.accountNo).subscribe({
+        this.memorandumReceiptService.getAllEmployeeMemorandumReceipt(employee.accountNo, this.editMode).subscribe({
             next: (data) => {
-                this.memorandumReceipts.set(data || []);
+                const list = data || [];
+                this.memorandumReceipts.set(list);
                 this.isLoadingMRs.set(false);
                 if (clearDetails) {
                     this.selectedMR.set(null);
                     this.returnDetails.set([]);
+                }
+                if (list.length > 0 && !this.selectedMR()) {
+                    this.selectMR(list[0]);
                 }
             },
             error: () => {
@@ -161,32 +194,28 @@ export class ReturnMemorandumReceiptAddEditComponent implements OnInit {
         });
     }
 
-    selectMR(mr: any): void {
+    selectMR(mr: MemorandumReceipt): void {
         this.selectedMR.set(mr);
-        const details: any[] = [];
-
-        if (mr?.memorandumReceiptDetails?.length > 0) {
-            for (const d of mr.memorandumReceiptDetails) {
-                details.push({
-                    ...d,
-                    returnedQuantity: d.quantity - d.returned,
-                    usable:           true,
-                    selected:         false
-                });
-            }
-        }
+        const details: ReturnDetailRow[] = (mr.memorandumReceiptDetails || []).map((d): ReturnDetailRow => ({
+            stockWithdrawalDetail: d.stockWithdrawalDetail,
+            quantity:              d.quantity,
+            returned:              d.returned,
+            returnedQuantity:      (d.quantity ?? 0) - (d.returned ?? 0),
+            usable:                true,
+            selected:              false
+        }));
         this.returnDetails.set(details);
     }
 
-    detailQuantityChanged(detail: any): void {
-        const max = detail.quantity - detail.returned;
+    detailQuantityChanged(detail: ReturnDetailRow): void {
+        const max = (detail.quantity ?? 0) - (detail.returned ?? 0);
         if (detail.returnedQuantity >= max) {
             detail.returnedQuantity = max;
         }
         this.returnDetails.update(list => [...list]);
     }
 
-    compareById(a: any, b: any): boolean {
+    compareById(a: { id: number } | null, b: { id: number } | null): boolean {
         return a && b ? a.id === b.id : a === b;
     }
 
@@ -214,9 +243,9 @@ export class ReturnMemorandumReceiptAddEditComponent implements OnInit {
         const selectedOffice   = this.selectedOffice();
         const selectedMR       = this.selectedMR();
 
-        const payload: any = {
+        const payload: ReturnMemorandumReceiptPayload = {
             date:     this.date,
-            employee: selectedEmployee
+            employee: selectedEmployee?.accountNo != null
                 ? { accountNo: selectedEmployee.accountNo, name: selectedEmployee.name || selectedEmployee.fullName }
                 : null,
             office: selectedOffice?.id ? { id: selectedOffice.id } : null,
@@ -225,7 +254,7 @@ export class ReturnMemorandumReceiptAddEditComponent implements OnInit {
             returnMemorandumReceiptDetails: selectedDetails
         };
 
-        if (this.editMode) payload.id = this.id;
+        if (this.editMode && this.id != null) payload.id = this.id;
 
         const request$ = this.editMode
             ? this.service.update(payload)

@@ -10,7 +10,7 @@ import { BrowseEntityModalComponent } from '@/app/shared/modals/browse-entity-mo
 import { provideIcons } from '@ng-icons/core';
 import { tablerSearch, tablerTrash, tablerArrowLeft, tablerCheck } from '@ng-icons/tabler-icons';
 import { StockWithdrawal, StockWithdrawalDetail } from '@/app/models/inventory-modules/stock-withdrawal.model';
-import { AssignedItemRow, AvailableItemRow, MemorandumReceiptDto, MemorandumReceiptSource, SlEntity } from '@/app/models/inventory-modules/memorandum-receipt.model';
+import { AssignedItemRow, AvailableItemRow, MemorandumReceipt, MemorandumReceiptSource, SlEntity } from '@/app/models/inventory-modules/memorandum-receipt.model';
 
 interface MemorandumReceiptPayload {
     id?: number;
@@ -90,7 +90,7 @@ export class MemorandumReceiptAddEditComponent implements OnInit {
         if (this.id == null) return;
         this.isLoading.set(true);
         this.service.getData(this.id).subscribe({
-            next: (data: MemorandumReceiptDto) => {
+            next: (data: MemorandumReceipt) => {
                 this.isLoading.set(false);
                 if (!data?.id) {
                     this.alertService.error(this.module, 'Not found.', '');
