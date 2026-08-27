@@ -2,6 +2,7 @@ package com.noreco1.fireflyv2.model;
 
 import lombok.*;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.noreco1.fireflyv2.controller.response.StockWithdrawalDetailDto;
 import org.hibernate.annotations.NotFound;
@@ -25,7 +26,7 @@ public class StockWithdrawalDetail implements Serializable {
     @Column
     private Integer id;
 
-    @JsonIgnoreProperties(ignoreUnknown = true)
+    @JsonIgnore
     @NotFound(action = NotFoundAction.IGNORE)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="FK_stockWithdrawalId", nullable = true, columnDefinition = "0")
@@ -62,7 +63,18 @@ public class StockWithdrawalDetail implements Serializable {
     }
 
     public StockWithdrawalDetailDto toDto(){
-        return new StockWithdrawalDetailDto(getItem().getId(), getItem().getCode(), getUnit().getId(), getUnit().getCode(), getItem().getDescription(), getQuantity(), getQuantityReleased(), getQuantity(), getIsSpecialEquipment());
+        Item item = getItem();
+        UnitMeasure unit = getUnit();
+        return new StockWithdrawalDetailDto(
+                item != null ? item.getId() : null,
+                item != null ? item.getCode() : null,
+                unit != null ? unit.getId() : null,
+                unit != null ? unit.getCode() : null,
+                item != null ? item.getDescription() : null,
+                getQuantity(),
+                getQuantityReleased(),
+                getQuantity(),
+                Boolean.TRUE.equals(getIsSpecialEquipment()));
     }
 
 }

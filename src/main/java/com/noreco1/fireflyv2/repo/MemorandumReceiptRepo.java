@@ -10,8 +10,10 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Tri-Nvent on 3/26/2020.
@@ -62,7 +64,7 @@ public interface MemorandumReceiptRepo extends JpaRepository<MemorandumReceipt, 
 
     ArrayList<MemorandumReceipt> findAllByEmployeeAccountNoAndDocumentStatusId(Integer accountNo, Integer status);
 
-    @Query(value = "SELECT * FROM MemorandumReceipt " +
+    @Query(value = "SELECT MemorandumReceipt.* FROM MemorandumReceipt " +
             "INNER JOIN MemorandumReceiptDetail ON MemorandumReceipt.id = MemorandumReceiptDetail.FK_memorandumReceiptId " +
             "WHERE MemorandumReceiptDetail.quantity > ( " +
             "  SELECT IF(sum(returnedQuantity) IS NOT NULL, sum(returnedQuantity), 0) " +
@@ -78,6 +80,47 @@ public interface MemorandumReceiptRepo extends JpaRepository<MemorandumReceipt, 
     ArrayList<MemorandumReceipt> findAllByEmployeeAccountNoNotInReturnMemorandumReceipt(@Param("accountNo") Integer accountNo, @Param("status") Integer status);
 
     ArrayList<MemorandumReceipt> findAllByDocumentStatusIdAndEmployeeAccountNoIsNull(Integer status);
+
+    @Query(value = "SELECT " +
+            " mr.id AS id, " +
+            " mr.code AS code, " +
+            " mr.date AS date, " +
+            " ds.status AS status, " +
+            " se.name AS employeeName, " +
+            " o.name AS officeName, " +
+            " rmr.code AS returnedMR, " +
+            " u.fullname AS preparedBy " +
+            "FROM MemorandumReceipt mr " +
+            "INNER JOIN User u ON u.id = mr.FK_createdByUserId " +
+            "INNER JOIN DocumentStatus ds ON ds.id = mr.FK_documentStatusId " +
+            "LEFT JOIN slentity se ON se.accountNo = mr.FK_employeeAccountNo " +
+            "LEFT JOIN Office o ON o.id = mr.FK_officeId " +
+            "LEFT JOIN ReturnMemorandumReceipt rmr ON rmr.id = mr.FK_returnMemorandumReceiptId " +
+            "WHERE mr.date >= :startDate " +
+            "   AND mr.date <= :endDate " +
+            "   AND (:employeeAccountNo IS NULL OR mr.FK_employeeAccountNo = :employeeAccountNo) " +
+            "   AND (:query IS NULL OR :query = '' OR " +
+            "       mr.code LIKE CONCAT('%', :query, '%') " +
+            "       OR se.name LIKE CONCAT('%', :query, '%') " +
+            "       OR u.fullname LIKE CONCAT('%', :query, '%')) " +
+            "ORDER BY mr.date DESC, mr.id DESC",
+            countQuery = "SELECT COUNT(*) " +
+                    "FROM MemorandumReceipt mr " +
+                    "INNER JOIN User u ON u.id = mr.FK_createdByUserId " +
+                    "LEFT JOIN slentity se ON se.accountNo = mr.FK_employeeAccountNo " +
+                    "WHERE mr.date >= :startDate " +
+                    "   AND mr.date <= :endDate " +
+                    "   AND (:employeeAccountNo IS NULL OR mr.FK_employeeAccountNo = :employeeAccountNo) " +
+                    "   AND (:query IS NULL OR :query = '' OR " +
+                    "       mr.code LIKE CONCAT('%', :query, '%') " +
+                    "       OR se.name LIKE CONCAT('%', :query, '%') " +
+                    "       OR u.fullname LIKE CONCAT('%', :query, '%')) ", nativeQuery = true)
+    Page<Map<String, Object>> getMemorandumReceiptPaged(@Param("startDate") String startDate,
+                                                          @Param("endDate") String endDate,
+                                                          @Param("employeeAccountNo") Integer employeeAccountNo,
+                                                          @Param("query") String query,
+                                                          Pageable pageable);
+
 
     @Query(value = "SELECT * FROM MemorandumReceipt " +
             "INNER JOIN MemorandumReceiptDetail ON MemorandumReceipt.id = MemorandumReceiptDetail.FK_memorandumReceiptId " +

@@ -3,7 +3,7 @@ import { COMMON_ALL_PAGE_IMPORTS, COMMON_MAIN_PAGE_IMPORTS, SHARED_PROVIDERS } f
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { provideIcons } from '@ng-icons/core';
 import { tablerSearch } from '@ng-icons/tabler-icons';
-import { MctService } from '@/app/pages/mct/mct.service';
+import { MctService } from '@/app/pages/inventory/mct/mct.service';
 
 @Component({
     selector: 'app-browse-mct-stock-release-modal',

@@ -10,6 +10,7 @@ import org.springframework.data.repository.query.Param;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by lenovo on 5/4/2017.
@@ -61,7 +62,7 @@ public interface StockWithdrawalRepo extends JpaRepository<StockWithdrawal, Inte
             "AND id IN (SELECT FK_stockWithdrawalId " +
             "FROM StockWithdrawalDetail WHERE quantity > quantityReleased) " +
             "AND FK_inventoryLocationId = :invLocId " +
-            "\n#pageable\n",
+            "#pageable",
             countQuery = "SELECT COUNT(*) FROM StockWithdrawal " +
                     "WHERE FK_documentStatusId = :documentStatus " +
                     "AND id IN (SELECT FK_stockWithdrawalId " +
@@ -77,7 +78,7 @@ public interface StockWithdrawalRepo extends JpaRepository<StockWithdrawal, Inte
             "AND id IN (SELECT FK_stockWithdrawalId " +
             "FROM StockWithdrawalDetail WHERE quantity > quantityReleased) " +
             "AND FK_inventoryLocationId = :invLocId " +
-            "\n#pageable\n",
+            "#pageable",
             countQuery = "SELECT COUNT(*) FROM StockWithdrawal " +
                     "WHERE (UPPER(code) LIKE :query OR UPPER(description) LIKE :query) " +
                     "AND FK_documentStatusId = :documentStatus " +
@@ -109,7 +110,7 @@ public interface StockWithdrawalRepo extends JpaRepository<StockWithdrawal, Inte
             "WHERE totalQuantity = totalReleased " +
             "AND sw.FK_turnOnOrderWithdrawalId IS NOT NULL " +
             "AND sea.id is null " +
-            "ORDER BY sw.voucherDate  \n#pageable\n",
+            "ORDER BY sw.voucherDate  #pageable",
             countQuery = "SELECT COUNT(*) FROM StockWithdrawal sw " +
                     "JOIN (SELECT swd.FK_stockWithdrawalId, SUM(swd.quantity) AS totalQuantity, SUM(swd.quantityReleased) AS totalReleased FROM StockWithdrawalDetail swd " +
                     "LEFT JOIN Item i ON swd.FK_itemId = i.id " +
@@ -131,7 +132,7 @@ public interface StockWithdrawalRepo extends JpaRepository<StockWithdrawal, Inte
             "AND sw.FK_turnOnOrderWithdrawalId IS NOT NULL " +
             "AND sea.id is null " +
             "AND sw.code LIKE :query " +
-            "ORDER BY sw.voucherDate  \n#pageable\n",
+            "ORDER BY sw.voucherDate  #pageable",
             countQuery = "SELECT COUNT(*) FROM StockWithdrawal sw " +
                     "JOIN (SELECT swd.FK_stockWithdrawalId, SUM(swd.quantity) AS totalQuantity, SUM(swd.quantityReleased) AS totalReleased FROM StockWithdrawalDetail swd " +
                     "LEFT JOIN Item i ON swd.FK_itemId = i.id " +
@@ -156,7 +157,7 @@ public interface StockWithdrawalRepo extends JpaRepository<StockWithdrawal, Inte
             "AND IF(LENGTH(:query) > 0, (sw.code LIKE CONCAT('%', :query, '%') OR sw.description LIKE CONCAT('%', :query, '%')), 1) " +
             "AND swe.id IS NULL " +
             "GROUP BY sw.code " +
-            "ORDER BY sw.code \n#pageable\n",
+            "ORDER BY sw.code ",
             countQuery = "SELECT count(*) FROM StockWithdrawal sw " +
                     "LEFT JOIN StockWithdrawalDetail swd ON sw.id = swd.FK_stockWithdrawalId " +
                     "LEFT JOIN StockWithdrawalEmployee swe ON sw.id = swe.FK_stockWithdrawalId  " +
@@ -167,9 +168,8 @@ public interface StockWithdrawalRepo extends JpaRepository<StockWithdrawal, Inte
                     "AND IF(LENGTH(:query) > 0, (sw.code LIKE CONCAT('%', :query, '%') OR sw.description LIKE CONCAT('%', :query, '%')), 1) " +
                     "AND swe.id IS NULL " +
                     "GROUP BY sw.code " +
-                    "ORDER BY sw.code ",
-            nativeQuery = true)
-    Page<StockWithdrawal> findAllForMemorandumReceipt(@Param("query") String query, Pageable paging);
+                    "ORDER BY sw.code ", nativeQuery = true)
+    Page<StockWithdrawal> findAllForMemorandumReceipt(@Param("query") String query, Pageable pageable);
 
     @Query(value = "SELECT sw.* FROM StockWithdrawal sw " +
             "INNER JOIN StockWithdrawalDetail swd ON sw.id = swd.FK_stockWithdrawalId " +
@@ -180,7 +180,7 @@ public interface StockWithdrawalRepo extends JpaRepository<StockWithdrawal, Inte
             "AND swd.quantity > (SELECT IF(sum(quantity) IS NOT NULL, sum(quantity), 0) FROM MemorandumReceiptDetail WHERE MemorandumReceiptDetail.FK_stockWithdrawalDetailId = swd.id) " +
             "AND IF(LENGTH(:query) > 0, (sw.code LIKE CONCAT('%', :query, '%') OR sw.description LIKE CONCAT('%', :query, '%')), 1) " +
             "GROUP BY sw.code " +
-            "ORDER BY sw.code \n#pageable\n",
+            "ORDER BY sw.code ",
             countQuery = "SELECT count(*) FROM StockWithdrawal sw " +
                     "INNER JOIN StockWithdrawalDetail swd ON sw.id = swd.FK_stockWithdrawalId " +
                     "INNER JOIN StockWithdrawalEmployee swe ON sw.id = swe.FK_stockWithdrawalId " +
@@ -190,7 +190,59 @@ public interface StockWithdrawalRepo extends JpaRepository<StockWithdrawal, Inte
                     "AND swd.quantity > (SELECT IF(sum(quantity) IS NOT NULL, sum(quantity), 0) FROM MemorandumReceiptDetail WHERE MemorandumReceiptDetail.FK_stockWithdrawalDetailId = swd.id) " +
                     "AND IF(LENGTH(:query) > 0, (sw.code LIKE CONCAT('%', :query, '%') OR sw.description LIKE CONCAT('%', :query, '%')), 1) " +
                     "GROUP BY sw.code " +
-                    "ORDER BY sw.code ",
+                    "ORDER BY sw.code ", nativeQuery = true)
+    Page<StockWithdrawal> findAllForMemorandumReceiptMultipleEmployees(@Param("query") String query, Pageable pageable);
+    
+    
+    @Query(value = "SELECT " +
+            " sw.id AS id, " +
+            " sw.code AS code, " +
+            " sw.voucherDate AS voucherDate, " +
+            " sw.`description` AS description, " +
+            " u.fullname AS preparedBy, " +
+            " a.fullname AS approvedBy, " +
+            " ds.status AS status " +
+            "FROM StockWithdrawal sw " +
+            "INNER JOIN User u ON u.id = sw.fk_createdbyuserid " +
+            "LEFT JOIN User a ON a.id = sw.fk_approvedbyuserid " +
+            "INNER JOIN DocumentStatus ds ON ds.id = sw.fk_documentstatusid " +
+            "WHERE sw.voucherDate >= :startDate " +
+            "   AND sw.voucherDate <= :endDate " +
+            "   AND (:statusId IS NULL OR sw.FK_documentStatusId = :statusId) " +
+            "   AND (:query IS NULL OR :query = '' OR " +
+            "       sw.code LIKE CONCAT('%', :query, '%') " +
+            "       OR sw.description LIKE CONCAT('%', :query, '%') " +
+            "       OR u.fullname LIKE CONCAT('%', :query, '%')) " +
+            "   AND (sw.FK_createdByUserId = :userId " +
+            "       OR sw.FK_approvedByUserId = :userId " +
+            "       OR sw.FK_checkedbyUserId = :userId " +
+            "       OR sw.FK_issuedByUserId = :userId " +
+            "       OR sw.FK_receivedByUserId = :userId) " +
+            "   AND sw.fk_documentstatusid not in (:notInStatusId) " +
+            "ORDER BY sw.voucherDate DESC, sw.id DESC",
+            countQuery = "SELECT COUNT(*) " +
+                    "FROM StockWithdrawal sw " +
+                    "INNER JOIN User u ON u.id = sw.fk_createdbyuserid " +
+                    "WHERE sw.voucherDate >= :startDate " +
+                    "   AND sw.voucherDate <= :endDate " +
+                    "   AND (:statusId IS NULL OR sw.FK_documentStatusId = :statusId) " +
+                    "   AND (:query IS NULL OR :query = '' OR " +
+                    "       sw.code LIKE CONCAT('%', :query, '%') " +
+                    "       OR sw.description LIKE CONCAT('%', :query, '%') " +
+                    "       OR u.fullname LIKE CONCAT('%', :query, '%')) " +
+                    "   AND (sw.FK_createdByUserId = :userId " +
+                    "       OR sw.FK_approvedByUserId = :userId " +
+                    "       OR sw.FK_checkedbyUserId = :userId " +
+                    "       OR sw.FK_issuedByUserId = :userId " +
+                    "       OR sw.FK_receivedByUserId = :userId) " +
+                    "   AND sw.fk_documentstatusid not in (:notInStatusId) ",
             nativeQuery = true)
-    Page<StockWithdrawal> findAllForMemorandumReceiptMultipleEmployees(@Param("query") String query, Pageable paging);
+    Page<Map<String, Object>> getStockWithdrawalPaged(@Param("startDate") String startDate,
+                                                      @Param("endDate") String endDate,
+                                                      @Param("statusId") Integer statusId,
+                                                      @Param("query") String query,
+                                                      @Param("userId") Integer userId,
+                                                      @Param("notInStatusId") Collection<Integer> notInStatusId,
+                                                      Pageable pageable);
+
 }

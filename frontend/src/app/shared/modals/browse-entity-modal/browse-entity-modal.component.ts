@@ -18,6 +18,7 @@ export class BrowseEntityModalComponent implements OnInit {
     private cdr = inject(ChangeDetectorRef);
 
     @Input() entityTypes?: number[];
+    @Input() defaultClassificationId?: number = 1;
 
     items: any[] = [];
     classifications: any[] = [];
@@ -30,10 +31,21 @@ export class BrowseEntityModalComponent implements OnInit {
 
     ngOnInit(): void {
         this.service.getEntityClassifications().subscribe({
-            next: (res) => { this.classifications = res; this.cdr.markForCheck(); },
-            error: () => {}
+            next: (res) => {
+                this.classifications = res;
+                if (this.defaultClassificationId != null) {
+                    const match = res.find(c => c.id === this.defaultClassificationId);
+                    if (match) {
+                        this.selectedClassification = match.description;
+                    }
+                }
+                this.loadData();
+                this.cdr.markForCheck();
+            },
+            error: () => {
+                this.loadData();
+            }
         });
-        this.loadData();
     }
 
     onClassificationChange(): void {

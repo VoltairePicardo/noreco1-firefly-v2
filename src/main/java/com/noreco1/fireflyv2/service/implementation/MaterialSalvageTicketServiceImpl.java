@@ -193,6 +193,14 @@ public class MaterialSalvageTicketServiceImpl implements MaterialSalvageTicketSe
 
     @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
+    public Page<Map<String, Object>> getMaterialSalvageTicketPaged(String from, String to, Integer statusId, String query, Pageable pageable) {
+        User loggedIn = authenticationFacade.getLoggedIn();
+
+        return materialSalvageTicketRepo.getMaterialSalvageTicketPaged(from, to, statusId, query, loggedIn.getId(), pageable);
+    }
+
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
+    @Override
     public List<DocumentStatus> getDocumentsStatuses() {
         return documentDtoer.getDocumentStatuses(com.noreco1.fireflyv2.model.enums.Workflow.MATERIAL_SALVAGE_TICKET.getId());
     }

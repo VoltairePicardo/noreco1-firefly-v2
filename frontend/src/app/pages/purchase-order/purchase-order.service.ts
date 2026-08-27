@@ -1,14 +1,17 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '@/environments/environment';
 import { DownloadService } from '@/app/core/services/download.service';
+import { PurchaseOrderForItemTestingPage } from '@/app/models/inventory-modules/purchase-order.model';
 
 const BASE_API = environment.get('baseApiUrl');
 
 const httpOptions = {
     headers: new HttpHeaders({ 'Content-Type': 'application/json' })
 };
+
+const DOCUMENT_STATUS_APPROVED = 7;
 
 @Injectable({ providedIn: 'root' })
 export class PurchaseOrderService {
@@ -100,5 +103,13 @@ export class PurchaseOrderService {
 
     print(id: number): void {
         this.downloadService.print(`${BASE_API}/purchase-order/export/${id}`, { type: 'pdf' });
+    }
+
+    getForItemTestingPaged(query = '', page = 0, size = 10): Observable<PurchaseOrderForItemTestingPage> {
+        const params = new HttpParams().set('q', query).set('page', page).set('size', size);
+        return this.http.get<PurchaseOrderForItemTestingPage>(
+            `${BASE_API}/purchase-order/for-item-testing/${DOCUMENT_STATUS_APPROVED}/paged`,
+            { params }
+        );
     }
 }

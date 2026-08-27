@@ -100,6 +100,12 @@ public class StockWithdrawalServiceImpl implements StockWithdrawalService, Print
     @Autowired
     StockWithdrawalEmployeeRepo stockWithdrawalEmployeeRepo;
 
+    private final ItemTransactionDetailRepo itemTransactionDetailRepo;
+
+    public StockWithdrawalServiceImpl(ItemTransactionDetailRepo itemTransactionDetailRepo) {
+        this.itemTransactionDetailRepo = itemTransactionDetailRepo;
+    }
+
     @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public StockWithdrawal findById(Integer id) {
@@ -168,7 +174,69 @@ public class StockWithdrawalServiceImpl implements StockWithdrawalService, Print
         } else return null;
     }
 
+    @Override
     @Transactional(isolation = Isolation.READ_UNCOMMITTED)
+    public PostResponse create(Map<String, Object> payload) {
+        PostResponse response = new PostResponse();
+        StockWithdrawal sw = new StockWithdrawal();
+        Object dateObj = payload.get("voucherDate");
+        if (dateObj instanceof String dateStr && !dateStr.isEmpty()) {
+            Date voucherDate = java.sql.Date.valueOf(dateStr);
+            sw.setVoucherDate(voucherDate);
+            int year = Integer.parseInt(GlobalConstant.YYYY_DATE_FORMAT.format(voucherDate));
+            sw.setYear(year);
+            sw.setType(1);
+            Object latestCode = stockWithdrawalRepo.findLatestCodeByYear(year, 1);
+            String code = generatorFacade.voucherCodeNoOffice("MRS",
+                    latestCode == null ? "" : String.valueOf(latestCode),
+                    voucherDate, GlobalConstant.COUNTER_PAD_4);
+            sw.setCode(code);
+        }
+        sw.setDescription(payload.get("description") != null ? String.valueOf(payload.get("description")) : null);
+        Date now = new Date();
+        sw.setCreatedAt(now);
+        sw.setUpdatedAt(now);
+        sw.setCreatedBy(authenticationFacade.getLoggedIn());
+        DocumentStatus ds = new DocumentStatus();
+        ds.setId(com.noreco1.fireflyv2.model.enums.DocumentStatus.DOCUMENT_CREATED.getId());
+        sw.setDocumentStatus(ds);
+        Workflow wf = new Workflow();
+        wf.setId(com.noreco1.fireflyv2.model.enums.Workflow.WITHDRAWAL.getId());
+        sw.setWorkflow(wf);
+        sw.setTransaction(generatorFacade.transaction());
+        StockWithdrawal saved = stockWithdrawalRepo.save(sw);
+        response.setSuccessMessage("Stock Withdrawal saved.");
+        response.setModelId(saved.getId());
+        return response;
+    }
+
+    @Override
+    @Transactional
+    public PostResponse update(Map<String, Object> payload) {
+        PostResponse response = new PostResponse();
+        Object idObj = payload.get("id");
+        if (idObj == null) {
+            response.setFailureMessage("ID is required.");
+            return response;
+        }
+        Integer id = ((Number) idObj).intValue();
+        StockWithdrawal sw = stockWithdrawalRepo.findById(id).orElse(null);
+        if (sw == null) {
+            response.setFailureMessage("Record not found.");
+            return response;
+        }
+        Object dateObj = payload.get("voucherDate");
+        if (dateObj instanceof String dateStr && !dateStr.isEmpty()) {
+            sw.setVoucherDate(java.sql.Date.valueOf(dateStr));
+        }
+        sw.setDescription(payload.get("description") != null ? String.valueOf(payload.get("description")) : null);
+        sw.setUpdatedAt(new Date());
+        StockWithdrawal saved = stockWithdrawalRepo.save(sw);
+        response.setSuccessMessage("Stock Withdrawal updated.");
+        response.setModelId(saved.getId());
+        return response;
+    }
+
     @Override
     public List<StockWithdrawal> findAll() {
         return stockWithdrawalRepo.findAll();
@@ -223,58 +291,46 @@ public class StockWithdrawalServiceImpl implements StockWithdrawalService, Print
 
     @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
-    public List<Map> findByDateRangeAndStatusId(String from, String to, Integer docStatusId, Integer officeId) {
-        try {
-            Date fromDate = DateHelper.strToDate(from, "yyyy-MM-dd");
-            Date toDate = DateHelper.strToDate(to, "yyyy-MM-dd");
+    public Page<Map<String, Object>> getStockWithdrawalPaged(String from, String to, Integer statusId, String query, Pageable pageable) {
+        User loggedIn = authenticationFacade.getLoggedIn();
+        Integer[] ids = {
+                com.noreco1.fireflyv2.model.enums.DocumentStatus.APPROVED.getId(),
+                com.noreco1.fireflyv2.model.enums.DocumentStatus.DENIED.getId(),
+                com.noreco1.fireflyv2.model.enums.DocumentStatus.CANCELLED.getId(),
+        };
 
-            if (fromDate == null) {
-                fromDate = new Date(0);
-            }
-
-            if (toDate == null) {
-                toDate = new Date();
-            }
-
-            User loggedIn = authenticationFacade.getLoggedIn();
-
-            List<StockWithdrawal> docs = stockWithdrawalRepo.findByAllowedUserVoucherDateBetweenAndDocumentStatusIdNotInAndOfficeId(loggedIn.getId(), fromDate, toDate, docStatusId);
-            return this.makeWithdrawalListMap(docs);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-        return null;
+        return stockWithdrawalRepo.getStockWithdrawalPaged(from, to, statusId, query, loggedIn.getId(), Arrays.asList(ids), pageable);
     }
 
     @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<Map> findByDateRangePending(String from, String to, Integer officeId) {
-        try {
-            Date fromDate = DateHelper.strToDate(from, "yyyy-MM-dd");
-            Date toDate = DateHelper.strToDate(to, "yyyy-MM-dd");
-
-            if (fromDate == null) {
-                fromDate = new Date(0);
-            }
-
-            if (toDate == null) {
-                toDate = new Date();
-            }
-
-            Integer[] ids = {
-                    com.noreco1.fireflyv2.model.enums.DocumentStatus.APPROVED.getId(),
-                    com.noreco1.fireflyv2.model.enums.DocumentStatus.DENIED.getId(),
-                    com.noreco1.fireflyv2.model.enums.DocumentStatus.CANCELLED.getId()
-            };
-
-            User loggedIn = authenticationFacade.getLoggedIn();
-
-            List<StockWithdrawal> docs = stockWithdrawalRepo.findByAllowedUserVoucherDateBetweenAndDocumentStatusIdNotInAndOfficeId(loggedIn.getId(), fromDate, toDate, Arrays.asList(ids));
-            return this.makeWithdrawalListMap(docs);
-
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
+//        try {
+//            Date fromDate = DateHelper.strToDate(from, "yyyy-MM-dd");
+//            Date toDate = DateHelper.strToDate(to, "yyyy-MM-dd");
+//
+//            if (fromDate == null) {
+//                fromDate = new Date(0);
+//            }
+//
+//            if (toDate == null) {
+//                toDate = new Date();
+//            }
+//
+//            Integer[] ids = {
+//                    com.noreco1.fireflyv2.model.enums.DocumentStatus.APPROVED.getId(),
+//                    com.noreco1.fireflyv2.model.enums.DocumentStatus.DENIED.getId(),
+//                    com.noreco1.fireflyv2.model.enums.DocumentStatus.CANCELLED.getId()
+//            };
+//
+//            User loggedIn = authenticationFacade.getLoggedIn();
+//
+//            List<StockWithdrawal> docs = stockWithdrawalRepo.findByAllowedUserVoucherDateBetweenAndDocumentStatusIdNotInAndOfficeId(loggedIn.getId(), fromDate, toDate, Arrays.asList(ids));
+//            return this.makeWithdrawalListMap(docs);
+//
+//        } catch (Exception ex) {
+//            ex.printStackTrace();
+//        }
         return null;
     }
 
@@ -302,22 +358,31 @@ public class StockWithdrawalServiceImpl implements StockWithdrawalService, Print
                     detailsDto.add(d.toDto());
                 }
 
+
                 dto.setDate(entity.getVoucherDate());
                 dto.setCode(entity.getCode());
-                dto.setPurpose(Checker.isStringNullOrEmpty(entity.getDescription()) ? entity.getPurpose().getDescription() : entity.getDescription());
+                dto.setPurpose(Checker.isStringNullOrEmpty(entity.getDescription())
+                        ? (entity.getPurpose() != null ? entity.getPurpose().getDescription() : null)
+                        : entity.getDescription());
                 dto.setWithdrawalDetails(detailsDto);
                 dto.setTransId(entity.getTransaction().getId());
-                dto.setCreatedBy(entity.getCreatedBy().getFullName());
 
-                User user = new User();
-                user.setId(entity.getCreatedBy().getId());
-                user.setFullName(entity.getCreatedBy().getFullName());
-                user.setAccountNo(entity.getCreatedBy().getAccountNo());
+                if (entity.getCreatedBy() != null) {
+                    dto.setCreatedBy(entity.getCreatedBy().getFullName());
 
-                dto.setCreatedByUser(user);
+                    User user = new User();
+                    user.setId(entity.getCreatedBy().getId());
+                    user.setFullName(entity.getCreatedBy().getFullName());
+                    user.setAccountNo(entity.getCreatedBy().getAccountNo());
+                    dto.setCreatedByUser(user);
+                }
 
-                dto.setDepartmentName(entity.getDepartment().getName());
-                dto.setInventoryCategoryTypeId(entity.getInventoryCategory().getType());
+                if (entity.getDepartment() != null) {
+                    dto.setDepartmentName(entity.getDepartment().getName());
+                }
+                if (entity.getInventoryCategory() != null) {
+                    dto.setInventoryCategoryTypeId(entity.getInventoryCategory().getType());
+                }
 
                 return dto;
         });
@@ -397,7 +462,7 @@ public class StockWithdrawalServiceImpl implements StockWithdrawalService, Print
                 detailDto.setItemDescription(detail.getItem().getDescription());
                 detailDto.setQuantity(detail.getQuantity());
                 detailDto.setQuantityReleased(detail.getQuantityReleased());
-                detailDto.setIsSpecialEquipment(detail.getIsSpecialEquipment());
+                detailDto.setSpecialEquipment(detail.getIsSpecialEquipment());
 
                 data.add(detailDto);
             }
@@ -511,12 +576,14 @@ public class StockWithdrawalServiceImpl implements StockWithdrawalService, Print
     }
 
     @Override
+    @Transactional
     public PostResponse processUpdate(Document v, BindingResult bindingResult, MessageSource messageSource) {
         StockWithdrawal withdrawal = (StockWithdrawal) v;
         return this.processCreate(withdrawal, bindingResult, messageSource);
     }
 
     @Override
+    @Transactional
     public PostResponse processCreate(Document v, BindingResult bindingResult, MessageSource messageSource) {
 
         StockWithdrawal withdrawal = (StockWithdrawal) v;
@@ -794,30 +861,25 @@ public class StockWithdrawalServiceImpl implements StockWithdrawalService, Print
         return documentLoggerFacade.makeLog(sw);
     }
 
-    private List<Map> makeWithdrawalListMap(List<StockWithdrawal> cs) {
 
-        List<Map> mapList = new ArrayList<>();
+    @Override
+    @Transactional(readOnly = true)
+    public Page<StockWithdrawal> getMemorandumReceiptVouchers(String query, Boolean multipleEmployee, Pageable pageable) {
+        Page<StockWithdrawal> data;
 
-        if (!Checker.collectionIsEmpty(cs)) {
-            for (StockWithdrawal c : cs) {
-                mapList.add(composeWithdrawalMap(c));
-            }
+        if (multipleEmployee) {
+            data = stockWithdrawalRepo.findAllForMemorandumReceiptMultipleEmployees(query, pageable);
+        } else {
+            data = stockWithdrawalRepo.findAllForMemorandumReceipt(query, pageable);
         }
-        return mapList;
+
+
+        data.forEach(row -> {
+            ArrayList<StockWithdrawalDetail> items = stockWithdrawalDetailRepo.findByStockWithdrawalId(row.getId());
+
+            row.setItems(items);
+        });
+
+        return data;
     }
-
-    private Map composeWithdrawalMap(StockWithdrawal w) {
-        Map map = new HashMap();
-
-        map.put("id", w.getId());
-        map.put("code", w.getCode());
-        map.put("voucherDate", w.getVoucherDate());
-        map.put("description", Checker.isStringNullOrEmpty(w.getDescription()) ? w.getPurpose().getDescription() : w.getDescription());
-        map.put("createdBy", w.getCreatedBy());
-        map.put("approvingOfficer", w.getApprovingOfficer());
-        map.put("documentStatus", w.getDocumentStatus());
-
-        return map;
-    }
-
 }

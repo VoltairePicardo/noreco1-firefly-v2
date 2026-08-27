@@ -241,7 +241,7 @@ export class AccountingReportsService {
     }
 
     getRvSummary(from: string, to: string, statusId: number): Observable<any[]> {
-        return this.http.get<any[]>(`${BASE_API}/api/requisition-voucher/list/${from}/${to}/${statusId}`);
+        return this.http.get<any[]>(`${BASE_API}/api/purchase-request/list/${from}/${to}/${statusId}`);
     }
 
     getPcfLedger(from: string, to: string, docStatId: number, pcfId: number): Observable<any[]> {

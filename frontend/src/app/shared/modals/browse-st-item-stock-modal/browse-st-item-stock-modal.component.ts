@@ -1,7 +1,7 @@
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef, inject } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { COMMON_ALL_PAGE_IMPORTS, COMMON_MAIN_PAGE_IMPORTS } from '@/app/shared/providers/shared-providers';
-import { StockTransferService } from '@/app/pages/stock-transfer/stock-transfer.service';
+import { StockTransferService } from '@/app/pages/inventory/stock-transfer/stock-transfer.service';
 
 @Component({
     selector: 'app-browse-st-item-stock-modal',

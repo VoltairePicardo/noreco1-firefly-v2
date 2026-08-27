@@ -1,0 +1,114 @@
+<div class="container-fluid">
+    <app-page-title [title]="module" [subTitle]="subModule" [menuLink]="menuLink"/>
+
+    <div class="card">
+        <div class="card-header">
+            <div class="col-md-12">
+                <div class="row mb-3 align-items-end g-2">
+                    <div class="col-md-2">
+                        <label class="form-label fw-bold mb-1 fs-xs text-uppercase">From</label>
+                        <input type="text" mwlFlatpickr [options]="flatpickrOptions"
+                               class="form-control" [(ngModel)]="fromDate" placeholder="From date"/>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label fw-bold mb-1 fs-xs text-uppercase">To</label>
+                        <input type="text" mwlFlatpickr [options]="flatpickrOptions"
+                               class="form-control" [(ngModel)]="toDate" placeholder="To date"/>
+                    </div>
+                    <div class="col-auto d-flex gap-2">
+                        <button type="button" class="btn btn-primary fw-bold gap-1" (click)="load()">
+                            <ng-icon name="tablerSearch" class="fs-lg fw-bold"></ng-icon>Search
+                        </button>
+                        <button type="button" class="btn btn-danger fw-bold gap-1" (click)="reset()">
+                            <ng-icon name="tablerRefresh" class="fs-lg fw-bold"></ng-icon>Reset
+                        </button>
+                    </div>
+                    <div class="col-md-auto ms-auto">
+                        <button type="button" class="btn btn-primary d-flex align-items-center gap-1 fw-bold"
+                                [routerLink]="['/' + menuLink + '/create']">
+                            <ng-icon name="tablerPlus" class="fs-lg fw-bold"></ng-icon>
+                            Create {{ module }}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-custom table-centered table-select table-hover w-100 mb-0">
+                <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                <tr class="text-uppercase fs-xxs">
+                    <th>Delivery Date</th>
+                    <th>Supplier</th>
+                    <th>Inventory Location</th>
+                    <th>Purchase Order</th>
+                    <th>No. of Items</th>
+                    <th>Prepared By</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                    @if (isLoading()) {
+                        <tr class="no-results">
+                            <td colspan="7" class="text-center text-muted py-3">
+                                <span class="spinner-border spinner-border-sm me-2" role="status"></span>Loading...
+                            </td>
+                        </tr>
+                    } @else if (records().length > 0) {
+                        @for (rec of records(); track rec.id) {
+                            <tr>
+                                <td>{{ rec.date | date:'MM/dd/yyyy' }}</td>
+                                <td>{{ rec.supplier?.name || '—' }}</td>
+                                <td>{{ rec.inventoryLocation?.description || '—' }}</td>
+                                <td>{{ rec.purchaseOrder?.code || '—' }}</td>
+                                <td class="text-end">{{ rec.totalItems ?? '—' }}</td>
+                                <td>{{ rec.createdBy?.fullName || '—' }}</td>
+                                <td class="text-nowrap">
+                                    <div class="d-flex justify-content-end gap-1">
+                                        <a href="javascript:void(0)" ngbTooltip="View"
+                                           [routerLink]="['/' + menuLink, rec.id, 'detail']"
+                                           class="btn btn-light btn-icon btn-sm rounded-circle">
+                                            <ng-icon name="tablerEye" class="fs-lg"></ng-icon>
+                                        </a>
+                                        @if (isEditable(rec)) {
+                                            <a href="javascript:void(0)" ngbTooltip="Edit"
+                                               [routerLink]="['/' + menuLink, rec.id, 'edit']"
+                                               class="btn btn-light btn-icon btn-sm rounded-circle">
+                                                <ng-icon name="tablerEdit" class="fs-lg"></ng-icon>
+                                            </a>
+                                        }
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    } @else {
+                        <tr class="no-results">
+                            <td colspan="7" class="text-center text-muted py-3">Nothing found.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        @if (filteredTotal() > pageSize) {
+            <div class="card-footer d-flex justify-content-center">
+                <div class="pagination-boxed align-items-center mt-2 mb-0">
+                    <ngb-pagination
+                        [collectionSize]="filteredTotal()"
+                        [page]="page()"
+                        (pageChange)="onPageChange($event)"
+                        [pageSize]="pageSize"
+                        [maxSize]="5"
+                        [rotate]="true">
+                        <ng-template ngbPaginationPrevious>
+                            <ng-icon name="tablerChevronLeft"/>
+                        </ng-template>
+                        <ng-template ngbPaginationNext>
+                            <ng-icon name="tablerChevronRight"/>
+                        </ng-template>
+                    </ngb-pagination>
+                </div>
+            </div>
+        }
+    </div>
+</div>

@@ -1,0 +1,115 @@
+<div class="modal-header">
+    <h4 class="modal-title">{{ title }}</h4>
+    <button type="button" class="btn-close" (click)="activeModal.dismiss()"></button>
+</div>
+
+<div class="modal-body">
+    <div class="row align-items-start justify-content-between mb-3 mt-0">
+        <!-- Dates -->
+        <div class="col-md-8">
+            <div class="row g-2">
+                <div class="col-md-3">
+                    <label class="form-label fw-bold mb-1 fs-sm d-block">From</label>
+                    <input type="text"
+                           mwlFlatpickr
+                           [options]="flatpickrOptions"
+                           class="form-control"
+                           [(ngModel)]="from"
+                           placeholder="From date"/>
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label fw-bold mb-1 fs-sm d-block">To</label>
+                    <input type="text"
+                           mwlFlatpickr
+                           [options]="flatpickrOptions"
+                           class="form-control"
+                           [(ngModel)]="to"
+                           placeholder="To date"/>
+                </div>
+            </div>
+        </div>
+
+        <!-- Search -->
+        <div class="col-md-4">
+            <label class="form-label fw-bold mb-1 fs-xs d-block invisible">Search</label>
+            <div class="input-group">
+                <input ngbAutofocus
+                       [formControl]="searchControl"
+                       type="search"
+                       class="form-control"
+                       placeholder="Search by code or particulars"
+                       (keyup.enter)="onSearch()"/>
+
+                <button type="button"
+                        class="btn btn-primary fw-bold"
+                        (click)="onSearch()">
+                    <ng-icon name="tablerSearch" class="fs-lg fw-bold"/>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-custom table-centered table-select table-hover w-100 mb-0">
+            <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                <tr class="text-uppercase fs-xxs">
+                    <th style="width:150px">Code</th>
+                    <th>Description</th>
+                    <th style="width:130px">Date</th>
+                    <th>Inventory Location</th>
+                    <th style="width:130px">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (loading()) {
+                    <tr>
+                        <td colspan="5" class="text-center py-4">
+                            <div class="d-flex justify-content-center align-items-center gap-2 py-2 text-muted">
+                                <span class="spinner-border spinner-border-sm"></span>
+                                <span>Loading...</span>
+                            </div>
+                        </td>
+                    </tr>
+                } @else if (hasResults()) {
+                    @for (item of items(); track item.id) {
+                        <tr style="cursor:pointer" (click)="select(item)">
+                            <td class="fw-bold">{{ item.code || '—' }}</td>
+                            <td>{{ item.description || '—' }}</td>
+                            <td>{{ item.voucherDate | date:'MMM dd, yyyy' }}</td>
+                            <td>{{ item.inventoryLocation?.description || item.inventoryLocation?.name || '—' }}</td>
+                            <td>
+                                <span class="badge bg-secondary bg-opacity-25 text-dark border">
+                                    {{ item.documentStatus?.status || '—' }}
+                                </span>
+                            </td>
+                        </tr>
+                    }
+                } @else {
+                    <tr class="no-results">
+                        <td colspan="5" class="text-center text-muted py-3">Nothing found.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    @if (total() > pageSize) {
+        <div class="d-flex justify-content-center pagination-boxed align-items-center mt-3">
+            <ngb-pagination
+                [collectionSize]="total()"
+                [page]="page()"
+                (pageChange)="onPageChange($event)"
+                [pageSize]="pageSize"
+                [maxSize]="5"
+                [rotate]="true">
+                <ng-template ngbPaginationPrevious>
+                    <ng-icon name="tablerChevronLeft"/>
+                </ng-template>
+                <ng-template ngbPaginationNext>
+                    <ng-icon name="tablerChevronRight"/>
+                </ng-template>
+            </ngb-pagination>
+        </div>
+    }
+</div>

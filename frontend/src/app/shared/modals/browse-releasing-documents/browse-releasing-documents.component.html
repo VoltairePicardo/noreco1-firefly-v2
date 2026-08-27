@@ -1,0 +1,81 @@
+<div class="modal-header">
+    <h4 class="modal-title">{{ title() }}</h4>
+    <button type="button" class="btn-close" (click)="activeModal.dismiss()" aria-label="Close"></button>
+</div>
+
+<div class="modal-body">
+    <div class="row align-items-center justify-content-between mb-3">
+        <div class="col-md-3">
+            <select class="form-select" [formControl]="typeControl">
+                @for (option of typeOptions; track option.value) {
+                    <option [value]="option.value">{{ option.label }}</option>
+                }
+            </select>
+        </div>
+
+        <div class="col-md-4">
+            <div class="input-group">
+                <input ngbAutofocus
+                       [formControl]="searchControl"
+                       type="search"
+                       class="form-control"
+                       placeholder="Search by code or particulars"
+                       (keyup.enter)="onSearch()"/>
+
+                <button type="button" class="btn btn-primary fw-bold" (click)="onSearch()">
+                    <ng-icon name="tablerSearch" class="fs-lg fw-bold"/>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-custom table-centered table-select table-hover w-100 mb-0">
+            <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                <tr class="text-uppercase fs-xxs">
+                    <th>Code</th>
+                    <th>Date</th>
+                    <th>Particulars</th>
+                    <th>Department</th>
+                    <th>Prepared By</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (loading()) {
+                    <tr>
+                        <td colspan="5" class="text-center py-4">
+                            <div class="d-flex justify-content-center align-items-center gap-2 py-2 text-muted">
+                                <span class="spinner-border spinner-border-sm"></span>
+                                <span>Loading...</span>
+                            </div>
+                        </td>
+                    </tr>
+                } @else if (hasResults()) {
+                    @for (document of documents(); track document.transId) {
+                        <tr style="cursor: pointer" (click)="select(document)">
+                            <td class="fw-bold">{{ document.code }}</td>
+                            <td>{{ document.date | date:'MM/dd/yyyy' }}</td>
+                            <td>{{ document.purpose || '—' }}</td>
+                            <td>{{ document.departmentName || '—' }}</td>
+                            <td>{{ document.createdBy || '—' }}</td>
+                        </tr>
+                    }
+                } @else {
+                    <tr class="no-results">
+                        <td colspan="5" class="text-center text-muted py-3">Nothing found.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    @if (hasResults()) {
+        <div class="d-flex justify-content-center pagination-boxed align-items-center mt-3">
+            <ngb-pagination [collectionSize]="total()" [page]="page()" (pageChange)="onPageChange($event)"
+                            [pageSize]="pageSize()" [maxSize]="5" [rotate]="true">
+                <ng-template ngbPaginationPrevious><ng-icon name="tablerChevronLeft"/></ng-template>
+                <ng-template ngbPaginationNext><ng-icon name="tablerChevronRight"/></ng-template>
+            </ngb-pagination>
+        </div>
+    }
+</div>

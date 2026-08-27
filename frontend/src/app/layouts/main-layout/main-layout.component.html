@@ -4,10 +4,6 @@
     </div>
 </div>
 
-<app-vertical-layout *ngIf="layout.orientation === 'vertical'">
-    <router-outlet/>
-</app-vertical-layout>
+<app-vertical-layout *ngIf="layout.orientation === 'vertical'"/>
 
-<app-horizontal-layout *ngIf="layout.orientation === 'horizontal'">
-    <router-outlet/>
-</app-horizontal-layout>
+<app-horizontal-layout *ngIf="layout.orientation === 'horizontal'"/>

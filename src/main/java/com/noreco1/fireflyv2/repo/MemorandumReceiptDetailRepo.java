@@ -214,7 +214,7 @@ public interface MemorandumReceiptDetailRepo extends JpaRepository<MemorandumRec
             nativeQuery = true)
     List<MemorandumReceiptDetail> findAllForMRTELedgerByItem(@Param("acctNo")Integer acctNo, @Param("itemId")Integer itemId);
 
-    @Query(value = "SELECT * FROM MemorandumReceiptDetail " +
+    @Query(value = "SELECT MemorandumReceiptDetail.* FROM MemorandumReceiptDetail " +
             "WHERE MemorandumReceiptDetail.quantity > ( " +
             "  SELECT IF(sum(returnedQuantity) IS NOT NULL, sum(returnedQuantity), 0) " +
             "  FROM ReturnMemorandumReceiptDetail " +

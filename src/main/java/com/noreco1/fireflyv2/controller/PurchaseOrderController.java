@@ -2,10 +2,9 @@ package com.noreco1.fireflyv2.controller;
 
 import com.noreco1.fireflyv2.common.GlobalConstant;
 import com.noreco1.fireflyv2.common.facade.FileFacadeImpl;
-import com.noreco1.fireflyv2.controller.response.PostResponse;
-import com.noreco1.fireflyv2.controller.response.ProcessDocumentDto;
-import com.noreco1.fireflyv2.controller.response.PoDto;
-import com.noreco1.fireflyv2.controller.response.PoListDto;
+import com.noreco1.fireflyv2.common.helpers.Checker;
+import com.noreco1.fireflyv2.controller.response.*;
+import com.noreco1.fireflyv2.controller.response.reports.CommonSummaryDetail;
 import com.noreco1.fireflyv2.controller.response.reports.PODetail;
 import com.noreco1.fireflyv2.model.Document;
 import com.noreco1.fireflyv2.model.DocumentFile;
@@ -14,11 +13,13 @@ import com.noreco1.fireflyv2.model.PurchaseOrder;
 import com.noreco1.fireflyv2.model.enums.DeliveryTerm;
 import com.noreco1.fireflyv2.repo.DocumentFileRepo;
 import com.noreco1.fireflyv2.repo.PurchaseOrderRepo;
+import com.noreco1.fireflyv2.resource.POResource;
 import com.noreco1.fireflyv2.service.DownloadService;
 import com.noreco1.fireflyv2.service.PrintableVoucher;
 import com.noreco1.fireflyv2.service.PurchaseOrderService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import net.sf.jasperreports.engine.JRDataSource;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import org.apache.commons.io.FileUtils;
@@ -26,6 +27,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.MessageSource;
 import org.springframework.core.env.Environment;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -40,24 +48,25 @@ import java.util.*;
 @RequestMapping("/api/purchase-order")
 public class PurchaseOrderController {
 
-    @Autowired
-    @Qualifier("poServiceImpl")
-    private PurchaseOrderService purchaseOrderService;
+    private final PurchaseOrderService purchaseOrderService;
+    private final MessageSource messageSource;
+    private final PurchaseOrderRepo purchaseOrderRepo;
+    private final DocumentFileRepo documentFileRepo;
+    private final FileFacadeImpl fileFacade;
+    private final Environment env;
+    private final PrintableVoucher printableVoucher;
+    private final DownloadService downloadService;
 
-    @Autowired
-    private MessageSource messageSource;
-
-    @Autowired
-    private PurchaseOrderRepo purchaseOrderRepo;
-
-    @Autowired
-    private DocumentFileRepo documentFileRepo;
-
-    @Autowired
-    private FileFacadeImpl fileFacade;
-
-    @Autowired
-    private Environment env;
+    public PurchaseOrderController(@Qualifier("poServiceImpl") PurchaseOrderService purchaseOrderService, MessageSource messageSource, PurchaseOrderRepo purchaseOrderRepo, DocumentFileRepo documentFileRepo, FileFacadeImpl fileFacade, Environment env, @Qualifier("poServiceImpl") PrintableVoucher printableVoucher, DownloadService downloadService) {
+        this.purchaseOrderService = purchaseOrderService;
+        this.messageSource = messageSource;
+        this.purchaseOrderRepo = purchaseOrderRepo;
+        this.documentFileRepo = documentFileRepo;
+        this.fileFacade = fileFacade;
+        this.env = env;
+        this.printableVoucher = printableVoucher;
+        this.downloadService = downloadService;
+    }
 
     @GetMapping("/list/{from}/{to}")
     public List<Map> listByDateRange(@PathVariable String from, @PathVariable String to) {
@@ -92,23 +101,23 @@ public class PurchaseOrderController {
                 .toList();
     }
 
-    @PostMapping("/create")
-    public PostResponse create(@RequestBody PurchaseOrder purchaseOrder, HttpServletRequest request) {
-        BindingResult bindingResult = new BeanPropertyBindingResult(purchaseOrder, "purchaseOrder");
-        return purchaseOrderService.processCreate(purchaseOrder, bindingResult, messageSource, request);
-    }
-
-    @PostMapping("/update")
-    public PostResponse update(@RequestBody PurchaseOrder purchaseOrder, HttpServletRequest request) {
-        BindingResult bindingResult = new BeanPropertyBindingResult(purchaseOrder, "purchaseOrder");
-        return purchaseOrderService.processUpdate(purchaseOrder, bindingResult, messageSource, request, Collections.emptyList());
-    }
-
-    @PostMapping("/process")
-    public PostResponse process(@RequestBody ProcessDocumentDto dto) {
-        BindingResult bindingResult = new BeanPropertyBindingResult(dto, "processDocumentDto");
-        return purchaseOrderService.process(dto, bindingResult, messageSource);
-    }
+//    @PostMapping("/create")
+//    public PostResponse create(@RequestBody PurchaseOrder purchaseOrder, HttpServletRequest request) {
+//        BindingResult bindingResult = new BeanPropertyBindingResult(purchaseOrder, "purchaseOrder");
+//        return purchaseOrderService.processCreate(purchaseOrder, bindingResult, messageSource, request);
+//    }
+//
+//    @PostMapping("/update")
+//    public PostResponse update(@RequestBody PurchaseOrder purchaseOrder, HttpServletRequest request) {
+//        BindingResult bindingResult = new BeanPropertyBindingResult(purchaseOrder, "purchaseOrder");
+//        return purchaseOrderService.processUpdate(purchaseOrder, bindingResult, messageSource, request, Collections.emptyList());
+//    }
+//
+//    @PostMapping("/process")
+//    public PostResponse process(@RequestBody ProcessDocumentDto dto) {
+//        BindingResult bindingResult = new BeanPropertyBindingResult(dto, "processDocumentDto");
+//        return purchaseOrderService.process(dto, bindingResult, messageSource);
+//    }
 
     @PostMapping("/supplier-received")
     public PostResponse supplierReceived(@RequestBody Document document) {
@@ -190,14 +199,7 @@ public class PurchaseOrderController {
         return Map.of("success", true);
     }
 
-    @Autowired
-    @Qualifier("poServiceImpl")
-    PrintableVoucher printableVoucher;
-
-    @Autowired
-    private DownloadService downloadService;
-
-    @RequestMapping(value="/export/{id}")
+    @GetMapping("/export/{id}")
     public void exportToPdf(@PathVariable Integer id,
                             @RequestParam(value = "type") String type,
                             @RequestParam(value = "token") String token,
@@ -211,5 +213,125 @@ public class PurchaseOrderController {
 
         String template = GlobalConstant.JASPER_BASE_PATH + "/vouchers/PurchaseOrder.jrxml";
         downloadService.download(type, token, response, params, template, dataSource);
+    }
+
+
+    @GetMapping("/list")
+    public List<PoListDto> poList() {
+        return purchaseOrderService.findAll();
+    }
+
+    @GetMapping("/for-cv")
+    public List<PoListDto> getPurchaseOrderForCV(HttpServletRequest request) {
+        return purchaseOrderService.findForCV();
+    }
+
+    @GetMapping("/list/for-editing/{from}/{to}/{status}/{officeId}")
+    public List<Map> listByDateAndStatusAndForEditing(@PathVariable String from, @PathVariable String to,
+                                                      @PathVariable Integer status, @PathVariable Integer officeId) {
+        return purchaseOrderService.findByDateRangeAndStatusIdAndForEditing(from, to, status, officeId);
+    }
+
+    @PostMapping(value = "/create", consumes = {"multipart/form-data"})
+    public PostResponse create(@RequestPart(value = "model") @Valid PurchaseOrder paymentRequest,
+                               HttpServletRequest request,
+                               BindingResult bindingResult) {
+
+        PostResponse response = purchaseOrderService.processCreate(paymentRequest, bindingResult, messageSource, request);
+        if (Checker.documentSaved(response)) {
+            purchaseOrderService.logNewValue(response.getLogId());
+        }
+        return response;
+    }
+
+    @PostMapping(value = "/update", consumes = {"multipart/form-data"})
+    public PostResponse update(@RequestPart(value = "filesToRemove", required = false) List<Map> filesToRemove,
+                               @RequestPart(value = "model") @Valid PurchaseOrder paymentRequest, HttpServletRequest request,
+                               BindingResult bindingResult) {
+
+        PostResponse response = purchaseOrderService.processUpdate(paymentRequest, bindingResult, messageSource, request, filesToRemove);
+        if (Checker.documentSaved(response)) {
+            purchaseOrderService.logNewValue(response.getLogId());
+        }
+        return response;
+    }
+
+    @PostMapping("/process")
+    public PostResponse process(@RequestBody ProcessDocumentDto postData, BindingResult bindingResult) {
+        return purchaseOrderService.process(postData, bindingResult, messageSource);
+    }
+
+    @GetMapping("/default-signatories")
+    public Map defaultSignatories() {
+        return purchaseOrderService.defaultSignatories();
+    }
+
+    @GetMapping(value = "/{documentStatusId}/paged")
+    public Page<PurchaseOrder> byStatusPagedForRR(@PathVariable Integer documentStatusId,
+                                                  @RequestParam(value = "q", required = false) String filter,
+                                                  Pageable pageable) {
+
+        return purchaseOrderService.findByStatusAndFilter(documentStatusId, filter, pageable);
+    }
+
+    @GetMapping("/list/{status}")
+    public List<PurchaseOrder> listByStatus(@PathVariable Integer status) {
+        return purchaseOrderService.findByStatusId(status);
+    }
+
+//    @RequestMapping(value = "/check-editing-allowed")
+//    @ResponseBody
+//    public Boolean checkEditingAllowed() {
+//        Map poEditorRole = settingFacade.getByCode("PO_EDITOR_ROLE");
+//        if (poEditorRole != null) {
+//            Integer poEditorRoleId = Integer.parseInt(poEditorRole.get("id").toString());
+//            List<Object[]> roleObj = userRepo.findRolesByUserIdAndRoleId(authenticationFacade.getLoggedIn().getId(), poEditorRoleId);
+//            if (!Checker.collectionIsEmpty(roleObj)) {
+//                return true;
+//            }
+//        }
+//        return false;
+//    }
+
+    @GetMapping(value = "/for-item-testing/{documentStatusId}/paged")
+    public Page<PurchaseOrder> byStatusPagedForForItemTesting(@PathVariable Integer documentStatusId,
+                                                       @RequestParam(value = "q", required = false) String filter,
+                                                       Pageable pageable) {
+
+        return purchaseOrderService.findPurchaseOrderForItemTestingByStatusAndFilter(documentStatusId, filter, pageable);
+    }
+
+//    @RequestMapping(value = "/with-item-testing-for-rr/paged", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+//    HttpEntity<PagedResources<POResource>> byPagedPurchaseOrderWithItemTestingForRR(Pageable pageable, PagedResourcesAssembler assembler,
+//                                                                                    @RequestParam(value = "q", required = false) String filter) {
+//
+//        Page<PurchaseOrder> items = purchaseOrderService.findPurchaseOrderWithItemTestingForRRByFilter(filter, pageable);
+//
+//        return new ResponseEntity<PagedResources<POResource>>(assembler.toResource(items), HttpStatus.OK);
+//    }
+
+    @GetMapping("/is-document-for-cash-flow-item-assignment/{transactionId}")
+    public boolean isDocumentForCashFlowItemAssignment(@PathVariable Integer transactionId) {
+        return purchaseOrderService.isDocumentForCashFlowItemAssignment(transactionId);
+    }
+
+    @PostMapping("/saveCashFlowItem")
+    public PostResponse saveCashFlowItem(@Valid @RequestBody CashFlowItemDto dto, BindingResult bindingResult) {
+        return purchaseOrderService.saveCashFlowItem(dto, bindingResult, messageSource);
+    }
+
+//    @RequestMapping(value = "/for-credit-card-purchase-request/{documentStatusId}/paged", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+//    HttpEntity<PagedResources<POResource>> byStatusPagedForCreditCardPurchaseRequest(Pageable pageable, PagedResourcesAssembler assembler,
+//                                                                                     @PathVariable Integer documentStatusId,
+//                                                                                     @RequestParam(value = "q", required = false) String filter) {
+//
+//        Page<PurchaseOrder> items = purchaseOrderService.findAllForCreditCardPurchaseRequestByStatusAndFilter(documentStatusId, filter, pageable);
+//
+//        return new ResponseEntity<PagedResources<POResource>>(assembler.toResource(items), HttpStatus.OK);
+//    }
+
+    @PostMapping("/processSupplierReceived")
+    public PostResponse processSupplierReceived(@Valid @RequestBody PurchaseOrder purchaseOrder, BindingResult bindingResult) {
+        return purchaseOrderService.processSupplierReceived(purchaseOrder, bindingResult, messageSource);
     }
 }

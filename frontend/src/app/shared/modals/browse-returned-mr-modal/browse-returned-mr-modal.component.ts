@@ -1,7 +1,7 @@
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef, inject } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { COMMON_ALL_PAGE_IMPORTS, COMMON_MAIN_PAGE_IMPORTS } from '@/app/shared/providers/shared-providers';
-import { MemorandumReceiptService } from '@/app/pages/memorandum-receipt/memorandum-receipt.service';
+import { MemorandumReceiptService } from '@/app/pages/inventory/memorandum-receipt/memorandum-receipt.service';
 
 @Component({
     selector: 'app-browse-returned-mr-modal',

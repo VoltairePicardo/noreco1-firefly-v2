@@ -3,6 +3,7 @@ package com.noreco1.fireflyv2.controller;
 import com.noreco1.fireflyv2.common.GlobalConstant;
 import com.noreco1.fireflyv2.common.facade.AuthenticationFacade;
 import com.noreco1.fireflyv2.common.facade.GeneratorFacade;
+import com.noreco1.fireflyv2.controller.response.CostEstimateDetailDto;
 import com.noreco1.fireflyv2.controller.response.PostResponse;
 import com.noreco1.fireflyv2.controller.response.ProcessDocumentDto;
 import com.noreco1.fireflyv2.model.*;
@@ -108,7 +109,18 @@ public class CostEstimateController {
         return costEstimateService.getDocumentsStatuses();
     }
 
-    @Transactional
+    @GetMapping("/list/stock-withdrawal/{invLocId}")
+    public Page<CostEstimate> listForStockWithdrawal(@PathVariable Integer invLocId,
+                                                      @RequestParam(value = "q", required = false) String query,
+                                                      Pageable pageable) {
+        return costEstimateService.getCostEstimateForStockWithdrawal(query, invLocId, pageable);
+    }
+
+    @GetMapping("/details-for-withdrawal/{transId}")
+    public List<CostEstimateDetailDto> detailsForWithdrawal(@PathVariable Integer transId) {
+        return costEstimateService.findAllDetailByCostEstimateTransId(transId);
+    }
+
     @PostMapping("/create")
     public PostResponse create(@RequestBody Map<String, Object> payload) {
         PostResponse response = new PostResponse();

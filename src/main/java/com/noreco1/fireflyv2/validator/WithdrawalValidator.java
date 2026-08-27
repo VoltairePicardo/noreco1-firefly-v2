@@ -25,6 +25,17 @@ public class WithdrawalValidator implements Validator {
     @Override
     public void validate(Object o, Errors errors) {
         StockWithdrawal withdrawal = (StockWithdrawal) o;
+
+        if (Checker.collectionIsNotEmpty(withdrawal.getDetails())) {
+            for (StockWithdrawalDetailDto detail : withdrawal.getDetails()) {
+                boolean hasQuantity = detail.getQuantity() != null && detail.getQuantity().compareTo(BigDecimal.ZERO) > 0;
+                if (hasQuantity && detail.getUnitId() == null) {
+                    errors.rejectValue("details", "withdrawal.details.unit.required");
+                    break;
+                }
+            }
+        }
+
         if(Checker.isValidId(withdrawal.getTurnOnOrderWithdrawalId())){
             BigDecimal totalItems = BigDecimal.ZERO;
             if(Checker.collectionIsNotEmpty(withdrawal.getDetails())){

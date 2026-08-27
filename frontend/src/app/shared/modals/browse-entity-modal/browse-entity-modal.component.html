@@ -19,8 +19,8 @@
                    placeholder="Search by name" (keyup.enter)="onSearchChange()"/>
             <ng-icon name="tablerSearch" class="app-search-icon text-muted"/>
         </div>
-        <button type="button" class="btn btn-success fw-bold" (click)="onSearchChange()">
-            <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"/>Search
+        <button type="button" class="btn btn-primary fw-bold" (click)="onSearchChange()">
+            <ng-icon name="tablerSearch" class="me-1 fs-lg fw-bold"/>Search
         </button>
     </div>
 
@@ -28,8 +28,8 @@
         <table class="table table-custom table-centered table-select table-hover w-100 mb-0">
             <thead class="bg-light align-middle bg-opacity-25 thead-sm">
                 <tr class="text-uppercase fs-xxs">
-                    <th style="width:12%">Account No.</th>
-                    <th style="width:40%">Name</th>
+                    <th>Account No.</th>
+                    <th>Name</th>
                     <th>Address</th>
                 </tr>
             </thead>
@@ -46,7 +46,7 @@
                 } @else if (total > 0) {
                     @for (item of items; track item.accountNo) {
                         <tr style="cursor: pointer" (click)="select(item)">
-                            <td class="text-muted">{{ item.accountNo }}</td>
+                            <td>{{ item.accountNo }}</td>
                             <td class="fw-bold">{{ item.name }}</td>
                             <td>{{ item.address || '—' }}</td>
                         </tr>
@@ -59,9 +59,11 @@
             </tbody>
         </table>
     </div>
+</div>
 
+<div class="modal-footer d-flex justify-content-center">
     @if (total > 0) {
-        <div class="d-flex justify-content-center pagination-boxed align-items-center mt-3">
+        <div class="pagination-boxed">
             <ngb-pagination
                 [collectionSize]="total"
                 [(page)]="page"

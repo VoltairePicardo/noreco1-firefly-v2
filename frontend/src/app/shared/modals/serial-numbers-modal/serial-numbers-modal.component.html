@@ -1,0 +1,57 @@
+<div class="modal-header">
+    <h4 class="modal-title fw-bold">Serial Numbers</h4>
+    <button type="button" class="btn-close" (click)="activeModal.dismiss()"></button>
+</div>
+<div class="modal-body">
+    <div class="d-flex justify-content-end gap-2 mb-3">
+        <input type="text" class="form-control" style="max-width: 320px;"
+               [(ngModel)]="newSerialNo" placeholder="Enter Serial No."
+               (keyup.enter)="addRow()"/>
+        <button type="button" class="btn btn-primary" (click)="addRow()">
+            <ng-icon name="tablerPlus" class="fs-lg"></ng-icon>
+        </button>
+    </div>
+
+    <div class="table-responsive" style="max-height: 420px; overflow-y: auto;">
+        <table class="table table-custom table-hover table-centered w-100 mb-0">
+            <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                <tr class="text-uppercase fs-xxs">
+                    <th class="text-center position-sticky top-0 z-2 bg-light" style="width: 3rem;">#</th>
+                    <th class="text-start position-sticky top-0 z-2 bg-light">Serial No.</th>
+                    <th class="text-end position-sticky top-0 z-2 bg-light" style="width: 3rem;"></th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (total() === 0) {
+                    <tr>
+                        <td colspan="3" class="text-center text-muted py-3">No serial numbers added.</td>
+                    </tr>
+                }
+                @for (row of rows(); track $index) {
+                    <tr [class.table-warning]="isDuplicate($index)">
+                        <td class="text-center">{{ $index + 1 }}</td>
+                        <td>
+                            <input type="text" class="form-control" [ngModel]="row"
+                                   (ngModelChange)="updateRow($index, $event)"/>
+                        </td>
+                        <td class="text-end">
+                            <button type="button"
+                                    class="btn btn-light btn-icon btn-sm rounded-circle"
+                                    (click)="removeRow($index)"
+                                    ngbTooltip="Remove">
+                                <ng-icon name="tablerTrash" class="fs-lg text-danger"></ng-icon>
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="modal-footer d-flex justify-content-between align-items-center">
+    <div class="fw-bold">Total: <span class="fs-4">{{ total() }}</span></div>
+    <div class="d-flex gap-2">
+        <button type="button" class="btn btn-light fw-bold" (click)="activeModal.dismiss()">Cancel</button>
+        <button type="button" class="btn btn-primary fw-bold" (click)="save()">Save</button>
+    </div>
+</div>

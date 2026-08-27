@@ -3,21 +3,33 @@ package com.noreco1.fireflyv2.controller;
 import com.noreco1.fireflyv2.common.GlobalConstant;
 import com.noreco1.fireflyv2.common.facade.AuthenticationFacade;
 import com.noreco1.fireflyv2.common.facade.GeneratorFacade;
+import com.noreco1.fireflyv2.common.helpers.Checker;
+import com.noreco1.fireflyv2.controller.response.ItemTransactionDetailDto;
+import com.noreco1.fireflyv2.controller.response.MaterialSalvageTicketDocumentDto;
 import com.noreco1.fireflyv2.controller.response.PostResponse;
 import com.noreco1.fireflyv2.controller.response.ProcessDocumentDto;
 import com.noreco1.fireflyv2.model.DocumentStatus;
 import com.noreco1.fireflyv2.model.MaterialSalvageTicket;
 import com.noreco1.fireflyv2.model.Workflow;
 import com.noreco1.fireflyv2.repo.MaterialSalvageTicketRepo;
+import com.noreco1.fireflyv2.resource.MaterialSalvageTicketDocumentResource;
 import com.noreco1.fireflyv2.service.DownloadService;
 import com.noreco1.fireflyv2.service.MaterialSalvageTicketService;
 import com.noreco1.fireflyv2.service.PrintableVoucher;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import net.sf.jasperreports.engine.JRDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.MessageSource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -31,125 +43,108 @@ import java.util.Map;
 @RequestMapping("/api/mst")
 public class MaterialSalvageTicketController {
 
-    @Autowired
-    @Qualifier("materialSalvageTicketServiceImpl")
-    private MaterialSalvageTicketService mstService;
+    private final MessageSource messageSource;
+    private final MaterialSalvageTicketService materialSalvageTicketService;
+    private final DownloadService downloadService;
+    private final PrintableVoucher printableVoucher;
 
-    @Autowired
-    private MaterialSalvageTicketRepo mstRepo;
-
-    @Autowired
-    private AuthenticationFacade authenticationFacade;
-
-    @Autowired
-    private GeneratorFacade generatorFacade;
-
-    @Autowired
-    private MessageSource messageSource;
-
-    @GetMapping("/list")
-    public List<Map> list() {
-        return mstService.findByDateRangePending("2000-01-01",
-                GlobalConstant.YYYY_DATE_FORMAT.format(new Date()) + "-12-31", null);
+    public MaterialSalvageTicketController(MessageSource messageSource, MaterialSalvageTicketService materialSalvageTicketService, DownloadService downloadService, @Qualifier("stockAdjustmentServiceImpl") PrintableVoucher printableVoucher) {
+        this.messageSource = messageSource;
+        this.materialSalvageTicketService = materialSalvageTicketService;
+        this.downloadService = downloadService;
+        this.printableVoucher = printableVoucher;
     }
 
-    @GetMapping("/list/{from}/{to}")
-    public List<Map> listByDateRange(@PathVariable String from, @PathVariable String to) {
-        return mstService.findByDateRangePending(from, to, null);
+    @GetMapping(value = "/list")
+    @ResponseBody
+    public List<MaterialSalvageTicket> list() {
+        return materialSalvageTicketService.findAll();
     }
 
-    @GetMapping("/list/{from}/{to}/{statusId}")
-    public List<Map> listByDateRangeAndStatus(@PathVariable String from, @PathVariable String to,
-                                               @PathVariable Integer statusId) {
-        return mstService.findByDateRangeAndStatusId(from, to, statusId, null);
+    @GetMapping(value = "/list-paged")
+    @ResponseBody
+    public Page<Map<String, Object>> listPaged(@RequestParam String from, @RequestParam String to,
+                                                @RequestParam(required = false) Integer statusId,
+                                                @RequestParam(required = false) String query,
+                                                Pageable pageable) {
+        return materialSalvageTicketService.getMaterialSalvageTicketPaged(from, to, statusId, query, pageable);
     }
 
-    @GetMapping("/document-statuses")
-    public List<DocumentStatus> documentStatuses() {
-        return mstService.getDocumentsStatuses();
+    @GetMapping(value = "/list/{from}/{to}/{officeId}")
+    @ResponseBody
+    public List<Map> listByDateAndStatusPending(@PathVariable String from, @PathVariable String to, @PathVariable Integer officeId) {
+        return materialSalvageTicketService.findByDateRangePending(from, to, officeId);
     }
 
-    @GetMapping("/{id}")
-    public MaterialSalvageTicket getById(@PathVariable Integer id) {
-        return mstService.findById(id);
+    @GetMapping(value = "/list/{from}/{to}/{status}/{officeId}")
+    @ResponseBody
+    public List<Map> listByDateAndStatus(@PathVariable String from, @PathVariable String to, @PathVariable Integer status, @PathVariable Integer officeId) {
+        return materialSalvageTicketService.findByDateRangeAndStatusId(from, to, status, officeId);
     }
 
-    @PostMapping("/create")
-    public PostResponse create(@RequestBody Map<String, Object> payload) {
-        PostResponse response = new PostResponse();
-        try {
-            MaterialSalvageTicket mst = new MaterialSalvageTicket();
-            Object dateObj = payload.get("voucherDate");
-            if (dateObj instanceof String dateStr && !dateStr.isEmpty()) {
-                Date voucherDate = java.sql.Date.valueOf(dateStr);
-                mst.setVoucherDate(voucherDate);
-                int year = Integer.parseInt(GlobalConstant.YYYY_DATE_FORMAT.format(voucherDate));
-                mst.setYear(year);
-                Object latestCode = mstRepo.findLatestCodeByYear(year);
-                String code = generatorFacade.voucherCodeWithMonth("MST",
-                        latestCode == null ? "" : String.valueOf(latestCode), voucherDate);
-                mst.setCode(code);
-            }
-            mst.setPurpose(payload.get("remarks") != null ? String.valueOf(payload.get("remarks")) : null);
-            Date now = new Date();
-            mst.setCreatedAt(now);
-            mst.setUpdatedAt(now);
-            mst.setCreatedBy(authenticationFacade.getLoggedIn());
-            DocumentStatus ds = new DocumentStatus();
-            ds.setId(com.noreco1.fireflyv2.model.enums.DocumentStatus.DOCUMENT_CREATED.getId());
-            mst.setDocumentStatus(ds);
-            Workflow wf = new Workflow();
-            wf.setId(com.noreco1.fireflyv2.model.enums.Workflow.MATERIAL_SALVAGE_TICKET.getId());
-            mst.setWorkflow(wf);
-            mst.setTransaction(generatorFacade.transaction());
-            MaterialSalvageTicket saved = mstRepo.save(mst);
-            response.setSuccessMessage("Material Salvage Ticket saved.");
-            response.setModelId(saved.getId());
-        } catch (Exception e) {
-            response.setFailureMessage("Failed to save: " + e.getMessage());
+    @PostMapping(value = "/create")
+    @ResponseBody
+    public PostResponse create(@Valid @RequestBody MaterialSalvageTicket materialSalvageTicket, BindingResult bindingResult) {
+        PostResponse response = materialSalvageTicketService.processCreate(materialSalvageTicket, bindingResult, messageSource);
+        if (Checker.documentSaved(response)) {
+            materialSalvageTicketService.logNewValue(response.getLogId());
         }
         return response;
     }
 
-    @PostMapping("/update")
-    public PostResponse update(@RequestBody Map<String, Object> payload) {
-        PostResponse response = new PostResponse();
-        Object idObj = payload.get("id");
-        if (idObj == null) { response.setFailureMessage("ID is required."); return response; }
-        Integer id = ((Number) idObj).intValue();
-        MaterialSalvageTicket mst = mstRepo.findById(id).orElse(null);
-        if (mst == null) { response.setFailureMessage("Record not found."); return response; }
-        try {
-            Object dateObj = payload.get("voucherDate");
-            if (dateObj instanceof String dateStr && !dateStr.isEmpty()) {
-                mst.setVoucherDate(java.sql.Date.valueOf(dateStr));
-            }
-            mst.setPurpose(payload.get("remarks") != null ? String.valueOf(payload.get("remarks")) : null);
-            mst.setUpdatedAt(new Date());
-            MaterialSalvageTicket saved = mstRepo.save(mst);
-            response.setSuccessMessage("Material Salvage Ticket updated.");
-            response.setModelId(saved.getId());
-        } catch (Exception e) {
-            response.setFailureMessage("Failed to update: " + e.getMessage());
+    @GetMapping(value = "/{id}")
+    @ResponseBody
+    public MaterialSalvageTicket get(@PathVariable Integer id, HttpServletRequest request) {
+        return materialSalvageTicketService.findById(id);
+    }
+
+    @PostMapping(value = "/update")
+    @ResponseBody
+    public PostResponse update(@Valid @RequestBody MaterialSalvageTicket materialSalvageTicket, BindingResult bindingResult, HttpServletRequest request) {
+        PostResponse response = materialSalvageTicketService.processUpdate(materialSalvageTicket, bindingResult, messageSource);
+        if (Checker.documentSaved(response)) {
+            materialSalvageTicketService.logNewValue(response.getLogId());
         }
         return response;
     }
 
-    @PostMapping("/process")
-    public PostResponse process(@RequestBody ProcessDocumentDto dto) {
-        BindingResult br = new BeanPropertyBindingResult(dto, "dto");
-        return mstService.process(dto, br, messageSource);
+    @PostMapping(value = "/process")
+    @ResponseBody
+    public PostResponse process(@RequestBody ProcessDocumentDto postData, BindingResult bindingResult) {
+        return materialSalvageTicketService.process(postData, bindingResult, messageSource);
     }
 
-    @Autowired
-    @Qualifier("materialSalvageTicketServiceImpl")
-    PrintableVoucher printableVoucher;
+    @RequestMapping(value = "/default-signatories")
+    @ResponseBody
+    public Map defaultSignatories() {
+        return materialSalvageTicketService.defaultSignatories();
+    }
 
-    @Autowired
-    private DownloadService downloadService;
+    @GetMapping(value = "/document-statuses")
+    @ResponseBody
+    public List<DocumentStatus> getWorkflowActions() {
+        return materialSalvageTicketService.getDocumentsStatuses();
+    }
 
-    @Autowired
-    private MaterialSalvageTicketService materialSalvageTicketService;
+    @GetMapping(value = "/summary/{from}/{to}")
+    @ResponseBody
+    public List<MaterialSalvageTicket> listForSummaryReport(@PathVariable String from, @PathVariable String to, HttpServletRequest request) {
+        return materialSalvageTicketService.getListForSummaryReport(from, to, request);
+    }
+
+    @GetMapping(value = "/items/{transId}")
+    @ResponseBody
+    public List<ItemTransactionDetailDto> itemsPerMCRT(@PathVariable Integer transId) {
+        return materialSalvageTicketService.getItems(transId);
+    }
+
+//    @RequestMapping(value = "/approved-paged", produces = {MediaType.APPLICATION_JSON_VALUE})
+//    HttpEntity<PagedResources<MaterialSalvageTicketDocumentResource>> approvedListForMaterialSalvageTicketPaged(Pageable pageable, PagedResourcesAssembler assembler,
+//                                                                                                                @RequestParam(value="q", required = false ) String query) {
+//
+//        Page<MaterialSalvageTicketDocumentDto> documents = materialSalvageTicketService.findAllApprovedForAccountSettingPaged(query, pageable);
+//        return new ResponseEntity<PagedResources<MaterialSalvageTicketDocumentResource>>(assembler.toResource(documents), HttpStatus.OK);
+//    }
 
     @RequestMapping(value="/export/{id}")
     public void exportToPdf(@PathVariable Integer id,
