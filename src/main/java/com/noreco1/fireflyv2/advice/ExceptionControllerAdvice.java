@@ -156,7 +156,7 @@ public class ExceptionControllerAdvice {
         String supported = ex.getSupportedHttpMethods() != null
                 ? ex.getSupportedHttpMethods().stream().map(Object::toString).collect(Collectors.joining(", "))
                 : "none";
-        logger.warn("Method '{}' not supported. Supported: [{}]", ex.getMethod(), supported);
+        logger.warn("Method '{}' not supported on '{}'. Supported: [{}]", ex.getMethod(), request.getDescription(false), supported);
         return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body(ErrorResponse.builder()
                 .status(HttpStatus.METHOD_NOT_ALLOWED.value())
                 .error("Method Not Allowed")

@@ -11,7 +11,7 @@ type UserDropdownItemType = {
 
 export const userDropdownItems: UserDropdownItemType[] = [
     {
-        label: 'Welcome back!',
+        label: 'My Account',
         isHeader: true
     },
     {

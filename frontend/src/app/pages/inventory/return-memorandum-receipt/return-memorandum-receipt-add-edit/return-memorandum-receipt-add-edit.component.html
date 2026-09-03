@@ -1,0 +1,185 @@
+<div class="container-fluid">
+    <app-page-title [title]="module" [subTitle]="subModule" [menuLink]="menuLink"/>
+
+    @if (isLoading() && editMode) {
+        <div class="d-flex align-items-center gap-2 text-muted py-4">
+            <span class="spinner-border spinner-border-sm" role="status"></span> Loading...
+        </div>
+    } @else {
+        <form (ngSubmit)="save()" #f="ngForm">
+            <div class="row g-3">
+                <div class="col-xl-12">
+                    <app-ui-card title="Return Memorandum Receipt">
+                        <div class="col-xl-12 p-3" card-body>
+
+                            <div class="row g-3">
+
+                                <div class="col-md-3">
+                                    <label class="form-label fw-bold">Date <span class="text-danger">*</span></label>
+                                    <input type="text" mwlFlatpickr [options]="flatpickrOptions"
+                                           class="form-control" [(ngModel)]="date"
+                                           name="date" placeholder="Select date" required/>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label class="form-label fw-bold">Office</label>
+                                    <select class="form-select"
+                                            [ngModel]="selectedOffice()" (ngModelChange)="selectedOffice.set($event)"
+                                            name="office"
+                                            [compareWith]="compareById">
+                                        <option [ngValue]="null">— Select Office —</option>
+                                        @for (o of offices(); track o.id) {
+                                            <option [ngValue]="o">{{ o.name }}</option>
+                                        }
+                                    </select>
+                                </div>
+
+                            </div>
+
+                            <hr class="border-dashed mx-n3 mt-3"/>
+                            <div class="col-12 fs-sm fw-semibold mb-2">Employee</div>
+
+                            <div class="row g-3">
+                                <div class="col-md-8">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control"
+                                               [value]="selectedEmployee() ? (selectedEmployee()?.name || selectedEmployee()?.fullName || '') : ''"
+                                               readonly placeholder="Browse employee..."/>
+                                        <button type="button" class="btn btn-primary fw-bold gap-1"
+                                                (click)="openEmployeeBrowse()">
+                                            <ng-icon name="tablerSearch" class="fs-lg fw-bold"></ng-icon>Browse
+                                        </button>
+                                        @if (selectedEmployee()) {
+                                            <button type="button" class="btn btn-danger fw-bold gap-1"
+                                                    (click)="resetEmployee()" title="Remove Employee">
+                                                <ng-icon name="tablerX" class="fs-lg fw-bold"></ng-icon>
+                                            </button>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+
+                            @if (selectedEmployee() && (memorandumReceipts().length > 0 || isLoadingMRs() || returnDetails().length > 0)) {
+                                <hr class="border-dashed mx-n3 mt-3"/>
+
+                                <div class="row g-3">
+                                    <div class="col-md-4">
+                                        <div class="fs-sm fw-semibold mb-2">List of Memorandum Receipts</div>
+
+                                        @if (isLoadingMRs()) {
+                                            <div class="text-muted py-2">
+                                                <span class="spinner-border spinner-border-sm me-2" role="status"></span>Loading...
+                                            </div>
+                                        } @else {
+                                            <div class="table-responsive" style="max-height: 420px; overflow-y: auto;">
+                                                <table class="table table-custom table-centered table-hover table-select w-100 mb-0 text-center">
+                                                    <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                                                    <tr class="text-uppercase fs-xxs">
+                                                        <th class="text-start position-sticky z-2 top-0 bg-light">Code</th>
+                                                        <th class="position-sticky z-2 top-0 bg-light">Date</th>
+                                                    </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        @for (mr of memorandumReceipts(); track mr.id) {
+                                                            <tr role="button"
+                                                                [class.table-warning]="selectedMR()?.id === mr.id"
+                                                                (click)="selectMR(mr)">
+                                                                <td class="fw-bold text-start">{{ mr.code }}</td>
+                                                                <td>{{ mr.date | date:'MMMM dd, yyyy' }}</td>
+                                                            </tr>
+                                                        } @empty {
+                                                            <tr class="no-results">
+                                                                <td colspan="2" class="text-center text-muted py-3">No returnable Memorandum Receipts.</td>
+                                                            </tr>
+                                                        }
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        }
+                                    </div>
+
+                                    <div class="col-md-8">
+                                        <div class="fs-sm fw-semibold mb-2">Memorandum Receipt Details</div>
+
+                                        @if (returnDetails().length > 0) {
+                                            <div class="table-responsive" style="max-height: 420px; overflow-y: auto;">
+                                                <table class="table table-custom table-centered table-hover w-100 mb-0">
+                                                    <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                                                    <tr class="text-uppercase fs-xxs">
+                                                        <th class="position-sticky z-2 top-0 bg-light" style="width:50px">Select</th>
+                                                        <th class="position-sticky z-2 top-0 bg-light">Item</th>
+                                                        <th class="text-center position-sticky z-2 top-0 bg-light" style="width:100px">Assigned</th>
+                                                        <th class="text-center position-sticky z-2 top-0 bg-light" style="width:100px">Returned</th>
+                                                        <th class="text-center position-sticky z-2 top-0 bg-light" style="width: 6rem">Return</th>
+                                                        <th class="text-center position-sticky z-2 top-0 bg-light" style="width:80px">Usable</th>
+                                                    </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        @for (detail of returnDetails(); track $index) {
+                                                            <tr>
+                                                                <td class="text-center">
+                                                                    <input type="checkbox"
+                                                                           class="form-check-input"
+                                                                           [(ngModel)]="detail.selected"
+                                                                           [name]="'sel_' + $index"/>
+                                                                </td>
+                                                                <td>{{ detail.stockWithdrawalDetail?.item?.description || detail.itemDescription || '—' }}</td>
+                                                                <td class="text-center fw-bold">{{ detail.quantity }}</td>
+                                                                <td class="text-center">{{ detail.returned }}</td>
+                                                                <td>
+                                                                    <input type="number"
+                                                                           class="form-control form-control-sm text-end fw-bold"
+                                                                           [(ngModel)]="detail.returnedQuantity"
+                                                                           [name]="'retQty_' + $index"
+                                                                           (ngModelChange)="detailQuantityChanged(detail)"
+                                                                           min="0" step="1"/>
+                                                                </td>
+                                                                <td class="text-center">
+                                                                    <input type="checkbox"
+                                                                           class="form-check-input"
+                                                                           [(ngModel)]="detail.usable"
+                                                                           [name]="'usable_' + $index"/>
+                                                                </td>
+                                                            </tr>
+                                                        }
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        } @else if (!isLoadingMRs()) {
+                                            <div class="text-muted py-2">Select a Memorandum Receipt to view its details.</div>
+                                        }
+                                    </div>
+                                </div>
+                            }
+
+                            <hr class="border-dashed mx-n3 mt-3"/>
+                            <div class="col-12 fs-sm fw-semibold mb-2">Remarks <span class="text-danger">*</span></div>
+                            <div class="row g-3">
+                                <div class="col-md-8">
+                                    <textarea class="form-control" [(ngModel)]="remarks" name="remarks"
+                                              rows="4" maxlength="1024" placeholder="Enter remarks" required></textarea>
+                                </div>
+                            </div>
+
+                            <hr class="border-dashed mx-n3 mt-3"/>
+                            <div class="d-flex gap-2 justify-content-end align-items-center mt-3">
+                                <a [routerLink]="['/' + menuLink]" class="btn btn-light fw-bold">
+                                    <ng-icon name="tablerArrowLeft" class="me-1 fs-lg fw-bold"></ng-icon>Back
+                                </a>
+                                <button type="submit" class="btn btn-primary fw-bold" [disabled]="isLoading()">
+                                    @if (isLoading()) {
+                                        <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                                        {{ editMode ? 'Updating...' : 'Saving...' }}
+                                    } @else {
+                                        {{ editMode ? 'Update' : 'Save ' + module }}
+                                    }
+                                </button>
+                            </div>
+
+                        </div>
+                    </app-ui-card>
+                </div>
+            </div>
+        </form>
+    }
+</div>

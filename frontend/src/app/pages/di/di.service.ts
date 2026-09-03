@@ -11,7 +11,7 @@ export const PRINT_BASE_MAP: Record<string, string> = {
     'Accounts Payable':         'accounts-payable',
     'Journal Voucher':          'journal-voucher',
     'Check Voucher':            'check-voucher',
-    'Purchase or Work Request': 'requisition-voucher',
+    'Purchase or Work Request': 'purchase-request',
     'Canvass':                  'canvass-rv',
     'Purchase Order':           'purchase-order',
     'Job Order':                'job-order',

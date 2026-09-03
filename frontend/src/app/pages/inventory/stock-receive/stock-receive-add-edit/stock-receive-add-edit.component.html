@@ -1,0 +1,156 @@
+<div class="container-fluid">
+    <app-page-title [title]="module" [subTitle]="subModule" [menuLink]="menuLink"/>
+</div>
+<div class="container-fluid">
+    @if (isLoading() && editMode) {
+        <div class="d-flex align-items-center gap-2 text-muted py-4">
+            <span class="spinner-border spinner-border-sm" role="status"></span> Loading...
+        </div>
+    } @else {
+    <form (ngSubmit)="save()" #f="ngForm">
+        <div class="row g-3">
+            <div class="col-xl-12">
+                <app-ui-card title="Receive Stock Transfer Information">
+                    <div class="col-xl-12 p-3" card-body>
+                        <div class="row g-3">
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold">Date <span class="text-danger">*</span></label>
+                                <input type="text" mwlFlatpickr [options]="flatpickrOptions"
+                                       class="form-control" [(ngModel)]="voucherDate"
+                                       name="voucherDate" placeholder="Select date" required/>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold">Inventory Location <span class="text-danger">*</span></label>
+                                <select class="form-select" [ngModel]="inventoryLocation()" (ngModelChange)="inventoryLocation.set($event)" name="inventoryLocation"
+                                        [compareWith]="compareById" [disabled]="details().length > 0" required>
+                                    <option [ngValue]="null">— Select Location —</option>
+                                    @for (loc of inventoryLocations(); track loc.id) {
+                                        <option [ngValue]="loc">{{ loc.description || loc.name }}</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+
+                        @if (!editMode) {
+                        <hr class="my-3"/>
+                        <div class="fs-xs text-uppercase fw-semibold text-muted mb-2">Document Details</div>
+                        <div class="row g-3 align-items-end">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Receiving Document <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" [value]="selectedDocCode()" readonly
+                                           placeholder="No document selected"/>
+                                    <button type="button" class="btn btn-success fw-bold"
+                                            [disabled]="!inventoryLocation()" (click)="openDocumentBrowse()">
+                                        <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        @if (selectedDocCode()) {
+                        <div class="row g-3 mt-1">
+                            <div class="col-md-3">
+                                <div class="fs-xs text-muted fw-semibold">Code</div>
+                                <div class="fw-bold">{{ selectedDocCode() }}</div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="fs-xs text-muted fw-semibold">Date</div>
+                                <div>{{ selectedDocDate() | date:'MMM dd, yyyy' }}</div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="fs-xs text-muted fw-semibold">Requested By</div>
+                                <div>{{ selectedDocCreatedBy() }}</div>
+                            </div>
+                        </div>
+                        }
+                        }
+
+                        @if (details().length > 0) {
+                        <hr class="my-3"/>
+                        <div class="fs-xs text-uppercase fw-semibold text-muted mb-2">Items to Receive</div>
+                        <div class="table-responsive">
+                            <table class="table table-custom table-centered w-100 mb-0">
+                                <thead class="bg-light bg-opacity-25 thead-sm">
+                                    <tr class="text-uppercase fs-xxs">
+                                        <th>#</th>
+                                        <th>Code</th>
+                                        <th>Description</th>
+                                        <th>Unit</th>
+                                        <th class="text-center">Qty Ordered</th>
+                                        <th class="text-center">Qty Released</th>
+                                        <th class="text-center">Qty Received</th>
+                                        <th class="text-center" style="width:140px">Receive Qty</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @for (item of details(); track $index; let i = $index) {
+                                        <tr>
+                                            <td class="text-center">{{ i + 1 }}</td>
+                                            <td class="fw-bold">{{ item.itemCode }}</td>
+                                            <td>{{ item.itemDescription }}</td>
+                                            <td>{{ item.unitCode }}</td>
+                                            <td class="text-center">{{ item.quantityOrdered | number:'1.0-3' }}</td>
+                                            <td class="text-center">{{ item.quantityReleased | number:'1.0-3' }}</td>
+                                            <td class="text-center text-muted">{{ item.quantityReceived | number:'1.0-3' }}</td>
+                                            <td class="text-center">
+                                                <input type="number" class="form-control form-control-sm text-center"
+                                                       [name]="'rcvQty_' + $index"
+                                                       [value]="item.receiveQuantity"
+                                                       (change)="onReceiveQtyChange(item, $any($event.target).value)"
+                                                       min="0" [max]="item.quantityReleased - item.quantityReceived"
+                                                       step="0.001"/>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                        }
+
+                        <hr class="my-3"/>
+                        <div class="row g-3">
+                            <div class="col-md-12">
+                                <label class="form-label fw-bold">Remarks <span class="text-danger">*</span></label>
+                                <textarea class="form-control" [(ngModel)]="description" name="description"
+                                          rows="3" placeholder="Remarks" required></textarea>
+                            </div>
+                        </div>
+
+                        <hr class="my-3"/>
+                        <div class="fs-xs text-uppercase fw-semibold text-muted mb-2">Signatories</div>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Noted By <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control"
+                                           [value]="checkedBy() ? (checkedBy().name || checkedBy().fullName || '') : ''"
+                                           readonly placeholder="Browse noting officer..."/>
+                                    <button type="button" class="btn btn-success fw-bold"
+                                            (click)="openSignatoryBrowse()">
+                                        <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex gap-2 justify-content-end align-items-center pt-3 border-top mt-3">
+                            <a [routerLink]="['/' + menuLink]" class="btn btn-light fw-bold">
+                                <ng-icon name="tablerArrowLeft" class="ps-0 pe-3 fw-bold"></ng-icon>Back
+                            </a>
+                            <button type="submit" class="btn btn-primary fw-bold" [disabled]="isLoading()">
+                                @if (isLoading()) {
+                                    <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                                    {{ editMode ? 'Updating...' : 'Saving...' }}
+                                } @else {
+                                    <ng-icon name="tablerCheck" class="ps-0 pe-3 fw-bold"></ng-icon>
+                                    {{ editMode ? 'Update' : 'Save ' + module }}
+                                }
+                            </button>
+                        </div>
+                    </div>
+                </app-ui-card>
+            </div>
+        </div>
+    </form>
+    }
+</div>

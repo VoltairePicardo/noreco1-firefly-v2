@@ -57,7 +57,7 @@ export class CanvassService {
     getCanvassedRVs(canvassIds: number[]): Observable<any[]> {
         let params = new HttpParams();
         canvassIds.forEach(id => params = params.append('canvassIds', String(id)));
-        return this.http.get<any[]>(`${BASE_API}/requisition-voucher/list/canvass`, { params });
+        return this.http.get<any[]>(`${BASE_API}/purchase-request/list/canvass`, { params });
     }
 
     searchSuppliers(q: string = '', page = 0, size = 20): Observable<any> {

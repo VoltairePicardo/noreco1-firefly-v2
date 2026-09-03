@@ -13,6 +13,11 @@ export const PAGES_ROUTES: Routes = [
         data: { title: 'Dashboard' },
     },
     {
+        path: 'profile',
+        loadComponent: () => import('./profile/profile.component').then((m) => m.ProfileComponent),
+        data: { title: 'My Profile' },
+    },
+    {
         path: 'profile/change-password',
         loadComponent: () => import('./auth/change-password/change-password.component').then((m) => m.ChangePasswordComponent),
         data: { title: 'Change Password' },
@@ -378,53 +383,53 @@ export const PAGES_ROUTES: Routes = [
         data: { title: 'Project Acceptance Certifications' },
     },
     {
-        path: 'rr',
-        loadChildren: () => import('./rr/rr.route').then(m => m.RR_ROUTES),
+        path: 'receiving-report',
+        loadChildren: () => import('./inventory/receiving-report/receiving-report.route').then(m => m.RECEIVING_REPORT_ROUTES),
         data: { title: 'Receiving Reports' },
     },
     {
         path: 'withdrawal',
-        loadChildren: () => import('./withdrawal/withdrawal.route').then(m => m.WITHDRAWAL_ROUTES),
+        loadChildren: () => import('./inventory/withdrawal/withdrawal.route').then(m => m.WITHDRAWAL_ROUTES),
         data: { title: 'Stock Withdrawals' },
     },
     {
         path: 'stock-release',
-        loadChildren: () => import('./stock-release/stock-release.route').then(m => m.STOCK_RELEASE_ROUTES),
+        loadChildren: () => import('./inventory/stock-release/stock-release.route').then(m => m.STOCK_RELEASE_ROUTES),
         data: { title: 'Stock Releases' },
     },
     {
         path: 'mct',
-        loadChildren: () => import('./mct/mct.route').then(m => m.MCT_ROUTES),
+        loadChildren: () => import('./inventory/mct/mct.route').then(m => m.MCT_ROUTES),
         data: { title: 'Material Credit Tickets' },
     },
     {
         path: 'stock-adjustment',
-        loadChildren: () => import('./stock-adjustment/stock-adjustment.route').then(m => m.STOCK_ADJUSTMENT_ROUTES),
+        loadChildren: () => import('./inventory/stock-adjustment/stock-adjustment.route').then(m => m.STOCK_ADJUSTMENT_ROUTES),
         data: { title: 'Stock Adjustments' },
     },
     {
         path: 'mst',
-        loadChildren: () => import('./mst/mst.route').then(m => m.MST_ROUTES),
+        loadChildren: () => import('./inventory/mst/mst.route').then(m => m.MST_ROUTES),
         data: { title: 'Material Salvage Tickets' },
     },
     {
         path: 'stock-transfer',
-        loadChildren: () => import('./stock-transfer/stock-transfer.route').then(m => m.STOCK_TRANSFER_ROUTES),
+        loadChildren: () => import('./inventory/stock-transfer/stock-transfer.route').then(m => m.STOCK_TRANSFER_ROUTES),
         data: { title: 'Stock Transfers' },
     },
     {
         path: 'stock-receive',
-        loadChildren: () => import('./stock-receive/stock-receive.route').then(m => m.STOCK_RECEIVE_ROUTES),
+        loadChildren: () => import('./inventory/stock-receive/stock-receive.route').then(m => m.STOCK_RECEIVE_ROUTES),
         data: { title: 'Receive Stock Transfer' },
     },
     {
         path: 'memorandum-receipt',
-        loadChildren: () => import('./memorandum-receipt/memorandum-receipt.route').then(m => m.MEMORANDUM_RECEIPT_ROUTES),
+        loadChildren: () => import('./inventory/memorandum-receipt/memorandum-receipt.route').then(m => m.MEMORANDUM_RECEIPT_ROUTES),
         data: { title: 'Memorandum Receipts' },
     },
     {
         path: 'item-testing',
-        loadChildren: () => import('./item-testing/item-testing.route').then(m => m.ITEM_TESTING_ROUTES),
+        loadChildren: () => import('./inventory/item-testing/item-testing.route').then(m => m.ITEM_TESTING_ROUTES),
         data: { title: 'Item Testing' },
     },
     {
@@ -444,7 +449,7 @@ export const PAGES_ROUTES: Routes = [
     },
     {
         path: 'return-memorandum-receipt',
-        loadChildren: () => import('./return-memorandum-receipt/return-memorandum-receipt.route').then(m => m.RETURN_MEMORANDUM_RECEIPT_ROUTES),
+        loadChildren: () => import('./inventory/return-memorandum-receipt/return-memorandum-receipt.route').then(m => m.RETURN_MEMORANDUM_RECEIPT_ROUTES),
         data: { title: 'Return Memorandum Receipts' },
     },
     {

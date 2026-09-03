@@ -1,55 +1,83 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, Input, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, Input, OnInit, signal } from '@angular/core';
 import { COMMON_ALL_PAGE_IMPORTS, COMMON_MAIN_PAGE_IMPORTS, SHARED_PROVIDERS } from '@/app/shared/providers/shared-providers';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { provideIcons } from '@ng-icons/core';
-import { tablerSearch } from '@ng-icons/tabler-icons';
-import { WithdrawalService } from '@/app/pages/withdrawal/withdrawal.service';
+import { tablerChevronLeft, tablerChevronRight, tablerSearch } from '@ng-icons/tabler-icons';
+import { Observable } from 'rxjs';
+import { ItemStockService } from '@/app/shared/services/item-stock.service';
+import { ItemStock } from '@/app/models/inventory-modules/item-stock.model';
+
+export type ItemStockBrowseType = 'INV_LOCATION_CATEGORY' | 'INV_LOCATION';
 
 @Component({
     selector: 'app-browse-item-stock-modal',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [...COMMON_ALL_PAGE_IMPORTS, ...COMMON_MAIN_PAGE_IMPORTS],
-    providers: [...SHARED_PROVIDERS, provideIcons({ tablerSearch })],
+    providers: [...SHARED_PROVIDERS, provideIcons({ tablerChevronLeft, tablerChevronRight, tablerSearch })],
     templateUrl: './browse-item-stock-modal.component.html'
 })
 export class BrowseItemStockModalComponent implements OnInit {
     @Input() locationId!: number;
     @Input() categoryId!: number;
+    @Input() type: ItemStockBrowseType = 'INV_LOCATION_CATEGORY';
 
-    activeModal      = inject(NgbActiveModal);
-    private service  = inject(WithdrawalService);
-    private cdr      = inject(ChangeDetectorRef);
+    activeModal                = inject(NgbActiveModal);
+    private itemStockService   = inject(ItemStockService);
 
-    items:      any[] = [];
-    loading           = false;
-    searchText        = '';
+    readonly pageSize = 10;
 
-    get filtered(): any[] {
-        const q = this.searchText.trim().toLowerCase();
-        if (!q) return this.items;
-        return this.items.filter(s =>
-            (s.item?.code        || '').toLowerCase().includes(q) ||
-            (s.item?.description || '').toLowerCase().includes(q) ||
-            (s.item?.unit?.code  || '').toLowerCase().includes(q)
-        );
-    }
+    items   = signal<ItemStock[]>([]);
+    total   = signal(0);
+    page    = signal(1);
+    loading = signal(false);
+
+    searchText = '';
 
     ngOnInit(): void {
-        this.loading = true;
-        this.service.getItemStocksForWithdrawal(this.locationId, this.categoryId).subscribe({
+        this.loadData();
+    }
+
+    private fetchItemStocks(): Observable<any> {
+        switch (this.type) {
+            case 'INV_LOCATION':
+                return this.itemStockService.getItemStocksInvLocWithZeroQuantity(
+                    this.locationId, this.searchText, this.page() - 1, this.pageSize
+                );
+            case 'INV_LOCATION_CATEGORY':
+            default:
+                return this.itemStockService.getItemStocksWithZeroQuantityInvLocInvCat(
+                    this.locationId, this.categoryId, this.searchText, this.page() - 1, this.pageSize
+                );
+        }
+    }
+
+    loadData(): void {
+        this.loading.set(true);
+        this.fetchItemStocks().subscribe({
             next: (data) => {
-                this.items   = data || [];
-                this.loading = false;
-                this.cdr.markForCheck();
+                this.items.set(data?.content ?? []);
+                this.total.set(data?.page?.totalElements ?? 0);
+                this.loading.set(false);
             },
             error: () => {
-                this.loading = false;
-                this.cdr.markForCheck();
+                this.items.set([]);
+                this.total.set(0);
+                this.loading.set(false);
             }
         });
     }
 
-    select(stock: any): void {
+    onSearchChange(): void {
+        this.page.set(1);
+        this.loadData();
+    }
+
+    onPageChange(page: number): void {
+        this.page.set(page);
+        this.loadData();
+    }
+
+    select(stock: ItemStock): void {
         this.activeModal.close({ action: 'select', data: stock });
     }
 }

@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '@/environments/environment';
+import {InventoryLocation} from '@/app/models/shared/reference.model';
 
 const BASE_API = environment.get('baseApiUrl');
 const httpOptions = {
@@ -19,6 +20,10 @@ export class InventoryLocationService {
 
     getData(id: number): Observable<any> {
         return this.http.get(`${BASE_API}/inventory-location/${id}`);
+    }
+
+    getAllLocations(): Observable<InventoryLocation[]> {
+        return this.http.get<InventoryLocation[]>(`${BASE_API}/inventory-location/all`);
     }
 
     getAccounts(): Observable<any> {

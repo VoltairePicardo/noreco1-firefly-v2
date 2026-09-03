@@ -1,103 +1,63 @@
 package com.noreco1.fireflyv2.controller;
 
-import com.noreco1.fireflyv2.common.GlobalConstant;
 import com.noreco1.fireflyv2.controller.response.ItemTestingDto;
 import com.noreco1.fireflyv2.controller.response.PostResponse;
-import com.noreco1.fireflyv2.controller.response.ProcessDocumentDto;
-import com.noreco1.fireflyv2.model.InventoryLocation;
 import com.noreco1.fireflyv2.model.ItemTesting;
-import com.noreco1.fireflyv2.model.PoDetail;
-import com.noreco1.fireflyv2.service.DownloadService;
+import com.noreco1.fireflyv2.repo.ItemTestingDetailRepo;
 import com.noreco1.fireflyv2.service.ItemTestingService;
-import com.noreco1.fireflyv2.service.PrintableVoucher;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import net.sf.jasperreports.engine.JRDataSource;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
-import org.springframework.validation.BeanPropertyBindingResult;
+import org.springframework.data.domain.Pageable;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @RestController
 @RequestMapping("/api/item-testing")
 public class ItemTestingController {
 
-    @Autowired
-    @Qualifier("itemTestingServiceImpl")
-    private ItemTestingService itemTestingService;
+    private final ItemTestingService itemTestingService;
+    private final MessageSource messageSource;
+    private final ItemTestingDetailRepo itemTestingDetailRepo;
 
-    @Autowired
-    private MessageSource messageSource;
-
-    @Autowired
-    @Qualifier("itemTestingServiceImpl")
-    private PrintableVoucher printableVoucher;
-
-    @Autowired
-    private DownloadService downloadService;
-
-    @GetMapping("/list")
-    public List<ItemTesting> list() {
-        Page<ItemTesting> page = itemTestingService.findAll("2000-01-01",
-                GlobalConstant.YYYY_DATE_FORMAT.format(new Date()) + "-12-31",
-                PageRequest.of(0, 1000, Sort.by("date").descending()));
-        return page.getContent();
+    public ItemTestingController(ItemTestingService itemTestingService, MessageSource messageSource, ItemTestingDetailRepo itemTestingDetailRepo) {
+        this.itemTestingService = itemTestingService;
+        this.messageSource = messageSource;
+        this.itemTestingDetailRepo = itemTestingDetailRepo;
     }
 
-    @GetMapping("/list/{from}/{to}")
-    public List<ItemTesting> listByDateRange(@PathVariable String from, @PathVariable String to) {
-        Page<ItemTesting> page = itemTestingService.findAll(from, to,
-                PageRequest.of(0, 1000, Sort.by("date").descending()));
-        return page.getContent();
-    }
-
-    @GetMapping("/inventory-locations")
-    public List<InventoryLocation> inventoryLocations() {
-        return itemTestingService.getInventoryLocations();
-    }
-
-    @GetMapping("/po-details/{poId}")
-    public List<PoDetail> poDetails(@PathVariable Integer poId) {
-        return itemTestingService.getPurchaseOrderDetailsForItemTesting(poId);
-    }
-
-    @GetMapping("/details/{id}")
-    public List<Map> getDetails(@PathVariable Integer id) {
-        return itemTestingService.getItemTestingDetails(id);
-    }
-
-    @GetMapping("/{id}")
-    public ItemTestingDto getById(@PathVariable Integer id) {
+    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
+    @ResponseBody
+    public ItemTestingDto get(@PathVariable Integer id) {
         return itemTestingService.findById(id);
     }
 
-    @PostMapping("/create")
-    public PostResponse create(@RequestBody ItemTesting itemTesting) {
-        BindingResult br = new BeanPropertyBindingResult(itemTesting, "itemTesting");
-        return itemTestingService.create(itemTesting, br, messageSource);
+    @GetMapping(value = "/list-paged")
+    @ResponseBody
+    public Page<Map<String, Object>> listPaged(@RequestParam String from, @RequestParam String to, Pageable pageable) {
+        return itemTestingService.getItemTestingPaged(from, to, pageable);
     }
 
-    @PostMapping("/update")
-    public PostResponse update(@RequestBody ItemTesting itemTesting) {
-        BindingResult br = new BeanPropertyBindingResult(itemTesting, "itemTesting");
-        return itemTestingService.update(itemTesting, br, messageSource);
+    @RequestMapping(value = "/create", method = RequestMethod.POST)
+    @ResponseBody
+    public PostResponse create(@Valid @RequestBody ItemTesting itemTesting, BindingResult bindingResult) {
+        return itemTestingService.create(itemTesting, bindingResult, messageSource);
     }
 
-    @PostMapping("/process")
-    public PostResponse process(@RequestBody ProcessDocumentDto dto) {
-        PostResponse response = new PostResponse();
-        response.setFailureMessage("Process not supported for Item Testing.");
-        return response;
+    @RequestMapping(value = "/update", method = RequestMethod.POST)
+    @ResponseBody
+    public PostResponse update(@Valid @RequestBody ItemTesting itemTesting, BindingResult bindingResult, HttpServletRequest request) {
+        return itemTestingService.update(itemTesting, bindingResult, messageSource);
+    }
+
+    @RequestMapping(value = "/delete/{id}", method = RequestMethod.POST)
+    @ResponseBody
+    public PostResponse delete(@PathVariable Integer id) {
+        return itemTestingService.delete(id);
     }
 
     @PostMapping("/delete/{id}")

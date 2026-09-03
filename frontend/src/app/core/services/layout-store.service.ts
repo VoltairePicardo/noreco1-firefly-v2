@@ -8,7 +8,7 @@ import {BehaviorSubject} from 'rxjs';
 const STORAGE_KEY = '__INSPINIA_ANGULAR_CONFIG__';
 
 const defaultState: LayoutState = {
-    skin: 'classic',
+    skin: 'material',
     theme: 'light',
     orientation: 'vertical',
     position: 'fixed',

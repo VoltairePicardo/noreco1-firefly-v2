@@ -92,6 +92,12 @@ public class MemorandumReceiptServiceImpl implements MemorandumReceiptService, P
 
     @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
+    public Page<Map<String, Object>> getMemorandumReceiptPaged(String from, String to, Integer employeeAccountNo, String query, Pageable pageable) {
+        return memorandumReceiptRepo.getMemorandumReceiptPaged(from, to, employeeAccountNo, query, pageable);
+    }
+
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
+    @Override
     public Page<MemorandumReceipt> findAll(String startDate, String endDate, Pageable pageable) {
         Date fromDate = DateHelper.strToDate(startDate, "yyyy-MM-dd");
         Date toDate = DateHelper.strToDate(endDate, "yyyy-MM-dd");

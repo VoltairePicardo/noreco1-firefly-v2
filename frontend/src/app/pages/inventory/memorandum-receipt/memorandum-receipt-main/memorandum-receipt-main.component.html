@@ -1,0 +1,160 @@
+<div class="container-fluid">
+    <app-page-title [title]="module" [subTitle]="subModule" [menuLink]="menuLink"/>
+
+    <div class="card">
+        <div class="card-header">
+            <div class="col-12 d-flex align-items-end gap-3">
+                <div class="row flex-grow-1 g-2">
+                    <div class="col-md-2">
+                        <label class="form-label fw-bold mb-1 fs-xs text-uppercase">From</label>
+                        <input type="text" mwlFlatpickr [options]="flatpickrOptions"
+                               class="form-control" [(ngModel)]="fromDate" placeholder="From date"/>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label fw-bold mb-1 fs-xs text-uppercase">To</label>
+                        <input type="text" mwlFlatpickr [options]="flatpickrOptions"
+                               class="form-control" [(ngModel)]="toDate" placeholder="To date"/>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold mb-1 fs-xs text-uppercase">Employee</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control"
+                                   [value]="employee()?.name || employee()?.fullName || ''"
+                                   readonly placeholder="All employees"/>
+                            <button type="button" class="btn btn-primary fw-bold gap-1" (click)="openEmployeeBrowse()">
+                                <ng-icon name="tablerUsers" class="fs-lg fw-bold"></ng-icon>Browse
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row flex-grow-1 align-items-center g-3 justify-content-between">
+
+                <div class="d-flex align-items-center gap-2">
+                    <div class="col-md-3">
+                        <input type="text"
+                               class="form-control"
+                               [ngModel]="searchText()"
+                               (ngModelChange)="searchText.set($event)"
+                               placeholder="Search..."
+                               (keyup.enter)="search()" />
+                    </div>
+
+                    <button type="button"
+                            class="btn btn-primary fw-bold d-flex align-items-center gap-1"
+                            (click)="search()">
+                        <ng-icon name="tablerSearch" class="fs-lg fw-bold"></ng-icon>
+                        Search
+                    </button>
+
+                    <button type="button"
+                            class="btn btn-danger fw-bold d-flex align-items-center gap-1"
+                            (click)="reset()">
+                        <ng-icon name="tablerRefresh" class="fs-lg fw-bold"></ng-icon>
+                        Reset
+                    </button>
+                </div>
+
+                <div class="col-auto d-flex align-items-center gap-2">
+                    <button type="button"
+                            class="btn btn-primary d-flex align-items-center gap-1 fw-bold flex-shrink-0"
+                            [routerLink]="['/' + menuLink + '/create']">
+                        <ng-icon name="tablerPlus" class="fs-lg fw-bold"></ng-icon>
+                        Create Office MR
+                    </button>
+
+                    <button type="button"
+                            class="btn btn-primary d-flex align-items-center gap-1 fw-bold flex-shrink-0"
+                            [routerLink]="['/' + menuLink + '/create-multiple']">
+                        <ng-icon name="tablerPlus" class="fs-lg fw-bold"></ng-icon>
+                        Create Multiple Employee MR
+                    </button>
+
+                    <button type="button"
+                            class="btn btn-primary d-flex align-items-center gap-1 fw-bold flex-shrink-0"
+                            [routerLink]="['/' + menuLink + '/reissue']">
+                        <ng-icon name="tablerRecycle" class="fs-lg fw-bold"></ng-icon>
+                        Re-issue Returned MR
+                    </button>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-custom table-centered table-select table-hover w-100 mb-0 text-center">
+                <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                    <tr class="text-uppercase fs-xxs">
+                        <th class="text-start">Code</th>
+                        <th class="text-start">Returned MR</th>
+                        <th>Date</th>
+                        <th class="text-start">Office</th>
+                        <th class="text-start">Employee</th>
+                        <th>Status</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (isLoading()) {
+                        <tr class="no-results">
+                            <td colspan="7" class="text-center text-muted py-3">
+                                <span class="spinner-border spinner-border-sm me-2" role="status"></span>Loading...
+                            </td>
+                        </tr>
+                    } @else if (records().length > 0) {
+                        @for (rec of records(); track rec.id) {
+                            <tr>
+                                <td class="fw-bold text-start">{{ rec.code }}</td>
+                                <td class="text-start">{{ rec.returnedMR || '—' }}</td>
+                                <td>{{ rec.date | date:'MM/dd/yyyy' }}</td>
+                                <td class="text-start">{{ rec.officeName || '—' }}</td>
+                                <td class="text-start">{{ rec.employeeName || '—' }}</td>
+                                <td><span class="badge bg-secondary bg-opacity-25 text-dark border">{{ rec.status || '—' }}</span></td>
+                                <td>
+                                    <div class="d-flex gap-1">
+                                        <a [routerLink]="['/' + menuLink, rec.id, 'detail']"
+                                           class="btn btn-light btn-icon btn-sm rounded-circle" ngbTooltip="View">
+                                            <ng-icon name="tablerEye"></ng-icon>
+                                        </a>
+                                        @if (isEditable(rec)) {
+                                            <a [routerLink]="['/' + menuLink, rec.id, 'edit']"
+                                               class="btn btn-light btn-icon btn-sm rounded-circle" ngbTooltip="Edit">
+                                                <ng-icon name="tablerEdit"></ng-icon>
+                                            </a>
+                                        }
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    } @else {
+                        <tr class="no-results">
+                            <td colspan="7" class="text-center text-muted py-3">Nothing found.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        @if (filteredTotal() > pageSize) {
+            <div class="card-footer d-flex justify-content-center">
+                <div class="pagination-boxed align-items-center mt-2 mb-0">
+                    <ngb-pagination
+                        [collectionSize]="filteredTotal()"
+                        [page]="page()"
+                        (pageChange)="onPageChange($event)"
+                        [pageSize]="pageSize"
+                        [maxSize]="5"
+                        [rotate]="true">
+                        <ng-template ngbPaginationPrevious>
+                            <ng-icon name="tablerChevronLeft"/>
+                        </ng-template>
+                        <ng-template ngbPaginationNext>
+                            <ng-icon name="tablerChevronRight"/>
+                        </ng-template>
+                    </ngb-pagination>
+                </div>
+            </div>
+        }
+    </div>
+</div>

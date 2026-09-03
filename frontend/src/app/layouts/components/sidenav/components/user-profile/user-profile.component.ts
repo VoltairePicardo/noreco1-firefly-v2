@@ -40,7 +40,7 @@ export class UserProfileComponent implements OnInit {
         if (itemLabel === 'Log Out') {
             this.authService.logout();
         } else if (itemLabel === 'Profile') {
-            this.router.navigate(['/profile/change-password']);
+            this.router.navigate(['/profile']);
         }
     }
 }

@@ -17,6 +17,7 @@ import java.util.ArrayList;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Menu {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column
@@ -46,12 +47,9 @@ public class Menu {
     @JoinColumn(name = "FK_viewRouteId", nullable = true, columnDefinition = "0")
     private Route viewRoute;
 
-    public Menu(String title, String state, String iconClass, Menu parentMenu, Route viewRoute) {
-        this.title = title;
-        this.state = state;
-        this.iconClass = iconClass;
-        this.parentMenu = parentMenu;
-        this.viewRoute = viewRoute;
-    }
+    @Column
+    private String url;
+
+    public Menu(Integer id, String title, String state, String iconClass, String type, String url) {}
 
 }

@@ -20,6 +20,7 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.data.domain.*;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -318,6 +319,10 @@ public class PurchaseRequestServiceImpl implements PurchaseRequestService, Print
             }
         }
 
+        if (Checker.documentSaved(response)) {
+            this.logNewValue(response.getLogId());
+        }
+
         return response;
     }
 
@@ -527,7 +532,7 @@ public class PurchaseRequestServiceImpl implements PurchaseRequestService, Print
 
     @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
-    public org.springframework.data.domain.Page<Object[]> getRequisitionVoucherForStockWithdrawal(String query, Integer invLocId, Pageable pageable) {
+    public Page<Map<String, Object>> getRequisitionVoucherForStockWithdrawal(String query, Integer invLocId, Pageable pageable) {
         if (Checker.isStringNullAndEmpty(query)) {
             return purchaseRequestRepo.findPurchaseRequestsForStockWithdrawal(invLocId, authenticationFacade.getLoggedIn().getId(), pageable);
         } else {
@@ -537,12 +542,14 @@ public class PurchaseRequestServiceImpl implements PurchaseRequestService, Print
 
     @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
-    public org.springframework.data.domain.Page<Object[]> getRequisitionVoucherForRR(String query, Pageable pageable) {
-        if (Checker.isStringNullAndEmpty(query)) {
-            return purchaseRequestRepo.findPurchaseRequestsForRR(pageable);
-        } else {
-            return purchaseRequestRepo.findPurchaseRequestsForRR("%"+query+"%", pageable);
-        }
+    public Page<Map<String, Object>> getRequisitionVoucherForRR(String query, Pageable pageable) {
+//        if (Checker.isStringNullAndEmpty(query)) {
+//            return purchaseRequestRepo.findPurchaseRequestsForRR(pageable);
+//        } else {
+//            return purchaseRequestRepo.findPurchaseRequestsForRR("%"+query+"%", pageable);
+//        }
+
+        return null;
     }
 
     @Transactional(isolation = Isolation.READ_UNCOMMITTED)
@@ -792,7 +799,7 @@ public class PurchaseRequestServiceImpl implements PurchaseRequestService, Print
             rvDto.setTransId(purchaseRequest.getTransaction().getId());
 
             SlEntity createdBy = slEntityRepo.findById(purchaseRequest.getCreatedBy().getAccountNo()).orElse(null);
-            SlEntity approvedBy = slEntityRepo.findById(purchaseRequest.getApprovingOfficer().getAccountNo()).orElse(null);
+            SlEntity approvedBy = slEntityRepo.findOneByAccountNo(purchaseRequest.getApprovingOfficer().getAccountNo());
 
             SlEntity inventoryCheckedBy = null;
 
@@ -1080,5 +1087,17 @@ public class PurchaseRequestServiceImpl implements PurchaseRequestService, Print
 
         return isPurchasingOfficer;
 
+    }
+
+
+    @Override
+    public Page<Map<String, Object>> purchaseRequestListForStockWithdrawal(Integer locationId, String query, Pageable pageable) {
+        User user = authenticationFacade.getLoggedIn();
+
+        if (Checker.isStringNullAndEmpty(query)) {
+            return purchaseRequestRepo.findPurchaseRequestsForStockWithdrawal(locationId, user.getId(), pageable);
+        } else {
+            return purchaseRequestRepo.findPurchaseRequestsForStockWithdrawal("%"+query+"%", locationId, user.getId(), pageable);
+        }
     }
 }

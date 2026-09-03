@@ -12,6 +12,7 @@ import com.noreco1.fireflyv2.repo.*;
 import com.noreco1.fireflyv2.controller.response.*;
 import com.noreco1.fireflyv2.service.PrintableVoucher;
 import com.noreco1.fireflyv2.service.StockReleaseService;
+import com.noreco1.fireflyv2.service.strategy.inventory_document.InventoryDocumentReleasingStrategyRegistry;
 import com.noreco1.fireflyv2.validator.StockReleaseValidator;
 import net.sf.jasperreports.engine.JRDataSource;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
@@ -59,9 +60,6 @@ public class StockReleaseServiceImpl implements StockReleaseService, PrintableVo
 
     @Autowired
     UserRepo userRepo;
-
-    @Autowired
-    SlEntityRepo slEntityRepo;
 
     @Autowired
     DocumentWorkflowActionMapRepo workflowActionMapRepo;
@@ -113,10 +111,14 @@ public class StockReleaseServiceImpl implements StockReleaseService, PrintableVo
 
     private Map reportMeta;
 
+    @Autowired
     MemorandumReceiptRepo memorandumReceiptRepo;
 
-    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
+    @Autowired
+    InventoryDocumentReleasingStrategyRegistry releasingStrategyRegistry;
+
     @Override
+    @Transactional(readOnly = true, isolation = Isolation.READ_UNCOMMITTED)
     public StockRelease findById(Integer id) {
 
         StockRelease ret = stockReleaseRepo.findById(id).orElse(null);
@@ -162,6 +164,7 @@ public class StockReleaseServiceImpl implements StockReleaseService, PrintableVo
 
                         }
                     }
+
 
                     dto.setSerialNumbers(specialEquipments);
 
@@ -210,8 +213,9 @@ public class StockReleaseServiceImpl implements StockReleaseService, PrintableVo
 
     }
 
-    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
+    
     @Override
+    @Transactional(readOnly = true)
     public StockRelease findByCode(String code) {
 
         List<StockRelease> releases = stockReleaseRepo.findByCode(code);
@@ -221,26 +225,30 @@ public class StockReleaseServiceImpl implements StockReleaseService, PrintableVo
         } else return null;
     }
 
-    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
+    
     @Override
+    @Transactional(readOnly = true)
     public List<StockRelease> findAll() {
         return stockReleaseRepo.findAll();
     }
 
-    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
+    
     @Override
+    @Transactional(readOnly = true)
     public Page<StockRelease> findAll(Pageable pageable) {
         return null;
     }
 
-    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
+    
     @Override
+    @Transactional(readOnly = true)
     public Page<StockRelease> findByQuery(String query, Pageable pageable) {
         return null;
     }
 
-    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
+    
     @Override
+    @Transactional(readOnly = true)
     public List<Map> getDetails(int id) {
         List<Map> data = new ArrayList<>();
 
@@ -275,8 +283,9 @@ public class StockReleaseServiceImpl implements StockReleaseService, PrintableVo
         return data;
     }
 
-    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
+    
     @Override
+    @Transactional(readOnly = true)
     public List<Map> findByDateRangeAndStatusId(String from, String to, Integer docStatusId, Integer officeId) {
         try {
             Date fromDate = DateHelper.strToDate(from, "yyyy-MM-dd");
@@ -300,8 +309,9 @@ public class StockReleaseServiceImpl implements StockReleaseService, PrintableVo
         return null;
     }
 
-    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
+    
     @Override
+    @Transactional(readOnly = true)
     public List<Map> findByDateRangePending(String from, String to, Integer officeId) {
         try {
             Date fromDate = DateHelper.strToDate(from, "yyyy-MM-dd");
@@ -321,7 +331,9 @@ public class StockReleaseServiceImpl implements StockReleaseService, PrintableVo
                     com.noreco1.fireflyv2.model.enums.DocumentStatus.CANCELLED.getId()
             };
 
+
             User loggedIn = authenticationFacade.getLoggedIn();
+
 
             List<StockRelease> docs = stockReleaseRepo.findByAllowedUserVoucherDateBetweenAndDocumentStatusIdNotInAndOfficeId(loggedIn.getId(), fromDate, toDate, Arrays.asList(ids));
             return this.makeReleasingMapList(docs);
@@ -332,14 +344,16 @@ public class StockReleaseServiceImpl implements StockReleaseService, PrintableVo
         return null;
     }
 
-    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
+    
     @Override
+    @Transactional(readOnly = true)
     public List<StockWithdrawal> findStockWithdrawalByDocumentStatusId(Integer documentStatusId) {
         return stockReleaseRepo.findStockWithdrawalByDocumentStatusId(documentStatusId);
     }
 
-    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
+    
     @Override
+    @Transactional(readOnly = true)
     public List<Map> getAvailableItemStock(Integer itemId) {
 
         List<Map> ret = new ArrayList<>();
@@ -362,21 +376,25 @@ public class StockReleaseServiceImpl implements StockReleaseService, PrintableVo
     }
 
     @Override
+    @Transactional
     public PostResponse processUpdate(Document v, BindingResult bindingResult, MessageSource messageSource, HttpServletRequest request, List<Map> filesToRemove) {
         return this.processUpdate(v, bindingResult, messageSource);
     }
 
     @Override
+    @Transactional
     public PostResponse processCreate(Document v, BindingResult bindingResult, MessageSource messageSource, HttpServletRequest request) {
         return this.processCreate(v, bindingResult, messageSource);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<DocumentStatus> getDocumentsStatuses() {
         return documentDtoer.getDocumentStatuses(com.noreco1.fireflyv2.model.enums.Workflow.RELEASING_OFE.getId());
     }
 
     @Override
+    @Transactional
     public PostResponse process(ProcessDocumentDto postData, BindingResult bindingResult, MessageSource messageSource) {
 
         PostResponse response = new PostResponse();
@@ -427,22 +445,26 @@ public class StockReleaseServiceImpl implements StockReleaseService, PrintableVo
     }
 
     @Override
+    @Transactional
     public PostResponse processUpdate(Document v, BindingResult bindingResult, MessageSource messageSource) {
         return null;
     }
 
     @Override
+    @Transactional
     public PostResponse processCreate(Document v, BindingResult bindingResult, MessageSource messageSource) {
         return null;
     }
 
     @Override
+    @Transactional
     public PostResponse processUpdate(DocumentNoApproval v, BindingResult bindingResult, MessageSource messageSource) {
         StockRelease release = (StockRelease) v;
         return this.processCreate(release, bindingResult, messageSource);
     }
 
     @Override
+    @Transactional
     public PostResponse processCreate(DocumentNoApproval v, BindingResult bindingResult, MessageSource messageSource) {
 
         StockRelease stockRelease = (StockRelease) v;
@@ -473,7 +495,7 @@ public class StockReleaseServiceImpl implements StockReleaseService, PrintableVo
             Boolean insertMode = stockRelease.getId() == null;
             if (insertMode) { // insert mode
                 String typeCode = "";
-                com.noreco1.fireflyv2.model.enums.StockReleaseType type = com.noreco1.fireflyv2.model.enums.StockReleaseType.typeFromInt(stockRelease.getType());
+                StockReleaseType type = StockReleaseType.typeFromInt(stockRelease.getType());
                 switch (type) {
                     case MCT:
                         typeCode = StockReleaseType.MCT.getCode();
@@ -716,12 +738,17 @@ public class StockReleaseServiceImpl implements StockReleaseService, PrintableVo
 
         }
 
+        if (Checker.documentSaved(response)) {
+            this.logNewValue(response.getLogId());
+        }
+
         return response;
 
     }
 
-    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
+    
     @Override
+    @Transactional(readOnly = true)
     public List<StockRelease> getListForSummaryReport(String from, String to, HttpServletRequest request) {
         List<StockRelease> list = new ArrayList<>();
 
@@ -777,8 +804,9 @@ public class StockReleaseServiceImpl implements StockReleaseService, PrintableVo
         return list;
     }
 
-    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
+    
     @Override
+    @Transactional(readOnly = true)
     public List<StockWithdrawalDetailDto> getItems(Integer docTransId) {
         List<StockWithdrawalDetailDto> data = new ArrayList<>();
         ArrayList<StockWithdrawalDetail> details = stockWithdrawalDetailRepo.findByStockWithdrawalTransactionId(docTransId);
@@ -818,6 +846,7 @@ public class StockReleaseServiceImpl implements StockReleaseService, PrintableVo
     }
 
     @Override
+    @Transactional
     public PostResponse processCreateMultiple(StockReleaseForm v, BindingResult bindingResult, MessageSource messageSource) {
         PostResponse response = new PostResponse();
         response.setSuccess(false);
@@ -848,7 +877,7 @@ public class StockReleaseServiceImpl implements StockReleaseService, PrintableVo
                 Boolean insertMode = stockRelease.getId() == null;
                 if (insertMode) { // insert mode
                     String typeCode = "";
-                    com.noreco1.fireflyv2.model.enums.StockReleaseType type = com.noreco1.fireflyv2.model.enums.StockReleaseType.typeFromInt(stockRelease.getType());
+                    StockReleaseType type = StockReleaseType.typeFromInt(stockRelease.getType());
                     switch (type) {
                         case MCT:
                             typeCode = StockReleaseType.MCT.getCode();
@@ -991,8 +1020,9 @@ public class StockReleaseServiceImpl implements StockReleaseService, PrintableVo
         return response;
     }
 
-    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
+    
     @Override
+    @Transactional(readOnly = true)
     public Page<StockRelease> findByDateRangeAndCodeAndType(String from, String to, Integer type, String query, Pageable pageable) {
         String format = "yyyy-MM-dd";
         Date start = DateHelper.strToDateOrToday(from, format);
@@ -1005,6 +1035,20 @@ public class StockReleaseServiceImpl implements StockReleaseService, PrintableVo
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public Page<Map<String, Object>> getStockReleasePaged(String from, String to, Integer statusId, String query, Pageable pageable) {
+        User loggedIn = authenticationFacade.getLoggedIn();
+        Integer[] ids = {
+                com.noreco1.fireflyv2.model.enums.DocumentStatus.APPROVED.getId(),
+                com.noreco1.fireflyv2.model.enums.DocumentStatus.DENIED.getId(),
+                com.noreco1.fireflyv2.model.enums.DocumentStatus.CANCELLED.getId()
+        };
+
+        return stockReleaseRepo.getStockReleasePaged(from, to, statusId, query, loggedIn.getId(), Arrays.asList(ids), pageable);
+    }
+
+    @Override
+    @Transactional
     public void logNewValue(Integer logId) {
         DocumentLog documentLog = documentLogRepo.findById(logId).orElse(null);
         if (documentLog != null) {
@@ -1026,11 +1070,13 @@ public class StockReleaseServiceImpl implements StockReleaseService, PrintableVo
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Map defaultSignatories() {
         return signatoryFacade.defaultSignatories(DocumentType.SRL);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public HashMap reportParameters(Integer vid, HttpServletRequest request) {
 
         this.reportMeta = new HashMap();
@@ -1065,7 +1111,7 @@ public class StockReleaseServiceImpl implements StockReleaseService, PrintableVo
             }
             String title = "";
             String additionalNote = "."; //End note with a period by default
-            com.noreco1.fireflyv2.model.enums.StockReleaseType type = com.noreco1.fireflyv2.model.enums.StockReleaseType.typeFromInt(stockRelease.getType());
+            StockReleaseType type = StockReleaseType.typeFromInt(stockRelease.getType());
             switch (type) {
                 case MCT:
                     title = StockReleaseType.MCT.getDescription();
@@ -1103,6 +1149,7 @@ public class StockReleaseServiceImpl implements StockReleaseService, PrintableVo
     }
 
     @Override
+    @Transactional(readOnly = true)
     public JRDataSource datasource(Integer vid) {
         List<Map> rrDetails = this.getDetails(vid);
 
@@ -1116,7 +1163,7 @@ public class StockReleaseServiceImpl implements StockReleaseService, PrintableVo
                 List<StockTransactionDetailSerialNo> serialNos = this.stockTransactionDetailSerialNoRepo.findAllByStockTransactionDetailId(stockTransactionDetailId);
 
                 if(Checker.collectionIsNotEmpty(serialNos)) {
-                    
+
                     Map line = new HashMap();
                     line.put("code", detail.get("code"));
                     line.put("name", detail.get("description"));
@@ -1144,8 +1191,9 @@ public class StockReleaseServiceImpl implements StockReleaseService, PrintableVo
         return this.reportMeta;
     }
 
-    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
+    
     @Override
+    @Transactional(readOnly = true)
     public Page<StockReleaseDocumentDto> findAllApprovedForAccountSettingPaged(String query, Pageable pageable) {
 
         Page<StockRelease> stockReleases;
@@ -1158,35 +1206,46 @@ public class StockReleaseServiceImpl implements StockReleaseService, PrintableVo
 
         return stockReleases.map(entity -> {
 
-                StockReleaseDocumentDto dto = new StockReleaseDocumentDto();
+            StockReleaseDocumentDto dto = new StockReleaseDocumentDto();
 
-                dto.setVoucherDate(entity.getVoucherDate());
-                dto.setLocalCode(entity.getCode());
-                dto.setParticulars(entity.getDescription());
-                dto.setId(entity.getId());
-                dto.setPreparedBy(entity.getCreatedBy() != null ? entity.getCreatedBy().getFullName() : null);
-                dto.setTransactionId(entity.getTransaction().getId());
+            dto.setVoucherDate(entity.getVoucherDate());
+            dto.setLocalCode(entity.getCode());
+            dto.setParticulars(entity.getDescription());
+            dto.setId(entity.getId());
+            dto.setPreparedBy(entity.getCreatedBy() != null ? entity.getCreatedBy().getFullName() : null);
+            dto.setTransactionId(entity.getTransaction().getId());
 
-                ArrayList<StockTransactionDetail> stockTransactionDetails = stockTransactionDetailRepo.findByStockTransactionTransactionId(entity.getTransaction().getId());
+            ArrayList<StockTransactionDetail> stockTransactionDetails = stockTransactionDetailRepo.findByStockTransactionTransactionId(entity.getTransaction().getId());
 
-                if(Checker.collectionIsNotEmpty(stockTransactionDetails)){
+            if(Checker.collectionIsNotEmpty(stockTransactionDetails)){
 
-                    BigDecimal quantity = BigDecimal.ZERO;
+                BigDecimal quantity = BigDecimal.ZERO;
 
-                    for (StockTransactionDetail stockTransactionDetail : stockTransactionDetails){
+                for (StockTransactionDetail stockTransactionDetail : stockTransactionDetails){
 
-                        quantity = quantity.add(stockTransactionDetail.getQuantity());
-
-                    }
-
-                    dto.setNetAmount(BigDecimal.ZERO);
-                    dto.setQuantity(quantity);
+                    quantity = quantity.add(stockTransactionDetail.getQuantity());
 
                 }
 
-                return dto;
+                dto.setNetAmount(BigDecimal.ZERO);
+                dto.setQuantity(quantity);
+
+            }
+
+            return dto;
+
         });
 
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<Page<InventoryDocumentDto>> findInventoryDocumentsForReleasing(String type, String query, Pageable pageable) {
+        if (type == null) {
+            return Optional.empty();
+        }
+        return releasingStrategyRegistry.get(type)
+                .map(strategy -> strategy.findAllForReleasingByQuery(query, pageable));
     }
 
     private Map forLogMapMain(StockRelease sr) {
@@ -1218,4 +1277,5 @@ public class StockReleaseServiceImpl implements StockReleaseService, PrintableVo
 
         return map;
     }
+
 }

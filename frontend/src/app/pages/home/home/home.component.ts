@@ -44,7 +44,7 @@ export class HomeComponent {
 
     private loadDocuments(): void {
         this.isLoading.set(true);
-        this.http.get<any[]>(`${BASE_API}/api/dashboard/documents`).subscribe({
+        this.http.get<any[]>(`${BASE_API}/dashboard/documents`).subscribe({
             next: (data) => { this.rows.set(data ?? []); this.isLoading.set(false); },
             error: () => { this.rows.set([]); this.isLoading.set(false); }
         });
@@ -52,7 +52,7 @@ export class HomeComponent {
 
     private loadOtherApproved(): void {
         this.isLoading.set(true);
-        this.http.get<any[]>(`${BASE_API}/api/dashboard/other-approved-documents`).subscribe({
+        this.http.get<any[]>(`${BASE_API}/dashboard/other-approved-documents`).subscribe({
             next: (data) => { this.rows.set(data ?? []); this.isLoading.set(false); },
             error: () => { this.rows.set([]); this.isLoading.set(false); }
         });

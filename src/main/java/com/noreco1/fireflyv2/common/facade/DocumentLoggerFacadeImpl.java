@@ -1014,7 +1014,7 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
             map.put("transactionId", materialCreditTicket.getTransaction().getId());
             map.put("remarks", materialCreditTicket.getRemarks());
             map.put("createdBy", materialCreditTicket.getCreatedBy() != null ? materialCreditTicket.getCreatedBy().getFullName() : "");
-            map.put("requestedBy", materialCreditTicket.getStockRelease() != null ? materialCreditTicket.getStockRelease().getReceivedBy().getFullName() : "");
+            map.put("requestedBy", materialCreditTicket.getStockRelease() != null && materialCreditTicket.getStockRelease().getReceivedBy() != null ? materialCreditTicket.getStockRelease().getReceivedBy().getFullName() : "");
             map.put("approvedBy", materialCreditTicket.getApprovingOfficer() != null ? materialCreditTicket.getApprovingOfficer().getFullName() : "");
             map.put("workflow", materialCreditTicket.getWorkflow() != null ? materialCreditTicket.getWorkflow().getName() : "");
             map.put("createdAt", materialCreditTicket.getCreatedAt());

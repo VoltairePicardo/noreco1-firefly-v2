@@ -235,17 +235,15 @@ export class HelperService {
     }
 
     public static getEnvVar(key: any, env: any) {
-        let val = window.localStorage.getItem('env.' + key);
-        if (val) {
-            return val;
-        } else {
-            for (let entry of env) {
-                for (let k in entry) {
-                    window.localStorage.setItem('env.' + k, entry[k]);
-                }
+        // env.json/env-prod.json bundled with this build is always the source of truth —
+        // refresh localStorage from it on every call so a stale value cached by a previous
+        // build/config (e.g. an old absolute API URL) never lingers and silently wins.
+        for (let entry of env) {
+            for (let k in entry) {
+                window.localStorage.setItem('env.' + k, entry[k]);
             }
-            return window.localStorage.getItem('env.' + key);
         }
+        return window.localStorage.getItem('env.' + key);
     }
 
     // Array Utilities

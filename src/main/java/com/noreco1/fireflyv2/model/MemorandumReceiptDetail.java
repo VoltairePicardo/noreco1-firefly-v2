@@ -1,5 +1,6 @@
 package com.noreco1.fireflyv2.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import com.noreco1.fireflyv2.controller.response.StockWithdrawalDetailDto;
@@ -24,6 +25,7 @@ public class MemorandumReceiptDetail implements Serializable {
     @Column
     private Integer id;
 
+    @JsonIgnore
     @NotFound(action = NotFoundAction.IGNORE)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="FK_MemorandumReceiptId")

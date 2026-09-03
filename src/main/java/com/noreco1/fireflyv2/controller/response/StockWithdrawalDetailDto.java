@@ -1,12 +1,16 @@
 package com.noreco1.fireflyv2.controller.response;
 
-import com.noreco1.fireflyv2.model.SpecialEquipmentWithdrawalDetail;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.math.BigDecimal;
 
 /**
  * Created by lenovo on 6/15/2017.
  */
+@Getter
+@Setter
 public class StockWithdrawalDetailDto {
 
     private Integer itemId;
@@ -16,6 +20,8 @@ public class StockWithdrawalDetailDto {
     private String itemDescription;
     private BigDecimal quantity;
     private BigDecimal quantityReleased;
+
+    @JsonProperty("isSpecialEquipment")
     private boolean isSpecialEquipment;
     private Integer itemStockId;
     private BigDecimal inventoryBalance;
@@ -37,99 +43,4 @@ public class StockWithdrawalDetailDto {
         this.isSpecialEquipment = isSpecialEquipment;
     }
 
-    public Integer getItemId() {
-        return itemId;
-    }
-
-    public void setItemId(Integer itemId) {
-        this.itemId = itemId;
-    }
-
-    public String getItemCode() {
-        return itemCode;
-    }
-
-    public void setItemCode(String itemCode) {
-        this.itemCode = itemCode;
-    }
-
-    public Integer getUnitId() {
-        return unitId;
-    }
-
-    public void setUnitId(Integer unitId) {
-        this.unitId = unitId;
-    }
-
-    public String getUnitCode() {
-        return unitCode;
-    }
-
-    public void setUnitCode(String unitCode) {
-        this.unitCode = unitCode;
-    }
-
-    public String getItemDescription() {
-        return itemDescription;
-    }
-
-    public void setItemDescription(String itemDescription) {
-        this.itemDescription = itemDescription;
-    }
-
-    public BigDecimal getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(BigDecimal quantity) {
-        this.quantity = quantity;
-    }
-
-    public BigDecimal getQuantityReleased() {
-        return quantityReleased;
-    }
-
-    public void setQuantityReleased(BigDecimal quantityReleased) {
-        this.quantityReleased = quantityReleased;
-    }
-
-    public boolean isSpecialEquipment() {
-        return isSpecialEquipment;
-    }
-
-    public void setIsSpecialEquipment(boolean specialEquipment) {
-        isSpecialEquipment = specialEquipment;
-    }
-
-    public BigDecimal getInsertedQuantity() {
-        return insertedQuantity;
-    }
-
-    public void setInsertedQuantity(BigDecimal insertedQuantity) {
-        this.insertedQuantity = insertedQuantity;
-    }
-
-    public Integer getItemStockId() {
-        return itemStockId;
-    }
-
-    public void setItemStockId(Integer itemStockId) {
-        this.itemStockId = itemStockId;
-    }
-
-    public BigDecimal getInventoryBalance() {
-        return inventoryBalance;
-    }
-
-    public void setInventoryBalance(BigDecimal inventoryBalance) {
-        this.inventoryBalance = inventoryBalance;
-    }
-
-    public BigDecimal getRvBalance() {
-        return rvBalance;
-    }
-
-    public void setRvBalance(BigDecimal rvBalance) {
-        this.rvBalance = rvBalance;
-    }
 }

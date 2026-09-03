@@ -1,7 +1,7 @@
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef, inject } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { COMMON_ALL_PAGE_IMPORTS, COMMON_MAIN_PAGE_IMPORTS } from '@/app/shared/providers/shared-providers';
-import { MstService } from '@/app/pages/mst/mst.service';
+import { MstService } from '@/app/pages/inventory/mst/mst.service';
 
 @Component({
     selector: 'app-browse-mst-item-stock-modal',

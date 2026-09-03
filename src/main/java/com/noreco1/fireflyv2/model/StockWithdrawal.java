@@ -68,6 +68,11 @@ public class StockWithdrawal extends Document implements Serializable {
     @NotFound(action = NotFoundAction.IGNORE)
     private ArrayList<StockWithdrawalDetailDto> details = new ArrayList<>();
 
+    @Transient
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    @NotFound(action = NotFoundAction.IGNORE)
+    private ArrayList<StockWithdrawalDetail> items = new ArrayList<>();
+
     @Column
     private Integer type;
 
