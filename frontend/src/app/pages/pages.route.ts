@@ -13,6 +13,11 @@ export const PAGES_ROUTES: Routes = [
         data: { title: 'Dashboard' },
     },
     {
+        path: 'profile',
+        loadComponent: () => import('./profile/profile.component').then((m) => m.ProfileComponent),
+        data: { title: 'My Profile' },
+    },
+    {
         path: 'profile/change-password',
         loadComponent: () => import('./auth/change-password/change-password.component').then((m) => m.ChangePasswordComponent),
         data: { title: 'Change Password' },

@@ -10,6 +10,7 @@ import org.springframework.validation.BindingResult;
 
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.Map;
 
 public interface UserService {
     User findByUsername(String username);
@@ -36,5 +37,8 @@ public interface UserService {
     Page<User> findAllPageable(String searchText, int page, int size);
 
     Page<User> findAllWithAccountNo(String searchText, int page, int size);
+
+    @Transactional
+    PostResponse updateProfile(Map<String, String> request);
 
 }

@@ -80,13 +80,13 @@ export class AppMenuComponent implements OnInit {
             return topLevel.map(m => {
                 const children = (m.subMenus || []).map((c: any) => ({
                     text: c.title,
-                    link: c.viewRoute?.url || null,
+                    link: c.url || null,
                     icon: this.resolveIcon(c.iconClass),
                 }));
                 return {
                     text: m.title,
                     icon: this.resolveIcon(m.iconClass),
-                    link: children.length === 0 ? (m.viewRoute?.url || null) : null,
+                    link: children.length === 0 ? (m.url || null) : null,
                     isCollapsed: true,
                     children,
                 };
@@ -110,7 +110,7 @@ export class AppMenuComponent implements OnInit {
             }
             parentMap.get(pid).children.push({
                 text: m.title,
-                link: m.viewRoute?.url || null,
+                link: m.url || null,
                 icon: this.resolveIcon(m.iconClass),
             });
         }
@@ -120,7 +120,9 @@ export class AppMenuComponent implements OnInit {
 
     resolveIcon(iconClass: string): string {
         if (!iconClass) return 'tablerCircleDot';
-        return this.iconMap[iconClass.trim()] || 'tablerCircleDot';
+        const trimmed = iconClass.trim();
+        if (trimmed.startsWith('tabler')) return trimmed;
+        return this.iconMap[trimmed] || 'tablerCircleDot';
     }
 
     hasSubMenu(item: any): boolean {

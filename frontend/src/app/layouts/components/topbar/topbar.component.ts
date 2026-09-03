@@ -1,10 +1,10 @@
-import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
+import {ChangeDetectionStrategy, Component, inject, computed} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {RouterLink} from '@angular/router';
 import {NgIcon} from '@ng-icons/core';
 import {LayoutStoreService} from '@core/services/layout-store.service';
 import {LucideAngularModule, Search} from 'lucide-angular';
-import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
+import {NgbModal, NgbModalRef, NgbTooltipModule} from '@ng-bootstrap/ng-bootstrap';
 import {SearchModalComponent} from './components/search-modal/search-modal.component';
 import {ThemeTogglerComponent} from '@layouts/components/topbar/components/theme-toggler/theme-toggler.component';
 import {
@@ -22,6 +22,7 @@ import {UserProfileComponent} from '@layouts/components/topbar/components/user-p
         NgIcon,
         RouterLink,
         LucideAngularModule,
+        NgbTooltipModule,
         CustomizerTogglerComponent,
         ThemeTogglerComponent,
         UserProfileComponent
@@ -35,6 +36,11 @@ export class TopbarComponent {
 
     Search = Search;
     private activeModal: NgbModalRef | null = null;
+
+    sidebarIcon = computed(() => {
+        const size = this.layout.state().sidenav.size;
+        return size === 'condensed' ? 'tablerLayoutSidebarLeftExpand' : 'tablerLayoutSidebarLeftCollapse';
+    });
 
     openSearch(event?: KeyboardEvent) {
         event?.preventDefault();

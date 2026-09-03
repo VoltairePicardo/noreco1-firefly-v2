@@ -27,6 +27,7 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -314,6 +315,70 @@ public class UserServiceImpl implements UserService {
             ex.printStackTrace();
         }
         return null; // Return null explicitly if no department found
+    }
+
+    @Override
+    @Transactional
+    public PostResponse updateProfile(Map<String, String> request) {
+        PostResponse response = new PostResponse();
+
+        User currentUser = authenticationFacade.getLoggedIn();
+        User user = userRepo.findById(currentUser.getId()).orElse(null);
+
+        if (user == null) {
+            response.setFailureMessage("User not found.");
+            return response;
+        }
+
+        String fullName    = request.get("fullName");
+        String username    = request.get("username");
+        String email       = request.get("email");
+        String currentPw   = request.get("currentPassword");
+        String newPassword = request.get("newPassword");
+        String retypePw    = request.get("retypePassword");
+
+        if (Checker.isStringNullAndEmpty(fullName) || Checker.isStringNullAndEmpty(username) || Checker.isStringNullAndEmpty(email)) {
+            response.setFailureMessage("Full name, username, and email are required.");
+            return response;
+        }
+
+        // Unique username check
+        User byUsername = userRepo.findOneByUsername(username);
+        if (byUsername != null && !byUsername.getId().equals(user.getId())) {
+            response.setFailureMessage("Username is already taken.");
+            return response;
+        }
+
+        // Unique email check
+        List<User> byEmail = userRepo.findByEmail(email);
+        boolean emailTaken = byEmail.stream().anyMatch(u -> !u.getId().equals(user.getId()));
+        if (emailTaken) {
+            response.setFailureMessage("Email is already in use by another account.");
+            return response;
+        }
+
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        boolean changingPassword = !Checker.isStringNullAndEmpty(newPassword);
+
+        if (changingPassword) {
+            String storedPassword = userRepo.findPasswordByUsername(user.getUsername());
+            if (Checker.isStringNullAndEmpty(currentPw) || !encoder.matches(currentPw, storedPassword)) {
+                response.setFailureMessage("Current password is incorrect.");
+                return response;
+            }
+            if (!newPassword.equals(retypePw)) {
+                response.setFailureMessage("New passwords do not match.");
+                return response;
+            }
+            String hashedNew = encoder.encode(newPassword);
+            userRepo.saveWithPassword(user.getId(), fullName, username, email, user.getEnabled(), user.getAccountNo(), hashedNew);
+        } else {
+            userRepo.saveWoPassword(user.getId(), fullName, username, email, user.getEnabled(), user.getAccountNo());
+        }
+
+        response.setSuccessMessage("Profile updated successfully.");
+        response.setModelId(user.getId());
+        return response;
     }
 
     private void saveAttachments(HttpServletRequest request) {

@@ -1,7 +1,6 @@
 package com.noreco1.fireflyv2.controller.response;
 
 import com.noreco1.fireflyv2.model.Menu;
-import com.noreco1.fireflyv2.model.Route;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,8 +14,8 @@ public class MenuDto {
     private String state;
     private String title;
     private String iconClass;
+    private String url;
     private Menu parentMenu;
-    private Route viewRoute;
     private List<MenuDto> subMenus = new ArrayList<>();
 
     public int getId() {
@@ -67,11 +66,11 @@ public class MenuDto {
         this.subMenus = subMenus;
     }
 
-    public Route getViewRoute() {
-        return viewRoute;
+    public String getUrl() {
+        return url;
     }
 
-    public void setViewRoute(Route viewRoute) {
-        this.viewRoute = viewRoute;
+    public void setUrl(String url) {
+        this.url = url;
     }
 }

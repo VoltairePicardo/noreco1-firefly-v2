@@ -91,4 +91,12 @@ export class UserService {
         return this.http.post(USER_API + '/change-password', payload, httpOptions);
     }
 
+    getSelfProfile(): Observable<any> {
+        return this.http.get(USER_API + '/profile');
+    }
+
+    updateSelfProfile(payload: any): Observable<any> {
+        return this.http.post(USER_API + '/update-profile', payload, httpOptions);
+    }
+
 }

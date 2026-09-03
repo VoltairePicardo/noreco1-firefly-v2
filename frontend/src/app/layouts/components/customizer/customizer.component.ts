@@ -94,8 +94,7 @@ export class CustomizerComponent {
         {skin: "modern", image: modernImg},
         {skin: "saas", image: saasImg},
         {skin: "flat", image: flatImg},
-        {skin: "minimal", image: minimalImg},
-        {skin: "galaxy", image: galaxyImg, disabled: true}
+        {skin: "minimal", image: minimalImg}
     ]
 
     themeOptions: ThemeOptionType[] = [

@@ -124,7 +124,7 @@
                                                placeholder="Browse purchase order..."/>
                                         <button type="button" class="btn btn-success fw-bold"
                                                 (click)="openPOBrowse()">
-                                            <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
+                                            <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
                                         </button>
                                     </div>
                                 </div>
@@ -141,7 +141,7 @@
                                                placeholder="Browse job order..."/>
                                         <button type="button" class="btn btn-success fw-bold"
                                                 (click)="openJOBrowse()">
-                                            <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
+                                            <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
                                         </button>
                                     </div>
                                 </div>
@@ -158,7 +158,7 @@
                                                placeholder="Browse supplier..."/>
                                         <button type="button" class="btn btn-success fw-bold"
                                                 (click)="openSupplierBrowse()">
-                                            <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
+                                            <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
                                         </button>
                                     </div>
                                 </div>
@@ -170,9 +170,9 @@
                         <div class="d-flex align-items-center justify-content-between mb-2">
                             <span class="fs-xs text-uppercase fw-semibold text-muted">Items Received</span>
                             @if (isIFR() || isRV()) {
-                                <button type="button" class="btn btn-success btn-sm fw-bold"
+                                <button type="button" class="btn btn-primary fw-bold"
                                         (click)="addIFRRow()">
-                                    <ng-icon name="tablerPlus" class="ps-0 pe-2 fw-bold"></ng-icon>Add Row
+                                    <ng-icon name="tablerPlus" class="ps-0 pe-3 fw-bold"></ng-icon>Add Row
                                 </button>
                             }
                         </div>
@@ -360,7 +360,7 @@
                                            readonly placeholder="Browse noted by..."/>
                                     <button type="button" class="btn btn-success fw-bold"
                                             (click)="openSignatoryBrowse('notedBy')">
-                                        <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
+                                        <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
                                     </button>
                                 </div>
                             </div>
@@ -373,7 +373,7 @@
                                            readonly placeholder="Browse approved by..."/>
                                     <button type="button" class="btn btn-success fw-bold"
                                             (click)="openSignatoryBrowse('approvedBy')">
-                                        <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
+                                        <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
                                     </button>
                                 </div>
                             </div>

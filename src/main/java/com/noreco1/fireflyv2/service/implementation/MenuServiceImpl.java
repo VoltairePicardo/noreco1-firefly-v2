@@ -37,7 +37,7 @@ public class MenuServiceImpl implements MenuService {
             menuDto.setState(menu.getState());
             menuDto.setTitle(menu.getTitle());
             menuDto.setParentMenu(menu.getParentMenu());
-            menuDto.setViewRoute(menu.getViewRoute());
+            menuDto.setUrl(menu.getUrl());
 
             if (menu.getParentMenu() == null || menu.getParentMenu().getId() == 0) {
                 menuDto.setSubMenus(this.getChildren(menus, menu.getId()));
@@ -66,7 +66,7 @@ public class MenuServiceImpl implements MenuService {
             menuDto.setIconClass(menu.getIconClass());
             menuDto.setState(menu.getState());
             menuDto.setTitle(menu.getTitle());
-            menuDto.setViewRoute(menu.getViewRoute());
+            menuDto.setUrl(menu.getUrl());
             menuDto.setParentMenu(menu.getParentMenu());
 
             if (menu.getParentMenu() == null || menu.getParentMenu().getId() == 0) {
@@ -92,7 +92,7 @@ public class MenuServiceImpl implements MenuService {
                     menuDto.setParentMenu(menu.getParentMenu());
                     menuDto.setState(menu.getState());
                     menuDto.setTitle(menu.getTitle());
-                    menuDto.setViewRoute(menu.getViewRoute());
+                    menuDto.setUrl(menu.getUrl());
 
                     menuDtoChildren.add(menuDto);
                 }

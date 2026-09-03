@@ -158,14 +158,14 @@ export class SearchModalComponent implements AfterViewInit {
     activeIndex = signal(0);
 
     private allMenus = computed<MenuSearchResult[]>(() => {
-        const menus: any[] = this.auth.getUser()?.menus ?? [];
+        const menus: any[] = this.auth.getMenus();
         return menus
-            .filter(m => m.link)
+            .filter(m => m.url)
             .map(m => ({
-                text: m.text,
+                text: m.title,
                 parentMenuText: this.buildParentText(m),
-                link: m.link,
-                icon: m.icon,
+                link: m.url,
+                icon: m.iconClass,
             }));
     });
 
@@ -221,7 +221,7 @@ export class SearchModalComponent implements AfterViewInit {
         const parts: string[] = [];
         let p = menu.parentMenu;
         while (p) {
-            parts.unshift(p.text ?? '');
+            parts.unshift(p.title ?? '');
             p = p.parentMenu;
         }
         return parts.join('|');

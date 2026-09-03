@@ -25,12 +25,14 @@
             </div>
 
             <!-- Sidebar Menu Toggle Button -->
-            <button (click)="toggleSidebar()" class="sidenav-toggle-button btn btn-primary btn-icon">
-                <ng-icon name="tablerMenu4" class="fs-22"/>
+            <button (click)="toggleSidebar()" class="sidenav-toggle-button btn btn-default btn-icon"
+                    [ngbTooltip]="layout.sidenavSize === 'condensed' ? 'Expand Sidebar' : 'Collapse Sidebar'"
+                    placement="bottom">
+                <ng-icon [name]="sidebarIcon()" class="fs-22"/>
             </button>
 
             <!-- Search -->
-            <div class="app-search d-none d-xl-flex position-relative" (click)="openSearch()">
+            <div class="app-search d-none d-xl-flex position-relative" style="width: 450px" (click)="openSearch()">
                 <input type="search" class="form-control topbar-search pe-5"
                        placeholder="Search modules..."
                        readonly

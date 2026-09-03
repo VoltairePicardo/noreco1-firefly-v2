@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping(value = "/api/user")
@@ -93,6 +94,11 @@ public class UserController {
                                HttpServletRequest request) {
 
         return userService.processUpdate(user, bindingResult, messageSource, request);
+    }
+
+    @PostMapping(value = "/update-profile")
+    public PostResponse updateProfile(@RequestBody Map<String, String> request) {
+        return userService.updateProfile(request);
     }
 
     @GetMapping(value = "/default-department")
