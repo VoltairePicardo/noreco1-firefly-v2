@@ -60,7 +60,7 @@ public class ItemTestingController {
         return itemTestingService.delete(id);
     }
 
-    @PostMapping("/delete/{id}")
+    /*@PostMapping("/delete/{id}")
     public PostResponse delete(@PathVariable Integer id) {
         return itemTestingService.delete(id);
     }
@@ -74,5 +74,5 @@ public class ItemTestingController {
         JRDataSource dataSource = printableVoucher.datasource(id);
         String template = GlobalConstant.JASPER_BASE_PATH + "/inventory/ItemTestingAcknowledgement.jrxml";
         downloadService.download(type, token, response, params, template, dataSource);
-    }
+    }*/
 }
