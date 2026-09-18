@@ -18,4 +18,9 @@ export const CA_LIQUIDATION_ROUTES: Routes = [
         loadComponent: () => import('./ca-liquidation-add-edit/ca-liquidation-add-edit.component').then(m => m.CaLiquidationAddEditComponent),
         data: { title: 'Edit CA Liquidation', mainPath }
     },
+    {
+        path: ':id/detail',
+        loadComponent: () => import('./ca-liquidation-detail/ca-liquidation-detail.component').then(m => m.CaLiquidationDetailComponent),
+        data: { title: 'CA Liquidation Detail', mainPath }
+    },
 ];

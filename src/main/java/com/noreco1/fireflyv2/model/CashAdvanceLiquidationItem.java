@@ -26,11 +26,13 @@ public class CashAdvanceLiquidationItem implements Serializable {
     @Column
     private Integer id;
 
+    @JsonIgnoreProperties(ignoreUnknown = true)
     @NotFound(action = NotFoundAction.IGNORE)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="FK_cashAdvanceLiquidationId")
     private CashAdvanceLiquidation cashAdvanceLiquidation;
 
+    @JsonIgnoreProperties(ignoreUnknown = true)
     @NotFound(action = NotFoundAction.IGNORE)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="FK_cashAdvanceParticularId")

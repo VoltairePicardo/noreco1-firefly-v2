@@ -651,6 +651,10 @@ public class CvServiceImpl implements CvService, PrintableVoucher, PrintableCheq
                 cvDto.setPurchaseOrder(checkVoucher.getPurchaseOrder());
                 cvDto.setJobOrder(checkVoucher.getJobOrder());
 
+                // Restore GL lines (with their SL splits + WHT metadata already attached
+                // per-line by the dtoer) so edit mode can repopulate the journal entries grid.
+                cvDto.setGeneralLedgerLines(ledgerDtoer.getGLAccountEntriesDtoByTrans(checkVoucher.getTransaction().getId(), false));
+
                 List<CheckVoucherIEMOPBilling> cvIemopBillings = checkVoucherIEMOPBillingRepo.findAllByCheckVoucherId(checkVoucher.getId());
                 List<IEMOPBilling> iemopBillings = new ArrayList<>();
                 if(!cvIemopBillings.isEmpty()){

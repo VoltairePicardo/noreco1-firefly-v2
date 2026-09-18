@@ -7,6 +7,7 @@ import com.noreco1.fireflyv2.common.helpers.DateHelper;
 import com.noreco1.fireflyv2.common.helpers.MessageFormatter;
 import com.noreco1.fireflyv2.common.helpers.ServiceUtil;
 import com.noreco1.fireflyv2.controller.form.PrepaymentVoucherLinkForm;
+import com.noreco1.fireflyv2.exception.BusinessException;
 import com.noreco1.fireflyv2.model.*;
 import com.noreco1.fireflyv2.model.DocumentType;
 import com.noreco1.fireflyv2.model.SLEntityClassification;
@@ -20,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.data.domain.*;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -388,6 +390,7 @@ public class PrepaymentServiceImpl implements PrepaymentService {
             ppDto.setBalance(pp.getBalance());
             ppDto.setStartMonth(pp.getStartMonth() != null ? pp.getStartMonth() - 1 : null); // js month starts at 0
             ppDto.setStartYear(pp.getStartYear());
+            ppDto.setCode(pp.getCode());
 
             if(pp.getStartMonth() != null) {
 
@@ -455,19 +458,15 @@ public class PrepaymentServiceImpl implements PrepaymentService {
         Prepayment prepayment = prepaymentRepo.findById(prepaymentId).orElse(null);
         if(prepayment != null) {
 
-            List<Object[]> objects = subLedgerRepo.sumDebitByTransNoAndAccountId(voucherTransId, prepaymentAccountId);
-            if(Checker.collectionIsNotEmpty(objects)) {
-                Object debitObj = objects.get(0);
+            BigDecimal totalCost = subLedgerRepo.sumDebitByTransNoAndAccountId(voucherTransId, prepaymentAccountId);
 
-                BigDecimal totalCost =  (BigDecimal) debitObj;
-                data.put("totalCost", totalCost);
+            data.put("totalCost", totalCost);
 
-                BigDecimal balance = totalCost.subtract(prepayment.getAppliedCost());
-                data.put("balance", balance);
+            BigDecimal balance = totalCost.subtract(prepayment.getAppliedCost());
+            data.put("balance", balance);
 
-                BigDecimal monthlyCost = totalCost.divide(new BigDecimal(prepayment.getNoOfMonths()), 2, RoundingMode.HALF_UP);
-                data.put("monthlyCost", monthlyCost);
-            }
+            BigDecimal monthlyCost = totalCost.divide(new BigDecimal(prepayment.getNoOfMonths()), 2, RoundingMode.HALF_UP);
+            data.put("monthlyCost", monthlyCost);
         }
 
         return data;
@@ -489,38 +488,30 @@ public class PrepaymentServiceImpl implements PrepaymentService {
     }
 
     @Override
+    @Transactional
     public PostResponse saveLink(PrepaymentVoucherLinkForm form, BindingResult bindingResult, MessageSource messageSource) {
         PostResponse response = new PostResponse();
 
-        try {
+        Prepayment prepayment = prepaymentRepo.findById(form.getPrepayment().getId())
+                .orElseThrow(() -> new BusinessException("Prepayment is not available.", HttpStatus.NOT_FOUND));
 
-            Prepayment prepayment = prepaymentRepo.findById(form.getPrepayment().getId()).orElse(null);
-            if(prepayment != null) {
+        prepayment.setTotalCost(form.getTotalCost());
+        prepayment.setMonthlyCost(form.getMonthlyCost());
+        prepayment.setBalance(form.getBalance());
 
-                prepayment.setTotalCost(form.getTotalCost());
-                prepayment.setMonthlyCost(form.getMonthlyCost());
-                prepayment.setBalance(form.getBalance());
+        prepaymentRepo.save(prepayment);
 
-                prepaymentRepo.save(prepayment);
+        PrepaymentVoucher prepaymentVoucher = new PrepaymentVoucher();
+        prepaymentVoucher.setTransaction(form.getVoucherTransaction());
+        prepaymentVoucher.setPrepayment(prepayment);
+        prepaymentVoucher.setDocumentType(form.getDocumentType());
+        prepaymentVoucher.setCreatedBy(authenticationFacade.getLoggedIn());
+        prepaymentVoucher.setCreatedAt(new Date());
 
-                PrepaymentVoucher prepaymentVoucher = new PrepaymentVoucher();
-                prepaymentVoucher.setTransaction(form.getVoucherTransaction());
-                prepaymentVoucher.setPrepayment(prepayment);
-                prepaymentVoucher.setDocumentType(form.getDocumentType());
-                prepaymentVoucher.setCreatedBy(authenticationFacade.getLoggedIn());
-                prepaymentVoucher.setCreatedAt(new Date());
+        prepaymentVoucherRepo.save(prepaymentVoucher);
 
-                prepaymentVoucherRepo.save(prepaymentVoucher);
-
-                response.setSuccessMessage("Prepayment & Voucher linked successfully.");
-
-            } else {
-                response.setFailureMessage("Prepayment is not available.");
-            }
-
-        }catch (Exception e) {
-            e.printStackTrace();
-        }
+        response.setSuccessMessage("Prepayment & Voucher linked successfully.");
+        response.setSuccess(Boolean.TRUE);
 
         return response;
     }

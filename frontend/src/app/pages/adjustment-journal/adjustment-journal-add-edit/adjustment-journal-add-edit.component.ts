@@ -108,10 +108,14 @@ export class AdjustmentJournalAddEditComponent {
                     this.voucherDate     = data.voucherDate ? new Date(data.voucherDate).toISOString().substring(0, 10) : '';
                     this.explanation     = data.explanation || data.remarks || '';
                     this.transactionType = data.transactionType || 'Adjustment';
-                    this.journalEntries  = (data.journalEntries || data.details || []).map((e: any): JournalEntry => ({
-                        account:         e.account || (e.code ? { accountCode: e.code, accountTitle: e.description, id: e.accountId } : null),
-                        debit:           Number(e.debit ?? e.debitAmount) || null,
-                        credit:          Number(e.credit ?? e.creditAmount) || null,
+                    this.journalEntries  = (data.generalLedgerLines || []).map((e: any): JournalEntry => ({
+                        account: {
+                            id:           e.accountId,
+                            accountCode:  e.code,
+                            accountTitle: e.description
+                        },
+                        debit:           Number(e.debit)  || null,
+                        credit:          Number(e.credit) || null,
                         applyAllocation: e.applyAllocation || false,
                         allocationPct:   e.allocationPct   ?? null,
                         applyWht:        e.applyWht        || false,

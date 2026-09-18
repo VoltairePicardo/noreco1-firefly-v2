@@ -23,12 +23,6 @@
                                    [(ngModel)]="voucherDate" [ngModelOptions]="{ standalone: true }"
                                    placeholder="Select date"/>
                         </div>
-                        <div class="col-md-7">
-                            <label class="form-label fw-bold">Explanation / Remarks</label>
-                            <textarea class="form-control" rows="2"
-                                   [(ngModel)]="explanation" [ngModelOptions]="{ standalone: true }"
-                                   placeholder="Enter explanation or remarks..."></textarea>
-                        </div>
                         <div class="col-md-2">
                             <label class="form-label fw-bold d-block">Payable</label>
                             <div class="form-check form-switch mt-2">
@@ -37,9 +31,15 @@
                                 <label class="form-check-label" for="payableSwitch">{{ payable ? 'Yes' : 'No' }}</label>
                             </div>
                         </div>
+                        <div class="col-md-8">
+                            <label class="form-label fw-bold">Explanation / Remarks</label>
+                            <textarea class="form-control" rows="3"
+                                   [(ngModel)]="explanation" [ngModelOptions]="{ standalone: true }"
+                                   placeholder="Enter explanation or remarks..."></textarea>
+                        </div>
                     </div>
 
-                    <hr class="mt-4"/>
+                    <hr class="border-dashed mx-n3 mt-3"/>
 
                     <!-- Temp GL/SL -->
                     <div class="row mt-3">
@@ -105,6 +105,66 @@
                         </div>
                     </div>
 
+                    <!-- Credit Card Purchase Request Batch -->
+                    <div class="row mt-3">
+                        <div class="col-12">
+                            <div class="alert alert-secondary p-3 mb-0">
+                                <div class="d-flex align-items-start gap-3">
+                                    <div class="flex-grow-1">
+                                        @if (!ccprBatch) {
+                                            <span class="text-muted fs-sm">You may select a Credit Card Purchase Request batch to pre-fill journal entries.</span>
+                                        } @else {
+                                            <div class="row g-1 fs-sm">
+                                                <div class="col-md-4">
+                                                    <span class="text-muted">Batch:</span>
+                                                    <strong class="ms-1">#{{ ccprBatch.id }}</strong>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <span class="text-muted">Status:</span>
+                                                    <span class="ms-1">{{ ccprBatch.status ? 'Active' : 'Closed' }}</span>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <span class="text-muted">Created:</span>
+                                                    <span class="ms-1">{{ ccprBatch.createdAt | date:'MMM d, yyyy' }}</span>
+                                                </div>
+                                            </div>
+                                        }
+                                        @if (showCcprList) {
+                                            <div class="mt-2">
+                                                @if (loadingCcprBatches) {
+                                                    <span class="spinner-border spinner-border-sm me-2 text-muted"></span>
+                                                    <span class="text-muted fs-sm">Loading batches...</span>
+                                                } @else if (ccprBatches.length > 0) {
+                                                    <select class="form-select form-select-sm" (change)="onCcprBatchSelect($event)">
+                                                        <option value="">— Select a batch —</option>
+                                                        @for (b of ccprBatches; track b.id) {
+                                                            <option [value]="b.id">
+                                                                Batch #{{ b.id }} — {{ b.status ? 'Active' : 'Closed' }}
+                                                            </option>
+                                                        }
+                                                    </select>
+                                                } @else {
+                                                    <span class="text-muted fs-sm">No batches available.</span>
+                                                }
+                                            </div>
+                                        }
+                                    </div>
+                                    <div class="d-flex gap-2 flex-shrink-0">
+                                        <button type="button" class="btn btn-success fw-bold"
+                                                [disabled]="loadingCcprBatches" (click)="openCcprBrowse()">
+                                            @if (loadingCcprBatches) {
+                                                <span class="spinner-border spinner-border-sm me-1"></span>
+                                            } @else {
+                                                <ng-icon name="tablerDatabase" class="ps-0 pe-3 fw-bold"></ng-icon>
+                                            }
+                                            Browse CCPR Batch
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="row mt-3">
                         <div class="col-12">
                             <div class="alert alert-secondary p-3 mb-0">
@@ -114,13 +174,18 @@
                                             <span class="text-muted fs-sm">You may select a document to pre-fill journal entries.</span>
                                         } @else {
                                             <div class="row g-1 fs-sm">
+                                                @if (selectedIsCal) {
+                                                    <div class="col-12 mb-1">
+                                                        <span class="badge bg-info-subtle text-info fw-bold">Cash Advance Liquidation</span>
+                                                    </div>
+                                                }
                                                 <div class="col-md-3">
                                                     <span class="text-muted">Code:</span>
                                                     <strong class="ms-1">{{ selectedDocument.localCode || selectedDocument.code }}</strong>
                                                 </div>
                                                 <div class="col-md-3">
                                                     <span class="text-muted">Amount:</span>
-                                                    <strong class="ms-1">{{ selectedDocument.netAmount | number:'1.2-2' }}</strong>
+                                                    <strong class="ms-1">{{ (selectedDocument.netAmount ?? selectedDocument.totalReturnedAmount ?? selectedDocument.amount) | number:'1.2-2' }}</strong>
                                                 </div>
                                                 <div class="col-md-3">
                                                     <span class="text-muted">Date:</span>
@@ -128,7 +193,7 @@
                                                 </div>
                                                 <div class="col-md-3">
                                                     <span class="text-muted">Particulars:</span>
-                                                    <span class="ms-1">{{ selectedDocument.particulars || '—' }}</span>
+                                                    <span class="ms-1">{{ selectedDocument.particulars || selectedDocument.remarks || '—' }}</span>
                                                 </div>
                                             </div>
                                             @if (loadingDocEntries) {
@@ -149,12 +214,12 @@
                         </div>
                     </div>
 
-                    <hr class="mt-4"/>
+                    <hr class="border-dashed mx-n3 mt-3"/>
 
                     <!-- Journal Entries (reuse shared JournalEntriesFormComponent) -->
                     <div class="row mt-3">
                         <div class="col-12">
-                            <app-journal-entries-form [entries]="journalEntries"/>
+                            <app-journal-entries-form [entries]="journalEntries" [voucherDate]="voucherDate"/>
                             @if (journalEntries.length > 0 && !isBalanced) {
                                 <div class="text-danger text-center fs-xs fw-bold py-1 mt-1">
                                     Debit and credit totals must be equal.
@@ -163,7 +228,7 @@
                         </div>
                     </div>
 
-                    <hr class="mt-4"/>
+                    <hr class="border-dashed mx-n3 mt-3"/>
 
                     <!-- Signatories -->
                     <div class="row mt-3">
@@ -189,7 +254,7 @@
                         }
                     </div>
 
-                    <hr class="mt-4"/>
+                    <hr class="border-dashed mx-n3 mt-3"/>
 
                     <!-- Attachments -->
                     <div class="row mt-3">
@@ -227,7 +292,9 @@
                         </div>
                     </div>
 
-                    <div class="d-flex gap-2 justify-content-end align-items-center pt-3 border-top mt-3">
+                    <hr class="border-dashed mx-n3 mt-3"/>
+
+                    <div class="d-flex gap-2 justify-content-end align-items-center mt-3">
                         <a [routerLink]="['/' + menuLink]" class="btn btn-light fw-bold">
                             <ng-icon name="tablerArrowLeft" class="ps-0 pe-3 fw-bold"></ng-icon>Back
                         </a>

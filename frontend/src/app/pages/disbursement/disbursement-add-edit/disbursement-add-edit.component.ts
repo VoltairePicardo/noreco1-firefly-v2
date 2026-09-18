@@ -139,11 +139,33 @@ export class DisbursementAddEditComponent {
                     this.payee               = data.payee               || null;
                     this.selectedBankAccount = data.bankAccount         || null;
 
-                    this.journalEntries = (data.journalEntries || data.details || []).map((e: any) => ({
-                        account: e.account || null,
-                        debit:   Number(e.debitAmount  || e.debit)  || null,
-                        credit:  Number(e.creditAmount || e.credit) || null,
-                    }));
+                    this.journalEntries = (data.generalLedgerLines || []).map((line: any) => {
+                        // The backend currently attaches the transaction's wTaxEntry to every
+                        // GL line (a pre-existing quirk), so only the line whose account actually
+                        // matches the ATC's WHT account is flagged as the auto-generated WHT row.
+                        const whtAccountId = line.wTaxEntry?.atc?.account?.id;
+                        const isWhtRow = whtAccountId != null && whtAccountId === line.accountId;
+
+                        return {
+                            account: {
+                                id: line.accountId,
+                                accountCode: line.code,
+                                accountTitle: line.description,
+                                hasSL: line.hasSL
+                            },
+                            debit:  Number(line.debit)  || null,
+                            credit: Number(line.credit) || null,
+                            slentries: (line.slentries || []).map((sl: any) => ({
+                                entity: null,
+                                accountNo: sl.accountNo,
+                                name: sl.name,
+                                debit:  Number(sl.debit)  || null,
+                                credit: Number(sl.credit) || null
+                            })),
+                            generated: isWhtRow,
+                            wTaxEntry: isWhtRow ? line.wTaxEntry : null
+                        };
+                    });
                     if (this.journalEntries.length === 0) this.addEntry();
 
                     this.iemopBillings = data.iemopBillings || [];
@@ -322,12 +344,40 @@ export class DisbursementAddEditComponent {
             this.alertService.warning(this.module, 'Validation', 'Please select a payee.');
             return;
         }
+        if (this.checkAmount == null || isNaN(Number(this.checkAmount))) {
+            this.alertService.warning(this.module, 'Validation', 'Please enter check amount.');
+            return;
+        }
+        if (!this.particulars || this.particulars.trim() === '') {
+            this.alertService.warning(this.module, 'Validation', 'Please enter particulars.');
+            return;
+        }
+
+        const requiredSignatoryKeys = ['checker', 'budgetOfficer', 'recommendingApproval', 'auditingOfficer', 'checkPrinter', 'approvingOfficer'];
+        const missingSignatory = requiredSignatoryKeys.find(key => !this.signatories[key]);
+        if (missingSignatory) {
+            this.alertService.warning(this.module, 'Validation', `Please select ${this.signatoryLabels[missingSignatory]}.`);
+            return;
+        }
+
         if (this.journalEntries.length === 0) {
             this.alertService.warning(this.module, 'Validation', 'Please add at least one journal entry.');
             return;
         }
         if (!this.isBalanced) {
             this.alertService.warning(this.module, 'Validation', 'Debit and credit totals must be equal.');
+            return;
+        }
+        if (this.totalDebit <= 0 || this.totalCredit <= 0) {
+            this.alertService.warning(this.module, 'Validation', 'Journal entries totals must be greater than zero.');
+            return;
+        }
+
+        const missingSl = this.journalEntries.find(e =>
+            !e.generated && e.account?.hasSL && !(e.slentries && e.slentries.length > 0)
+        );
+        if (missingSl) {
+            this.alertService.warning(this.module, 'Validation', `SL entry is required for ${missingSl.account?.accountTitle || 'the selected account'}.`);
             return;
         }
 
@@ -351,8 +401,21 @@ export class DisbursementAddEditComponent {
                 description: e.account?.accountTitle || '',
                 accountId:   e.account?.id           || null,
                 debit:       Number(e.debit)         || 0,
-                credit:      Number(e.credit)        || 0
+                credit:      Number(e.credit)        || 0,
+                hasSL:       !!e.account?.hasSL,
+                wTaxEntry:   e.wTaxEntry || null,
+                vatEntry:    e.vatEntry  || null
             })),
+            // SL split lines live on the voucher, not nested in each GL line — the backend
+            // (LedgerFacadeImpl.postGeneralLedger) matches them back to their GL line by accountId.
+            subLedgerLines: this.journalEntries.flatMap(e =>
+                (e.slentries || []).map(sl => ({
+                    accountId: e.account?.id ?? null,
+                    accountNo: sl.accountNo,
+                    debit:     Number(sl.debit)  || 0,
+                    credit:    Number(sl.credit) || 0
+                }))
+            ),
             iemopBillings:       this.iemopBillings.map(b => ({ id: b.id })),
             checker:              sigRef('checker'),
             budgetOfficer:        sigRef('budgetOfficer'),

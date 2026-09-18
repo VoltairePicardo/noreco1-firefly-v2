@@ -4,12 +4,13 @@ import { AlertService } from '@/app/shared/services/alert.service';
 import { COMMON_ALL_PAGE_IMPORTS, COMMON_MAIN_PAGE_IMPORTS, SHARED_PROVIDERS } from '@/app/shared/providers/shared-providers';
 import { GeneralJournalService } from '../general-journal.service';
 import { provideIcons } from '@ng-icons/core';
-import { tablerArrowLeft, tablerPrinter, tablerEdit, tablerEye, tablerEyeOff, tablerCheck } from '@ng-icons/tabler-icons';
+import { NgbCollapse } from '@ng-bootstrap/ng-bootstrap';
+import { tablerArrowLeft, tablerPrinter, tablerEdit, tablerEye, tablerEyeOff, tablerCheck, tablerChevronDown, tablerChevronRight } from '@ng-icons/tabler-icons';
 
 @Component({
     selector: 'app-general-journal-detail',
-    imports: [...COMMON_ALL_PAGE_IMPORTS, ...COMMON_MAIN_PAGE_IMPORTS],
-    providers: [...SHARED_PROVIDERS, provideIcons({ tablerArrowLeft, tablerPrinter, tablerEdit, tablerEye, tablerEyeOff, tablerCheck })],
+    imports: [...COMMON_ALL_PAGE_IMPORTS, ...COMMON_MAIN_PAGE_IMPORTS, NgbCollapse],
+    providers: [...SHARED_PROVIDERS, provideIcons({ tablerArrowLeft, tablerPrinter, tablerEdit, tablerEye, tablerEyeOff, tablerCheck, tablerChevronDown, tablerChevronRight })],
     templateUrl: './general-journal-detail.component.html'
 })
 export class GeneralJournalDetailComponent {
@@ -52,7 +53,25 @@ export class GeneralJournalDetailComponent {
                 this.isLoading.set(false);
                 if (data?.id) {
                     this.data = data;
-                    this.journalEntries = data.journalEntries || data.details || [];
+                    const rawEntries: any[] = data.journalEntries || data.details || [];
+                    // SL sub-rows are flattened into the same list, right after their parent
+                    // GL row, with "&nbsp;"-prefixed labels and amounts in slDebitAmount/
+                    // slCreditAmount instead of glDebitAmount/glCreditAmount — regroup them
+                    // under their parent so they can be shown in a collapsible breakdown
+                    this.journalEntries = [];
+                    for (const e of rawEntries) {
+                        const isSlEntry = e.glDebitAmount == null && e.glCreditAmount == null;
+                        const cleaned = {
+                            ...e,
+                            accountCode:  String(e.accountCode || '').replace(/(&nbsp;)+/g, '').trim(),
+                            accountTitle: String(e.accountTitle || '').replace(/(&nbsp;)+/g, '').trim(),
+                        };
+                        if (isSlEntry) {
+                            this.journalEntries[this.journalEntries.length - 1]?.slEntries.push(cleaned);
+                        } else {
+                            this.journalEntries.push({ ...cleaned, slEntries: [], expanded: false });
+                        }
+                    }
                     this.loadWorkflowActions();
                     this.loadAttachments();
                 } else {

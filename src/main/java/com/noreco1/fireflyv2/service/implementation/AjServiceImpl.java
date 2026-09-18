@@ -604,6 +604,7 @@ public class AjServiceImpl implements AjService, PrintableVoucher {
 
         if (adjustmentJournal.getTransaction() != null) {
             map.put("journalEntries", ledgerDtoers.getVoucherLedgerLines(adjustmentJournal.getTransaction().getId()));
+            map.put("generalLedgerLines", ledgerDtoers.getGLAccountEntriesDtoByTrans(adjustmentJournal.getTransaction().getId(), false));
         }
 
         return map;

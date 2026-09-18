@@ -1,0 +1,231 @@
+<div class="container-fluid">
+    <app-page-title [title]="module" [subTitle]="subModule" [menuLink]="menuLink"/>
+</div>
+
+@if (isLoading()) {
+    <div class="card"><div class="card-body text-center py-4">
+        <span class="spinner-border spinner-border-sm me-2" role="status"></span>Loading...
+    </div></div>
+} @else {
+
+<div class="card mb-3">
+    <div class="card-body">
+
+        <!-- Actions -->
+        <div class="d-flex gap-2 justify-content-end align-items-center pt-3 mt-3">
+            <a [routerLink]="['/' + menuLink]" class="btn btn-light fw-bold">
+                <ng-icon name="tablerArrowLeft" class="ps-0 pe-3 fw-bold"></ng-icon>Back
+            </a>
+            <button type="button" class="btn btn-success fw-bold" (click)="print()">
+                <ng-icon name="tablerPrinter" class="ps-0 pe-3 fw-bold"></ng-icon>Print
+            </button>
+            @if (isEditable()) {
+                <a class="btn btn-primary fw-bold" [routerLink]="['/' + menuLink, id, 'edit']">
+                    <ng-icon name="tablerEdit" class="ps-0 pe-3 fw-bold"></ng-icon>Edit
+                </a>
+            }
+        </div>
+
+        <!-- Workflow Actions -->
+        @if (workflowActions.length > 0) {
+            <hr class="my-3"/>
+            <div class="fs-xs text-uppercase fw-semibold text-muted mb-2">Process Document</div>
+            <div class="row g-3 align-items-end">
+                <div class="col-md-3">
+                    <label class="form-label fw-bold">Action</label>
+                    <select class="form-select" [(ngModel)]="selectedAction">
+                        <option [ngValue]="null">— Select Action —</option>
+                        @for (a of workflowActions; track a.actionMapId) {
+                            <option [ngValue]="a">{{ a.action }}</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-bold">Remarks <span class="text-muted fw-normal">(optional)</span></label>
+                    <textarea rows="1" class="form-control" [(ngModel)]="remarks" placeholder="Enter remarks"></textarea>
+                </div>
+                <div class="col-md-2">
+                    <button type="button" class="btn btn-primary fw-bold"
+                            (click)="processWorkflow()"
+                            [disabled]="!selectedAction || processingWorkflow">
+                        @if (processingWorkflow) {
+                            <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                        } @else {
+                            <ng-icon name="tablerCheck" class="ps-0 pe-3 fw-bold"></ng-icon>
+                        }
+                        Process
+                    </button>
+                </div>
+            </div>
+        }
+
+        <hr class="my-3"/>
+
+        <!-- Header Info -->
+        <div class="row g-3">
+            <div class="col-md-3">
+                <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Code</div>
+                <div class="fw-bold fs-5">{{ data.code || '—' }}</div>
+            </div>
+            <div class="col-md-3">
+                <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Status</div>
+                <span class="badge"
+                      [ngClass]="isEditable() ? 'bg-secondary bg-opacity-25 text-dark border' : 'bg-success bg-opacity-25 text-success border'">
+                    {{ data.documentStatus?.status || 'N/A' }}
+                </span>
+            </div>
+            <div class="col-md-3">
+                <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Voucher Date</div>
+                <div>{{ data.voucherDate | date:'MMMM d, yyyy' }}</div>
+            </div>
+            <div class="col-md-3">
+                <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Office</div>
+                <div>{{ data.office?.name || '—' }}</div>
+            </div>
+        </div>
+        <div class="row g-3 mt-1">
+            <div class="col-md-3">
+                <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Cash Advance</div>
+                <div>{{ data.cashAdvance?.code || '—' }}</div>
+            </div>
+            <div class="col-md-3">
+                <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Employee</div>
+                <div>{{ data.cashAdvance?.employee?.fullName || data.cashAdvance?.employee?.name || '—' }}</div>
+            </div>
+            <div class="col-md-3">
+                <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Total Amount</div>
+                <div class="fw-bold">{{ data.amount | number:'1.2-2' }}</div>
+            </div>
+            <div class="col-md-3">
+                <div class="fs-xs text-uppercase fw-bold text-muted mb-1">For Clearing</div>
+                <div>{{ data.forClearing ? 'Yes' : 'No' }}</div>
+            </div>
+        </div>
+        <div class="row g-3 mt-1">
+            <div class="col-md-6">
+                <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Remarks</div>
+                <div>{{ data.remarks || '—' }}</div>
+            </div>
+            <div class="col-md-3">
+                <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Prepared By</div>
+                <div>{{ data.createdBy?.fullName || '—' }}</div>
+            </div>
+            <div class="col-md-3">
+                <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Created On</div>
+                <div>{{ data.createdAt | date:'MMMM d, yyyy h:mm a' }}</div>
+            </div>
+        </div>
+
+        <!-- Signatories -->
+        <hr class="my-3"/>
+        <div class="fs-xs text-uppercase fw-semibold text-muted mb-2">Signatories</div>
+        <div class="row g-3">
+            <div class="col-md-4">
+                <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Recommending Approval</div>
+                <div>{{ data.recommendedBy?.name || data.recommendedBy?.fullName || '—' }}</div>
+            </div>
+            <div class="col-md-4">
+                <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Approving Officer</div>
+                <div>{{ data.approvingOfficer?.name || data.approvingOfficer?.fullName || '—' }}</div>
+            </div>
+        </div>
+
+        <!-- Items -->
+        <hr class="my-3"/>
+        <div class="fs-xs text-uppercase fw-semibold text-muted mb-2">Liquidation Items</div>
+        <div class="table-responsive">
+            <table class="table table-custom table-centered table-hover w-100 mb-0">
+                <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                    <tr class="text-uppercase fs-xxs">
+                        <th>Date</th>
+                        <th>Description</th>
+                        <th class="text-end">Quantity</th>
+                        <th>Unit</th>
+                        <th class="text-end">Amount</th>
+                        <th class="text-end">Total</th>
+                        <th class="text-end">Returned Amount</th>
+                        <th>OR Number</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (items.length > 0) {
+                        @for (item of items; track $index) {
+                            <tr>
+                                <td>{{ item.cashAdvanceParticular?.date | date:'MMM d, yyyy' }}</td>
+                                <td>{{ item.cashAdvanceParticular?.particular }}</td>
+                                <td class="text-end">{{ item.cashAdvanceParticular?.quantity }}</td>
+                                <td>{{ item.cashAdvanceParticular?.unit?.code || '—' }}</td>
+                                <td class="text-end">{{ item.cashAdvanceParticular?.amount | number:'1.2-2' }}</td>
+                                <td class="text-end">{{ item.cashAdvanceParticular?.total | number:'1.2-2' }}</td>
+                                <td class="text-end fw-bold">{{ item.amount | number:'1.2-2' }}</td>
+                                <td>{{ item.orNumber || '—' }}</td>
+                            </tr>
+                        }
+                        <tr class="fw-bold">
+                            <td colspan="4" class="text-end text-uppercase fs-xs">Totals</td>
+                            <td class="text-end">{{ totalOriginalAmount | number:'1.2-2' }}</td>
+                            <td></td>
+                            <td class="text-end">{{ totalReturnedAmount | number:'1.2-2' }}</td>
+                            <td></td>
+                        </tr>
+                    } @else {
+                        <tr>
+                            <td colspan="8" class="text-center text-muted py-3">No items found.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</div>
+
+<!-- Document Logs -->
+<div class="mt-3">
+    <button type="button" class="btn btn-light fw-bold" (click)="toggleLogs()">
+        <ng-icon [name]="showLogs ? 'tablerEyeOff' : 'tablerEye'" class="ps-0 pe-3 fw-bold"></ng-icon>
+        {{ showLogs ? 'Hide' : 'Show' }} Document Logs
+    </button>
+    @if (showLogs) {
+        <div class="card mt-2">
+            <div class="card-body">
+                @if (logsLoading) {
+                    <div class="text-center py-3">
+                        <span class="spinner-border spinner-border-sm me-2"></span>Loading logs...
+                    </div>
+                } @else if (logs.length === 0) {
+                    <p class="text-muted mb-0">No logs found.</p>
+                } @else {
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover w-100 mb-0">
+                            <thead class="bg-light bg-opacity-50">
+                                <tr class="text-uppercase fs-xxs text-muted">
+                                    <th class="text-nowrap">Date</th>
+                                    <th class="text-nowrap">By</th>
+                                    <th class="text-nowrap">Status</th>
+                                    <th>Remarks</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @for (log of logs; track $index) {
+                                    <tr class="align-middle">
+                                        <td class="text-nowrap text-muted fs-xs">{{ log.createdAt | date:'MM/dd/yyyy hh:mm a' }}</td>
+                                        <td class="text-nowrap">{{ log.createdBy?.fullName || '—' }}</td>
+                                        <td class="text-nowrap">
+                                            <span class="badge bg-secondary bg-opacity-25 text-dark border">
+                                                {{ log.action || '—' }}
+                                            </span>
+                                        </td>
+                                        <td>{{ log.remarks || '—' }}</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</div>
+
+} <!-- end !isLoading -->

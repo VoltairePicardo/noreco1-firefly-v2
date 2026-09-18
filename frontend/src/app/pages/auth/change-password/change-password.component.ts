@@ -108,7 +108,7 @@ function confirmPasswordValidator(group: AbstractControl): ValidationErrors | nu
                                     </div>
                                 </div>
 
-                                <hr/>
+                                <hr class="border-dashed mx-n3 mt-3"/>
                                 <div class="text-end">
                                     <button
                                         type="button"

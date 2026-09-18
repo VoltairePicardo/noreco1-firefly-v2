@@ -85,7 +85,7 @@ public class CashAdvanceController {
         return cashAdvanceService.findById(id);
     }
 
-    @RequestMapping(value = "/create", method = RequestMethod.POST, consumes = {"multipart/form-data"})
+    @PostMapping(value = "/create", consumes = {"multipart/form-data"})
     public PostResponse create(@RequestPart("model") @Valid CashAdvance cashAdvance,
                                BindingResult bindingResult, HttpServletRequest request) {
         PostResponse response = cashAdvanceService.processCreate(cashAdvance, bindingResult, messageSource, request);
@@ -95,7 +95,7 @@ public class CashAdvanceController {
         return response;
     }
 
-    @RequestMapping(value = "/update", method = RequestMethod.POST, consumes = {"multipart/form-data"})
+    @PostMapping(value = "/update", consumes = {"multipart/form-data"})
     public PostResponse update(@RequestPart(value = "filesToRemove", required = false) List<Map> filesToRemove,
                                @RequestPart("model") @Valid CashAdvance cashAdvance,
                                BindingResult bindingResult, HttpServletRequest request) {

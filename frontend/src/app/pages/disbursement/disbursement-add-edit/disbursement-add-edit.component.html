@@ -126,12 +126,14 @@
                         </div>
                     </div>
 
-                    <hr class="mt-4"/>
+                    <hr class="border-dashed mx-n3 mt-3"/>
 
                     <!-- GL Journal Entries -->
                     <div class="row mt-3">
                         <div class="col-12">
-                            <app-journal-entries-form [entries]="journalEntries"/>
+                            <app-journal-entries-form [entries]="journalEntries"
+                                                       [voucherDate]="voucherDate"
+                                                       [defaultEntity]="payee"/>
                             @if (journalEntries.length > 0 && !isBalanced) {
                                 <div class="text-danger text-center fs-xs fw-bold py-1 mt-1">
                                     Debit and credit totals must be equal.
@@ -140,7 +142,7 @@
                         </div>
                     </div>
 
-                    <hr class="mt-4"/>
+                    <hr class="border-dashed mx-n3"/>
 
                     <!-- IEMOP Billings -->
                     <div class="row mt-3">
@@ -204,7 +206,7 @@
                         </div>
                     </div>
 
-                    <hr class="mt-4"/>
+                    <hr class="border-dashed mx-n3 mt-3"/>
 
                     <!-- Signatories -->
                     <div class="row mt-3">
@@ -230,7 +232,7 @@
                         }
                     </div>
 
-                    <hr class="mt-4"/>
+                    <hr class="border-dashed mx-n3 mt-3"/>
 
                     <!-- Attachments -->
                     <div class="row mt-3">
@@ -268,7 +270,8 @@
                         </div>
                     </div>
 
-                    <div class="d-flex gap-2 justify-content-end align-items-center pt-3 border-top mt-3">
+                    <hr class="border-dashed mx-n3 mt-3"/>
+                    <div class="d-flex gap-2 justify-content-end align-items-center mt-3">
                         <a [routerLink]="['/' + menuLink]" class="btn btn-light fw-bold">
                             <ng-icon name="tablerArrowLeft" class="ps-0 pe-3 fw-bold"></ng-icon>Back
                         </a>

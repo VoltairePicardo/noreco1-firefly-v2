@@ -108,7 +108,18 @@
       "Bash(kill %1)",
       "Bash(./mvnw -q -o compile -Dmaven.compiler.showWarnings=false)",
       "Bash(./mvnw -o compile)",
-      "Bash(tee /tmp/compile_full.log)"
+      "Bash(tee /tmp/compile_full.log)",
+      "Bash(tee build_output.log)",
+      "Bash(echo \"---EXIT: $?---\")",
+      "Bash([ -f \"$f\" ])",
+      "Bash(perl -v)",
+      "Bash(cp frontend/src/app/pages/allocation-factor/allocation-factor-add-edit/allocation-factor-add-edit.component.html /tmp/hrfix/test1.html)",
+      "Bash(cp frontend/src/app/pages/work-order/work-order-add-edit/work-order-add-edit.component.html /tmp/hrfix/test2.html)",
+      "Bash(perl /tmp/hrfix/fix.pl /tmp/hrfix/test1.html /tmp/hrfix/test2.html)",
+      "Read(//tmp/hrfix/**)",
+      "Bash(awk 'NR==86,NR==89' frontend/src/app/pages/work-order/work-order-add-edit/work-order-add-edit.component.html)",
+      "Bash(xxd)",
+      "Bash(perl -ne 'if \\($. >= 86 && $. <= 89\\) { print \"$.: \"; print; }' frontend/src/app/pages/work-order/work-order-add-edit/work-order-add-edit.component.html)"
     ]
   }
 }

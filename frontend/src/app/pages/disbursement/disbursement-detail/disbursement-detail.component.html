@@ -12,7 +12,7 @@
     <div class="card-body">
 
         <!-- Actions -->
-        <div class="d-flex gap-2 justify-content-end align-items-center pt-3 border-top mt-3">
+        <div class="d-flex gap-2 justify-content-end align-items-center pt-3 mt-3">
             <a [routerLink]="['/' + menuLink]" class="btn btn-light fw-bold">
                 <ng-icon name="tablerArrowLeft" class="ps-0 pe-3 fw-bold"></ng-icon>Back
             </a>
@@ -142,7 +142,24 @@
                             <tr>
                                 <td>{{ i + 1 }}</td>
                                 <td class="fw-bold">{{ entry.code || entry.account?.accountCode || '—' }}</td>
-                                <td>{{ entry.description || entry.account?.accountTitle || entry.account?.accountDescription || '—' }}</td>
+                                <td>
+                                    {{ entry.description || entry.account?.accountTitle || entry.account?.accountDescription || '—' }}
+                                    @if (entry.slentries?.length) {
+                                        <div class="table-responsive mt-1">
+                                            <table class="table table-sm table-borderless mb-0 fs-xs">
+                                                <tbody>
+                                                    @for (sl of entry.slentries; track $index) {
+                                                        <tr class="text-muted">
+                                                            <td class="ps-3">{{ sl.name }}</td>
+                                                            <td class="text-end" style="width:120px">{{ sl.debit ? (sl.debit | number:'1.2-2') : '' }}</td>
+                                                            <td class="text-end" style="width:120px">{{ sl.credit ? (sl.credit | number:'1.2-2') : '' }}</td>
+                                                        </tr>
+                                                    }
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    }
+                                </td>
                                 <td>{{ entry.particulars || '—' }}</td>
                                 <td class="text-end">{{ (entry.debit ?? entry.debitAmount) | number:'1.2-2' }}</td>
                                 <td class="text-end">{{ (entry.credit ?? entry.creditAmount) | number:'1.2-2' }}</td>

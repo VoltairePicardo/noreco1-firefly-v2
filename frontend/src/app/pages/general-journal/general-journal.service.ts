@@ -108,6 +108,19 @@ export class GeneralJournalService {
         return this.http.get<any[]>(`${BASE_API}/ledger/account-setting/${transId}`);
     }
 
+    getCcprBatchesForJv(): Observable<any[]> {
+        return this.http.get<any[]>(`${BASE_API}/credit-card-purchase-request/batches-for-jv`);
+    }
+
+    getCcprRequestsByBatch(batchId: number): Observable<any[]> {
+        return this.http.get<any[]>(`${BASE_API}/credit-card-purchase-request/batch/${batchId}`);
+    }
+
+    getCalForJv(q: string = '', page = 0, size = 10): Observable<any> {
+        const params = new HttpParams().set('q', q).set('page', page).set('size', size);
+        return this.http.get(`${BASE_API}/cash-advance-liquidation/for-jv`, { params });
+    }
+
     print(id: number): void {
         this.downloadService.print(`${BASE_API}/general-journal/export/${id}`, { type: 'pdf' });
     }

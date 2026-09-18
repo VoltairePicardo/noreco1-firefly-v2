@@ -69,8 +69,15 @@ export class GeneralJournalAddEditComponent {
     loadingTempBatches          = false;
     showTempList                = false;
 
+    // Credit Card Purchase Request batch
+    ccprBatch: any               = null;
+    ccprBatches: any[]           = [];
+    loadingCcprBatches           = false;
+    showCcprList                 = false;
+
     // Document browse
     selectedDocument: any       = null;
+    selectedIsCal: boolean      = false;
     loadingDocEntries           = false;
 
     // Attachments (staged for upload)
@@ -127,17 +134,36 @@ export class GeneralJournalAddEditComponent {
                     this.voucherDate = data.voucherDate ? new Date(data.voucherDate).toISOString().substring(0, 10) : '';
                     this.explanation = data.explanation || data.remarks || '';
                     this.payable     = data.payable     || false;
-                    this.journalEntries = (data.journalEntries || data.details || []).map((e: any): JournalEntry => ({
-                        account:         e.account || (e.code ? { accountCode: e.code, accountTitle: e.description, id: e.accountId } : null),
-                        debit:           Number(e.debit ?? e.debitAmount) || null,
-                        credit:          Number(e.credit ?? e.creditAmount) || null,
+                    this.journalEntries = (data.generalLedgerLines || []).map((e: any): JournalEntry => ({
+                        account: {
+                            id:           e.accountId,
+                            accountCode:  e.code,
+                            accountTitle: e.description,
+                            hasSL:        e.hasSL || false
+                        },
+                        debit:           Number(e.debit)  || null,
+                        credit:          Number(e.credit) || null,
                         applyAllocation: e.applyAllocation || false,
                         allocationPct:   e.allocationPct   ?? null,
                         applyWht:        e.applyWht        || false,
-                        wht:             e.wht             || null
+                        wht:             e.wht             || null,
+                        wTaxEntry:       e.wTaxEntry        || null,
+                        vatEntry:        e.vatEntry         || null,
+                        slentries:       (e.slentries || []).map((sl: any) => ({
+                            entity:    null,
+                            accountNo: sl.accountNo,
+                            name:      sl.name,
+                            debit:     Number(sl.debit)  || null,
+                            credit:    Number(sl.credit) || null
+                        }))
                     }));
                     if (this.journalEntries.length === 0) {
                         this.journalEntries = [{ account: null, debit: null, credit: null }];
+                    }
+                    this.ccprBatch = data.batch || null;
+                    if (data.cashAdvanceLiquidation) {
+                        this.selectedDocument = data.cashAdvanceLiquidation;
+                        this.selectedIsCal    = true;
                     }
                     this.signatories = {
                         checker:              data.checker              || data.checkedBy         || null,
@@ -227,6 +253,56 @@ export class GeneralJournalAddEditComponent {
         this.showTempList   = false;
     }
 
+    // Credit Card Purchase Request batch — selecting a batch groups its requests by
+    // expense account and sums PO+JO amounts into debit lines, mirroring legacy
+    // jv.js's onBatchChange().
+    openCcprBrowse(): void {
+        this.showCcprList = !this.showCcprList;
+        if (this.showCcprList && this.ccprBatches.length === 0 && !this.loadingCcprBatches) {
+            this.loadingCcprBatches = true;
+            this.service.getCcprBatchesForJv().subscribe({
+                next: (data) => { this.ccprBatches = data || []; this.loadingCcprBatches = false; },
+                error: () => { this.loadingCcprBatches = false; }
+            });
+        }
+    }
+
+    onCcprBatchSelect(event: Event): void {
+        const id = Number((event.target as HTMLSelectElement).value);
+        if (!id) return;
+        const batch = this.ccprBatches.find(b => Number(b.id) === id);
+        if (!batch) return;
+        this.ccprBatch    = batch;
+        this.showCcprList = false;
+        this.service.getCcprRequestsByBatch(batch.id).subscribe({
+            next: (requests) => {
+                const accountMap = new Map<number, JournalEntry>();
+                (requests || []).forEach((r: any) => {
+                    const account = r.expenseAccount;
+                    if (!account?.id) return;
+                    const amount = (Number(r.purchaseOrder?.amount) || 0) + (Number(r.jobOrder?.amount) || 0);
+                    const existing = accountMap.get(account.id);
+                    if (existing) {
+                        existing.debit = (Number(existing.debit) || 0) + amount;
+                    } else {
+                        accountMap.set(account.id, {
+                            account: { id: account.id, accountCode: account.code, accountTitle: account.title, hasSL: account.hasSL || false },
+                            debit:   amount || null,
+                            credit:  null
+                        });
+                    }
+                });
+                this.journalEntries = Array.from(accountMap.values());
+            },
+            error: () => {}
+        });
+    }
+
+    clearCcprBatch(): void {
+        this.ccprBatch     = null;
+        this.showCcprList  = false;
+    }
+
     // Document browse
     async openDocumentBrowse(): Promise<void> {
         try {
@@ -237,7 +313,13 @@ export class GeneralJournalAddEditComponent {
             );
             if (result?.action === 'select' && result?.data) {
                 this.selectedDocument = result.data;
-                if (result.data.transactionId) {
+                this.selectedIsCal    = result.docType === 'cal';
+
+                if (this.selectedIsCal) {
+                    // Legacy links the CA Liquidation directly and copies its remarks
+                    // into the explanation — it does not pre-fill journal entries.
+                    this.explanation = result.data.remarks || this.explanation;
+                } else if (result.data.transactionId) {
                     this.loadingDocEntries = true;
                     this.service.getAccountSettingEntries(result.data.transactionId).subscribe({
                         next: (entries) => {
@@ -257,6 +339,7 @@ export class GeneralJournalAddEditComponent {
 
     clearSelectedDocument(): void {
         this.selectedDocument = null;
+        this.selectedIsCal    = false;
     }
 
     // Entity browse (signatories)
@@ -339,14 +422,36 @@ export class GeneralJournalAddEditComponent {
             voucherDate:    this.voucherDate,
             explanation:    this.explanation    || null,
             payable:        this.payable,
+            amount:         this.totalDebit,
             tempBatchId:    this.tempBatch?.tempBatchId || null,
+            batch:          this.ccprBatch?.id ? { id: this.ccprBatch.id } : null,
+            // Mutually exclusive, matching legacy: a CA Liquidation link replaces the
+            // generic invDocTransactionId source-document link.
+            invDocTransactionId:    this.selectedIsCal ? null : (this.selectedDocument?.transactionId || null),
+            cashAdvanceLiquidation: this.selectedIsCal && this.selectedDocument?.id
+                ? { id: this.selectedDocument.id } : null,
             generalLedgerLines: this.journalEntries.map(e => ({
                 code:        e.account?.accountCode  || '',
                 description: e.account?.accountTitle || e.account?.accountDescription || '',
                 accountId:   e.account?.id           || null,
                 debit:       Number(e.debit)         || 0,
-                credit:      Number(e.credit)        || 0
+                credit:      Number(e.credit)        || 0,
+                hasSL:       !!e.account?.hasSL,
+                wTaxEntry:   e.wTaxEntry || null,
+                vatEntry:    e.vatEntry  || null
             })),
+            // Top-level, matched back to its GL line by accountId — this is what the
+            // backend (LedgerFacadeImpl.postGeneralLedger) actually reads; the per-line
+            // `slentries` on GeneralLedgerLineDto2 is populated only on read, never on save.
+            subLedgerLines: this.journalEntries
+                .filter(e => (e.slentries || []).length > 0)
+                .flatMap(e => (e.slentries || []).map(sl => ({
+                    accountId: e.account?.id || null,
+                    accountNo: sl.accountNo,
+                    name:      sl.name,
+                    debit:     Number(sl.debit)  || 0,
+                    credit:    Number(sl.credit) || 0
+                }))),
             checker:             sigRef('checker'),
             budgetOfficer:       sigRef('budgetOfficer'),
             recommendingOfficer: sigRef('recommendingApproval'),

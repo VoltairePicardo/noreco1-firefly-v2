@@ -4,6 +4,7 @@ import com.noreco1.fireflyv2.controller.form.PrepaymentVoucherLinkForm;
 import com.noreco1.fireflyv2.model.Prepayment;
 import com.noreco1.fireflyv2.controller.response.PostResponse;
 import com.noreco1.fireflyv2.service.PrepaymentService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.MessageSource;
@@ -89,8 +90,7 @@ public class PrepaymentController {
      * Links a prepayment to a voucher/transaction and updates cost fields.
      */
     @PostMapping("/link-voucher")
-    public PostResponse linkVoucher(@RequestBody PrepaymentVoucherLinkForm form) {
-        BindingResult bindingResult = new BeanPropertyBindingResult(form, "prepaymentVoucherLinkForm");
+    public PostResponse linkVoucher(@Valid @RequestBody PrepaymentVoucherLinkForm form, BindingResult bindingResult) {
         return prepaymentService.saveLink(form, bindingResult, messageSource);
     }
 }

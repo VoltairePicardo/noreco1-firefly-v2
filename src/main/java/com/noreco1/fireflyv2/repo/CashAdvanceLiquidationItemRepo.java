@@ -14,7 +14,7 @@ public interface CashAdvanceLiquidationItemRepo extends JpaRepository<CashAdvanc
     List<CashAdvanceLiquidationItem> findByCashAdvanceLiquidationId(Integer id);
     Long deleteByCashAdvanceLiquidationId(Integer id);
 
-    @Query(value = "SELECT * FROM CashAdvanceLiquidationItem cali " +
+    @Query(value = "SELECT cali.* FROM CashAdvanceLiquidationItem cali " +
             "JOIN CashAdvanceLiquidation cal ON cali.FK_cashAdvanceLiquidationId = cal.id " +
             "JOIN CashAdvance ca ON cal.FK_cashAdvanceId = ca.id " +
             "WHERE ca.id = :caId AND cal.id != :existingId ", nativeQuery = true)

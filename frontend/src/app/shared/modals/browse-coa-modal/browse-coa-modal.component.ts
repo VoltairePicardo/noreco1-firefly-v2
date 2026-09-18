@@ -1,14 +1,14 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
 import { COMMON_ALL_PAGE_IMPORTS, COMMON_MAIN_PAGE_IMPORTS, SHARED_PROVIDERS } from '@/app/shared/providers/shared-providers';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { provideIcons } from '@ng-icons/core';
+import {NG_ICON_DIRECTIVES, provideIcons} from '@ng-icons/core';
 import { tablerChevronLeft, tablerChevronRight, tablerSearch } from '@ng-icons/tabler-icons';
 import { GeneralJournalService } from '@/app/pages/general-journal/general-journal.service';
 
 @Component({
     selector: 'app-browse-coa-modal',
     changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [...COMMON_ALL_PAGE_IMPORTS, ...COMMON_MAIN_PAGE_IMPORTS],
+    imports: [...COMMON_ALL_PAGE_IMPORTS, ...COMMON_MAIN_PAGE_IMPORTS, NG_ICON_DIRECTIVES],
     providers: [...SHARED_PROVIDERS, provideIcons({ tablerChevronLeft, tablerChevronRight, tablerSearch })],
     templateUrl: './browse-coa-modal.component.html'
 })

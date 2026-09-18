@@ -92,10 +92,14 @@ export class MaterialIssuanceAddEditComponent {
                     this.particulars          = data.particulars || '';
                     this.selectedInventoryDoc = data.inventoryDoc || null;
                     this.inventoryDocItems    = data.inventoryDocItems || data.items || [];
-                    this.journalEntries = (data.journalEntries || data.details || []).map((e: any): JournalEntry => ({
-                        account:         e.account || (e.code ? { accountCode: e.code, accountTitle: e.description, id: e.accountId } : null),
-                        debit:           Number(e.debit ?? e.debitAmount) || null,
-                        credit:          Number(e.credit ?? e.creditAmount) || null,
+                    this.journalEntries = (data.generalLedgerLines || []).map((e: any): JournalEntry => ({
+                        account: {
+                            id:           e.accountId,
+                            accountCode:  e.code,
+                            accountTitle: e.description
+                        },
+                        debit:           Number(e.debit)  || null,
+                        credit:          Number(e.credit) || null,
                         applyAllocation: e.applyAllocation || false,
                         allocationPct:   e.allocationPct   ?? null,
                         applyWht:        e.applyWht        || false,

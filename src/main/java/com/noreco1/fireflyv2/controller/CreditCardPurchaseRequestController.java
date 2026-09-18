@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/credit-card-purchase-request")
@@ -83,6 +84,16 @@ public class CreditCardPurchaseRequestController {
     @GetMapping("/{id}")
     public CreditCardPurchaseRequestDto getById(@PathVariable Integer id) {
         return service.findById(id);
+    }
+
+    @GetMapping("/batches-for-jv")
+    public List<Map<String, Object>> batchesForJv() {
+        return service.findAllBatchesForJv();
+    }
+
+    @GetMapping("/batch/{id}")
+    public List<CreditCardPurchaseRequestDto> requestsByBatch(@PathVariable Integer id) {
+        return service.getCreditCardPurchaseRequestByBatch(id);
     }
 
     @Autowired

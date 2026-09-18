@@ -398,19 +398,19 @@ public class LedgerFacadeImpl implements LedgerFacade {
 
             }
 
-            if (ledgerLine.getwTaxEntry() != null) {
+            if (ledgerLine.getWTaxEntry() != null) {
 
                 CheckVoucherIncomePayment incomePayment = incomePaymentRepo.findOneByTransactionId(transaction.getId());
                 if (incomePayment == null) incomePayment = new CheckVoucherIncomePayment();
-                LinkedHashMap atc = (LinkedHashMap)ledgerLine.getwTaxEntry().get("atc");
+                LinkedHashMap atc = (LinkedHashMap)ledgerLine.getWTaxEntry().get("atc");
 
                 TaxCode taxCode = new TaxCode();
                 taxCode.setId(Integer.parseInt(atc.get("id").toString()));
 
                 incomePayment.setTransaction(transaction);
-                incomePayment.setAmount(new BigDecimal(ledgerLine.getwTaxEntry().get("amount").toString()));
-                incomePayment.setBaseAmount(new BigDecimal(ledgerLine.getwTaxEntry().get("baseAmount").toString()));
-                incomePayment.setPercentage(new BigDecimal(ledgerLine.getwTaxEntry().get("percentage").toString()));
+                incomePayment.setAmount(new BigDecimal(ledgerLine.getWTaxEntry().get("amount").toString()));
+                incomePayment.setBaseAmount(new BigDecimal(ledgerLine.getWTaxEntry().get("baseAmount").toString()));
+                incomePayment.setPercentage(new BigDecimal(ledgerLine.getWTaxEntry().get("percentage").toString()));
                 incomePayment.setTaxCode(taxCode);
 
                 incomePaymentRepo.save(incomePayment);

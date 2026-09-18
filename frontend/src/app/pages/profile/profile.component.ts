@@ -71,7 +71,7 @@ import { UiCardComponent } from '@app/components/ui-card.component';
                                     </div>
                                 </div>
 
-                                <hr/>
+                                <hr class="border-dashed mx-n3 mt-3"/>
                                 <p class="fs-xs text-uppercase fw-semibold text-muted mb-3">
                                     Change Password <span class="text-muted fw-normal text-lowercase">(leave blank to keep current)</span>
                                 </p>
@@ -100,7 +100,8 @@ import { UiCardComponent } from '@app/components/ui-card.component';
                                 </div>
 
                                 <!-- Footer -->
-                                <div class="d-flex gap-2 justify-content-end align-items-center pt-3 border-top mt-3">
+                                <hr class="border-dashed mx-n3 mt-3"/>
+                                <div class="d-flex gap-2 justify-content-end align-items-center mt-3">
                                     <a routerLink="/home" class="btn btn-light fw-bold">
                                         <ng-icon name="tablerArrowLeft" class="ps-0 pe-3 fw-bold"></ng-icon>Back
                                     </a>

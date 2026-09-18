@@ -53,7 +53,7 @@ export class DisbursementDetailComponent {
                 this.isLoading.set(false);
                 if (data?.id) {
                     this.data = data;
-                    this.journalEntries = data.journalEntries || data.details || [];
+                    this.journalEntries = data.generalLedgerLines || [];
                     this.iemopBillings  = data.iemopBillings  || [];
                     this.loadWorkflowActions();
                     this.loadAttachments();
