@@ -15,6 +15,104 @@
                         </div>
                     } @else {
 
+                    <!-- Temp GL/SL -->
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <span class="fs-sm fw-semibold">Temp GL/SL</span>
+                        <div class="d-flex gap-2">
+                            <button type="button" class="btn btn-primary fw-bold" (click)="openTempBrowse()">
+                                <ng-icon name="tablerDatabase" class="me-1 fs-lg fw-bold"></ng-icon>Browse Temp GL/SL
+                            </button>
+                            @if (tempBatch) {
+                                <button type="button" class="btn btn-danger fw-bold"
+                                        (click)="clearTempBatch()" aria-label="Clear temp batch">
+                                    <ng-icon name="tablerTrash" class="fs-lg fw-bold"></ng-icon>
+                                </button>
+                            }
+                        </div>
+                    </div>
+
+                    @if (tempBatch) {
+                        <div class="row g-1">
+                            <div class="col-12 d-flex"><span style="width:110px">Document:</span> <span class="fw-bold">{{ tempBatch.docTypeDesc }}</span></div>
+                            <div class="col-12 d-flex"><span style="width:110px">Remarks:</span> <span class="fw-bold">{{ tempBatch.remarks || '—' }}</span></div>
+                            <div class="col-12 d-flex"><span style="width:110px">Amount:</span> <span class="fw-bold">{{ tempBatch.amount | number:'1.2-2' }}</span></div>
+                            <div class="col-12 d-flex"><span style="width:110px">Date:</span> <span class="fw-bold">{{ tempBatch.tempBatchDate | date:'MMM d, yyyy' }}</span></div>
+                        </div>
+                    }
+
+                    <hr class="border-dashed mx-n3 mt-3"/>
+
+                    <!-- Source Document -->
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <span class="fs-sm fw-semibold">Source Document</span>
+                        <div class="d-flex gap-2">
+                            <button type="button" class="btn btn-primary fw-bold" (click)="openDocumentBrowse()">
+                                <ng-icon name="tablerFolder" class="me-1 fs-lg fw-bold"></ng-icon>Browse Document
+                            </button>
+                            @if (selectedDocument) {
+                                <button type="button" class="btn btn-danger fw-bold"
+                                        (click)="clearSelectedDocument()" aria-label="Clear selected document">
+                                    <ng-icon name="tablerTrash" class="fs-lg fw-bold"></ng-icon>
+                                </button>
+                            }
+                        </div>
+                    </div>
+
+                    @if (selectedDocument) {
+                        <div class="row g-1">
+                            @if (selectedIsCal) {
+                                <div class="col-12 mb-1">
+                                    <span class="badge bg-info-subtle text-info fw-bold">Cash Advance Liquidation</span>
+                                </div>
+                            }
+                            <div class="col-12 d-flex"><span style="width:110px">Code:</span> <span class="fw-bold">{{ selectedDocument.localCode || selectedDocument.code }}</span></div>
+                            <div class="col-12 d-flex"><span style="width:110px">Amount:</span> <span class="fw-bold">{{ (selectedDocument.netAmount ?? selectedDocument.totalReturnedAmount ?? selectedDocument.amount) | number:'1.2-2' }}</span></div>
+                            <div class="col-12 d-flex"><span style="width:110px">Date:</span> <span class="fw-bold">{{ selectedDocument.voucherDate | date:'MMM d, yyyy' }}</span></div>
+                            <div class="col-12 d-flex"><span style="width:110px">Particulars:</span> <span class="fw-bold">{{ selectedDocument.particulars || selectedDocument.remarks || '—' }}</span></div>
+                        </div>
+                        @if (loadingDocEntries) {
+                            <div class="mt-1">
+                                <span class="spinner-border spinner-border-sm me-2 text-muted"></span>
+                                <span class="text-muted fs-sm">Loading journal entries from document...</span>
+                            </div>
+                        }
+                    }
+
+                    <hr class="border-dashed mx-n3 mt-3"/>
+
+                    <!-- Credit Card Purchase Request Batch -->
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <span class="fs-sm fw-semibold">Credit Card Purchase Request Batch</span>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <select class="form-select" [disabled]="loadingCcprBatches" (change)="onCcprBatchSelect($event)">
+                                <option value="" [selected]="!ccprBatch">— Select a batch —</option>
+                                @for (b of ccprBatches; track b.id) {
+                                    <option [value]="b.id" [selected]="ccprBatch?.id === b.id">
+                                        Batch #{{ b.id }} — {{ b.status ? 'Active' : 'Closed' }}
+                                    </option>
+                                }
+                            </select>
+                            @if (loadingCcprBatches) {
+                                <div class="fs-xs text-muted mt-1">
+                                    <span class="spinner-border spinner-border-sm me-1"></span>Loading batches...
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    @if (ccprBatch) {
+                        <div class="row g-1 mt-1">
+                            <div class="col-12 d-flex"><span style="width:110px">Batch:</span> <span class="fw-bold">#{{ ccprBatch.id }}</span></div>
+                            <div class="col-12 d-flex"><span style="width:110px">Status:</span> <span class="fw-bold">{{ ccprBatch.status ? 'Active' : 'Closed' }}</span></div>
+                            <div class="col-12 d-flex"><span style="width:110px">Created:</span> <span class="fw-bold">{{ ccprBatch.createdAt | date:'MMM d, yyyy' }}</span></div>
+                        </div>
+                    }
+
+                    <hr class="border-dashed mx-n3 mt-3"/>
+
                     <!-- Basic Info -->
                     <div class="row g-3">
                         <div class="col-md-3">
@@ -36,181 +134,6 @@
                             <textarea class="form-control" rows="3"
                                    [(ngModel)]="explanation" [ngModelOptions]="{ standalone: true }"
                                    placeholder="Enter explanation or remarks..."></textarea>
-                        </div>
-                    </div>
-
-                    <hr class="border-dashed mx-n3 mt-3"/>
-
-                    <!-- Temp GL/SL -->
-                    <div class="row mt-3">
-                        <div class="col-12">
-                            <div class="alert alert-secondary p-3 mb-0">
-                                <div class="d-flex align-items-start gap-3">
-                                    <div class="flex-grow-1">
-                                        @if (!tempBatch) {
-                                            <span class="text-muted fs-sm">You may select a temporary GL/SL batch to pre-fill journal entries.</span>
-                                        } @else {
-                                            <div class="row g-1 fs-sm">
-                                                <div class="col-md-3">
-                                                    <span class="text-muted">Document:</span>
-                                                    <strong class="ms-1">{{ tempBatch.docTypeDesc }}</strong>
-                                                </div>
-                                                <div class="col-md-3">
-                                                    <span class="text-muted">Remarks:</span>
-                                                    <span class="ms-1">{{ tempBatch.remarks }}</span>
-                                                </div>
-                                                <div class="col-md-3">
-                                                    <span class="text-muted">Amount:</span>
-                                                    <strong class="ms-1">{{ tempBatch.amount | number:'1.2-2' }}</strong>
-                                                </div>
-                                                <div class="col-md-3">
-                                                    <span class="text-muted">Date:</span>
-                                                    <span class="ms-1">{{ tempBatch.tempBatchDate | date:'MMM d, yyyy' }}</span>
-                                                </div>
-                                            </div>
-                                        }
-                                        @if (showTempList) {
-                                            <div class="mt-2">
-                                                @if (loadingTempBatches) {
-                                                    <span class="spinner-border spinner-border-sm me-2 text-muted"></span>
-                                                    <span class="text-muted fs-sm">Loading temp batches...</span>
-                                                } @else if (tempBatches.length > 0) {
-                                                    <select class="form-select form-select-sm" (change)="onTempBatchSelect($event)">
-                                                        <option value="">— Select a batch —</option>
-                                                        @for (b of tempBatches; track b.tempBatchId) {
-                                                            <option [value]="b.tempBatchId">
-                                                                {{ b.docTypeDesc }} — {{ b.remarks || 'No remarks' }} ({{ b.amount | number:'1.2-2' }})
-                                                            </option>
-                                                        }
-                                                    </select>
-                                                } @else {
-                                                    <span class="text-muted fs-sm">No temporary batches available.</span>
-                                                }
-                                            </div>
-                                        }
-                                    </div>
-                                    <div class="d-flex gap-2 flex-shrink-0">
-                                        <button type="button" class="btn btn-success fw-bold"
-                                                [disabled]="loadingTempBatches" (click)="openTempBrowse()">
-                                            @if (loadingTempBatches) {
-                                                <span class="spinner-border spinner-border-sm me-1"></span>
-                                            } @else {
-                                                <ng-icon name="tablerDatabase" class="ps-0 pe-3 fw-bold"></ng-icon>
-                                            }
-                                            Browse Temp GL/SL
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Credit Card Purchase Request Batch -->
-                    <div class="row mt-3">
-                        <div class="col-12">
-                            <div class="alert alert-secondary p-3 mb-0">
-                                <div class="d-flex align-items-start gap-3">
-                                    <div class="flex-grow-1">
-                                        @if (!ccprBatch) {
-                                            <span class="text-muted fs-sm">You may select a Credit Card Purchase Request batch to pre-fill journal entries.</span>
-                                        } @else {
-                                            <div class="row g-1 fs-sm">
-                                                <div class="col-md-4">
-                                                    <span class="text-muted">Batch:</span>
-                                                    <strong class="ms-1">#{{ ccprBatch.id }}</strong>
-                                                </div>
-                                                <div class="col-md-4">
-                                                    <span class="text-muted">Status:</span>
-                                                    <span class="ms-1">{{ ccprBatch.status ? 'Active' : 'Closed' }}</span>
-                                                </div>
-                                                <div class="col-md-4">
-                                                    <span class="text-muted">Created:</span>
-                                                    <span class="ms-1">{{ ccprBatch.createdAt | date:'MMM d, yyyy' }}</span>
-                                                </div>
-                                            </div>
-                                        }
-                                        @if (showCcprList) {
-                                            <div class="mt-2">
-                                                @if (loadingCcprBatches) {
-                                                    <span class="spinner-border spinner-border-sm me-2 text-muted"></span>
-                                                    <span class="text-muted fs-sm">Loading batches...</span>
-                                                } @else if (ccprBatches.length > 0) {
-                                                    <select class="form-select form-select-sm" (change)="onCcprBatchSelect($event)">
-                                                        <option value="">— Select a batch —</option>
-                                                        @for (b of ccprBatches; track b.id) {
-                                                            <option [value]="b.id">
-                                                                Batch #{{ b.id }} — {{ b.status ? 'Active' : 'Closed' }}
-                                                            </option>
-                                                        }
-                                                    </select>
-                                                } @else {
-                                                    <span class="text-muted fs-sm">No batches available.</span>
-                                                }
-                                            </div>
-                                        }
-                                    </div>
-                                    <div class="d-flex gap-2 flex-shrink-0">
-                                        <button type="button" class="btn btn-success fw-bold"
-                                                [disabled]="loadingCcprBatches" (click)="openCcprBrowse()">
-                                            @if (loadingCcprBatches) {
-                                                <span class="spinner-border spinner-border-sm me-1"></span>
-                                            } @else {
-                                                <ng-icon name="tablerDatabase" class="ps-0 pe-3 fw-bold"></ng-icon>
-                                            }
-                                            Browse CCPR Batch
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row mt-3">
-                        <div class="col-12">
-                            <div class="alert alert-secondary p-3 mb-0">
-                                <div class="d-flex align-items-start gap-3">
-                                    <div class="flex-grow-1">
-                                        @if (!selectedDocument) {
-                                            <span class="text-muted fs-sm">You may select a document to pre-fill journal entries.</span>
-                                        } @else {
-                                            <div class="row g-1 fs-sm">
-                                                @if (selectedIsCal) {
-                                                    <div class="col-12 mb-1">
-                                                        <span class="badge bg-info-subtle text-info fw-bold">Cash Advance Liquidation</span>
-                                                    </div>
-                                                }
-                                                <div class="col-md-3">
-                                                    <span class="text-muted">Code:</span>
-                                                    <strong class="ms-1">{{ selectedDocument.localCode || selectedDocument.code }}</strong>
-                                                </div>
-                                                <div class="col-md-3">
-                                                    <span class="text-muted">Amount:</span>
-                                                    <strong class="ms-1">{{ (selectedDocument.netAmount ?? selectedDocument.totalReturnedAmount ?? selectedDocument.amount) | number:'1.2-2' }}</strong>
-                                                </div>
-                                                <div class="col-md-3">
-                                                    <span class="text-muted">Date:</span>
-                                                    <span class="ms-1">{{ selectedDocument.voucherDate | date:'MMM d, yyyy' }}</span>
-                                                </div>
-                                                <div class="col-md-3">
-                                                    <span class="text-muted">Particulars:</span>
-                                                    <span class="ms-1">{{ selectedDocument.particulars || selectedDocument.remarks || '—' }}</span>
-                                                </div>
-                                            </div>
-                                            @if (loadingDocEntries) {
-                                                <div class="mt-1">
-                                                    <span class="spinner-border spinner-border-sm me-2 text-muted"></span>
-                                                    <span class="text-muted fs-sm">Loading journal entries from document...</span>
-                                                </div>
-                                            }
-                                        }
-                                    </div>
-                                    <div class="d-flex gap-2 flex-shrink-0">
-                                        <button type="button" class="btn btn-success fw-bold" (click)="openDocumentBrowse()">
-                                            <ng-icon name="tablerLink" class="ps-0 pe-3 fw-bold"></ng-icon>Browse Document
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
                         </div>
                     </div>
 
@@ -240,7 +163,7 @@
                                 <label class="form-label fw-bold">{{ signatoryLabels[key] }}</label>
                                 <div class="input-group">
                                     <input type="text" class="form-control"
-                                           [value]="signatories[key] ? signatories[key].name : ''"
+                                           [value]="signatories[key]?.name ?? ''"
                                            readonly placeholder="Select signatory..."/>
                                     <button type="button" class="btn btn-success fw-bold"
                                             (click)="openEntityBrowse(key)">
@@ -248,7 +171,7 @@
                                     </button>
                                 </div>
                                 @if (signatories[key]?.position) {
-                                    <small class="text-muted">{{ signatories[key].position }}</small>
+                                    <small class="text-muted">{{ signatories[key]?.position }}</small>
                                 }
                             </div>
                         }
@@ -269,8 +192,22 @@
                             </div>
                             <input #fileInput type="file" multiple accept=".jpg,.jpeg,.png,.pdf"
                                    style="display:none" (change)="onFileSelect($event)"/>
-                            @if (stagedFiles.length > 0) {
+                            @if (existingFiles.length > 0 || stagedFiles.length > 0) {
                                 <div class="d-flex flex-wrap gap-2">
+                                    @for (f of existingFiles; track f.id; let i = $index) {
+                                        <div class="d-flex align-items-center gap-2 border rounded px-3 py-2 bg-light">
+                                            <ng-icon name="tablerFile" class="text-muted fs-sm"></ng-icon>
+                                            <a [href]="fileUrl(f.id)" target="_blank"
+                                               class="fs-xs text-truncate text-primary" style="max-width:200px"
+                                               [title]="f.originalFilename || f.oFile || f.name || 'File'">
+                                                {{ f.originalFilename || f.oFile || f.name || 'File' }}
+                                            </a>
+                                            <button type="button" class="btn btn-link p-0 text-danger ms-1"
+                                                    (click)="removeExistingFile(i)">
+                                                <ng-icon name="tablerTrash" class="fs-sm"></ng-icon>
+                                            </button>
+                                        </div>
+                                    }
                                     @for (f of stagedFiles; track $index; let i = $index) {
                                         <div class="d-flex align-items-center gap-2 border rounded px-3 py-2 bg-light">
                                             @if (isImage(f)) {

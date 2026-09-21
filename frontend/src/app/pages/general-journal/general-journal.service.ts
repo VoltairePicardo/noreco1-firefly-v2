@@ -5,6 +5,7 @@ import { environment } from '@/environments/environment';
 import { DownloadService } from '@/app/core/services/download.service';
 
 const BASE_API = environment.get('baseApiUrl');
+const BASE_URL = environment.get('baseUrl'); // http://localhost:8080 (for non-/api controllers)
 const httpOptions = { headers: new HttpHeaders({ 'Content-Type': 'application/json' }) };
 
 @Injectable({ providedIn: 'root' })
@@ -31,12 +32,21 @@ export class GeneralJournalService {
         return this.http.get(`${BASE_API}/general-journal/${id}`);
     }
 
-    create(form: any): Observable<any> {
-        return this.http.post(`${BASE_API}/general-journal/create`, form, httpOptions);
+    create(form: any, files: File[] = []): Observable<any> {
+        const formData = new FormData();
+        formData.append('model', new Blob([JSON.stringify(form)], { type: 'application/json' }));
+        files.forEach(f => formData.append('file_', f, f.name));
+        return this.http.post(`${BASE_API}/general-journal/create`, formData);
     }
 
-    update(form: any): Observable<any> {
-        return this.http.post(`${BASE_API}/general-journal/update`, form, httpOptions);
+    update(form: any, files: File[] = [], filesToRemove: any[] = []): Observable<any> {
+        const formData = new FormData();
+        formData.append('model', new Blob([JSON.stringify(form)], { type: 'application/json' }));
+        files.forEach(f => formData.append('file_', f, f.name));
+        if (filesToRemove.length > 0) {
+            formData.append('filesToRemove', new Blob([JSON.stringify(filesToRemove)], { type: 'application/json' }));
+        }
+        return this.http.post(`${BASE_API}/general-journal/update`, formData);
     }
 
     getWorkflowActions(transId: number): Observable<any[]> {
@@ -80,20 +90,16 @@ export class GeneralJournalService {
         return this.http.post<any>(`${BASE_API}/approve-vouchers/process-all`, payloads, httpOptions);
     }
 
-    getFiles(id: number): Observable<any[]> {
-        return this.http.get<any[]>(`${BASE_API}/general-journal/${id}/files`);
-    }
-
-    uploadFiles(id: number, formData: FormData): Observable<any> {
-        return this.http.post(`${BASE_API}/general-journal/${id}/upload`, formData);
+    getFiles(transId: number): Observable<any[]> {
+        return this.http.get<any[]>(`${BASE_URL}/file/attachments/${transId}`);
     }
 
     deleteFile(fileId: number): Observable<any> {
-        return this.http.delete(`${BASE_API}/general-journal/file/${fileId}`);
+        return this.http.delete(`${BASE_URL}/file/${fileId}`);
     }
 
     fileUrl(fileId: number): string {
-        return `${BASE_API}/general-journal/file/${fileId}`;
+        return this.downloadService.printUrl(`${BASE_URL}/file/${fileId}`);
     }
 
     getTempBatches(): Observable<any[]> {
@@ -119,6 +125,21 @@ export class GeneralJournalService {
     getCalForJv(q: string = '', page = 0, size = 10): Observable<any> {
         const params = new HttpParams().set('q', q).set('page', page).set('size', size);
         return this.http.get(`${BASE_API}/cash-advance-liquidation/for-jv`, { params });
+    }
+
+    getMctForJv(q: string = '', page = 0, size = 10): Observable<any> {
+        const params = new HttpParams().set('q', q).set('page', page).set('size', size);
+        return this.http.get(`${BASE_API}/stock-receive/for-jv-approved-paged`, { params });
+    }
+
+    getStockAdjustmentForJv(q: string = '', page = 0, size = 10): Observable<any> {
+        const params = new HttpParams().set('q', q).set('page', page).set('size', size);
+        return this.http.get(`${BASE_API}/stock-adjustment/for-jv-approved-paged`, { params });
+    }
+
+    getRrForJv(q: string = '', page = 0, size = 10): Observable<any> {
+        const params = new HttpParams().set('q', q).set('page', page).set('size', size);
+        return this.http.get(`${BASE_API}/rr/for-jv`, { params });
     }
 
     print(id: number): void {

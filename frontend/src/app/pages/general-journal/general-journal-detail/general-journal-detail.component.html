@@ -11,30 +11,29 @@
 <div class="card mb-3">
     <div class="card-body">
 
-        <div class="row">
-            <!-- Actions -->
-            <div class="d-flex gap-2 justify-content-end align-items-center pt-3 mt-3">
-                <a [routerLink]="['/' + menuLink]" class="btn btn-light fw-bold">
-                    <ng-icon name="tablerArrowLeft" class="ps-0 pe-3 fw-bold"></ng-icon>Back
+        <!-- Actions -->
+        <div class="d-flex gap-2 justify-content-end align-items-center">
+            <a [routerLink]="['/' + menuLink]" class="btn btn-light fw-bold">
+                <ng-icon name="tablerArrowLeft" class="ps-0 pe-3 fw-bold fs-lg"></ng-icon>Back
+            </a>
+            <button type="button" class="btn btn-success fw-bold" (click)="print()">
+                <ng-icon name="tablerPrinter" class="ps-0 pe-3 fw-bold fs-lg"></ng-icon>Print
+            </button>
+            @if (isEditable()) {
+                <a [routerLink]="['/' + menuLink, id, 'edit']" class="btn btn-primary fw-bold">
+                    <ng-icon name="tablerEdit" class="ps-0 pe-3 fw-bold fs-lg"></ng-icon>Edit
                 </a>
-                <button type="button" class="btn btn-success fw-bold" (click)="print()">
-                    <ng-icon name="tablerPrinter" class="ps-0 pe-3 fw-bold"></ng-icon>Print
-                </button>
-                @if (isEditable()) {
-                    <a [routerLink]="['/' + menuLink, id, 'edit']" class="btn btn-primary fw-bold">
-                        <ng-icon name="tablerEdit" class="ps-0 pe-3 fw-bold"></ng-icon>Edit
-                    </a>
-                }
-            </div>
+            }
         </div>
 
+        <!-- Workflow Actions -->
         @if (workflowActions.length > 0) {
-            <hr class="my-3"/>
+            <hr class="border-dashed mx-n3 mt-3"/>
             <div class="fs-xs text-uppercase fw-semibold text-muted mb-2">Process Document</div>
             <div class="row g-3 align-items-end">
                 <div class="col-md-4">
                     <label class="form-label fw-bold">Action</label>
-                    <select class="form-select" [(ngModel)]="selectedAction" [ngModelOptions]="{ standalone: true }">
+                    <select class="form-select" [(ngModel)]="selectedAction">
                         <option [ngValue]="null">— Select Action —</option>
                         @for (a of workflowActions; track a.actionMapId) {
                             <option [ngValue]="a">{{ a.action }}</option>
@@ -43,7 +42,7 @@
                 </div>
                 <div class="col-md-6">
                     <label class="form-label fw-bold">Remarks <span class="text-muted fw-normal">(optional)</span></label>
-                    <input type="text" class="form-control" [(ngModel)]="remarks" [ngModelOptions]="{ standalone: true }" placeholder="Optional remarks"/>
+                    <input type="text" class="form-control" [(ngModel)]="remarks" placeholder="Optional remarks"/>
                 </div>
                 <div class="col-md-2">
                     <button type="button" class="btn btn-primary fw-bold"
@@ -60,152 +59,200 @@
             </div>
         }
 
-        <hr class="my-3"/>
+        <hr class="border-dashed mx-n3 mt-3"/>
 
-        <!-- Document Info -->
-        <div class="fs-xs text-uppercase fw-semibold text-muted mb-2">Document Information</div>
+        <!-- Header Info -->
         <div class="row g-3">
             <div class="col-md-3">
                 <div class="fs-xs text-uppercase fw-bold text-muted mb-1">JV Code</div>
-                <div class="fw-bold fs-5">{{ data.localCode || '—' }}</div>
+                <div class="fw-bold fs-5">{{ data.code || '—' }}</div>
+            </div>
+            <div class="col-md-3">
+                <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Status</div>
+                <span class="badge"
+                      [ngClass]="isEditable() ? 'bg-secondary bg-opacity-25 text-dark border' : 'bg-success bg-opacity-25 text-success border'">
+                    {{ data.documentStatus?.status || '—' }}
+                </span>
             </div>
             <div class="col-md-3">
                 <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Voucher Date</div>
                 <div>{{ data.voucherDate | date:'MMMM d, yyyy' }}</div>
             </div>
-            <div class="col-md-2">
-                <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Status</div>
-                <span class="badge bg-secondary bg-opacity-25 text-dark border">
-                    {{ data.documentStatus?.status || data.status }}
-                </span>
-            </div>
-            <div class="col-md-2">
-                <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Amount</div>
-                <div class="fw-bold">{{ (data.amount || totalDebit) | number:'1.2-2' }}</div>
-            </div>
-            <div class="col-md-2">
+            <div class="col-md-3">
                 <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Payable</div>
                 <div>{{ data.payable ? 'Yes' : 'No' }}</div>
             </div>
+        </div>
+        <div class="row g-3 mt-1">
             <div class="col-md-3">
-                <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Prepared By</div>
-                <div>{{ data.createdBy?.name || data.preparedBy || '—' }}</div>
+                <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Amount</div>
+                <div class="fw-bold">{{ (data.amount || totalDebit) | number:'1.2-2' }}</div>
             </div>
             <div class="col-md-3">
-                <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Date Created</div>
-                <div>{{ data.createdAt | date:'MMM dd, yyyy HH:mm' }}</div>
+                <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Prepared By</div>
+                <div>{{ data.createdBy?.name || '—' }}</div>
+            </div>
+            <div class="col-md-3">
+                <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Created On</div>
+                <div>{{ data.createdAt | date:'MMMM d, yyyy h:mm a' }}</div>
             </div>
             <div class="col-md-3">
                 <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Last Updated</div>
-                <div>{{ data.updatedAt || data.lastUpdated | date:'MMM dd, yyyy HH:mm' }}</div>
+                <div>{{ data.updatedAt | date:'MMMM d, yyyy h:mm a' }}</div>
             </div>
+        </div>
+        <div class="row g-3 mt-1">
             <div class="col-md-12">
                 <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Explanation / Remarks</div>
-                <div>{{ data.explanation || data.remarks || '—' }}</div>
+                <div>{{ data.explanation || '—' }}</div>
             </div>
         </div>
 
+        <!-- Source Document -->
+        @if (sourceDocument) {
+            <hr class="border-dashed mx-n3 mt-3"/>
+            <div class="fs-xs text-uppercase fw-semibold text-muted mb-2">Source Document</div>
+            <div class="row g-3">
+                <div class="col-12 mb-1">
+                    <span class="badge bg-info-subtle text-info fw-bold">{{ sourceDocumentType }}</span>
+                </div>
+                <div class="col-md-3">
+                    <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Code</div>
+                    <div class="fw-bold">{{ sourceDocument.code || '—' }}</div>
+                </div>
+                <div class="col-md-3">
+                    <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Amount</div>
+                    <div>{{ sourceDocument.amount | number:'1.2-2' }}</div>
+                </div>
+                <div class="col-md-3">
+                    <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Date</div>
+                    <div>{{ sourceDocument.voucherDate | date:'MMM d, yyyy' }}</div>
+                </div>
+                <div class="col-md-3">
+                    <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Particulars</div>
+                    <div>{{ sourceDocument.particulars || '—' }}</div>
+                </div>
+            </div>
+        }
+
+        <!-- Credit Card Purchase Request Batch -->
+        @if (data.batch) {
+            <hr class="border-dashed mx-n3 mt-3"/>
+            <div class="fs-xs text-uppercase fw-semibold text-muted mb-2">Credit Card Purchase Request Batch</div>
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Batch</div>
+                    <div class="fw-bold">#{{ data.batch.id }}</div>
+                </div>
+                <div class="col-md-3">
+                    <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Status</div>
+                    <div>{{ data.batch.status ? 'Active' : 'Closed' }}</div>
+                </div>
+                <div class="col-md-3">
+                    <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Created</div>
+                    <div>{{ data.batch.createdAt | date:'MMM d, yyyy' }}</div>
+                </div>
+            </div>
+        }
+
         <!-- Journal Entries -->
-        <hr class="my-3"/>
+        <hr class="border-dashed mx-n3 mt-3"/>
         <div class="fs-xs text-uppercase fw-semibold text-muted mb-2">Journal Entries</div>
         <div class="table-responsive">
             <table class="table table-custom table-centered table-hover w-100 mb-0">
                 <thead class="bg-light align-middle bg-opacity-25 thead-sm">
                     <tr class="text-uppercase fs-xxs">
-                        <th>Account</th>
+                        <th style="width:60%">Account</th>
                         <th class="text-end">Debit</th>
                         <th class="text-end">Credit</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @for (entry of journalEntries; track $index) {
-                        <tr>
-                            <td>
-                                <div class="d-flex align-items-center gap-2">
-                                    @if (entry.slEntries.length > 0) {
-                                        <button type="button" class="btn btn-light btn-icon btn-sm rounded-circle"
-                                                (click)="entry.expanded = !entry.expanded">
-                                            <ng-icon [name]="entry.expanded ? 'tablerChevronDown' : 'tablerChevronRight'"></ng-icon>
+                    @if (journalEntries.length > 0) {
+                        @for (entry of journalEntries; track $index; let i = $index) {
+                            <tr>
+                                <td>
+                                    @if (entry.slentries?.length) {
+                                        <button type="button" class="btn btn-sm btn-warning btn-rounded float-end py-0 px-2"
+                                                (click)="toggleSl(i)">
+                                            <small class="fw-bold">SL</small>
+                                            <ng-icon [name]="isSlExpanded(i) ? 'tablerChevronDown' : 'tablerChevronRight'" class="fs-sm ms-1"/>
                                         </button>
                                     }
-                                    <b>{{ entry.accountCode || '—' }}</b> {{ entry.accountTitle || '—' }}
-                                </div>
-                            </td>
-                            <td class="text-end">{{ (entry.glDebitAmount ?? 0) | number:'1.2-2' }}</td>
-                            <td class="text-end">{{ (entry.glCreditAmount ?? 0) | number:'1.2-2' }}</td>
-                        </tr>
-                        @if (entry.slEntries.length > 0) {
-                            <tr>
-                                <td colspan="3" class="p-0 border-0">
-                                    <div [ngbCollapse]="!entry.expanded">
-                                        <table class="table table-sm table-borderless mb-0 fs-xs bg-light">
-                                            <tbody>
-                                                @for (sl of entry.slEntries; track $index) {
-                                                    <tr class="text-muted">
-                                                        <td class="ps-5">{{ sl.accountTitle || '—' }}</td>
-                                                        <td class="text-end" style="width:120px">{{ sl.slDebitAmount ? (sl.slDebitAmount | number:'1.2-2') : '' }}</td>
-                                                        <td class="text-end" style="width:120px">{{ sl.slCreditAmount ? (sl.slCreditAmount | number:'1.2-2') : '' }}</td>
+                                    <strong>{{ entry.code || '—' }}</strong><br/>
+                                    {{ entry.description || '—' }}
+                                    @if (entry.slentries?.length && isSlExpanded(i)) {
+                                        <div class="table-responsive mt-1">
+                                            <table class="table table-sm table-success mb-0 fs-xs">
+                                                <thead>
+                                                    <tr>
+                                                        <th>SL Entries</th>
+                                                        <th class="text-end" style="width:120px">Debit</th>
+                                                        <th class="text-end" style="width:120px">Credit</th>
                                                     </tr>
-                                                }
-                                            </tbody>
-                                        </table>
-                                    </div>
+                                                </thead>
+                                                <tbody>
+                                                    @for (sl of entry.slentries; track $index) {
+                                                        <tr>
+                                                            <td>{{ sl.name }}</td>
+                                                            <td class="text-end">{{ sl.debit ? (sl.debit | number:'1.2-2') : '' }}</td>
+                                                            <td class="text-end">{{ sl.credit ? (sl.credit | number:'1.2-2') : '' }}</td>
+                                                        </tr>
+                                                    }
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    }
                                 </td>
+                                <td class="text-end">{{ entry.debit ? (entry.debit | number:'1.2-2') : '' }}</td>
+                                <td class="text-end">{{ entry.credit ? (entry.credit | number:'1.2-2') : '' }}</td>
                             </tr>
                         }
-                    }
-                    @if (journalEntries.length === 0) {
-                        <tr><td colspan="3" class="text-center text-muted py-3">No journal entries.</td></tr>
-                    }
-                    @if (journalEntries.length > 0) {
                         <tr class="fw-bold bg-light">
                             <td class="text-end fw-bold text-uppercase fs-xs">Totals</td>
                             <td class="text-end">{{ totalDebit | number:'1.2-2' }}</td>
                             <td class="text-end">{{ totalCredit | number:'1.2-2' }}</td>
                         </tr>
+                    } @else {
+                        <tr><td colspan="3" class="text-center text-muted py-3">No journal entries.</td></tr>
                     }
                 </tbody>
             </table>
         </div>
 
         <!-- Signatories -->
-        @if (data.checker || data.checkedBy || data.budgetOfficer || data.recommendingApproval || data.recommendingOfficer || data.recommendedBy || data.auditingOfficer || data.auditedBy || data.approvingOfficer || data.approvedBy) {
-            <hr class="my-3"/>
+        @if (data.checker || data.budgetOfficer || data.recommendingOfficer || data.auditingOfficer || data.approvingOfficer) {
+            <hr class="border-dashed mx-n3 mt-3"/>
             <div class="fs-xs text-uppercase fw-semibold text-muted mb-2">Signatories</div>
             <div class="row g-3">
-                @if (data.checker || data.checkedBy) {
+                @if (data.checker) {
                     <div class="col-md-4">
                         <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Checked By</div>
-                        <div>{{ (data.checker || data.checkedBy)?.name || '—' }}</div>
-                        <small class="text-muted">{{ (data.checker || data.checkedBy)?.position || '' }}</small>
+                        <div>{{ data.checker?.name || '—' }}</div>
                     </div>
                 }
                 @if (data.budgetOfficer) {
                     <div class="col-md-4">
                         <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Budget Officer</div>
                         <div>{{ data.budgetOfficer?.name || '—' }}</div>
-                        <small class="text-muted">{{ data.budgetOfficer?.position || '' }}</small>
                     </div>
                 }
-                @if (data.recommendingApproval || data.recommendingOfficer || data.recommendedBy) {
+                @if (data.recommendingOfficer) {
                     <div class="col-md-4">
                         <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Recommended By</div>
-                        <div>{{ (data.recommendingApproval || data.recommendingOfficer || data.recommendedBy)?.name || '—' }}</div>
-                        <small class="text-muted">{{ (data.recommendingApproval || data.recommendingOfficer || data.recommendedBy)?.position || '' }}</small>
+                        <div>{{ data.recommendingOfficer?.name || '—' }}</div>
                     </div>
                 }
-                @if (data.auditingOfficer || data.auditedBy) {
+                @if (data.auditingOfficer) {
                     <div class="col-md-4">
                         <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Audited By</div>
-                        <div>{{ (data.auditingOfficer || data.auditedBy)?.name || '—' }}</div>
-                        <small class="text-muted">{{ (data.auditingOfficer || data.auditedBy)?.position || '' }}</small>
+                        <div>{{ data.auditingOfficer?.name || '—' }}</div>
                     </div>
                 }
-                @if (data.approvingOfficer || data.approvedBy) {
+                @if (data.approvingOfficer) {
                     <div class="col-md-4">
                         <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Approving Officer</div>
-                        <div>{{ (data.approvingOfficer || data.approvedBy)?.name || '—' }}</div>
-                        <small class="text-muted">{{ (data.approvingOfficer || data.approvedBy)?.position || '' }}</small>
+                        <div>{{ data.approvingOfficer?.name || '—' }}</div>
                     </div>
                 }
             </div>
@@ -213,7 +260,7 @@
 
         <!-- Attachments -->
         @if (attachments.length > 0) {
-            <hr class="my-3"/>
+            <hr class="border-dashed mx-n3 mt-3"/>
             <div class="fs-xs text-uppercase fw-semibold text-muted mb-2">Attachments</div>
             <ul class="list-unstyled mb-0">
                 @for (f of attachments; track $index) {

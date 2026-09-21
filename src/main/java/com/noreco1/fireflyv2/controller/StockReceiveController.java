@@ -3,6 +3,7 @@ package com.noreco1.fireflyv2.controller;
 import com.noreco1.fireflyv2.common.GlobalConstant;
 import com.noreco1.fireflyv2.controller.response.PostResponse;
 import com.noreco1.fireflyv2.controller.response.ProcessDocumentDto;
+import com.noreco1.fireflyv2.controller.response.StockReceiveDocumentDto;
 import com.noreco1.fireflyv2.model.*;
 import com.noreco1.fireflyv2.controller.response.ItemTransactionDetailDto;
 import com.noreco1.fireflyv2.repo.InventoryLocationRepo;
@@ -69,6 +70,14 @@ public class StockReceiveController {
     @GetMapping("/document-statuses")
     public List<DocumentStatus> documentStatuses() {
         return stockReceiveService.getDocumentsStatuses();
+    }
+
+    @GetMapping("/for-jv-approved-paged")
+    public Page<StockReceiveDocumentDto> approvedForJvPaged(
+            @RequestParam(value = "q", required = false, defaultValue = "") String q,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size) {
+        return stockReceiveService.findAllApprovedForJVPaged(q.isEmpty() ? null : q, PageRequest.of(page, size));
     }
 
     @GetMapping("/inventory-locations")

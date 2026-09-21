@@ -2,6 +2,7 @@ package com.noreco1.fireflyv2.controller;
 
 import com.noreco1.fireflyv2.common.GlobalConstant;
 import com.noreco1.fireflyv2.common.helpers.Checker;
+import com.noreco1.fireflyv2.controller.response.CvVoucherDto;
 import com.noreco1.fireflyv2.controller.response.PostResponse;
 import com.noreco1.fireflyv2.controller.response.ProcessDocumentDto;
 import com.noreco1.fireflyv2.model.DocumentStatus;
@@ -9,10 +10,13 @@ import com.noreco1.fireflyv2.model.JournalVoucher;
 import com.noreco1.fireflyv2.service.DownloadService;
 import com.noreco1.fireflyv2.service.JvService;
 import com.noreco1.fireflyv2.service.PrintableVoucher;
+import jakarta.validation.Valid;
 import net.sf.jasperreports.engine.JRDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.MessageSource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -60,23 +64,33 @@ public class GeneralJournalController {
         return jvService.findById(id);
     }
 
-    @PostMapping("/create")
-    public PostResponse create(@RequestBody JournalVoucher jv) {
-        BindingResult bindingResult = new BeanPropertyBindingResult(jv, "journalVoucher");
-        PostResponse response = jvService.processCreate(jv, bindingResult, messageSource);
+    @GetMapping("/approved-for-cv-paged")
+    public Page<CvVoucherDto> approvedForCvPaged(
+            @RequestParam(value = "q", required = false, defaultValue = "") String q,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size) {
+        return jvService.findAllApprovedForCvPaged(q.isEmpty() ? null : q, PageRequest.of(page, size));
+    }
+
+    @PostMapping(value = "/create", consumes = {"multipart/form-data"})
+    @ResponseBody
+    public PostResponse createJv(@RequestPart(value = "model") @Valid JournalVoucher jv, HttpServletRequest request, BindingResult bindingResult) {
+        PostResponse response = jvService.processCreate(jv, bindingResult, messageSource, request);
         if (Checker.documentSaved(response)) {
             jvService.logNewValue(response.getLogId());
         }
         return response;
     }
 
-    @PostMapping("/update")
-    public PostResponse update(@RequestBody JournalVoucher jv) {
-        BindingResult bindingResult = new BeanPropertyBindingResult(jv, "journalVoucher");
-        PostResponse response = jvService.processUpdate(jv, bindingResult, messageSource);
+    @PostMapping(value = "/update", consumes = {"multipart/form-data"})
+    @ResponseBody
+    public PostResponse updateJv(@RequestPart(value = "filesToRemove", required = false) List<Map> filesToRemove,
+                                 @RequestPart(value = "model") @Valid JournalVoucher jv, HttpServletRequest request, BindingResult bindingResult) {
+        PostResponse response = jvService.processUpdate(jv, bindingResult, messageSource, request, filesToRemove);
         if (Checker.documentSaved(response)) {
             jvService.logNewValue(response.getLogId());
         }
+
         return response;
     }
 

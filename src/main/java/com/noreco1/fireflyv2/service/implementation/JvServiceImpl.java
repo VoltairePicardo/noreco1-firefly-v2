@@ -904,10 +904,8 @@ public class JvServiceImpl implements JvService, PrintableVoucher {
         if (request instanceof MultipartHttpServletRequest) {
             MultipartHttpServletRequest mRequest = (MultipartHttpServletRequest) request;
             if (this.model != null) {
-                if (mRequest.getFileMap() != null) {
-                    fileFacade.removeDocumentAttachment(fileToRemove, this.model.getTransaction().getId());
-                    fileFacade.saveDocumentAttachment(mRequest.getFileMap(), this.model.getTransaction().getId());
-                }
+                fileFacade.removeDocumentAttachment(fileToRemove, this.model.getTransaction().getId());
+                fileFacade.saveDocumentAttachment(FileFacadeImpl.flattenFileMap(mRequest), this.model.getTransaction().getId());
             }
         }
 
@@ -922,9 +920,7 @@ public class JvServiceImpl implements JvService, PrintableVoucher {
         if (request instanceof MultipartHttpServletRequest) {
             MultipartHttpServletRequest mRequest = (MultipartHttpServletRequest) request;
             if (this.model != null) {
-                if (mRequest.getFileMap() != null) {
-                    fileFacade.saveDocumentAttachment(mRequest.getFileMap(), this.model.getTransaction().getId());
-                }
+                fileFacade.saveDocumentAttachment(FileFacadeImpl.flattenFileMap(mRequest), this.model.getTransaction().getId());
             }
         }
 

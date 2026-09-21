@@ -11,7 +11,8 @@ import { FlatpickrDirective, provideFlatpickrDefaults } from 'angularx-flatpickr
 import { GeneralJournalService } from '../general-journal.service';
 import { ModalService } from '@/app/shared/modals/modal-service';
 import { BrowseEntityModalComponent } from '@/app/shared/modals/browse-entity-modal/browse-entity-modal.component';
-import { BrowseAccountSettingDocModalComponent } from '@/app/shared/modals/browse-account-setting-doc-modal/browse-account-setting-doc-modal.component';
+import { BrowseDocumentModalComponent } from '@/app/shared/modals/browse-document-modal/browse-document-modal.component';
+import { BrowseTempGLModalComponent } from '@/app/shared/modals/browse-temp-gl-modal/browse-temp-gl-modal.component';
 import { JournalEntriesFormComponent, JournalEntry } from '@/app/shared/forms/journal-entries-form/journal-entries-form.component';
 import { provideIcons } from '@ng-icons/core';
 import {
@@ -19,6 +20,77 @@ import {
     tablerTrash, tablerPaperclip, tablerPhoto, tablerFile,
     tablerDatabase, tablerLink
 } from '@ng-icons/tabler-icons';
+
+interface Signatory {
+    name?: string;
+    position?: string;
+    accountNo?: string;
+}
+
+interface TempBatch {
+    tempBatchId?: number;
+    docTypeDesc?: string;
+    remarks?: string;
+    amount?: number;
+    tempBatchDate?: string;
+}
+
+interface CcprBatch {
+    id?: number;
+    status?: boolean;
+    createdAt?: string;
+}
+
+interface SourceDocument {
+    id?: number;
+    transactionId?: number;
+    localCode?: string;
+    code?: string;
+    netAmount?: number;
+    totalReturnedAmount?: number;
+    amount?: number;
+    voucherDate?: string;
+    particulars?: string;
+    remarks?: string;
+}
+
+interface SignatoryRef {
+    accountNo?: string;
+}
+
+interface GeneralJournalPayload {
+    id: number | null;
+    voucherDate: string;
+    explanation: string | null;
+    payable: boolean;
+    amount: number;
+    tempBatchId: number | null;
+    batch: { id: number } | null;
+    invDocTransactionId: number | null;
+    cashAdvanceLiquidation: { id: number } | null;
+    generalLedgerLines: {
+        code: string;
+        description: string;
+        accountId: number | null;
+        debit: number;
+        credit: number;
+        hasSL: boolean;
+        wTaxEntry: any;
+        vatEntry: any;
+    }[];
+    subLedgerLines: {
+        accountId: number | null;
+        accountNo: number | null;
+        name: string;
+        debit: number;
+        credit: number;
+    }[];
+    checker: SignatoryRef | null;
+    budgetOfficer: SignatoryRef | null;
+    recommendingOfficer: SignatoryRef | null;
+    auditingOfficer: SignatoryRef | null;
+    approvingOfficer: SignatoryRef | null;
+}
 
 @Component({
     selector: 'app-general-journal-add-edit',
@@ -47,45 +119,36 @@ export class GeneralJournalAddEditComponent {
     subModule = 'Create';
     menuLink  = 'general-journal';
 
-    id: any    = null;
+    id: number | null = null;
+    transId: number | null = null;
     editMode   = false;
     formSubmit = false;
     isLoading  = signal(false);
 
     flatpickrOptions = { dateFormat: 'Y-m-d', altInput: true, altFormat: 'F j, Y' };
 
-    // Form fields
     voucherDate = '';
     explanation = '';
     payable     = false;
 
-    // Journal entries (uses shared JournalEntry type)
     journalEntries: JournalEntry[] = [];
 
-    // Temp GL/SL
-    tempBatch: any              = null;
-    tempBatches: any[]          = [];
-    selectedTempId: number | null = null;
-    loadingTempBatches          = false;
-    showTempList                = false;
+    tempBatch: TempBatch | null = null;
 
-    // Credit Card Purchase Request batch
-    ccprBatch: any               = null;
-    ccprBatches: any[]           = [];
+    ccprBatch: CcprBatch | null  = null;
+    ccprBatches: CcprBatch[]     = [];
     loadingCcprBatches           = false;
-    showCcprList                 = false;
 
-    // Document browse
-    selectedDocument: any       = null;
+    selectedDocument: SourceDocument | null = null;
     selectedIsCal: boolean      = false;
     loadingDocEntries           = false;
 
-    // Attachments (staged for upload)
     stagedFiles  : File[] = [];
+    existingFiles: any[]  = [];
+    filesToRemove: any[]  = [];
     uploadingFiles = false;
 
-    // Signatories
-    signatories: { [key: string]: any } = {
+    signatories: Record<string, Signatory | null> = {
         checker:              null,
         budgetOfficer:        null,
         recommendingApproval: null,
@@ -123,14 +186,16 @@ export class GeneralJournalAddEditComponent {
                 this.loadDefaultSignatories();
             }
         });
+        this.loadCcprBatches();
     }
 
     loadForEdit(): void {
         this.isLoading.set(true);
-        this.service.getData(this.id).subscribe({
+        this.service.getData(this.id!).subscribe({
             next: (data) => {
                 this.isLoading.set(false);
                 if (data?.id) {
+                    this.transId     = data.transId ?? data.transaction?.id ?? null;
                     this.voucherDate = data.voucherDate ? new Date(data.voucherDate).toISOString().substring(0, 10) : '';
                     this.explanation = data.explanation || data.remarks || '';
                     this.payable     = data.payable     || false;
@@ -172,6 +237,7 @@ export class GeneralJournalAddEditComponent {
                         auditingOfficer:      data.auditingOfficer      || data.auditedBy         || null,
                         approvingOfficer:     data.approvingOfficer     || data.approvedBy        || null
                     };
+                    this.loadAttachments();
                 } else {
                     this.alertService.error(this.module, 'Record not found.', '');
                     this.router.navigate(['/' + this.menuLink]);
@@ -183,6 +249,23 @@ export class GeneralJournalAddEditComponent {
                 this.router.navigate(['/' + this.menuLink]);
             }
         });
+    }
+
+    loadAttachments(): void {
+        if (!this.transId) return;
+        this.service.getFiles(this.transId).subscribe({
+            next: (files) => { this.existingFiles = files || []; },
+            error: () => { this.existingFiles = []; }
+        });
+    }
+
+    fileUrl(fileId: number): string {
+        return this.service.fileUrl(fileId);
+    }
+
+    removeExistingFile(index: number): void {
+        const [removed] = this.existingFiles.splice(index, 1);
+        if (removed) this.filesToRemove.push(removed);
     }
 
     loadDefaultSignatories(): void {
@@ -202,7 +285,6 @@ export class GeneralJournalAddEditComponent {
         });
     }
 
-    // Totals (read from entries array for validation)
     get totalDebit(): number {
         return this.journalEntries.reduce((sum, e) => sum + (Number(e.debit) || 0), 0);
     }
@@ -215,66 +297,46 @@ export class GeneralJournalAddEditComponent {
         return this.journalEntries.length > 0 && Math.abs(this.totalDebit - this.totalCredit) < 0.001;
     }
 
-    // Temp GL/SL
-    openTempBrowse(): void {
-        this.showTempList = !this.showTempList;
-        if (this.showTempList && this.tempBatches.length === 0 && !this.loadingTempBatches) {
-            this.loadingTempBatches = true;
-            this.service.getTempBatches().subscribe({
-                next: (data) => { this.tempBatches = data || []; this.loadingTempBatches = false; },
-                error: () => { this.loadingTempBatches = false; }
-            });
-        }
-    }
-
-    onTempBatchSelect(event: Event): void {
-        const id = Number((event.target as HTMLSelectElement).value);
-        if (!id) return;
-        const batch = this.tempBatches.find(b => Number(b.tempBatchId) === id);
-        if (!batch) return;
-        this.tempBatch    = batch;
-        this.showTempList = false;
-        this.selectedTempId = null;
-        this.service.getTempGLEntries(batch.tempBatchId).subscribe({
-            next: (entries) => {
-                this.journalEntries = (entries || []).map((e: any): JournalEntry => ({
+    async openTempBrowse(): Promise<void> {
+        try {
+            const result = await this.modalService.openModal(
+                BrowseTempGLModalComponent,
+                {},
+                { size: 'xl', centered: true, }
+            );
+            if (result?.action === 'select' && result?.data) {
+                this.tempBatch = result.data;
+                this.journalEntries = (result.entries || []).map((e: any): JournalEntry => ({
                     account: { accountCode: e.code, accountTitle: e.description, id: e.accountId },
                     debit:   Number(e.debit) || null,
                     credit:  Number(e.credit) || null
                 }));
-            },
-            error: () => {}
-        });
+            }
+        } catch { }
     }
 
     clearTempBatch(): void {
-        this.tempBatch      = null;
-        this.selectedTempId = null;
-        this.showTempList   = false;
+        this.tempBatch = null;
     }
 
-    // Credit Card Purchase Request batch — selecting a batch groups its requests by
-    // expense account and sums PO+JO amounts into debit lines, mirroring legacy
-    // jv.js's onBatchChange().
-    openCcprBrowse(): void {
-        this.showCcprList = !this.showCcprList;
-        if (this.showCcprList && this.ccprBatches.length === 0 && !this.loadingCcprBatches) {
-            this.loadingCcprBatches = true;
-            this.service.getCcprBatchesForJv().subscribe({
-                next: (data) => { this.ccprBatches = data || []; this.loadingCcprBatches = false; },
-                error: () => { this.loadingCcprBatches = false; }
-            });
-        }
+    loadCcprBatches(): void {
+        this.loadingCcprBatches = true;
+        this.service.getCcprBatchesForJv().subscribe({
+            next: (data) => { this.ccprBatches = data || []; this.loadingCcprBatches = false; },
+            error: () => { this.loadingCcprBatches = false; }
+        });
     }
 
     onCcprBatchSelect(event: Event): void {
         const id = Number((event.target as HTMLSelectElement).value);
-        if (!id) return;
+        if (!id) {
+            this.clearCcprBatch();
+            return;
+        }
         const batch = this.ccprBatches.find(b => Number(b.id) === id);
         if (!batch) return;
-        this.ccprBatch    = batch;
-        this.showCcprList = false;
-        this.service.getCcprRequestsByBatch(batch.id).subscribe({
+        this.ccprBatch = batch;
+        this.service.getCcprRequestsByBatch(batch.id!).subscribe({
             next: (requests) => {
                 const accountMap = new Map<number, JournalEntry>();
                 (requests || []).forEach((r: any) => {
@@ -299,25 +361,21 @@ export class GeneralJournalAddEditComponent {
     }
 
     clearCcprBatch(): void {
-        this.ccprBatch     = null;
-        this.showCcprList  = false;
+        this.ccprBatch = null;
     }
 
-    // Document browse
     async openDocumentBrowse(): Promise<void> {
         try {
             const result = await this.modalService.openModal(
-                BrowseAccountSettingDocModalComponent,
-                { docType: '' },
+                BrowseDocumentModalComponent,
+                {},
                 { size: 'lg', centered: true }
             );
             if (result?.action === 'select' && result?.data) {
                 this.selectedDocument = result.data;
-                this.selectedIsCal    = result.docType === 'cal';
+                this.selectedIsCal    = result.documentType === 'CAL';
 
                 if (this.selectedIsCal) {
-                    // Legacy links the CA Liquidation directly and copies its remarks
-                    // into the explanation — it does not pre-fill journal entries.
                     this.explanation = result.data.remarks || this.explanation;
                 } else if (result.data.transactionId) {
                     this.loadingDocEntries = true;
@@ -342,7 +400,6 @@ export class GeneralJournalAddEditComponent {
         this.selectedIsCal    = false;
     }
 
-    // Entity browse (signatories)
     async openEntityBrowse(key: string): Promise<void> {
         try {
             const result = await this.modalService.openModal(BrowseEntityModalComponent, { entityTypes: [1] }, { size: 'lg', centered: true });
@@ -356,7 +413,6 @@ export class GeneralJournalAddEditComponent {
         this.signatories[key] = null;
     }
 
-    // Attachments
     openFilePicker(): void {
         this.fileInput.nativeElement.click();
     }
@@ -380,24 +436,6 @@ export class GeneralJournalAddEditComponent {
         return file.type.startsWith('image/');
     }
 
-    private uploadAndNavigate(savedId: number): void {
-        const formData = new FormData();
-        this.stagedFiles.forEach(f => formData.append('files', f, f.name));
-        this.service.uploadFiles(savedId, formData).subscribe({
-            next: () => {
-                this.formSubmit = false;
-                this.alertService.success(this.module, 'Saved successfully.', '');
-                this.router.navigate(['/' + this.menuLink, savedId, 'detail']);
-            },
-            error: () => {
-                this.formSubmit = false;
-                this.alertService.success(this.module, 'Saved successfully.', 'Record saved but file upload failed.');
-                this.router.navigate(['/' + this.menuLink, savedId, 'detail']);
-            }
-        });
-    }
-
-    // Save
     save(): void {
         if (!this.voucherDate) {
             this.alertService.warning(this.module, 'Validation', 'Please enter a voucher date.');
@@ -414,10 +452,10 @@ export class GeneralJournalAddEditComponent {
 
         this.formSubmit = true;
 
-        const sigRef = (key: string) => this.signatories[key]
-            ? { accountNo: this.signatories[key].accountNo } : null;
+        const sigRef = (key: string): SignatoryRef | null => this.signatories[key]?.accountNo
+            ? { accountNo: this.signatories[key]!.accountNo } : null;
 
-        const payload: any = {
+        const payload: GeneralJournalPayload = {
             id:             this.editMode ? this.id : null,
             voucherDate:    this.voucherDate,
             explanation:    this.explanation    || null,
@@ -425,8 +463,6 @@ export class GeneralJournalAddEditComponent {
             amount:         this.totalDebit,
             tempBatchId:    this.tempBatch?.tempBatchId || null,
             batch:          this.ccprBatch?.id ? { id: this.ccprBatch.id } : null,
-            // Mutually exclusive, matching legacy: a CA Liquidation link replaces the
-            // generic invDocTransactionId source-document link.
             invDocTransactionId:    this.selectedIsCal ? null : (this.selectedDocument?.transactionId || null),
             cashAdvanceLiquidation: this.selectedIsCal && this.selectedDocument?.id
                 ? { id: this.selectedDocument.id } : null,
@@ -440,9 +476,6 @@ export class GeneralJournalAddEditComponent {
                 wTaxEntry:   e.wTaxEntry || null,
                 vatEntry:    e.vatEntry  || null
             })),
-            // Top-level, matched back to its GL line by accountId — this is what the
-            // backend (LedgerFacadeImpl.postGeneralLedger) actually reads; the per-line
-            // `slentries` on GeneralLedgerLineDto2 is populated only on read, never on save.
             subLedgerLines: this.journalEntries
                 .filter(e => (e.slentries || []).length > 0)
                 .flatMap(e => (e.slentries || []).map(sl => ({
@@ -459,19 +492,16 @@ export class GeneralJournalAddEditComponent {
             approvingOfficer:    sigRef('approvingOfficer')
         };
 
-        const req$ = this.editMode ? this.service.update(payload) : this.service.create(payload);
+        const req$ = this.editMode
+            ? this.service.update(payload, this.stagedFiles, this.filesToRemove)
+            : this.service.create(payload, this.stagedFiles);
         req$.subscribe({
             next: (res) => {
+                this.formSubmit = false;
                 if (res?.success) {
-                    if (this.stagedFiles.length > 0) {
-                        this.uploadAndNavigate(res.modelId);
-                    } else {
-                        this.formSubmit = false;
-                        this.alertService.success(this.module, 'Saved successfully.', '');
-                        this.router.navigate(['/' + this.menuLink, res.modelId, 'detail']);
-                    }
+                    this.alertService.success(this.module, 'Saved successfully.', '');
+                    this.router.navigate(['/' + this.menuLink, res.modelId, 'detail']);
                 } else {
-                    this.formSubmit = false;
                     this.alertService.error(this.module, 'Save failed.', res?.failureMessage || '');
                 }
             },

@@ -15,47 +15,192 @@
                         </div>
                     } @else {
 
-                    <!-- Temporary GL Selection -->
-                    <div class="alert alert-secondary p-3 mb-3">
-                        <div class="d-flex align-items-start gap-3">
-                            <div class="flex-grow-1">
-                                @if (!tempBatch) {
-                                    <span class="text-muted fs-sm">You may select from temporary GL entries to pre-fill journal entries.</span>
-                                } @else {
-                                    <div class="row g-1 fs-sm">
-                                        <div class="col-md-3">
-                                            <span class="text-muted">Document:</span>
-                                            <strong class="ms-1">{{ tempBatch.docTypeDesc }}</strong>
-                                        </div>
-                                        <div class="col-md-3">
-                                            <span class="text-muted">Remarks:</span>
-                                            <span class="ms-1">{{ tempBatch.remarks }}</span>
-                                        </div>
-                                        <div class="col-md-3">
-                                            <span class="text-muted">Amount:</span>
-                                            <strong class="ms-1">{{ tempBatch.amount | number:'1.2-2' }}</strong>
-                                        </div>
-                                        <div class="col-md-3">
-                                            <span class="text-muted">Date:</span>
-                                            <span class="ms-1">{{ tempBatch.tempBatchDate | date:'MMM d, yyyy' }}</span>
-                                        </div>
-                                    </div>
-                                }
-                            </div>
-                            <div class="d-flex gap-2 flex-shrink-0">
-                                <button type="button" class="btn btn-success fw-bold" (click)="openTempGLBrowse()">
-                                    <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse Temp GL
+                    <!-- Temp GL/SL -->
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <span class="fs-sm fw-semibold">Temp GL/SL</span>
+                        <div class="d-flex gap-2">
+                            <button type="button" class="btn btn-primary fw-bold" (click)="openTempGLBrowse()">
+                                <ng-icon name="tablerSearch" class="me-1 fs-lg fw-bold"></ng-icon>Browse Temp GL/SL
+                            </button>
+                            @if (tempBatch) {
+                                <button type="button" class="btn btn-danger fw-bold" (click)="clearTempGL()" aria-label="Clear temp batch">
+                                    <ng-icon name="tablerX" class="fs-lg fw-bold"></ng-icon>
                                 </button>
-                                @if (tempBatch) {
-                                    <button type="button" class="btn btn-danger fw-bold" (click)="clearTempGL()">
-                                        <ng-icon name="tablerX" class="ps-0 pe-3 fw-bold"></ng-icon>Clear
-                                    </button>
-                                }
-                            </div>
+                            }
                         </div>
                     </div>
 
-                    <hr class="mt-0 mb-3"/>
+                    @if (tempBatch) {
+                        <div class="row g-1">
+                            <div class="col-12 d-flex"><span style="width:110px">Document:</span> <span class="fw-bold">{{ tempBatch.docTypeDesc }}</span></div>
+                            <div class="col-12 d-flex"><span style="width:110px">Remarks:</span> <span class="fw-bold">{{ tempBatch.remarks || '—' }}</span></div>
+                            <div class="col-12 d-flex"><span style="width:110px">Amount:</span> <span class="fw-bold">{{ tempBatch.amount | number:'1.2-2' }}</span></div>
+                            <div class="col-12 d-flex"><span style="width:110px">Date:</span> <span class="fw-bold">{{ tempBatch.tempBatchDate | date:'MMM d, yyyy' }}</span></div>
+                        </div>
+                    }
+
+                    <hr class="border-dashed mx-n3 mt-3"/>
+
+                    <!-- Source Document -->
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <span class="fs-sm fw-semibold">Source Document</span>
+                        <div class="d-flex gap-2">
+                            <button type="button" class="btn btn-primary fw-bold" (click)="openSourceVoucherBrowse()">
+                                <ng-icon name="tablerLink" class="me-1 fs-lg fw-bold"></ng-icon>Browse Document
+                            </button>
+                            @if (selectedSourceVoucher) {
+                                <button type="button" class="btn btn-danger fw-bold"
+                                        (click)="clearSourceVoucher()" aria-label="Clear linked document">
+                                    <ng-icon name="tablerTrash" class="fs-lg fw-bold"></ng-icon>
+                                </button>
+                            }
+                        </div>
+                    </div>
+
+                    @if (selectedSourceVoucher) {
+                        <div class="row g-1">
+                            <div class="col-12 mb-1">
+                                <span class="badge bg-info-subtle text-info fw-bold">{{ voucherTypeLabels[selectedVoucherType!] }}</span>
+                            </div>
+                            <div class="col-12 d-flex"><span style="width:110px">Code:</span> <span class="fw-bold">{{ selectedSourceVoucher.localCode || '—' }}</span></div>
+                            <div class="col-12 d-flex"><span style="width:110px">Amount:</span> <span class="fw-bold">{{ selectedSourceVoucher.amount | number:'1.2-2' }}</span></div>
+                            <div class="col-12 d-flex"><span style="width:110px">Date:</span> <span class="fw-bold">{{ selectedSourceVoucher.voucherDate | date:'MMM d, yyyy' }}</span></div>
+                            <div class="col-12 d-flex"><span style="width:110px">Particulars:</span> <span class="fw-bold">{{ selectedSourceVoucher.particulars || '—' }}</span></div>
+                        </div>
+
+                        @if (selectedSourceVoucher.forInstallment) {
+                            <div class="table-responsive mt-2">
+                                <table class="table table-custom table-centered table-hover w-100 mb-0">
+                                    <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                                        <tr class="text-uppercase fs-xxs">
+                                            <th style="width:60px">Select</th>
+                                            <th>Due Date</th>
+                                            <th class="text-end">Amount</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @for (detail of installmentDetails; track detail.id) {
+                                            <tr>
+                                                <td class="text-center">
+                                                    <input type="checkbox" class="form-check-input"
+                                                           [checked]="isInstallmentSelected(detail)"
+                                                           (change)="toggleInstallmentDetail(detail)"/>
+                                                </td>
+                                                <td>{{ detail.dueDate | date:'MMM d, yyyy' }}</td>
+                                                <td class="text-end">{{ detail.amount | number:'1.2-2' }}</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
+
+                        @if (loadingSourceVoucherEntries) {
+                            <div class="mt-1">
+                                <span class="spinner-border spinner-border-sm me-2 text-muted"></span>
+                                <span class="text-muted fs-sm">Loading journal entries from document...</span>
+                            </div>
+                        }
+                    }
+
+                    @if (cashAdvances.length > 0) {
+                        <div class="table-responsive mt-2">
+                            <table class="table table-custom table-centered table-hover w-100 mb-0">
+                                <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                                    <tr class="text-uppercase fs-xxs">
+                                        <th>Code</th>
+                                        <th class="text-end">Amount</th>
+                                        <th>Particulars</th>
+                                        <th>Date</th>
+                                        <th style="width:50px"></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @for (ca of cashAdvances; track ca.id; let i = $index) {
+                                        <tr>
+                                            <td class="fw-bold">{{ ca.localCode || '—' }}</td>
+                                            <td class="text-end">{{ ca.amount | number:'1.2-2' }}</td>
+                                            <td>{{ ca.particulars || '—' }}</td>
+                                            <td>{{ ca.voucherDate | date:'MMM d, yyyy' }}</td>
+                                            <td class="text-center">
+                                                <button type="button" class="btn btn-danger btn-icon btn rounded-circle"
+                                                        (click)="removeCashAdvance(i)" ngbTooltip="Remove">
+                                                    <ng-icon name="tablerTrash" class="fs-sm"></ng-icon>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+
+                    <hr class="border-dashed mx-n3 mt-3"/>
+
+                    <!-- Bank / Check Numbers -->
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">Bank</label>
+                            <select class="form-select" [(ngModel)]="selectedBank" [ngModelOptions]="{ standalone: true }"
+                                    [compareWith]="compareById"
+                                    [disabled]="loadingBankAccountsForCv" (change)="onBankChange()">
+                                <option [ngValue]="null">— Select Bank —</option>
+                                @for (bank of banks; track bank.id) {
+                                    <option [ngValue]="bank">{{ bank.name }}</option>
+                                }
+                            </select>
+                            @if (loadingBankAccountsForCv) {
+                                <div class="fs-xs text-muted mt-1">
+                                    <span class="spinner-border spinner-border-sm me-1"></span>Loading bank accounts...
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    @if (checkNumberRows.length > 0) {
+                        <div class="table-responsive mt-3">
+                            <table class="table table-custom table-centered table-hover w-100 mb-0">
+                                <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                                    <tr class="text-uppercase fs-xxs">
+                                        <th>Bank Account</th>
+                                        <th style="width:260px">Check Number</th>
+                                        <th style="width:50px"></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @for (row of checkNumberRows; track row.bankAccount.id; let i = $index) {
+                                        <tr>
+                                            <td>{{ row.bankAccount.bank?.name }} — {{ row.bankAccount.accountNumber }}</td>
+                                            <td>
+                                                <div class="input-group input-group-sm">
+                                                    <input type="text" class="form-control"
+                                                           [(ngModel)]="row.checkNumber" [ngModelOptions]="{ standalone: true }"
+                                                           placeholder="Enter check number..."/>
+<!--                                                    <button type="button" class="btn btn-outline-secondary"-->
+<!--                                                            [disabled]="row.loadingNextNumber"-->
+<!--                                                            (click)="getNextCheckNumberFor(row)">-->
+<!--                                                        @if (row.loadingNextNumber) {-->
+<!--                                                            <span class="spinner-border spinner-border-sm"></span>-->
+<!--                                                        } @else {-->
+<!--                                                            Next #-->
+<!--                                                        }-->
+<!--                                                    </button>-->
+                                                </div>
+                                            </td>
+                                            <td class="text-center">
+                                                <button type="button" class="btn btn-danger btn-icon btn-sm rounded-circle"
+                                                        (click)="removeBankAccountRow(i)" ngbTooltip="Remove">
+                                                    <ng-icon name="tablerTrash" class="fs-lg"></ng-icon>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+
+                    <hr class="border-dashed mx-n3 mt-3"/>
 
                     <!-- Basic Info -->
                     <div class="row g-3">
@@ -66,18 +211,6 @@
                                    placeholder="Select date"/>
                         </div>
                         <div class="col-md-3">
-                            <label class="form-label fw-bold">Check Date</label>
-                            <input type="text" class="form-control" mwlFlatpickr [options]="flatpickrOptions"
-                                   [(ngModel)]="checkDate" [ngModelOptions]="{ standalone: true }"
-                                   placeholder="Select date"/>
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label fw-bold">Check Number</label>
-                            <input type="text" class="form-control"
-                                   [(ngModel)]="checkNumber" [ngModelOptions]="{ standalone: true }"
-                                   placeholder="Enter check number..."/>
-                        </div>
-                        <div class="col-md-3">
                             <label class="form-label fw-bold">Check Amount</label>
                             <input type="number" class="form-control text-end"
                                    [(ngModel)]="checkAmount" [ngModelOptions]="{ standalone: true }"
@@ -85,13 +218,13 @@
                         </div>
                     </div>
 
-                    <!-- Payee + Bank Account -->
+                    <!-- Payee -->
                     <div class="row g-3 mt-1">
                         <div class="col-md-6">
                             <label class="form-label fw-bold">Payee <span class="text-danger">*</span></label>
                             <div class="input-group">
                                 <input type="text" class="form-control"
-                                       [value]="payee ? payee.name : ''"
+                                       [value]="payee?.name ?? ''"
                                        readonly placeholder="Select payee..."/>
                                 <button type="button" class="btn btn-success fw-bold"
                                         (click)="openPayeeBrowse()">
@@ -99,18 +232,9 @@
                                 </button>
                             </div>
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold">Bank Account</label>
-                            <select class="form-select" [(ngModel)]="selectedBankAccount" [ngModelOptions]="{ standalone: true }">
-                                <option [ngValue]="null">— Select Bank Account —</option>
-                                @for (ba of bankAccounts; track ba.id) {
-                                    <option [ngValue]="ba">{{ ba.bankName }} — {{ ba.accountNumber }}</option>
-                                }
-                            </select>
-                        </div>
                     </div>
 
-                    <!-- Additional Payee Info -->
+                    <!-- Additional Payee Info / Particulars -->
                     <div class="row g-3 mt-1">
                         <div class="col-md-6">
                             <label class="form-label fw-bold">Additional Payee Information</label>
@@ -125,6 +249,47 @@
                                       placeholder="Enter particulars..."></textarea>
                         </div>
                     </div>
+
+                    <hr class="border-dashed mx-n3 mt-3"/>
+
+                    <!-- Job Order / Purchase Order -->
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <span class="fs-sm fw-semibold">Job Order / Purchase Order</span>
+                        <div class="d-flex gap-2">
+                            @if (!purchaseOrder) {
+                                <button type="button" class="btn btn-primary fw-bold" (click)="openJobOrderBrowse()">
+                                    <ng-icon name="tablerSearch" class="me-1 fs-lg fw-bold"></ng-icon>Browse Job Order
+                                </button>
+                            }
+                            @if (jobOrder) {
+                                <button type="button" class="btn btn-danger fw-bold" (click)="clearJobOrder()" aria-label="Clear job order">
+                                    <ng-icon name="tablerTrash" class="fs-lg fw-bold"></ng-icon>
+                                </button>
+                            }
+                            @if (!jobOrder) {
+                                <button type="button" class="btn btn-primary fw-bold" (click)="openPurchaseOrderBrowse()">
+                                    <ng-icon name="tablerSearch" class="me-1 fs-lg fw-bold"></ng-icon>Browse Purchase Order
+                                </button>
+                            }
+                            @if (purchaseOrder) {
+                                <button type="button" class="btn btn-danger fw-bold" (click)="clearPurchaseOrder()" aria-label="Clear purchase order">
+                                    <ng-icon name="tablerTrash" class="fs-lg fw-bold"></ng-icon>
+                                </button>
+                            }
+                        </div>
+                    </div>
+
+                    @if (jobOrder) {
+                        <div class="row g-1">
+                            <div class="col-12 d-flex"><span style="width:110px">Job Order:</span> <span class="fw-bold">{{ jobOrder.localCode || jobOrder.code || '—' }}</span></div>
+                        </div>
+                    } @else if (purchaseOrder) {
+                        <div class="row g-1">
+                            <div class="col-12 d-flex"><span style="width:110px">Purchase Order:</span> <span class="fw-bold">{{ purchaseOrder.localCode || purchaseOrder.code || '—' }}</span></div>
+                        </div>
+                    } @else {
+                        <span class="text-muted fs-sm">Optionally link a Job Order or Purchase Order.</span>
+                    }
 
                     <hr class="border-dashed mx-n3 mt-3"/>
 
@@ -177,10 +342,10 @@
                                                 <td class="text-end">{{ (bill.ewtPurchases || 0) | number:'1.2-2' }}</td>
                                                 <td class="text-center">
                                                     <button type="button"
-                                                            class="btn btn-danger btn-icon btn rounded-circle"
+                                                            class="btn btn-danger btn-icon btn-sm rounded-circle"
                                                             (click)="removeIemop(i)"
                                                             ngbTooltip="Remove">
-                                                        <ng-icon name="tablerTrash" class="fs-sm"></ng-icon>
+                                                        <ng-icon name="tablerTrash" class="fs-lg"></ng-icon>
                                                     </button>
                                                 </td>
                                             </tr>
@@ -218,7 +383,7 @@
                                 <label class="form-label fw-bold">{{ signatoryLabels[key] }}</label>
                                 <div class="input-group">
                                     <input type="text" class="form-control"
-                                           [value]="signatories[key] ? signatories[key].name : ''"
+                                           [value]="signatories[key]?.name ?? ''"
                                            readonly placeholder="Select signatory..."/>
                                     <button type="button" class="btn btn-success fw-bold"
                                             (click)="openEntityBrowse(key)">
@@ -226,7 +391,7 @@
                                     </button>
                                 </div>
                                 @if (signatories[key]?.position) {
-                                    <small class="text-muted">{{ signatories[key].position }}</small>
+                                    <small class="text-muted">{{ signatories[key]?.position }}</small>
                                 }
                             </div>
                         }
@@ -247,8 +412,22 @@
                             </div>
                             <input #fileInput type="file" multiple accept=".jpg,.jpeg,.png,.pdf"
                                    style="display:none" (change)="onFileSelect($event)"/>
-                            @if (stagedFiles.length > 0) {
+                            @if (existingFiles.length > 0 || stagedFiles.length > 0) {
                                 <div class="d-flex flex-wrap gap-2">
+                                    @for (f of existingFiles; track f.id; let i = $index) {
+                                        <div class="d-flex align-items-center gap-2 border rounded px-3 py-2 bg-light">
+                                            <ng-icon name="tablerFile" class="text-muted fs-sm"></ng-icon>
+                                            <a [href]="fileUrl(f.id)" target="_blank"
+                                               class="fs-xs text-truncate text-primary" style="max-width:200px"
+                                               [title]="f.originalFilename || f.oFile || f.name || 'File'">
+                                                {{ f.originalFilename || f.oFile || f.name || 'File' }}
+                                            </a>
+                                            <button type="button" class="btn btn-link p-0 text-danger ms-1"
+                                                    (click)="removeExistingFile(i)">
+                                                <ng-icon name="tablerTrash" class="fs-sm"></ng-icon>
+                                            </button>
+                                        </div>
+                                    }
                                     @for (f of stagedFiles; track $index; let i = $index) {
                                         <div class="d-flex align-items-center gap-2 border rounded px-3 py-2 bg-light">
                                             @if (isImage(f)) {

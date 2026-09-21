@@ -76,7 +76,6 @@ public class CashAdvanceLiquidationServiceImpl implements CashAdvanceLiquidation
         CashAdvanceLiquidation cashAdvanceLiquidation = cashAdvanceLiquidationRepo.findById(id).orElse(null);
 
         if(cashAdvanceLiquidation != null){
-
             List<CashAdvanceLiquidationItem> items = cashAdvanceLiquidationItemRepo.findByCashAdvanceLiquidationId(cashAdvanceLiquidation.getId());
             if(!items.isEmpty()){
                 cashAdvanceLiquidation.setCashAdvanceLiquidationItems(items);

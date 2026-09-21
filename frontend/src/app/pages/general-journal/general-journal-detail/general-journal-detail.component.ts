@@ -4,13 +4,18 @@ import { AlertService } from '@/app/shared/services/alert.service';
 import { COMMON_ALL_PAGE_IMPORTS, COMMON_MAIN_PAGE_IMPORTS, SHARED_PROVIDERS } from '@/app/shared/providers/shared-providers';
 import { GeneralJournalService } from '../general-journal.service';
 import { provideIcons } from '@ng-icons/core';
-import { NgbCollapse } from '@ng-bootstrap/ng-bootstrap';
-import { tablerArrowLeft, tablerPrinter, tablerEdit, tablerEye, tablerEyeOff, tablerCheck, tablerChevronDown, tablerChevronRight } from '@ng-icons/tabler-icons';
+import {
+    tablerArrowLeft, tablerPrinter, tablerEdit, tablerEye, tablerEyeOff, tablerCheck,
+    tablerChevronDown, tablerChevronRight
+} from '@ng-icons/tabler-icons';
 
 @Component({
     selector: 'app-general-journal-detail',
-    imports: [...COMMON_ALL_PAGE_IMPORTS, ...COMMON_MAIN_PAGE_IMPORTS, NgbCollapse],
-    providers: [...SHARED_PROVIDERS, provideIcons({ tablerArrowLeft, tablerPrinter, tablerEdit, tablerEye, tablerEyeOff, tablerCheck, tablerChevronDown, tablerChevronRight })],
+    imports: [...COMMON_ALL_PAGE_IMPORTS, ...COMMON_MAIN_PAGE_IMPORTS],
+    providers: [...SHARED_PROVIDERS, provideIcons({
+        tablerArrowLeft, tablerPrinter, tablerEdit, tablerEye, tablerEyeOff, tablerCheck,
+        tablerChevronDown, tablerChevronRight
+    })],
     templateUrl: './general-journal-detail.component.html'
 })
 export class GeneralJournalDetailComponent {
@@ -21,6 +26,7 @@ export class GeneralJournalDetailComponent {
     data: any = {};
     journalEntries: any[] = [];
     attachments   : any[] = [];
+    expandedSl    = new Set<number>();
     isLoading   = signal(false);
     processingWorkflow = false;
 
@@ -53,25 +59,8 @@ export class GeneralJournalDetailComponent {
                 this.isLoading.set(false);
                 if (data?.id) {
                     this.data = data;
-                    const rawEntries: any[] = data.journalEntries || data.details || [];
-                    // SL sub-rows are flattened into the same list, right after their parent
-                    // GL row, with "&nbsp;"-prefixed labels and amounts in slDebitAmount/
-                    // slCreditAmount instead of glDebitAmount/glCreditAmount — regroup them
-                    // under their parent so they can be shown in a collapsible breakdown
-                    this.journalEntries = [];
-                    for (const e of rawEntries) {
-                        const isSlEntry = e.glDebitAmount == null && e.glCreditAmount == null;
-                        const cleaned = {
-                            ...e,
-                            accountCode:  String(e.accountCode || '').replace(/(&nbsp;)+/g, '').trim(),
-                            accountTitle: String(e.accountTitle || '').replace(/(&nbsp;)+/g, '').trim(),
-                        };
-                        if (isSlEntry) {
-                            this.journalEntries[this.journalEntries.length - 1]?.slEntries.push(cleaned);
-                        } else {
-                            this.journalEntries.push({ ...cleaned, slEntries: [], expanded: false });
-                        }
-                    }
+                    this.journalEntries = data.generalLedgerLines || [];
+                    this.expandedSl.clear();
                     this.loadWorkflowActions();
                     this.loadAttachments();
                 } else {
@@ -96,8 +85,8 @@ export class GeneralJournalDetailComponent {
     }
 
     loadAttachments(): void {
-        if (!this.data?.id) return;
-        this.service.getFiles(this.data.id).subscribe({
+        if (!this.data?.transId) return;
+        this.service.getFiles(this.data.transId).subscribe({
             next: (files) => { this.attachments = files || []; },
             error: () => { this.attachments = []; }
         });
@@ -132,11 +121,42 @@ export class GeneralJournalDetailComponent {
     }
 
     get totalDebit(): number {
-        return this.journalEntries.reduce((sum, e) => sum + (Number(e.glDebitAmount) || 0), 0);
+        return this.journalEntries.reduce((sum, e) => sum + (Number(e.debit) || 0), 0);
     }
 
     get totalCredit(): number {
-        return this.journalEntries.reduce((sum, e) => sum + (Number(e.glCreditAmount) || 0), 0);
+        return this.journalEntries.reduce((sum, e) => sum + (Number(e.credit) || 0), 0);
+    }
+
+    get sourceDocumentType(): string | null {
+        if (this.data.cashAdvanceLiquidation) return 'Cash Advance Liquidation';
+        if (this.data.document?.extensionUrl === 'receiving-report') return 'Receiving Report';
+        if (this.data.document) return 'Stock Receive / Stock Adjustment';
+        return null;
+    }
+
+    get sourceDocument(): { code: string; amount: number; voucherDate: string; particulars: string } | null {
+        const cal = this.data.cashAdvanceLiquidation;
+        if (cal) {
+            return { code: cal.code, amount: cal.amount, voucherDate: cal.voucherDate, particulars: cal.remarks };
+        }
+        const doc = this.data.document;
+        if (doc) {
+            return { code: doc.localCode, amount: doc.netAmount, voucherDate: doc.voucherDate, particulars: doc.particulars };
+        }
+        return null;
+    }
+
+    isSlExpanded(index: number): boolean {
+        return this.expandedSl.has(index);
+    }
+
+    toggleSl(index: number): void {
+        if (this.expandedSl.has(index)) {
+            this.expandedSl.delete(index);
+        } else {
+            this.expandedSl.add(index);
+        }
     }
 
     fileUrl(fileId: number): string {

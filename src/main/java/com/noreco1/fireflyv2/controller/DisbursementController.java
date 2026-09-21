@@ -9,6 +9,7 @@ import com.noreco1.fireflyv2.model.DocumentStatus;
 import com.noreco1.fireflyv2.service.CvService;
 import com.noreco1.fireflyv2.service.DownloadService;
 import com.noreco1.fireflyv2.service.PrintableVoucher;
+import jakarta.validation.Valid;
 import net.sf.jasperreports.engine.JRDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -60,23 +61,27 @@ public class DisbursementController {
         return cvService.findById(id);
     }
 
-    @PostMapping("/create")
-    public PostResponse create(@RequestBody CheckVoucher cv) {
-        BindingResult bindingResult = new BeanPropertyBindingResult(cv, "checkVoucher");
-        PostResponse response = cvService.processCreate(cv, bindingResult, messageSource);
+    @PostMapping(value = "/create", consumes = {"multipart/form-data"})
+    @ResponseBody
+    public PostResponse createCv(@RequestPart(value = "model") @Valid CheckVoucher cv, HttpServletRequest request,
+                                 BindingResult bindingResult ) {
+        PostResponse response = cvService.processCreate(cv, bindingResult, messageSource, request);
         if (Checker.documentSaved(response)) {
             cvService.logNewValue(response.getLogId());
         }
         return response;
     }
 
-    @PostMapping("/update")
-    public PostResponse update(@RequestBody CheckVoucher cv) {
-        BindingResult bindingResult = new BeanPropertyBindingResult(cv, "checkVoucher");
-        PostResponse response = cvService.processUpdate(cv, bindingResult, messageSource);
+    @PostMapping(value = "/update", consumes = {"multipart/form-data"})
+    @ResponseBody
+    public PostResponse updateCv(@RequestPart(value = "filesToRemove", required = false) List<Map> filesToRemove,
+                                 @RequestPart(value = "model") @Valid CheckVoucher cv, HttpServletRequest request,
+                                 BindingResult bindingResult) {
+        PostResponse response = cvService.processUpdate(cv, bindingResult, messageSource, request, filesToRemove);
         if (Checker.documentSaved(response)) {
             cvService.logNewValue(response.getLogId());
         }
+
         return response;
     }
 
@@ -94,6 +99,16 @@ public class DisbursementController {
     @GetMapping("/default-signatories")
     public Map defaultSignatories() {
         return cvService.defaultSignatories();
+    }
+
+    @GetMapping("/next-check-number/{bankAccountId}")
+    public Map nextCheckNumber(@PathVariable Integer bankAccountId) {
+        return cvService.getNextCheckNumber(bankAccountId);
+    }
+
+    @GetMapping("/checks/{transId}")
+    public List<Map> checks(@PathVariable Integer transId) {
+        return cvService.findCvChecks(transId);
     }
 
     @GetMapping("/export/{id}")

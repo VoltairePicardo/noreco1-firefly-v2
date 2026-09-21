@@ -119,7 +119,13 @@
       "Read(//tmp/hrfix/**)",
       "Bash(awk 'NR==86,NR==89' frontend/src/app/pages/work-order/work-order-add-edit/work-order-add-edit.component.html)",
       "Bash(xxd)",
-      "Bash(perl -ne 'if \\($. >= 86 && $. <= 89\\) { print \"$.: \"; print; }' frontend/src/app/pages/work-order/work-order-add-edit/work-order-add-edit.component.html)"
+      "Bash(perl -ne 'if \\($. >= 86 && $. <= 89\\) { print \"$.: \"; print; }' frontend/src/app/pages/work-order/work-order-add-edit/work-order-add-edit.component.html)",
+      "Bash(awk 'BEGIN{o=0;c=0} {o+=gsub\\(/{/,\"{\"\\); c+=gsub\\(/}/,\"}\"\\)} END{print \"open:\",o,\" close:\",c}' src/main/java/com/noreco1/fireflyv2/service/implementation/CvServiceImpl.java)",
+      "Bash(./mvnw.cmd -q -o compile)",
+      "Read(//c/Program Files/Java/**)",
+      "Read(//c/Program Files/**)",
+      "Bash(where java *)",
+      "Bash(JAVA_HOME=\"/c/Program Files/Java/jdk-21\" ./mvnw.cmd -q -o compile)"
     ]
   }
 }

@@ -62,8 +62,8 @@ public class LedgerFacadeImpl implements LedgerFacade {
 
         if (transaction != null && transaction.getId() > 0) {
             voucherCashflowDetailRepo.deleteByTransactionId(transaction.getId());
-            generalLedgerRepo.deleteByTransactionId(transaction.getId());
             subLedgerRepo.deleteByTransactionId(transaction.getId());
+            generalLedgerRepo.deleteByTransactionId(transaction.getId());
             incomePaymentRepo.deleteByTransactionId(transaction.getId());
         }
 

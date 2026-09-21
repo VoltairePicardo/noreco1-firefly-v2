@@ -23,6 +23,7 @@ import com.noreco1.fireflyv2.service.CvService;
 import com.noreco1.fireflyv2.service.PrintableCheque;
 import com.noreco1.fireflyv2.service.PrintableVoucher;
 import com.noreco1.fireflyv2.validator.CvValidator;
+import lombok.RequiredArgsConstructor;
 import net.sf.jasperreports.engine.JRDataSource;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,138 +46,53 @@ import java.util.*;
 import java.util.List;
 
 @Service(value = "cvServiceImpl")
+@RequiredArgsConstructor
 public class CvServiceImpl implements CvService, PrintableVoucher, PrintableCheque, Bir2307 {
 
     private CheckVoucher model;
-
-    @Autowired
-    GeneratorFacade generatorFacade;
-
-    @Autowired
-    private AuthenticationFacade authenticationFacade;
-
-    @Autowired
-    CheckVoucherRepo cvRepo;
-
-    @Autowired
-    UserRepo userRepo;
-
-    @Autowired
-    SlEntityRepo slEntityRepo;
-
-    @Autowired
-    LedgerFacadeImpl ledgerFacade;
-
-    @Autowired
-    LedgerDtoerImpl ledgerDtoers;
-
-    @Autowired
-    DocumentWorkflowActionMapRepo workflowActionMapRepo;
-
-    @Autowired
-    DocumentProcessingFacade documentProcessingFacade;
-
-    @Autowired
-    CheckVoucherChequeRepo chequeRepo;
-
-    @Autowired
-    CheckConfigRepo checkConfigRepo;
-
-    @Autowired
-    CheckVoucherApvRepo checkVoucherApvRepo;
-
-    @Autowired
-    CheckVoucherApvPaidInstallmentRepo checkVoucherApvPaidInstallmentRepo;
-
-    @Autowired
-    AccountsPayableVoucherRepo apvRepo;
-
-    @Autowired
-    ReleasedCheckRepo releasedCheckRepo;
-
-    @Autowired
-    SupplierRepo supplierRepo;
-
-    @Autowired
-    TokenService tokenService;
-
-    @Autowired
-    EmployeeRepo employeeRepo;
-
-    @Autowired
-    CheckVoucherIncomePaymentRepo incomePaymentRepo;
-
-    @Autowired
-    FileFacade fileFacade;
-
-    @Autowired
-    MonthlyCycleRepo monthlyCycleRepo;
-
-    @Autowired
-    DocumentLogRepo documentLogRepo;
-
-    @Autowired
-    LedgerDtoer ledgerDtoer;
-
-    @Autowired
-    DocumentLoggerFacade documentLoggerFacade;
-
-    @Autowired
-    SignatoryFacade signatoryFacade;
-
-    @Autowired
-    DocumentDtoer documentDtoer;
-
-    @Autowired
-    SignatureFacade signatureFacade;
-
-    @Autowired
-    OrganizationRepo organizationRepo;
-
-    @Autowired
-    AllocationFactorRepo allocationFactorRepo;
-
-    @Autowired
-    CheckVoucherCashAdvanceRepo checkVoucherCashAdvanceRepo;
-
-    @Autowired
-    VoucherCashflowDetailRepo voucherCashflowDetailRepo;
-
-    @Autowired
-    CheckVoucherJvRepo checkVoucherJvRepo;
-
-    @Autowired
-    CheckVoucherRrRepo checkVoucherRrRepo;
-
-    @Autowired
-    CheckVoucherJoAcceptanceRepo checkVoucherJoAcceptanceRepo;
-
-    @Autowired
-    BankAccountRepo bankAccountRepo;
-
-    @Autowired
-    CheckVoucherChequeRepo checkVoucherChequeRepo;
-
-    @Autowired
-    CheckVoucherIEMOPBillingRepo checkVoucherIEMOPBillingRepo;
-
-    @Autowired
-    AccountsPayableVoucherIEMOPBillingRepo accountsPayableVoucherIEMOPBillingRepo;
-
-    @Autowired
-    CheckVoucherBudgetDetailRepo checkVoucherBudgetDetailRepo;
-
-    @Autowired
-    SettingFacade settingFacade;
-
-    @Autowired
-    TaxCodeRepo taxCodeRepo;
-
-    @Autowired
-    BudgetDetailRepo budgetDetailRepo;
-
-    @Autowired
-    BudgetLineItemDetailRepo budgetLineItemDetailRepo;
+    private final GeneratorFacade generatorFacade;
+    private final AuthenticationFacade authenticationFacade;
+    private final CheckVoucherRepo cvRepo;
+    private final UserRepo userRepo;
+    private final SlEntityRepo slEntityRepo;
+    private final LedgerFacadeImpl ledgerFacade;
+    private final LedgerDtoerImpl ledgerDtoers;
+    private final DocumentWorkflowActionMapRepo workflowActionMapRepo;
+    private final DocumentProcessingFacade documentProcessingFacade;
+    private final CheckVoucherChequeRepo chequeRepo;
+    private final CheckConfigRepo checkConfigRepo;
+    private final CheckVoucherApvRepo checkVoucherApvRepo;
+    private final CheckVoucherApvPaidInstallmentRepo checkVoucherApvPaidInstallmentRepo;
+    private final AccountsPayableVoucherRepo apvRepo;
+    private final ReleasedCheckRepo releasedCheckRepo;
+    private final SupplierRepo supplierRepo;
+    private final TokenService tokenService;
+    private final EmployeeRepo employeeRepo;
+    private final CheckVoucherIncomePaymentRepo incomePaymentRepo;
+    private final FileFacade fileFacade;
+    private final MonthlyCycleRepo monthlyCycleRepo;
+    private final DocumentLogRepo documentLogRepo;
+    private final LedgerDtoer ledgerDtoer;
+    private final DocumentLoggerFacade documentLoggerFacade;
+    private final SignatoryFacade signatoryFacade;
+    private final DocumentDtoer documentDtoer;
+    private final SignatureFacade signatureFacade;
+    private final OrganizationRepo organizationRepo;
+    private final AllocationFactorRepo allocationFactorRepo;
+    private final CheckVoucherCashAdvanceRepo checkVoucherCashAdvanceRepo;
+    private final VoucherCashflowDetailRepo voucherCashflowDetailRepo;
+    private final CheckVoucherJvRepo checkVoucherJvRepo;
+    private final CheckVoucherRrRepo checkVoucherRrRepo;
+    private final CheckVoucherJoAcceptanceRepo checkVoucherJoAcceptanceRepo;
+    private final BankAccountRepo bankAccountRepo;
+    private final CheckVoucherChequeRepo checkVoucherChequeRepo;
+    private final CheckVoucherIEMOPBillingRepo checkVoucherIEMOPBillingRepo;
+    private final AccountsPayableVoucherIEMOPBillingRepo accountsPayableVoucherIEMOPBillingRepo;
+    private final CheckVoucherBudgetDetailRepo checkVoucherBudgetDetailRepo;
+    private final SettingFacade settingFacade;
+    private final TaxCodeRepo taxCodeRepo;
+    private final BudgetDetailRepo budgetDetailRepo;
+    private final BudgetLineItemDetailRepo budgetLineItemDetailRepo;
 
     @Override
     @Transactional
@@ -289,109 +205,108 @@ public class CvServiceImpl implements CvService, PrintableVoucher, PrintableCheq
 
             this.model = cvRepo.save(existingCv);
 
-            if (this.model != null) {
-                // start: update default signatories
-                signatoryFacade.cv(this.model);
-                // end: update default signatories
+            // start: update default signatories
+            signatoryFacade.cv(this.model);
+            // end: update default signatories
 
-                // save apv
-                checkVoucherApvRepo.deleteByCheckVoucherId(this.model.getId()); // with or without
-                if (cv.getAccountsPayableVoucher() != null && cv.getAccountsPayableVoucher().getId() != null) {
-                    CheckVoucherApv checkVoucherApv = new CheckVoucherApv();
-                    checkVoucherApv.setCheckVoucher(this.model);
-                    checkVoucherApv.setAccountsPayableVoucher(cv.getAccountsPayableVoucher());
-                    CheckVoucherApv savedCheckVoucherApv = checkVoucherApvRepo.save(checkVoucherApv);
+            // save apv
+            checkVoucherApvRepo.deleteByCheckVoucherId(this.model.getId()); // with or without
+            if (cv.getAccountsPayableVoucher() != null && cv.getAccountsPayableVoucher().getId() != null) {
+                CheckVoucherApv checkVoucherApv = new CheckVoucherApv();
+                checkVoucherApv.setCheckVoucher(this.model);
+                checkVoucherApv.setAccountsPayableVoucher(cv.getAccountsPayableVoucher());
+                CheckVoucherApv savedCheckVoucherApv = checkVoucherApvRepo.save(checkVoucherApv);
 
-                    if (Checker.isValidId(savedCheckVoucherApv.getId()) && Checker.collectionIsNotEmpty(cv.getSelectedInstallmentDetails())) {
-                        for (AccountsPayableVoucherInstallmentDetail detail : cv.getSelectedInstallmentDetails()) {
-                            CheckVoucherApvPaidInstallment paidInstallment = new CheckVoucherApvPaidInstallment();
-                            paidInstallment.setCheckVoucherApv(savedCheckVoucherApv);
-                            paidInstallment.setAccountsPayableVoucherInstallmentDetail(detail);
-                            checkVoucherApvPaidInstallmentRepo.save(paidInstallment);
-                        }
+                if (Checker.isValidId(savedCheckVoucherApv.getId()) && Checker.collectionIsNotEmpty(cv.getSelectedInstallmentDetails())) {
+                    for (AccountsPayableVoucherInstallmentDetail detail : cv.getSelectedInstallmentDetails()) {
+                        CheckVoucherApvPaidInstallment paidInstallment = new CheckVoucherApvPaidInstallment();
+                        paidInstallment.setCheckVoucherApv(savedCheckVoucherApv);
+                        paidInstallment.setAccountsPayableVoucherInstallmentDetail(detail);
+                        checkVoucherApvPaidInstallmentRepo.save(paidInstallment);
                     }
                 }
+            }
 
-                // save iemop billing
-                checkVoucherIEMOPBillingRepo.deleteByCheckVoucherId(this.model.getId()); // with or without
+            // save iemop billing
+            checkVoucherIEMOPBillingRepo.deleteByCheckVoucherId(this.model.getId()); // with or without
 
-                if (!Checker.collectionIsEmpty(cv.getIemopBillings())) {
-                    for(IEMOPBilling iemopBilling : cv.getIemopBillings()) {
+            if (!Checker.collectionIsEmpty(cv.getIemopBillings())) {
+                for(IEMOPBilling iemopBilling : cv.getIemopBillings()) {
 
-                        CheckVoucherIEMOPBilling checkVoucherIEMOPBilling = new CheckVoucherIEMOPBilling();
-                        checkVoucherIEMOPBilling.setCheckVoucher(this.model);
-                        checkVoucherIEMOPBilling.setIemopBilling(iemopBilling);
+                    CheckVoucherIEMOPBilling checkVoucherIEMOPBilling = new CheckVoucherIEMOPBilling();
+                    checkVoucherIEMOPBilling.setCheckVoucher(this.model);
+                    checkVoucherIEMOPBilling.setIemopBilling(iemopBilling);
 
-                        checkVoucherIEMOPBillingRepo.save(checkVoucherIEMOPBilling);
-                    }
+                    checkVoucherIEMOPBillingRepo.save(checkVoucherIEMOPBilling);
                 }
+            }
 
-                // save cash advance
-                checkVoucherCashAdvanceRepo.deleteByCheckVoucherId(this.model.getId());
+            // save cash advance
+            checkVoucherCashAdvanceRepo.deleteByCheckVoucherId(this.model.getId());
                /* if (cv.getCashAdvance() != null && cv.getCashAdvance().getId() != null) {
                     CheckVoucherCashAdvance checkVoucherCashAdvance = new CheckVoucherCashAdvance();
                     checkVoucherCashAdvance.setCheckVoucher(this.model);
                     checkVoucherCashAdvance.setCashAdvance(cv.getCashAdvance());
                     checkVoucherCashAdvanceRepo.save(checkVoucherCashAdvance);
                 }*/
-                if (!cv.getCashAdvances().isEmpty()) {
+            if (!cv.getCashAdvances().isEmpty()) {
 
-                    for(CashAdvance cashAdvance : cv.getCashAdvances()){
-                        CheckVoucherCashAdvance checkVoucherCashAdvance = new CheckVoucherCashAdvance();
-                        checkVoucherCashAdvance.setCheckVoucher(this.model);
-                        checkVoucherCashAdvance.setCashAdvance(cashAdvance);
-                        checkVoucherCashAdvanceRepo.save(checkVoucherCashAdvance);
-                    }
-
+                for(CashAdvance cashAdvance : cv.getCashAdvances()){
+                    CheckVoucherCashAdvance checkVoucherCashAdvance = new CheckVoucherCashAdvance();
+                    checkVoucherCashAdvance.setCheckVoucher(this.model);
+                    checkVoucherCashAdvance.setCashAdvance(cashAdvance);
+                    checkVoucherCashAdvanceRepo.save(checkVoucherCashAdvance);
                 }
 
-                // save journal voucher
-                checkVoucherJvRepo.deleteByCheckVoucherId(this.model.getId());
-                if (cv.getJournalVoucher() != null && cv.getJournalVoucher().getId() != null) {
-                    CheckVoucherJv checkVoucherJv = new CheckVoucherJv();
-                    checkVoucherJv.setCheckVoucher(this.model);
-                    checkVoucherJv.setJournalVoucher(cv.getJournalVoucher());
-                    checkVoucherJvRepo.save(checkVoucherJv);
-                }
+            }
 
-                // save receiving report
-                checkVoucherRrRepo.deleteByCheckVoucherId(this.model.getId());
-                if (cv.getReceivingReport() != null && cv.getReceivingReport().getId() != null) {
-                    CheckVoucherRr checkVoucherRr = new CheckVoucherRr();
-                    checkVoucherRr.setCheckVoucher(this.model);
-                    checkVoucherRr.setReceivingReport(cv.getReceivingReport());
-                    checkVoucherRrRepo.save(checkVoucherRr);
-                }
+            // save journal voucher
+            checkVoucherJvRepo.deleteByCheckVoucherId(this.model.getId());
+            if (cv.getJournalVoucher() != null && cv.getJournalVoucher().getId() != null) {
+                CheckVoucherJv checkVoucherJv = new CheckVoucherJv();
+                checkVoucherJv.setCheckVoucher(this.model);
+                checkVoucherJv.setJournalVoucher(cv.getJournalVoucher());
+                checkVoucherJvRepo.save(checkVoucherJv);
+            }
 
-                // save jo acceptance
-                checkVoucherJoAcceptanceRepo.deleteByCheckVoucherId(this.model.getId());
-                if (cv.getJoAcceptance() != null && cv.getJoAcceptance().getId() != null) {
-                    CheckVoucherJoAcceptance checkVoucherJoAcceptance = new CheckVoucherJoAcceptance();
-                    checkVoucherJoAcceptance.setCheckVoucher(this.model);
-                    checkVoucherJoAcceptance.setJoAcceptance(cv.getJoAcceptance());
-                    checkVoucherJoAcceptanceRepo.save(checkVoucherJoAcceptance);
-                }
+            // save receiving report
+            checkVoucherRrRepo.deleteByCheckVoucherId(this.model.getId());
+            if (cv.getReceivingReport() != null && cv.getReceivingReport().getId() != null) {
+                CheckVoucherRr checkVoucherRr = new CheckVoucherRr();
+                checkVoucherRr.setCheckVoucher(this.model);
+                checkVoucherRr.setReceivingReport(cv.getReceivingReport());
+                checkVoucherRrRepo.save(checkVoucherRr);
+            }
 
-                List<GeneralLedgerLineDto2> cvGeneralLedgerLines = cv.getGeneralLedgerLines();
+            // save jo acceptance
+            checkVoucherJoAcceptanceRepo.deleteByCheckVoucherId(this.model.getId());
+            if (cv.getJoAcceptance() != null && cv.getJoAcceptance().getId() != null) {
+                CheckVoucherJoAcceptance checkVoucherJoAcceptance = new CheckVoucherJoAcceptance();
+                checkVoucherJoAcceptance.setCheckVoucher(this.model);
+                checkVoucherJoAcceptance.setJoAcceptance(cv.getJoAcceptance());
+                checkVoucherJoAcceptanceRepo.save(checkVoucherJoAcceptance);
+            }
 
-                // save check numbers
-                chequeRepo.deleteByTransactionId(this.model.getTransaction().getId());
-                List<CheckVoucherCheque> checkNumbers = cv.getCheckNumbers();
-                if (!Checker.collectionIsEmpty(checkNumbers)) {
-                    for(CheckVoucherCheque ch:checkNumbers) {
-                        ch.setTransaction(this.model.getTransaction());
-                        ch.setCleared(false);
-                        ch.setPrinted(false);
-                        ch.setReleased(false);
-                        chequeRepo.save(ch);
-                    }
-                }
-                ledgerFacade.postGeneralLedger(this.model.getTransaction(), cvGeneralLedgerLines, cv.getSubLedgerLines(), this.model.getVoucherDate());
+            List<GeneralLedgerLineDto2> cvGeneralLedgerLines = cv.getGeneralLedgerLines();
 
-                if (insertMode) { // log action only when adding document
-                    documentProcessingFacade.processAction(this.model.getTransaction(), null, this.model.getWorkflow(), createdBy);
-                    oldJvMap = null; // new document has no old value
+            // save check numbers
+            chequeRepo.deleteByTransactionId(this.model.getTransaction().getId());
+            List<CheckVoucherCheque> checkNumbers = cv.getCheckNumbers();
+            if (!Checker.collectionIsEmpty(checkNumbers)) {
+                for(CheckVoucherCheque ch:checkNumbers) {
+                    ch.setTransaction(this.model.getTransaction());
+                    ch.setCleared(false);
+                    ch.setPrinted(false);
+                    ch.setReleased(false);
+                    chequeRepo.save(ch);
                 }
+            }
+            ledgerFacade.postGeneralLedger(this.model.getTransaction(), cvGeneralLedgerLines, cv.getSubLedgerLines(), this.model.getVoucherDate());
+
+            if (insertMode) { // log action only when adding document
+                documentProcessingFacade.processAction(this.model.getTransaction(), null, this.model.getWorkflow(), createdBy);
+                oldJvMap = null; // new document has no old value
+            }
 
 //                checkVoucherBudgetDetailRepo.deleteByCheckVoucherId(this.model.getId());
 //                ArrayList<BudgetSubItem> budgetDetails = cv.getBudgetDetails();
@@ -412,15 +327,14 @@ public class CvServiceImpl implements CvService, PrintableVoucher, PrintableCheq
 //
 //                }
 
-                // generic document logging here
-                // old value only
-                DocumentLog log = documentLoggerFacade.log(this.model.getTransaction(), authenticationFacade.getLoggedIn(), oldJvMap, null);
+            // generic document logging here
+            // old value only
+            DocumentLog log = documentLoggerFacade.log(this.model.getTransaction(), authenticationFacade.getLoggedIn(), oldJvMap, null);
 
-                response.setLogId(log != null ? log.getId() : 0);
-                response.setModelId(this.model.getId());
-                response.setSuccessMessage("CV successfully saved!");
-                response.setSuccess(true);
-            }
+            response.setLogId(log != null ? log.getId() : 0);
+            response.setModelId(this.model.getId());
+            response.setSuccessMessage("CV successfully saved!");
+            response.setSuccess(true);
         }
         return response;
     }
@@ -2250,10 +2164,8 @@ public class CvServiceImpl implements CvService, PrintableVoucher, PrintableCheq
         if (request instanceof MultipartHttpServletRequest) {
             MultipartHttpServletRequest mRequest = (MultipartHttpServletRequest) request;
             if (this.model != null) {
-                if (mRequest.getFileMap() != null) {
-                    fileFacade.removeDocumentAttachment(fileToRemove, this.model.getTransaction().getId());
-                    fileFacade.saveDocumentAttachment(mRequest.getFileMap(), this.model.getTransaction().getId());
-                }
+                fileFacade.removeDocumentAttachment(fileToRemove, this.model.getTransaction().getId());
+                fileFacade.saveDocumentAttachment(FileFacadeImpl.flattenFileMap(mRequest), this.model.getTransaction().getId());
             }
         }
 
@@ -2268,9 +2180,7 @@ public class CvServiceImpl implements CvService, PrintableVoucher, PrintableCheq
         if (request instanceof MultipartHttpServletRequest) {
             MultipartHttpServletRequest mRequest = (MultipartHttpServletRequest) request;
             if (this.model != null) {
-                if (mRequest.getFileMap() != null) {
-                    fileFacade.saveDocumentAttachment(mRequest.getFileMap(), this.model.getTransaction().getId());
-                }
+                fileFacade.saveDocumentAttachment(FileFacadeImpl.flattenFileMap(mRequest), this.model.getTransaction().getId());
             }
         }
 

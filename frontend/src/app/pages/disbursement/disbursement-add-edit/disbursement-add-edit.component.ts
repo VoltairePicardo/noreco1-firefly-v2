@@ -13,12 +13,35 @@ import { ModalService } from '@/app/shared/modals/modal-service';
 import { BrowseEntityModalComponent } from '@/app/shared/modals/browse-entity-modal/browse-entity-modal.component';
 import { BrowseIemopBillingModalComponent } from '@/app/shared/modals/browse-iemop-billing-modal/browse-iemop-billing-modal.component';
 import { BrowseTempGLModalComponent } from '@/app/shared/modals/browse-temp-gl-modal/browse-temp-gl-modal.component';
+import {
+    BrowseCvSourceVoucherModalComponent,
+    CvSourceVoucherType,
+    CvVoucherDto,
+    CvVoucherInstallmentDetail
+} from '@/app/shared/modals/browse-cv-source-voucher-modal/browse-cv-source-voucher-modal.component';
+import { BrowseJobOrderModalComponent } from '@/app/shared/modals/browse-job-order-modal/browse-job-order-modal.component';
+import { BrowsePurchaseOrderModalComponent } from '@/app/shared/modals/browse-purchase-order-modal/browse-purchase-order-modal.component';
+import { SelectBankAccountsModalComponent } from '@/app/shared/modals/select-bank-accounts-modal/select-bank-accounts-modal.component';
 import { JournalEntriesFormComponent, JournalEntry } from '@/app/shared/forms/journal-entries-form/journal-entries-form.component';
 import { provideIcons } from '@ng-icons/core';
 import {
     tablerSearch, tablerX, tablerArrowLeft, tablerCheck,
-    tablerPlus, tablerTrash, tablerPaperclip, tablerPhoto, tablerFile
+    tablerPlus, tablerTrash, tablerPaperclip, tablerPhoto, tablerFile, tablerLink
 } from '@ng-icons/tabler-icons';
+
+interface CheckNumberRow {
+    bankAccount: any;
+    checkNumber: string;
+    loadingNextNumber?: boolean;
+}
+
+const VOUCHER_TYPE_LABELS: Record<CvSourceVoucherType, string> = {
+    APV: 'Account Payable Voucher',
+    CA:  'Cash Advance',
+    JV:  'Journal Voucher',
+    RR:  'Receiving Report',
+    JOA: 'JO Acceptance'
+};
 
 @Component({
     selector: 'app-disbursement-add-edit',
@@ -32,7 +55,10 @@ import {
     providers: [
         provideFlatpickrDefaults(),
         ...SHARED_PROVIDERS,
-        provideIcons({ tablerSearch, tablerX, tablerArrowLeft, tablerCheck, tablerPlus, tablerTrash, tablerPaperclip, tablerPhoto, tablerFile })
+        provideIcons({
+            tablerSearch, tablerX, tablerArrowLeft, tablerCheck, tablerPlus,
+            tablerTrash, tablerPaperclip, tablerPhoto, tablerFile, tablerLink
+        })
     ],
     templateUrl: './disbursement-add-edit.component.html'
 })
@@ -43,30 +69,43 @@ export class DisbursementAddEditComponent {
     subModule = 'Create';
     menuLink  = 'disbursement';
 
-    id: any    = null;
-    editMode   = false;
-    formSubmit = false;
-    isLoading  = signal(false);
+    id: any       = null;
+    transId: number | null = null;
+    editMode      = false;
+    formSubmit    = false;
+    isLoading     = signal(false);
 
     flatpickrOptions = { dateFormat: 'Y-m-d', altInput: true, altFormat: 'F j, Y' };
 
     voucherDate          = '';
-    checkDate            = '';
-    checkNumber          = '';
     particulars          = '';
     additionalPayeeInfo  = '';
     checkAmount: number | null = null;
 
     payee: any = null;
 
-    bankAccounts      : any[] = [];
-    selectedBankAccount: any  = null;
+    banks        : any[] = [];
+    selectedBank : any   = null;
+    loadingBankAccountsForCv = false;
+    checkNumberRows     : CheckNumberRow[] = [];
+
+    purchaseOrder: any = null;
+    jobOrder: any = null;
+
+    readonly voucherTypeLabels = VOUCHER_TYPE_LABELS;
+    selectedVoucherType: CvSourceVoucherType | null = null;
+    selectedSourceVoucher: CvVoucherDto | null = null;
+    cashAdvances: CvVoucherDto[] = [];
+    selectedInstallmentIds: number[] = [];
+    loadingSourceVoucherEntries = false;
 
     journalEntries: JournalEntry[] = [];
     iemopBillings : any[] = [];
     tempBatch: any = null;
 
     stagedFiles  : File[] = [];
+    existingFiles: any[]  = [];
+    filesToRemove: any[]  = [];
     uploadingFiles = false;
 
     signatories: { [key: string]: any } = {
@@ -113,14 +152,14 @@ export class DisbursementAddEditComponent {
                 this.addEntry();
                 this.loadDefaultSignatories();
             }
-            this.loadBankAccounts();
+            this.loadBanks();
         });
     }
 
-    loadBankAccounts(): void {
-        this.service.getBankAccounts().subscribe({
-            next: (data) => { this.bankAccounts = data || []; },
-            error: () => { this.bankAccounts = []; }
+    loadBanks(): void {
+        this.service.getBanks().subscribe({
+            next: (data) => { this.banks = data || []; },
+            error: () => { this.banks = []; }
         });
     }
 
@@ -130,14 +169,30 @@ export class DisbursementAddEditComponent {
             next: (data) => {
                 this.isLoading.set(false);
                 if (data?.id) {
+                    this.transId             = data.transId ?? data.transaction?.id ?? null;
                     this.voucherDate         = data.voucherDate         ? new Date(data.voucherDate).toISOString().substring(0, 10) : '';
-                    this.checkDate           = data.checkDate           ? new Date(data.checkDate).toISOString().substring(0, 10)   : '';
-                    this.checkNumber         = data.checkNumber         || '';
                     this.particulars         = data.particulars         || '';
                     this.additionalPayeeInfo = data.additionalPayeeInfo || '';
                     this.checkAmount         = data.checkAmount         ?? null;
                     this.payee               = data.payee               || null;
-                    this.selectedBankAccount = data.bankAccount         || null;
+                    this.selectedBank        = data.bank                || null;
+                    this.purchaseOrder       = data.purchaseOrder       || null;
+                    this.jobOrder            = data.jobOrder            || null;
+                    this.cashAdvances        = data.cashAdvances        || [];
+
+                    if (data.accountsPayableVoucher?.id) {
+                        this.selectedVoucherType   = 'APV';
+                        this.selectedSourceVoucher = data.accountsPayableVoucher;
+                    } else if (data.journalVoucher?.id) {
+                        this.selectedVoucherType   = 'JV';
+                        this.selectedSourceVoucher = data.journalVoucher;
+                    } else if (data.receivingReport?.id) {
+                        this.selectedVoucherType   = 'RR';
+                        this.selectedSourceVoucher = data.receivingReport;
+                    } else if (data.joAcceptance?.id) {
+                        this.selectedVoucherType   = 'JOA';
+                        this.selectedSourceVoucher = data.joAcceptance;
+                    }
 
                     this.journalEntries = (data.generalLedgerLines || []).map((line: any) => {
                         // The backend currently attaches the transaction's wTaxEntry to every
@@ -173,12 +228,15 @@ export class DisbursementAddEditComponent {
                     this.signatories = {
                         checker:              data.checker              || data.checkedBy         || null,
                         budgetOfficer:        data.budgetOfficer                                  || null,
-                        recommendingApproval: data.recommendingApproval || data.recommendedBy     || null,
-                        auditingOfficer:      data.auditingOfficer      || data.auditedBy         || null,
+                        recommendingApproval: data.recommendingOfficer  || data.recommendedBy     || null,
+                        auditingOfficer:      data.auditor              || data.auditedBy         || null,
                         checkPrinter:         data.checkPrinter                                   || null,
                         approvingOfficer:     data.approvingOfficer     || data.approvedBy        || null,
                         secondCheckSign:      data.secondCheckSign                                || null
                     };
+
+                    if (this.transId) this.loadExistingCheckNumbers(this.transId);
+                    this.loadAttachments();
                 } else {
                     this.alertService.error(this.module, 'Record not found.', '');
                     this.router.navigate(['/' + this.menuLink]);
@@ -189,6 +247,35 @@ export class DisbursementAddEditComponent {
                 this.alertService.error(this.module, 'Failed to load record.', '');
                 this.router.navigate(['/' + this.menuLink]);
             }
+        });
+    }
+
+    loadAttachments(): void {
+        if (!this.transId) return;
+        this.service.getFiles(this.transId).subscribe({
+            next: (files) => { this.existingFiles = files || []; },
+            error: () => { this.existingFiles = []; }
+        });
+    }
+
+    fileUrl(fileId: number): string {
+        return this.service.fileUrl(fileId);
+    }
+
+    removeExistingFile(index: number): void {
+        const [removed] = this.existingFiles.splice(index, 1);
+        if (removed) this.filesToRemove.push(removed);
+    }
+
+    private loadExistingCheckNumbers(transId: number): void {
+        this.service.getCvChecks(transId).subscribe({
+            next: (checks) => {
+                this.checkNumberRows = (checks || []).map((c: any) => ({
+                    bankAccount: c.bankAccount,
+                    checkNumber: c.checkNumber || ''
+                }));
+            },
+            error: () => {}
         });
     }
 
@@ -243,6 +330,235 @@ export class DisbursementAddEditComponent {
     }
 
     clearPayee(): void { this.payee = null; }
+
+    // Source document linking (APV / CA / JV / RR / JOA) — mirrors legacy cv2.js setSelectedVoucher()
+    async openSourceVoucherBrowse(): Promise<void> {
+        try {
+            const result = await this.modalService.openModal(BrowseCvSourceVoucherModalComponent, {}, { size: 'lg', centered: true });
+            if (result?.action !== 'select' || !result?.data) return;
+
+            const voucherType: CvSourceVoucherType = result.voucherType;
+            const voucher: CvVoucherDto = result.data;
+
+            if (voucherType === 'CA') {
+                this.addCashAdvance(voucher);
+                return;
+            }
+
+            this.selectedVoucherType   = voucherType;
+            this.selectedSourceVoucher = voucher;
+            this.selectedInstallmentIds = [];
+
+            if (voucherType === 'APV' || voucherType === 'RR' || voucherType === 'JOA') {
+                this.payee = { accountNo: voucher.slentityAccountNo, name: voucher.slentityName };
+            }
+            this.checkAmount = voucher.amount ?? null;
+            this.particulars = voucher.particulars || this.particulars;
+
+            if (voucherType === 'APV') {
+                if (voucher.forInstallment) {
+                    // Amount is derived from selected installments, not the full APV amount.
+                    this.checkAmount = null;
+                } else {
+                    this.fetchSourceGLEntries(this.service.getGLEntriesWithoutWithholdingTax(voucher.transId!));
+                }
+            } else if (voucherType === 'JV') {
+                this.fetchSourceGLEntries(this.service.getGLEntries(voucher.transId!));
+            }
+            // RR / JOA: legacy does not auto-fetch GL entries for these — payee/amount/particulars only.
+        } catch { }
+    }
+
+    private fetchSourceGLEntries(request: ReturnType<DisbursementService['getGLEntries']>): void {
+        this.loadingSourceVoucherEntries = true;
+        request.subscribe({
+            next: (entries) => {
+                this.loadingSourceVoucherEntries = false;
+                this.journalEntries = (entries || []).map((e: any): JournalEntry => ({
+                    account: { accountCode: e.code, accountTitle: e.description, id: e.accountId, hasSL: e.hasSL },
+                    debit:   Number(e.debit)  || null,
+                    credit:  Number(e.credit) || null
+                }));
+            },
+            error: () => { this.loadingSourceVoucherEntries = false; }
+        });
+    }
+
+    clearSourceVoucher(): void {
+        this.selectedVoucherType    = null;
+        this.selectedSourceVoucher  = null;
+        this.selectedInstallmentIds = [];
+        this.payee        = null;
+        this.checkAmount  = null;
+        this.journalEntries = [];
+    }
+
+    get installmentDetails(): CvVoucherInstallmentDetail[] {
+        return this.selectedSourceVoucher?.installmentDetails || [];
+    }
+
+    isInstallmentSelected(detail: CvVoucherInstallmentDetail): boolean {
+        return this.selectedInstallmentIds.includes(detail.id);
+    }
+
+    toggleInstallmentDetail(detail: CvVoucherInstallmentDetail): void {
+        const idx = this.selectedInstallmentIds.indexOf(detail.id);
+        if (idx >= 0) {
+            this.selectedInstallmentIds.splice(idx, 1);
+        } else {
+            this.selectedInstallmentIds.push(detail.id);
+        }
+        this.checkAmount = this.installmentDetails
+            .filter(d => this.selectedInstallmentIds.includes(d.id))
+            .reduce((sum, d) => sum + (Number(d.amount) || 0), 0);
+    }
+
+    // Cash Advance linking — additive, matching legacy handleCashAdvance()
+    private addCashAdvance(voucher: CvVoucherDto): void {
+        if (this.cashAdvances.some(ca => ca.id === voucher.id)) return;
+
+        if (this.cashAdvances.length === 0) this.journalEntries = [];
+
+        this.cashAdvances.push(voucher);
+        this.checkAmount = (this.checkAmount || 0) + (voucher.amount || 0);
+        this.particulars = this.particulars ? `${this.particulars}, ${voucher.particulars || ''}` : (voucher.particulars || '');
+
+        this.service.getGLEntriesForCashAdvance(voucher.id!).subscribe({
+            next: (entries) => this.mergeCashAdvanceEntries(entries || []),
+            error: () => {}
+        });
+    }
+
+    private mergeCashAdvanceEntries(entries: any[]): void {
+        const byAccountId = new Map<number, JournalEntry>();
+        this.journalEntries.forEach(e => { if (e.account?.id != null) byAccountId.set(e.account.id, e); });
+
+        entries.forEach((e: any) => {
+            const accountId = e.accountId;
+            if (accountId == null) return;
+            const existing = byAccountId.get(accountId);
+            if (existing) {
+                existing.debit  = (Number(existing.debit)  || 0) + (Number(e.debit)  || 0);
+                existing.credit = (Number(existing.credit) || 0) + (Number(e.credit) || 0);
+            } else {
+                const entry: JournalEntry = {
+                    account: { accountCode: e.code, accountTitle: e.description, id: accountId, hasSL: e.hasSL },
+                    debit:   Number(e.debit)  || null,
+                    credit:  Number(e.credit) || null
+                };
+                byAccountId.set(accountId, entry);
+                this.journalEntries.push(entry);
+            }
+        });
+    }
+
+    removeCashAdvance(index: number): void {
+        const [removed] = this.cashAdvances.splice(index, 1);
+        if (removed) this.checkAmount = Math.max(0, (this.checkAmount || 0) - (removed.amount || 0));
+        if (this.cashAdvances.length === 0) this.journalEntries = [];
+    }
+
+    // Job Order / Purchase Order — mutually exclusive, matching legacy jo_selection_handler/po_selection_handler
+    async openJobOrderBrowse(): Promise<void> {
+        try {
+            const result = await this.modalService.openModal(BrowseJobOrderModalComponent, {}, { size: 'lg', centered: true });
+            if (result?.action === 'select' && result?.data) {
+                this.jobOrder      = result.data;
+                this.purchaseOrder = null;
+            }
+        } catch { }
+    }
+
+    clearJobOrder(): void { this.jobOrder = null; }
+
+    async openPurchaseOrderBrowse(): Promise<void> {
+        try {
+            const result = await this.modalService.openModal(BrowsePurchaseOrderModalComponent, {}, { size: 'lg', centered: true });
+            if (result?.action === 'select' && result?.data) {
+                this.purchaseOrder = result.data;
+                this.jobOrder       = null;
+            }
+        } catch { }
+    }
+
+    clearPurchaseOrder(): void { this.purchaseOrder = null; }
+
+    // Bank + bank accounts + check numbers
+    compareById(a: any, b: any): boolean {
+        return a === b || a?.id === b?.id;
+    }
+
+    onBankChange(): void {
+        if (!this.selectedBank) return;
+        this.loadingBankAccountsForCv = true;
+        this.service.getBankAccountsForCv(this.selectedBank.id).subscribe({
+            next: (accounts) => {
+                this.loadingBankAccountsForCv = false;
+                this.openSelectBankAccountsModal(accounts || []);
+            },
+            error: () => { this.loadingBankAccountsForCv = false; }
+        });
+    }
+
+    private async openSelectBankAccountsModal(accounts: any[]): Promise<void> {
+        try {
+            const result = await this.modalService.openModal(
+                SelectBankAccountsModalComponent,
+                {
+                    bank: this.selectedBank,
+                    bankAccounts: accounts,
+                    alreadySelectedIds: this.checkNumberRows.map(r => r.bankAccount.id)
+                },
+                { size: 'lg', centered: true }
+            );
+            if (result?.action === 'select' && result?.data) {
+                (result.data as any[]).forEach(bankAccount => {
+                    if (this.checkNumberRows.some(r => r.bankAccount.id === bankAccount.id)) return;
+                    const row: CheckNumberRow = { bankAccount, checkNumber: '' };
+                    this.checkNumberRows.push(row);
+                    this.getNextCheckNumberFor(row);
+                    this.addJournalEntryForBankAccount(bankAccount);
+                });
+            }
+        } catch { }
+    }
+
+    private addJournalEntryForBankAccount(bankAccount: any): void {
+        const account = bankAccount.account;
+        if (!account?.id) return;
+        if (this.journalEntries.some(e => e.account?.id === account.id)) return;
+
+        const blankEntry = this.journalEntries.find(e => !e.account);
+        const entry: JournalEntry = {
+            account: { accountCode: account.code, accountTitle: account.title, id: account.id, hasSL: account.hasSL || false },
+            debit:   null,
+            credit:  null
+        };
+        if (blankEntry) {
+            Object.assign(blankEntry, entry);
+        } else {
+            this.journalEntries.push(entry);
+        }
+    }
+
+    removeBankAccountRow(index: number): void {
+        const [removed] = this.checkNumberRows.splice(index, 1);
+        const accountId = removed?.bankAccount?.account?.id;
+        if (accountId == null) return;
+        const entryIdx = this.journalEntries.findIndex(e => e.account?.id === accountId);
+        if (entryIdx >= 0) this.journalEntries.splice(entryIdx, 1);
+    }
+
+    getNextCheckNumberFor(row: CheckNumberRow): void {
+        row.loadingNextNumber = true;
+        this.service.getNextCheckNumber(row.bankAccount.id).subscribe({
+            next: (res) => {
+                row.loadingNextNumber = false;
+                if (res?.checkNumber) row.checkNumber = res.checkNumber;
+            },
+            error: () => { row.loadingNextNumber = false; }
+        });
+    }
 
     // Journal Entries
     addEntry(): void {
@@ -318,23 +634,6 @@ export class DisbursementAddEditComponent {
         return file.type.startsWith('image/');
     }
 
-    private uploadAndNavigate(savedId: number): void {
-        const formData = new FormData();
-        this.stagedFiles.forEach(f => formData.append('files', f, f.name));
-        this.service.uploadFiles(savedId, formData).subscribe({
-            next: () => {
-                this.formSubmit = false;
-                this.alertService.success(this.module, 'Saved successfully.', '');
-                this.router.navigate(['/' + this.menuLink, savedId, 'detail']);
-            },
-            error: () => {
-                this.formSubmit = false;
-                this.alertService.success(this.module, 'Saved successfully.', 'Record saved but file upload failed.');
-                this.router.navigate(['/' + this.menuLink, savedId, 'detail']);
-            }
-        });
-    }
-
     save(): void {
         if (!this.voucherDate) {
             this.alertService.warning(this.module, 'Validation', 'Please enter a voucher date.');
@@ -381,6 +680,11 @@ export class DisbursementAddEditComponent {
             return;
         }
 
+        if (this.checkNumberRows.some(r => !r.checkNumber || r.checkNumber.trim() === '')) {
+            this.alertService.warning(this.module, 'Validation', 'Please enter a check number for every selected bank account.');
+            return;
+        }
+
         this.formSubmit = true;
 
         const sigRef = (key: string) => this.signatories[key]
@@ -388,14 +692,21 @@ export class DisbursementAddEditComponent {
 
         const payload: any = {
             id:                  this.editMode ? this.id : null,
+            transaction:         this.transId ? { id: this.transId } : null,
             voucherDate:         this.voucherDate,
-            checkDate:           this.checkDate           || null,
-            checkNumber:         this.checkNumber         || null,
-            checkAmount:         this.checkAmount         ?? null,
+            checkAmount:         this.checkAmount        ?? null,
+            amount:              this.totalDebit,
             particulars:         this.particulars         || null,
             additionalPayeeInfo: this.additionalPayeeInfo || null,
             payee:               { accountNo: this.payee.accountNo },
-            bankAccount:         this.selectedBankAccount ? { id: this.selectedBankAccount.id } : null,
+            bank:                this.selectedBank ? { id: this.selectedBank.id } : null,
+            checker:              sigRef('checker'),
+            budgetOfficer:        sigRef('budgetOfficer'),
+            recommendingOfficer:  sigRef('recommendingApproval'),
+            auditingOfficer:      sigRef('auditingOfficer'),
+            checkPrinter:         sigRef('checkPrinter'),
+            approvingOfficer:     sigRef('approvingOfficer'),
+            secondCheckSign:      sigRef('secondCheckSign'),
             generalLedgerLines:  this.journalEntries.map(e => ({
                 code:        e.account?.accountCode  || '',
                 description: e.account?.accountTitle || '',
@@ -406,8 +717,6 @@ export class DisbursementAddEditComponent {
                 wTaxEntry:   e.wTaxEntry || null,
                 vatEntry:    e.vatEntry  || null
             })),
-            // SL split lines live on the voucher, not nested in each GL line — the backend
-            // (LedgerFacadeImpl.postGeneralLedger) matches them back to their GL line by accountId.
             subLedgerLines: this.journalEntries.flatMap(e =>
                 (e.slentries || []).map(sl => ({
                     accountId: e.account?.id ?? null,
@@ -416,29 +725,36 @@ export class DisbursementAddEditComponent {
                     credit:    Number(sl.credit) || 0
                 }))
             ),
-            iemopBillings:       this.iemopBillings.map(b => ({ id: b.id })),
-            checker:              sigRef('checker'),
-            budgetOfficer:        sigRef('budgetOfficer'),
-            recommendingOfficer:  sigRef('recommendingApproval'),
-            auditingOfficer:      sigRef('auditingOfficer'),
-            checkPrinter:         sigRef('checkPrinter'),
-            approvingOfficer:     sigRef('approvingOfficer'),
-            secondCheckSign:      sigRef('secondCheckSign')
+            checkNumbers: this.checkNumberRows.map(r => ({
+                checkNumber: r.checkNumber,
+                bankAccount: { id: r.bankAccount.id },
+                account:     { id: r.bankAccount.account?.id }
+            })),
+            purchaseOrder:  this.purchaseOrder ? { id: this.purchaseOrder.id } : null,
+            jobOrder:       this.jobOrder      ? { id: this.jobOrder.id }      : null,
+            accountsPayableVoucher: this.selectedVoucherType === 'APV' && this.selectedSourceVoucher
+                ? { id: this.selectedSourceVoucher.id } : null,
+            journalVoucher: this.selectedVoucherType === 'JV' && this.selectedSourceVoucher
+                ? { id: this.selectedSourceVoucher.id } : null,
+            receivingReport: this.selectedVoucherType === 'RR' && this.selectedSourceVoucher
+                ? { id: this.selectedSourceVoucher.id } : null,
+            joAcceptance: this.selectedVoucherType === 'JOA' && this.selectedSourceVoucher
+                ? { id: this.selectedSourceVoucher.id } : null,
+            cashAdvances: this.cashAdvances.map(ca => ({ id: ca.id })),
+            selectedInstallmentDetails: this.selectedInstallmentIds.map(id => ({ id })),
+            iemopBillings: this.iemopBillings.map(b => ({ id: b.id }))
         };
 
-        const req$ = this.editMode ? this.service.update(payload) : this.service.create(payload);
+        const req$ = this.editMode
+            ? this.service.update(payload, this.stagedFiles, this.filesToRemove)
+            : this.service.create(payload, this.stagedFiles);
         req$.subscribe({
             next: (res) => {
+                this.formSubmit = false;
                 if (res?.success) {
-                    if (this.stagedFiles.length > 0) {
-                        this.uploadAndNavigate(res.modelId);
-                    } else {
-                        this.formSubmit = false;
-                        this.alertService.success(this.module, 'Saved successfully.', '');
-                        this.router.navigate(['/' + this.menuLink, res.modelId, 'detail']);
-                    }
+                    this.alertService.success(this.module, 'Saved successfully.', '');
+                    this.router.navigate(['/' + this.menuLink, res.modelId, 'detail']);
                 } else {
-                    this.formSubmit = false;
                     this.alertService.error(this.module, 'Save failed.', res?.failureMessage || '');
                 }
             },

@@ -12,23 +12,23 @@
     <div class="card-body">
 
         <!-- Actions -->
-        <div class="d-flex gap-2 justify-content-end align-items-center pt-3 mt-3">
+        <div class="d-flex gap-2 justify-content-end align-items-center">
             <a [routerLink]="['/' + menuLink]" class="btn btn-light fw-bold">
-                <ng-icon name="tablerArrowLeft" class="ps-0 pe-3 fw-bold"></ng-icon>Back
+                <ng-icon name="tablerArrowLeft" class="ps-0 pe-3 fw-bold fs-lg"></ng-icon>Back
             </a>
             <button type="button" class="btn btn-success fw-bold" (click)="print()">
-                <ng-icon name="tablerPrinter" class="ps-0 pe-3 fw-bold"></ng-icon>Print
+                <ng-icon name="tablerPrinter" class="ps-0 pe-3 fw-bold fs-lg"></ng-icon>Print
             </button>
             @if (isEditable()) {
                 <a class="btn btn-primary fw-bold" [routerLink]="['/' + menuLink, id, 'edit']">
-                    <ng-icon name="tablerEdit" class="ps-0 pe-3 fw-bold"></ng-icon>Edit
+                    <ng-icon name="tablerEdit" class="ps-0 pe-3 fw-bold fs-lg"></ng-icon>Edit
                 </a>
             }
         </div>
 
         <!-- Workflow Actions -->
         @if (workflowActions.length > 0) {
-            <hr class="my-3"/>
+            <hr class="border-dashed mx-n3 mt-3"/>
             <div class="fs-xs text-uppercase fw-semibold text-muted mb-2">Process Document</div>
             <div class="row g-3 align-items-end">
                 <div class="col-md-3">
@@ -59,7 +59,7 @@
             </div>
         }
 
-        <hr class="my-3"/>
+        <hr class="border-dashed mx-n3 mt-3"/>
 
         <!-- Header Info -->
         <div class="row g-3">
@@ -117,7 +117,7 @@
         </div>
 
         <!-- Signatories -->
-        <hr class="my-3"/>
+        <hr class="border-dashed mx-n3 mt-3"/>
         <div class="fs-xs text-uppercase fw-semibold text-muted mb-2">Signatories</div>
         <div class="row g-3">
             <div class="col-md-4">
@@ -131,7 +131,7 @@
         </div>
 
         <!-- Items -->
-        <hr class="my-3"/>
+        <hr class="border-dashed mx-n3 mt-3"/>
         <div class="fs-xs text-uppercase fw-semibold text-muted mb-2">Liquidation Items</div>
         <div class="table-responsive">
             <table class="table table-custom table-centered table-hover w-100 mb-0">
@@ -176,7 +176,6 @@
                 </tbody>
             </table>
         </div>
-
     </div>
 </div>
 

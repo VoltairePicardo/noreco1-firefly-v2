@@ -1,0 +1,43 @@
+<div class="modal-header">
+    <h4 class="modal-title">Select Bank Accounts — {{ bank?.name }}</h4>
+    <button type="button" class="btn-close" (click)="activeModal.dismiss()" aria-label="Close"></button>
+</div>
+
+<div class="modal-body">
+    <div class="table-responsive">
+        <table class="table table-custom table-centered table-hover w-100 mb-0">
+            <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                <tr class="text-uppercase fs-xxs">
+                    <th style="width:50px">
+                        <input type="checkbox" class="form-check-input" [checked]="selectAll" (change)="toggleAll()"/>
+                    </th>
+                    <th>Account Number</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (account of accounts; track account.id) {
+                    <tr style="cursor: pointer" (click)="toggle(account)">
+                        <td>
+                            <input type="checkbox" class="form-check-input"
+                                   [checked]="isSelected(account)"
+                                   (click)="$event.stopPropagation()" (change)="toggle(account)"/>
+                        </td>
+                        <td class="fw-bold">{{ account.accountNumber }}</td>
+                        <td>{{ account.description || '—' }}</td>
+                    </tr>
+                }
+                @if (accounts.length === 0) {
+                    <tr>
+                        <td colspan="3" class="text-center text-muted py-3">No accounts found for this bank.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="modal-footer">
+    <button type="button" class="btn btn-light fw-bold" (click)="activeModal.dismiss()">Cancel</button>
+    <button type="button" class="btn btn-primary fw-bold" (click)="confirm()">Add Selected</button>
+</div>
