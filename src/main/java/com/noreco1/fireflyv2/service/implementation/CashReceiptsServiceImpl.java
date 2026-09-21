@@ -266,6 +266,7 @@ public class CashReceiptsServiceImpl implements CashReceiptsService, PrintableVo
             }
 
             cashReceiptsDto.setJournalEntries(ledgerDtoers.getVoucherLedgerLines(cashReceipts.getTransaction().getId()));
+            cashReceiptsDto.setGeneralLedgerLines(ledgerDtoers.getGLAccountEntriesDtoByTrans(cashReceipts.getTransaction().getId(), false));
         }
 
         return  cashReceiptsDto;

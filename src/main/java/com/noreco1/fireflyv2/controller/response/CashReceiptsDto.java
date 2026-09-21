@@ -30,6 +30,7 @@ public class CashReceiptsDto {
     private Date created;
     private Office office;
     private List<CommonLedgerDetail> journalEntries;
+    private List<GeneralLedgerLineDto2> generalLedgerLines;
 
 
     public CashReceiptsDto() {}
@@ -160,5 +161,13 @@ public class CashReceiptsDto {
 
     public void setJournalEntries(List<CommonLedgerDetail> journalEntries) {
         this.journalEntries = journalEntries;
+    }
+
+    public List<GeneralLedgerLineDto2> getGeneralLedgerLines() {
+        return generalLedgerLines;
+    }
+
+    public void setGeneralLedgerLines(List<GeneralLedgerLineDto2> generalLedgerLines) {
+        this.generalLedgerLines = generalLedgerLines;
     }
 }

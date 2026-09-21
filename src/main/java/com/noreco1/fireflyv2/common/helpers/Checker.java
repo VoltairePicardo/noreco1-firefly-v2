@@ -135,6 +135,13 @@ public class Checker {
         return linkTypeId.equals(AssetVoucherLinkType.RETIREMENT.getId());
     }
 
+    public static boolean isSafeFilename(String filename) {
+        return !isStringNullOrEmpty(filename)
+                && !filename.contains("..")
+                && !filename.contains("/")
+                && !filename.contains("\\");
+    }
+
     public  static boolean isItemImageAllowed( MultipartFile file) {
         if (!file.isEmpty()) {
             String contentType = file.getContentType();

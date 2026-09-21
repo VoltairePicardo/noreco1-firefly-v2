@@ -28,8 +28,7 @@ public interface PrepaymentService extends DataManagementService{
     @Transactional
     public List<PrepaymentListDto> findAll();
 
-    @Transactional
-    public List<PrepaymentDto> findByStartDateCreatedAndMonthYear(String month, String year);
+    List<PrepaymentDto> findByStartDateCreatedAndMonthYear(String month, String year);
 
     @Transactional(readOnly = true)
     public List<PrepaymentDto> findByMonthAndYear(String month, String year);
@@ -41,7 +40,6 @@ public interface PrepaymentService extends DataManagementService{
 
     Page<Object[]> vouchersForPrepaymentLinking(Integer prepaymentAccountNo, String query, Pageable pageable);
 
-    @Transactional
     PostResponse saveLink(PrepaymentVoucherLinkForm form, BindingResult bindingResult, MessageSource messageSource);
 
     List<PrepaymentListDto> findByStatusAndDateRange(String status, String start, String end);

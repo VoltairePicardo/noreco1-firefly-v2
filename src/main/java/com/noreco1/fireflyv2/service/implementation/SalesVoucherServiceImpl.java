@@ -270,6 +270,7 @@ public class SalesVoucherServiceImpl implements SalesVoucherService, PrintableVo
             }
 
             svDto.setJournalEntries(ledgerDtoers.getVoucherLedgerLines(salesVoucher.getTransaction().getId()));
+            svDto.setGeneralLedgerLines(ledgerDtoers.getGLAccountEntriesDtoByTrans(salesVoucher.getTransaction().getId(), false));
         }
 
         return  svDto;

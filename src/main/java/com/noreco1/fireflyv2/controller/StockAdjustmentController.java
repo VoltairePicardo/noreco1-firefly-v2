@@ -5,6 +5,7 @@ import com.noreco1.fireflyv2.common.helpers.Checker;
 import com.noreco1.fireflyv2.controller.response.ItemTransactionDetailDto;
 import com.noreco1.fireflyv2.controller.response.PostResponse;
 import com.noreco1.fireflyv2.controller.response.ProcessDocumentDto;
+import com.noreco1.fireflyv2.controller.response.StockAdjustmentDocumentDto;
 import com.noreco1.fireflyv2.model.DocumentStatus;
 import com.noreco1.fireflyv2.model.StockAdjustment;
 import com.noreco1.fireflyv2.service.DownloadService;
@@ -17,6 +18,7 @@ import net.sf.jasperreports.engine.JRDataSource;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -146,12 +148,13 @@ public class StockAdjustmentController {
 //        Page<StockAdjustmentDocumentDto> documents = stockAdjustmentService.findAllApprovedForAccountSettingPaged(query, pageable);
 //        return new ResponseEntity<PagedResources<StockAdjustmentDocumentResource>>(assembler.toResource(documents), HttpStatus.OK);
 //    }
-//
-//    @RequestMapping(value = "/for-jv-approved-paged", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
-//    HttpEntity<PagedResources<StockAdjustmentDocumentResource>> approvedListForJVPaged(Pageable pageable, PagedResourcesAssembler assembler,
-//                                                                                       @RequestParam(value="q", required = false ) String query) {
-//
-//        Page<StockAdjustmentDocumentDto> documents = stockAdjustmentService.findAllApprovedForJVPaged(query, pageable);
-//        return new ResponseEntity<PagedResources<StockAdjustmentDocumentResource>>(assembler.toResource(documents), HttpStatus.OK);
-//    }
+
+    @GetMapping(value = "/for-jv-approved-paged")
+    @ResponseBody
+    public Page<StockAdjustmentDocumentDto> approvedForJvPaged(
+            @RequestParam(value = "q", required = false, defaultValue = "") String q,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size) {
+        return stockAdjustmentService.findAllApprovedForJVPaged(q.isEmpty() ? null : q, PageRequest.of(page, size));
+    }
 }

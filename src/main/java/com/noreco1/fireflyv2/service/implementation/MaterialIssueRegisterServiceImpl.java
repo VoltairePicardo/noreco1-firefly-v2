@@ -474,6 +474,7 @@ public class MaterialIssueRegisterServiceImpl implements MaterialIssueRegisterSe
             }
 
             dto.setJournalEntries(ledgerDtoers.getVoucherLedgerLines(mir.getTransaction().getId()));
+            dto.setGeneralLedgerLines(new ArrayList<>(ledgerDtoers.getGLAccountEntriesDtoByTrans(mir.getTransaction().getId(), false)));
         }
 
         return dto;

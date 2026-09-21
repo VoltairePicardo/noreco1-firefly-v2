@@ -1,64 +1,70 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, signal } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { HttpClient } from '@angular/common/http';
+import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, computed, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { COMMON_ALL_PAGE_IMPORTS, COMMON_MAIN_PAGE_IMPORTS, SHARED_PROVIDERS } from '@/app/shared/providers/shared-providers';
-import { provideIcons } from '@ng-icons/core';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { NG_ICON_DIRECTIVES, provideIcons } from '@ng-icons/core';
 import { tablerSearch } from '@ng-icons/tabler-icons';
-import { environment } from '@/environments/environment';
+import { GeneralJournalService } from '@/app/pages/general-journal/general-journal.service';
 
-const BASE_API = environment.get('baseApiUrl');
+export interface TempGLBatch {
+    tempBatchId: number;
+    docTypeDesc?: string;
+    remarks?: string;
+    amount?: number;
+    tempBatchDate?: string;
+}
 
 @Component({
     selector: 'app-browse-temp-gl-modal',
-    imports: [...COMMON_ALL_PAGE_IMPORTS, ...COMMON_MAIN_PAGE_IMPORTS],
-    providers: [...SHARED_PROVIDERS, provideIcons({ tablerSearch })],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    templateUrl: './browse-temp-gl-modal.component.html'
+    imports: [...COMMON_ALL_PAGE_IMPORTS, ...COMMON_MAIN_PAGE_IMPORTS, ReactiveFormsModule, NG_ICON_DIRECTIVES],
+    providers: [...SHARED_PROVIDERS, provideIcons({ tablerSearch })],
+    templateUrl: './browse-temp-gl-modal.component.html',
 })
-export class BrowseTempGLModalComponent {
-    searchText  = '';
-    batches     = signal<any[]>([]);
-    isLoading   = signal(false);
-    isSelecting = signal(false);
+export class BrowseTempGLModalComponent implements OnInit {
+    activeModal = inject(NgbActiveModal);
+    private service = inject(GeneralJournalService);
+    private destroyRef = inject(DestroyRef);
 
-    private activeModal = inject(NgbActiveModal);
-    private http        = inject(HttpClient);
-    private cdr         = inject(ChangeDetectorRef);
+    protected readonly searchControl = new FormControl('', { nonNullable: true });
 
-    ngOnInit(): void {
-        this.load();
-    }
+    private readonly searchTerm = signal('');
+    protected readonly batches = signal<TempGLBatch[]>([]);
+    protected readonly loading = signal(false);
+    protected readonly selecting = signal(false);
 
-    load(): void {
-        this.isLoading.set(true);
-        this.http.get<any[]>(`${BASE_API}/ledger/temp/all`).subscribe({
-            next: (data) => { this.batches.set(data || []); this.isLoading.set(false); this.cdr.markForCheck(); },
-            error: () => { this.batches.set([]); this.isLoading.set(false); this.cdr.markForCheck(); }
-        });
-    }
-
-    get filtered(): any[] {
-        if (!this.searchText.trim()) return this.batches();
-        const q = this.searchText.toLowerCase();
+    protected readonly filteredBatches = computed(() => {
+        const q = this.searchTerm().trim().toLowerCase();
+        if (!q) return this.batches();
         return this.batches().filter(b =>
             (b.docTypeDesc || '').toLowerCase().includes(q) ||
-            (b.remarks     || '').toLowerCase().includes(q)
-        );
+            (b.remarks || '').toLowerCase().includes(q));
+    });
+
+    protected readonly hasResults = computed(() => this.filteredBatches().length > 0);
+
+    ngOnInit(): void {
+        this.searchControl.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(value => this.searchTerm.set(value));
+        this.loadData();
     }
 
-    select(batch: any): void {
-        this.isSelecting.set(true);
-        this.http.get<any[]>(`${BASE_API}/ledger/temp/gl/${batch.tempBatchId}`).subscribe({
+    protected select(batch: TempGLBatch): void {
+        this.selecting.set(true);
+        this.service.getTempGLEntries(batch.tempBatchId).subscribe({
             next: (entries) => {
-                this.isSelecting.set(false);
-                this.activeModal.close({ action: 'select', data: { batch, entries: entries || [] } });
+                this.selecting.set(false);
+                this.activeModal.close({ action: 'select', data: batch, entries: entries || [] });
             },
-            error: () => {
-                this.isSelecting.set(false);
-                this.cdr.markForCheck();
-            }
+            error: () => { this.selecting.set(false); },
         });
     }
 
-    close(): void { this.activeModal.dismiss(); }
+    private loadData(): void {
+        this.loading.set(true);
+        this.service.getTempBatches().subscribe({
+            next: (data) => { this.batches.set(data || []); this.loading.set(false); },
+            error: () => { this.batches.set([]); this.loading.set(false); },
+        });
+    }
 }

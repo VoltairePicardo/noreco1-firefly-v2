@@ -4,6 +4,7 @@ import com.noreco1.fireflyv2.common.GlobalConstant;
 import com.noreco1.fireflyv2.common.facade.AuthenticationFacade;
 import com.noreco1.fireflyv2.common.facade.GeneratorFacade;
 import com.noreco1.fireflyv2.common.helpers.Checker;
+import com.noreco1.fireflyv2.controller.response.CvVoucherDto;
 import com.noreco1.fireflyv2.controller.response.PostResponse;
 import com.noreco1.fireflyv2.controller.response.ProcessDocumentDto;
 import com.noreco1.fireflyv2.model.*;
@@ -98,6 +99,14 @@ public class ReceivingReportController {
     @GetMapping("/default-signatories")
     public Map defaultSignatories() {
         return rrService.defaultSignatories();
+    }
+
+    @GetMapping("/approved-for-cv-paged")
+    public Page<CvVoucherDto> approvedForCvPaged(
+            @RequestParam(value = "q", required = false, defaultValue = "") String q,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size) {
+        return rrService.findAllApprovedForCvPaged(q.isEmpty() ? null : q, PageRequest.of(page, size));
     }
 
     @PostMapping("/create")

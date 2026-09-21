@@ -76,10 +76,14 @@ export class CashReceiptsAddEditComponent {
                     this.voucherDate      = data.voucherDate ? new Date(data.voucherDate).toISOString().substring(0, 10) : '';
                     this.particulars      = data.particulars || '';
                     this.approvingOfficer = data.approvingOfficer || null;
-                    this.journalEntries   = (data.journalEntries || data.details || []).filter((e: any) => e.accountCode || e.account?.accountCode || e.code).map((e: any): JournalEntry => ({
-                        account:         e.account || (e.accountCode ? { accountCode: e.accountCode, accountTitle: e.accountTitle, id: e.accountId ?? null } : e.code ? { accountCode: e.code, accountTitle: e.description, id: e.accountId ?? null } : null),
-                        debit:           Number(e.debit ?? e.debitAmount ?? e.glDebitAmount) || null,
-                        credit:          Number(e.credit ?? e.creditAmount ?? e.glCreditAmount) || null,
+                    this.journalEntries   = (data.generalLedgerLines || []).map((e: any): JournalEntry => ({
+                        account: {
+                            id:           e.accountId,
+                            accountCode:  e.code,
+                            accountTitle: e.description
+                        },
+                        debit:           Number(e.debit)  || null,
+                        credit:          Number(e.credit) || null,
                         applyAllocation: e.applyAllocation || false,
                         allocationPct:   e.allocationPct   ?? null,
                         applyWht:        e.applyWht        || false,

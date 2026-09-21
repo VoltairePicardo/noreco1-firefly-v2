@@ -187,7 +187,7 @@ public class LedgerDtoerImpl implements LedgerDtoer {
                     wTaxEntry.put("atc", incomePayment.getTaxCode());
                     wTaxEntry.put("baseAmount", incomePayment.getBaseAmount());
 
-                    lineDto.setwTaxEntry(wTaxEntry);
+                    lineDto.setWTaxEntry(wTaxEntry);
                 }
 
                 // cashflow

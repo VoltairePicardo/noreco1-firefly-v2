@@ -43,7 +43,7 @@
                 </div>
 
                 <!-- Project Details -->
-                <hr/>
+                <hr class="border-dashed mx-n3 mt-3"/>
                 <p class="fs-xs text-uppercase fw-semibold text-muted mb-3">Project Details</p>
                 <div class="row g-3">
                     <div class="col-md-12">
@@ -78,7 +78,7 @@
                 @if (project) {
 
                 <!-- Assemblies -->
-                <hr/>
+                <hr class="border-dashed mx-n3 mt-3"/>
                 <div class="d-flex align-items-center justify-content-between mb-3">
                     <p class="fs-xs text-uppercase fw-semibold text-muted mb-0">Assemblies</p>
                     <button type="button" class="btn btn-success fw-bold" (click)="browseAssemblyUnit()">
@@ -144,7 +144,7 @@
                 </div>
 
                 <!-- Accessories -->
-                <hr/>
+                <hr class="border-dashed mx-n3 mt-3"/>
                 <div class="d-flex align-items-center justify-content-between mb-3">
                     <p class="fs-xs text-uppercase fw-semibold text-muted mb-0">Accessories</p>
                     <button type="button" class="btn btn-success fw-bold" (click)="browseAccessoryItem()">
@@ -207,7 +207,7 @@
                 </div>
 
                 <!-- Metering -->
-                <hr/>
+                <hr class="border-dashed mx-n3 mt-3"/>
                 <div class="d-flex align-items-center justify-content-between mb-3">
                     <p class="fs-xs text-uppercase fw-semibold text-muted mb-0">Metering</p>
                     <button type="button" class="btn btn-success fw-bold" (click)="browseMeterItem()">
@@ -270,7 +270,7 @@
                 </div>
 
                 <!-- Miscellaneous Charges -->
-                <hr/>
+                <hr class="border-dashed mx-n3 mt-3"/>
                 <div class="d-flex align-items-center justify-content-between mb-3">
                     <p class="fs-xs text-uppercase fw-semibold text-muted mb-0">Miscellaneous Charges</p>
                     <button type="button" class="btn btn-success fw-bold" (click)="browseMiscCharge()">
@@ -338,7 +338,7 @@
                 </div>
 
                 <!-- Cost Summary -->
-                <hr/>
+                <hr class="border-dashed mx-n3 mt-3"/>
                 <p class="fs-xs text-uppercase fw-semibold text-muted mb-3">Cost Summary</p>
                 <table class="table table-sm mb-0" style="max-width:640px; margin-left:auto">
                     <tbody>
@@ -431,13 +431,13 @@
                 } <!-- end @if (project) -->
 
                 <!-- Notes -->
-                <hr/>
+                <hr class="border-dashed mx-n3 mt-3"/>
                 <p class="fs-xs text-uppercase fw-semibold text-muted mb-3">Notes</p>
                 <textarea class="form-control" [(ngModel)]="notes" name="notes"
                           rows="4" placeholder="Enter notes" maxlength="1024"></textarea>
 
                 <!-- Signatories -->
-                <hr/>
+                <hr class="border-dashed mx-n3 mt-3"/>
                 <p class="fs-xs text-uppercase fw-semibold text-muted mb-3">Signatories</p>
                 <div class="row g-3">
                     @for (key of signatoryKeys; track key) {
@@ -459,7 +459,8 @@
                     }
                 </div>
 
-                <div class="d-flex gap-2 justify-content-end align-items-center pt-3 border-top mt-3">
+                <hr class="border-dashed mx-n3 mt-3"/>
+                <div class="d-flex gap-2 justify-content-end align-items-center mt-3">
                     <a [routerLink]="['/' + menuLink]" class="btn btn-light fw-bold">
                         <ng-icon name="tablerArrowLeft" class="ps-0 pe-3 fw-bold"></ng-icon>Back
                     </a>

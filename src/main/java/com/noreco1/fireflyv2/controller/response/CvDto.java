@@ -54,6 +54,7 @@ public class CvDto {
     private List<Map>  cashAdvances;
     private List<IEMOPBilling> iemopBillings;
     private List<CheckVoucherBudgetDetail> budgetDetails;
+    private List<GeneralLedgerLineDto2> generalLedgerLines = new ArrayList<>();
 
     private boolean isForAddingBudgetDetail = false;
 
@@ -393,6 +394,14 @@ public class CvDto {
 
     public void setBudgetDetails(List<CheckVoucherBudgetDetail> budgetDetails) {
         this.budgetDetails = budgetDetails;
+    }
+
+    public List<GeneralLedgerLineDto2> getGeneralLedgerLines() {
+        return generalLedgerLines;
+    }
+
+    public void setGeneralLedgerLines(List<GeneralLedgerLineDto2> generalLedgerLines) {
+        this.generalLedgerLines = generalLedgerLines;
     }
 
     public boolean isForAddingBudgetDetail() {

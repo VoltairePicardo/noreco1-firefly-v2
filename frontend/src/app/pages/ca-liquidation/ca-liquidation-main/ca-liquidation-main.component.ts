@@ -29,8 +29,8 @@ export class CaLiquidationMainComponent {
         return this.records().filter(r =>
             !q ||
             (r.code || '').toLowerCase().includes(q) ||
-            (r.cashAdvanceCode || r.cashAdvance?.code || '').toLowerCase().includes(q) ||
-            (r.employee || r.employeeName || '').toLowerCase().includes(q)
+            (r.employee || '').toLowerCase().includes(q) ||
+            (r.preparedBy?.fullName || '').toLowerCase().includes(q)
         );
     }
 
@@ -62,7 +62,7 @@ export class CaLiquidationMainComponent {
     }
 
     isEditable(rec: any): boolean {
-        const s = (rec?.status || rec?.documentStatus || '').toString();
-        return s === 'Document Created' || s === 'Returned to Creator' || s === '1';
+        const s = (rec?.documentStatus?.status || '').toString();
+        return s === 'Document Created' || s === 'Returned to Creator';
     }
 }

@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public interface SubLedgerRepo extends JpaRepository<SubLedger, Integer> {
@@ -110,8 +111,7 @@ public interface SubLedgerRepo extends JpaRepository<SubLedger, Integer> {
 
     @Query(value = "SELECT SUM(COALESCE(debit, 0)) as totalCost FROM SubLedger " +
             "JOIN SegmentAccount ON SubLedger.FK_segmentAccountId = SegmentAccount.id " +
-            "WHERE FK_transactionId = :voucherTransNo AND SegmentAccount.FK_accountId = :accountId LIMIT 1",
-            nativeQuery = true)
-    List<Object[]> sumDebitByTransNoAndAccountId(@Param("voucherTransNo") Integer voucherTransNo,
-                                              @Param("accountId") Integer accountId);
+            "WHERE FK_transactionId = :voucherTransNo AND SegmentAccount.FK_accountId = :accountId ", nativeQuery = true)
+    BigDecimal sumDebitByTransNoAndAccountId(@Param("voucherTransNo") Integer voucherTransNo,
+                                             @Param("accountId") Integer accountId);
 }

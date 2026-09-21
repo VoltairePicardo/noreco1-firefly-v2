@@ -13,6 +13,7 @@ const DOC_BROWSE_ENDPOINTS: Record<string, string> = {
     stockRelease: 'inventory/releasing/approved-paged',
     mst:          'inventory/mst/approved-paged',
     stockAdjust:  'inventory/stock-adjustment/approved-paged',
+    cal:          'cash-advance-liquidation/for-jv',
 };
 
 @Injectable({ providedIn: 'root' })

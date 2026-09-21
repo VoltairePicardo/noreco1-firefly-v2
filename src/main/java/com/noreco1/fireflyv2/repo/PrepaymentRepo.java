@@ -19,17 +19,18 @@ public interface PrepaymentRepo extends JpaRepository<Prepayment, Integer> {
     @Query(value = "SELECT pp.* " +
             "FROM Prepayment AS pp " +
             "WHERE (DATE(:startDateCreated) BETWEEN DATE_ADD(DATE_FORMAT(pp.datePaid, '%Y-%m-01'), INTERVAL 1 MONTH) " +
-            "AND ADDDATE(DATE_FORMAT(pp.datePaid, '%Y-%m-01'), INTERVAL pp.noOfMonths MONTH)) " +
-            "AND pp.id NOT IN " +
-            "(SELECT ppp.FK_prepaymentId " +
-            "FROM PrepaymentDetail AS ppp " +
-            "WHERE CONCAT(ppp.year, ppp.month) = :concatYearMonth) " +
-            "AND pp.balance > 0 " +
-            "AND pp.FK_accountNo IN " +
-            "(SELECT sl.FK_accountNo " +
-            "FROM SubLedger sl " +
-            "WHERE sl.FK_accountNo = pp.FK_accountNo)", nativeQuery = true)
-    public List<Prepayment> findByStartDateCreatedAndMonthYear(@Param("startDateCreated") String startDateCreated, @Param("concatYearMonth") String concatYearMonth);
+            "   AND DATE_ADD(DATE_FORMAT(pp.datePaid, '%Y-%m-01'), INTERVAL pp.noOfMonths MONTH)) " +
+            "   AND pp.id NOT IN  (" +
+            "       SELECT ppp.FK_prepaymentId " +
+            "       FROM PrepaymentDetail AS ppp " +
+            "       WHERE CONCAT(ppp.year, ppp.month) = :concatYearMonth) " +
+            "   AND pp.balance > 0 " +
+            "   AND EXISTS ( " +
+            "       SELECT 1 " +
+            "       FROM SubLedger AS sl " +
+            "       WHERE sl.FK_accountNo = pp.FK_accountNo " +
+            "   )", nativeQuery = true)
+    List<Prepayment> findByStartDateCreatedAndMonthYear(@Param("startDateCreated") String startDateCreated, @Param("concatYearMonth") String concatYearMonth);
 
     @Query(value = "SELECT e.code FROM Prepayment e WHERE year = :year  AND code LIKE '%PP%' AND code LIKE :offAcro ORDER BY id DESC LIMIT 1", nativeQuery = true)
     Object findLatestPpCodeByYear(@Param("year") Integer year, @Param("offAcro") String offAcro);

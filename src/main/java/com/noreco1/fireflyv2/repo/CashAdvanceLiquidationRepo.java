@@ -107,14 +107,13 @@ public interface CashAdvanceLiquidationRepo extends JpaRepository<CashAdvanceLiq
             @Param("from") Date from,
             @Param("to") Date to, @Param("officeId") Integer officeId);
 
-    @Query(value = "SELECT * FROM CashAdvanceLiquidation cal " +
+    @Query(value = "SELECT cal.* FROM CashAdvanceLiquidation cal " +
             "LEFT JOIN JournalVoucher jv ON cal.id = jv.FK_cashAdvanceLiquidationId " +
-            "WHERE cal.FK_documentStatusId = 7 AND jv.id IS null  \n#pageable\n",
+            "WHERE cal.FK_documentStatusId = 7 AND jv.id IS null ",
             countQuery = "SELECT COUNT(*) " +
                     "FROM CashAdvanceLiquidation cal " +
                     "LEFT JOIN JournalVoucher jv ON cal.id = jv.FK_cashAdvanceLiquidationId " +
-                    "WHERE cal.FK_documentStatusId = 7 AND jv.id IS null",
-            nativeQuery = true)
+                    "WHERE cal.FK_documentStatusId = 7 AND jv.id IS null", nativeQuery = true)
     Page<CashAdvanceLiquidation> findAllForJV(Pageable pageable);
 
     @Query(value = "SELECT * FROM CashAdvanceLiquidation cal " +
