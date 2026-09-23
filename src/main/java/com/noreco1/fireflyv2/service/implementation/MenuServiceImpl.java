@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class MenuServiceImpl implements MenuService {
@@ -56,8 +57,17 @@ public class MenuServiceImpl implements MenuService {
 
         User currentUser = authenticationFacade.getLoggedIn();
 
+        List<Integer> ids = menuRepo.findMenuIdsByUserId(currentUser.getId());
+        if (ids.isEmpty()) return new ArrayList<>();
+
+        Map<Integer, Integer> orderMap = new java.util.HashMap<>();
+        for (int i = 0; i < ids.size(); i++) orderMap.put(ids.get(i), i);
+
+        List<Menu> menus = menuRepo.findAllById(ids).stream()
+                .sorted(java.util.Comparator.comparingInt(m -> orderMap.get(m.getId())))
+                .collect(java.util.stream.Collectors.toList());
+
         List<MenuDto> menuDtoList = new ArrayList<>();
-        List<Menu> menus =  menuRepo.findAllByUserId(currentUser.getId());
 
         for (Menu menu : menus) {
             MenuDto menuDto = new MenuDto();

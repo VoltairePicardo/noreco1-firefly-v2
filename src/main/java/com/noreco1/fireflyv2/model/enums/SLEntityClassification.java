@@ -15,7 +15,10 @@ public enum SLEntityClassification {
     PETTY_CASH(6),
     OTHER_ACCOUNTS_RECEIVABLE(7),
     CONSUMER(8),
-    OTHER_SL_ENTITIES(9);
+    OTHER_SL_ENTITIES(9),
+    BMCOO(10),
+    DMCOO(11),
+    PAYEE(12);
 
     private Integer id;
 

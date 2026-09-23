@@ -7,7 +7,6 @@ import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
 import jakarta.persistence.*;
-import java.util.ArrayList;
 
 @Getter
 @Setter
@@ -37,15 +36,12 @@ public class Menu {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     @NotFound(action = NotFoundAction.IGNORE)
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="FK_parentMenuId", nullable = true, columnDefinition = "0")
     private Menu parentMenu;
 
-    @JsonIgnoreProperties(ignoreUnknown = true)
-    @NotFound(action = NotFoundAction.IGNORE)
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "FK_viewRouteId", nullable = true, columnDefinition = "0")
-    private Route viewRoute;
+    @Column(name = "FK_viewRouteId")
+    private Integer viewRouteId;
 
     @Column
     private String url;

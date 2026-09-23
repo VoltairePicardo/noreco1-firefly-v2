@@ -3,6 +3,7 @@ package com.noreco1.fireflyv2.service.implementation;
 import com.noreco1.fireflyv2.common.GlobalConstant;
 import com.noreco1.fireflyv2.common.facade.*;
 import com.noreco1.fireflyv2.common.helpers.Checker;
+import com.noreco1.fireflyv2.mysql_model.GlobalEntityAccountNo;
 import com.noreco1.fireflyv2.common.helpers.MessageFormatter;
 import com.noreco1.fireflyv2.common.helpers.StringFormatter;
 import com.noreco1.fireflyv2.common.facade.AssetDepreciationScheduleFacade;
@@ -51,6 +52,9 @@ public class AssetServiceImpl implements AssetService {
 
     @Autowired
     GeneratorFacade generatorFacade;
+
+    @Autowired
+    GlobalEntityAcctNoFacade globalEntityAcctNoFacade;
 
     @Autowired
     private AuthenticationFacade authenticationFacade;
@@ -859,6 +863,7 @@ public class AssetServiceImpl implements AssetService {
                 response.setSuccess(false);
             } else {
                 User createdBy = authenticationFacade.getLoggedIn();
+                GlobalEntityAccountNo acct = null;
 
                 if (asset.getId() != null) {
 
@@ -886,7 +891,8 @@ public class AssetServiceImpl implements AssetService {
                     asset.setCode(code);
                     asset.setYear(year);
                     asset.setCreatedBy(createdBy);
-                    asset.setAccountNo(generatorFacade.entityAccountNumber());
+                    acct = globalEntityAcctNoFacade.generate(EntityType.ASSET.getCode(), 0, EntitySystem.NORECO1_FIREFLY_V2.getCode(), code);
+                    asset.setAccountNo(acct.getAccountNo());
                 }
 
                 // Set others fields.
@@ -906,6 +912,7 @@ public class AssetServiceImpl implements AssetService {
                 asset.setCreatedAt(new Date());
 
                 Asset a = assetRepo.save(asset);
+                if (acct != null) globalEntityAcctNoFacade.link(acct.getAccountNo(), a.getId(), EntitySystem.NORECO1_FIREFLY_V2.getCode());
 
                 if (a != null) {
 

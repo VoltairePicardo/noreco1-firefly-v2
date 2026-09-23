@@ -3,7 +3,11 @@ package com.noreco1.fireflyv2.service.implementation;
 import com.noreco1.fireflyv2.common.facade.AuthenticationFacade;
 import com.noreco1.fireflyv2.common.facade.FileFacade;
 import com.noreco1.fireflyv2.common.facade.GeneratorFacade;
+import com.noreco1.fireflyv2.common.facade.GlobalEntityAcctNoFacade;
 import com.noreco1.fireflyv2.common.facade.UserFacade;
+import com.noreco1.fireflyv2.model.enums.EntitySystem;
+import com.noreco1.fireflyv2.model.enums.EntityType;
+import com.noreco1.fireflyv2.mysql_model.GlobalEntityAccountNo;
 import com.noreco1.fireflyv2.common.helpers.Checker;
 import com.noreco1.fireflyv2.common.helpers.MessageFormatter;
 import com.noreco1.fireflyv2.common.helpers.StringFormatter;
@@ -46,6 +50,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     GeneratorFacade generatorFacade;
+
+    @Autowired
+    GlobalEntityAcctNoFacade globalEntityAcctNoFacade;
 
     @Autowired
     EmployeeRepo employeeRepo;
@@ -162,9 +169,12 @@ public class UserServiceImpl implements UserService {
                 userForm.setPassword(hashedPassword);
 
                 userForm.setFullName(fullName);
-                userForm.setAccountNo(generatorFacade.entityAccountNumber());
+                GlobalEntityAccountNo acct = globalEntityAcctNoFacade.generate(
+                        EntityType.USER.getCode(), 0, EntitySystem.NORECO1_FIREFLY_V2.getCode(), fullName);
+                userForm.setAccountNo(acct.getAccountNo());
 
                 this.existingUser = userFacade.create(userForm);
+                globalEntityAcctNoFacade.link(acct.getAccountNo(), this.existingUser.getId(), EntitySystem.NORECO1_FIREFLY_V2.getCode());
 
                 // userForm roles
                 if (!Checker.collectionIsEmpty(userForm.getRoles())) {
@@ -186,7 +196,10 @@ public class UserServiceImpl implements UserService {
                     employee.setDivision(userForm.getDivision());
                     employee.setSection(userForm.getSection());
                     employee.setPosition(userForm.getPosition());
-                    employee.setAccountNumber(userForm.getAccountNo());
+                    // Employee shares the same GEAN as the User (Option A).
+                    // One GlobalEntityAccountNo record (USER type, entityId=user.id) covers both.
+                    // Employee.accountNumber is an FK reference to that same account no.
+                    employee.setAccountNumber(acct.getAccountNo());
                     employee.setCreatedBy(authenticationFacade.getLoggedIn());
 
                     SLEntityClassification slEntityClassification = new SLEntityClassification();

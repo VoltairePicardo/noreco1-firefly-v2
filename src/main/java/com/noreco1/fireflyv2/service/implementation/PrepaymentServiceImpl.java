@@ -3,6 +3,9 @@ package com.noreco1.fireflyv2.service.implementation;
 import com.noreco1.fireflyv2.common.GlobalConstant;
 import com.noreco1.fireflyv2.common.facade.*;
 import com.noreco1.fireflyv2.common.helpers.Checker;
+import com.noreco1.fireflyv2.model.enums.EntitySystem;
+import com.noreco1.fireflyv2.model.enums.EntityType;
+import com.noreco1.fireflyv2.mysql_model.GlobalEntityAccountNo;
 import com.noreco1.fireflyv2.common.helpers.DateHelper;
 import com.noreco1.fireflyv2.common.helpers.MessageFormatter;
 import com.noreco1.fireflyv2.common.helpers.ServiceUtil;
@@ -43,6 +46,9 @@ public class PrepaymentServiceImpl implements PrepaymentService {
 
     @Autowired
     GeneratorFacade generatorFacade;
+
+    @Autowired
+    GlobalEntityAcctNoFacade globalEntityAcctNoFacade;
 
     @Autowired
     private AuthenticationFacade authenticationFacade;
@@ -142,6 +148,7 @@ public class PrepaymentServiceImpl implements PrepaymentService {
             Integer voucherYear = Integer.parseInt(GlobalConstant.YYYY_DATE_FORMAT.format(new Date()));
 
             Boolean insertMode = pp.getId() == null;
+            GlobalEntityAccountNo acct = null;
             if (insertMode) { // insert mode
                 Employee employee = employeeRepo.findOneByAccountNumber(createdBy.getAccountNo());
                 pp.setOffice(employee.getOffice());
@@ -149,7 +156,8 @@ public class PrepaymentServiceImpl implements PrepaymentService {
                 Object latestPpCode = prepaymentRepo.findLatestPpCodeByYear(voucherYear, "%-"+offAcro+"-%");
                 pp.setCode(generatorFacade.voucherCode("PP-"+offAcro, (latestPpCode == null ? "" : String.valueOf(latestPpCode)), new Date()));
                 pp.setTransaction(transaction);
-                pp.setAccountNo(generatorFacade.entityAccountNumber());
+                acct = globalEntityAcctNoFacade.generate(EntityType.PREPAYMENT.getCode(), 0, EntitySystem.NORECO1_FIREFLY_V2.getCode(), pp.getCode());
+                pp.setAccountNo(acct.getAccountNo());
                 pp.setCreatedBy(createdBy);
                 pp.setCreatedAt(new Date());
                 pp.setUpdatedAt(new Date());
@@ -184,6 +192,7 @@ public class PrepaymentServiceImpl implements PrepaymentService {
             }
 
             Prepayment newPp = prepaymentRepo.save(existingPp);
+            if (insertMode && acct != null) globalEntityAcctNoFacade.link(acct.getAccountNo(), newPp.getId(), EntitySystem.NORECO1_FIREFLY_V2.getCode());
 
             if (newPp != null) {
                 if(pp.isHasPpd()){
