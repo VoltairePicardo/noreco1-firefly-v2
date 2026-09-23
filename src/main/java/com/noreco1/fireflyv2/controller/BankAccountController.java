@@ -22,6 +22,11 @@ public class BankAccountController {
         return bankAccountService.getAllBankAccounts();
     }
 
+    @GetMapping("/for-cv/{bankId}")
+    public List<BankAccount> getAllForCv(@PathVariable Integer bankId) {
+        return bankAccountService.getAllBankAccountsForCv(bankId);
+    }
+
     @GetMapping("/list")
     public Page<BankAccount> list(
             @RequestParam(defaultValue = "") String q,

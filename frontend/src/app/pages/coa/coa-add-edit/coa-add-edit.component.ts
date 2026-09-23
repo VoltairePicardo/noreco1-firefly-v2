@@ -56,15 +56,15 @@ export class CoaAddEditComponent {
 
     initForm(data?: any): void {
         this.validationForm = this.fb.group({
-            code:          [data?.code          || '',  Validators.required],
+            code:          [data?.code          || ''],
             title:         [data?.title         || '',  Validators.required],
             classification:[data?.classification || ''],
             normalBalance: [data?.normalBalance  ?? 1],
             isActive:      [data != null ? (data.isActive === 1 || data.isActive === true) : true],
             isHeader:      [data != null ? (data.isHeader === 1 || data.isHeader === true) : false],
             hasSL:         [data != null ? (data.hasSL   === 1 || data.hasSL   === true) : false],
-            glaccount:     [data?.GLAccount      || ''],
-            slaccount:     [data?.SLAccount      || ''],
+            glaccount:     [data?.glaccount      || ''],
+            slaccount:     [data?.slaccount      || ''],
             auxAccount:    [data?.auxAccount     || ''],
             accountTypeId: [data?.accountType?.id  ?? null, Validators.required],
             accountGroupId:[data?.accountGroup?.id ?? null, Validators.required],
@@ -131,11 +131,8 @@ export class CoaAddEditComponent {
             parentAccountId: this.selectedParentAccount?.id ?? 0,
             accountType:   v.accountTypeId  ? { id: v.accountTypeId }  : null,
             accountGroup:  v.accountGroupId ? { id: v.accountGroupId } : null,
+            allocationFactor: { id: v.factorId || 0 },
         };
-
-        if (v.factorId) {
-            frm.allocationFactor = { id: v.factorId };
-        }
 
         const req = this.editMode ? this.service.update(frm) : this.service.create(frm);
 

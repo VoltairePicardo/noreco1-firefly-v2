@@ -19,6 +19,8 @@ import org.springframework.web.bind.annotation.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -72,6 +74,14 @@ public class CashAdvanceLiquidationController {
     @GetMapping("/{id}")
     public CashAdvanceLiquidation getData(@PathVariable Integer id) {
         return cashAdvanceLiquidationService.findById(id);
+    }
+
+    @GetMapping("/for-jv")
+    public Page<CashAdvanceLiquidation> forJv(
+            @RequestParam(value = "q", required = false) String query,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size) {
+        return cashAdvanceLiquidationService.findAllForJv(query, PageRequest.of(page, size));
     }
 
     @RequestMapping(value = "/create", method = RequestMethod.POST, consumes = {"multipart/form-data"})

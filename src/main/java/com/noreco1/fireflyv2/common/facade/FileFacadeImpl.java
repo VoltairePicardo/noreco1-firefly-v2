@@ -12,9 +12,11 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -45,6 +47,24 @@ public class FileFacadeImpl implements FileFacade {
 
     @Autowired
     private EmployeeRepo employeeRepo;
+
+    /**
+     * MultipartHttpServletRequest#getFileMap() keeps only one MultipartFile per form field
+     * name, so multiple files submitted under the same field (e.g. repeated "file_" appends)
+     * silently collapse to one. This re-keys each file uniquely so none are dropped, while
+     * still starting with the original field name — saveDocumentAttachment only checks the
+     * key's prefix, so the "_<index>" suffix doesn't affect that matching.
+     */
+    public static Map<String, MultipartFile> flattenFileMap(MultipartHttpServletRequest request) {
+        Map<String, MultipartFile> flattened = new LinkedHashMap<>();
+        int i = 0;
+        for (Map.Entry<String, List<MultipartFile>> entry : request.getMultiFileMap().entrySet()) {
+            for (MultipartFile file : entry.getValue()) {
+                flattened.put(entry.getKey() + "_" + (i++), file);
+            }
+        }
+        return flattened;
+    }
 
     @Override
     @Transactional

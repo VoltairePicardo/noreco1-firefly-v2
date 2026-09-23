@@ -9,10 +9,12 @@ import com.noreco1.fireflyv2.service.AccountService;
 import com.noreco1.fireflyv2.service.DownloadService;
 import com.noreco1.fireflyv2.service.JasperDatasourceService;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import net.sf.jasperreports.engine.JRDataSource;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -24,18 +26,17 @@ import java.util.Map;
 public class AccountController {
 
     private final AccountService accountService;
+    private final AccountRepo accountRepo;
+    private final DownloadService downloadService;
+    private final JasperDatasourceService jasperDatasourceService;
+    private final MessageSource messageSource;
 
-    @Autowired
-    private AccountRepo accountRepo;
-
-    @Autowired
-    private DownloadService downloadService;
-
-    @Autowired
-    private JasperDatasourceService jasperDatasourceService;
-
-    public AccountController(AccountService accountService) {
+    public AccountController(AccountService accountService, AccountRepo accountRepo, DownloadService downloadService, JasperDatasourceService jasperDatasourceService, MessageSource messageSource) {
         this.accountService = accountService;
+        this.accountRepo = accountRepo;
+        this.downloadService = downloadService;
+        this.jasperDatasourceService = jasperDatasourceService;
+        this.messageSource = messageSource;
     }
 
     @GetMapping("/search")
@@ -59,6 +60,11 @@ public class AccountController {
         return accountService.findSupplierAccount();
     }
 
+    @GetMapping("/vat")
+    public Map vatAccount() {
+        return accountService.findVat();
+    }
+
     @GetMapping("/list")
     public List<AccountDto> getList() {
         return accountService.findAll();
@@ -70,21 +76,13 @@ public class AccountController {
     }
 
     @PostMapping("/create")
-    public PostResponse create(@RequestBody Account account) {
-        Account saved = accountService.create(account);
-        PostResponse response = new PostResponse();
-        response.setSuccess(saved != null && saved.getId() != null && saved.getId() > 0);
-        response.setModelId(saved != null && saved.getId() != null ? saved.getId() : 0);
-        return response;
+    public PostResponse create(@Valid @RequestBody Account account, BindingResult bindingResult) {
+        return accountService.processCreate(account, bindingResult, messageSource);
     }
 
     @PostMapping("/update")
-    public PostResponse update(@RequestBody Account account) {
-        Account saved = accountService.update(account);
-        PostResponse response = new PostResponse();
-        response.setSuccess(saved != null && saved.getId() != null && saved.getId() > 0);
-        response.setModelId(saved != null && saved.getId() != null ? saved.getId() : 0);
-        return response;
+    public PostResponse update(@Valid @RequestBody Account account, BindingResult bindingResult) {
+        return accountService.processUpdate(account, bindingResult, messageSource);
     }
 
     @PostMapping("/delete/{id}")

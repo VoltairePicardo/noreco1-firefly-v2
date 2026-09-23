@@ -385,9 +385,20 @@ public class JvServiceImpl implements JvService, PrintableVoucher {
         JournalVoucher journalVoucher = jvRepo.findById(id).orElse(null);
         if (journalVoucher != null) {
             map = composeJvMap(journalVoucher);
+
+            if (journalVoucher.getTransaction() != null) {
+                map.put("journalEntries", getJournalEntryLines(journalVoucher.getTransaction().getId()));
+                map.put("generalLedgerLines", ledgerDtoers.getGLAccountEntriesDtoByTrans(journalVoucher.getTransaction().getId(), false));
+            }
         }
 
         return map;
+    }
+
+    private List<CommonLedgerDetail> getJournalEntryLines(Integer transId) {
+        return ledgerDtoers.getVoucherLedgerLines(transId).stream()
+                .filter(d -> d.getAccountCode() != null && !d.getAccountCode().isEmpty())
+                .collect(Collectors.toList());
     }
 
     @Transactional(isolation = Isolation.READ_UNCOMMITTED)
@@ -680,6 +691,7 @@ public class JvServiceImpl implements JvService, PrintableVoucher {
         map.put("postedBy", journalVoucher.getPostedBy() != null ? journalVoucher.getPostedBy().getFullName():"");
         map.put("payable", journalVoucher.getPayable());
         map.put("cashAdvanceLiquidation", journalVoucher.getCashAdvanceLiquidation());
+        map.put("batch", journalVoucher.getBatch());
 
         Map crUser = new HashMap();
         crUser.put("accountNo", journalVoucher.getCreatedBy().getAccountNo());
@@ -892,10 +904,8 @@ public class JvServiceImpl implements JvService, PrintableVoucher {
         if (request instanceof MultipartHttpServletRequest) {
             MultipartHttpServletRequest mRequest = (MultipartHttpServletRequest) request;
             if (this.model != null) {
-                if (mRequest.getFileMap() != null) {
-                    fileFacade.removeDocumentAttachment(fileToRemove, this.model.getTransaction().getId());
-                    fileFacade.saveDocumentAttachment(mRequest.getFileMap(), this.model.getTransaction().getId());
-                }
+                fileFacade.removeDocumentAttachment(fileToRemove, this.model.getTransaction().getId());
+                fileFacade.saveDocumentAttachment(FileFacadeImpl.flattenFileMap(mRequest), this.model.getTransaction().getId());
             }
         }
 
@@ -910,9 +920,7 @@ public class JvServiceImpl implements JvService, PrintableVoucher {
         if (request instanceof MultipartHttpServletRequest) {
             MultipartHttpServletRequest mRequest = (MultipartHttpServletRequest) request;
             if (this.model != null) {
-                if (mRequest.getFileMap() != null) {
-                    fileFacade.saveDocumentAttachment(mRequest.getFileMap(), this.model.getTransaction().getId());
-                }
+                fileFacade.saveDocumentAttachment(FileFacadeImpl.flattenFileMap(mRequest), this.model.getTransaction().getId());
             }
         }
 

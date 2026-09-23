@@ -205,7 +205,7 @@ public interface CashAdvanceRepo extends JpaRepository<CashAdvance, Integer> {
             nativeQuery = true)
     List<CashAdvance> findAllUnliquidatedNotOverdue();
 
-    @Query(value = "SELECT * FROM CashAdvance ca " +
+    @Query(value = "SELECT ca.* FROM CashAdvance ca " +
             "left JOIN CashAdvanceLiquidation cal ON ca.id = cal.FK_cashAdvanceId " +
             "LEFT JOIN JournalVoucher jv ON cal.id = jv.FK_cashAdvanceLiquidationId " +
             "WHERE (cal.id IS NULL OR jv.id IS NULL OR jv.FK_documentStatusId != 7) " +

@@ -2,6 +2,7 @@ package com.noreco1.fireflyv2.controller;
 
 import com.noreco1.fireflyv2.common.GlobalConstant;
 import com.noreco1.fireflyv2.common.helpers.Checker;
+import com.noreco1.fireflyv2.controller.response.CvVoucherDto;
 import com.noreco1.fireflyv2.controller.response.PostResponse;
 import com.noreco1.fireflyv2.controller.response.ProcessDocumentDto;
 import com.noreco1.fireflyv2.model.CashAdvance;
@@ -13,6 +14,8 @@ import net.sf.jasperreports.engine.JRDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.MessageSource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -75,6 +78,14 @@ public class CashAdvanceController {
         return cashAdvanceService.findByDateRange(from, to, officeId);
     }
 
+    @GetMapping("/approved-for-cv-paged")
+    public Page<CvVoucherDto> approvedForCvPaged(
+            @RequestParam(value = "q", required = false, defaultValue = "") String q,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size) {
+        return cashAdvanceService.findAllApprovedForCvPaged(q.isEmpty() ? null : q, PageRequest.of(page, size));
+    }
+
     @GetMapping("/document-statuses")
     public List<DocumentStatus> documentStatuses() {
         return cashAdvanceService.getDocumentsStatuses();
@@ -85,7 +96,7 @@ public class CashAdvanceController {
         return cashAdvanceService.findById(id);
     }
 
-    @RequestMapping(value = "/create", method = RequestMethod.POST, consumes = {"multipart/form-data"})
+    @PostMapping(value = "/create", consumes = {"multipart/form-data"})
     public PostResponse create(@RequestPart("model") @Valid CashAdvance cashAdvance,
                                BindingResult bindingResult, HttpServletRequest request) {
         PostResponse response = cashAdvanceService.processCreate(cashAdvance, bindingResult, messageSource, request);
@@ -95,7 +106,7 @@ public class CashAdvanceController {
         return response;
     }
 
-    @RequestMapping(value = "/update", method = RequestMethod.POST, consumes = {"multipart/form-data"})
+    @PostMapping(value = "/update", consumes = {"multipart/form-data"})
     public PostResponse update(@RequestPart(value = "filesToRemove", required = false) List<Map> filesToRemove,
                                @RequestPart("model") @Valid CashAdvance cashAdvance,
                                BindingResult bindingResult, HttpServletRequest request) {

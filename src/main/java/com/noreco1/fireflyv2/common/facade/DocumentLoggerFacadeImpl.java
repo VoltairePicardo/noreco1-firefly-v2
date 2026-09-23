@@ -562,7 +562,7 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
                     CashAdvanceLiquidationItemDto dto = new CashAdvanceLiquidationItemDto();
 
                     dto.setId(cali.getId());
-                    dto.setParticular(cali.getCashAdvanceParticular().getParticular());
+                    dto.setParticular(cali.getCashAdvanceParticular() != null ? cali.getCashAdvanceParticular().getParticular() : null);
                     dto.setAmount(cali.getAmount());
                     dto.setOrNumber(cali.getOrNumber());
 

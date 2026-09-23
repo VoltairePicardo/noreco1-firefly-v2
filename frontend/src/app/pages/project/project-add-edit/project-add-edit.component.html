@@ -119,7 +119,7 @@
                 </div>
 
                 <!-- Contractors -->
-                <hr/>
+                <hr class="border-dashed mx-n3 mt-3"/>
                 <div class="d-flex align-items-center justify-content-between mb-3">
                     <p class="fs-xs text-uppercase fw-semibold text-muted mb-0">Contractors</p>
                     <button type="button" class="btn btn-success fw-bold" (click)="browseSupplier()">
@@ -165,7 +165,7 @@
                 </div>
 
                 <!-- As Planned Staking Sheet -->
-                <hr/>
+                <hr class="border-dashed mx-n3 mt-3"/>
                 <p class="fs-xs text-uppercase fw-semibold text-muted mb-3">As Planned Staking Sheet</p>
                 <div class="d-flex align-items-center gap-3 mb-2">
                     <button type="button" class="btn btn-success fw-bold" (click)="openStakingFilePicker()">
@@ -215,7 +215,8 @@
                     <p class="text-muted mb-0 fs-xs">No files attached.</p>
                 }
 
-                <div class="d-flex gap-2 justify-content-end align-items-center pt-3 border-top mt-3">
+                <hr class="border-dashed mx-n3 mt-3"/>
+                <div class="d-flex gap-2 justify-content-end align-items-center mt-3">
                     <a [routerLink]="['/' + menuLink]" class="btn btn-light fw-bold">
                         <ng-icon name="tablerArrowLeft" class="ps-0 pe-3 fw-bold"></ng-icon>Back
                     </a>

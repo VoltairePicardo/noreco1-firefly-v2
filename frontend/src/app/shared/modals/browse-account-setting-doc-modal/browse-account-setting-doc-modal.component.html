@@ -55,9 +55,9 @@
                     @for (item of items; track item.id) {
                         <tr style="cursor: pointer" (click)="select(item)">
                             <td class="fw-bold">{{ item.localCode || item.code || '—' }}</td>
-                            <td class="text-end">{{ item.netAmount != null ? (item.netAmount | number:'1.2-2') : '—' }}</td>
+                            <td class="text-end">{{ (item.netAmount ?? item.totalReturnedAmount ?? item.amount) != null ? ((item.netAmount ?? item.totalReturnedAmount ?? item.amount) | number:'1.2-2') : '—' }}</td>
                             <td>{{ item.voucherDate | date:'MMM d, yyyy' }}</td>
-                            <td>{{ item.particulars || '—' }}</td>
+                            <td>{{ item.particulars || item.remarks || '—' }}</td>
                             <td>{{ item.preparedBy || item.createdBy?.name || item.createdBy?.fullName || '—' }}</td>
                         </tr>
                     }

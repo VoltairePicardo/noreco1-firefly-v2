@@ -69,7 +69,7 @@ public class CashAdvanceParticularServiceImpl implements CashAdvanceParticularSe
     @Override
     public List<HashMap> findByCAIdForLiquidation(Integer id, Integer calId) {
         List<HashMap> mapList = new ArrayList<>();
-        List<CashAdvanceParticular> cashAdvanceParticulars = cashAdvanceParticularRepo.findByCAIdForLiquidation(id, calId);
+        List<CashAdvanceParticular> cashAdvanceParticulars = cashAdvanceParticularRepo.findByCAIdForLiquidation(id);
 
         if (!Checker.collectionIsEmpty(cashAdvanceParticulars)) {
             for (CashAdvanceParticular cashAdvanceParticular : cashAdvanceParticulars) {

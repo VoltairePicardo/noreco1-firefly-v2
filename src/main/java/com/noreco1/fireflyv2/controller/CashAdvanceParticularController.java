@@ -31,7 +31,6 @@ public class CashAdvanceParticularController {
     }
 
     @RequestMapping(value = "/details-for-liquidation/{id}/{calId}")
-    
     public List<HashMap> findByCaIdForLiquidation(@PathVariable Integer id, @PathVariable Integer calId) {
         return cashAdvanceParticularService.findByCAIdForLiquidation(id, calId);
     }

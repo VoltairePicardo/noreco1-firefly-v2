@@ -63,7 +63,7 @@
 
         <!-- Allocation Factor Distributions -->
         @if (data.factor) {
-            <hr/>
+            <hr class="border-dashed mx-n3 mt-3"/>
             <div class="mb-2">
                 <span class="fw-semibold text-uppercase fs-xs text-muted">Allocation Factor</span>
                 <span class="ms-2 fw-bold">{{ data.factor.code }} — {{ data.factor.description }}</span>
@@ -101,7 +101,7 @@
         }
 
         }
-        <hr/>
+        <hr class="border-dashed mx-n3 mt-3"/>
         <div class="d-flex justify-content-end gap-2">
             <button type="button" class="btn btn-primary fw-bold"
                     [routerLink]="['/' + menuLink, data.id, 'edit']">

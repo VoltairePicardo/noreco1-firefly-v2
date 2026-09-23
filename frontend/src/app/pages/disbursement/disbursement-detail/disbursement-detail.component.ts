@@ -4,12 +4,18 @@ import { AlertService } from '@/app/shared/services/alert.service';
 import { COMMON_ALL_PAGE_IMPORTS, COMMON_MAIN_PAGE_IMPORTS, SHARED_PROVIDERS } from '@/app/shared/providers/shared-providers';
 import { DisbursementService } from '../disbursement.service';
 import { provideIcons } from '@ng-icons/core';
-import { tablerArrowLeft, tablerPrinter, tablerEdit, tablerCheck, tablerEye, tablerEyeOff } from '@ng-icons/tabler-icons';
+import {
+    tablerArrowLeft, tablerPrinter, tablerEdit, tablerCheck, tablerEye, tablerEyeOff,
+    tablerChevronDown, tablerChevronRight, tablerFile
+} from '@ng-icons/tabler-icons';
 
 @Component({
     selector: 'app-disbursement-detail',
     imports: [...COMMON_ALL_PAGE_IMPORTS, ...COMMON_MAIN_PAGE_IMPORTS],
-    providers: [...SHARED_PROVIDERS, provideIcons({ tablerArrowLeft, tablerPrinter, tablerEdit, tablerCheck, tablerEye, tablerEyeOff })],
+    providers: [...SHARED_PROVIDERS, provideIcons({
+        tablerArrowLeft, tablerPrinter, tablerEdit, tablerCheck, tablerEye, tablerEyeOff,
+        tablerChevronDown, tablerChevronRight, tablerFile
+    })],
     templateUrl: './disbursement-detail.component.html'
 })
 export class DisbursementDetailComponent {
@@ -21,6 +27,8 @@ export class DisbursementDetailComponent {
     journalEntries: any[] = [];
     iemopBillings : any[] = [];
     attachments   : any[] = [];
+    expandedSl    = new Set<number>();
+    printingCheckRows = new Set<any>();
     isLoading          = signal(false);
     processingWorkflow = false;
 
@@ -53,8 +61,9 @@ export class DisbursementDetailComponent {
                 this.isLoading.set(false);
                 if (data?.id) {
                     this.data = data;
-                    this.journalEntries = data.journalEntries || data.details || [];
+                    this.journalEntries = data.generalLedgerLines || [];
                     this.iemopBillings  = data.iemopBillings  || [];
+                    this.expandedSl.clear();
                     this.loadWorkflowActions();
                     this.loadAttachments();
                 } else {
@@ -122,8 +131,37 @@ export class DisbursementDetailComponent {
         return this.iemopBillings.reduce((s, b) => s + (b.ewtPurchases || 0), 0);
     }
 
+    isSlExpanded(index: number): boolean {
+        return this.expandedSl.has(index);
+    }
+
+    toggleSl(index: number): void {
+        if (this.expandedSl.has(index)) {
+            this.expandedSl.delete(index);
+        } else {
+            this.expandedSl.add(index);
+        }
+    }
+
+    get sourceVoucherType(): string | null {
+        if (this.data.apvDto) return 'Account Payable Voucher';
+        if (this.data.jvDto)  return 'Journal Voucher';
+        if (this.data.rrDto)  return 'Receiving Report';
+        if (this.data.joaDto) return 'JO Acceptance';
+        return null;
+    }
+
+    get sourceVoucher(): any {
+        return this.data.apvDto || this.data.jvDto || this.data.rrDto || this.data.joaDto || null;
+    }
+
+    get checkNumberRows(): any[] {
+        return this.data.bankAccountDetailsMap || [];
+    }
+
     loadAttachments(): void {
-        this.service.getFiles(this.id).subscribe({
+        if (!this.data?.transId) return;
+        this.service.getFiles(this.data.transId).subscribe({
             next: (files) => { this.attachments = files || []; },
             error: () => { this.attachments = []; }
         });
@@ -151,5 +189,45 @@ export class DisbursementDetailComponent {
 
     print(): void {
         this.service.print(this.id);
+    }
+
+    print2307(): void {
+        if (!this.data?.payee?.accountNo || !this.data?.transId) return;
+        this.service.print2307(this.data.payee.accountNo, this.data.transId);
+    }
+
+    print2307SubSuppliers(): void {
+        if (!this.data?.transId) return;
+        this.service.print2307SubSuppliers(this.data.transId);
+    }
+
+    printCheck(row: any): void {
+        const checkNumber = (row.checkNumber || '').trim();
+        if (!checkNumber || this.printingCheckRows.has(row)) return;
+
+        this.service.printCheck(row.transId, row.bankAccount.id);
+
+        this.printingCheckRows.add(row);
+        const payload = {
+            checkNumber,
+            transaction: { id: row.transId },
+            bankAccount: { id: row.bankAccount.id },
+            account:     { id: row.bankAccount.account?.id }
+        };
+        this.service.updateCheckNumber(payload).subscribe({
+            next: (res) => {
+                this.printingCheckRows.delete(row);
+                if (res?.success) {
+                    row.printed = true;
+                    this.alertService.success(this.module, 'Check Printed', '');
+                } else {
+                    this.alertService.error(this.module, 'Error', res?.failureMessage || '');
+                }
+            },
+            error: () => {
+                this.printingCheckRows.delete(row);
+                this.alertService.error(this.module, 'Error', '');
+            }
+        });
     }
 }

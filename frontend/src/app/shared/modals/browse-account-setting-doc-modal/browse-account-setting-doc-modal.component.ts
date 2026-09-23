@@ -26,6 +26,7 @@ export class BrowseAccountSettingDocModalComponent implements OnInit {
         { key: 'stockRelease', label: 'Stock Release' },
         { key: 'mst',          label: 'Material Salvage Ticket' },
         { key: 'stockAdjust',  label: 'Stock Adjustment' },
+        { key: 'cal',          label: 'Cash Advance Liquidation' },
     ];
 
     selectedDocType = '';
@@ -66,6 +67,9 @@ export class BrowseAccountSettingDocModalComponent implements OnInit {
     onSearchChange(): void { this.page = 1; this.loadData(); }
 
     select(item: any): void {
-        this.activeModal.close({ action: 'select', data: item });
+        // `docType` is included alongside `data` so callers that support more than one
+        // document shape (e.g. a Cash Advance Liquidation vs. an account-setting doc)
+        // can branch on it instead of guessing from the item's fields.
+        this.activeModal.close({ action: 'select', data: item, docType: this.selectedDocType });
     }
 }

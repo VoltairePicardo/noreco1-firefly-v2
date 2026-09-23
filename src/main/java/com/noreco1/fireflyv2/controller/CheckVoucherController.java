@@ -1,21 +1,21 @@
 package com.noreco1.fireflyv2.controller;
 
 import com.noreco1.fireflyv2.common.GlobalConstant;
-import com.noreco1.fireflyv2.model.CheckConfig;
-import com.noreco1.fireflyv2.repo.CheckConfigRepo;
-import com.noreco1.fireflyv2.controller.response.reports.CheckDto;
+import com.noreco1.fireflyv2.controller.response.PostResponse;
+import com.noreco1.fireflyv2.model.CheckVoucherCheque;
 import com.noreco1.fireflyv2.service.DownloadService;
 import com.noreco1.fireflyv2.service.*;
 import net.sf.jasperreports.engine.JRDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.context.MessageSource;
+import org.springframework.validation.BeanPropertyBindingResult;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
 import java.util.HashMap;
 
 @RestController
@@ -38,10 +38,10 @@ public class CheckVoucherController {
     private DownloadService downloadService;
 
     @Autowired
-    CheckConfigRepo checkConfigRepo;
+    CvService cvService;
 
     @Autowired
-    CvService cvService;
+    MessageSource messageSource;
 
     @RequestMapping(value="/export/{id}")
     public void exportToPdf(@PathVariable Integer id,
@@ -81,5 +81,11 @@ public class CheckVoucherController {
                           @RequestParam(value = "token") String token,
                           HttpServletResponse response, HttpServletRequest request) {
         bir2307.fillPdfMultiple(transId, token, response);
+    }
+
+    @PostMapping(value = "/update-check")
+    public PostResponse updateCheck(@RequestBody CheckVoucherCheque cheque) {
+        BindingResult bindingResult = new BeanPropertyBindingResult(cheque, "checkVoucherCheque");
+        return cvService.updateCheckNumber(cheque, bindingResult, messageSource);
     }
 }

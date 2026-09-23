@@ -25,9 +25,7 @@ public interface CashAdvanceParticularRepo extends JpaRepository<CashAdvancePart
 
     @Query(value = "select * " +
             "from CashAdvanceParticular cap " +
-            "LEFT JOIN CashAdvanceLiquidationItem cali ON cap.id = cali.FK_cashAdvanceParticularId " +
-            "where cap.FK_cashAdvanceId = :caId AND cali.id is null OR cali.id = :calId ",
-            nativeQuery = true)
-    List<CashAdvanceParticular> findByCAIdForLiquidation(@Param("caId") Integer pcvId, @Param("calId") Integer calId);
+            "where cap.FK_cashAdvanceId = :caId ", nativeQuery = true)
+    List<CashAdvanceParticular> findByCAIdForLiquidation(@Param("caId") Integer caId);
 
 }

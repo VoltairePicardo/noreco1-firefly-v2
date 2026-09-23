@@ -4,6 +4,7 @@ import com.noreco1.fireflyv2.common.GlobalConstant;
 import com.noreco1.fireflyv2.common.helpers.Checker;
 import com.noreco1.fireflyv2.controller.response.ApvListDto;
 import com.noreco1.fireflyv2.controller.response.ApvPurchasingDocumentDto;
+import com.noreco1.fireflyv2.controller.response.CvVoucherDto;
 import com.noreco1.fireflyv2.controller.response.PostResponse;
 import com.noreco1.fireflyv2.controller.response.ProcessDocumentDto;
 import com.noreco1.fireflyv2.model.AccountsPayableVoucher;
@@ -123,5 +124,13 @@ public class AccountsPayableVoucherController {
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "10") int size) {
         return receivingReportService.findAllApprovedForApvPaged(q, PageRequest.of(page, size));
+    }
+
+    @GetMapping("/approved-for-cv-paged")
+    public Page<CvVoucherDto> approvedForCvPaged(
+            @RequestParam(value = "q", required = false, defaultValue = "") String q,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size) {
+        return apvService.findAllApprovedForCvPaged(q.isEmpty() ? null : q, PageRequest.of(page, size));
     }
 }
