@@ -5,11 +5,14 @@ import com.noreco1.fireflyv2.model.enums.EntityType;
 import com.noreco1.fireflyv2.mysql_model.GlobalEntityAccountNo;
 import com.noreco1.fireflyv2.mysql_repo.GlobalEntityAccountNoRepo;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Date;
@@ -20,17 +23,31 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class GlobalEntityAcctNoFacadeImpl implements GlobalEntityAcctNoFacade {
 
-    private final GlobalEntityAccountNoRepo repo;
-    private final AuthenticationFacade      authenticationFacade;
+    private final GlobalEntityAccountNoRepo  repo;
+    private final AuthenticationFacade       authenticationFacade;
+    private final PlatformTransactionManager mysqlTransactionManager;
 
     @Override
-    @Transactional("mysqlTransactionManager")
     public GlobalEntityAccountNo generate(String entityType, Integer entityId,
                                           String entitySystem, String displayName) {
+        TransactionTemplate tt = new TransactionTemplate(mysqlTransactionManager);
+        for (int attempt = 0; attempt < 5; attempt++) {
+            try {
+                return tt.execute(status -> doGenerate(entityType, entityId, entitySystem, displayName));
+            } catch (DataIntegrityViolationException ignored) {
+            }
+        }
+        throw new ResponseStatusException(HttpStatus.CONFLICT,
+                "Failed to generate a unique account number after 5 attempts.");
+    }
+
+    private GlobalEntityAccountNo doGenerate(String entityType, Integer entityId,
+                                              String entitySystem, String displayName) {
         EntityType type   = EntityType.fromCode(entityType);
         EntitySystem sys  = EntitySystem.fromCode(entitySystem);
 
-        int candidate = repo.findMaxAccountNo() + 1;
+        int max = repo.findMaxAccountNo();
+        int candidate = max > 0 ? max + 1 : 100000;
         while (!isValidMod11(candidate)) {
             candidate++;
         }
