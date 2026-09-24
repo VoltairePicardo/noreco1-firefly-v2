@@ -1,0 +1,98 @@
+<div class="container-fluid">
+    <app-page-title [title]="module" [subTitle]="subModule" [menuLink]="menuLink"/>
+
+    <div class="card">
+        <div class="card-header border-light d-flex align-items-center justify-content-between">
+            <h4 class="card-title mb-0">{{ module }} Details</h4>
+        </div>
+
+        <div class="card-body">
+            @if (isLoading()) {
+                <div class="d-flex align-items-center gap-2 text-muted py-2">
+                    <span class="spinner-border spinner-border-sm" role="status"></span>
+                    Loading...
+                </div>
+            } @else {
+                <div class="row">
+                    <div class="col-sm-6">
+                        <dl class="row mb-0">
+                            <dt class="col-sm-5 fw-normal">Date</dt>
+                            <dd class="col-sm-7 fw-bold">{{ data.date || '—' }}</dd>
+                            <dt class="col-sm-5 fw-normal">Meter Model</dt>
+                            <dd class="col-sm-7 fw-bold">{{ data.meterModel?.modelName || '—' }}</dd>
+                            <dt class="col-sm-5 fw-normal">Tested By</dt>
+                            <dd class="col-sm-7 fw-bold">{{ data.testedBy || '—' }}</dd>
+                            <dt class="col-sm-5 fw-normal">Multiplier</dt>
+                            <dd class="col-sm-7 fw-bold">{{ data.multiplier ?? '—' }}</dd>
+                        </dl>
+                    </div>
+                    <div class="col-sm-6">
+                        <dl class="row mb-0">
+                            <dt class="col-sm-5 fw-normal">Temperature</dt>
+                            <dd class="col-sm-7 fw-bold">{{ data.temperature || '—' }}</dd>
+                            <dt class="col-sm-5 fw-normal">Relative Humidity</dt>
+                            <dd class="col-sm-7 fw-bold">{{ data.relativeHumidity || '—' }}</dd>
+                            <dt class="col-sm-5 fw-normal">Created By</dt>
+                            <dd class="col-sm-7 fw-bold">{{ data.createdBy?.fullName || '—' }}</dd>
+                            <dt class="col-sm-5 fw-normal">Created At</dt>
+                            <dd class="col-sm-7 fw-bold">{{ data.createdAt || '—' }}</dd>
+                        </dl>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <div class="fs-xs text-uppercase fw-semibold text-muted px-3 mb-2">Meters Test Results</div>
+
+        <ng-template #boolBadge let-value="value">
+            @if (value === true) {
+                <span class="badge bg-success bg-opacity-25 text-success border border-success">Passed</span>
+            } @else if (value === false) {
+                <span class="badge bg-danger bg-opacity-25 text-danger border border-danger">Failed</span>
+            } @else {
+                <span class="text-muted">—</span>
+            }
+        </ng-template>
+
+        <div class="table-responsive">
+            <table class="table table-custom table-centered table-select table-hover w-100 mb-0 text-center">
+                <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                <tr class="text-uppercase fs-xxs">
+                    <th>Meter Serial No.</th>
+                    <th>Error</th>
+                    <th>STA</th>
+                    <th>CRP</th>
+                    <th>Voltage Test</th>
+                    <th>Result</th>
+                </tr>
+                </thead>
+                <tbody>
+                    @if (data.details?.length > 0) {
+                        @for (detail of data.details; track detail.id) {
+                            <tr>
+                                <td class="fw-bold font-monospace">{{ detail.meterSerialNo || '—' }}</td>
+                                <td class="font-monospace">{{ detail.error | number: '1.4-4' }}</td>
+                                <td><ng-container *ngTemplateOutlet="boolBadge; context: { value: detail.sta }"></ng-container></td>
+                                <td><ng-container *ngTemplateOutlet="boolBadge; context: { value: detail.crp }"></ng-container></td>
+                                <td><ng-container *ngTemplateOutlet="boolBadge; context: { value: detail.voltageTest }"></ng-container></td>
+                                <td><ng-container *ngTemplateOutlet="boolBadge; context: { value: detail.result }"></ng-container></td>
+                            </tr>
+                        }
+                    } @else {
+                        <tr class="no-results">
+                            <td colspan="6" class="text-center text-muted py-3">No meters recorded.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card-footer border-0">
+            <div class="d-flex justify-content-end gap-2">
+                <a [routerLink]="['/' + menuLink]" class="btn btn-light fw-bold">
+                    <ng-icon name="tablerArrowLeft" class="ps-0 pe-3 fw-bold"></ng-icon>Back
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

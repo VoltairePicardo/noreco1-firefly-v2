@@ -8,15 +8,6 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-/**
- * Registry of all {@link InventoryDocumentReleasingStrategy} beans, keyed by
- * document type code.
- * <p>
- * Spring collects every strategy bean into the injected {@code List} for us -
- * adding a new document type only means dropping in a new
- * {@code @Component} implementing the strategy interface, no switch/factory
- * code to touch.
- */
 @Component
 public class InventoryDocumentReleasingStrategyRegistry {
 

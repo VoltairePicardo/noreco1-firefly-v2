@@ -1,0 +1,76 @@
+<div class="modal-header">
+    <h4 class="modal-title">Browse Consumer</h4>
+    <button type="button" class="btn-close" (click)="activeModal.dismiss()"></button>
+</div>
+
+<div class="modal-body">
+    <div class="d-flex gap-2 mb-3">
+        <div class="app-search flex-grow-1 w-50">
+            <input ngbAutofocus [ngModel]="searchText()" (ngModelChange)="searchText.set($event)" type="search"
+                   class="form-control"
+                   placeholder="Search by account name, account no., or old account no."
+                   (keyup.enter)="onSearchChange()"/>
+            <ng-icon name="tablerSearch" class="app-search-icon text-muted"/>
+        </div>
+        <button type="button" class="btn btn-primary fw-bold gap-1" (click)="onSearchChange()">
+            <ng-icon name="tablerSearch" class="fw-bold fs-lg"/>Search
+        </button>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-custom table-centered table-select table-hover w-100 mb-0">
+            <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                <tr class="text-uppercase fs-xxs">
+                    <th>Account No.</th>
+                    <th>Account Name</th>
+                    <th>Address</th>
+                    <th>Meter Serial No.</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (loading()) {
+                    <tr>
+                        <td colspan="5" class="text-center py-4">
+                            <div class="d-flex justify-content-center align-items-center gap-2 py-2 text-muted">
+                                <span class="spinner-border spinner-border-sm"></span>
+                                <span>Loading...</span>
+                            </div>
+                        </td>
+                    </tr>
+                } @else if (hasResults()) {
+                    @for (item of items(); track item.id) {
+                        <tr style="cursor: pointer" (click)="select(item)">
+                            <td>{{ item.consumer?.accountNo ?? '—' }} / {{ item.consumer?.oldAccountNo ?? '—' }}</td>
+                            <td>{{ item.consumer?.accountName }}</td>
+                            <td>{{ item.consumer?.address }}</td>
+                            <td>{{ item.meter?.serialNo ?? '—' }}</td>
+                        </tr>
+                    }
+                } @else {
+                    <tr class="no-results">
+                        <td colspan="5" class="text-center text-muted py-3">Nothing found.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    @if (hasResults()) {
+        <div class="d-flex justify-content-center pagination-boxed align-items-center mt-3">
+            <ngb-pagination
+                [collectionSize]="total()"
+                [page]="page()"
+                (pageChange)="page.set($event); loadData()"
+                [pageSize]="pageSize()"
+                [maxSize]="5"
+                [rotate]="true">
+                <ng-template ngbPaginationPrevious>
+                    <ng-icon name="tablerChevronLeft"/>
+                </ng-template>
+                <ng-template ngbPaginationNext>
+                    <ng-icon name="tablerChevronRight"/>
+                </ng-template>
+            </ngb-pagination>
+        </div>
+    }
+</div>

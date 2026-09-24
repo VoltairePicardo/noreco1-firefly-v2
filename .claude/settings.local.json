@@ -125,7 +125,15 @@
       "Read(//c/Program Files/Java/**)",
       "Read(//c/Program Files/**)",
       "Bash(where java *)",
-      "Bash(JAVA_HOME=\"/c/Program Files/Java/jdk-21\" ./mvnw.cmd -q -o compile)"
+      "Bash(JAVA_HOME=\"/c/Program Files/Java/jdk-21\" ./mvnw.cmd -q -o compile)",
+      "Bash(mvn -q -o compile)",
+      "Bash(JAVA_HOME=\"C:\\\\Program Files\\\\Java\\\\jdk-21\" mvn -q -o compile)",
+      "Bash(wc -l /tmp_tsc_out.txt)",
+      "Bash(head -60 /tmp_tsc_out.txt)",
+      "Bash(JAVA_HOME=\"C:\\\\Program Files\\\\Java\\\\jdk-21\" mvn -q -o dependency:build-classpath -Dmdep.outputFile=/tmp/cp.txt)",
+      "Bash(JAVA_HOME=\"C:\\\\Program Files\\\\Java\\\\jdk-21\" jps -l)",
+      "Bash(JAVA_HOME=\"/c/Program Files/Java/jdk-21\" mvn -q -o compile)",
+      "Bash(xargs -n1 basename)"
     ]
   }
 }

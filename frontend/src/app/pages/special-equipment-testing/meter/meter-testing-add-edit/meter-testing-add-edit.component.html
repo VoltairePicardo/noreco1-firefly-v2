@@ -1,0 +1,119 @@
+<div class="container-fluid">
+    <app-page-title [title]="module" [subTitle]="subModule()" [menuLink]="menuLink"/>
+
+    <form (ngSubmit)="save()" #f="ngForm">
+        <div class="card">
+            <div class="card-header border-light d-flex align-items-center justify-content-between">
+                <h4 class="card-title mb-0">Meter Testing Information</h4>
+            </div>
+
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="fs-xs text-uppercase fw-semibold text-muted">Consumer / Meter Information</span>
+                    <button type="button" class="btn btn-success fw-bold" (click)="openConsumerBrowse()">
+                        <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
+                    </button>
+                </div>
+                @if (submit() && !meterSerialNo().trim()) {
+                    <div class="text-danger small mt-1">A consumer meter must be selected.</div>
+                }
+
+                <div class="row gy-2 mt-1">
+                    <div class="col-md-8 d-flex">
+                        <span class="fw-bold" style="min-width:120px">Billing Name:</span>
+                        <span>{{ accountName() || '—' }}</span>
+                    </div>
+                    <div class="col-md-4 d-flex align-items-center">
+                        <span class="fw-bold" style="min-width:70px">Date:</span>
+                        <input type="text" mwlFlatpickr [options]="flatpickrOptions"
+                               class="form-control form-control-sm" placeholder="Select date"
+                               [ngModel]="actualDateOfTesting()" (ngModelChange)="actualDateOfTesting.set($event)"
+                               name="actualDateOfTesting"/>
+                    </div>
+
+                    <div class="col-md-8 d-flex">
+                        <span class="fw-bold" style="min-width:120px">Address:</span>
+                        <span>{{ address() || '—' }}</span>
+                    </div>
+                    <div class="col-md-4 d-flex">
+                        <span class="fw-bold" style="min-width:70px">Reading:</span>
+                        <span>{{ presentReading() ?? '—' }}</span>
+                    </div>
+
+                    <div class="col-md-4 d-flex">
+                        <span class="fw-bold" style="min-width:120px">Account No.:</span>
+                        <span>{{ accountNo() ?? '—' }}{{ oldAccountNo() ? ' / ' + oldAccountNo() : '' }}</span>
+                    </div>
+                    <div class="col-md-4 d-flex">
+                        <span class="fw-bold" style="min-width:70px">Serial No.:</span>
+                        <span>{{ meterSerialNo() || '—' }}</span>
+                    </div>
+                    <div class="col-md-4 d-flex align-items-center">
+                        <span class="badge bg-warning-subtle text-dark fw-bold">METER</span>
+                    </div>
+                </div>
+
+                <hr/>
+
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold">Seal No.</label>
+                        <input type="text" class="form-control" placeholder="Enter seal no."
+                               [ngModel]="sealNo()" (ngModelChange)="sealNo.set($event)" name="sealNo"/>
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold">Error (%)</label>
+                        <input type="number" step="0.0001" class="form-control" placeholder="e.g. -0.0069"
+                               [ngModel]="error()" (ngModelChange)="error.set($event)" name="error"/>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold">STA</label>
+                        <select class="form-select" [ngModel]="sta()" (ngModelChange)="sta.set($event)" name="sta">
+                            <option [ngValue]="null">— Not Tested —</option>
+                            <option [ngValue]="true">Passed</option>
+                            <option [ngValue]="false">Failed</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold">CRP</label>
+                        <select class="form-select" [ngModel]="crp()" (ngModelChange)="crp.set($event)" name="crp">
+                            <option [ngValue]="null">— Not Tested —</option>
+                            <option [ngValue]="true">Passed</option>
+                            <option [ngValue]="false">Failed</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold">Voltage Test</label>
+                        <select class="form-select" [ngModel]="voltageTest()" (ngModelChange)="voltageTest.set($event)" name="voltageTest">
+                            <option [ngValue]="null">— Not Tested —</option>
+                            <option [ngValue]="true">Passed</option>
+                            <option [ngValue]="false">Failed</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold">Result</label>
+                        <select class="form-select" [ngModel]="result()" (ngModelChange)="result.set($event)" name="result">
+                            <option [ngValue]="null">— Not Tested —</option>
+                            <option [ngValue]="true">Passed</option>
+                            <option [ngValue]="false">Failed</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-footer border-0">
+                <div class="d-flex gap-2 justify-content-end align-items-center">
+                    <a [routerLink]="['/' + menuLink]" class="btn btn-light fw-bold">
+                        <ng-icon name="tablerArrowLeft" class="ps-0 pe-3 fw-bold"></ng-icon>Back
+                    </a>
+                    <button type="submit" class="btn btn-primary fw-bold" [disabled]="isLoading()">
+                        <ng-icon name="tablerCheck" class="ps-0 pe-3 fw-bold"></ng-icon>
+                        {{ editMode() ? 'Update' : 'Save Meter Testing' }}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>

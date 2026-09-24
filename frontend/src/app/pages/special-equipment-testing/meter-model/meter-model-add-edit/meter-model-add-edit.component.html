@@ -1,0 +1,133 @@
+<div class="container-fluid">
+    <app-page-title [title]="module" [subTitle]="subModule" [menuLink]="menuLink"/>
+
+    @if (isLoading() && editMode) {
+        <div class="d-flex align-items-center gap-2 text-muted py-4">
+            <span class="spinner-border spinner-border-sm" role="status"></span> Loading...
+        </div>
+    } @else if (validationForm) {
+        <form class="needs-validation" novalidate (ngSubmit)="validSubmit()" [formGroup]="validationForm">
+            <div class="card">
+                <div class="card-header border-light d-flex align-items-center justify-content-between">
+                    <h4 class="card-title mb-0">Meter Model Information</h4>
+                </div>
+
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">Model Name <span class="text-danger">*</span></label>
+                            <input id="modelName" type="text" class="form-control"
+                                   placeholder="Meter Model Name" formControlName="modelName"
+                                   [class]="submit && !form.get('modelName')?.errors ? 'is-valid'
+                                          : submit &&  form.get('modelName')?.errors ? 'is-invalid' : ''"
+                                   required/>
+                            <div class="invalid-feedback">Please provide a model name.</div>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">Brand <span class="text-danger">*</span></label>
+                            <select id="brandId" class="form-select" formControlName="brandId"
+                                    [class]="submit && !form.get('brandId')?.errors ? 'is-valid'
+                                           : submit &&  form.get('brandId')?.errors ? 'is-invalid' : ''">
+                                <option [ngValue]="null">-- Select Brand --</option>
+                                @for (brand of brands(); track brand.id) {
+                                    <option [ngValue]="brand.id">{{ brand.name }}</option>
+                                }
+                            </select>
+                            <div class="invalid-feedback">Please select a brand.</div>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">Meter Type <span class="text-danger">*</span></label>
+                            <select id="meterTypeId" class="form-select" formControlName="meterTypeId"
+                                    [class]="submit && !form.get('meterTypeId')?.errors ? 'is-valid'
+                                           : submit &&  form.get('meterTypeId')?.errors ? 'is-invalid' : ''">
+                                <option [ngValue]="null">-- Select Meter Type --</option>
+                                @for (mt of meterTypes(); track mt.id) {
+                                    <option [ngValue]="mt.id">{{ mt.description }}</option>
+                                }
+                            </select>
+                            <div class="invalid-feedback">Please select a meter type.</div>
+                        </div>
+                    </div>
+
+                    <hr class="border-dashed mx-n3 mt-3"/>
+                    <div class="col-12 fs-sm fw-semibold mb-2">Specifications</div>
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold">Phase</label>
+                            <select id="phaseId" class="form-select" formControlName="phaseId">
+                                <option [ngValue]="null">-- Select Phase --</option>
+                                @for (ph of phases(); track ph.id) {
+                                    <option [ngValue]="ph.id">{{ ph.description }}</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold">Current Rating</label>
+                            <select id="currentRatingId" class="form-select" formControlName="currentRatingId">
+                                <option [ngValue]="null">-- Select Current Rating --</option>
+                                @for (cr of currents(); track cr.id) {
+                                    <option [ngValue]="cr.id">{{ cr.description }}</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold">Accuracy Class</label>
+                            <select id="accuracyClassId" class="form-select" formControlName="accuracyClassId">
+                                <option [ngValue]="null">-- Select Accuracy Class --</option>
+                                @for (ac of accuracyClasses(); track ac.id) {
+                                    <option [ngValue]="ac.id">{{ ac.description }}</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold">Meter Form</label>
+                            <select id="meterFormId" class="form-select" formControlName="meterFormId">
+                                <option [ngValue]="null">-- Select Meter Form --</option>
+                                @for (mf of meterForms(); track mf.id) {
+                                    <option [ngValue]="mf.id">{{ mf.name }}</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+
+                    <hr class="border-dashed mx-n3 mt-3"/>
+                    <div class="col-12 fs-sm fw-semibold mb-2">Electrical Ratings</div>
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">Constant</label>
+                            <input id="constant" type="number" step="0.0001" class="form-control"
+                                   placeholder="0.0000" formControlName="constant"/>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">Amperage</label>
+                            <input id="amperage" type="number" step="0.01" class="form-control"
+                                   placeholder="0.00" formControlName="amperage"/>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">Voltage</label>
+                            <input id="voltage" type="number" step="0.01" class="form-control"
+                                   placeholder="0.00" formControlName="voltage"/>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-footer border-0">
+                    <div class="d-flex gap-2 justify-content-end align-items-center">
+                        <a [routerLink]="['/' + menuLink]" class="btn btn-light fw-bold">
+                            <ng-icon name="tablerArrowLeft" class="ps-0 pe-3 fw-bold"></ng-icon>Back
+                        </a>
+                        <button type="submit" class="btn btn-primary fw-bold" [disabled]="formSubmit">
+                            @if (formSubmit) {
+                                <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                                {{ editMode ? 'Updating...' : 'Saving...' }}
+                            } @else {
+                                <ng-icon name="tablerCheck" class="ps-0 pe-3 fw-bold"></ng-icon>
+                                {{ editMode ? 'Update' : 'Save ' + module }}
+                            }
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    }
+</div>

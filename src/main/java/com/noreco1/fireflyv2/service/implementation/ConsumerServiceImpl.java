@@ -1,8 +1,11 @@
 package com.noreco1.fireflyv2.service.implementation;
 
+import com.noreco1.fireflyv2.mssql_model.ConsumerMeter;
+import com.noreco1.fireflyv2.mssql_repo.MssqlConsumerMeterRepo;
 import com.noreco1.fireflyv2.service.ConsumerService;
 import com.noreco1.fireflyv2.mysql_model.Consumer;
 import com.noreco1.fireflyv2.mysql_repo.ConsumerRepo;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,10 +21,11 @@ import java.util.List;
  * Created by Tri-Nvent on 8/19/2020.
  */
 @Service
+@RequiredArgsConstructor
 public class ConsumerServiceImpl implements ConsumerService {
 
-    @Autowired
-    ConsumerRepo consumerRepo;
+    private final ConsumerRepo consumerRepo;
+    private final MssqlConsumerMeterRepo mssqlConsumerMeterRepo;
 
     @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
@@ -51,5 +55,11 @@ public class ConsumerServiceImpl implements ConsumerService {
     @Override
     public Page<Consumer> findAllByQueryAndConsumerIds(List<Integer> ids, String query, Pageable pageable) {
         return consumerRepo.findAllByQueryAndConsumerIds(ids, query.trim(), pageable);
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public Page<ConsumerMeter> findAllConsumerFromIBCMS(String query, Pageable pageable) {
+        return mssqlConsumerMeterRepo.findAllByQuery(query, pageable);
     }
 }

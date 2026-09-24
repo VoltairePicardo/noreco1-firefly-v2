@@ -149,6 +149,60 @@ public class AnyJsonController {
     @Autowired
     private CostEstimateRepo costEstimateRepo;
 
+    @Autowired
+    private BrandRepo brandRepo;
+
+    @Autowired
+    private MeterTypeRepo meterTypeRepo;
+
+    @Autowired
+    private PhaseRepo phaseRepo;
+
+    @Autowired
+    private CurrentRepo currentRepo;
+
+    @Autowired
+    private AccuracyClassRepo accuracyClassRepo;
+
+    @Autowired
+    private MeterFormRepo meterFormRepo;
+
+    @GetMapping(value = "/brands")
+
+    public List<Brand> getBrands() {
+        return brandRepo.findByOrderByName();
+    }
+
+    @GetMapping(value = "/meter-types")
+
+    public List<MeterType> getMeterTypes() {
+        return meterTypeRepo.findByOrderByDescriptionAsc();
+    }
+
+    @GetMapping(value = "/phases")
+
+    public List<Phase> getPhases() {
+        return phaseRepo.findByOrderByDescriptionAsc();
+    }
+
+    @GetMapping(value = "/currents")
+
+    public List<Current> getCurrents() {
+        return currentRepo.findByOrderByDescriptionAsc();
+    }
+
+    @GetMapping(value = "/accuracy-classes")
+
+    public List<AccuracyClass> getAccuracyClasses() {
+        return accuracyClassRepo.findByOrderByDescriptionAsc();
+    }
+
+    @GetMapping(value = "/meter-forms")
+
+    public List<MeterForm> getMeterForms() {
+        return meterFormRepo.findByOrderByNameAsc();
+    }
+
     @GetMapping(value = "/entities")
 
     public List<SlEntity> getEntities(@RequestParam(value = "entityTypes", required = false) Integer[] entityTypes) {

@@ -1,0 +1,186 @@
+<div class="container-fluid">
+    <app-page-title [title]="module" [subTitle]="subModule" [menuLink]="menuLink"/>
+</div>
+
+<div class="container-fluid">
+    <div class="row g-3">
+        <div class="col-xl-12">
+            <app-ui-card title="Meter Testing Details">
+                <div class="col-xl-12 p-3" card-body>
+
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold">Meter Model</label>
+                            <select class="form-select" [(ngModel)]="meterModelId" name="meterModelId">
+                                <option [ngValue]="null">-- Select Meter Model --</option>
+                                @for (mm of meterModels(); track mm.id) {
+                                    <option [ngValue]="mm.id">{{ mm.modelName }}</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold">Actual Date of Testing</label>
+                            <input type="text" mwlFlatpickr [options]="flatpickrOptions"
+                                   class="form-control" placeholder="Select date"
+                                   [(ngModel)]="actualDateOfTesting" name="actualDateOfTesting"/>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label fw-bold">Multiplier</label>
+                            <input type="number" step="0.0001" class="form-control" placeholder="1.0000"
+                                   [(ngModel)]="multiplier" name="multiplier"/>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label fw-bold">Temperature</label>
+                            <input type="text" class="form-control" placeholder="From extracted file"
+                                   [(ngModel)]="temperature" name="temperature" readonly/>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label fw-bold">Relative Humidity</label>
+                            <input type="text" class="form-control" placeholder="From extracted file"
+                                   [(ngModel)]="relativeHumidity" name="relativeHumidity" readonly/>
+                        </div>
+                    </div>
+
+                    <hr class="border-dashed mx-n3 mt-3"/>
+
+                    <div class="d-flex gap-2 justify-content-end align-items-center">
+                        <a [routerLink]="['/' + menuLink]" class="btn btn-light fw-bold">
+                            <ng-icon name="tablerArrowLeft" class="ps-0 pe-3 fw-bold"></ng-icon>Back
+                        </a>
+                        <button type="button" class="btn btn-primary fw-bold" [disabled]="isSaving()" (click)="save()">
+                            @if (isSaving()) {
+                                <span class="spinner-border spinner-border-sm me-2" role="status"></span>Saving...
+                            } @else {
+                                <ng-icon name="tablerCheck" class="ps-0 pe-3 fw-bold"></ng-icon>Save {{ module }}
+                            }
+                        </button>
+                    </div>
+
+                </div>
+            </app-ui-card>
+        </div>
+
+        <div class="col-xl-12">
+            <app-ui-card title="Upload Meter Testing File">
+                <div class="col-xl-12 p-3" card-body>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Excel File <span class="text-danger">*</span></label>
+                            <input type="file" class="form-control" accept=".xls,.xlsx"
+                                   [class]="submit && !selectedFile ? 'is-invalid' : ''"
+                                   (change)="onFileChange($event)"/>
+                            <div class="form-text">Accepted formats: .xls, .xlsx</div>
+                            @if (fileName) {
+                                <div class="form-text text-muted">Selected: {{ fileName }}</div>
+                            }
+                            @if (submit && !selectedFile) {
+                                <div class="text-danger small mt-1">Please select an Excel file.</div>
+                            }
+                        </div>
+                        <div class="d-flex gap-2 align-items-center">
+                            <button type="button" class="btn btn-danger fw-bold" [disabled]="isExtracting()" (click)="reset()">
+                                <ng-icon name="tablerRefresh" class="ps-0 pe-3 fw-bold"></ng-icon>Reset
+                            </button>
+                            <button type="button" class="btn btn-primary fw-bold" [disabled]="isExtracting()" (click)="extract()">
+                                @if (isExtracting()) {
+                                    <span class="spinner-border spinner-border-sm me-2" role="status"></span>Extracting...
+                                } @else {
+                                    <ng-icon name="tablerUpload" class="ps-0 pe-3 fw-bold"></ng-icon>Extract
+                                }
+                            </button>
+                        </div>
+                    </div>
+
+<!--                    <hr class="border-dashed mx-n3 mt-3"/>-->
+
+<!--                    <div class="d-flex gap-2 justify-content-end align-items-center">-->
+<!--                        <button type="button" class="btn btn-danger fw-bold" [disabled]="isExtracting()" (click)="reset()">-->
+<!--                            <ng-icon name="tablerRefresh" class="ps-0 pe-3 fw-bold"></ng-icon>Reset-->
+<!--                        </button>-->
+<!--                        <button type="button" class="btn btn-primary fw-bold" [disabled]="isExtracting()" (click)="extract()">-->
+<!--                            @if (isExtracting()) {-->
+<!--                                <span class="spinner-border spinner-border-sm me-2" role="status"></span>Extracting...-->
+<!--                            } @else {-->
+<!--                                <ng-icon name="tablerUpload" class="ps-0 pe-3 fw-bold"></ng-icon>Extract-->
+<!--                            }-->
+<!--                        </button>-->
+<!--                    </div>-->
+
+                    @if (result(); as data) {
+                        <hr class="border-dashed mx-n3 mt-3"/>
+
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-2">
+                                <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Tester</div>
+                                <div>{{ data.tester || '—' }}</div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Date Tested</div>
+                                <div>{{ data.dateTested || '—' }}</div>
+                            </div>
+                        </div>
+
+                        <div class="row g-2 mb-3">
+                            <div class="col-md-auto">
+                                <span class="badge bg-secondary bg-opacity-25 text-dark border fs-xs">Total: {{ data.totalCount }}</span>
+                            </div>
+                            <div class="col-md-auto">
+                                <span class="badge bg-success bg-opacity-25 text-success border border-success fs-xs">Passed: {{ data.passedCount }}</span>
+                            </div>
+                            <div class="col-md-auto">
+                                <span class="badge bg-danger bg-opacity-25 text-danger border border-danger fs-xs">Failed: {{ data.failedCount }}</span>
+                            </div>
+                        </div>
+
+                        <ng-template #boolBadge let-value="value">
+                            @if (value === true) {
+                                <span class="badge bg-success bg-opacity-25 text-success border border-success">Passed</span>
+                            } @else if (value === false) {
+                                <span class="badge bg-danger bg-opacity-25 text-danger border border-danger">Failed</span>
+                            } @else {
+                                <span class="text-muted">—</span>
+                            }
+                        </ng-template>
+
+                        <div class="table-responsive">
+                            <table class="table table-custom table-centered table-bordered table-select table-hover w-100 mb-0 text-center">
+                                <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                                    <tr class="text-uppercase fs-xxs">
+                                        <th>No.</th>
+                                        <th>Meter Serial No.</th>
+                                        <th>Error</th>
+                                        <th>STA</th>
+                                        <th>CRP</th>
+                                        <th>Voltage Test</th>
+                                        <th>Result</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (data.records.length > 0) {
+                                        @for (rec of data.records; track rec.no) {
+                                            <tr>
+                                                <td class="font-monospace">{{ rec.no }}</td>
+                                                <td class="fw-bold font-monospace">{{ rec.meterSerialNo || '—' }}</td>
+                                                <td class="font-monospace">{{ rec.error | number: '1.4-4' }}</td>
+                                                <td><ng-container *ngTemplateOutlet="boolBadge; context: { value: rec.sta }"></ng-container></td>
+                                                <td><ng-container *ngTemplateOutlet="boolBadge; context: { value: rec.crp }"></ng-container></td>
+                                                <td><ng-container *ngTemplateOutlet="boolBadge; context: { value: rec.voltageTest }"></ng-container></td>
+                                                <td><ng-container *ngTemplateOutlet="boolBadge; context: { value: rec.result }"></ng-container></td>
+                                            </tr>
+                                        }
+                                    } @else {
+                                        <tr>
+                                            <td colspan="9" class="text-center text-muted py-3">No records extracted.</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+
+                </div>
+            </app-ui-card>
+        </div>
+    </div>
+</div>

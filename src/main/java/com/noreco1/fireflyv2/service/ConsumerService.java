@@ -1,5 +1,6 @@
 package com.noreco1.fireflyv2.service;
 
+import com.noreco1.fireflyv2.mssql_model.ConsumerMeter;
 import com.noreco1.fireflyv2.mysql_model.Consumer;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,4 +18,7 @@ public interface ConsumerService {
     Page<Consumer> findByConsumerIds(List<Integer> ids, Pageable pageable);
     Page<Consumer> findAllByQueryAndConsumerIds(List<Integer> ids, String query, Pageable pageable);
 
+
+    //MSSQL
+    Page<ConsumerMeter> findAllConsumerFromIBCMS(String query, Pageable pageable);
 }

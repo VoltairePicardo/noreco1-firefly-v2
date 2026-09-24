@@ -1,0 +1,101 @@
+<div class="container-fluid">
+    <app-page-title [title]="module" [subTitle]="subModule" [menuLink]="menuLink"/>
+
+    <div class="card">
+        <div class="card-header border-light d-flex flex-wrap align-items-center justify-content-between gap-2">
+            <div class="d-flex gap-2">
+                <div class="app-search">
+                    <input type="text" class="form-control my-1 my-md-0"
+                           placeholder="Search by tester..."
+                           [(ngModel)]="searchText"
+                           (keyup.enter)="search()"
+                           [ngModelOptions]="{ standalone: true }"/>
+                    <ng-icon name="tablerSearch" class="app-search-icon text-muted"></ng-icon>
+                </div>
+                <button type="button" class="btn btn-success fw-bold" (click)="search()">
+                    <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Search
+                </button>
+                <button type="button" class="btn btn-danger fw-bold" (click)="clearSearch()">
+                    <ng-icon name="tablerRefresh" class="ps-0 pe-3 fw-bold"></ng-icon>Reset
+                </button>
+            </div>
+
+            <div class="d-flex gap-2">
+                <a [routerLink]="['/' + menuLink, 'upload']" class="btn btn-success fw-bold">
+                    <ng-icon name="tablerUpload" class="ps-0 pe-3 fw-bold"></ng-icon>Multiple Meter Testing
+                </a>
+                <a [routerLink]="['/' + menuLink, 'create']" class="btn btn-primary fw-bold">
+                    <ng-icon name="tablerPlus" class="ps-0 pe-3 fw-bold"></ng-icon>Single Meter Testing
+                </a>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-custom table-centered table-select table-hover w-100 mb-0">
+                <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                    <tr class="text-uppercase fs-xxs">
+                        <th>ID</th>
+                        <th>Date</th>
+                        <th>Meter Model</th>
+                        <th>Tested By</th>
+                        <th>Created By</th>
+                        <th>Created At</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (records().length > 0) {
+                        @for (rec of records(); track rec.id) {
+                            <tr>
+                                <td>{{ rec.id }}</td>
+                                <td >{{ rec.date | date: 'MM-dd-yyyy' }}</td>
+                                <td >{{ rec.meterModel?.modelName || '—' }}</td>
+                                <td >{{ rec.testedBy || '—' }}</td>
+                                <td >{{ rec.createdBy?.fullName || '—' }}</td>
+                                <td >{{ rec.createdAt | date: 'MM-dd-yyyy hh:mm:ss a' }}</td>
+                                <td class="text-nowrap">
+                                    <div class="d-flex justify-content-end gap-1">
+                                        <a href="javascript:void(0)" ngbTooltip="View"
+                                           [routerLink]="['/' + menuLink, rec.id, 'detail']"
+                                           class="btn btn-light btn-icon btn-sm rounded-circle">
+                                            <ng-icon name="tablerEye" class="fs-lg"></ng-icon>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    } @else {
+                        <tr class="no-results">
+                            <td colspan="7" class="text-center text-muted py-3">
+                                @if (isLoading()) {
+                                    <span class="spinner-border spinner-border-sm me-2" role="status"></span>Loading...
+                                } @else { No records found. }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card-footer border-0">
+            @if (totalElements() > pageSize) {
+                <div class="d-flex justify-content-between pagination-boxed align-items-center">
+                    <span class="text-muted fs-xxs">Showing {{ records().length }} of {{ totalElements() }} records</span>
+                    <ngb-pagination
+                        [collectionSize]="totalElements()"
+                        [page]="pageNumber() + 1"
+                        [pageSize]="pageSize"
+                        [maxSize]="5"
+                        (pageChange)="onPageChange($event)">
+                        <ng-template ngbPaginationPrevious>
+                            <ng-icon name="tablerChevronLeft"/>
+                        </ng-template>
+                        <ng-template ngbPaginationNext>
+                            <ng-icon name="tablerChevronRight"/>
+                        </ng-template>
+                    </ngb-pagination>
+                </div>
+            }
+        </div>
+    </div>
+</div>
