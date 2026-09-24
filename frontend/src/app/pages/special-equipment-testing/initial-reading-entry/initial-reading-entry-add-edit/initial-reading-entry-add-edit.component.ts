@@ -1,5 +1,6 @@
-import { ChangeDetectionStrategy, Component, ElementRef, inject, signal, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, inject, OnDestroy, signal, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { Subject, debounceTime, takeUntil } from 'rxjs';
 import { AlertService } from '@/app/shared/services/alert.service';
 import {
     COMMON_ALL_PAGE_IMPORTS,
@@ -16,7 +17,7 @@ import { InitialReadingEntryService } from '../initial-reading-entry.service';
     providers: [provideFlatpickrDefaults(), ...SHARED_PROVIDERS],
     templateUrl: './initial-reading-entry-add-edit.component.html'
 })
-export class InitialReadingEntryAddEditComponent {
+export class InitialReadingEntryAddEditComponent implements OnDestroy {
     module    = 'Initial Reading Entry';
     menuLink  = 'initial-reading-entry';
 
@@ -35,6 +36,9 @@ export class InitialReadingEntryAddEditComponent {
 
     flatpickrOptions = { dateFormat: 'Y-m-d', altInput: true, altFormat: 'F j, Y' };
 
+    private readonly serialNo$ = new Subject<string>();
+    private readonly destroy$  = new Subject<void>();
+
     @ViewChild('serialNoInput') serialNoInput!: ElementRef<HTMLInputElement>;
 
     private service      = inject(InitialReadingEntryService);
@@ -43,6 +47,15 @@ export class InitialReadingEntryAddEditComponent {
     private alertService = inject(AlertService);
 
     ngOnInit(): void {
+        this.serialNo$.pipe(
+            debounceTime(300),
+            takeUntil(this.destroy$)
+        ).subscribe(value => {
+            if (value.trim() && !this.meter() && !this.isLookingUp()) {
+                this.search();
+            }
+        });
+
         this.route.paramMap.subscribe(params => {
             const idParam = params.get('id');
             const isEdit  = idParam != null && /^\d+$/.test(idParam);
@@ -75,6 +88,8 @@ export class InitialReadingEntryAddEditComponent {
             }
         });
     }
+
+    ngOnDestroy(): void { this.destroy$.next(); this.destroy$.complete(); }
 
     onSerialNoKeydown(event: KeyboardEvent): void {
         if (event.key === 'Enter') { event.preventDefault(); this.search(); }

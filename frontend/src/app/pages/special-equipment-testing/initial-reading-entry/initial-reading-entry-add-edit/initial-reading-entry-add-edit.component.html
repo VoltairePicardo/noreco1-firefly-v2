@@ -28,7 +28,7 @@
                                             class="form-control"
                                             placeholder="Scan barcode or type serial no..."
                                             [ngModel]="serialNo()"
-                                            (ngModelChange)="serialNo.set($event)"
+                                            (ngModelChange)="serialNo.set($event); serialNo$.next($event)"
                                             (keydown)="onSerialNoKeydown($event)"
                                             [disabled]="isLookingUp()"
                                             autofocus
