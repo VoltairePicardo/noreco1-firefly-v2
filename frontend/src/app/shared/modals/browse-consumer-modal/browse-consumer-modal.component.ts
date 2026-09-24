@@ -53,7 +53,10 @@ export class BrowseConsumerModalComponent implements OnInit {
             address: consumerMeter.consumer?.address ?? null,
             meterId: consumerMeter.meter?.id ?? null,
             meterSerialNo: consumerMeter.meter?.serialNo ?? null,
-            presentReading: consumerMeter.meter?.presentReading ?? null
+            presentReading: consumerMeter.meter?.presentReading ?? null,
+            meterModelId: consumerMeter.meter?.meterModel?.id ?? null,
+            modelName: consumerMeter.meter?.meterModel?.modelName ?? null,
+            accuracyClassDescription: consumerMeter.meter?.meterModel?.accuracyClassDescription ?? null
         };
         this.activeModal.close({ action: 'select', data: selection });
     }

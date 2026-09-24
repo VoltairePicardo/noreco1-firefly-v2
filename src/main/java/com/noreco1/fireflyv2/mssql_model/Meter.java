@@ -29,7 +29,7 @@ public class Meter {
     private Integer multiplier;
 
     @NotFound(action = NotFoundAction.IGNORE)
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "FK_meterModelId")
     private MeterModel meterModel;
 

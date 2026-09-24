@@ -1,6 +1,7 @@
 package com.noreco1.fireflyv2.service.implementation;
 
 import com.noreco1.fireflyv2.common.facade.AuthenticationFacade;
+import com.noreco1.fireflyv2.common.helpers.Checker;
 import com.noreco1.fireflyv2.common.helpers.MessageFormatter;
 import com.noreco1.fireflyv2.controller.response.MeterTestingRecordDto;
 import com.noreco1.fireflyv2.controller.response.MeterTestingResultDto;
@@ -9,12 +10,17 @@ import com.noreco1.fireflyv2.exception.BusinessException;
 import com.noreco1.fireflyv2.model.Meter;
 import com.noreco1.fireflyv2.model.MeterTesting;
 import com.noreco1.fireflyv2.model.MeterTestingDetail;
+import com.noreco1.fireflyv2.model.MeterTestingOption;
+import com.noreco1.fireflyv2.model.MeterTestingOptionDetail;
 import com.noreco1.fireflyv2.model.User;
 import com.noreco1.fireflyv2.mssql_model.MeterModel;
 import com.noreco1.fireflyv2.repo.MeterModelRepo;
 import com.noreco1.fireflyv2.repo.MeterRepo;
 import com.noreco1.fireflyv2.repo.MeterTestingDetailRepo;
+import com.noreco1.fireflyv2.repo.MeterTestingOptionDetailRepo;
+import com.noreco1.fireflyv2.repo.MeterTestingOptionRepo;
 import com.noreco1.fireflyv2.repo.MeterTestingRepo;
+import com.noreco1.fireflyv2.repo.UserRepo;
 import com.noreco1.fireflyv2.service.MeterTestingService;
 import com.noreco1.fireflyv2.validator.MeterTestingValidator;
 import lombok.RequiredArgsConstructor;
@@ -57,11 +63,14 @@ public class MeterTestingServiceImpl implements MeterTestingService {
 
     private final MeterTestingRepo meterTestingRepo;
     private final MeterTestingDetailRepo meterTestingDetailRepo;
+    private final MeterTestingOptionDetailRepo meterTestingOptionDetailRepo;
+    private final MeterTestingOptionRepo meterTestingOptionRepo;
     private final AuthenticationFacade authenticationFacade;
     private final MeterRepo meterRepo;
     private final com.noreco1.fireflyv2.mssql_repo.MssqlMeterRepo mssqlMeterRepo;
     private final MeterModelRepo meterModelRepo;
     private final com.noreco1.fireflyv2.mssql_repo.MssqlUserRepo mssqlUserRepo;
+    private final UserRepo userRepo;
 
     @Override
     @Transactional("chainedTransactionManager")
@@ -79,6 +88,12 @@ public class MeterTestingServiceImpl implements MeterTestingService {
             }
 
             List<MeterTestingDetail> details = meterTesting.getDetails();
+
+            if (meterTesting.getMeterCalibrator() != null && meterTesting.getMeterCalibrator().getAccountNo() != null) {
+                meterTesting.setMeterCalibrator(userRepo.findOneByAccountNo(meterTesting.getMeterCalibrator().getAccountNo()));
+            } else {
+                meterTesting.setMeterCalibrator(null);
+            }
 
             meterTesting.setId(null);
             meterTesting.setCreatedBy(authenticationFacade.getLoggedIn());
@@ -117,6 +132,76 @@ public class MeterTestingServiceImpl implements MeterTestingService {
             response.setModelId(saved.getId());
             response.setSuccessMessage("Meter Testing successfully saved.");
 
+        } catch(BusinessException e) {
+            throw new BusinessException(e.getMessage(), e);
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+
+        return response;
+    }
+
+    @Override
+    @Transactional()
+    public PostResponse createIndividual(MeterTesting meterTesting, BindingResult bindingResult, MessageSource messageSource) {
+        PostResponse response = new PostResponse();
+        MessageFormatter messageFormatter = new MessageFormatter(bindingResult, messageSource, response);
+
+        try {
+            MeterTestingValidator validator = new MeterTestingValidator();
+            validator.validate(meterTesting, bindingResult);
+
+            if (bindingResult.hasErrors()) {
+                messageFormatter.buildErrorMessages();
+                return messageFormatter.getResponse();
+            }
+
+            List<MeterTestingDetail> details = meterTesting.getDetails();
+            List<MeterTestingOptionDetail> optionDetails = meterTesting.getOptionDetails();
+
+            if (meterTesting.getMeterCalibrator() != null && meterTesting.getMeterCalibrator().getAccountNo() != null) {
+                User meterCalibrator = userRepo.findOneByAccountNo(meterTesting.getMeterCalibrator().getAccountNo());
+                meterTesting.setMeterCalibrator(meterCalibrator);
+                meterTesting.setTestedBy(meterCalibrator.getFullName());
+            } else {
+                meterTesting.setMeterCalibrator(null);
+            }
+
+            meterModelRepo.findById(meterTesting.getMeterModel().getId())
+                    .orElseThrow(() -> new BusinessException("Meter Model with id: " + meterTesting.getMeterModel().getId() + " not found."));
+
+            if (meterTesting.getMeter() != null && meterTesting.getMeter().getId() != null) {
+                meterRepo.findById(meterTesting.getMeter().getId())
+                        .orElseThrow(() -> new BusinessException("Meter with id: " + meterTesting.getMeter().getId() + " not found."));
+            } else {
+                meterTesting.setMeter(null);
+            }
+
+            meterTesting.setId(null);
+            meterTesting.setCreatedBy(authenticationFacade.getLoggedIn());
+            meterTesting.setCreatedAt(new Date());
+            meterTesting.setUpdatedAt(new Date());
+            MeterTesting saved = meterTestingRepo.save(meterTesting);
+
+            for (MeterTestingDetail detail : details) {
+                detail.setId(null);
+                detail.setMeterTesting(saved);
+            }
+            meterTestingDetailRepo.saveAll(details);
+
+            if (!Checker.collectionIsEmpty(optionDetails)) {
+                for (MeterTestingOptionDetail optionDetail : optionDetails) {
+                    optionDetail.setId(null);
+                    optionDetail.setMeterTesting(saved);
+                }
+                meterTestingOptionDetailRepo.saveAll(optionDetails);
+            }
+
+            response.setModelId(saved.getId());
+            response.setSuccessMessage("Meter Testing successfully saved.");
+
+        } catch(BusinessException e) {
+            throw new BusinessException(e.getMessage(), e);
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -142,8 +227,15 @@ public class MeterTestingServiceImpl implements MeterTestingService {
         MeterTesting meterTesting = meterTestingRepo.findById(id).orElse(null);
         if (meterTesting != null) {
             meterTesting.setDetails(meterTestingDetailRepo.findByMeterTestingId(id));
+            meterTesting.setOptionDetails(meterTestingOptionDetailRepo.findByMeterTestingId(id));
         }
         return meterTesting;
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public List<MeterTestingOption> findActiveOptions() {
+        return meterTestingOptionRepo.findByActiveTrueOrderByOptionTypeIdAscOrderAsc();
     }
 
     private void syncMetersToMssql(List<Meter> mysqlMeters) {

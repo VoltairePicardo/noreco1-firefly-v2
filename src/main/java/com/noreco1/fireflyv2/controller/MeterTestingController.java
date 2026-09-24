@@ -3,6 +3,7 @@ package com.noreco1.fireflyv2.controller;
 import com.noreco1.fireflyv2.controller.response.MeterTestingResultDto;
 import com.noreco1.fireflyv2.controller.response.PostResponse;
 import com.noreco1.fireflyv2.model.MeterTesting;
+import com.noreco1.fireflyv2.model.MeterTestingOption;
 import com.noreco1.fireflyv2.service.MeterTestingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
@@ -18,6 +19,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -37,6 +40,11 @@ public class MeterTestingController {
         return meterTestingService.create(meterTesting, bindingResult, messageSource);
     }
 
+    @PostMapping("/create-individual")
+    public PostResponse createIndividual(@RequestBody MeterTesting meterTesting, BindingResult bindingResult) {
+        return meterTestingService.createIndividual(meterTesting, bindingResult, messageSource);
+    }
+
     @GetMapping("/list")
     public Page<MeterTesting> list(
             @RequestParam(defaultValue = "") String q,
@@ -53,6 +61,11 @@ public class MeterTestingController {
     public ResponseEntity<MeterTesting> getById(@PathVariable Integer id) {
         MeterTesting meterTesting = meterTestingService.findById(id);
         return meterTesting != null ? ResponseEntity.ok(meterTesting) : ResponseEntity.notFound().build();
+    }
+
+    @GetMapping("/options")
+    public List<MeterTestingOption> options() {
+        return meterTestingService.findActiveOptions();
     }
 
 }

@@ -1,5 +1,7 @@
 package com.noreco1.fireflyv2.model;
 
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -13,7 +15,7 @@ import org.hibernate.annotations.NotFoundAction;
 @Setter
 @RequiredArgsConstructor
 @AllArgsConstructor
-public class MeterTestingOption {
+public class MeterTestingOptionDetail {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,17 +23,17 @@ public class MeterTestingOption {
     private Integer id;
 
     @NotFound(action = NotFoundAction.IGNORE)
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "FK_typeId")
-    private MeterTestingOptionType optionType;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "FK_meterTestingId")
+    @JsonIgnore
+    private MeterTesting meterTesting;
+
+    @NotFound(action = NotFoundAction.IGNORE)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "FK_meterTestingOptionId")
+    private MeterTestingOption meterTestingOption;
 
     @Column
-    private String description;
-
-    @Column
-    private Boolean active;
-
-    @Column
-    private Integer order;
+    private String otherRemarks;
 
 }

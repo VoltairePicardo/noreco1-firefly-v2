@@ -49,4 +49,7 @@ public class MeterModel {
     @Column
     private BigDecimal voltage;
 
+    @Transient
+    private String accuracyClassDescription;
+
 }

@@ -1,7 +1,11 @@
 package com.noreco1.fireflyv2.service.implementation;
 
+import com.noreco1.fireflyv2.model.AccuracyClass;
 import com.noreco1.fireflyv2.mssql_model.ConsumerMeter;
+import com.noreco1.fireflyv2.mssql_model.Meter;
+import com.noreco1.fireflyv2.mssql_model.MeterModel;
 import com.noreco1.fireflyv2.mssql_repo.MssqlConsumerMeterRepo;
+import com.noreco1.fireflyv2.repo.AccuracyClassRepo;
 import com.noreco1.fireflyv2.service.ConsumerService;
 import com.noreco1.fireflyv2.mysql_model.Consumer;
 import com.noreco1.fireflyv2.mysql_repo.ConsumerRepo;
@@ -26,6 +30,7 @@ public class ConsumerServiceImpl implements ConsumerService {
 
     private final ConsumerRepo consumerRepo;
     private final MssqlConsumerMeterRepo mssqlConsumerMeterRepo;
+    private final AccuracyClassRepo accuracyClassRepo;
 
     @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
@@ -60,6 +65,19 @@ public class ConsumerServiceImpl implements ConsumerService {
     @Transactional(readOnly = true)
     @Override
     public Page<ConsumerMeter> findAllConsumerFromIBCMS(String query, Pageable pageable) {
-        return mssqlConsumerMeterRepo.findAllByQuery(query, pageable);
+        Page<ConsumerMeter> page = mssqlConsumerMeterRepo.findAllByQuery(query, pageable);
+        page.getContent().forEach(this::attachAccuracyClassDescription);
+        return page;
+    }
+
+    private void attachAccuracyClassDescription(ConsumerMeter consumerMeter) {
+        Meter meter = consumerMeter.getMeter();
+        MeterModel meterModel = meter != null ? meter.getMeterModel() : null;
+        if (meterModel == null || meterModel.getAccuracyClass() == null) {
+            return;
+        }
+        accuracyClassRepo.findById(meterModel.getAccuracyClass())
+                .map(AccuracyClass::getDescription)
+                .ifPresent(meterModel::setAccuracyClassDescription);
     }
 }

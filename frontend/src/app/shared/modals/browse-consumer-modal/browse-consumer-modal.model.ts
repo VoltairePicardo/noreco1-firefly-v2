@@ -6,21 +6,24 @@ export interface ConsumerSummary {
     address: string | null;
 }
 
+export interface MeterModelSummary {
+    id: number;
+    modelName: string | null;
+    accuracyClass: number | null;
+    accuracyClassDescription: string | null;
+}
+
 export interface MeterSummary {
     id: number;
     serialNo: string | null;
     presentReading: number | null;
+    meterModel: MeterModelSummary | null;
 }
 
 export interface ConsumerMeterRow {
     id: number;
     consumer: ConsumerSummary | null;
     meter: MeterSummary | null;
-}
-
-export interface MeterModel {
-    id: number;
-    
 }
 
 export interface ConsumerMeterSelection {
@@ -32,6 +35,9 @@ export interface ConsumerMeterSelection {
     meterId: number | null;
     meterSerialNo: string | null;
     presentReading: number | null;
+    meterModelId: number | null;
+    modelName: string | null;
+    accuracyClassDescription: string | null;
 }
 
 export interface ConsumerMeterPage {

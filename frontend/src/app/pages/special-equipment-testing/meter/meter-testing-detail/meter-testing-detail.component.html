@@ -17,30 +17,55 @@
                     <div class="col-sm-6">
                         <dl class="row mb-0">
                             <dt class="col-sm-5 fw-normal">Date</dt>
-                            <dd class="col-sm-7 fw-bold">{{ data.date || '—' }}</dd>
+                            <dd class="col-sm-7 fw-bold">{{ data()?.date | date: 'MMMM dd, yyyy' }}</dd>
                             <dt class="col-sm-5 fw-normal">Meter Model</dt>
-                            <dd class="col-sm-7 fw-bold">{{ data.meterModel?.modelName || '—' }}</dd>
+                            <dd class="col-sm-7 fw-bold">{{ data()?.meterModel?.modelName || '—' }}</dd>
                             <dt class="col-sm-5 fw-normal">Tested By</dt>
-                            <dd class="col-sm-7 fw-bold">{{ data.testedBy || '—' }}</dd>
+                            <dd class="col-sm-7 fw-bold">{{ data()?.testedBy || '—' }}</dd>
                             <dt class="col-sm-5 fw-normal">Multiplier</dt>
-                            <dd class="col-sm-7 fw-bold">{{ data.multiplier ?? '—' }}</dd>
+                            <dd class="col-sm-7 fw-bold">{{ data()?.multiplier ?? '—' }}</dd>
                         </dl>
                     </div>
                     <div class="col-sm-6">
                         <dl class="row mb-0">
                             <dt class="col-sm-5 fw-normal">Temperature</dt>
-                            <dd class="col-sm-7 fw-bold">{{ data.temperature || '—' }}</dd>
+                            <dd class="col-sm-7 fw-bold">{{ data()?.temperature || '—' }}</dd>
                             <dt class="col-sm-5 fw-normal">Relative Humidity</dt>
-                            <dd class="col-sm-7 fw-bold">{{ data.relativeHumidity || '—' }}</dd>
+                            <dd class="col-sm-7 fw-bold">{{ data()?.relativeHumidity || '—' }}</dd>
                             <dt class="col-sm-5 fw-normal">Created By</dt>
-                            <dd class="col-sm-7 fw-bold">{{ data.createdBy?.fullName || '—' }}</dd>
+                            <dd class="col-sm-7 fw-bold">{{ data()?.createdBy?.fullName || '—' }}</dd>
                             <dt class="col-sm-5 fw-normal">Created At</dt>
-                            <dd class="col-sm-7 fw-bold">{{ data.createdAt || '—' }}</dd>
+                            <dd class="col-sm-7 fw-bold">{{ data()?.createdAt | date: 'MMMM dd, yyyy hh:mm:ss a' }}</dd>
                         </dl>
                     </div>
                 </div>
             }
         </div>
+
+        @if (optionDetailGroups().length) {
+            <hr class="border-dashed mx-n3 mt-3"/>
+            <div class="fs-xs text-uppercase fw-semibold text-muted px-3 mb-2">Selected Options</div>
+
+            <div class="px-3 d-flex flex-column gap-2">
+                @for (group of optionDetailGroups(); track group.typeId) {
+                    <div class="d-flex flex-wrap align-items-center gap-2">
+                        <span class="fw-bold text-nowrap" style="flex:0 0 150px">{{ group.typeDescription }}:</span>
+                        <div class="d-flex flex-wrap gap-2">
+                            @for (opt of group.options; track opt.id) {
+                                <span class="badge bg-light text-dark border fs-sm fw-normal">
+                            {{ opt.meterTestingOption?.description || '—' }}
+                                    @if (opt.otherRemarks) {
+                                        : {{ opt.otherRemarks }}
+                                    }
+                        </span>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        <hr class="border-dashed mx-n3 mt-3"/>
+
 
         <div class="fs-xs text-uppercase fw-semibold text-muted px-3 mb-2">Meters Test Results</div>
 
@@ -67,8 +92,8 @@
                 </tr>
                 </thead>
                 <tbody>
-                    @if (data.details?.length > 0) {
-                        @for (detail of data.details; track detail.id) {
+                    @if (data()?.details?.length) {
+                        @for (detail of data()?.details; track detail.id) {
                             <tr>
                                 <td class="fw-bold font-monospace">{{ detail.meterSerialNo || '—' }}</td>
                                 <td class="font-monospace">{{ detail.error | number: '1.4-4' }}</td>

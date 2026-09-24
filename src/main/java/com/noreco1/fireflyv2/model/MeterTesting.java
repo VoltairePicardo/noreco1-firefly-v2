@@ -66,6 +66,11 @@ public class MeterTesting {
     @Column(name = "FK_consumerAccountNo")
     private Integer accountNo;
 
+    @NotFound(action = NotFoundAction.IGNORE)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "FK_meterId")
+    private Meter meter;
+
     @Column
     private BigDecimal presentReading;
 
@@ -78,5 +83,8 @@ public class MeterTesting {
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     @NotFound(action = NotFoundAction.IGNORE)
     private List<MeterTestingDetail> details = new LinkedList<>();
+
+    @Transient
+    private List<MeterTestingOptionDetail> optionDetails = new LinkedList<>();
 
 }
