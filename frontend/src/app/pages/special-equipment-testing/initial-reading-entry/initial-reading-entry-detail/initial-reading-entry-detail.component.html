@@ -1,0 +1,54 @@
+<div class="container-fluid">
+    <app-page-title [title]="module" [subTitle]="subModule" [menuLink]="menuLink"/>
+</div>
+
+<app-ui-card [title]="module + ' Details'">
+    <div class="col-xl-12 p-3" card-body>
+        @if (isLoading()) {
+            <div class="d-flex align-items-center gap-2 text-muted py-2">
+                <span class="spinner-border spinner-border-sm" role="status"></span>
+                Loading...
+            </div>
+        } @else {
+            <div class="row">
+                <div class="col-sm-6">
+                    <dl class="row mb-0">
+                        <dt class="col-sm-4 fw-normal">Serial No.</dt>
+                        <dd class="col-sm-8 fw-bold font-monospace">{{ data.serialNo || '—' }}</dd>
+
+                        <dt class="col-sm-4 fw-normal">Meter Model</dt>
+                        <dd class="col-sm-8 fw-bold">{{ data.meterModel?.modelName || '—' }}</dd>
+
+                        <dt class="col-sm-4 fw-normal">Multiplier</dt>
+                        <dd class="col-sm-8 fw-bold">{{ data.multiplier ?? '—' }}</dd>
+
+                        <dt class="col-sm-4 fw-normal">Status</dt>
+                        <dd class="col-sm-8">
+                            @if (data.meterStatus) {
+                                <span class="badge bg-info-subtle text-dark fw-bold">{{ data.meterStatus.description }}</span>
+                            } @else {
+                                <span class="text-muted">—</span>
+                            }
+                        </dd>
+
+                        <dt class="col-sm-4 fw-normal">Present Reading</dt>
+                        <dd class="col-sm-8 fw-bold font-monospace">{{ data.presentReading ?? '—' }}</dd>
+
+                        <dt class="col-sm-4 fw-normal">Reading Date</dt>
+                        <dd class="col-sm-8 fw-bold">{{ data.readingDate ? (data.readingDate | date: 'MMMM d, y') : '—' }}</dd>
+                    </dl>
+                </div>
+            </div>
+        }
+
+        <hr class="border-dashed mx-n3 mt-3"/>
+        <div class="d-flex justify-content-end gap-2">
+            <a [routerLink]="['/' + menuLink]" class="btn btn-light fw-bold">
+                <ng-icon name="tablerArrowLeft" class="ps-0 pe-3 fw-bold"></ng-icon>Back
+            </a>
+            <a [routerLink]="['/' + menuLink, data.id, 'edit']" class="btn btn-primary fw-bold">
+                <ng-icon name="tablerPencil" class="ps-0 pe-3 fw-bold"></ng-icon>Edit
+            </a>
+        </div>
+    </div>
+</app-ui-card>

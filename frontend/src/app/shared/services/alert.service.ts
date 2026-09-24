@@ -181,4 +181,31 @@ export class AlertService {
         });
     }
 
+    savedWithActions(message: string, onDetails: () => void, onAnother: () => void): void {
+        Swal.fire({
+            icon: 'success',
+            title: 'Saved!',
+            text: message,
+            showConfirmButton: true,
+            confirmButtonText: '&#8594;&nbsp; See Details',
+            showDenyButton: true,
+            denyButtonText: '&#43;&nbsp; Another Entry',
+            allowOutsideClick: false,
+            reverseButtons: true,
+            focusConfirm: false,
+            focusDeny: true,
+            buttonsStyling: false,
+            customClass: {
+                confirmButton: 'btn btn-success fw-bold',
+                denyButton: 'btn btn-primary fw-bold me-2'
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                this.ngZone.run(() => onDetails());
+            } else if (result.isDenied) {
+                this.ngZone.run(() => onAnother());
+            }
+        });
+    }
+
 }

@@ -448,6 +448,12 @@ export const PAGES_ROUTES: Routes = [
         data: { title: 'Meter Models' },
     },
     {
+        path: 'initial-reading-entry',
+        loadChildren: () => import('./special-equipment-testing/initial-reading-entry/initial-reading-entry.route')
+            .then(m => m.INITIAL_READING_ENTRY_ROUTES),
+        data: { title: 'Initial Reading Entry' },
+    },
+    {
         path: 'ifr',
         loadChildren: () => import('./ifr/ifr.route').then(m => m.IFR_ROUTES),
         data: { title: 'Items For Repair' },

@@ -1,0 +1,181 @@
+<div class="container-fluid">
+    <app-page-title [title]="module" [subTitle]="subModule()" [menuLink]="menuLink"/>
+</div>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-xl-12">
+            <app-ui-card [title]="module + ' Details'">
+                <div class="col-xl-12 p-3" card-body>
+
+                    @if (isLoadingEdit()) {
+                        <div class="d-flex align-items-center gap-2 text-muted py-2">
+                            <span class="spinner-border spinner-border-sm" role="status"></span>
+                            Loading...
+                        </div>
+                    } @else {
+
+                        <!-- Meter Search (create mode only) -->
+                        @if (!editMode()) {
+                            <p class="fs-xs text-uppercase fw-semibold text-muted mb-2">Meter Search</p>
+                            <div class="row g-3">
+                                <div class="col-md-5">
+                                    <label class="form-label fw-bold">Serial No. <span class="text-muted fw-normal small">(scan or type, press Enter)</span></label>
+                                    <div class="input-group">
+                                        <input
+                                            #serialNoInput
+                                            type="text"
+                                            class="form-control"
+                                            placeholder="Scan barcode or type serial no..."
+                                            [ngModel]="serialNo()"
+                                            (ngModelChange)="serialNo.set($event)"
+                                            (keydown)="onSerialNoKeydown($event)"
+                                            [disabled]="isLookingUp()"
+                                            autofocus
+                                        />
+                                        <button type="button" class="btn btn-success fw-bold"
+                                                (click)="search()"
+                                                [disabled]="isLookingUp() || !serialNo().trim()">
+                                            @if (isLookingUp()) {
+                                                <span class="spinner-border spinner-border-sm me-1"></span>
+                                            } @else {
+                                                <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>
+                                            }
+                                            Search
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Multiple results — pick one -->
+                            @if (searchResults().length > 1) {
+                                <div class="row mt-3">
+                                    <div class="col-xl-12">
+                                        <p class="fs-xs text-uppercase fw-semibold text-muted mb-2">Select a Meter</p>
+                                        <div class="table-responsive">
+                                            <table class="table table-custom table-centered table-select table-hover w-100 mb-0">
+                                                <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                                                    <tr class="text-uppercase fs-xxs">
+                                                        <th>Serial No.</th>
+                                                        <th>Meter Model</th>
+                                                        <th>Multiplier</th>
+                                                        <th>Status</th>
+                                                        <th></th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @for (r of searchResults(); track r.id) {
+                                                        <tr>
+                                                            <td class="fw-bold font-monospace small">{{ r.serialNo }}</td>
+                                                            <td class="small">{{ r.meterModel?.modelName || '—' }}</td>
+                                                            <td class="small">{{ r.multiplier ?? '—' }}</td>
+                                                            <td>
+                                                                @if (r.meterStatus) {
+                                                                    <span class="badge bg-info-subtle text-dark">{{ r.meterStatus.description }}</span>
+                                                                } @else {
+                                                                    <span class="text-muted small">—</span>
+                                                                }
+                                                            </td>
+                                                            <td>
+                                                                <a href="javascript:void(0)" ngbTooltip="Select"
+                                                                   (click)="selectMeter(r.serialNo)"
+                                                                   class="btn btn-light btn-icon btn-sm rounded-circle">
+                                                                    <ng-icon name="tablerCheck" class="fs-lg"></ng-icon>
+                                                                </a>
+                                                            </td>
+                                                        </tr>
+                                                    }
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        }
+
+                        <!-- Meter Info Panel -->
+                        @if (meter()) {
+                            <hr/>
+                            <p class="fs-xs text-uppercase fw-semibold text-muted mb-2">Meter Information</p>
+                            <div class="row g-2 mb-1">
+                                <div class="col-md-3">
+                                    <span class="fw-bold d-block small text-muted">Serial No.</span>
+                                    <span class="fw-bold font-monospace">{{ meter().serialNo }}</span>
+                                </div>
+                                <div class="col-md-3">
+                                    <span class="fw-bold d-block small text-muted">Meter Model</span>
+                                    <span>{{ meter().meterModel?.modelName || '—' }}</span>
+                                </div>
+                                <div class="col-md-2">
+                                    <span class="fw-bold d-block small text-muted">Multiplier</span>
+                                    <span>{{ meter().multiplier ?? '—' }}</span>
+                                </div>
+                                <div class="col-md-2">
+                                    <span class="fw-bold d-block small text-muted">Status</span>
+                                    @if (meter().meterStatus) {
+                                        <span class="badge bg-info-subtle text-dark">{{ meter().meterStatus.description }}</span>
+                                    } @else {
+                                        <span class="text-muted">No Status</span>
+                                    }
+                                </div>
+                            </div>
+
+                            <hr/>
+                            <p class="fs-xs text-uppercase fw-semibold text-muted mb-2">Reading Details</p>
+                            <div class="row g-3">
+                                <div class="col-md-3">
+                                    <label class="form-label fw-bold">Present Reading <span class="text-danger">*</span></label>
+                                    <input
+                                        type="number"
+                                        step="0.01"
+                                        class="form-control text-end"
+                                        placeholder="0.00"
+                                        [ngModel]="presentReading()"
+                                        (ngModelChange)="presentReading.set($event)"
+                                        (keydown.enter)="save()"
+                                    />
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label fw-bold">Reading Date</label>
+                                    <input
+                                        type="text"
+                                        class="form-control"
+                                        mwlFlatpickr
+                                        [options]="flatpickrOptions"
+                                        [ngModel]="readingDate()"
+                                        (ngModelChange)="readingDate.set($event)"
+                                        placeholder="Select date"
+                                    />
+                                </div>
+                            </div>
+
+                            <div class="d-flex gap-2 justify-content-end align-items-center pt-3 border-top mt-3">
+                                <a [routerLink]="['/' + menuLink]" class="btn btn-light fw-bold">
+                                    <ng-icon name="tablerArrowLeft" class="ps-0 pe-3 fw-bold"></ng-icon>Back
+                                </a>
+                                <button type="button" class="btn btn-primary fw-bold"
+                                        (click)="save()" [disabled]="isSaving()">
+                                    @if (isSaving()) {
+                                        <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                                        Saving...
+                                    } @else {
+                                        <ng-icon name="tablerCheck" class="ps-0 pe-3 fw-bold"></ng-icon>
+                                        {{ editMode() ? 'Update' : 'Save ' + module }}
+                                    }
+                                </button>
+                            </div>
+                        } @else if (!editMode()) {
+                            <!-- No meter looked up yet in create mode -->
+                            <div class="d-flex gap-2 justify-content-end align-items-center pt-3 border-top mt-3">
+                                <a [routerLink]="['/' + menuLink]" class="btn btn-light fw-bold">
+                                    <ng-icon name="tablerArrowLeft" class="ps-0 pe-3 fw-bold"></ng-icon>Back
+                                </a>
+                            </div>
+                        }
+
+                    }
+                </div>
+            </app-ui-card>
+        </div>
+    </div>
+</div>
