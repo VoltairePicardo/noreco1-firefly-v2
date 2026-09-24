@@ -1,11 +1,15 @@
 package com.noreco1.fireflyv2.service.implementation;
 
 import com.noreco1.fireflyv2.common.facade.GeneratorFacade;
+import com.noreco1.fireflyv2.common.facade.GlobalEntityAcctNoFacade;
 import com.noreco1.fireflyv2.common.helpers.Checker;
 import com.noreco1.fireflyv2.common.helpers.MessageFormatter;
 import com.noreco1.fireflyv2.model.SLEntityClassification;
 import com.noreco1.fireflyv2.model.SlEntity;
 import com.noreco1.fireflyv2.model.SubLedgerEntity;
+import com.noreco1.fireflyv2.model.enums.EntitySystem;
+import com.noreco1.fireflyv2.model.enums.EntityType;
+import com.noreco1.fireflyv2.mysql_model.GlobalEntityAccountNo;
 import com.noreco1.fireflyv2.repo.SlEntityRepo;
 import com.noreco1.fireflyv2.repo.SubLedgerEntityRepo;
 import com.noreco1.fireflyv2.controller.response.PostResponse;
@@ -34,6 +38,9 @@ public class SlEntityServiceImpl implements SlEntityService {
 
     @Autowired
     GeneratorFacade generatorFacade;
+
+    @Autowired
+    GlobalEntityAcctNoFacade globalEntityAcctNoFacade;
 
     @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
@@ -147,6 +154,7 @@ public class SlEntityServiceImpl implements SlEntityService {
             response.setSuccess(false);
         } else {
             Boolean insertMode = slEntity.getId() == null || slEntity.getId() == 0;
+            GlobalEntityAccountNo acct = null;
             if (!insertMode) {
                 SubLedgerEntity ledgerEntity = subLedgerEntityRepo.findById(slEntity.getId()).orElse(null);
                 if (ledgerEntity == null) {
@@ -159,15 +167,47 @@ public class SlEntityServiceImpl implements SlEntityService {
                 SLEntityClassification slEntityClassification = new SLEntityClassification();
                 slEntityClassification.setId(slEntity.getSlEntityClassification().getId());
                 slEntity.setSlEntityClassification(slEntityClassification);
-                slEntity.setAccountNo(generatorFacade.entityAccountNumber());
+                String entityType = resolveEntityType(slEntity.getSlEntityClassification());
+                if (entityType != null) {
+                    acct = globalEntityAcctNoFacade.generate(
+                            entityType, 0, EntitySystem.NORECO1_FIREFLY_V2.getCode(), slEntity.getName());
+                    slEntity.setAccountNo(acct.getAccountNo());
+                }
             }
 
             slEntity = subLedgerEntityRepo.save(slEntity);
+            if (insertMode && acct != null) {
+                globalEntityAcctNoFacade.link(acct.getAccountNo(), slEntity.getId(), EntitySystem.NORECO1_FIREFLY_V2.getCode());
+            }
 
             response.setModelId(slEntity.getId());
             response.setSuccessMessage("Sub Ledger Entity successfully saved!");
             response.setSuccess(true);
         }
         return response;
+    }
+
+    private String resolveEntityType(SLEntityClassification classification) {
+        if (classification == null || classification.getId() == null) return null;
+        try {
+            com.noreco1.fireflyv2.model.enums.SLEntityClassification type =
+                    com.noreco1.fireflyv2.model.enums.SLEntityClassification.findByID(classification.getId());
+            return switch (type) {
+                case EMPLOYEE                -> EntityType.EMPLOYEE.getCode();
+                case SUPPLIER                -> EntityType.SUPPLIER.getCode();
+                case CONSUMER                -> EntityType.CONSUMER.getCode();
+                case ASSET                   -> EntityType.ASSET.getCode();
+                case WORK_ORDER              -> EntityType.WORK_ORDER.getCode();
+                case PREPAYMENT              -> EntityType.PREPAYMENT.getCode();
+                case PETTY_CASH              -> EntityType.PETTY_CASH.getCode();
+                case OTHER_ACCOUNTS_RECEIVABLE -> EntityType.ACCOUNTS_RECEIVABLE.getCode();
+                case OTHER_SL_ENTITIES       -> EntityType.SL_ENTITIES.getCode();
+                case BMCOO                   -> EntityType.BMCOO.getCode();
+                case DMCOO                   -> EntityType.DMCOO.getCode();
+                case PAYEE                   -> EntityType.PAYEE.getCode();
+            };
+        } catch (IllegalArgumentException e) {
+            return null; // unknown classification id — skip GEAN generation
+        }
     }
 }

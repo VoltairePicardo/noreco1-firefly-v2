@@ -14,21 +14,23 @@ public interface MenuRepo extends JpaRepository<Menu, Integer> {
 
     List<Menu> findAllByType(String type);
 
-    @Query(value = "SELECT m.* FROM Menu m " +
-            "WHERE m.`type` = 'FIREFLY' AND (" +
-            "  m.id IN (" +
-            "    SELECT DISTINCT FK_menuId FROM RoleMenu " +
-            "    JOIN UserRole ON RoleMenu.FK_roleId = UserRole.FK_roleId " +
-            "    WHERE FK_userId = ?1" +
-            "  ) OR m.id IN (" +
-            "    SELECT DISTINCT FK_parentMenuId FROM Menu " +
-            "    WHERE FK_parentMenuId > 0 " +
-            "    AND id IN (" +
-            "      SELECT FK_menuId FROM RoleMenu " +
-            "      JOIN UserRole ON RoleMenu.FK_roleId = UserRole.FK_roleId " +
-            "      WHERE FK_userId = ?1" +
-            "    )" +
-            "  )" +
-            ") GROUP BY m.id ORDER BY m.`order` ASC", nativeQuery = true)
-    public List<Menu> findAllByUserId(Integer userId);
+    @Query(value = """
+            SELECT m.id FROM Menu m
+            WHERE m.`type` = 'FIREFLY' AND (
+              m.id IN (
+                SELECT DISTINCT FK_menuId FROM RoleMenu
+                JOIN UserRole ON RoleMenu.FK_roleId = UserRole.FK_roleId
+                WHERE FK_userId = :userId
+              ) OR m.id IN (
+                SELECT DISTINCT FK_parentMenuId FROM Menu
+                WHERE FK_parentMenuId > 0
+                AND id IN (
+                  SELECT FK_menuId FROM RoleMenu
+                  JOIN UserRole ON RoleMenu.FK_roleId = UserRole.FK_roleId
+                  WHERE FK_userId = :userId
+                )
+              )
+            ) GROUP BY m.id ORDER BY m.`order` ASC
+            """, nativeQuery = true)
+    List<Integer> findMenuIdsByUserId(@Param("userId") Integer userId);
 }

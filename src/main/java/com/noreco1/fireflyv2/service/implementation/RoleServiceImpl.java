@@ -117,8 +117,8 @@ public class RoleServiceImpl implements RoleService {
 
                 if (!Checker.collectionIsEmpty(role.getMenusToEvict())) {
                     for (Menu menu : role.getMenusToEvict()) {
-                        if (menu.getViewRoute() != null) {
-                            roleRepo.removeAssignedRoute(role.getId(), menu.getViewRoute().getId());
+                        if (menu.getViewRouteId() != null) {
+                            roleRepo.removeAssignedRoute(role.getId(), menu.getViewRouteId());
                         }
                     }
                 }
@@ -128,8 +128,8 @@ public class RoleServiceImpl implements RoleService {
             if (!Checker.collectionIsEmpty(role.getMenus())) {
                 for (Menu menu : role.getMenus()) {
                     roleRepo.saveMenus(role.getId(), menu.getId());
-                    if (menu.getViewRoute() != null) {
-                        roleRepo.saveAssignedRoute(role.getId(), menu.getViewRoute().getId());
+                    if (menu.getViewRouteId() != null) {
+                        roleRepo.saveAssignedRoute(role.getId(), menu.getViewRouteId());
                     }
                 }
             }

@@ -4,6 +4,10 @@ import com.noreco1.fireflyv2.common.GlobalConstant;
 import com.noreco1.fireflyv2.common.facade.AssetDepreciationScheduleFacade;
 import com.noreco1.fireflyv2.common.facade.AuthenticationFacade;
 import com.noreco1.fireflyv2.common.facade.GeneratorFacade;
+import com.noreco1.fireflyv2.common.facade.GlobalEntityAcctNoFacade;
+import com.noreco1.fireflyv2.model.enums.EntitySystem;
+import com.noreco1.fireflyv2.model.enums.EntityType;
+import com.noreco1.fireflyv2.mysql_model.GlobalEntityAccountNo;
 import com.noreco1.fireflyv2.common.facade.LedgerFacade;
 import com.noreco1.fireflyv2.common.helpers.Checker;
 import com.noreco1.fireflyv2.common.helpers.MessageFormatter;
@@ -48,6 +52,9 @@ public class WorkOrderServiceImpl implements WorkOrderService {
 
     @Autowired
     GeneratorFacade generatorFacade;
+
+    @Autowired
+    GlobalEntityAcctNoFacade globalEntityAcctNoFacade;
 
     @Autowired
     AssetRepo assetRepo;
@@ -180,7 +187,6 @@ public class WorkOrderServiceImpl implements WorkOrderService {
 
             workOrder.setYear(cal.get(Calendar.YEAR));
             workOrder.setMonth(cal.get(Calendar.MONTH));
-            workOrder.setAccountNumber(generatorFacade.entityAccountNumber());
             workOrder.setCreatedBy(authenticationFacade.getLoggedIn());
 
             Project project = projectRepo.findById(workOrder.getProject().getId()).orElse(null);
@@ -195,6 +201,8 @@ public class WorkOrderServiceImpl implements WorkOrderService {
             String code = generatorFacade.voucherCodeWithTown("WO", StringFormatter.getValueOrBlank(latestCode), workOrder.getDate(), townName, GlobalConstant.COUNTER_PAD_2);
 
             workOrder.setCode(code);
+            GlobalEntityAccountNo acct = globalEntityAcctNoFacade.generate(EntityType.WORK_ORDER.getCode(), 0, EntitySystem.NORECO1_FIREFLY_V2.getCode(), code);
+            workOrder.setAccountNumber(acct.getAccountNo());
 
             SLEntityClassification slEntityClassification = new SLEntityClassification();
             slEntityClassification.setId(com.noreco1.fireflyv2.model.enums.SLEntityClassification.WORK_ORDER.getId());
@@ -202,6 +210,7 @@ public class WorkOrderServiceImpl implements WorkOrderService {
 
             workOrder= workOrderRepo.save(workOrder);
             if (workOrder != null) {
+                globalEntityAcctNoFacade.link(acct.getAccountNo(), workOrder.getId(), EntitySystem.NORECO1_FIREFLY_V2.getCode());
                 response.setSuccess(true);
                 response.setModelId(workOrder.getId());
                 response.setSuccessMessage("Work order successfully created!");
@@ -389,7 +398,8 @@ public class WorkOrderServiceImpl implements WorkOrderService {
                         asset.setCode(code);
                         asset.setYear(year);
                         asset.setLocation(existingWorkOrder.getLocation());
-                        asset.setAccountNo(generatorFacade.entityAccountNumber());
+                        GlobalEntityAccountNo assetAcct = globalEntityAcctNoFacade.generate(EntityType.ASSET.getCode(), 0, EntitySystem.NORECO1_FIREFLY_V2.getCode(), code);
+                        asset.setAccountNo(assetAcct.getAccountNo());
                         asset.setAcquisitionDate(new Date());
                         asset.setCreatedBy(authenticationFacade.getLoggedIn());
                         asset.setDefaultAnnualDepreciationRate();
@@ -403,6 +413,7 @@ public class WorkOrderServiceImpl implements WorkOrderService {
                         asset.setSlEntityClassification(assetClass);
 
                         Asset newAsset = assetRepo.save(asset);
+                        if (newAsset != null) globalEntityAcctNoFacade.link(assetAcct.getAccountNo(), newAsset.getId(), EntitySystem.NORECO1_FIREFLY_V2.getCode());
 
                         if (newAsset != null) {
 
@@ -876,6 +887,7 @@ public class WorkOrderServiceImpl implements WorkOrderService {
         try {
             WorkOrder wo = buildWorkOrderFromPayload(payload, null);
             WorkOrder saved = workOrderRepo.save(wo);
+            globalEntityAcctNoFacade.link(saved.getAccountNumber(), saved.getId(), EntitySystem.NORECO1_FIREFLY_V2.getCode());
             updateProjectTown(saved.getProject(), saved.getTown());
             response.setSuccessMessage("Work Order successfully created.");
             response.setModelId(saved.getId());
@@ -1120,8 +1132,8 @@ public class WorkOrderServiceImpl implements WorkOrderService {
                 "WO", latestCode == null ? "" : String.valueOf(latestCode),
                 woDate, GlobalConstant.COUNTER_PAD_4);
         wo.setCode(code);
-
-        wo.setAccountNumber(generatorFacade.entityAccountNumber());
+        GlobalEntityAccountNo woAcct = globalEntityAcctNoFacade.generate(EntityType.WORK_ORDER.getCode(), 0, EntitySystem.NORECO1_FIREFLY_V2.getCode(), code);
+        wo.setAccountNumber(woAcct.getAccountNo());
         wo.setCreatedAt(now);
         wo.setUpdatedAt(now);
         wo.setCreatedBy(authenticationFacade.getLoggedIn());

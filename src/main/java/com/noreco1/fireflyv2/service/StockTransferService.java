@@ -17,6 +17,7 @@ public interface StockTransferService extends DocumentService {
     Page<StockTransfer> findAll(Pageable pageable);
     Page<StockTransfer> findByQuery(String query, Pageable pageable);
     List<Map> findByDateRangePending(String from, String to, Integer officeId);
+    List<Map> findByDateRangeAll(String from, String to);
     List<Map> findByDateRangeAndStatusId(String from, String to, Integer status, Integer officeId);
     List<DocumentStatus> getDocumentsStatuses();
     List<Map> getDetails(Integer id);

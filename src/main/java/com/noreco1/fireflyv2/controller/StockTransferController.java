@@ -53,7 +53,7 @@ public class StockTransferController {
 
     @GetMapping("/list/{from}/{to}")
     public List<Map> listByDateRange(@PathVariable String from, @PathVariable String to) {
-        return stockTransferService.findByDateRangePending(from, to, null);
+        return stockTransferService.findByDateRangeAll(from, to);
     }
 
     @GetMapping("/list/{from}/{to}/{statusId}")

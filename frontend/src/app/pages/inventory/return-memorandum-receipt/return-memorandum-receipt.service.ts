@@ -40,7 +40,7 @@ export class ReturnMemorandumReceiptService {
     }
 
     print(id: number): void {
-        this.downloadService.print(`${BASE_URL}/return-memorandum-receipt/export/${id}`, { type: 'pdf' });
+        this.downloadService.print(`${BASE_API}/return-memorandum-receipt/export/${id}`, { type: 'pdf' });
     }
 
     getOffices(): Observable<Office[]> {

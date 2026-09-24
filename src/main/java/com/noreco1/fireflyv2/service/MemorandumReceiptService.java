@@ -3,6 +3,7 @@ package com.noreco1.fireflyv2.service;
 import com.noreco1.fireflyv2.model.Employee;
 import com.noreco1.fireflyv2.model.MemorandumReceipt;
 import com.noreco1.fireflyv2.model.SlEntity;
+import com.noreco1.fireflyv2.model.StockWithdrawal;
 import com.noreco1.fireflyv2.controller.response.InventoryDocumentDto;
 import com.noreco1.fireflyv2.controller.response.MemorandumReceiptDto;
 import com.noreco1.fireflyv2.controller.response.PostResponse;
@@ -49,6 +50,8 @@ public interface MemorandumReceiptService {
     Map defaultSignatories();
 
     MemorandumReceiptDto findById(Integer id);
+
+    List<StockWithdrawal> getStockWithdrawals(String query);
 
     List<Map> getStockWithdrawalBalance(Integer stockTransactionDetailId);
 

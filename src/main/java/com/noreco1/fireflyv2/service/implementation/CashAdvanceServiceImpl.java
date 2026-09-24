@@ -3,6 +3,7 @@ package com.noreco1.fireflyv2.service.implementation;
 import com.noreco1.fireflyv2.common.GlobalConstant;
 import com.noreco1.fireflyv2.common.facade.*;
 import com.noreco1.fireflyv2.common.helpers.*;
+import com.noreco1.fireflyv2.mysql_model.GlobalEntityAccountNo;
 import com.noreco1.fireflyv2.dtoers.DocumentDtoer;
 import com.noreco1.fireflyv2.model.*;
 import com.noreco1.fireflyv2.model.DocumentStatus;
@@ -62,6 +63,9 @@ public class CashAdvanceServiceImpl implements CashAdvanceService, PrintableVouc
 
     @Autowired
     GeneratorFacade generatorFacade;
+
+    @Autowired
+    GlobalEntityAcctNoFacade globalEntityAcctNoFacade;
 
     @Autowired
     FileFacade fileFacade;
@@ -607,6 +611,7 @@ public class CashAdvanceServiceImpl implements CashAdvanceService, PrintableVouc
                 boolean insertMode = !Checker.isValidId(ca.getId());
                 DocumentStatus ds = new DocumentStatus();
                 Workflow wf = new Workflow();
+                GlobalEntityAccountNo acct = null;
 
                 ds.setId(com.noreco1.fireflyv2.model.enums.DocumentStatus.DOCUMENT_CREATED.getId());
                 wf.setId(com.noreco1.fireflyv2.model.enums.Workflow.CA.getId());
@@ -614,9 +619,10 @@ public class CashAdvanceServiceImpl implements CashAdvanceService, PrintableVouc
                 // Insert mode.
                 if (insertMode) {
                     String offAcro = ca.getOffice().getAcronym();
-                    ca.setAccountNo(generatorFacade.entityAccountNumber());
                     Object latestPcvCode = cashAdvanceRepo.findLatestCaCodeByYear(voucherYear, "%-"+offAcro+"-%");
                     ca.setCode(generatorFacade.voucherCode("CA-"+offAcro, (latestPcvCode == null ? "" : String.valueOf(latestPcvCode)), ca.getCashAdvanceDate()));
+                    acct = globalEntityAcctNoFacade.generate(EntityType.CASH_ADVANCE.getCode(), 0, EntitySystem.NORECO1_FIREFLY_V2.getCode(), ca.getCode());
+                    ca.setAccountNo(acct.getAccountNo());
                     ca.setDocumentStatus(ds);
                     ca.setTransaction(generatorFacade.transaction());
                     ca.setCreatedBy(createdBy);
@@ -672,6 +678,7 @@ public class CashAdvanceServiceImpl implements CashAdvanceService, PrintableVouc
                 existingCa.setWorkflow(wf);
 
                 this.model = cashAdvanceRepo.save(existingCa);
+                if (insertMode && acct != null) globalEntityAcctNoFacade.link(acct.getAccountNo(), this.model.getId(), EntitySystem.NORECO1_FIREFLY_V2.getCode());
 
                 if (this.model != null) {
 

@@ -332,6 +332,8 @@ public class ItemsForRepairServiceImpl implements ItemsForRepairService, Printab
                         StockTransaction stockTransaction = new StockTransaction();
                         stockTransaction.setTransaction(itemsForRepair.getTransaction());
                         stockTransaction.setCreatedBy(processedBy);
+                        stockTransaction.setCreatedAt(new Date());
+                        stockTransaction.setUpdatedAt(new Date());
                         stockTransaction = stockTransactionRepo.save(stockTransaction);
                         for (ItemTransactionDetailDto detailDto : itemsForRepair.getDetails()) {
                             if (detailDto.getDeductFromStock()) {

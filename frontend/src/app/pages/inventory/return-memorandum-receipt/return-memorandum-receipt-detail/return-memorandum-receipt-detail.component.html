@@ -10,6 +10,7 @@
 
 <div class="card mb-3">
     <div class="card-body">
+        <div class="fs-xs text-uppercase fw-semibold text-muted mb-2">Document Information</div>
         <div class="row g-3">
             <div class="col-md-3">
                 <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Code</div>
@@ -27,11 +28,11 @@
                 <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Memorandum Receipt</div>
                 <div>{{ data().memorandumReceipt?.code || '—' }}</div>
             </div>
-            <div class="col-md-6">
+            <div class="col-md-3">
                 <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Office</div>
                 <div>{{ data().office?.name || '—' }}</div>
             </div>
-            <div class="col-md-6">
+            <div class="col-md-3">
                 <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Employee</div>
                 <div>{{ data().employee?.name || data().employee?.fullName || '—' }}</div>
             </div>
@@ -91,18 +92,24 @@
         <div class="card-body">
             <h6 class="fw-semibold text-uppercase fs-xs mb-3">Process Document</h6>
             <div class="row g-3 align-items-end">
-                <div class="col-md-4"><label class="form-label fw-bold">Action</label>
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Action</label>
                     <select class="form-select" [(ngModel)]="selectedAction">
                         <option [ngValue]="null">— Select action —</option>
-                        @for (a of workflowActions(); track a.actionMapId) { <option [ngValue]="a">{{ a.action }}</option> }
+                        @for (a of workflowActions(); track a.actionMapId) {
+                            <option [ngValue]="a">{{ a.action }}</option>
+                        }
                     </select>
                 </div>
-                <div class="col-md-5"><label class="form-label fw-bold">Remarks</label>
+                <div class="col-md-5">
+                    <label class="form-label fw-bold">Remarks</label>
                     <input type="text" class="form-control" [(ngModel)]="remarks" placeholder="Optional remarks"/>
                 </div>
                 <div class="col-md-auto">
                     <button type="button" class="btn btn-primary fw-bold" [disabled]="!selectedAction || processingWorkflow()" (click)="processWorkflow()">
-                        @if (processingWorkflow()) { <span class="spinner-border spinner-border-sm me-2" role="status"></span> }
+                        @if (processingWorkflow()) {
+                            <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                        }
                         Process
                     </button>
                 </div>
@@ -136,20 +143,38 @@
     </div>
     @if (showLogs) {
         <div class="card-body">
-            @if (logsLoading()) { <div class="text-center py-3"><span class="spinner-border spinner-border-sm me-2"></span>Loading...</div> }
-            @else if (logs().length === 0) { <p class="text-muted mb-0">No logs found.</p> }
-            @else {
-                <div class="table-responsive"><table class="table table-sm w-100 mb-0">
-                    <thead><tr class="text-uppercase fs-xxs text-muted"><th>Date</th><th>Action</th><th>By</th><th>Remarks</th></tr></thead>
-                    <tbody>
-                        @for (log of logs(); track log.id) {
-                            <tr><td class="text-nowrap">{{ log.createdAt | date:'MM/dd/yyyy hh:mm a' }}</td><td>{{ log.action }}</td><td>{{ log.createdBy.fullName }}</td><td>{{ log.remarks }}</td></tr>
-                        }
-                    </tbody>
-                </table></div>
+            @if (logsLoading()) {
+                <div class="text-center py-3">
+                    <span class="spinner-border spinner-border-sm me-2"></span>Loading...
+                </div>
+            } @else if (logs().length === 0) {
+                <p class="text-muted mb-0">No logs found.</p>
+            } @else {
+                <div class="table-responsive">
+                    <table class="table table-sm w-100 mb-0">
+                        <thead>
+                            <tr class="text-uppercase fs-xxs text-muted">
+                                <th>Date</th>
+                                <th>Action</th>
+                                <th>By</th>
+                                <th>Remarks</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (log of logs(); track log.id) {
+                                <tr>
+                                    <td class="text-nowrap">{{ log.createdAt | date:'MM/dd/yyyy hh:mm a' }}</td>
+                                    <td>{{ log.action }}</td>
+                                    <td>{{ log.createdBy.fullName }}</td>
+                                    <td>{{ log.remarks }}</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
             }
         </div>
     }
 </div>
 
-}
+} <!-- end !isLoading -->

@@ -313,6 +313,8 @@ public class MaterialCreditTicketServiceImpl implements MaterialCreditTicketServ
                         StockTransaction stockTransaction = new StockTransaction();
                         stockTransaction.setTransaction(materialCreditTicket.getTransaction());
                         stockTransaction.setCreatedBy(processedBy);
+                        stockTransaction.setCreatedAt(new Date());
+                        stockTransaction.setUpdatedAt(new Date());
                         stockTransaction = stockTransactionRepo.save(stockTransaction);
 
                         for (ItemTransactionDetailDto detailDto : materialCreditTicket.getDetails()) {
@@ -334,6 +336,8 @@ public class MaterialCreditTicketServiceImpl implements MaterialCreditTicketServ
                                 itemStock.setInventoryLocation(inventoryLocation);
                                 itemStock.setTotalQuantity(detailDto.getQuantity());
                                 itemStock.setTotalItemCost(detailDto.getTotalCost());
+                                itemStock.setCreatedAt(new java.sql.Date(System.currentTimeMillis()));
+                                itemStock.setUpdatedAt(new java.sql.Date(System.currentTimeMillis()));
                             }
 
                             ItemStock newItemStock = itemStockRepo.save(itemStock);

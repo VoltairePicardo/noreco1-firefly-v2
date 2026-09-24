@@ -12,3 +12,8 @@
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 
+app-root,
+app-main-layout,
+app-vertical-layout,
+app-horizontal-layout { display: block; }
+

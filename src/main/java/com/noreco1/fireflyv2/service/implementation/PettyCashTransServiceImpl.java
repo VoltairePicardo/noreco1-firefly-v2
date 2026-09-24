@@ -3,6 +3,9 @@ package com.noreco1.fireflyv2.service.implementation;
 import com.noreco1.fireflyv2.common.GlobalConstant;
 import com.noreco1.fireflyv2.common.facade.*;
 import com.noreco1.fireflyv2.common.helpers.*;
+import com.noreco1.fireflyv2.model.enums.EntitySystem;
+import com.noreco1.fireflyv2.model.enums.EntityType;
+import com.noreco1.fireflyv2.mysql_model.GlobalEntityAccountNo;
 import com.noreco1.fireflyv2.dtoers.LedgerDtoerImpl;
 import com.noreco1.fireflyv2.model.*;
 import com.noreco1.fireflyv2.model.DocumentStatus;
@@ -78,6 +81,9 @@ public class PettyCashTransServiceImpl implements PettyCashTransService, Printab
 
     @Autowired
     GeneratorFacade generatorFacade;
+
+    @Autowired
+    GlobalEntityAcctNoFacade globalEntityAcctNoFacade;
 
     @Autowired
     FileFacade fileFacade;
@@ -560,6 +566,7 @@ public class PettyCashTransServiceImpl implements PettyCashTransService, Printab
             Integer voucherYear = Integer.parseInt(GlobalConstant.YYYY_DATE_FORMAT.format(pct.getPettyCashDate()));
             Boolean insertMode = (pct.getId() == null);
             DocumentStatus ds = new DocumentStatus();
+            GlobalEntityAccountNo acct = null;
 
             // Insert mode.
             if (insertMode) {
@@ -568,12 +575,13 @@ public class PettyCashTransServiceImpl implements PettyCashTransService, Printab
                 ds.setId(com.noreco1.fireflyv2.model.enums.DocumentStatus.DOCUMENT_CREATED.getId());
                 wf.setId(com.noreco1.fireflyv2.model.enums.Workflow.PCV.getId());
 
-                pct.setAccountNo(generatorFacade.entityAccountNumber());
                 Employee employee = employeeRepo.findOneByAccountNumber(createdBy.getAccountNo());
                 pct.setOffice(employee.getOffice());
                 String offAcro = employee.getOffice().getAcronym();
                 Object latestPcvCode = pettyCashTransRepo.findLatestPcvCodeByYear(voucherYear, "%-"+offAcro+"-%");
                 pct.setCode(generatorFacade.voucherCode("PCV-"+offAcro, (latestPcvCode == null ? "" : String.valueOf(latestPcvCode)), pct.getPettyCashDate()));
+                acct = globalEntityAcctNoFacade.generate(EntityType.PETTY_CASH_TRANS.getCode(), 0, EntitySystem.NORECO1_FIREFLY_V2.getCode(), pct.getCode());
+                pct.setAccountNo(acct.getAccountNo());
                 pct.setDocumentStatus(ds);
                 pct.setTransaction(generatorFacade.transaction());
                 pct.setCreatedBy(createdBy);
@@ -649,6 +657,7 @@ public class PettyCashTransServiceImpl implements PettyCashTransService, Printab
             existingPct.setCreatedAt(new Date());
 
             this.model = pettyCashTransRepo.save(existingPct);
+            if (insertMode && acct != null) globalEntityAcctNoFacade.link(acct.getAccountNo(), this.model.getId(), EntitySystem.NORECO1_FIREFLY_V2.getCode());
 
             if (this.model != null) {
                 // start: update default signatories

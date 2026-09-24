@@ -2,9 +2,13 @@ package com.noreco1.fireflyv2.service.implementation;
 
 import com.noreco1.fireflyv2.common.facade.AuthenticationFacade;
 import com.noreco1.fireflyv2.common.facade.GeneratorFacade;
+import com.noreco1.fireflyv2.common.facade.GlobalEntityAcctNoFacade;
 import com.noreco1.fireflyv2.controller.response.PostResponse;
 import com.noreco1.fireflyv2.model.SLEntityClassification;
 import com.noreco1.fireflyv2.model.Supplier;
+import com.noreco1.fireflyv2.model.enums.EntitySystem;
+import com.noreco1.fireflyv2.model.enums.EntityType;
+import com.noreco1.fireflyv2.mysql_model.GlobalEntityAccountNo;
 import com.noreco1.fireflyv2.repo.SupplierRepo;
 import com.noreco1.fireflyv2.service.SupplierService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +32,9 @@ public class SupplierServiceImpl implements SupplierService {
 
     @Autowired
     private GeneratorFacade generatorFacade;
+
+    @Autowired
+    private GlobalEntityAcctNoFacade globalEntityAcctNoFacade;
 
     @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
@@ -53,11 +60,14 @@ public class SupplierServiceImpl implements SupplierService {
             supplier.setCreatedBy(authFacade.getLoggedIn());
             supplier.setCreatedAt(new Date());
             supplier.setUpdatedAt(new Date());
-            supplier.setAccountNumber(generatorFacade.entityAccountNumber());
+            GlobalEntityAccountNo acct = globalEntityAcctNoFacade.generate(
+                    EntityType.SUPPLIER.getCode(), 0, EntitySystem.NORECO1_FIREFLY_V2.getCode(), supplier.getName());
+            supplier.setAccountNumber(acct.getAccountNo());
             SLEntityClassification slec = new SLEntityClassification();
             slec.setId(com.noreco1.fireflyv2.model.enums.SLEntityClassification.SUPPLIER.getId());
             supplier.setSlEntityClassification(slec);
             Supplier saved = supplierRepo.save(supplier);
+            globalEntityAcctNoFacade.link(acct.getAccountNo(), saved.getId(), EntitySystem.NORECO1_FIREFLY_V2.getCode());
             res.setModelId(saved.getId());
             res.setSuccessMessage("Supplier successfully saved!");
             res.setSuccess(true);

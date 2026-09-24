@@ -1,6 +1,10 @@
 package com.noreco1.fireflyv2.service.implementation;
 
 import com.noreco1.fireflyv2.common.facade.GeneratorFacade;
+import com.noreco1.fireflyv2.common.facade.GlobalEntityAcctNoFacade;
+import com.noreco1.fireflyv2.model.enums.EntitySystem;
+import com.noreco1.fireflyv2.model.enums.EntityType;
+import com.noreco1.fireflyv2.mysql_model.GlobalEntityAccountNo;
 import com.noreco1.fireflyv2.common.helpers.Checker;
 import com.noreco1.fireflyv2.common.helpers.MessageFormatter;
 import com.noreco1.fireflyv2.model.PettyCashFund;
@@ -33,6 +37,9 @@ public class PettyCashFundServiceImpl implements PettyCashFundService {
 
     @Autowired
     GeneratorFacade generatorFacade;
+
+    @Autowired
+    GlobalEntityAcctNoFacade globalEntityAcctNoFacade;
 
     private PettyCashFund model;
 
@@ -137,11 +144,13 @@ public class PettyCashFundServiceImpl implements PettyCashFundService {
                     slEntityClassification.setId(com.noreco1.fireflyv2.model.enums.SLEntityClassification.PETTY_CASH.getId());
 
                     pettyCashFund.setSlEntityClassification(slEntityClassification);
-                    pettyCashFund.setAccountNo(generatorFacade.entityAccountNumber());
+                    GlobalEntityAccountNo acct = globalEntityAcctNoFacade.generate(EntityType.PETTY_CASH.getCode(), 0, EntitySystem.NORECO1_FIREFLY_V2.getCode(), pettyCashFund.getDescription());
+                    pettyCashFund.setAccountNo(acct.getAccountNo());
                     pettyCashFund.setCreatedAt(new Date());
                     pettyCashFund.setUpdatedAt(new Date());
 
                     this.model = pettyCashFundRepo.save(pettyCashFund);
+                    globalEntityAcctNoFacade.link(acct.getAccountNo(), this.model.getId(), EntitySystem.NORECO1_FIREFLY_V2.getCode());
                     
                 } else {
 

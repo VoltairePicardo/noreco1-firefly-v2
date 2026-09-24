@@ -149,7 +149,7 @@ public interface StockWithdrawalRepo extends JpaRepository<StockWithdrawal, Inte
 
     @Query(value = "SELECT sw.* FROM StockWithdrawal sw " +
             "LEFT JOIN StockWithdrawalDetail swd ON sw.id = swd.FK_stockWithdrawalId " +
-            "LEFT JOIN StockWithdrawalEmployee swe ON sw.id = swe.FK_stockWithdrawalId  " +
+            "LEFT JOIN StockWithdrawalEmployee swe ON sw.id = swe.FK_stockWithdrawalId " +
             "WHERE sw.type = 3 " + //OFE
             "AND sw.FK_documentStatusId = 7 " +
             "AND sw.FK_transactionId IN (SELECT sr.FK_documentTransactionId FROM StockRelease sr WHERE sr.FK_documentStatusId = 7) " + // Approved
@@ -160,7 +160,7 @@ public interface StockWithdrawalRepo extends JpaRepository<StockWithdrawal, Inte
             "ORDER BY sw.code ",
             countQuery = "SELECT count(*) FROM StockWithdrawal sw " +
                     "LEFT JOIN StockWithdrawalDetail swd ON sw.id = swd.FK_stockWithdrawalId " +
-                    "LEFT JOIN StockWithdrawalEmployee swe ON sw.id = swe.FK_stockWithdrawalId  " +
+                    "LEFT JOIN StockWithdrawalEmployee swe ON sw.id = swe.FK_stockWithdrawalId " +
                     "WHERE sw.type = 3 " + //OFE
                     "AND sw.FK_documentStatusId = 7 " +
                     "AND sw.FK_transactionId IN (SELECT sr.FK_documentTransactionId FROM StockRelease sr WHERE sr.FK_documentStatusId = 7) " + // Approved
