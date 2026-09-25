@@ -1,13 +1,14 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { COMMON_ALL_PAGE_IMPORTS, COMMON_MAIN_PAGE_IMPORTS, SHARED_PROVIDERS } from '@/app/shared/providers/shared-providers';
 import { FlatpickrDirective, provideFlatpickrDefaults } from 'angularx-flatpickr';
+import { NgbNavModule } from '@ng-bootstrap/ng-bootstrap';
 import { DownloadService } from '@/app/services/download.service';
 import { AlertService } from '@/app/shared/services/alert.service';
 import { AccountingReportsService } from '../accounting-reports.service';
 
 @Component({
     selector: 'app-mir-register',
-    imports: [...COMMON_ALL_PAGE_IMPORTS, ...COMMON_MAIN_PAGE_IMPORTS, FlatpickrDirective],
+    imports: [...COMMON_ALL_PAGE_IMPORTS, ...COMMON_MAIN_PAGE_IMPORTS, FlatpickrDirective, NgbNavModule],
     providers: [...SHARED_PROVIDERS, provideFlatpickrDefaults()],
     templateUrl: './mir-register.component.html'
 })
@@ -15,6 +16,7 @@ export class MirRegisterComponent {
     module   = 'Material Issue Register';
     menuLink = 'accounting-reports';
     flatpickrOptions = { dateFormat: 'Y-m-d', altInput: true, altFormat: 'F j, Y' };
+    activeTab = 'register';
 
     fromDate         = '';
     toDate           = '';
@@ -44,9 +46,12 @@ export class MirRegisterComponent {
     }
 
     setDefaultDates(): void {
-        const now = new Date(), first = new Date(now.getFullYear(), now.getMonth(), 1);
-        this.fromDate = first.toISOString().substring(0, 10);
-        this.toDate   = now.toISOString().substring(0, 10);
+        const now   = new Date();
+        const first = new Date(now.getFullYear(), now.getMonth(), 1);
+        const last  = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+        const fmt   = (d: Date) => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+        this.fromDate = fmt(first);
+        this.toDate   = fmt(last);
     }
 
     search(): void {

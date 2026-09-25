@@ -39,7 +39,7 @@
             </div>
 
             <div class="table-responsive mt-2">
-                <table class="table table-custom table-centered table-hover w-100 mb-0">
+                <table class="table table-custom table-centered table-hover w-100 mb-0 small">
                     <thead class="bg-light align-middle bg-opacity-25 thead-sm">
                         <tr class="text-uppercase fs-xxs">
                             <th>Reference No.</th>
@@ -59,7 +59,7 @@
                         } @else {
                             @for (row of rows(); track $index) {
                                 <tr>
-                                    <td class="fw-bold">{{ row.localCode }}</td>
+                                    <td>@if (row.id) {<a [routerLink]="getDetailRoute(row)" target="_blank" class="text-primary fw-semibold">{{ row.localCode }}</a>} @else {{{ row.localCode }}}</td>
                                     <td>{{ row.particulars }}</td>
                                     <td>{{ row.voucherDate | date:'MMM d, y' }}</td>
                                     <td class="text-end">{{ row.amount | number:'1.2-2' }}</td>

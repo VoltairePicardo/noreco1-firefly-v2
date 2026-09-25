@@ -61,7 +61,7 @@
                         } @else {
                             @for (row of rows(); track $index) {
                                 <tr>
-                                    <td>{{ row.localCode }}</td>
+                                    <td>@if (row.id) {<a [routerLink]="['/', 'payment-request', row.id, 'detail']" target="_blank" class="text-primary fw-semibold">{{ row.localCode }}</a>} @else {{{ row.localCode }}}</td>
                                     <td>{{ row.voucherDate | date:'MMM d, y' }}</td>
                                     <td>{{ row.description }}</td>
                                     <td class="text-end">{{ row.amount | number:'1.2-2' }}</td>

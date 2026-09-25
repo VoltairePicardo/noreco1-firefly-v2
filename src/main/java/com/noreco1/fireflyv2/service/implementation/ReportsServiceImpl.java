@@ -426,7 +426,8 @@ public class ReportsServiceImpl implements ReportsService, Bir1601E {
                 break;
         }
 
-        params.put("OFFICE", "");
+        String officeName = officeRepo.findAll().stream().findFirst().map(o -> o.getName()).orElse("");
+        params.put("OFFICE", officeName);
 
         return params;
     }
@@ -445,7 +446,8 @@ public class ReportsServiceImpl implements ReportsService, Bir1601E {
                 break;
         }
 
-        params.put("OFFICE", "");
+        String officeName = officeRepo.findAll().stream().findFirst().map(o -> o.getName()).orElse("");
+        params.put("OFFICE", officeName);
 
         return params;
     }
@@ -2754,9 +2756,6 @@ public class ReportsServiceImpl implements ReportsService, Bir1601E {
     @Override
     public List<Map> dataForAccountsPayableAging(String cutOffDate) {
         List<Map> data = new ArrayList<>();
-        DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-        long s = Long.parseLong(cutOffDate);
-        cutOffDate = formatter.format(new java.sql.Date(s));
         try {
             List<Object[]> payables = accountsPayableVoucherRepo.findForAging(cutOffDate);
 

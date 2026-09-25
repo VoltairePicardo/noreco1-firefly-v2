@@ -46,7 +46,7 @@
 	</background>
 	<title>
 		<band height="94" splitType="Stretch">
-			<image isLazy="true" onErrorType="Icon">
+			<image scaleImage="RetainShape" hAlign="Left">
 				<reportElement uuid="a572ebb6-75d3-4cc5-adf8-83c0b47be5b6" x="64" y="14" width="60" height="52"/>
 				<imageExpression><![CDATA[$P{LOGO_PATH}]]></imageExpression>
 			</image>

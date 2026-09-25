@@ -301,20 +301,28 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService, Printable
     @Override
     public List<Map> findByDateRangeAndStatusId(String from, String to, Integer id) {
         try {
-            java.util.Date fromDate = DateHelper.strToDate(from, "yyyy-MM-dd");
-            java.util.Date toDate = DateHelper.strToDate(to, "yyyy-MM-dd");
-
-            if (fromDate == null) {
-                fromDate = new java.util.Date(0);
+            List<Object[]> rows;
+            if (id == DisplayStatus.ALL.getId()) {
+                rows = purchaseOrderRepo.findForSummaryByDateRange(from, to);
+            } else if (id == DisplayStatus.PENDING.getId()) {
+                rows = purchaseOrderRepo.findForSummaryByDateRangeAndStatusPending(from, to, com.noreco1.fireflyv2.model.enums.DocumentStatus.APPROVED.getId());
+            } else {
+                rows = purchaseOrderRepo.findForSummaryByDateRangeAndStatus(from, to, id);
             }
 
-            if (toDate == null) {
-                toDate = new java.util.Date();
+            List<Map> mapList = new ArrayList<>();
+            for (Object[] row : rows) {
+                Map map = new HashMap();
+                map.put("id", row[0]);
+                map.put("localCode", row[1]);
+                map.put("voucherDate", row[2]);
+                map.put("supplier", row[3]);
+                map.put("amount", row[5]);
+                map.put("status", row[7]);
+                mapList.add(map);
             }
-
-            List<PurchaseOrder> docs = purchaseOrderRepo.findByDocumentStatusIdAndVoucherDateBetween(id, fromDate, toDate);
-            return this.makePOListMap(docs);
-        }catch (Exception ex) {
+            return mapList;
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
         return null;

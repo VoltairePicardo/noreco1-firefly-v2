@@ -221,27 +221,27 @@ export class AccountingReportsService {
     }
 
     getPoSummary(from: string, to: string, statusId: number): Observable<any[]> {
-        return this.http.get<any[]>(`${BASE_API}/api/purchase-order/list/${from}/${to}/${statusId}`);
+        return this.http.get<any[]>(`${BASE_API}/purchase-order/list/${from}/${to}/${statusId}`);
     }
 
     getJoSummary(from: string, to: string, statusId: number): Observable<any[]> {
-        return this.http.get<any[]>(`${BASE_API}/api/job-order/list/${from}/${to}/${statusId}`);
+        return this.http.get<any[]>(`${BASE_API}/job-order/list/${from}/${to}/${statusId}`);
     }
 
     getJoaSummary(from: string, to: string, statusId: number): Observable<any[]> {
-        return this.http.get<any[]>(`${BASE_API}/api/jo-acceptance/list/${from}/${to}/${statusId}`);
+        return this.http.get<any[]>(`${BASE_API}/jo-acceptance/list/${from}/${to}/${statusId}`);
     }
 
     getCanvassSummary(from: string, to: string, statusId: number): Observable<any[]> {
-        return this.http.get<any[]>(`${BASE_API}/api/canvass/list/${from}/${to}/${statusId}`);
+        return this.http.get<any[]>(`${BASE_API}/canvass/list/${from}/${to}/${statusId}`);
     }
 
     getPrSummary(from: string, to: string, statusId: number): Observable<any[]> {
-        return this.http.get<any[]>(`${BASE_API}/api/payment-request/list/${from}/${to}/${statusId}`);
+        return this.http.get<any[]>(`${BASE_API}/payment-request/list/${from}/${to}/${statusId}`);
     }
 
     getRvSummary(from: string, to: string, statusId: number): Observable<any[]> {
-        return this.http.get<any[]>(`${BASE_API}/api/purchase-request/list/${from}/${to}/${statusId}`);
+        return this.http.get<any[]>(`${BASE_API}/purchase-request/list/${from}/${to}/${statusId}`);
     }
 
     getPcfLedger(from: string, to: string, docStatId: number, pcfId: number): Observable<any[]> {

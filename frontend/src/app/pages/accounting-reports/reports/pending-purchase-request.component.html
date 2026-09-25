@@ -40,7 +40,7 @@
                 </div>
             </div>
             <div class="table-responsive mt-3">
-                <table class="table table-custom table-centered table-select table-hover w-100 mb-0">
+                <table class="table table-custom table-centered table-hover w-100 mb-0 small">
                     <thead class="bg-light align-middle bg-opacity-25 thead-sm">
                         <tr class="text-uppercase fs-xxs">
                             <th>Code</th>
@@ -59,7 +59,7 @@
                         } @else {
                             @for (row of rows(); track $index) {
                                 <tr>
-                                    <td>{{ row.code }}</td>
+                                    <td>@if (row.id) {<a [routerLink]="['/', 'purchase-request', row.id, 'detail']" target="_blank" class="text-primary fw-semibold">{{ row.code }}</a>} @else {{{ row.code }}}</td>
                                     <td>{{ row.voucherDate | date:'MMM dd, yyyy' }}</td>
                                     <td>{{ row.purpose }}</td>
                                     <td>{{ row.requestedBy }}</td>

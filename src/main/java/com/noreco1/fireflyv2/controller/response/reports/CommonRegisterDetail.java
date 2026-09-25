@@ -8,6 +8,7 @@ import java.util.Date;
  */
 public class CommonRegisterDetail {
 
+    private Integer id;
     private String reference;
     private Date voucherDate;
     private String code;
@@ -24,6 +25,14 @@ public class CommonRegisterDetail {
     private String reportType;
 
     public CommonRegisterDetail() {}
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
     public String getReference() {
         return reference;

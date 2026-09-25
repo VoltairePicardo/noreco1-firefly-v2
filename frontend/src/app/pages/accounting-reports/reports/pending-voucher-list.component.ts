@@ -62,6 +62,25 @@ export class PendingVoucherListComponent {
         });
     }
 
+    private readonly docTypeRouteMap: Record<string, string> = {
+        'APV':    'accounts-payable-voucher',
+        'Canvass':'canvass',
+        'CRV':    'cash-receipts',
+        'CV':     'disbursement',
+        'JOA':   'jo-acceptance',
+        'JO':    'job-order',
+        'JV':    'general-journal',
+        'MIR':   'material-issuance',
+        'PO':    'purchase-order',
+        'RV':    'requisition-voucher',
+        'SV':    'energy-sales',
+    };
+
+    getDetailRoute(row: any): any[] {
+        const module = this.docTypeRouteMap[this.selectedDocType.desc];
+        return module ? ['/', module, row.id, 'detail'] : [];
+    }
+
     export(type: 'pdf' | 'xls'): void {
         const dt     = this.selectedDocType;
         const status = this.documentStatuses().find(s => s.id === this.selectedStatusId);

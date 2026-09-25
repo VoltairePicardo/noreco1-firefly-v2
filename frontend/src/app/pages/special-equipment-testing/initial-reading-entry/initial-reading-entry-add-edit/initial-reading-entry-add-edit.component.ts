@@ -36,7 +36,7 @@ export class InitialReadingEntryAddEditComponent implements OnDestroy {
 
     flatpickrOptions = { dateFormat: 'Y-m-d', altInput: true, altFormat: 'F j, Y' };
 
-    private readonly serialNo$ = new Subject<string>();
+    readonly serialNo$ = new Subject<string>();
     private readonly destroy$  = new Subject<void>();
 
     @ViewChild('serialNoInput') serialNoInput!: ElementRef<HTMLInputElement>;

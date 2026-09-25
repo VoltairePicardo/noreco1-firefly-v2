@@ -9,7 +9,7 @@ import { environment } from '@/environments/environment';
 export class DownloadService {
 
   token: string | null = null;
-  private baseUrl: string = environment.get('baseUrl') ?? '';
+  private baseUrl: string = environment.get('baseApiUrl') ?? '';
 
   constructor(private tokenStorageService: TokenStorageService) {
     this.token = this.tokenStorageService.getToken() ?? ''

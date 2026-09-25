@@ -1,31 +1,51 @@
-<div class="auth-box overflow-hidden align-items-center d-flex">
+<div class="auth-wrapper d-flex align-items-center justify-content-center min-vh-100">
     <div class="container">
         <div class="row justify-content-center">
-            <div class="col-xxl-4 col-md-6 col-sm-8">
-                <div class="auth-brand text-center mb-3">
-                    <a routerLink="/" class="logo-dark">
-                        <img src="assets/images/logo-black.png" alt="dark logo" height="32">
-                    </a>
-                    <a routerLink="/" class="logo-light">
-                        <img src="assets/images/logo.png" alt="logo" height="32">
-                    </a>
+            <div class="col-xxl-4 col-xl-5 col-lg-5 col-md-7 col-sm-9">
+
+                <div class="card shadow-sm border-0 rounded-4 p-2">
+                    <div class="card-body p-4 text-center">
+
+                        <!-- Brand -->
+                        <div class="mb-2">
+                            <img ngSrc="noreco1_logo.png" alt="NORECO1 Logo" width="64" height="64" class="mb-2">
+                            <div class="text-muted small">{{ appNameExtended }}</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <img ngSrc="firefly.png" alt="Firefly" width="100" height="48">
+                        </div>
+
+                        <hr class="my-3">
+
+                        <!-- Search icon -->
+                        <div class="mb-3">
+                            <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-primary bg-opacity-10 mb-3"
+                                 style="width:72px;height:72px;">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" fill="none"
+                                     viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"
+                                     style="color:var(--bs-primary)">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                          d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607ZM10.5 7.5v6m3-3h-6"/>
+                                </svg>
+                            </div>
+                            <div class="fw-bold" style="font-size:4rem;line-height:1;color:var(--bs-primary)">404</div>
+                        </div>
+
+                        <h5 class="fw-bold mb-1">Page Not Found</h5>
+                        <p class="text-muted small mb-4">
+                            The page you're looking for doesn't exist or has been moved.<br>
+                            Check the URL or navigate back.
+                        </p>
+
+
+                    </div>
                 </div>
 
-                <div class="p-2 text-center">
-                    <img src="assets/images/svg/404.svg" alt="404" class="img-fluid">
-                    <h3 class="fw-bold text-uppercase">Page Not Found</h3>
-                    <p class="text-muted">The page you’re looking for doesn’t exist or has been moved.</p>
-
-                    <a routerLink="/" class="btn btn-primary mt-3 rounded-pill" >Go
-                        Home</a>
-
-                </div>
-
-                <p class="text-center text-muted mt-5 mb-0">
-                    © 2014 -
-                   {{currentYear}} INSPINIA — by <span
-                        class="fw-bold">{{credits.name}}</span>
+                <p class="text-center text-muted small mt-4 mb-0">
+                    &copy; {{ startYear }} {{ appName }} &mdash; by <span class="fw-semibold">{{ credits.name }}</span>
                 </p>
+
             </div>
         </div>
     </div>

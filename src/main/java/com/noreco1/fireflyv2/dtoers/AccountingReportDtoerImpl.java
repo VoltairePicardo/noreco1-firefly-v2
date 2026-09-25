@@ -1672,6 +1672,7 @@ public class AccountingReportDtoerImpl implements AccountingReportDtoer {
                 }
 
                 CommonRegisterDetail jvDetail = new CommonRegisterDetail();
+                jvDetail.setId(cvId);
                 jvDetail.setReference(reference);
                 jvDetail.setVoucherDate(voucherDate);
                 jvDetail.setPayee(payee);
@@ -1838,9 +1839,9 @@ public class AccountingReportDtoerImpl implements AccountingReportDtoer {
                 code = String.valueOf(row[1]);
                 voucherDate = (Date) row[2];
                 supplier = String.valueOf(row[3]);
-                term = Integer.parseInt(row[4].toString());
-                amount = new BigDecimal(row[5].toString());
-                noOfItems = Integer.parseInt(row[6].toString());
+                term = row[4] != null ? Integer.parseInt(row[4].toString()) : 0;
+                amount = row[5] != null ? new BigDecimal(row[5].toString()) : BigDecimal.ZERO;
+                noOfItems = row[6] != null ? Integer.parseInt(row[6].toString()) : 0;
                 status = String.valueOf(row[7]);
                 detail.setReference(code);
                 detail.setVoucherDate(voucherDate);
@@ -1854,9 +1855,9 @@ public class AccountingReportDtoerImpl implements AccountingReportDtoer {
                 particulars = String.valueOf(row[2]);
                 voucherDate = (Date) row[3];
                 supplier = String.valueOf(row[4]);
-                term = Integer.parseInt(row[5].toString());
-                amount = new BigDecimal(row[6].toString());
-                noOfItems = Integer.parseInt(row[7].toString());
+                term = row[5] != null ? Integer.parseInt(row[5].toString()) : 0;
+                amount = row[6] != null ? new BigDecimal(row[6].toString()) : BigDecimal.ZERO;
+                noOfItems = row[7] != null ? Integer.parseInt(row[7].toString()) : 0;
                 status = String.valueOf(row[8]);
                 detail.setReference(code);
                 detail.setVoucherDate(voucherDate);
@@ -1870,9 +1871,9 @@ public class AccountingReportDtoerImpl implements AccountingReportDtoer {
                 code = String.valueOf(row[1]);
                 voucherDate = (Date) row[2];
                 supplier = String.valueOf(row[3]);
-                amount = new BigDecimal(row[4].toString());
-                adjustment = new BigDecimal(row[5].toString());
-                netAmount = new BigDecimal(row[6].toString());
+                amount = row[4] != null ? new BigDecimal(row[4].toString()) : BigDecimal.ZERO;
+                adjustment = row[5] != null ? new BigDecimal(row[5].toString()) : BigDecimal.ZERO;
+                netAmount = row[6] != null ? new BigDecimal(row[6].toString()) : BigDecimal.ZERO;
                 status = String.valueOf(row[7]);
                 detail.setReference(code);
                 detail.setVoucherDate(voucherDate);
@@ -1886,7 +1887,7 @@ public class AccountingReportDtoerImpl implements AccountingReportDtoer {
                 particulars = String.valueOf(row[2]);
                 voucherDate = (Date) row[3];
                 Date requiredDate = (Date) row[4];
-                noOfItems = Integer.parseInt(row[5].toString());
+                noOfItems = row[5] != null ? Integer.parseInt(row[5].toString()) : 0;
                 requestedBy = String.valueOf(row[6]);
                 status = String.valueOf(row[7]);
                 detail.setReference(code);
@@ -1900,7 +1901,7 @@ public class AccountingReportDtoerImpl implements AccountingReportDtoer {
                 code = String.valueOf(row[1]);
                 particulars = String.valueOf(row[2]);
                 voucherDate = (Date) row[3];
-                noOfItems = Integer.parseInt(row[4].toString());
+                noOfItems = row[4] != null ? Integer.parseInt(row[4].toString()) : 0;
                 requestedBy = String.valueOf(row[5]);
                 status = String.valueOf(row[6]);
                 detail.setReference(code);
@@ -1913,9 +1914,9 @@ public class AccountingReportDtoerImpl implements AccountingReportDtoer {
                 code = String.valueOf(row[1]);
                 voucherDate = (Date) row[2];
                 supplier = String.valueOf(row[3]);
-                amount = new BigDecimal(row[4].toString());
-                adjustment = new BigDecimal(row[5].toString());
-                netAmount = new BigDecimal(row[6].toString());
+                amount = row[4] != null ? new BigDecimal(row[4].toString()) : BigDecimal.ZERO;
+                adjustment = row[5] != null ? new BigDecimal(row[5].toString()) : BigDecimal.ZERO;
+                netAmount = row[6] != null ? new BigDecimal(row[6].toString()) : BigDecimal.ZERO;
                 status = String.valueOf(row[7]);
                 detail.setReference(code);
                 detail.setVoucherDate(voucherDate);
