@@ -8,7 +8,7 @@ import com.noreco1.fireflyv2.model.enums.DocumentStatus;
 import com.noreco1.fireflyv2.repo.*;
 import com.noreco1.fireflyv2.controller.response.WorkflowActionsDto;
 import org.apache.commons.lang3.reflect.FieldUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -19,136 +19,53 @@ import java.util.List;
  */
 
 @Component
+@RequiredArgsConstructor
 public class WorkflowDtoerImpl implements WorkflowDtoer {
 
-    @Autowired
-    DocumentWorkflowLogRepo wfRepo;
-
-    @Autowired
-    DocumentWorkflowActionMapRepo dwfMapRepo;
-
-    @Autowired
-    private AuthenticationFacade authenticationFacade;
-
-    @Autowired
-    private JournalVoucherRepo journalVoucherRepo;
-
-    @Autowired
-    private AccountsPayableVoucherRepo accountsPayableVoucherRepo;
-
-    @Autowired
-    private CheckVoucherRepo checkVoucherRepo;
-
-    @Autowired
-    private PettyCashTransRepo pettyCashTransRepo;
-
-    @Autowired
-    private PurchaseRequestRepo PurchaseRequestRepo;
-
-    @Autowired
-    private SalesVoucherRepo salesVoucherRepo;
-
-    @Autowired
-    private CashReceiptsRepo cashReceiptsRepo;
-
-    @Autowired
-    private BankDepositRepo bankDepositRepo;
-
-    @Autowired
-    private CashAdvanceRepo cashAdvanceRepo;
-
-    @Autowired
-    private CashAdvanceLiquidationRepo cashAdvanceLiquidationRepo;
-
-    @Autowired
-    private MaterialIssueRegisterRepo materialIssueRegisterRepo;
-
-    @Autowired
-    private AdjustmentJournalRepo adjustmentJournalRepo;
-
-    @Autowired
-    private PurchaseOrderRepo purchaseOrderRepo;
-
-    @Autowired
-    private JobOrderRepo jobOrderRepo;
-
-    @Autowired
-    private JoAcceptanceRepo joAcceptanceRepo;
-
-    @Autowired
-    private PaymentRequestRepo paymentRequestRepo;
-
-    @Autowired
-    private ReceivingReportRepo receivingReportRepo;
-
-    @Autowired
-    private StockWithdrawalRepo withdrawalRepo;
-
-    @Autowired
-    private CanvassRepo canvassRepo;
-
-    @Autowired
-    private WorkflowRepo workflowRepo;
-
-    @Autowired
-    private StockReleaseRepo stockReleaseRepo;
-
-    @Autowired
-    private StockReceiveRepo stockReceiveRepo;
-
-    @Autowired
-    private MaterialCreditTicketRepo materialCreditTicketRepo;
-
-    @Autowired
-    private StockAdjustmentRepo stockAdjustmentRepo;
-
-    @Autowired
-    private MaterialSalvageTicketRepo materialSalvageTicketRepo;
-
-    @Autowired
-    private StockTransferRepo stockTransferRepo;
-
-    @Autowired
-    private BudgetRepo budgetRepo;
-
-    @Autowired
-    QuotationRepo quotationRepo;
-
-    @Autowired
-    SiteInspectionReportRepo siteInspectionReportRepo;
-
-    @Autowired
-    CostEstimateRepo costEstimateRepo;
-
-    @Autowired
-    BillOfMaterialRepo billOfMaterialRepo;
-
-    @Autowired
-    ProjectRepo projectRepo;
-
-    @Autowired
-    private ProjectAcceptanceReportRepo projectAcceptanceReportRepo;
-
-    @Autowired
-    ProjectAcceptanceCertificationRepo projectAcceptanceCertificationRepo;
-
-    @Autowired
-    private ItemsForRepairRepo itemsForRepairRepo;
-
-    @Autowired
-    private BudgetLineItemRepo budgetLineItemRepo;
-
-    @Autowired
-    private PettyCashLiquidationRepo pettyCashLiquidationRepo;
-
-    @Autowired
-    private MemorandumReceiptRepo memorandumReceiptRepo;
-
-    @Autowired
-    private ReturnMemorandumReceiptRepo returnMemorandumReceiptRepo;
-
-    @Autowired
-    private CreditCardPurchaseRequestRepo creditCardPurchaseRequestRepo;
+    private final DocumentWorkflowLogRepo wfRepo;
+    private final DocumentWorkflowActionMapRepo dwfMapRepo;
+    private final AuthenticationFacade authenticationFacade;
+    private final JournalVoucherRepo journalVoucherRepo;
+    private final AccountsPayableVoucherRepo accountsPayableVoucherRepo;
+    private final CheckVoucherRepo checkVoucherRepo;
+    private final PettyCashTransRepo pettyCashTransRepo;
+    private final PurchaseRequestRepo PurchaseRequestRepo;
+    private final SalesVoucherRepo salesVoucherRepo;
+    private final CashReceiptsRepo cashReceiptsRepo;
+    private final BankDepositRepo bankDepositRepo;
+    private final CashAdvanceRepo cashAdvanceRepo;
+    private final CashAdvanceLiquidationRepo cashAdvanceLiquidationRepo;
+    private final MaterialIssueRegisterRepo materialIssueRegisterRepo;
+    private final AdjustmentJournalRepo adjustmentJournalRepo;
+    private final PurchaseOrderRepo purchaseOrderRepo;
+    private final JobOrderRepo jobOrderRepo;
+    private final JoAcceptanceRepo joAcceptanceRepo;
+    private final PaymentRequestRepo paymentRequestRepo;
+    private final ReceivingReportRepo receivingReportRepo;
+    private final StockWithdrawalRepo withdrawalRepo;
+    private final CanvassRepo canvassRepo;
+    private final WorkflowRepo workflowRepo;
+    private final StockReleaseRepo stockReleaseRepo;
+    private final StockReceiveRepo stockReceiveRepo;
+    private final MaterialCreditTicketRepo materialCreditTicketRepo;
+    private final StockAdjustmentRepo stockAdjustmentRepo;
+    private final MaterialSalvageTicketRepo materialSalvageTicketRepo;
+    private final StockTransferRepo stockTransferRepo;
+    private final BudgetRepo budgetRepo;
+    private final QuotationRepo quotationRepo;
+    private final SiteInspectionReportRepo siteInspectionReportRepo;
+    private final CostEstimateRepo costEstimateRepo;
+    private final BillOfMaterialRepo billOfMaterialRepo;
+    private final ProjectRepo projectRepo;
+    private final ProjectAcceptanceReportRepo projectAcceptanceReportRepo;
+    private final ProjectAcceptanceCertificationRepo projectAcceptanceCertificationRepo;
+    private final ItemsForRepairRepo itemsForRepairRepo;
+    private final BudgetLineItemRepo budgetLineItemRepo;
+    private final PettyCashLiquidationRepo pettyCashLiquidationRepo;
+    private final MemorandumReceiptRepo memorandumReceiptRepo;
+    private final ReturnMemorandumReceiptRepo returnMemorandumReceiptRepo;
+    private final CreditCardPurchaseRequestRepo creditCardPurchaseRequestRepo;
+    private final TransformerTestingRepo transformerTestingRepo;
 
     @Override
     public List<WorkflowActionsDto> getWorkflowActionsDtoByWfId(Integer transId) {
@@ -156,9 +73,9 @@ public class WorkflowDtoerImpl implements WorkflowDtoer {
 
         List<Object[]> wfLog = wfRepo.findLatestDocumentLogByTransactionId(transId);
 
-        if (wfLog != null && wfLog.size() > 0) {
+        if (wfLog != null && !wfLog.isEmpty()) {
 
-            Object[] obj = wfLog.get(0);
+            Object[] obj = wfLog.getFirst();
 
             Integer workflowId = (Integer) obj[0];
             Integer sequence = (Integer) obj[1];
@@ -186,7 +103,7 @@ public class WorkflowDtoerImpl implements WorkflowDtoer {
                 }
             }
 
-            Boolean allowUser = false;
+            boolean allowUser = false;
 
             User currentUser = authenticationFacade.getLoggedIn();
             Workflow workflow = workflowRepo.findById(workflowId).orElse(null);
@@ -695,6 +612,18 @@ public class WorkflowDtoerImpl implements WorkflowDtoer {
                             if (returnMemorandumReceipt.getCreatedBy().getId().equals(currentUser.getId()) &&
                                     (returnMemorandumReceipt.getDocumentStatus().getId().equals(DocumentStatus.DOCUMENT_CREATED.getId()) ||
                                             returnMemorandumReceipt.getDocumentStatus().getId().equals(DocumentStatus.RETURNED_TO_CREATOR.getId()))) {
+                                allowUser = true;
+                            }
+                        }
+
+                        break;
+                    case TRANSFORMER_TESTING:
+                        voucher = transformerTestingRepo.findByTransactionId(transId);
+                        if (voucher != null) {
+                            TransformerTesting transformerTesting = (TransformerTesting) voucher;
+                            if (transformerTesting.getCreatedBy().getId().equals(currentUser.getId()) &&
+                                    (transformerTesting.getDocumentStatus().getId().equals(DocumentStatus.DOCUMENT_CREATED.getId()) ||
+                                            transformerTesting.getDocumentStatus().getId().equals(DocumentStatus.RETURNED_TO_CREATOR.getId()))) {
                                 allowUser = true;
                             }
                         }

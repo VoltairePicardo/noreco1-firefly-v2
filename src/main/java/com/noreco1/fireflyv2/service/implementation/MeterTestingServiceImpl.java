@@ -45,9 +45,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -104,14 +106,29 @@ public class MeterTestingServiceImpl implements MeterTestingService {
             meterModelRepo.findById(meterTesting.getMeterModel().getId())
                     .orElseThrow(() -> new BusinessException("Meter Model with id: "+meterTesting.getMeterModel().getId()+" not found."));
 
+            List<String> serialNos = details.stream()
+                    .map(MeterTestingDetail::getMeterSerialNo)
+                    .collect(Collectors.toList());
+            Set<String> existingSerialNos = meterRepo.findBySerialNoIn(serialNos).stream()
+                    .map(Meter::getSerialNo)
+                    .collect(Collectors.toSet());
+
             List<MeterTestingDetail> detailList = new ArrayList<>();
             List<Meter> meterList = new ArrayList<>();
+            List<Map<String, Object>> duplicates = new ArrayList<>();
 
             for (MeterTestingDetail detail : details) {
                 detail.setId(null);
                 detail.setMeterTesting(saved);
 
                 detailList.add(detail);
+
+                if (existingSerialNos.contains(detail.getMeterSerialNo())) {
+                    Map<String, Object> duplicate = new HashMap<>();
+                    duplicate.put("meterSerialNo", detail.getMeterSerialNo());
+                    duplicates.add(duplicate);
+                    continue;
+                }
 
                 Meter meter = new Meter();
                 meter.setSerialNo(detail.getMeterSerialNo());
@@ -130,7 +147,14 @@ public class MeterTestingServiceImpl implements MeterTestingService {
             syncMetersToMssql(savedMeters);
 
             response.setModelId(saved.getId());
-            response.setSuccessMessage("Meter Testing successfully saved.");
+            response.setDuplicates(duplicates);
+
+            if (duplicates.isEmpty()) {
+                response.setSuccessMessage("Meter Testing successfully saved.");
+            } else {
+                response.setSuccessMessage("Meter Testing successfully saved. " + duplicates.size()
+                        + " meter(s) already exist and were not re-created.");
+            }
 
         } catch(BusinessException e) {
             throw new BusinessException(e.getMessage(), e);

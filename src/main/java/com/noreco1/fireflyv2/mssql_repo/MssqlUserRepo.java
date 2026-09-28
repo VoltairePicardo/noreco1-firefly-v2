@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface MssqlUserRepo extends JpaRepository<User, Integer> {
     List<User> findAllByAccountNumberIn(List<Integer> accountNumbers);
+
+    User findByAccountNumber(Integer accountNumber);
 }

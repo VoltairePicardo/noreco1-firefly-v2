@@ -1,0 +1,359 @@
+<div class="container-fluid">
+    <app-page-title [title]="module" [subTitle]="subModule" [menuLink]="menuLink"/>
+
+    <form (ngSubmit)="save()" #f="ngForm">
+        <div class="card">
+            <div class="card-header border-light d-flex align-items-center justify-content-between">
+                <h4 class="card-title mb-0">Transformer Information</h4>
+            </div>
+
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    @if (transformerId()) {
+                        <span class="fs-xs text-uppercase fw-semibold text-muted">
+                            Linked to existing transformer <span class="text-body">{{ serialNo() }}</span>
+                        </span>
+                    } @else {
+                        <span class="fs-xs text-uppercase fw-semibold text-muted">New transformer</span>
+                    }
+                    <div class="d-flex gap-2">
+                        @if (transformerId()) {
+                            <button type="button" class="btn btn-light fw-bold" (click)="clearSelectedTransformer()">
+                                <ng-icon name="tablerX" class="ps-0 pe-2 fw-bold fs-lg"></ng-icon>Clear
+                            </button>
+                        }
+                        <button type="button" class="btn btn-primary fw-bold gap-1" (click)="openTransformerBrowse()">
+                            <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold fs-lg fs-lg"></ng-icon>Browse Existing Transformer
+                        </button>
+                    </div>
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold">Serial No.</label>
+                        <input type="text" class="form-control" placeholder="e.g. TX-00123"
+                               [ngModel]="serialNo()" (ngModelChange)="serialNo.set($event)" name="serialNo"/>
+                        @if (submit() && !serialNo().trim()) {
+                            <div class="text-danger small mt-1">Serial No. is required.</div>
+                        }
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold">Brand</label>
+                        <select class="form-select" [ngModel]="brandId()" (ngModelChange)="brandId.set($event)" name="brandId">
+                            <option [ngValue]="null">— Select Brand —</option>
+                            @for (brand of brands(); track brand.id) {
+                                <option [ngValue]="brand.id">{{ brand.name }}</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold">KVA</label>
+                        <input type="number" step="0.01" class="form-control"
+                               [ngModel]="kva()" (ngModelChange)="kva.set($event)" name="kva"/>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold">Impedance(%)</label>
+                        <input type="number" step="0.0001" class="form-control" placeholder="e.g. 5.75"
+                               [ngModel]="impedance()" (ngModelChange)="impedance.set($event)" name="impedance"/>
+                    </div>
+                </div>
+
+                <div class="row g-3 mt-1">
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold">Owner</label>
+                        <input type="text" class="form-control"
+                               [ngModel]="transformerOwner()" (ngModelChange)="transformerOwner.set($event)" name="transformerOwner"/>
+                    </div>
+                    <div class="col-md-8">
+                        <label class="form-label fw-bold">Owner Address</label>
+                        <input type="text" class="form-control"
+                               [ngModel]="ownerAddress()" (ngModelChange)="ownerAddress.set($event)" name="ownerAddress"/>
+                    </div>
+                </div>
+
+                <div class="row g-3 mt-1">
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold">Primary Voltage</label>
+                        <select class="form-select" [ngModel]="primaryVoltageId()" (ngModelChange)="primaryVoltageId.set($event)" name="primaryVoltageId">
+                            <option [ngValue]="null">— Select —</option>
+                            @for (voltage of primaryVoltages(); track voltage.id) {
+                                <option [ngValue]="voltage.id">{{ voltage.description }}</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold">Secondary Voltage</label>
+                        <select class="form-select" [ngModel]="secondaryVoltageId()" (ngModelChange)="secondaryVoltageId.set($event)" name="secondaryVoltageId">
+                            <option [ngValue]="null">— Select —</option>
+                            @for (voltage of secondaryVoltages(); track voltage.id) {
+                                <option [ngValue]="voltage.id">{{ voltage.description }}</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label fw-bold">Polarity</label>
+                        <select class="form-select" [ngModel]="polarity()" (ngModelChange)="polarity.set($event)" name="polarity">
+                            <option [ngValue]="null">— Select —</option>
+                            <option value="ADDITIVE">Additive</option>
+                            <option value="SUBTRACTIVE">Subtractive</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label fw-bold">Core Type</label>
+                        <select class="form-select" [ngModel]="coreType()" (ngModelChange)="coreType.set($event)" name="coreType">
+                            <option [ngValue]="null">— Select —</option>
+                            <option value="AMORPHOUS">Amorphous</option>
+                            <option value="SILICON">Silicon</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label fw-bold">Bushing</label>
+                        <select class="form-select" [ngModel]="bushing()" (ngModelChange)="bushing.set($event)" name="bushing">
+                            <option [ngValue]="null">— Select —</option>
+                            <option value="SINGLE">Single</option>
+                            <option value="DOUBLE">Double</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row g-3 mt-1">
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold">Type</label>
+                        <select class="form-select" [ngModel]="type()" (ngModelChange)="type.set($event)" name="type">
+                            <option [ngValue]="null">— Select —</option>
+                            <option value="DISTRIBUTION">Distribution</option>
+                            <option value="SOLE_USE">Sole Use</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <hr class="border-dashed mx-n3 mt-0"/>
+
+            <div class="card-header border-0 d-flex align-items-center justify-content-between">
+                <h4 class="card-title mb-0">Testing Information</h4>
+            </div>
+
+            <div class="card-body pt-0">
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold">Date Tested</label>
+                        <input type="text" mwlFlatpickr [options]="dateFlatpickrOptions"
+                               class="form-control" placeholder="Select date"
+                               [ngModel]="dateTested()" (ngModelChange)="dateTested.set($event)" name="dateTested"/>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold">Time Tested</label>
+                        <input type="text" mwlFlatpickr [options]="timeFlatpickrOptions"
+                               class="form-control" placeholder="Select time"
+                               [ngModel]="timeTested()" (ngModelChange)="timeTested.set($event)" name="timeTested"/>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold">Weather</label>
+                        <input type="text" class="form-control"
+                               [ngModel]="weather()" (ngModelChange)="weather.set($event)" name="weather"/>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold">Transformer Condition</label>
+                        <select class="form-select" [ngModel]="transformerConditionId()" (ngModelChange)="transformerConditionId.set($event)" name="transformerConditionId">
+                            <option [ngValue]="null">— Select —</option>
+                            @for (condition of transformerConditions(); track condition.id) {
+                                <option [ngValue]="condition.id">{{ condition.description }}</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row g-3 mt-1">
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Remarks</label>
+                        <textarea class="form-control" rows="2"
+                                  [ngModel]="remarks()" (ngModelChange)="remarks.set($event)" name="remarks"></textarea>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Recommendation</label>
+                        <textarea class="form-control" rows="2"
+                                  [ngModel]="recommendation()" (ngModelChange)="recommendation.set($event)" name="recommendation"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <hr class="border-dashed mx-n3 mt-0"/>
+
+            <div class="card-header border-0 d-flex align-items-center justify-content-between">
+                <h4 class="card-title mb-0">Voltage Ratio Test</h4>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-custom table-centered w-100 mb-0">
+                    <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                        <tr class="text-uppercase fs-xxs">
+                            <th>Primary Voltage Induce</th>
+                            <th>Tap 1</th>
+                            <th>Tap 2</th>
+                            <th>Tap 3</th>
+                            <th>Tap 4</th>
+                            <th>Tap 5</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (row of voltageRatioTests(); track $index) {
+                            <tr>
+                                <td><input type="number" step="0.01" class="form-control form-control-sm"
+                                           [value]="row.primaryVoltageInduce"
+                                           (input)="updateVoltageRatioField($index, 'primaryVoltageInduce', $any($event.target).value)"/></td>
+                                <td><input type="number" step="0.01" class="form-control form-control-sm"
+                                           [value]="row.tap1"
+                                           (input)="updateVoltageRatioField($index, 'tap1', $any($event.target).value)"/></td>
+                                <td><input type="number" step="0.01" class="form-control form-control-sm"
+                                           [value]="row.tap2"
+                                           (input)="updateVoltageRatioField($index, 'tap2', $any($event.target).value)"/></td>
+                                <td><input type="number" step="0.01" class="form-control form-control-sm"
+                                           [value]="row.tap3"
+                                           (input)="updateVoltageRatioField($index, 'tap3', $any($event.target).value)"/></td>
+                                <td><input type="number" step="0.01" class="form-control form-control-sm"
+                                           [value]="row.tap4"
+                                           (input)="updateVoltageRatioField($index, 'tap4', $any($event.target).value)"/></td>
+                                <td><input type="number" step="0.01" class="form-control form-control-sm"
+                                           [value]="row.tap5"
+                                           (input)="updateVoltageRatioField($index, 'tap5', $any($event.target).value)"/></td>
+                                <td>
+                                    @if (voltageRatioTests().length > 1) {
+                                        <button type="button" class="btn btn-light btn-icon btn-sm rounded-circle"
+                                                (click)="removeVoltageRatioRow($index)">
+                                            <ng-icon name="tablerTrash" class="fs-lg text-danger"></ng-icon>
+                                        </button>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <hr class="border-dashed mx-n3 mt-0"/>
+
+            <div class="card-header border-0 d-flex align-items-center justify-content-between">
+                <h4 class="card-title mb-0">Transformer Loss Test</h4>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-custom table-centered w-100 mb-0">
+                    <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                        <tr class="text-uppercase fs-xxs">
+                            <th>SC Primary Current</th>
+                            <th>SC Result</th>
+                            <th>OC Secondary Voltage</th>
+                            <th>OC Result</th>
+                            <th>Total Loss</th>
+                            <th>I<sub>ex</sub></th>
+                            <th>I<sub>z</sub></th>
+                            <th>I<sub>r</sub></th>
+                            <th>I<sub>x</sub></th>
+                            <th>Eff.</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (row of lossTests(); track $index) {
+                            <tr>
+                                <td><input type="number" step="0.01" class="form-control form-control-sm"
+                                           [value]="row.shortCircuitPrimaryCurrent"
+                                           (input)="updateLossTestField($index, 'shortCircuitPrimaryCurrent', $any($event.target).value)"/></td>
+                                <td><input type="number" step="0.01" class="form-control form-control-sm"
+                                           [value]="row.shortCircuitResult"
+                                           (input)="updateLossTestField($index, 'shortCircuitResult', $any($event.target).value)"/></td>
+                                <td><input type="number" step="0.01" class="form-control form-control-sm"
+                                           [value]="row.openCircuitSecondaryVoltage"
+                                           (input)="updateLossTestField($index, 'openCircuitSecondaryVoltage', $any($event.target).value)"/></td>
+                                <td><input type="number" step="0.01" class="form-control form-control-sm"
+                                           [value]="row.openCircuitResult"
+                                           (input)="updateLossTestField($index, 'openCircuitResult', $any($event.target).value)"/></td>
+                                <td><input type="number" step="0.01" class="form-control form-control-sm" readonly
+                                           [value]="row.totalLoss"/></td>
+                                <td><input type="number" step="0.01" class="form-control form-control-sm"
+                                           [value]="row.iex"
+                                           (input)="updateLossTestField($index, 'iex', $any($event.target).value)"/></td>
+                                <td><input type="number" step="0.01" class="form-control form-control-sm"
+                                           [value]="row.iz"
+                                           (input)="updateLossTestField($index, 'iz', $any($event.target).value)"/></td>
+                                <td><input type="number" step="0.01" class="form-control form-control-sm"
+                                           [value]="row.ir"
+                                           (input)="updateLossTestField($index, 'ir', $any($event.target).value)"/></td>
+                                <td><input type="number" step="0.01" class="form-control form-control-sm"
+                                           [value]="row.ix"
+                                           (input)="updateLossTestField($index, 'ix', $any($event.target).value)"/></td>
+                                <td><input type="number" step="0.01" class="form-control form-control-sm"
+                                           [value]="row.eff"
+                                           (input)="updateLossTestField($index, 'eff', $any($event.target).value)"/></td>
+                                <td>
+                                    @if (lossTests().length > 1) {
+                                        <button type="button" class="btn btn-light btn-icon btn-sm rounded-circle"
+                                                (click)="removeLossTestRow($index)">
+                                            <ng-icon name="tablerTrash" class="fs-lg text-danger"></ng-icon>
+                                        </button>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <hr class="border-dashed mx-n3 mt-0"/>
+
+            <div class="card-header border-0 d-flex align-items-center justify-content-between">
+                <h4 class="card-title mb-0">Signatories</h4>
+            </div>
+
+            <div class="card-body pt-0">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold">Tested By</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" [value]="testedByName()" readonly
+                                   placeholder="Browse a user"/>
+                            <button type="button" class="btn btn-primary fw-bold" (click)="openUserBrowse('testedBy')">
+                                <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold fs-lg"></ng-icon>Browse
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold">Recommending Approval</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" [value]="recommendingApprovalUserName()" readonly
+                                   placeholder="Browse a user"/>
+                            <button type="button" class="btn btn-primary fw-bold" (click)="openUserBrowse('recommendingApprovalUser')">
+                                <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold fs-lg"></ng-icon>Browse
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold">Approved By</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" [value]="approvedByName()" readonly
+                                   placeholder="Browse a user"/>
+                            <button type="button" class="btn btn-primary fw-bold" (click)="openUserBrowse('approvedBy')">
+                                <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold fs-lg"></ng-icon>Browse
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <hr class="border-dashed mx-n3 mb-0"/>
+            <div class="card-footer border-0 mt-0">
+                <div class="d-flex gap-2 justify-content-end align-items-center">
+                    <a [routerLink]="['/' + menuLink]" class="btn btn-light fw-bold">
+                        <ng-icon name="tablerArrowLeft" class="ps-0 pe-3 fw-bold"></ng-icon>Back
+                    </a>
+                    <button type="submit" class="btn btn-primary fw-bold" [disabled]="isLoading()">
+                        <ng-icon name="tablerCheck" class="ps-0 pe-3 fw-bold"></ng-icon>
+                        Save Transformer Testing
+                    </button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>

@@ -49,6 +49,7 @@ public enum DocumentType {
     SRC(36, "SRC", "Stock Receive", "INVENTORY", true),
     MRTE(509, "MRTE", "Memorandum Receipt", "INVENTORY", true),
     RMRTE(510, "RMRTE", "Return Memorandum Receipt", "INVENTORY", true),
+    TRANSFORMER_TESTING(501, "TRANSFORMER_TESTING", "Transformer Testing", "SPECIAL EQUIPMENT TESTING", true),
     SRL_OFE_OSSP(37, "SRL_OFE_OSSP", "Stock Release OFE & OSSP", "INVENTORY", true),
     IFR(46, "IFR", "Items For Repair", "INVENTORY", true),
     SITE_INSPECTION_REPORT(39, "SITE_INSPECTION_REPORT", "Site Inspection Report", "WORK ORDER", true),

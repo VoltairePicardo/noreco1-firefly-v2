@@ -167,6 +167,18 @@ public class AnyJsonController {
     @Autowired
     private MeterFormRepo meterFormRepo;
 
+    @Autowired
+    private TransformerRepo transformerRepo;
+
+    @Autowired
+    private PrimaryVoltageRepo primaryVoltageRepo;
+
+    @Autowired
+    private SecondaryVoltageRepo secondaryVoltageRepo;
+
+    @Autowired
+    private TransformerConditionRepo transformerConditionRepo;
+
     @GetMapping(value = "/brands")
 
     public List<Brand> getBrands() {
@@ -201,6 +213,30 @@ public class AnyJsonController {
 
     public List<MeterForm> getMeterForms() {
         return meterFormRepo.findByOrderByNameAsc();
+    }
+
+    @GetMapping(value = "/transformers/search")
+    public org.springframework.data.domain.Page<Transformer> searchTransformers(
+            @RequestParam(required = false, defaultValue = "") String q,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        PageRequest pageRequest = PageRequest.of(page, size);
+        return transformerRepo.findAllBySerialNoContainingIgnoreCase(q, pageRequest);
+    }
+
+    @GetMapping(value = "/primary-voltages")
+    public List<PrimaryVoltage> getPrimaryVoltages() {
+        return primaryVoltageRepo.findByOrderByDescriptionAsc();
+    }
+
+    @GetMapping(value = "/secondary-voltages")
+    public List<SecondaryVoltage> getSecondaryVoltages() {
+        return secondaryVoltageRepo.findByOrderByDescriptionAsc();
+    }
+
+    @GetMapping(value = "/transformer-conditions")
+    public List<TransformerCondition> getTransformerConditions() {
+        return transformerConditionRepo.findByOrderByDescriptionAsc();
     }
 
     @GetMapping(value = "/entities")
@@ -332,6 +368,13 @@ public class AnyJsonController {
         }
         return result;
     }
+
+    @GetMapping(value = "/v2/document-logs/{transId}")
+    @ResponseBody
+    public List<DocumentLog> getLogs(@PathVariable Integer transId) {
+        return documentLogRepo.findAllByTransactionIdOrderByCreatedAtDesc(transId);
+    }
+
 
     @GetMapping(value = "/setting/{code}")
     

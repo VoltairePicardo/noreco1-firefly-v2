@@ -1,0 +1,26 @@
+package com.noreco1.fireflyv2.model;
+
+import jakarta.persistence.*;
+import lombok.*;
+
+import java.util.Date;
+
+@Entity
+@Getter
+@Setter
+@RequiredArgsConstructor
+@AllArgsConstructor
+public class PrimaryVoltage {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column
+    private Integer id;
+
+    @Column
+    private String description;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(nullable = false)
+    private Date createdAt;
+}

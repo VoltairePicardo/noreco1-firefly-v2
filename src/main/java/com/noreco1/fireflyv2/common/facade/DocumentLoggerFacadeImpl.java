@@ -70,6 +70,12 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
     @Autowired
     BudgetLineItemDetailLogRepo budgetLineItemDetailLogRepo;
 
+    @Autowired
+    TransformerVoltageRatioTestRepo transformerVoltageRatioTestRepo;
+
+    @Autowired
+    TransformerLossTestRepo transformerLossTestRepo;
+
     @Override
     public DocumentLog log(Transaction transaction, User user, Map oldMap, Map newMap) {
         DocumentLog documentLog = null;
@@ -1859,6 +1865,52 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
 
             String jobOrderCode = creditCardPurchaseRequest.getJobOrder() != null ? (creditCardPurchaseRequest.getJobOrder().getCode() + ":" + (creditCardPurchaseRequest.getJobOrder().getVendor() != null ? creditCardPurchaseRequest.getJobOrder().getVendor().getName() : "")) : "";
             map.put("jobOrderCode", jobOrderCode);
+
+        } catch (Exception ex) {
+            Logger.getLogger(DocumentLoggerFacadeImpl.class.getName()).log(Level.SEVERE, null, ex);
+            throw new RuntimeException(ex);
+        }
+
+        return map;
+
+    }
+
+    @Override
+    public Map<String, Object> makeLog(TransformerTesting transformerTesting) {
+        Map<String, Object> map = new HashMap<>();
+
+        try {
+
+            Transformer transformer = transformerTesting.getTransformer();
+
+            map.put("id", transformerTesting.getId());
+            map.put("dateTested", transformerTesting.getDateTested());
+            map.put("timeTested", transformerTesting.getTimeTested() != null ? transformerTesting.getTimeTested().toString() : null);
+            map.put("owner", transformerTesting.getOwner());
+            map.put("ownerAddress", transformerTesting.getOwnerAddress());
+            map.put("weather", transformerTesting.getWeather());
+            map.put("remarks", transformerTesting.getRemarks());
+            map.put("recommendation", transformerTesting.getRecommendation());
+            map.put("transformerCondition", transformerTesting.getTransformerCondition() != null ? transformerTesting.getTransformerCondition().getDescription() : "");
+
+            map.put("transformerSerialNo", transformer != null ? transformer.getSerialNo() : "");
+            map.put("transformerBrand", transformer != null && transformer.getBrand() != null ? transformer.getBrand().getName() : "");
+            map.put("transformerKva", transformer != null ? transformer.getKva() : null);
+            map.put("transformerPrimaryVoltage", transformer != null && transformer.getPrimaryVoltage() != null ? transformer.getPrimaryVoltage().getDescription() : "");
+            map.put("transformerSecondaryVoltage", transformer != null && transformer.getSecondaryVoltage() != null ? transformer.getSecondaryVoltage().getDescription() : "");
+            map.put("transformerImpedance", transformer != null ? transformer.getImpedance().multiply(BigDecimal.valueOf(100)) : null);
+            map.put("transformerPolarity", transformer != null && transformer.getPolarity() != null ? transformer.getPolarity().name() : "");
+            map.put("transformerCoreType", transformer != null && transformer.getCoreType() != null ? transformer.getCoreType().name() : "");
+            map.put("transformerBushing", transformer != null && transformer.getBushing() != null ? transformer.getBushing().name() : "");
+            map.put("transformerType", transformer != null && transformer.getType() != null ? transformer.getType().name() : "");
+
+            map.put("testedBy", transformerTesting.getTestedBy() != null ? transformerTesting.getTestedBy().getFullName() : "");
+            map.put("recommendingApprovalUser", transformerTesting.getRecommendingApprovalUser() != null ? transformerTesting.getRecommendingApprovalUser().getFullName() : "");
+            map.put("approvedBy", transformerTesting.getApprovedBy() != null ? transformerTesting.getApprovedBy().getFullName() : "");
+            map.put("createdBy", transformerTesting.getCreatedBy() != null ? transformerTesting.getCreatedBy().getFullName() : "");
+            map.put("documentStatus", transformerTesting.getDocumentStatus() != null ? transformerTesting.getDocumentStatus().getStatus() : "");
+            map.put("createdAt", transformerTesting.getCreatedAt());
+            map.put("updatedAt", transformerTesting.getUpdatedAt());
 
         } catch (Exception ex) {
             Logger.getLogger(DocumentLoggerFacadeImpl.class.getName()).log(Level.SEVERE, null, ex);

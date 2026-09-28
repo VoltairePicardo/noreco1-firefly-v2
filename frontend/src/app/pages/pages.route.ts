@@ -448,6 +448,11 @@ export const PAGES_ROUTES: Routes = [
         data: { title: 'Meter Models' },
     },
     {
+        path: 'transformer-testing',
+        loadChildren: () => import('./special-equipment-testing/transformer/transformer-testing.route').then(m => m.TRANSFORMER_TESTING_ROUTES),
+        data: { title: 'Transformer Testing' },
+    },
+    {
         path: 'ifr',
         loadChildren: () => import('./ifr/ifr.route').then(m => m.IFR_ROUTES),
         data: { title: 'Items For Repair' },

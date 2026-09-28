@@ -1,0 +1,24 @@
+<div class="modal-header">
+    <h4 class="modal-title">{{ actionLabel }}</h4>
+    <button type="button" class="btn-close" (click)="activeModal.dismiss()" aria-label="Close"></button>
+</div>
+
+<div class="modal-body">
+    <p class="mb-3">Are you sure you want to <strong>{{ actionLabel | lowercase }}</strong> this document?</p>
+
+    <div class="mb-0">
+        <label for="workflow-action-remarks" class="form-label">Remarks (optional)</label>
+        <textarea
+            id="workflow-action-remarks"
+            class="form-control"
+            rows="5"
+            [formControl]="remarks"
+            placeholder="Add a remark for this action..."
+            ngbAutofocus></textarea>
+    </div>
+</div>
+
+<div class="modal-footer">
+    <button type="button" class="btn btn-light" (click)="activeModal.dismiss()">Cancel</button>
+    <button type="button" class="btn" [class.btn-danger]="isDenyAction" [class.btn-primary]="!isDenyAction" (click)="confirm()">{{ actionLabel }}</button>
+</div>

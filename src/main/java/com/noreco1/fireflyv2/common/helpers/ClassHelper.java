@@ -1,35 +1,29 @@
 package com.noreco1.fireflyv2.common.helpers;
 
-import com.noreco1.fireflyv2.common.GlobalConstant;
 import com.noreco1.fireflyv2.model.User;
+import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.Field;
 
+@Slf4j
 public class ClassHelper {
 
     public static void setSignatoryValue(Object documentObj, String classFullPath, String property, User signer) {
         try {
             Class<?> docClazz = Class.forName(classFullPath);
-            Object instance = docClazz.newInstance();
+            do {
+                try {
+                    Field field = docClazz.getDeclaredField(property); // e.g. FK_checkedByUserId
+                    field.setAccessible(true);
+                    field.set(documentObj, signer);
 
-            Class<?> newDocClazz = instance.getClass();
-            if (newDocClazz != null) {
-                do {
-                    try {
-                        Field field = newDocClazz.getDeclaredField(property); // e.g. FK_checkedByUserId
-                        field.setAccessible(true);
-                        field.set(documentObj, signer);
-
-                    } catch(NoSuchFieldException e) {}
-                }while((newDocClazz = newDocClazz.getSuperclass()) != null);  // to facilitate inheritance
-            }
+                } catch(NoSuchFieldException e) {}
+            } while((docClazz = docClazz.getSuperclass()) != null);  // to facilitate inheritance
 
         } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        } catch (InstantiationException e) {
-            e.printStackTrace();
+            log.error("ClassHelper.setSignatoryValue: class not found - {}", classFullPath, e);
         } catch (IllegalAccessException e) {
-            e.printStackTrace();
+            log.error("ClassHelper.setSignatoryValue: failed to set property '{}' on {}", property, classFullPath, e);
         }
     }
 }

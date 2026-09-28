@@ -52,6 +52,7 @@ public interface DocumentLoggerFacade {
     Map makeLog(ReturnMemorandumReceipt returnMemorandumReceipt);
     Map makeLog(ReleasedCheque releasedCheque);
     Map makeLog(CreditCardPurchaseRequest creditCardPurchaseRequest);
+    Map<String, Object> makeLog(TransformerTesting transformerTesting);
 
     SpecialEquipmentAssignmentLog log(SpecialEquipmentAssignment specialEquipmentAssignment, User user);
     void budgetLineItemDetailLog(BudgetLineItemDetail budgetLineItemDetail, User user);

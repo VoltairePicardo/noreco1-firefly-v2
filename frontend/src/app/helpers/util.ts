@@ -164,6 +164,10 @@ export class HelperService {
         return Math.round(value * 100) / 100;
     }
 
+    public static toPercentForm(value: number | null | undefined): number {
+        return value ? value * 100 : 0;
+    }
+
     public static roundMoney4Decimals(value: number): number {
         return Math.round(value * 10000) / 10000;
     }

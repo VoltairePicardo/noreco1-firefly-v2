@@ -12,10 +12,11 @@ export interface DocumentLogUser {
 
 export interface DocumentLog {
     id: number;
+    transaction: { id: number };
+    oldValue: string | null;
+    newValue: string | null;
+    loggedBy: DocumentLogUser;
     createdAt: string;
-    createdBy: DocumentLogUser;
-    action: string;
-    remarks: string;
 }
 
 
@@ -24,7 +25,7 @@ export class AnyJSONService {
     private http = inject(HttpClient);
 
     getLogs(transactionId: number): Observable<DocumentLog[]> {
-        return this.http.get<DocumentLog[]>(`${BASE_API}/json/document-logs/${transactionId}`);
+        return this.http.get<DocumentLog[]>(`${BASE_API}/json/v2/document-logs/${transactionId}`);
     }
 
     getWorkflowActions(transactionId: number): Observable<any[]> {
