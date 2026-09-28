@@ -79,6 +79,12 @@ public class MeterTesting {
     @JoinColumn(name = "FK_meterCalibratorId")
     private User meterCalibrator;
 
+    @Column
+    private String owner;
+
+    @Column
+    private String ownerAddress;
+
     @Transient
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     @NotFound(action = NotFoundAction.IGNORE)

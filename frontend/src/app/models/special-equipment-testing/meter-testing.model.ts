@@ -75,6 +75,8 @@ export interface MeterTestingData {
     relativeHumidity: string | null;
     createdBy: { fullName: string | null } | null;
     createdAt: string | null;
+    owner: string | null;
+    ownerAddress: string | null;
     details: MeterTestingDetailRow[];
     optionDetails: MeterTestingOptionDetailRow[];
 }

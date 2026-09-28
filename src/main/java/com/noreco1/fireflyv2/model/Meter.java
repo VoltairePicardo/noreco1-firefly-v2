@@ -59,4 +59,10 @@ public class Meter {
     @JoinColumn(name = "FK_meterStatusId")
     private MeterStatus meterStatus;
 
+    @Column
+    private String owner;
+
+    @Column
+    private String ownerAddress;
+
 }

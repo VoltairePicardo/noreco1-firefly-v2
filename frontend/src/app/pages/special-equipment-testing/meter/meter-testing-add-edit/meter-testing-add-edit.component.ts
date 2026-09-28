@@ -68,6 +68,12 @@ export class MeterTestingAddEditComponent implements OnInit {
     modelName = signal('');
     accuracyClassDescription = signal('');
     presentReading = signal<number | null>(null);
+
+    isPrivateMeter = signal(false);
+    ownerName = signal('');
+    ownerAddress = signal('');
+    multiplier = signal<number | null>(null);
+    meterModels = signal<any[]>([]);
     meterCalibratorAccountNo = signal<number | null>(null);
     meterCalibratorName = signal('');
     actualDateOfTesting = signal(new Date().toISOString().substring(0, 10));
@@ -96,6 +102,41 @@ export class MeterTestingAddEditComponent implements OnInit {
         this.meterTestingService.listOptions().subscribe(options => {
             this.optionGroups.set(this.groupOptions(options));
         });
+
+        this.meterTestingService.listMeterModels().subscribe(models => {
+            this.meterModels.set(models);
+        });
+    }
+
+    togglePrivateMeter(checked: boolean): void {
+        this.isPrivateMeter.set(checked);
+
+        if (checked) {
+            this.accountNo.set(null);
+            this.accountName.set('');
+            this.oldAccountNo.set('');
+            this.address.set('');
+            this.meterId.set(null);
+            this.meterSerialNo.set('');
+            this.meterModelId.set(null);
+            this.modelName.set('');
+            this.accuracyClassDescription.set('');
+            this.presentReading.set(null);
+        } else {
+            this.ownerName.set('');
+            this.ownerAddress.set('');
+            this.multiplier.set(null);
+            this.meterSerialNo.set('');
+            this.meterModelId.set(null);
+            this.presentReading.set(null);
+        }
+    }
+
+    onSelectMeterModel(id: number | null): void {
+        this.meterModelId.set(id);
+        const model = this.meterModels().find(m => m.id === id);
+        this.modelName.set(model?.modelName ?? '');
+        this.accuracyClassDescription.set(model?.accuracyClassDescription ?? '');
     }
 
     isOthersOption(option: MeterTestingOption): boolean {
@@ -194,8 +235,12 @@ export class MeterTestingAddEditComponent implements OnInit {
 
         if (!this.meterSerialNo().trim()) { return; }
 
+        if (this.isPrivateMeter() && !this.ownerName().trim()) { return; }
+
         if (!this.meterModelId()) {
-            this.alertService.warning(this.module, 'Meter Model', 'The selected meter has no meter model on record — please browse and select again.');
+            this.alertService.warning(this.module, 'Meter Model', this.isPrivateMeter()
+                ? 'Please select a meter model.'
+                : 'The selected meter has no meter model on record — please browse and select again.');
             return;
         }
 
@@ -203,8 +248,11 @@ export class MeterTestingAddEditComponent implements OnInit {
             date: this.actualDateOfTesting() || null,
             meterModel: { id: this.meterModelId() },
             meter: this.meterId() ? { id: this.meterId() } : null,
-            accountNo: this.accountNo(),
+            accountNo: this.isPrivateMeter() ? null : this.accountNo(),
             presentReading: this.presentReading(),
+            multiplier: this.isPrivateMeter() ? this.multiplier() : null,
+            owner: this.isPrivateMeter() ? this.ownerName().trim() : null,
+            ownerAddress: this.isPrivateMeter() ? this.ownerAddress().trim() : null,
             meterCalibrator: this.meterCalibratorAccountNo() ? { accountNo: this.meterCalibratorAccountNo() } : null,
             details: [{
                 meterSerialNo: this.meterSerialNo(),

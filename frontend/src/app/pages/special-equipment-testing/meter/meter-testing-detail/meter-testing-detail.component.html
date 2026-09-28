@@ -24,6 +24,12 @@
                             <dd class="col-sm-7 fw-bold">{{ data()?.testedBy || '—' }}</dd>
                             <dt class="col-sm-5 fw-normal">Multiplier</dt>
                             <dd class="col-sm-7 fw-bold">{{ data()?.multiplier ?? '—' }}</dd>
+                            @if (data()?.owner) {
+                                <dt class="col-sm-5 fw-normal">Owner</dt>
+                                <dd class="col-sm-7 fw-bold">{{ data()?.owner }}</dd>
+                                <dt class="col-sm-5 fw-normal">Owner Address</dt>
+                                <dd class="col-sm-7 fw-bold">{{ data()?.ownerAddress || '—' }}</dd>
+                            }
                         </dl>
                     </div>
                     <div class="col-sm-6">

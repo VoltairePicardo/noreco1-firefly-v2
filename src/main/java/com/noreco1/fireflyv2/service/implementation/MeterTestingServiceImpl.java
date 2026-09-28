@@ -195,8 +195,11 @@ public class MeterTestingServiceImpl implements MeterTestingService {
                     .orElseThrow(() -> new BusinessException("Meter Model with id: " + meterTesting.getMeterModel().getId() + " not found."));
 
             if (meterTesting.getMeter() != null && meterTesting.getMeter().getId() != null) {
-                meterRepo.findById(meterTesting.getMeter().getId())
+                Meter existingMeter = meterRepo.findById(meterTesting.getMeter().getId())
                         .orElseThrow(() -> new BusinessException("Meter with id: " + meterTesting.getMeter().getId() + " not found."));
+                meterTesting.setMeter(existingMeter);
+            } else if (isPrivatelyOwned(meterTesting)) {
+                meterTesting.setMeter(savePrivateMeter(meterTesting));
             } else {
                 meterTesting.setMeter(null);
             }
@@ -231,6 +234,39 @@ public class MeterTestingServiceImpl implements MeterTestingService {
         }
 
         return response;
+    }
+
+    private boolean isPrivatelyOwned(MeterTesting meterTesting) {
+        return meterTesting.getOwner() != null && !meterTesting.getOwner().isBlank();
+    }
+
+    private Meter savePrivateMeter(MeterTesting meterTesting) {
+        String serialNo = Checker.collectionIsEmpty(meterTesting.getDetails())
+                ? null
+                : meterTesting.getDetails().getFirst().getMeterSerialNo();
+
+        if (serialNo == null || serialNo.isBlank()) {
+            throw new BusinessException("Meter serial number is required for a privately-owned meter.");
+        }
+
+        Meter meter = meterRepo.findFirstBySerialNoOrderByIdDesc(serialNo).orElse(null);
+
+        if (meter == null) {
+            meter = new Meter();
+            meter.setSerialNo(serialNo);
+            meter.setCreatedBy(authenticationFacade.getLoggedIn());
+            meter.setCreatedAt(new Date());
+        }
+
+        meter.setMeterModel(meterTesting.getMeterModel());
+        meter.setMultiplier(meterTesting.getMultiplier());
+        meter.setPresentReading(meterTesting.getPresentReading());
+        meter.setReadingDate(meterTesting.getDate());
+        meter.setOwner(meterTesting.getOwner());
+        meter.setOwnerAddress(meterTesting.getOwnerAddress());
+        meter.setUpdatedAt(new Date());
+
+        return meterRepo.save(meter);
     }
 
     @Transactional(isolation = Isolation.READ_UNCOMMITTED)
