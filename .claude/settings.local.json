@@ -136,7 +136,11 @@
       "Bash(xargs -n1 basename)",
       "Bash(npx ngc *)",
       "Bash(wc -l /tmp_ngc_out.txt)",
-      "Bash(ng build:*)"
+      "Bash(ng build:*)",
+      "Bash(./mvnw.cmd -q compile -DskipTests)",
+      "PowerShell(echo $env:JAVA_HOME; where.exe java; Get-Content \"C:\\\\Users\\\\buena\\\\Documents\\\\Github\\\\noreco1-firefly-v2\\\\.mvn\\\\wrapper\\\\maven-wrapper.properties\" -ErrorAction SilentlyContinue)",
+      "PowerShell(\\(Get-Command java\\).Source; Get-ChildItem \"C:\\\\Program Files\\\\Java\" -ErrorAction SilentlyContinue | Select-Object Name; Get-ChildItem \"C:\\\\Program Files\\\\Eclipse Adoptium\" -ErrorAction SilentlyContinue | Select-Object Name)",
+      "PowerShell(cd \"C:\\\\Users\\\\buena\\\\Documents\\\\Github\\\\noreco1-firefly-v2\"; $env:JAVA_HOME = \"C:\\\\Program Files\\\\Java\\\\jdk-21\"; .\\\\mvnw.cmd -q compile -DskipTests 2>&1 | Select-Object -Last 150)"
     ]
   }
 }

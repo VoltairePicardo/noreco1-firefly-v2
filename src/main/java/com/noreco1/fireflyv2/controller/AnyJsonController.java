@@ -179,6 +179,9 @@ public class AnyJsonController {
     @Autowired
     private TransformerConditionRepo transformerConditionRepo;
 
+    @Autowired
+    private SpecialEquipmentRepo specialEquipmentRepo;
+
     @GetMapping(value = "/brands")
 
     public List<Brand> getBrands() {
@@ -237,6 +240,15 @@ public class AnyJsonController {
     @GetMapping(value = "/transformer-conditions")
     public List<TransformerCondition> getTransformerConditions() {
         return transformerConditionRepo.findByOrderByDescriptionAsc();
+    }
+
+    @GetMapping(value = "/special-equipment/search")
+    public org.springframework.data.domain.Page<SpecialEquipment> searchSpecialEquipment(
+            @RequestParam(required = false, defaultValue = "") String q,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        PageRequest pageRequest = PageRequest.of(page, size);
+        return specialEquipmentRepo.findAllBySerialNoContainingIgnoreCase(q, pageRequest);
     }
 
     @GetMapping(value = "/entities")

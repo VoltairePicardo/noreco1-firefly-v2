@@ -143,36 +143,7 @@
     </div>
     @if (showLogs) {
         <div class="card-body">
-            @if (logsLoading()) {
-                <div class="text-center py-3">
-                    <span class="spinner-border spinner-border-sm me-2"></span>Loading...
-                </div>
-            } @else if (logs().length === 0) {
-                <p class="text-muted mb-0">No logs found.</p>
-            } @else {
-                <div class="table-responsive">
-                    <table class="table table-sm w-100 mb-0">
-                        <thead>
-                            <tr class="text-uppercase fs-xxs text-muted">
-                                <th>Date</th>
-                                <th>Action</th>
-                                <th>By</th>
-                                <th>Remarks</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @for (log of logs(); track log.id) {
-                                <tr>
-                                    <td class="text-nowrap">{{ log.createdAt | date:'MM/dd/yyyy hh:mm a' }}</td>
-                                    <td>{{ log.action }}</td>
-                                    <td>{{ log.createdBy.fullName }}</td>
-                                    <td>{{ log.remarks }}</td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                </div>
-            }
+            <app-document-logs [transactionId]="transactionId()"/>
         </div>
     }
 </div>

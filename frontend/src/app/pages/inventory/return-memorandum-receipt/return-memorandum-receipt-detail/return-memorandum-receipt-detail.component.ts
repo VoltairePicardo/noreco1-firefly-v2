@@ -9,13 +9,14 @@ import { provideIcons } from '@ng-icons/core';
 import { tablerPrinter, tablerEdit, tablerArrowLeft } from '@ng-icons/tabler-icons';
 import { ReturnMemorandumReceiptDto } from '@/app/models/inventory-modules/memorandum-receipt.model';
 import { WorkflowAction } from '@/app/models/workflow-action.model';
-import { AnyJSONService, DocumentLog } from '@/app/shared/services/any-json.service';
+import { AnyJSONService } from '@/app/shared/services/any-json.service';
+import { DocumentLogsComponent } from '@/app/shared/components/document-logs/document-logs.component';
 
 const TERMINAL_STATUSES = ['Approved', 'Denied', 'Cancelled'];
 
 @Component({
     selector: 'app-return-memorandum-receipt-detail',
-    imports: [...COMMON_ALL_PAGE_IMPORTS, SharedModule, FormsModule, RouterLink],
+    imports: [...COMMON_ALL_PAGE_IMPORTS, SharedModule, FormsModule, RouterLink, DocumentLogsComponent],
     templateUrl: './return-memorandum-receipt-detail.component.html',
     providers: [provideIcons({ tablerPrinter, tablerEdit, tablerArrowLeft })],
     changeDetection: ChangeDetectionStrategy.OnPush
@@ -34,9 +35,7 @@ export class ReturnMemorandumReceiptDetailComponent implements OnInit {
     remarks            = '';
     processingWorkflow = signal(false);
 
-    logs        = signal<DocumentLog[]>([]);
-    showLogs    = false;
-    logsLoading = signal(false);
+    showLogs = false;
 
     private service       = inject(ReturnMemorandumReceiptService);
     private route          = inject(ActivatedRoute);
@@ -44,7 +43,7 @@ export class ReturnMemorandumReceiptDetailComponent implements OnInit {
     private alertService   = inject(AlertService);
     private anyJSONService = inject(AnyJSONService);
 
-    private transactionId = computed<number | undefined>(() => this.data()?.transaction?.id);
+    transactionId = computed<number | undefined>(() => this.data()?.transaction?.id);
 
     ngOnInit(): void {
         this.route.paramMap.subscribe(params => {
@@ -114,14 +113,6 @@ export class ReturnMemorandumReceiptDetailComponent implements OnInit {
 
     toggleLogs(): void {
         this.showLogs = !this.showLogs;
-        const transactionId = this.transactionId();
-        if (this.showLogs && this.logs().length === 0 && transactionId != null) {
-            this.logsLoading.set(true);
-            this.anyJSONService.getLogs(transactionId).subscribe({
-                next: (l) => { this.logs.set(l || []); this.logsLoading.set(false); },
-                error: () => { this.logsLoading.set(false); }
-            });
-        }
     }
 
     print(): void { if (this.data().id != null) this.service.print(this.data().id!); }

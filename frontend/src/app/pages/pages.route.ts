@@ -466,6 +466,11 @@ export const PAGES_ROUTES: Routes = [
         data: { title: 'Transformer Testing' },
     },
     {
+        path: 'other-special-equipment-testing',
+        loadChildren: () => import('./special-equipment-testing/other-special-equipment/other-special-equipment-testing.route').then(m => m.OTHER_SPECIAL_EQUIPMENT_TESTING_ROUTES),
+        data: { title: 'Other Special Equipment Testing' },
+    },
+    {
         path: 'initial-reading-entry',
         loadChildren: () => import('./special-equipment-testing/initial-reading-entry/initial-reading-entry.route').then(m => m.INITIAL_READING_ENTRY_ROUTES),
         data: { title: 'Initial Reading Entry' },

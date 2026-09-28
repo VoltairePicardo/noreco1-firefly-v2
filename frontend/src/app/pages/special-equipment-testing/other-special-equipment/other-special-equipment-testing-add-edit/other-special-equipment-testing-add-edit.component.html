@@ -1,0 +1,142 @@
+<div class="container-fluid">
+    <app-page-title [title]="module" [subTitle]="subModule" [menuLink]="menuLink"/>
+
+    <form (ngSubmit)="save()" #f="ngForm">
+        <div class="card">
+            <div class="card-header border-light d-flex align-items-center justify-content-between">
+                <h4 class="card-title mb-0">Special Equipment</h4>
+            </div>
+
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    @if (specialEquipmentId()) {
+                        <span class="fs-xs text-uppercase fw-semibold text-muted">
+                            Selected <span class="text-body">{{ specialEquipmentSerialNo() }}</span>
+                        </span>
+                    } @else {
+                        <span class="fs-xs text-uppercase fw-semibold text-muted">No special equipment selected</span>
+                    }
+                    <div class="d-flex gap-2">
+                        @if (specialEquipmentId()) {
+                            <button type="button" class="btn btn-light fw-bold" (click)="clearSelectedSpecialEquipment()">
+                                <ng-icon name="tablerX" class="ps-0 pe-2 fw-bold fs-lg"></ng-icon>Clear
+                            </button>
+                        }
+                        <button type="button" class="btn btn-primary fw-bold gap-1" (click)="openSpecialEquipmentBrowse()">
+                            <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold fs-lg"></ng-icon>Browse Special Equipment
+                        </button>
+                    </div>
+                </div>
+
+                @if (submit() && !specialEquipmentId()) {
+                    <div class="text-danger small mb-3">Special equipment is required.</div>
+                }
+
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold">Serial No.</label>
+                        <input type="text" class="form-control" readonly [value]="specialEquipmentSerialNo()"/>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold">Type</label>
+                        <input type="text" class="form-control" readonly [value]="specialEquipmentType()"/>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold">Brand</label>
+                        <input type="text" class="form-control" readonly [value]="specialEquipmentBrand()"/>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold">Owner</label>
+                        <input type="text" class="form-control" readonly [value]="specialEquipmentOwner()"/>
+                    </div>
+                </div>
+            </div>
+
+            <hr class="border-dashed mx-n3 mt-0"/>
+
+            <div class="card-header border-0 d-flex align-items-center justify-content-between">
+                <h4 class="card-title mb-0">Testing Information</h4>
+            </div>
+
+            <div class="card-body pt-0">
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold">Date</label>
+                        <input type="text" mwlFlatpickr [options]="dateFlatpickrOptions"
+                               class="form-control" placeholder="Select date"
+                               [ngModel]="date()" (ngModelChange)="date.set($event)" name="date"/>
+                    </div>
+                    <div class="col-md-3 d-flex align-items-end">
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" id="passed"
+                                   [ngModel]="passed()" (ngModelChange)="passed.set($event)" name="passed"/>
+                            <label class="form-check-label fw-bold" for="passed">Passed</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-3 mt-1">
+                    <div class="col-md-12">
+                        <label class="form-label fw-bold">Remarks</label>
+                        <textarea class="form-control" rows="2"
+                                  [ngModel]="remarks()" (ngModelChange)="remarks.set($event)" name="remarks"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <hr class="border-dashed mx-n3 mt-0"/>
+
+            <div class="card-header border-0 d-flex align-items-center justify-content-between">
+                <h4 class="card-title mb-0">Signatories</h4>
+            </div>
+
+            <div class="card-body pt-0">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold">Verified By</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" [value]="verifiedByName()" readonly
+                                   placeholder="Browse a user"/>
+                            <button type="button" class="btn btn-primary fw-bold" (click)="openUserBrowse('verifiedBy')">
+                                <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold fs-lg"></ng-icon>Browse
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold">Checked By</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" [value]="checkedByName()" readonly
+                                   placeholder="Browse a user"/>
+                            <button type="button" class="btn btn-primary fw-bold" (click)="openUserBrowse('checkedBy')">
+                                <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold fs-lg"></ng-icon>Browse
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold">Approved By</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" [value]="approvedByName()" readonly
+                                   placeholder="Browse a user"/>
+                            <button type="button" class="btn btn-primary fw-bold" (click)="openUserBrowse('approvedBy')">
+                                <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold fs-lg"></ng-icon>Browse
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <hr class="border-dashed mx-n3 mb-0"/>
+            <div class="card-footer border-0 mt-0">
+                <div class="d-flex gap-2 justify-content-end align-items-center">
+                    <a [routerLink]="['/' + menuLink]" class="btn btn-light fw-bold">
+                        <ng-icon name="tablerArrowLeft" class="ps-0 pe-3 fw-bold"></ng-icon>Back
+                    </a>
+                    <button type="submit" class="btn btn-primary fw-bold" [disabled]="isLoading()">
+                        <ng-icon name="tablerCheck" class="ps-0 pe-3 fw-bold"></ng-icon>
+                        Save Testing Record
+                    </button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
