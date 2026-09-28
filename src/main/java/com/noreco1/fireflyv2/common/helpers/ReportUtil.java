@@ -19,7 +19,8 @@ public class ReportUtil {
         parameters.put("COMP_ADDR", "Tinaogan, Bindoy, Negros Oriental, Philippines");
         parameters.put("COMP_CONTACT", "");
         parameters.put("PURCHASING_CONTACT", "");
-        parameters.put("LOGO_PATH", request.getSession().getServletContext().getRealPath("/resources/images/main/noreco1-logo.png"));
+        java.net.URL logoUrl = ReportUtil.class.getResource("/images/NORECO1_LOGO_NO_BG.png");
+        parameters.put("LOGO_PATH", logoUrl != null ? logoUrl.toString() : "");
         java.net.URL subreportUrl = ReportUtil.class.getResource("/jasper/vouchers/sub_reports/");
         parameters.put("SUBREPORT_DIR", subreportUrl != null ? subreportUrl.toString() + "/" : "jasper/vouchers/sub_reports/");
         return parameters;

@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.21.5.final using JasperReports Library version 6.21.5-74d586df47b25dbd05bd0957999819196e59934a  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="CommonVoucherRegister" pageWidth="1008" pageHeight="612" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="968" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isFloatColumnFooter="true" uuid="1c1c9646-3cb2-4a9c-92de-1f701483f249">
 	<property name="net.sf.jasperreports.export.xls.exclude.origin.keep.first.band.1" value="columnHeader"/>
 	<property name="net.sf.jasperreports.export.xls.exclude.origin.band.1" value="pageHeader"/>
@@ -16,7 +17,7 @@
 	<property name="net.sf.jasperreports.export.xls.wrap.text" value="true"/>
 	<property name="net.sf.jasperreports.export.xls.column.width.ratio" value="1.40f"/>
 	<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
-    <property name="ireport.zoom" value="0.683013455365071"/>
+	<property name="ireport.zoom" value="0.683013455365071"/>
 	<property name="ireport.x" value="4"/>
 	<property name="ireport.y" value="0"/>
 	<parameter name="COMP_ADDR" class="java.lang.String"/>
@@ -175,54 +176,55 @@
 		<band splitType="Stretch"/>
 	</background>
 	<title>
-		<band height="103" splitType="Stretch">
-			<image isLazy="true" onErrorType="Icon">
-				<reportElement x="64" y="14" width="60" height="52" uuid="d7b7db54-ce99-476d-a548-fc57fc8c01f4"/>
-				<imageExpression><![CDATA[$P{LOGO_PATH}]]></imageExpression>
-			</image>
+		<band height="100" splitType="Stretch">
 			<textField>
-				<reportElement mode="Transparent" x="1" y="43" width="967" height="24" forecolor="#000000" backcolor="#FFFFFF" uuid="12790634-aa5a-40c5-8609-6b3d7c1a6d68"/>
-				<textElement textAlignment="Center" verticalAlignment="Top" rotation="None" markup="none">
-					<font fontName="Calibri" size="18" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				<reportElement mode="Transparent" x="0" y="36" width="968" height="24" forecolor="#000000" backcolor="#FFFFFF" uuid="c282a433-c2e7-4451-88a3-0c0fa58f70c1">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="SansSerif" size="18" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{REPORT_TITLE}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="1" y="14" width="967" height="20" uuid="29e87489-cc9a-4817-8f76-2e7d6a3a2943"/>
-				<textElement textAlignment="Center">
-					<font fontName="Arial" size="10"/>
+				<reportElement x="0" y="20" width="968" height="16" uuid="452bb23e-91e5-4763-bef8-25e255461d19"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="10"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{COMP_ADDR}]]></textFieldExpression>
 			</textField>
-			<textField pattern="MM/dd/yyyy hh:mm a">
-				<reportElement x="882" y="0" width="86" height="14" uuid="e2112709-3cbf-4bee-a3a7-d22a8a3ae95d"/>
-				<textElement>
-					<font fontName="Arial" size="9"/>
-				</textElement>
-				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
-			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="1" y="0" width="967" height="20" uuid="5051ab7a-7d74-4ddb-81d4-216903df8ae6"/>
-				<textElement textAlignment="Center">
-					<font fontName="Arial" size="12" isBold="true"/>
+				<reportElement x="0" y="0" width="968" height="20" uuid="c595136c-a8ef-4060-a763-0bb943db4827">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="14" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{COMP_NAME}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="11" y="66" width="957" height="14" uuid="385eb32b-6f94-46c5-b1c2-75e3431aec0a"/>
-				<textElement textAlignment="Center">
-					<font fontName="Arial" size="10"/>
+				<reportElement x="0" y="60" width="968" height="20" uuid="46bf3326-72b7-47db-88ce-748c79d2c76f">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="12"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{RANGE}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="1" y="82" width="967" height="19" uuid="4761aec2-7955-41bf-afe6-bbdf05bc5832"/>
+				<reportElement x="0" y="80" width="968" height="20" uuid="371d88c0-4e8c-4c09-94df-407ec1fa5802"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="12" isBold="true"/>
+					<font fontName="SansSerif" size="12" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{OFFICE}]]></textFieldExpression>
 			</textField>
+			<image scaleImage="RetainShape" hAlign="Left">
+				<reportElement x="0" y="0" width="100" height="100" uuid="60751df5-17ed-4018-b148-89242748e2e7">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<imageExpression><![CDATA[$P{LOGO_PATH}]]></imageExpression>
+			</image>
 		</band>
 	</title>
 	<columnHeader>
@@ -230,21 +232,21 @@
 	</columnHeader>
 	<detail>
 		<band height="13" splitType="Stretch">
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement x="0" y="0" width="120" height="13" uuid="d7b813cc-c4e3-4fd3-966a-d69675801135"/>
 				<textElement>
 					<font fontName="Arial"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{reference}]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement x="217" y="0" width="197" height="13" uuid="d5d0f901-c8a2-4253-bad1-2fa431a59de9"/>
 				<textElement>
 					<font fontName="Arial"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{explanation}]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement x="414" y="0" width="100" height="13" uuid="c0ff5029-f9e4-4157-af9e-4489bec9c6a3"/>
 				<box leftPadding="5"/>
 				<textElement>
@@ -252,28 +254,28 @@
 				</textElement>
 				<textFieldExpression><![CDATA[$F{code}]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" pattern="#,##0.00;(#,##0.00)" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" pattern="#,##0.00;(#,##0.00)" isBlankWhenNull="true">
 				<reportElement x="857" y="0" width="111" height="13" uuid="64883b95-a285-49bf-99b8-1bf1175cd3ce"/>
 				<textElement textAlignment="Right">
 					<font fontName="Arial"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{sCredit}]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" pattern="#,##0.00;(#,##0.00)" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" pattern="#,##0.00;(#,##0.00)" isBlankWhenNull="true">
 				<reportElement x="745" y="0" width="112" height="13" uuid="7f353033-d7b7-4840-9cc9-291720e58efd"/>
 				<textElement textAlignment="Right">
 					<font fontName="Arial"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{sDebit}]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement x="514" y="0" width="231" height="13" uuid="44080b04-7b7c-4396-964a-875c523296f3"/>
 				<textElement>
 					<font fontName="Arial"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{title}]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement x="120" y="0" width="97" height="13" uuid="83b8e093-331f-43f3-bb8e-26a4159c6d96"/>
 				<textElement>
 					<font fontName="Arial"/>
@@ -290,27 +292,42 @@
 		</band>
 	</columnFooter>
 	<pageFooter>
-		<band height="50">
+		<band height="13">
 			<textField>
-				<reportElement x="1" y="0" width="495" height="20" uuid="63ec2068-8420-4169-b238-1092d6103e5f"/>
-				<textElement textAlignment="Right">
-					<font size="9"/>
+				<reportElement x="0" y="1" width="50" height="12" uuid="ff9c026c-2612-40f9-ac60-354cdbbee642">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Left">
+					<font fontName="SansSerif" size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of "]]></textFieldExpression>
 			</textField>
 			<textField evaluationTime="Report">
-				<reportElement x="501" y="0" width="467" height="20" uuid="23f5ee5d-cf78-4856-ac6c-f61ea25f17fb"/>
+				<reportElement x="50" y="1" width="41" height="12" uuid="e751be52-89f7-4ba2-8f19-c9fef1268685">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<box leftPadding="3"/>
 				<textElement>
-					<font size="9"/>
+					<font fontName="SansSerif" size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField pattern="MM/dd/yyyy hh:mm a">
+				<reportElement x="754" y="1" width="214" height="12" uuid="59dea161-8228-4a17-b4ac-22a3bc4fa9bd">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
 			</textField>
 		</band>
 	</pageFooter>
 	<summary>
-		<band height="34">
+		<band height="40">
 			<subreport>
-				<reportElement positionType="Float" x="0" y="0" width="411" height="29" isRemoveLineWhenBlank="true" uuid="f1328440-1b12-4215-9fe9-78eb348b920f"/>
+				<reportElement positionType="Float" x="0" y="0" width="480" height="40" isRemoveLineWhenBlank="true" uuid="f1328440-1b12-4215-9fe9-78eb348b920f"/>
 				<subreportParameter name="SUBREPORT_DIR">
 					<subreportParameterExpression><![CDATA[$P{SUBREPORT_DIR}]]></subreportParameterExpression>
 				</subreportParameter>

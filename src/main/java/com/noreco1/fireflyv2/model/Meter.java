@@ -8,6 +8,7 @@ import lombok.Setter;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 @Entity
@@ -45,5 +46,17 @@ public class Meter {
     @Temporal(TemporalType.TIMESTAMP)
     @Column(nullable = false)
     private Date updatedAt;
+
+    @Column
+    private BigDecimal presentReading;
+
+    @Temporal(TemporalType.DATE)
+    @Column
+    private java.util.Date readingDate;
+
+    @NotFound(action = NotFoundAction.IGNORE)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "FK_meterStatusId")
+    private MeterStatus meterStatus;
 
 }

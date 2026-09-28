@@ -1,56 +1,51 @@
-<div class="auth-box d-flex align-items-center">
-    <div class="container-xxl">
-        <div class="row align-items-center justify-content-center">
-            <div class="col-xl-10">
-                <div class="card rounded-3 p-0 rounded-4">
-                    <div class="card-body p-0">
-                        <div class="row justify-content-between g-0">
-                            <div class="col-lg-6">
-                                <div class="card mb-0 border-0 rounded-4">
-                                    <div class="card-body">
-                                        <div class="auth-brand text-center mb-3">
-                                            <a routerLink="/" class="logo-dark">
-                                                <img src="assets/images/logo-black.png" alt="dark logo" height="32">
-                                            </a>
-                                            <a routerLink="/" class="logo-light">
-                                                <img src="assets/images/logo.png" alt="logo" height="32">
-                                            </a>
-                                        </div>
+<div class="auth-wrapper d-flex align-items-center justify-content-center min-vh-100">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-xxl-4 col-xl-5 col-lg-5 col-md-7 col-sm-9">
 
-                                        <div class="p-2 text-center">
-                                            <div class="error-wave-container justify-content-center gap-1">
-                                                <span class="error-wave-char">4</span>
-                                                <span class="error-wave-char">0</span>
-                                                <span class="error-wave-char">1</span>
-                                            </div>
+                <div class="card shadow-sm border-0 rounded-4 p-2">
+                    <div class="card-body p-4 text-center">
 
-                                            <h3 class="fw-bold">Unauthorized Access</h3>
-                                            <p class="text-muted"> You don't have permission to view this page.</p>
-
-                                            <a routerLink="/" class="btn btn-primary mt-3 rounded-pill">Back to
-                                                Safety</a>
-                                        </div>
-
-                                        <p class="text-center text-muted mt-5 mb-0">
-                                            © 2014 -
-                                            {{currentYear}} INSPINIA — by
-                                            <span class="fw-bold">{{credits.name}}</span>
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-lg-6 d-none d-lg-block">
-                                <div
-                                    class="h-100 position-relative card-side-img rounded-end-4 rounded-end rounded-0 overflow-hidden">
-                                    <div
-                                        class="p-4 card-img-overlay rounded-4 rounded-start-0 auth-overlay d-flex align-items-end justify-content-center">
-
-                                    </div>
-                                </div>
-                            </div>
+                        <!-- Brand -->
+                        <div class="mb-2">
+                            <img ngSrc="noreco1_logo.png" alt="NORECO1 Logo" width="64" height="64" class="mb-2">
+                            <div class="text-muted small">{{ appNameExtended }}</div>
                         </div>
+
+                        <div class="mb-3">
+                            <img ngSrc="firefly.png" alt="Firefly" width="100" height="48">
+                        </div>
+
+                        <hr class="my-3">
+
+                        <!-- Lock icon -->
+                        <div class="mb-3">
+                            <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-danger bg-opacity-10 mb-3"
+                                 style="width:72px;height:72px;">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" fill="none"
+                                     viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"
+                                     class="text-danger" style="color: var(--bs-danger)">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                          d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z"/>
+                                </svg>
+                            </div>
+                            <div class="fw-bold" style="font-size:4rem;line-height:1;color:var(--bs-danger)">401</div>
+                        </div>
+
+                        <h5 class="fw-bold mb-1">Unauthorized Access</h5>
+                        <p class="text-muted small mb-4">
+                            You don't have permission to view this page.<br>
+                            Please sign in with an authorized account.
+                        </p>
+
+
                     </div>
                 </div>
+
+                <p class="text-center text-muted small mt-4 mb-0">
+                    &copy; {{ startYear }} {{ appName }} &mdash; by <span class="fw-semibold">{{ credits.name }}</span>
+                </p>
+
             </div>
         </div>
     </div>

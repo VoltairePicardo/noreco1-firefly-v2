@@ -46,4 +46,13 @@ public class Meter {
 
     @Column
     private BigDecimal presentReading;
+
+    @Temporal(TemporalType.DATE)
+    @Column
+    private java.util.Date readingDate;
+
+    @NotFound(action = NotFoundAction.IGNORE)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "FK_meterStatusId")
+    private MeterStatus meterStatus;
 }

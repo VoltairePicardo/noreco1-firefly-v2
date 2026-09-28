@@ -135,7 +135,8 @@
       "Bash(JAVA_HOME=\"/c/Program Files/Java/jdk-21\" mvn -q -o compile)",
       "Bash(xargs -n1 basename)",
       "Bash(npx ngc *)",
-      "Bash(wc -l /tmp_ngc_out.txt)"
+      "Bash(wc -l /tmp_ngc_out.txt)",
+      "Bash(ng build:*)"
     ]
   }
 }

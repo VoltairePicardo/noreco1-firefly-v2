@@ -25,7 +25,8 @@ export class AccountsPayableAgingComponent {
     private service      = inject(AccountingReportsService);
 
     ngOnInit(): void {
-        this.cutOffDate = new Date().toISOString().substring(0, 10);
+        const d = new Date();
+        this.cutOffDate = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
     }
 
     search(): void {

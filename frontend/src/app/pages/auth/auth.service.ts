@@ -78,8 +78,8 @@ export class AuthService {
     }
 
     menuIsAllowed(route: string): boolean {
-        for (const menu of this.getUser().menus) {
-           if(route === menu.link || (menu.parentMenu != null && menu.parentMenu.link === route)){
+        for (const menu of this.getMenus()) {
+           if(route === menu.url || (menu.parentMenu != null && menu.parentMenu.url === route)){
                return true;
            }
         }
