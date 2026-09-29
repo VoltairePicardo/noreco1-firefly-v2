@@ -7,6 +7,7 @@ import com.noreco1.fireflyv2.common.facade.GeneratorFacade;
 import com.noreco1.fireflyv2.common.helpers.Checker;
 import com.noreco1.fireflyv2.common.helpers.ClassHelper;
 import com.noreco1.fireflyv2.common.helpers.MessageFormatter;
+import com.noreco1.fireflyv2.common.helpers.ReportUtil;
 import com.noreco1.fireflyv2.controller.response.PostResponse;
 import com.noreco1.fireflyv2.controller.response.ProcessDocumentDto;
 import com.noreco1.fireflyv2.exception.BusinessException;
@@ -17,8 +18,11 @@ import com.noreco1.fireflyv2.mssql_repo.MssqlUserRepo;
 import com.noreco1.fireflyv2.repo.*;
 import com.noreco1.fireflyv2.service.TransformerTestingService;
 import com.noreco1.fireflyv2.validator.TransformerTestingValidator;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.sf.jasperreports.engine.JRDataSource;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -30,7 +34,6 @@ import org.springframework.validation.BindingResult;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -49,6 +52,7 @@ public class TransformerTestingServiceImpl implements TransformerTestingService 
     private final DocumentProcessingFacade documentProcessingFacade;
     private final MssqlTransformerRepo mssqlTransformerRepo;
     private final MssqlUserRepo mssqlUserRepo;
+    private final EmployeeRepo employeeRepo;
 
     @Override
     @Transactional(readOnly = true)
@@ -56,8 +60,8 @@ public class TransformerTestingServiceImpl implements TransformerTestingService 
         TransformerTesting data = transformerTestingRepo.findById(id)
                 .orElseThrow(() -> new BusinessException("Transformer testing with id:"+id+" not found!"));
 
-        data.setVoltageRatioTests(transformerVoltageRatioTestRepo.findByTransformerTestingId(data.getId()));
-        data.setLossTests(transformerLossTestRepo.findByTransformerTestingId(data.getId()));
+        data.setVoltageRatioTests(transformerVoltageRatioTestRepo.findAllByTransformerTestingId(data.getId()));
+        data.setLossTests(transformerLossTestRepo.findAllByTransformerTestingId(data.getId()));
 
         return data;
     }
@@ -72,6 +76,80 @@ public class TransformerTestingServiceImpl implements TransformerTestingService 
     @Transactional(readOnly = true)
     public Page<TransformerTesting> findAllByQuery(String query, Pageable pageable) {
         return transformerTestingRepo.findAllByTransformerSerialNoContainingIgnoreCase(query, pageable);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public HashMap<String, Object> transformerTestingParameters(HttpServletRequest request, Integer id) {
+        HashMap<String, Object> params = ReportUtil.setupSharedReportHeaders(request);
+
+        TransformerTesting data = transformerTestingRepo.findById(id)
+                .orElseThrow(() -> new BusinessException("Transformer testing with id:"+id+" not found!", HttpStatus.NOT_FOUND));
+
+        TransformerVoltageRatioTest voltageRatioTest = transformerVoltageRatioTestRepo.findByTransformerTestingId(id);
+        TransformerLossTest lossTest = transformerLossTestRepo.findByTransformerTestingId(id);
+
+        Transformer transformer = data.getTransformer();
+
+        Employee testedByPosition = employeeRepo.findOneByAccountNumber(data.getTestedBy().getAccountNo());
+        Employee recommendingApprovalPosition = employeeRepo.findOneByAccountNumber(data.getRecommendingApprovalUser().getAccountNo());
+        Employee approvedByPosition = employeeRepo.findOneByAccountNumber(data.getApprovedBy().getAccountNo());
+
+        params.put("TITLE", "TRANSFORMER TEST RESULT");
+        params.put("OWNER", data.getOwner());
+        params.put("OWNER_ADDRESS", data.getOwnerAddress());
+        params.put("DATE_TESTED", data.getDateTested());
+        params.put("TIME_TESTED", data.getTimeTested());
+        params.put("WEATHER", data.getWeather());
+
+        params.put("MAKE", transformer.getBrand() != null ? transformer.getBrand().getName() : null);
+        params.put("SERIAL_NO", transformer.getSerialNo());
+        params.put("KVA", transformer.getKva());
+        params.put("IMPEDANCE", transformer.getImpedance());
+        params.put("PRI_VOLTAGE", transformer.getPrimaryVoltage() !=  null ? transformer.getPrimaryVoltage().getDescription() : null);
+        params.put("SEC_VOLTAGE", transformer.getSecondaryVoltage() !=  null ? transformer.getSecondaryVoltage().getDescription() : null);
+        params.put("CORE_TYPE", transformer.getCoreType());
+        params.put("POLARITY", transformer.getPolarity());
+        params.put("BUSHING", transformer.getBushing());
+        params.put("TYPE", transformer.getType());
+        params.put("STATUS", data.getTransformerCondition() != null ? data.getTransformerCondition().getDescription() : null);
+
+        params.put("PRI_VOLTAGE_INDUCE", voltageRatioTest.getPrimaryVoltageInduce());
+        params.put("TAP1", voltageRatioTest.getTap1());
+        params.put("TAP2", voltageRatioTest.getTap2());
+        params.put("TAP3", voltageRatioTest.getTap3());
+        params.put("TAP4", voltageRatioTest.getTap4());
+        params.put("TAP5", voltageRatioTest.getTap5());
+
+        params.put("SC_PRI_CURRENT", lossTest.getShortCircuitPrimaryCurrent());
+        params.put("SC_RESULT", lossTest.getShortCircuitResult());
+        params.put("OC_SEC_VOLTAGE", lossTest.getOpenCircuitSecondaryVoltage());
+        params.put("OC_RESULT", lossTest.getOpenCircuitResult());
+        params.put("TOTAL_LOSSES", lossTest.getTotalLoss());
+        params.put("IEX", lossTest.getIex());
+        params.put("IZ", lossTest.getIz());
+        params.put("IR",  lossTest.getIr());
+        params.put("IX",  lossTest.getIx());
+        params.put("EFF",  lossTest.getEff());
+
+        params.put("TESTED_BY", data.getTestedBy().getFullName());
+        params.put("TESTED_BY_POS", testedByPosition.getPosition().getName());
+        params.put("RECOMMENDING_APPROVAL", data.getRecommendingApprovalUser().getFullName());
+        params.put("RECOMMENDING_APPROVAL_POS", recommendingApprovalPosition.getPosition().getName());
+        params.put("APPROVED_BY", data.getApprovedBy().getFullName());
+        params.put("APPROVED_BY_POS", approvedByPosition.getPosition().getName());
+
+        params.put("REMARKS", data.getRemarks());
+        params.put("RECOMMENDATION", data.getRecommendation());
+
+        return params;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public JRDataSource datasourceTransformerTesting(Integer id) {
+        List<TransformerVoltageRatioTest> data = transformerVoltageRatioTestRepo.findAllByTransformerTestingId(id);
+        return new JRBeanCollectionDataSource(data);
     }
 
     @Override

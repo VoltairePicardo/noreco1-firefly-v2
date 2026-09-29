@@ -4,6 +4,11 @@
     <div class="card">
         <div class="card-header border-light d-flex align-items-center justify-content-between">
             <h4 class="card-title mb-0">{{ module }} Details</h4>
+            @if (isIndividual()) {
+                <button type="button" class="btn btn-primary fw-bold gap-1" (click)="print()">
+                    <ng-icon name="tablerPrinter" class="ps-0 pe-3 fw-bold fs-lg"></ng-icon>Print
+                </button>
+            }
         </div>
 
         <div class="card-body">

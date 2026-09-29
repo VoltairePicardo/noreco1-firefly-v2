@@ -7,5 +7,7 @@ import java.util.List;
 
 public interface TransformerLossTestRepo extends JpaRepository<TransformerLossTest, Integer> {
 
-    List<TransformerLossTest> findByTransformerTestingId(Integer id);
+    List<TransformerLossTest> findAllByTransformerTestingId(Integer id);
+
+    TransformerLossTest findByTransformerTestingId(Integer id);
 }

@@ -4,11 +4,16 @@
     <div class="card">
         <div class="card-header border-light d-flex flex-wrap align-items-center justify-content-between gap-2">
             <h4 class="card-title mb-0">Transformer Testing Details</h4>
-            @if (actions().length > 0) {
-                <app-document-actions [actions]="actions()" [processing]="processing()" [status]="data()?.documentStatus?.status" (process)="onProcess($event)"/>
-            } @else if (data()?.documentStatus) {
-                <span [class]="statusBadgeClass(data()!.documentStatus!.status)">{{ data()!.documentStatus!.status }}</span>
-            }
+            <div class="d-flex flex-wrap align-items-center gap-2">
+                @if (actions().length > 0) {
+                    <app-document-actions [actions]="actions()" [processing]="processing()" [status]="data()?.documentStatus?.status" (process)="onProcess($event)"/>
+                } @else if (data()?.documentStatus) {
+                    <span [class]="statusBadgeClass(data()!.documentStatus!.status)">{{ data()!.documentStatus!.status }}</span>
+                }
+                <button type="button" class="btn btn-primary fw-bold gap-1" [disabled]="!data()?.id" (click)="print()">
+                    <ng-icon name="tablerPrinter" class="ps-0 pe-3 fw-bold fs-lg"></ng-icon>Print
+                </button>
+            </div>
         </div>
 
         <div class="card-body">

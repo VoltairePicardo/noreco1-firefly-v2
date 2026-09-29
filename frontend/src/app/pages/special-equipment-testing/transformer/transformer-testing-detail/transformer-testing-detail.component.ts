@@ -9,6 +9,8 @@ import { WorkflowService } from '@/app/shared/workflow/workflow.service';
 import { DocumentActionsComponent } from '@/app/shared/workflow/document-actions/document-actions.component';
 import { documentStatusBadgeClass } from '@/app/shared/workflow/document-status-badge.util';
 import { buildProcessPayload, WorkflowActionOption } from '@/app/models/shared/workflow.model';
+import { provideIcons } from '@ng-icons/core';
+import { tablerPrinter } from '@ng-icons/tabler-icons';
 import { NgbCollapse } from '@ng-bootstrap/ng-bootstrap';
 import { DocumentLogsComponent } from '@/app/shared/components/document-logs/document-logs.component';
 
@@ -16,7 +18,8 @@ import { DocumentLogsComponent } from '@/app/shared/components/document-logs/doc
     selector: 'app-transformer-testing-detail',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [...COMMON_ALL_PAGE_IMPORTS, DocumentActionsComponent, NgbCollapse, DocumentLogsComponent],
-    templateUrl: './transformer-testing-detail.component.html'
+    templateUrl: './transformer-testing-detail.component.html',
+    providers: [provideIcons({ tablerPrinter })]
 })
 export class TransformerTestingDetailComponent implements OnInit {
     module    = 'Transformer Testing';
@@ -68,6 +71,11 @@ export class TransformerTestingDetailComponent implements OnInit {
                 this.alertService.httpError(this.module, 'Process', err);
             }
         });
+    }
+
+    print(): void {
+        const id = this.data()?.id;
+        if (id != null) { this.service.print(id); }
     }
 
     toPercentForm(value: number | null | undefined): number {

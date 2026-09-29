@@ -7,5 +7,7 @@ import java.util.List;
 
 public interface TransformerVoltageRatioTestRepo extends JpaRepository<TransformerVoltageRatioTest, Integer> {
 
-    List<TransformerVoltageRatioTest> findByTransformerTestingId(Integer id);
+    List<TransformerVoltageRatioTest> findAllByTransformerTestingId(Integer id);
+
+    TransformerVoltageRatioTest findByTransformerTestingId(Integer id);
 }

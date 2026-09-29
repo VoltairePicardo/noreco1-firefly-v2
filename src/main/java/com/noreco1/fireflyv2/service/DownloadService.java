@@ -4,72 +4,46 @@ import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 
 import com.noreco1.fireflyv2.service.implementation.TokenService;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletResponse;
 
-import ar.com.fdvs.dj.core.DynamicJasperHelper;
-import ar.com.fdvs.dj.core.layout.ClassicLayoutManager;
-import ar.com.fdvs.dj.domain.DynamicReport;
-import ar.com.fdvs.dj.domain.builders.DynamicReportBuilder;
-import ar.com.fdvs.dj.domain.constants.Page;
-import ar.com.fdvs.dj.domain.entities.columns.AbstractColumn;
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.pdf.BaseFont;
 import com.itextpdf.text.pdf.PdfContentByte;
 import com.itextpdf.text.pdf.PdfReader;
 import com.itextpdf.text.pdf.PdfStamper;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.engine.design.JasperDesign;
 import net.sf.jasperreports.engine.xml.JRXmlLoader;
 
-import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 @Service
+@Slf4j
+@RequiredArgsConstructor
 public class DownloadService {
-	protected final Logger logger = Logger.getLogger("service");
-	
-	@Autowired
-	private ExporterService exporter;
-	
-	@Autowired
-	private TokenService tokenService;
 
-    @Autowired
-    Environment env;
+	private final ExporterService exporter;
+	private final TokenService tokenService;
 	
+	public void download(String type, HttpServletResponse response, HashMap<String, Object> params,
+                         String template, JRDataSource dataSource) {
+		download(type, null, response, params, template, dataSource);
+	}
+
 	public void download(String type, String token,
                          HttpServletResponse response,
                          HashMap<String, Object> params,
                          String template, JRDataSource dataSource) {
-		 
-		try {
 
-			InputStream reportStream = this.getClass().getResourceAsStream("/" + template);
-			JasperDesign jd = JRXmlLoader.load(reportStream);
-			JasperReport jr = JasperCompileManager.compileReport(jd);
-			// Make sure to pass the JasperReport, report parameters, and data source
-            JasperPrint jp = null;
-            if (dataSource != null) {
-                jp = JasperFillManager.fillReport(jr, params, dataSource);
-            } else {
-                jp = JasperFillManager.fillReport(jr, params, dataSource);
-            }
-			// Create an output byte stream where data will be written
-			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			// Export report
-			exporter.export(type, jp, response, baos);
-			// Write to response stream
-			write(token, response, baos);
-		
+		try {
+			download(type, token, response, fillReport(template, params, dataSource));
 		} catch (JRException jre) {
-			logger.error("Unable to process download");
-            jre.printStackTrace();
+            log.error("Unable to process download: {}", jre.getMessage(), jre);
 		}
 	}
 
@@ -115,33 +89,10 @@ public class DownloadService {
 
                 tokenService.remove(token);
             } else {
-
-                InputStream reportStream = this.getClass().getResourceAsStream("/" + template);
-                JasperDesign jd = JRXmlLoader.load(reportStream);
-                JasperReport jr = JasperCompileManager.compileReport(jd);
-                // Make sure to pass the JasperReport, report parameters, and data source
-                JasperPrint jp = null;
-                if (dataSource != null) {
-                    jp = JasperFillManager.fillReport(jr, params, dataSource);
-                } else {
-                    jp = JasperFillManager.fillReport(jr, params, dataSource);
-                }
-                // Create an output byte stream where data will be written
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                // Export report
-                exporter.export(type, jp, response, baos);
-                // Write to response stream
-                write(token, response, baos);
+                download(type, token, response, fillReport(template, params, dataSource));
             }
-        } catch (JRException jre) {
-            logger.error("Unable to process download");
-            jre.printStackTrace();
-        } catch (IOException e) {
-            logger.error("Unable to process download");
-            e.printStackTrace();
-        } catch (DocumentException e) {
-            logger.error("Unable to process download");
-            e.printStackTrace();
+        } catch (JRException | IOException | DocumentException e) {
+            log.error("Unable to process download: {}", e.getMessage(), e);
         }
     }
 
@@ -172,7 +123,7 @@ public class DownloadService {
 			tokenService.remove(token);
 
 		} catch (Exception e) {
-			logger.error("Unable to write report to the output stream");
+            log.error("Unable to write report to the output stream: {}", e.getMessage(), e);
 			throw new RuntimeException(e);
 		}
 	}
@@ -180,23 +131,23 @@ public class DownloadService {
     public void savePdf(String fileName, HashMap<String, Object> params, String template, JRDataSource dataSource) {
 
         try {
+            JasperExportManager.exportReportToPdfFile(fillReport(template, params, dataSource), fileName);
+        } catch (JRException jre) {
+            log.error("Unable to save pdf: {}", jre.getMessage(), jre);
+        }
+    }
 
-            InputStream reportStream = this.getClass().getResourceAsStream("/" + template);
+    private JasperPrint fillReport(String template, HashMap<String, Object> params, JRDataSource dataSource)
+            throws JRException {
+        try (InputStream reportStream = getClass().getResourceAsStream("/" + template)) {
+            if (reportStream == null) {
+                throw new JRException("Report template not found: " + template);
+            }
             JasperDesign jd = JRXmlLoader.load(reportStream);
             JasperReport jr = JasperCompileManager.compileReport(jd);
-
-            // Make sure to pass the JasperReport, report parameters, and data source
-            JasperPrint jp = null;
-            if (dataSource != null) {
-                jp = JasperFillManager.fillReport(jr, params, dataSource);
-            } else {
-                jp = JasperFillManager.fillReport(jr, params, dataSource);
-            }
-
-            JasperExportManager.exportReportToPdfFile(jp, fileName);
-
-        } catch (JRException jre) {
-            jre.printStackTrace();
+            return JasperFillManager.fillReport(jr, params, dataSource);
+        } catch (IOException e) {
+            throw new JRException("Unable to read report template: " + template, e);
         }
     }
 
@@ -226,10 +177,8 @@ public class DownloadService {
             baos.writeTo(os);
             os.flush();
 
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (DocumentException e) {
-            e.printStackTrace();
+        } catch (IOException | DocumentException e) {
+            log.error("Unable to process download: {}", e.getMessage(), e);
         }
     }
 }

@@ -3,6 +3,7 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '@/environments/environment';
 import {MeterTestingData, MeterTestingOption, MeterTestingResult} from '@/app/models/special-equipment-testing/meter-testing.model';
+import { DownloadService } from '@/app/core/services/download.service';
 
 const BASE_API = environment.get('baseApiUrl');
 const httpOptions = {
@@ -12,6 +13,7 @@ const httpOptions = {
 @Injectable({ providedIn: 'root' })
 export class MeterTestingService {
     private http = inject(HttpClient);
+    private downloadService = inject(DownloadService);
 
     extract(file: File): Observable<MeterTestingResult> {
         const formData = new FormData();
@@ -40,7 +42,11 @@ export class MeterTestingService {
         return this.http.get<MeterTestingData>(`${BASE_API}/meter-testing/${id}`);
     }
 
-    listOptions(): Observable<MeterTestingOption[]> {
+    print(id: number): void {
+        this.downloadService.print(`${BASE_API}/meter-testing/print/export/${id}`, { type: 'pdf' });
+    }
+
+    listOptions():Observable<MeterTestingOption[]> {
         return this.http.get<MeterTestingOption[]>(`${BASE_API}/meter-testing/options`);
     }
 }

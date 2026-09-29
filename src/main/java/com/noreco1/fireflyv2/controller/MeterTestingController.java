@@ -1,11 +1,16 @@
 package com.noreco1.fireflyv2.controller;
 
+import com.noreco1.fireflyv2.common.GlobalConstant;
 import com.noreco1.fireflyv2.controller.response.MeterTestingResultDto;
 import com.noreco1.fireflyv2.controller.response.PostResponse;
 import com.noreco1.fireflyv2.model.MeterTesting;
 import com.noreco1.fireflyv2.model.MeterTestingOption;
+import com.noreco1.fireflyv2.service.DownloadService;
 import com.noreco1.fireflyv2.service.MeterTestingService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import net.sf.jasperreports.engine.JRDataSource;
 import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -20,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.HashMap;
 import java.util.List;
 
 @RestController
@@ -29,6 +35,7 @@ public class MeterTestingController {
 
     private final MeterTestingService meterTestingService;
     private final MessageSource messageSource;
+    private final DownloadService downloadService;
 
     @PostMapping("/upload")
     public MeterTestingResultDto upload(@RequestParam("file") MultipartFile file) {
@@ -66,6 +73,19 @@ public class MeterTestingController {
     @GetMapping("/options")
     public List<MeterTestingOption> options() {
         return meterTestingService.findActiveOptions();
+    }
+
+
+    @RequestMapping(value="/print/export/{id}")
+    public void exportList(@PathVariable Integer id,
+                           @RequestParam(value = "type") String type,
+                           HttpServletResponse response, HttpServletRequest request) {
+
+        HashMap<String, Object> params = meterTestingService.meterTestingParameters(request, id);
+        JRDataSource dataSource = meterTestingService.datasourceMeterTesting(id);
+        String template = GlobalConstant.JASPER_BASE_PATH + "/special-equipment-testing/MeterTesting.jrxml";
+
+        downloadService.download(type, response, params, template, dataSource);
     }
 
 }

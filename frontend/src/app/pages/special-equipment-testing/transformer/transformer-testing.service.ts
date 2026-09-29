@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { environment } from '@/environments/environment';
 import { TransformerTestingBrand, TransformerTestingData, TransformerTestingLookup, TransformerTestingTransformer } from '@/app/models/special-equipment-testing/transformer-testing.model';
 import { ProcessDocumentPayload } from '@/app/models/shared/workflow.model';
+import { DownloadService } from '@/app/core/services/download.service';
 
 const BASE_API = environment.get('baseApiUrl');
 const httpOptions = {
@@ -13,6 +14,7 @@ const httpOptions = {
 @Injectable({ providedIn: 'root' })
 export class TransformerTestingService {
     private http = inject(HttpClient);
+    private downloadService = inject(DownloadService);
 
     list(query = '', page = 0, size = 10): Observable<any> {
         const params = new HttpParams().set('query', query).set('page', page).set('size', size);
@@ -31,7 +33,11 @@ export class TransformerTestingService {
         return this.http.post(`${BASE_API}/transformer-testing/process`, payload, httpOptions);
     }
 
-    listBrands(): Observable<TransformerTestingBrand[]> {
+    print(id: number): void {
+        this.downloadService.print(`${BASE_API}/transformer-testing/print/export/${id}`, { type: 'pdf' });
+    }
+
+    listBrands():Observable<TransformerTestingBrand[]> {
         return this.http.get<TransformerTestingBrand[]>(`${BASE_API}/json/brands`);
     }
 

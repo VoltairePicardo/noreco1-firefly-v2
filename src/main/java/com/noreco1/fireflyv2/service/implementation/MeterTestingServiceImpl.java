@@ -3,27 +3,22 @@ package com.noreco1.fireflyv2.service.implementation;
 import com.noreco1.fireflyv2.common.facade.AuthenticationFacade;
 import com.noreco1.fireflyv2.common.helpers.Checker;
 import com.noreco1.fireflyv2.common.helpers.MessageFormatter;
+import com.noreco1.fireflyv2.common.helpers.ReportUtil;
 import com.noreco1.fireflyv2.controller.response.MeterTestingRecordDto;
 import com.noreco1.fireflyv2.controller.response.MeterTestingResultDto;
 import com.noreco1.fireflyv2.controller.response.PostResponse;
 import com.noreco1.fireflyv2.exception.BusinessException;
-import com.noreco1.fireflyv2.model.Meter;
-import com.noreco1.fireflyv2.model.MeterTesting;
-import com.noreco1.fireflyv2.model.MeterTestingDetail;
-import com.noreco1.fireflyv2.model.MeterTestingOption;
-import com.noreco1.fireflyv2.model.MeterTestingOptionDetail;
-import com.noreco1.fireflyv2.model.User;
+import com.noreco1.fireflyv2.model.*;
+import com.noreco1.fireflyv2.mssql_model.Consumer;
 import com.noreco1.fireflyv2.mssql_model.MeterModel;
-import com.noreco1.fireflyv2.repo.MeterModelRepo;
-import com.noreco1.fireflyv2.repo.MeterRepo;
-import com.noreco1.fireflyv2.repo.MeterTestingDetailRepo;
-import com.noreco1.fireflyv2.repo.MeterTestingOptionDetailRepo;
-import com.noreco1.fireflyv2.repo.MeterTestingOptionRepo;
-import com.noreco1.fireflyv2.repo.MeterTestingRepo;
-import com.noreco1.fireflyv2.repo.UserRepo;
+import com.noreco1.fireflyv2.mssql_repo.MssqlConsumerRepo;
+import com.noreco1.fireflyv2.repo.*;
 import com.noreco1.fireflyv2.service.MeterTestingService;
 import com.noreco1.fireflyv2.validator.MeterTestingValidator;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import net.sf.jasperreports.engine.JRDataSource;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.DataFormatter;
@@ -73,6 +68,8 @@ public class MeterTestingServiceImpl implements MeterTestingService {
     private final MeterModelRepo meterModelRepo;
     private final com.noreco1.fireflyv2.mssql_repo.MssqlUserRepo mssqlUserRepo;
     private final UserRepo userRepo;
+    private final MssqlConsumerRepo mssqlConsumerRepo;
+    private final EmployeeRepo employeeRepo;
 
     @Override
     @Transactional("chainedTransactionManager")
@@ -185,6 +182,9 @@ public class MeterTestingServiceImpl implements MeterTestingService {
 
             if (meterTesting.getMeterCalibrator() != null && meterTesting.getMeterCalibrator().getAccountNo() != null) {
                 User meterCalibrator = userRepo.findOneByAccountNo(meterTesting.getMeterCalibrator().getAccountNo());
+                if (meterCalibrator == null) {
+                    throw new BusinessException("Meter calibrator with account no: " + meterTesting.getMeterCalibrator().getAccountNo() + " not found.");
+                }
                 meterTesting.setMeterCalibrator(meterCalibrator);
                 meterTesting.setTestedBy(meterCalibrator.getFullName());
             } else {
@@ -296,6 +296,97 @@ public class MeterTestingServiceImpl implements MeterTestingService {
     @Override
     public List<MeterTestingOption> findActiveOptions() {
         return meterTestingOptionRepo.findByActiveTrueOrderByOptionTypeIdAscOrderAsc();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public HashMap<String, Object> meterTestingParameters(HttpServletRequest request, Integer id) {
+        HashMap<String, Object> params = ReportUtil.setupSharedReportHeaders(request);
+
+        MeterTesting meterTesting = meterTestingRepo.findById(id)
+                .orElseThrow(() -> new BusinessException("Meter testing not found."));
+
+        List<MeterTestingDetail> details = meterTestingDetailRepo.findByMeterTestingId(id);
+        Meter meter = meterTesting.getMeter();
+        com.noreco1.fireflyv2.model.MeterModel meterModel = meter != null && meter.getMeterModel() != null
+                ? meter.getMeterModel()
+                : meterTesting.getMeterModel();
+        String serialNo = meter != null
+                ? meter.getSerialNo()
+                : details.stream().map(MeterTestingDetail::getMeterSerialNo).filter(Objects::nonNull).findFirst().orElse(null);
+        Consumer mssqlConsumer = meterTesting.getAccountNo() != null
+                ? mssqlConsumerRepo.findByAccountNo(meterTesting.getAccountNo())
+                : null;
+
+        List<MeterTestingOptionDetail> optionDetails = meterTestingOptionDetailRepo.findByMeterTestingId(id);
+
+        List<Integer> reasons = optionDetails.stream()
+                .filter(detail -> Objects.equals(detail.getMeterTestingOption().getOptionType().getId(), com.noreco1.fireflyv2.model.enums.MeterTestingOptionType.REASON.getId()))
+                .map(detail -> detail.getMeterTestingOption().getId())
+                .toList();
+
+        List<Integer> remarks = optionDetails.stream()
+                .filter(detail -> Objects.equals(detail.getMeterTestingOption().getOptionType().getId(), com.noreco1.fireflyv2.model.enums.MeterTestingOptionType.REMARK.getId()))
+                .map(detail -> detail.getMeterTestingOption().getId())
+                .toList();
+
+        List<Integer> recommendations = optionDetails.stream()
+                .filter(detail -> Objects.equals(detail.getMeterTestingOption().getOptionType().getId(), com.noreco1.fireflyv2.model.enums.MeterTestingOptionType.RECOMMENDATION.getId()))
+                .map(detail -> detail.getMeterTestingOption().getId())
+                .toList();
+
+        params.put("BILLING_NAME", mssqlConsumer != null ? mssqlConsumer.getAccountName() : meterTesting.getOwner());
+        params.put("ADDRESS", mssqlConsumer != null ? mssqlConsumer.getAddress() : meterTesting.getOwnerAddress());
+        params.put("ACCOUNT_NO", mssqlConsumer != null ? mssqlConsumer.getAccountNo() + " / " + mssqlConsumer.getOldAccountNo().trim() : null);
+        params.put("SERIAL_NO", serialNo);
+        params.put("CLASS", meterModel != null && meterModel.getAccuracyClass() != null ? meterModel.getAccuracyClass().getDescription() : null);
+        params.put("DATE", meterTesting.getDate());
+        params.put("READING", meterTesting.getPresentReading());
+        params.put("METER", meterModel != null ? meterModel.getModelName() : null);
+        params.put("METER_CALIBRATOR", meterTesting.getMeterCalibrator() != null ? meterTesting.getMeterCalibrator().getFullName() : null);
+
+        //Reason
+        params.put("REASON_1", reasons.contains(com.noreco1.fireflyv2.model.enums.MeterTestingOption.HIGH_CONSUMPTION.getId()));
+        params.put("REASON_2", reasons.contains(com.noreco1.fireflyv2.model.enums.MeterTestingOption.BURNT.getId()));
+        params.put("REASON_3", reasons.contains(com.noreco1.fireflyv2.model.enums.MeterTestingOption.RE_CALIBRATION.getId()));
+        params.put("REASON_4", reasons.contains(com.noreco1.fireflyv2.model.enums.MeterTestingOption.NOT_RUNNING.getId()));
+        params.put("REASON_5", reasons.contains(com.noreco1.fireflyv2.model.enums.MeterTestingOption.BROKEN_COVER.getId()));
+        params.put("REASON_6", reasons.contains(com.noreco1.fireflyv2.model.enums.MeterTestingOption.NEW_KWH_METER.getId()));
+        params.put("REASON_7", reasons.contains(com.noreco1.fireflyv2.model.enums.MeterTestingOption.FILLED_WITH_WATER.getId()));
+        params.put("REASON_8", reasons.contains(com.noreco1.fireflyv2.model.enums.MeterTestingOption.OTHERS.getId()));
+        params.put("REASON_REMARK", otherRemarksByOptionType(optionDetails, com.noreco1.fireflyv2.model.enums.MeterTestingOptionType.REASON.getId()));
+
+        //Remarks
+        params.put("REMARK_1", remarks.contains(com.noreco1.fireflyv2.model.enums.MeterTestingOption.NORMAL.getId()));
+        params.put("REMARK_2", remarks.contains(com.noreco1.fireflyv2.model.enums.MeterTestingOption.DEFECTIVE.getId()));
+        params.put("REMARK_3", remarks.contains(com.noreco1.fireflyv2.model.enums.MeterTestingOption.OTHERS_2.getId()));
+        params.put("OTHER_REMARK", otherRemarksByOptionType(optionDetails, com.noreco1.fireflyv2.model.enums.MeterTestingOptionType.REMARK.getId()));
+
+        //Recommendation
+        params.put("RECO_1", recommendations.contains(com.noreco1.fireflyv2.model.enums.MeterTestingOption.FOR_AVERAGING.getId()));
+        params.put("RECO_2", recommendations.contains(com.noreco1.fireflyv2.model.enums.MeterTestingOption.READY_FOR_INSTALLATION.getId()));
+        params.put("RECO_3", recommendations.contains(com.noreco1.fireflyv2.model.enums.MeterTestingOption.OTHERS_3.getId()));
+        params.put("RECO_4", recommendations.contains(com.noreco1.fireflyv2.model.enums.MeterTestingOption.FOR_REPLACEMENT.getId()));
+        params.put("RECO_5", recommendations.contains(com.noreco1.fireflyv2.model.enums.MeterTestingOption.READY_FOR_REINSTALLATION.getId()));
+        params.put("RECO_REMARK", otherRemarksByOptionType(optionDetails, com.noreco1.fireflyv2.model.enums.MeterTestingOptionType.RECOMMENDATION.getId()));
+
+        return params;
+    }
+
+    private String otherRemarksByOptionType(List<MeterTestingOptionDetail> optionDetails, int optionTypeId) {
+        return optionDetails.stream()
+                .filter(detail -> detail.getMeterTestingOption().getOptionType().getId() == optionTypeId)
+                .map(MeterTestingOptionDetail::getOtherRemarks)
+                .filter(remark -> remark != null && !remark.isBlank())
+                .findFirst()
+                .orElse(null);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public JRDataSource datasourceMeterTesting(Integer id) {
+        List<MeterTestingDetail> meterTestingDetails = meterTestingDetailRepo.findByMeterTestingId(id);
+        return new JRBeanCollectionDataSource(meterTestingDetails);
     }
 
     private void syncMetersToMssql(List<Meter> mysqlMeters) {
