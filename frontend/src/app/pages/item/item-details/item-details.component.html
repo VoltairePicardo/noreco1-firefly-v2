@@ -31,6 +31,8 @@
             </div>
             <div class="col-sm-6">
                 <dl class="row mb-0">
+                    <dt class="col-sm-5 fw-normal">Parent Item</dt>
+                    <dd class="col-sm-7 fw-bold">{{ data.parentItem ? ((data.parentItem.code ? data.parentItem.code + ' — ' : '') + data.parentItem.description) : '—' }}</dd>
                     <dt class="col-sm-5 fw-normal">Asset Account</dt>
                     <dd class="col-sm-7 fw-bold">{{ data.assetAccount ? (data.assetAccount.code + ' — ' + data.assetAccount.title) : '—' }}</dd>
                     <dt class="col-sm-5 fw-normal">Expense Account</dt>

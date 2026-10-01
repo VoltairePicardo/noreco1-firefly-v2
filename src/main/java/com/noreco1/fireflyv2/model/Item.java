@@ -91,6 +91,12 @@ public class Item {
     @Column
     private String barcode;
 
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    @NotFound(action = NotFoundAction.IGNORE)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "FK_parentItemId")
+    private Item parentItem;
+
     @Transient
     private String base64Image = "";
 

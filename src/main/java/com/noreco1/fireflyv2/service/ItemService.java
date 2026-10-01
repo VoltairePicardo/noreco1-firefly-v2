@@ -6,7 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface ItemService {
-    Page<Item> list(String q, Integer accountId, Integer categoryId, int page, int size);
+    Page<Item> list(String q, Integer accountId, Integer categoryId, int page, int size, Integer excludeId);
     Page<Item> findAll(Pageable pageable);
     Item findById(Integer id);
     PostResponse create(Item item);

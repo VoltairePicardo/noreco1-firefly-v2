@@ -27,7 +27,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
-    public Page<Item> list(String q, Integer accountId, Integer categoryId, int page, int size) {
+    public Page<Item> list(String q, Integer accountId, Integer categoryId, int page, int size, Integer excludeId) {
         PageRequest pageable = PageRequest.of(page, size, Sort.by("description").ascending());
         if (accountId != null) {
             return itemRepo.findByAssetAccountIdOrExpenseAccountIdOrderByDescriptionAsc(accountId, accountId, pageable);
@@ -36,6 +36,11 @@ public class ItemServiceImpl implements ItemService {
             return q.isBlank()
                     ? itemRepo.findByInventoryCategoryIdOrderByDescriptionAsc(categoryId, pageable)
                     : itemRepo.findByInventoryCategoryIdAndDescriptionContainingIgnoreCaseOrInventoryCategoryIdAndCodeContainingIgnoreCaseOrderByDescriptionAsc(categoryId, q, categoryId, q, pageable);
+        }
+        if (excludeId != null) {
+            return q.isBlank()
+                    ? itemRepo.findByIdNotOrderByDescriptionAsc(excludeId, pageable)
+                    : itemRepo.findByIdNotAndDescriptionContainingIgnoreCaseOrIdNotAndCodeContainingIgnoreCaseOrderByDescriptionAsc(excludeId, q, excludeId, q, pageable);
         }
         return q.isBlank()
                 ? itemRepo.findAllByOrderByDescriptionAsc(pageable)
@@ -88,6 +93,7 @@ public class ItemServiceImpl implements ItemService {
             existing.setInventoryCategory(item.getInventoryCategory());
             existing.setHasSerialNumbers(item.getHasSerialNumbers());
             existing.setBarcode(item.getBarcode());
+            existing.setParentItem(item.getParentItem());
             itemRepo.save(existing);
             res.setModelId(existing.getId());
             res.setSuccessMessage("Item successfully updated!");

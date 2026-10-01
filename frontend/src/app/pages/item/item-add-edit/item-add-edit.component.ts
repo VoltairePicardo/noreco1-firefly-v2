@@ -7,6 +7,7 @@ import { LaddaModule } from 'angular2-ladda';
 import { ItemService } from '../item.service';
 import { ModalService } from '@/app/shared/modals/modal-service';
 import { BrowseCOAModalComponent } from '@/app/shared/modals/browse-coa-modal/browse-coa-modal.component';
+import { BrowseItemModalComponent } from '@/app/shared/modals/browse-item-modal/browse-item-modal.component';
 
 @Component({
     selector: 'app-item-add-edit',
@@ -27,6 +28,7 @@ export class ItemAddEditComponent {
     units      = signal<any[]>([]);
     categories = signal<any[]>([]);
 
+    selectedParentItem:     any = null;
     selectedAssetAccount:   any = null;
     selectedExpenseAccount: any = null;
     selectedImageFile:      File | null = null;
@@ -57,6 +59,9 @@ export class ItemAddEditComponent {
     }
 
     initForm(data?: any): void {
+        if (data?.parentItem) {
+            this.selectedParentItem = data.parentItem;
+        }
         if (data?.assetAccount) {
             this.selectedAssetAccount = {
                 id: data.assetAccount.id,
@@ -99,6 +104,21 @@ export class ItemAddEditComponent {
     }
 
     get form(): UntypedFormGroup { return this.validationForm; }
+
+    async openParentItemBrowse(): Promise<void> {
+        try {
+            const result = await this.modalService.openModal(
+                BrowseItemModalComponent,
+                { excludeId: this.editMode ? +this.id : undefined },
+                { size: 'lg', centered: true }
+            );
+            if (result?.action === 'select' && result?.data) {
+                this.selectedParentItem = result.data;
+            }
+        } catch { }
+    }
+
+    clearParentItem(): void { this.selectedParentItem = null; }
 
     async openAssetAccountBrowse(): Promise<void> {
         try {
@@ -150,6 +170,7 @@ export class ItemAddEditComponent {
             idealQty:          v.idealQty,
             location:          v.location,
             isActive:          v.isActive,
+            parentItem:        this.selectedParentItem     ? { id: this.selectedParentItem.id }     : null,
             assetAccount:      this.selectedAssetAccount   ? { id: this.selectedAssetAccount.id }   : null,
             expenseAccount:    this.selectedExpenseAccount ? { id: this.selectedExpenseAccount.id } : null,
             inventoryCategory: v.inventoryCategoryId ? { id: v.inventoryCategoryId } : null,

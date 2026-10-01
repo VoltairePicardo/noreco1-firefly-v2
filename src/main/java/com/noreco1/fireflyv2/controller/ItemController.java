@@ -49,8 +49,9 @@ public class ItemController {
             @RequestParam(required = false) Integer accountId,
             @RequestParam(required = false) Integer categoryId,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
-        return itemService.list(q, accountId, categoryId, page, size);
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) Integer excludeId) {
+        return itemService.list(q, accountId, categoryId, page, size, excludeId);
     }
 
     @GetMapping("/{id}")

@@ -67,6 +67,23 @@
 
                         <div class="row">
                             <div class="col-md-4 mt-2">
+                                <label class="form-label">Parent Item</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control"
+                                           [value]="selectedParentItem ? ((selectedParentItem.code ? selectedParentItem.code + ' — ' : '') + selectedParentItem.description) : ''"
+                                           readonly placeholder="Select Parent Item (optional)"/>
+                                    @if (selectedParentItem) {
+                                        <button type="button" class="btn btn-danger fw-bold" (click)="clearParentItem()">
+                                            <ng-icon name="tablerX" class="fw-bold"></ng-icon>
+                                        </button>
+                                    } @else {
+                                        <button type="button" class="btn btn-success fw-bold" (click)="openParentItemBrowse()">
+                                            <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
+                                        </button>
+                                    }
+                                </div>
+                            </div>
+                            <div class="col-md-4 mt-2">
                                 <label for="inventoryCategoryId" class="form-label">Inventory Category</label>
                                 <select id="inventoryCategoryId" class="form-select" formControlName="inventoryCategoryId">
                                     <option [ngValue]="null">-- Select Category --</option>
@@ -75,6 +92,9 @@
                                     }
                                 </select>
                             </div>
+                        </div>
+
+                        <div class="row">
                             <div class="col-md-4 mt-2">
                                 <label class="form-label">Asset Account</label>
                                 <div class="input-group">

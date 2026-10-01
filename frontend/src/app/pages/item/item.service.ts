@@ -13,10 +13,11 @@ const httpOptions = {
 export class ItemService {
     private http = inject(HttpClient);
 
-    list(q = '', accountId: number | null = null, page = 0, size = 10, categoryId: number | null = null): Observable<any> {
+    list(q = '', accountId: number | null = null, page = 0, size = 10, categoryId: number | null = null, excludeId: number | null = null): Observable<any> {
         let params = new HttpParams().set('q', q).set('page', page).set('size', size);
         if (accountId != null) params = params.set('accountId', accountId);
         if (categoryId != null) params = params.set('categoryId', categoryId);
+        if (excludeId != null) params = params.set('excludeId', excludeId);
         return this.http.get(`${BASE_API}/item/list`, { params });
     }
 

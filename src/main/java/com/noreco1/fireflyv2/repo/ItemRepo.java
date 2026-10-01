@@ -11,8 +11,12 @@ import java.util.List;
 
 public interface ItemRepo extends JpaRepository<Item, Integer> {
     @Transactional
-    @EntityGraph(attributePaths = {"unit", "inventoryCategory", "assetAccount", "expenseAccount"})
+    @EntityGraph(attributePaths = {"unit", "inventoryCategory", "assetAccount", "expenseAccount", "parentItem"})
     Page<Item> findAllByOrderByDescriptionAsc(Pageable pageable);
+
+    @Override
+    @EntityGraph(attributePaths = {"unit", "inventoryCategory", "assetAccount", "expenseAccount", "parentItem"})
+    java.util.Optional<Item> findById(Integer id);
 
     List<Item> findAllByOrderByDescriptionAsc();
 
@@ -32,5 +36,11 @@ public interface ItemRepo extends JpaRepository<Item, Integer> {
 
     @EntityGraph(attributePaths = {"unit", "inventoryCategory", "assetAccount", "expenseAccount"})
     Page<Item> findByInventoryCategoryIdAndDescriptionContainingIgnoreCaseOrInventoryCategoryIdAndCodeContainingIgnoreCaseOrderByDescriptionAsc(Integer catId1, String q1, Integer catId2, String q2, Pageable pageable);
+
+    @EntityGraph(attributePaths = {"unit", "inventoryCategory", "assetAccount", "expenseAccount"})
+    Page<Item> findByIdNotOrderByDescriptionAsc(Integer excludeId, Pageable pageable);
+
+    @EntityGraph(attributePaths = {"unit", "inventoryCategory", "assetAccount", "expenseAccount"})
+    Page<Item> findByIdNotAndDescriptionContainingIgnoreCaseOrIdNotAndCodeContainingIgnoreCaseOrderByDescriptionAsc(Integer excludeId1, String q1, Integer excludeId2, String q2, Pageable pageable);
 
 }
