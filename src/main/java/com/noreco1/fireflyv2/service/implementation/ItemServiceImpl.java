@@ -27,8 +27,18 @@ public class ItemServiceImpl implements ItemService {
 
     @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
-    public Page<Item> list(String q, Integer accountId, Integer categoryId, int page, int size, Integer excludeId) {
+    public Page<Item> list(String q, Integer accountId, Integer categoryId, int page, int size, Integer excludeId, boolean noParent) {
         PageRequest pageable = PageRequest.of(page, size, Sort.by("description").ascending());
+        if (noParent) {
+            if (categoryId != null) {
+                return q.isBlank()
+                        ? itemRepo.findByParentItemIsNullAndCategoryId(categoryId, pageable)
+                        : itemRepo.findByParentItemIsNullAndCategoryIdAndSearch(categoryId, q, pageable);
+            }
+            return q.isBlank()
+                    ? itemRepo.findByParentItemIsNullOrderByDescriptionAsc(pageable)
+                    : itemRepo.findByParentItemIsNullAndSearch(q, pageable);
+        }
         if (accountId != null) {
             return itemRepo.findByAssetAccountIdOrExpenseAccountIdOrderByDescriptionAsc(accountId, accountId, pageable);
         }

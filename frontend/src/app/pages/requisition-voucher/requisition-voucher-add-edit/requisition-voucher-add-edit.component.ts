@@ -398,7 +398,7 @@ export class RequisitionVoucherAddEditComponent {
         try {
             const result = await this.modalService.openModal(
                 BrowseItemModalComponent,
-                {},
+                { noParent: true },
                 { size: 'lg', centered: true }
             );
             if (result?.action === 'select' && result?.data) {
