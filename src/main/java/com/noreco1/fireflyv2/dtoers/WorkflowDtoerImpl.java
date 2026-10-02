@@ -66,6 +66,7 @@ public class WorkflowDtoerImpl implements WorkflowDtoer {
     private final ReturnMemorandumReceiptRepo returnMemorandumReceiptRepo;
     private final CreditCardPurchaseRequestRepo creditCardPurchaseRequestRepo;
     private final TransformerTestingRepo transformerTestingRepo;
+    private final ItemRepo itemRepo;
 
     @Override
     public List<WorkflowActionsDto> getWorkflowActionsDtoByWfId(Integer transId) {
@@ -629,6 +630,19 @@ public class WorkflowDtoerImpl implements WorkflowDtoer {
                         }
 
                         break;
+                    case ITEM:
+                        voucher = itemRepo.findOneByTransactionId(transId);
+                        if (voucher != null) {
+                            Item item = (Item) voucher;
+                            if (item.getCreatedBy() != null && item.getCreatedBy().getId().equals(currentUser.getId()) &&
+                                    item.getDocumentStatus().getId().equals(DocumentStatus.DOCUMENT_CREATED.getId())) {
+                                allowUser = true;
+                            } else if (item.getDocumentStatus().getId().equals(DocumentStatus.FOR_APPROVAL.getId())) {
+                                allowUser = true; // IO check enforced by process() endpoint
+                            }
+                        }
+                        break;
+
                     case CCPR:
                         voucher = creditCardPurchaseRequestRepo.findOneByTransactionId(transId);
                         if (voucher != null) {

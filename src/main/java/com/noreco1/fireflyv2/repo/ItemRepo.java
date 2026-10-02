@@ -24,6 +24,13 @@ public interface ItemRepo extends JpaRepository<Item, Integer> {
 
     Item findOneByDescription(String desc);
 
+    boolean existsByDescriptionIgnoreCase(String description);
+    boolean existsByDescriptionIgnoreCaseAndIdNot(String description, Integer id);
+    boolean existsByCodeIgnoreCase(String code);
+    boolean existsByCodeIgnoreCaseAndIdNot(String code, Integer id);
+
+    Item findOneByTransactionId(Integer transactionId);
+
     Item findByMatId(Integer matId);
 
     @EntityGraph(attributePaths = {"unit", "inventoryCategory", "assetAccount", "expenseAccount"})

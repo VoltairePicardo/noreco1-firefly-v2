@@ -57,6 +57,14 @@ export class ItemService {
         return this.http.post(`${BASE_API}/item/delete/${id}`, {}, httpOptions);
     }
 
+    process(payload: { documentId: number; remarks: string; workflowActionsDto: { actionMapId: number } }): Observable<any> {
+        return this.http.post(`${BASE_API}/item/process`, payload, httpOptions);
+    }
+
+    isInventoryOfficer(): Observable<boolean> {
+        return this.http.get<boolean>(`${BASE_API}/item/is-inventory-officer`);
+    }
+
     // Returns Page<ItemStock> — item.id is itemStockId, item.item contains the actual Item entity
     listByLocation(locationId: number, q = '', page = 0, size = 10): Observable<any> {
         const params = new HttpParams().set('q', q).set('page', page).set('size', size);

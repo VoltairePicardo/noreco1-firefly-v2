@@ -10,74 +10,282 @@
                 Loading...
             </div>
         } @else {
+
+        @if (actions().length > 0) {
+            <div class="fs-xs text-uppercase fw-semibold text-muted mb-2">Process Document</div>
+            <div class="row g-3 align-items-end">
+                <div class="col-md-3">
+                    <label class="form-label fw-bold">Action</label>
+                    <select class="form-select" [(ngModel)]="selectedAction"
+                            (ngModelChange)="onActionChange()"
+                            [disabled]="processing()">
+                        <option [ngValue]="null">— Select Action —</option>
+                        @for (a of actions(); track a.actionMapId) {
+                            <option [ngValue]="a">{{ a.action }}</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-bold">Remarks</label>
+                    <textarea class="form-control" rows="1" [(ngModel)]="remarks"
+                              placeholder="Optional remarks..." [disabled]="processing()"></textarea>
+                </div>
+                <div class="col-md-auto">
+                    <button type="button" class="btn btn-primary fw-bold"
+                            (click)="processWorkflow()"
+                            [disabled]="!selectedAction || processing()">
+                        @if (processing()) {
+                            <span class="spinner-border spinner-border-sm me-2" role="status"></span>Processing...
+                        } @else {
+                            <ng-icon name="tablerCheck" class="ps-0 pe-3 fw-bold"></ng-icon>Process
+                        }
+                    </button>
+                </div>
+            </div>
+
+            @if (showApprovalForm() && approvalForm()) {
+                <hr class="border-dashed mx-n3 mt-3"/>
+                <div class="fs-xs text-uppercase fw-semibold text-muted mb-2">Approval Details</div>
+                <form [formGroup]="approvalForm()!" class="row g-3">
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold">Code</label>
+                        <input type="text" class="form-control" formControlName="code"
+                               placeholder="Item Code" maxlength="64"/>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Description <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" formControlName="description"
+                               placeholder="Item Description"
+                               [class.is-invalid]="approvalForm()!.get('description')?.invalid && approvalForm()!.get('description')?.touched"/>
+                        <div class="invalid-feedback">Description is required.</div>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold">Unit <span class="text-danger">*</span></label>
+                        <select class="form-select" formControlName="unitId"
+                                [class.is-invalid]="approvalForm()!.get('unitId')?.invalid && approvalForm()!.get('unitId')?.touched">
+                            <option [ngValue]="null">-- Select Unit --</option>
+                            @for (unit of units(); track unit.id) {
+                                <option [ngValue]="unit.id">{{ unit.code }} - {{ unit.description }}</option>
+                            }
+                        </select>
+                        <div class="invalid-feedback">Unit is required.</div>
+                    </div>
+
+                    <!-- Row 2: Reorder Point, Ideal Qty, Location, Barcode -->
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold">Reorder Point</label>
+                        <input type="number" class="form-control" formControlName="reorderPoint"
+                               placeholder="0.00" step="0.01"/>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold">Ideal Qty</label>
+                        <input type="number" class="form-control" formControlName="idealQty"
+                               placeholder="0.00" step="0.01"/>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold">Location</label>
+                        <input type="text" class="form-control" formControlName="location" placeholder="Location"/>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold">Barcode</label>
+                        <input type="text" class="form-control" formControlName="barcode" placeholder="Barcode"/>
+                    </div>
+
+                    <!-- Row 3: Asset Account, Expense Account -->
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Asset Account <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" readonly
+                                   [value]="selectedAssetAccount() ? (selectedAssetAccount().accountCode + ' — ' + selectedAssetAccount().accountTitle) : ''"
+                                   placeholder="Browse Asset Account"/>
+                            @if (selectedAssetAccount()) {
+                                <button type="button" class="btn btn-danger fw-bold"
+                                        (click)="selectedAssetAccount.set(null)" [disabled]="processing()">
+                                    <ng-icon name="tablerX" class="fw-bold"></ng-icon>
+                                </button>
+                            } @else {
+                                <button type="button" class="btn btn-success fw-bold"
+                                        (click)="openAssetBrowse()" [disabled]="processing()">
+                                    <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
+                                </button>
+                            }
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Expense Account <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" readonly
+                                   [value]="selectedExpenseAccount() ? (selectedExpenseAccount().accountCode + ' — ' + selectedExpenseAccount().accountTitle) : ''"
+                                   placeholder="Browse Expense Account"/>
+                            @if (selectedExpenseAccount()) {
+                                <button type="button" class="btn btn-danger fw-bold"
+                                        (click)="selectedExpenseAccount.set(null)" [disabled]="processing()">
+                                    <ng-icon name="tablerX" class="fw-bold"></ng-icon>
+                                </button>
+                            } @else {
+                                <button type="button" class="btn btn-success fw-bold"
+                                        (click)="openExpenseBrowse()" [disabled]="processing()">
+                                    <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
+                                </button>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Row 4: Inventory Category, Parent Item, Toggles -->
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold">Inventory Category</label>
+                        <select class="form-select" formControlName="inventoryCategoryId">
+                            <option [ngValue]="null">-- Select Category --</option>
+                            @for (cat of categories(); track cat.id) {
+                                <option [ngValue]="cat.id">{{ cat.description }}</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Parent Item</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" readonly
+                                   [value]="selectedParentItem() ? ((selectedParentItem().code ? selectedParentItem().code + ' — ' : '') + selectedParentItem().description) : ''"
+                                   placeholder="Optional Parent Item"/>
+                            @if (selectedParentItem()) {
+                                <button type="button" class="btn btn-danger fw-bold"
+                                        (click)="selectedParentItem.set(null)" [disabled]="processing()">
+                                    <ng-icon name="tablerX" class="fw-bold"></ng-icon>
+                                </button>
+                            } @else {
+                                <button type="button" class="btn btn-success fw-bold"
+                                        (click)="openParentBrowse()" [disabled]="processing()">
+                                    <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
+                                </button>
+                            }
+                        </div>
+                    </div>
+                    <div class="col-md-3 d-flex align-items-end pb-1">
+                        <div class="d-flex flex-column gap-2">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="dtlIsActive" formControlName="isActive"/>
+                                <label class="form-check-label" for="dtlIsActive">Active</label>
+                            </div>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="dtlHasSerial" formControlName="hasSerialNumbers"/>
+                                <label class="form-check-label" for="dtlHasSerial">Has Serial Numbers</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    @if (duplicates().length > 0) {
+                        <div class="col-12">
+                            <p class="text-uppercase fs-xs fw-semibold text-muted mb-1">Possible Duplicates</p>
+                            <table class="table table-custom table-centered table-hover w-100 mb-0">
+                                <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                                    <tr class="text-uppercase fs-xxs">
+                                        <th>Code</th>
+                                        <th>Description</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @for (dup of duplicates(); track dup.id) {
+                                        <tr>
+                                            <td>{{ dup.code || '—' }}</td>
+                                            <td>{{ dup.description }}</td>
+                                            <td>
+                                                @if (dup.documentStatus?.id === 7) { <span class="badge bg-success">Approved</span> }
+                                                @else if (dup.documentStatus?.id === 5) { <span class="badge bg-warning text-dark">For Approval</span> }
+                                                @else if (dup.documentStatus?.id === 1) { <span class="badge bg-secondary">Draft</span> }
+                                                @else if (dup.documentStatus?.id === 8) { <span class="badge bg-danger">Denied</span> }
+                                                @else { <span class="badge bg-success">Approved</span> }
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                </form>
+            }
+
+            <hr class="border-dashed mx-n3 mt-3"/>
+        }
+
         <div class="row">
             <div class="col-sm-6">
                 <dl class="row mb-0">
+                    <dt class="col-sm-4 fw-normal">Status</dt>
+                    <dd class="col-sm-8">
+                        @if (data()?.documentStatus?.status) {
+                            <span [class]="statusBadgeClass(data()!.documentStatus!.status)">{{ data()!.documentStatus!.status }}</span>
+                        } @else { <span class="text-muted">—</span> }
+                    </dd>
                     <dt class="col-sm-4 fw-normal">Code</dt>
-                    <dd class="col-sm-8 fw-bold">{{ data.code || '—' }}</dd>
+                    <dd class="col-sm-8 fw-bold">{{ data()?.code || '—' }}</dd>
                     <dt class="col-sm-4 fw-normal">Description</dt>
-                    <dd class="col-sm-8 fw-bold">{{ data.description }}</dd>
+                    <dd class="col-sm-8 fw-bold">{{ data()?.description }}</dd>
                     <dt class="col-sm-4 fw-normal">Unit</dt>
-                    <dd class="col-sm-8 fw-bold">{{ data.unit?.code || '—' }}</dd>
+                    <dd class="col-sm-8 fw-bold">{{ data()?.unit?.code || '—' }}</dd>
                     <dt class="col-sm-4 fw-normal">Location</dt>
-                    <dd class="col-sm-8 fw-bold">{{ data.location || '—' }}</dd>
+                    <dd class="col-sm-8 fw-bold">{{ data()?.location || '—' }}</dd>
                     <dt class="col-sm-4 fw-normal">Barcode</dt>
-                    <dd class="col-sm-8 fw-bold">{{ data.barcode || '—' }}</dd>
+                    <dd class="col-sm-8 fw-bold">{{ data()?.barcode || '—' }}</dd>
                     <dt class="col-sm-4 fw-normal">Reorder Point</dt>
-                    <dd class="col-sm-8 fw-bold">{{ data.reorderPoint ?? '—' }}</dd>
+                    <dd class="col-sm-8 fw-bold">{{ data()?.reorderPoint ?? '—' }}</dd>
                     <dt class="col-sm-4 fw-normal">Ideal Qty</dt>
-                    <dd class="col-sm-8 fw-bold">{{ data.idealQty ?? '—' }}</dd>
+                    <dd class="col-sm-8 fw-bold">{{ data()?.idealQty ?? '—' }}</dd>
                 </dl>
             </div>
             <div class="col-sm-6">
                 <dl class="row mb-0">
                     <dt class="col-sm-5 fw-normal">Parent Item</dt>
-                    <dd class="col-sm-7 fw-bold">{{ data.parentItem ? ((data.parentItem.code ? data.parentItem.code + ' — ' : '') + data.parentItem.description) : '—' }}</dd>
+                    <dd class="col-sm-7 fw-bold">{{ data()?.parentItem ? ((data()?.parentItem?.code ? data()?.parentItem?.code + ' — ' : '') + data()?.parentItem?.description) : '—' }}</dd>
                     <dt class="col-sm-5 fw-normal">Asset Account</dt>
-                    <dd class="col-sm-7 fw-bold">{{ data.assetAccount ? (data.assetAccount.code + ' — ' + data.assetAccount.title) : '—' }}</dd>
+                    <dd class="col-sm-7 fw-bold">{{ data()?.assetAccount ? (data()?.assetAccount?.code + ' — ' + data()?.assetAccount?.title) : '—' }}</dd>
                     <dt class="col-sm-5 fw-normal">Expense Account</dt>
-                    <dd class="col-sm-7 fw-bold">{{ data.expenseAccount ? (data.expenseAccount.code + ' — ' + data.expenseAccount.title) : '—' }}</dd>
+                    <dd class="col-sm-7 fw-bold">{{ data()?.expenseAccount ? (data()?.expenseAccount?.code + ' — ' + data()?.expenseAccount?.title) : '—' }}</dd>
                     <dt class="col-sm-5 fw-normal">Inventory Category</dt>
-                    <dd class="col-sm-7 fw-bold">{{ data.inventoryCategory?.description || '—' }}</dd>
+                    <dd class="col-sm-7 fw-bold">{{ data()?.inventoryCategory?.description || '—' }}</dd>
                     <dt class="col-sm-5 fw-normal">Has Serial Numbers</dt>
-                    <dd class="col-sm-7 fw-bold">{{ data.hasSerialNumbers ? 'Yes' : 'No' }}</dd>
+                    <dd class="col-sm-7 fw-bold">{{ data()?.hasSerialNumbers ? 'Yes' : 'No' }}</dd>
                     <dt class="col-sm-5 fw-normal">Active</dt>
                     <dd class="col-sm-7">
-                        @if (data.isActive) {
-                            <span class="badge bg-success">Active</span>
-                        } @else {
-                            <span class="badge bg-secondary">Inactive</span>
-                        }
+                        @if (data()?.isActive) { <span class="badge bg-success">Active</span> }
+                        @else { <span class="badge bg-secondary">Inactive</span> }
                     </dd>
+                    <dt class="col-sm-5 fw-normal">Created By</dt>
+                    <dd class="col-sm-7 fw-bold">{{ data()?.createdBy?.fullName || '—' }}</dd>
+                    <dt class="col-sm-5 fw-normal">Approved By</dt>
+                    <dd class="col-sm-7 fw-bold">{{ data()?.approvedBy?.fullName || '—' }}</dd>
                 </dl>
             </div>
         </div>
-        }
-        @if (data.base64Image) {
+
+        @if (data()?.base64Image) {
             <div class="row mt-3">
                 <div class="col-sm-12">
                     <div class="fw-normal mb-2 text-muted small text-uppercase">Item Picture</div>
-                    <img [src]="data.base64Image" alt="Item Picture"
+                    <img [src]="data()?.base64Image" alt="Item Picture"
                          class="img-thumbnail"
                          style="max-width: 300px; max-height: 300px; object-fit: contain;"/>
                 </div>
             </div>
         }
+
+        <hr class="border-dashed mx-n3 mt-3"/>
+        <div class="fs-xs text-uppercase fw-semibold text-muted mb-2">Document History</div>
+        <app-document-logs [transactionId]="data()?.transaction?.id"/>
+
         <hr class="border-dashed mx-n3 mt-3"/>
         <div class="d-flex justify-content-end gap-2">
-            <button type="button" class="btn btn-light fw-bold"
-                    [routerLink]="['/' + menuLink]">
+            <button type="button" class="btn btn-light fw-bold" [routerLink]="['/' + menuLink]">
                 <ng-icon name="tablerArrowLeft" class="ps-0 pe-3 fw-bold"></ng-icon>Back
             </button>
-            <!-- TODO: Confirm with PM before enabling delete
-            <button type="button" class="btn btn-danger fw-bold" (click)="delete()">
-                <ng-icon name="tablerTrash" class="ps-0 pe-3 fw-bold"></ng-icon>Delete
-            </button>
-            -->
-            <button type="button" class="btn btn-primary fw-bold"
-                    [routerLink]="['/' + menuLink, data.id, 'edit']">
-                <ng-icon name="tablerPencil" class="ps-0 pe-3 fw-bold"></ng-icon>Edit
-            </button>
+            @if ((isInventoryOfficer() && (data()?.documentStatus?.id === 5 || data()?.documentStatus?.id === 7)) || (data()?.documentStatus?.id === 1 && data()?.createdBy?.id == currentUserId)) {
+                <button type="button" class="btn btn-primary fw-bold"
+                        [routerLink]="['/' + menuLink, data()?.id, 'edit']">
+                    <ng-icon name="tablerPencil" class="ps-0 pe-3 fw-bold"></ng-icon>Edit
+                </button>
+            }
         </div>
+
+        }
     </div>
 </app-ui-card>

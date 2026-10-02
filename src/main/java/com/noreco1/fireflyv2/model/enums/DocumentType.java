@@ -58,7 +58,8 @@ public enum DocumentType {
     PROJECT_ACCEPTANCE(42, "PROJECT_ACCEPTANCE", "Project Acceptance Report", "WORK ORDER", true),
     PROJECT_ACCEPTANCE_CERTIFICATION(43, "PROJECT_ACCEPTANCE_CERTIFICATION", "Project Acceptance Certification", "WORK ORDER", true),
     ASSET_RETIREMENT(45, "ASSET_RETIREMENT", "Asset Retirement", "SUPPORT MODULE", false),
-    BOM(512, "BOM", "Bill of Materials", "WORK ORDER", false);
+    BOM(512, "BOM", "Bill of Materials", "WORK ORDER", false),
+    ITEM(513, "ITEM", "Item", "INVENTORY", false);
 
     private int id;
     private String description;

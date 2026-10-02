@@ -5,6 +5,7 @@ import com.noreco1.fireflyv2.common.facade.FileFacade;
 import com.noreco1.fireflyv2.common.helpers.Checker;
 import com.noreco1.fireflyv2.common.helpers.ReportUtil;
 import com.noreco1.fireflyv2.controller.response.PostResponse;
+import com.noreco1.fireflyv2.controller.response.ProcessDocumentDto;
 import com.noreco1.fireflyv2.model.Item;
 import com.noreco1.fireflyv2.model.enums.ProjectAttachmentPrefix;
 import com.noreco1.fireflyv2.service.DownloadService;
@@ -98,6 +99,16 @@ public class ItemController {
     @PostMapping("/delete/{id}")
     public PostResponse delete(@PathVariable Integer id) {
         return itemService.deleteById(id);
+    }
+
+    @PostMapping("/process")
+    public PostResponse process(@RequestBody ProcessDocumentDto dto) {
+        return itemService.process(dto);
+    }
+
+    @GetMapping("/is-inventory-officer")
+    public ResponseEntity<Boolean> isInventoryOfficer() {
+        return ResponseEntity.ok(itemService.isInventoryOfficer());
     }
 
     @RequestMapping(value = "/export")

@@ -8,7 +8,11 @@ import { ItemService } from '../item.service';
 import { ModalService } from '@/app/shared/modals/modal-service';
 import { BrowseCOAModalComponent } from '@/app/shared/modals/browse-coa-modal/browse-coa-modal.component';
 import { BrowseItemModalComponent } from '@/app/shared/modals/browse-item-modal/browse-item-modal.component';
-
+import { Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
+import { WorkflowService } from '@/app/shared/workflow/workflow.service';
+import { WorkflowActionOption, buildProcessPayload } from '@/app/models/shared/workflow.model';
+import Swal from 'sweetalert2';
 @Component({
     selector: 'app-item-add-edit',
     imports: [...COMMON_ALL_PAGE_IMPORTS, ...COMMON_ADD_EDIT_PAGE_IMPORTS, LaddaModule],
@@ -28,22 +32,39 @@ export class ItemAddEditComponent {
     units      = signal<any[]>([]);
     categories = signal<any[]>([]);
 
+    isInventoryOfficer = signal(false);
+    duplicates         = signal<any[]>([]);
+    currentItem        = signal<any>(null);
+    approveAction      = signal<WorkflowActionOption | null>(null);
+
+    private dupSearch$ = new Subject<string>();
+
     selectedParentItem:     any = null;
     selectedAssetAccount:   any = null;
     selectedExpenseAccount: any = null;
     selectedImageFile:      File | null = null;
     imagePreview:           string | null = null;
 
-    private service      = inject(ItemService);
-    private modalService = inject(ModalService);
+    private service          = inject(ItemService);
+    private modalService     = inject(ModalService);
+    private workflowService  = inject(WorkflowService);
     public  fb           = inject(FormBuilder);
     public  route        = inject(ActivatedRoute);
     public  router       = inject(Router);
     public  alertService = inject(AlertService);
 
     ngOnInit(): void {
+        this.service.isInventoryOfficer().subscribe({ next: v => this.isInventoryOfficer.set(v), error: () => {} });
         this.service.listUnits().subscribe({ next: d => this.units.set(d), error: () => {} });
         this.service.listCategories().subscribe({ next: d => this.categories.set(d), error: () => {} });
+
+        this.dupSearch$.pipe(
+            debounceTime(400),
+            distinctUntilChanged(),
+            switchMap(q => q.trim().length > 1
+                ? this.service.list(q, null, 0, 5, null, this.editMode ? +this.id : undefined)
+                : [{ content: [] }])
+        ).subscribe({ next: res => this.duplicates.set(res.content ?? []), error: () => {} });
 
         this.route.paramMap.subscribe(params => {
             this.editMode = params.get('id') != null && /^\d+$/.test(params.get('id') ?? '');
@@ -80,7 +101,7 @@ export class ItemAddEditComponent {
         this.validationForm = this.fb.group({
             code:                [data?.code                  || ''],
             description:         [data?.description           || '', Validators.required],
-            unitId:              [data?.unit?.id              || null],
+            unitId:              [data?.unit?.id              || null, Validators.required],
             reorderPoint:        [data?.reorderPoint          ?? null],
             idealQty:            [data?.idealQty              ?? null],
             location:            [data?.location              || ''],
@@ -89,6 +110,10 @@ export class ItemAddEditComponent {
             hasSerialNumbers:    [data?.hasSerialNumbers      ?? false],
             barcode:             [data?.barcode               || ''],
         });
+
+        if (data?.description) {
+            this.dupSearch$.next(data.description);
+        }
     }
 
     getData(): void {
@@ -96,14 +121,35 @@ export class ItemAddEditComponent {
         this.service.getData(this.id).subscribe({
             next:  (data) => {
                 this.isLoading.set(false);
-                if (data?.id) { this.initForm(data); }
-                else { this.alertService.error(this.module, 'Not Found', ''); this.router.navigate(['/' + this.menuLink]); }
+                if (data?.id) {
+                    this.currentItem.set(data);
+                    this.initForm(data);
+                    if (data.transaction?.id) {
+                        this.workflowService.getAvailableActionsForTransaction(data.transaction.id).subscribe({
+                            next: actions => {
+                                const approve = (actions ?? []).find(a => (a.action ?? '').toLowerCase().includes('approve'));
+                                this.approveAction.set(approve ?? null);
+                            }
+                        });
+                    }
+                } else {
+                    this.alertService.error(this.module, 'Not Found', '');
+                    this.router.navigate(['/' + this.menuLink]);
+                }
             },
             error: () => { this.isLoading.set(false); this.alertService.error(this.module, 'Error', ''); this.router.navigate(['/' + this.menuLink]); }
         });
     }
 
     get form(): UntypedFormGroup { return this.validationForm; }
+
+    get showFullForm(): boolean {
+        return this.editMode;
+    }
+
+    onDuplicateSearch(value: string): void {
+        this.dupSearch$.next(value);
+    }
 
     async openParentItemBrowse(): Promise<void> {
         try {
@@ -155,13 +201,9 @@ export class ItemAddEditComponent {
         }
     }
 
-    validSubmit(): void {
-        this.submit = true;
-        this.formSubmit = true;
-        if (this.validationForm.invalid) { this.formSubmit = false; return; }
-
+    private buildPayload(): any {
         const v = this.form.value;
-        const frm: any = {
+        return {
             id:                this.id || 0,
             code:              v.code,
             description:       v.description,
@@ -177,7 +219,14 @@ export class ItemAddEditComponent {
             hasSerialNumbers:  v.hasSerialNumbers,
             barcode:           v.barcode,
         };
+    }
 
+    validSubmit(): void {
+        this.submit = true;
+        this.formSubmit = true;
+        if (this.validationForm.invalid) { this.formSubmit = false; return; }
+
+        const frm = this.buildPayload();
         const req = this.editMode ? this.service.update(frm) : this.service.create(frm);
 
         req.subscribe({
@@ -197,8 +246,50 @@ export class ItemAddEditComponent {
                     }
                 } else {
                     this.formSubmit = false;
-                    this.alertService.error(this.module, 'Saving', res.failureMessage);
+                    Swal.fire({ title: 'Error', text: res.failureMessage || 'Failed to save item.', icon: 'error' });
                 }
+            },
+            error: () => { this.formSubmit = false; Swal.fire({ title: 'Error', text: 'Failed to save item.', icon: 'error' }); }
+        });
+    }
+
+    saveAndApprove(): void {
+        this.submit = true;
+        if (this.validationForm.invalid) return;
+        if (!this.validationForm.get('unitId')?.value) {
+            Swal.fire({ title: 'Required', text: 'Unit is required for approval.', icon: 'warning' });
+            return;
+        }
+        if (!this.selectedAssetAccount) {
+            Swal.fire({ title: 'Required', text: 'Asset Account is required for approval.', icon: 'warning' });
+            return;
+        }
+        if (!this.selectedExpenseAccount) {
+            Swal.fire({ title: 'Required', text: 'Expense Account is required for approval.', icon: 'warning' });
+            return;
+        }
+        const action = this.approveAction();
+        if (!action) return;
+        this.formSubmit = true;
+        this.service.update(this.buildPayload()).subscribe({
+            next: (res) => {
+                if (!res.success) {
+                    this.formSubmit = false;
+                    Swal.fire({ title: 'Error', text: res.failureMessage || 'Failed to save item.', icon: 'error' });
+                    return;
+                }
+                this.service.process(buildProcessPayload(res.modelId, action.actionMapId, '')).subscribe({
+                    next: (pRes) => {
+                        this.formSubmit = false;
+                        if (pRes.success) {
+                            Swal.fire({ title: 'Approved', text: 'Item saved and approved.', icon: 'success', timer: 2000, showConfirmButton: false });
+                            this.router.navigate(['/' + this.menuLink, res.modelId, 'detail']);
+                        } else {
+                            Swal.fire({ title: 'Error', text: pRes.failureMessage || 'Failed to approve.', icon: 'error' });
+                        }
+                    },
+                    error: () => { this.formSubmit = false; Swal.fire({ title: 'Error', text: 'Failed to approve.', icon: 'error' }); }
+                });
             },
             error: () => { this.formSubmit = false; this.alertService.error(this.module, 'Saving', ''); }
         });

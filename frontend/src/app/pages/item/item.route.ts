@@ -23,4 +23,9 @@ export const ITEM_ROUTES: Routes = [
         loadComponent: () => import('./item-details/item-details.component').then(m => m.ItemDetailsComponent),
         data: { title: 'Item Details', mainPath }
     },
+    {
+        path: 'approval',
+        loadComponent: () => import('./item-approval/item-approval.component').then(m => m.ItemApprovalComponent),
+        data: { title: 'Item Approval', mainPath }
+    },
 ];
