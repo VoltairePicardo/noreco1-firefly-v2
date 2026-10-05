@@ -34,9 +34,30 @@ public class PurchaseRequestDetail implements Serializable{
     @Column
     private BigDecimal rrQuantity = BigDecimal.ZERO;
 
+    @Setter(AccessLevel.NONE)
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "FK_itemId")
     private Item item;
+
+    @Getter(AccessLevel.NONE)
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "FK_newItemId")
+    private Item newItem;
+
+    public void setItem(Item item) {
+        this.item = item;
+        if (this.newItem == null) {
+            this.newItem = item;   // auto-seed so existing rows always have a non-null newItem
+        }
+    }
+
+    public Item getNewItem() {
+        return this.newItem != null ? this.newItem : this.item;
+    }
+
+    public void setNewItem(Item newItem) {
+        this.newItem = newItem;
+    }
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name="FK_unitId")

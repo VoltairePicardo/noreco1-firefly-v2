@@ -49,14 +49,32 @@ public class QuotationDetailServiceImpl implements QuotationDetailService {
 
             QuotationItemDto dto = new QuotationItemDto();
 
+            PurchaseRequestDetail prd = quotationItem.getPurchaseRequestDetail();
+            Item resolved = prd.getNewItem();
+
             dto.setAvailable(quotationItem.getIsAvailable());
             dto.setQuotationId(quotationId);
-            dto.setPurchaseRequestDetailId(quotationItem.getPurchaseRequestDetail().getId());
+            dto.setPurchaseRequestDetailId(prd.getId());
             dto.setId(quotationItem.getId());
-            dto.setItemDescription(quotationItem.getPurchaseRequestDetail().getItem() == null ? quotationItem.getPurchaseRequestDetail().getJoDescription() : quotationItem.getPurchaseRequestDetail().getItem().getDescription());
-            dto.setRvNo(quotationItem.getPurchaseRequestDetail().getPurchaseRequest().getCode());
-            dto.setQuantity(quotationItem.getPurchaseRequestDetail().getQuantity());
-            dto.setUnitCode(quotationItem.getPurchaseRequestDetail().getUnitMeasure().getCode());
+            dto.setItemDescription(prd.getItem() == null ? prd.getJoDescription() : prd.getItem().getDescription());
+            dto.setRvNo(prd.getPurchaseRequest().getCode());
+            dto.setQuantity(prd.getQuantity());
+            dto.setUnitCode(prd.getUnitMeasure().getCode());
+
+            if (resolved != null) {
+                dto.setNewItemId(resolved.getId() != null ? resolved.getId().longValue() : null);
+                dto.setNewItemDescription(resolved.getDescription());
+                dto.setIsChildItem(resolved.getParentItem() != null);
+                // ponytail: resolved.getDocumentStatus() triggers lazy SELECT per item — safe because
+                // this method is @Transactional; do not remove @Transactional without adding EntityGraph
+                dto.setIsApprovedItem(
+                    resolved.getDocumentStatus() != null
+                    && Integer.valueOf(7).equals(resolved.getDocumentStatus().getId())
+                );
+            }
+            if (prd.getItem() != null) {
+                dto.setOriginalItemId(prd.getItem().getId());
+            }
 
             List<QuotationItemDetailDto> details = new ArrayList<>();
 

@@ -95,6 +95,9 @@ public class QuotationServiceImpl implements QuotationService, PrintableVoucher 
     QuotationItemDetailRepo quotationItemDetailRepo;
 
     @Autowired
+    PurchaseRequestDetailRepo purchaseRequestDetailRepo;
+
+    @Autowired
     SupplierRepo supplierRepo;
 
     @Autowired
@@ -542,7 +545,7 @@ public class QuotationServiceImpl implements QuotationService, PrintableVoucher 
                     row.put("count", ++itemCount);
                     row.put("quantity", purchaseRequestDetail.getQuantity());
                     row.put("unit", purchaseRequestDetail.getUnitMeasure().getCode());
-                    row.put("particulars", purchaseRequestDetail.getItem() == null ? purchaseRequestDetail.getJoDescription(): purchaseRequestDetail.getItem().getDescription());
+                    row.put("particulars", purchaseRequestDetail.getNewItem() == null ? purchaseRequestDetail.getJoDescription(): purchaseRequestDetail.getNewItem().getDescription());
 //                    row.put("estimatedUnitPrice", purchaseRequestDetail.getEstimatedPrice());
 //                    row.put("estimatedAmount", purchaseRequestDetail.getEstimatedPrice().multiply(rvDetail.getQuantity()));
 
@@ -702,6 +705,40 @@ public class QuotationServiceImpl implements QuotationService, PrintableVoucher 
         Quotation quotation = quotationRepo.findById(postData.getDocumentId()).orElse(null);
 
         if (quotation != null) {
+            // --- Item resolution gate ---
+            List<QuotationItem> quotationItems = quotationItemRepo.findAllByQuotationId(quotation.getId());
+            List<String> notChildItems = new ArrayList<>();
+            List<String> notApprovedItems = new ArrayList<>();
+
+            for (QuotationItem qi : quotationItems) {
+                PurchaseRequestDetail prd = qi.getPurchaseRequestDetail();
+                if (prd == null) continue;
+                Item resolved = prd.getNewItem();
+                if (resolved == null) continue;
+
+                if (resolved.getParentItem() == null) {
+                    notChildItems.add(resolved.getDescription());
+                } else if (resolved.getDocumentStatus() == null
+                        || !Integer.valueOf(7).equals(resolved.getDocumentStatus().getId())) {
+                    notApprovedItems.add(resolved.getDescription());
+                }
+            }
+
+            if (!notChildItems.isEmpty() || !notApprovedItems.isEmpty()) {
+                StringBuilder msg = new StringBuilder("Cannot process: ");
+                if (!notChildItems.isEmpty()) {
+                    msg.append("parent items must be replaced with a child item: [")
+                       .append(String.join(", ", notChildItems)).append("]. ");
+                }
+                if (!notApprovedItems.isEmpty()) {
+                    msg.append("items pending approval: [")
+                       .append(String.join(", ", notApprovedItems)).append("].");
+                }
+                response.setFailureMessage(msg.toString());
+                return response;
+            }
+            // --- end gate ---
+
             // for logging
             Map oldMap = this.forLogMapMain(quotation);
             DocumentWorkflowActionMap actionMap = workflowActionMapRepo.findById(postData.getWorkflowActionsDto().getActionMapId()).orElse(null);
@@ -832,6 +869,13 @@ public class QuotationServiceImpl implements QuotationService, PrintableVoucher 
                     quotationItem.setPurchaseRequestDetail(new PurchaseRequestDetail(detail.getPurchaseRequestDetailId()));
 
                     quotationItemRepo.save(quotationItem);
+
+                    if (detail.getNewItemId() != null && detail.getNewItemId() > 0) {
+                        purchaseRequestDetailRepo.findById(detail.getPurchaseRequestDetailId()).ifPresent(prd -> {
+                            prd.setNewItem(new Item(detail.getNewItemId().intValue()));
+                            purchaseRequestDetailRepo.save(prd);
+                        });
+                    }
 
                     List<QuotationItemDetailDto> priceDetails = detail.getDetails();
                     for(QuotationItemDetailDto priceDetail: priceDetails) {

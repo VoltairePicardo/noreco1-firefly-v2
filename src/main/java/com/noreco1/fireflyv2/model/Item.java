@@ -131,4 +131,8 @@ public class Item {
     @Transient
     private String base64Image = "";
 
+    public Item(Integer id) {
+        this.id = id;
+    }
+
 }

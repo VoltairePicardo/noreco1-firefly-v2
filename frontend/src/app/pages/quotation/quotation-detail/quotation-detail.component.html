@@ -47,7 +47,7 @@
                 <div class="col-md-auto">
                     <button type="button" class="btn btn-primary fw-bold"
                             (click)="processWorkflow()"
-                            [disabled]="!selectedAction || processingWorkflow">
+                            [disabled]="processingNotAllowed || !selectedAction || processingWorkflow">
                         @if (processingWorkflow) {
                             <span class="spinner-border spinner-border-sm me-2" role="status"></span>
                         } @else {
@@ -57,6 +57,28 @@
                     </button>
                 </div>
             </div>
+            @if (processingNotAllowed) {
+                <div class="alert alert-warning d-flex flex-column gap-1 mt-3 mb-0">
+                    <p class="fw-semibold mb-1">
+                        <ng-icon name="tablerAlertTriangle" class="pe-1"></ng-icon>
+                        This AOQ cannot be processed until the following are resolved:
+                    </p>
+                    @if (notChildItems.length > 0) {
+                        <ul class="mb-0 small">
+                            @for (item of notChildItems; track $index) {
+                                <li><strong>{{ item.itemDescription }}</strong> — must be replaced with a child item</li>
+                            }
+                        </ul>
+                    }
+                    @if (notApprovedItems.length > 0) {
+                        <ul class="mb-0 small mt-1">
+                            @for (item of notApprovedItems; track $index) {
+                                <li><strong>{{ item.newItemDescription ?? item.itemDescription }}</strong> — pending item approval</li>
+                            }
+                        </ul>
+                    }
+                </div>
+            }
         }
 
         <hr class="my-3"/>

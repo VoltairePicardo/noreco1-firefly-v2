@@ -58,9 +58,9 @@ public class PoDetailServiceImpl implements PoDetailService {
                 lineDto.setRvDetailId(line.getPurchaseRequestDetail().getId());
                 lineDto.setPurchaseOrderId(line.getPurchaseOrder().getId());
                 lineDto.setQuantity(line.getQuantity());
-                lineDto.setItemId(line.getPurchaseRequestDetail().getItem().getId());
-                lineDto.setItemCode(line.getPurchaseRequestDetail().getItem().getCode());
-                lineDto.setItemDescription(line.getPurchaseRequestDetail().getItem().getDescription());
+                lineDto.setItemId(line.getPurchaseRequestDetail().getNewItem().getId());
+                lineDto.setItemCode(line.getPurchaseRequestDetail().getNewItem().getCode());
+                lineDto.setItemDescription(line.getPurchaseRequestDetail().getNewItem().getDescription());
                 lineDto.setUnitCode(line.getPurchaseRequestDetail().getUnitMeasure().getCode());
                 lineDto.setUnitPrice(line.getUnitPrice());
                 lineDto.setVat(line.getVat());
@@ -104,9 +104,9 @@ public class PoDetailServiceImpl implements PoDetailService {
                 lineDto.setPurchaseOrderId(line.getPurchaseOrder().getId());
                 lineDto.setQuantity(line.getQuantity());
 //                lineDto.setDeliveredQuantity(line.getDeliveredQuantity().add(receivingReportDetail != null ? receivingReportDetail.getQuantityReceived() : BigDecimal.ZERO));
-                lineDto.setItemId(line.getPurchaseRequestDetail().getItem().getId());
-                lineDto.setItemCode(line.getPurchaseRequestDetail().getItem().getCode());
-                lineDto.setItemDescription(line.getPurchaseRequestDetail().getItem().getDescription());
+                lineDto.setItemId(line.getPurchaseRequestDetail().getNewItem().getId());
+                lineDto.setItemCode(line.getPurchaseRequestDetail().getNewItem().getCode());
+                lineDto.setItemDescription(line.getPurchaseRequestDetail().getNewItem().getDescription());
                 lineDto.setUnitCode(line.getPurchaseRequestDetail().getUnitMeasure().getCode());
                 lineDto.setUnitPrice(line.getUnitPrice());
                 lineDto.setVat(line.getVat());
@@ -148,9 +148,9 @@ public class PoDetailServiceImpl implements PoDetailService {
                     BigDecimal totalItemQuantityTested = itemTestingDetailRepo.getTotalQuantityTestedByPoDetailId(line.getId());
 
                     lineDto.setQuantity(totalItemQuantityTested);
-                    lineDto.setItemId(line.getPurchaseRequestDetail().getItem().getId());
-                    lineDto.setItemCode(line.getPurchaseRequestDetail().getItem().getCode());
-                    lineDto.setItemDescription(line.getPurchaseRequestDetail().getItem().getDescription());
+                    lineDto.setItemId(line.getPurchaseRequestDetail().getNewItem().getId());
+                    lineDto.setItemCode(line.getPurchaseRequestDetail().getNewItem().getCode());
+                    lineDto.setItemDescription(line.getPurchaseRequestDetail().getNewItem().getDescription());
                     lineDto.setUnitCode(line.getPurchaseRequestDetail().getUnitMeasure().getCode());
                     lineDto.setUnitPrice(line.getUnitPrice());
                     lineDto.setDiscount(line.getDiscount());
