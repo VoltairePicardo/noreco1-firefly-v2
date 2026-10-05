@@ -399,19 +399,24 @@
                         <!-- Budget Balance (shown for PO/IT/REP; LAB has its own inline balance above) -->
                         @if (budgetBalance() && !isForLab()) {
                             <div class="row mt-2 g-2">
-                                <div class="col-md-4">
+                                <div class="col-md-3">
                                     <div class="alert alert-info py-2 mb-0 small">
                                         <span class="fw-bold">Qty Balance:</span> {{ budgetBalance().quantityBalance | number:'1.2-2' }}
                                     </div>
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-md-3">
                                     <div class="alert alert-info py-2 mb-0 small">
                                         <span class="fw-bold">Amount Balance (CV):</span> {{ budgetBalance().amountBalanceCV | number:'1.2-2' }}
                                     </div>
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-md-3">
                                     <div class="alert alert-info py-2 mb-0 small">
                                         <span class="fw-bold">Amount Balance (PO/JO):</span> {{ budgetBalance().amountBalancePOJO | number:'1.2-2' }}
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="alert alert-warning py-2 mb-0 small">
+                                        <span class="fw-bold">Amount Balance (PO/JO/PR):</span> {{ budgetBalance().amountBalancePOJOPR | number:'1.2-2' }}
                                     </div>
                                 </div>
                             </div>
@@ -447,11 +452,12 @@
                                                     <th style="width:12%">Quantity</th>
                                                 } @else {
                                                     <th style="width:10%">Item No.</th>
-                                                    <th style="width:15%">Unit</th>
-                                                    <th style="width:38%">Description</th>
-                                                    <th style="width:12%">Quantity</th>
+                                                    <th style="width:28%">Description</th>
+                                                    <th style="width:20%">Specification</th>
+                                                    <th style="width:10%">Quantity</th>
+                                                    <th style="width:12%">Unit</th>
                                                     @if (isForIt()) {
-                                                        <th style="width:17%">JO Description</th>
+                                                        <th style="width:12%">JO Description</th>
                                                     }
                                                 }
                                                 <th style="width:8%" class="text-end">
@@ -490,18 +496,8 @@
                                                                    min="1" placeholder="0"/>
                                                         </td>
                                                     } @else {
-                                                        <!-- PO/IT/REP: Item No. | Unit | Description | Quantity | [JO Desc for IT] -->
+                                                        <!-- PO/IT/REP: Item No. | Description | Specification | Quantity | Unit | [JO Desc for IT] -->
                                                         <td class="text-muted small">{{ li.itemCode || '—' }}</td>
-                                                        <td>
-                                                            <select class="form-select form-select-sm"
-                                                                    [(ngModel)]="li.unitId"
-                                                                    [ngModelOptions]="{standalone: true}">
-                                                                <option [ngValue]="null">— Select —</option>
-                                                                @for (u of units(); track u.id) {
-                                                                    <option [ngValue]="u.id">{{ u.code }}</option>
-                                                                }
-                                                            </select>
-                                                        </td>
                                                         <td>
                                                             <div class="input-group input-group-sm">
                                                                 <input type="text" class="form-control form-control-sm"
@@ -517,10 +513,27 @@
                                                             </div>
                                                         </td>
                                                         <td>
+                                                            <textarea class="form-control form-control-sm"
+                                                                      [(ngModel)]="li.joDescription"
+                                                                      [ngModelOptions]="{standalone: true}"
+                                                                      placeholder="Specification"
+                                                                      rows="1"></textarea>
+                                                        </td>
+                                                        <td>
                                                             <input type="number" class="form-control form-control-sm"
                                                                    [(ngModel)]="li.quantity"
                                                                    [ngModelOptions]="{standalone: true}"
                                                                    min="1" placeholder="0"/>
+                                                        </td>
+                                                        <td>
+                                                            <select class="form-select form-select-sm"
+                                                                    [(ngModel)]="li.unitId"
+                                                                    [ngModelOptions]="{standalone: true}">
+                                                                <option [ngValue]="null">— Select —</option>
+                                                                @for (u of units(); track u.id) {
+                                                                    <option [ngValue]="u.id">{{ u.code }}</option>
+                                                                }
+                                                            </select>
                                                         </td>
                                                         @if (isForIt()) {
                                                             <td>

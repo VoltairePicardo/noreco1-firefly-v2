@@ -21,6 +21,7 @@ public interface BudgetLineItemDetailRepo extends JpaRepository<BudgetLineItemDe
 
     List<BudgetLineItemDetail> findAllByBudgetLineItemDocumentStatusIdOrderByCodeAsc(Integer status);
     List<BudgetLineItemDetail> findAllByBudgetLineItemDocumentStatusIdAndBudgetLineItemDivisionIdOrderByCodeAsc(Integer status, Integer division);
+    List<BudgetLineItemDetail> findAllByBudgetLineItemDocumentStatusIdAndBudgetLineItemDepartmentIdOrderByCodeAsc(Integer status, Integer departmentId);
 
     @Query(value = "SELECT COALESCE(SUM(budgetLineItemDetailBalance.quantity), 0) FROM ( " +
             "  SELECT blid.quantity AS quantity FROM BudgetLineItemDetail blid WHERE blid.id = :budgetLineItemDetailId " +
@@ -163,6 +164,29 @@ public interface BudgetLineItemDetailRepo extends JpaRepository<BudgetLineItemDe
             ") AS budgetLineItemDetailAmountBalance ", nativeQuery = true)
     BigDecimal getBudgetLineItemDetailAmountBalancePCV(@Param("documentStatusId") Integer documentStatusId,
                                                        @Param("budgetLineItemDetailId") Integer budgetLineItemDetailId);
+
+    @Query(value = "SELECT COALESCE(SUM(budgetLineItemDetailAmountBalance.totalAmount), 0) FROM (  " +
+            "  SELECT blid.totalPrice AS totalAmount FROM BudgetLineItemDetail blid WHERE blid.id = :budgetLineItemDetailId  " +
+            "  UNION ALL " +
+            "  SELECT SUM(pod.amount*-1) AS totalAmount FROM PurchaseOrder po " +
+            "  INNER JOIN PoDetail pod ON pod.FK_purchaseOrderId = po.id " +
+            "  INNER JOIN PurchaseRequestDetail prd ON prd.id = pod.FK_purchaseRequestDetailId " +
+            "  INNER JOIN PurchaseRequest pr ON pr.id = prd.FK_purchaseRequestId " +
+            "  WHERE po.FK_documentStatusId != :cancelledStatusId AND pr.FK_budgetLineItemDetailId = :budgetLineItemDetailId " +
+            "  UNION ALL " +
+            "  SELECT SUM(jod.amount*-1) AS totalAmount FROM JobOrder jo " +
+            "  INNER JOIN JoDetail jod ON jod.FK_jobOrderId = jo.id " +
+            "  INNER JOIN PurchaseRequestDetail prd ON prd.id = jod.FK_purchaseRequestDetailId " +
+            "  INNER JOIN PurchaseRequest pr ON pr.id = prd.FK_purchaseRequestId " +
+            "  WHERE jo.FK_documentStatusId != :cancelledStatusId AND pr.FK_budgetLineItemDetailId = :budgetLineItemDetailId " +
+            "  UNION ALL " +
+            "  SELECT SUM(pr.estimatedAmount * -1) AS totalAmount FROM PurchaseRequest pr " +
+            "  WHERE pr.FK_documentStatusId NOT IN (:cancelledStatusId, :deniedStatusId) " +
+            "    AND pr.FK_budgetLineItemDetailId = :budgetLineItemDetailId " +
+            ") AS budgetLineItemDetailAmountBalance ", nativeQuery = true)
+    BigDecimal getBudgetLineItemDetailAmountBalancePOJOPR(@Param("cancelledStatusId") Integer cancelledStatusId,
+                                                          @Param("deniedStatusId") Integer deniedStatusId,
+                                                          @Param("budgetLineItemDetailId") Integer budgetLineItemDetailId);
 
     @Query(value = "SELECT DISTINCT blid.* " +
             "FROM BudgetLineItemDetail blid " +

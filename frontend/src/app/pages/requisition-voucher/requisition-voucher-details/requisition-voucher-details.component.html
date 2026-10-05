@@ -61,6 +61,34 @@
             </div>
         }
 
+        <!-- Mode of Procurement Selection -->
+        @if (showMopSelection() && modesOfProcurement.length > 0) {
+            <hr class="my-3"/>
+            <div class="fs-xs text-uppercase fw-semibold text-muted mb-2">Set Mode of Procurement</div>
+            <div class="row g-3 align-items-end">
+                <div class="col-md-5">
+                    <label class="form-label fw-bold">Mode of Procurement <span class="text-danger">*</span></label>
+                    <select class="form-select" [(ngModel)]="selectedMop">
+                        <option [ngValue]="null">— Select Mode of Procurement —</option>
+                        @for (m of modesOfProcurement; track m.id) {
+                            <option [ngValue]="m">{{ m.name }}</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-auto">
+                    <button type="button" class="btn btn-primary fw-bold"
+                            (click)="confirmModeOfProcurement()"
+                            [disabled]="!selectedMop || settingMop">
+                        @if (settingMop) {
+                            <span class="spinner-border spinner-border-sm me-1" role="status"></span>Saving...
+                        } @else {
+                            <ng-icon name="tablerCheck" class="ps-0 pe-3 fw-bold"></ng-icon>Confirm Mode of Procurement
+                        }
+                    </button>
+                </div>
+            </div>
+        }
+
         <hr class="my-3"/>
 
         <!-- Header Info -->
@@ -136,8 +164,8 @@
                 }
                 @if (data.modeOfProcurement) {
                     <div class="col-md-4">
-                        <div class="fs-xs text-uppercase fw-bold text-muted mb-1"> curement</div>
-                        <div>{{ data.modeOfProcurement.description || data.modeOfProcurement }}</div>
+                        <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Mode of Procurement</div>
+                        <div>{{ data.modeOfProcurement.name || '—' }}</div>
                     </div>
                 }
                 @if (data.costEstimate) {
@@ -242,9 +270,10 @@
                     <tr class="text-uppercase fs-xxs">
                         <th>#</th>
                         <th>Item No.</th>
-                        <th>Unit</th>
                         <th>Description</th>
+                        <th>Specification</th>
                         <th class="text-center">Qty</th>
+                        <th>Unit</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -253,47 +282,20 @@
                             <tr>
                                 <td class="text-muted">{{ i + 1 }}</td>
                                 <td class="fw-bold">{{ li.itemCode || '—' }}</td>
-                                <td>{{ li.unitCode || '—' }}</td>
                                 <td>{{ li.itemDescription || li.joDescription || '—' }}</td>
+                                <td>{{ li.joDescription || '—' }}</td>
                                 <td class="text-center fw-bold">{{ li.quantity }}</td>
+                                <td>{{ li.unitCode || '—' }}</td>
                             </tr>
                         }
                     } @else {
                         <tr>
-                            <td colspan="5" class="text-center text-muted py-3">No line items.</td>
+                            <td colspan="6" class="text-center text-muted py-3">No line items.</td>
                         </tr>
                     }
                 </tbody>
             </table>
         </div>
-
-        <!-- Mode of Procurement Selection -->
-        @if (showMopSelection() && modesOfProcurement.length > 0) {
-            <hr class="my-3"/>
-            <div class="fs-xs text-uppercase fw-semibold text-muted mb-2">Set Mode of Procurement</div>
-            <div class="row g-3 align-items-end">
-                <div class="col-md-5">
-                    <label class="form-label fw-bold">Mode of Procurement <span class="text-danger">*</span></label>
-                    <select class="form-select" [(ngModel)]="selectedMop">
-                        <option [ngValue]="null">— Select Mode of Procurement —</option>
-                        @for (m of modesOfProcurement; track m.id) {
-                            <option [ngValue]="m">{{ m.name }}</option>
-                        }
-                    </select>
-                </div>
-                <div class="col-md-auto">
-                    <button type="button" class="btn btn-primary fw-bold"
-                            (click)="confirmModeOfProcurement()"
-                            [disabled]="!selectedMop || settingMop">
-                        @if (settingMop) {
-                            <span class="spinner-border spinner-border-sm me-1" role="status"></span>Saving...
-                        } @else {
-                            <ng-icon name="tablerCheck" class="ps-0 pe-2 fw-bold"></ng-icon>Confirm Mode of Procurement
-                        }
-                    </button>
-                </div>
-            </div>
-        }
 
     </div>
 </div>
@@ -321,6 +323,9 @@
                                     <th class="text-nowrap">Date</th>
                                     <th class="text-nowrap">By</th>
                                     <th class="text-nowrap">Status</th>
+                                    <th class="text-nowrap">RV No.</th>
+                                    <th>Purpose</th>
+                                    <th class="text-nowrap">Approving Officer</th>
                                     <th>Remarks</th>
                                 </tr>
                             </thead>
@@ -334,7 +339,10 @@
                                                 {{ log.action || '—' }}
                                             </span>
                                         </td>
-                                        <td>{{ log.remarks || '—' }}</td>
+                                        <td class="text-nowrap fw-bold fs-xs">{{ log.detail?.code || '—' }}</td>
+                                        <td class="fs-xs">{{ log.detail?.purpose || '—' }}</td>
+                                        <td class="text-nowrap fs-xs">{{ log.detail?.approvedBy || '—' }}</td>
+                                        <td class="fs-xs">{{ log.remarks || '—' }}</td>
                                     </tr>
                                 }
                             </tbody>

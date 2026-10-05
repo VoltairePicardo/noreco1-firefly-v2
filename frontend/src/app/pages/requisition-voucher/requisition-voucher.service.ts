@@ -19,10 +19,8 @@ export class RequisitionVoucherService {
     }
 
     listByDateRange(from: string, to: string, statusId?: number | null): Observable<any[]> {
-        const url = statusId
-            ? `${BASE_API}/purchase-request/list/${from}/${to}/${statusId}`
-            : `${BASE_API}/purchase-request/list/${from}/${to}`;
-        return this.http.get<any[]>(url);
+        const id = statusId ?? 0;   // 0 = all statuses
+        return this.http.get<any[]>(`${BASE_API}/purchase-request/list/${from}/${to}/${id}`);
     }
 
     getDocumentStatuses(): Observable<any[]> {

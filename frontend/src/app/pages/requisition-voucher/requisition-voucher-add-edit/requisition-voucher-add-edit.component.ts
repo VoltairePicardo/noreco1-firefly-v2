@@ -133,7 +133,7 @@ export class RequisitionVoucherAddEditComponent {
     initForm(data?: any): void {
         this.validationForm = this.fb.group({
             rvType:                      [data?.rvTypeId             || null,  Validators.required],
-            voucherDate:                 [data?.voucherDate  ? this.toDateInput(data.voucherDate)  : '', Validators.required],
+            voucherDate:                 [data?.voucherDate ? this.toDateInput(data.voucherDate) : new Date().toISOString().substring(0, 10), Validators.required],
             deliveryDate:                [data?.deliveryDate ? this.toDateInput(data.deliveryDate) : ''],
             purpose:                     [data?.purpose              || '',    Validators.required],
             approvingOfficer:            [data?.approvedBy?.accountNo || null, Validators.required],
@@ -185,10 +185,8 @@ export class RequisitionVoucherAddEditComponent {
             });
         }
 
-        // Voucher date is locked once the document is created
-        if (this.editMode) {
-            this.form.get('voucherDate')?.disable();
-        }
+        // Voucher date is auto-set on create and locked once the document is created
+        this.form.get('voucherDate')?.disable();
     }
 
     /**

@@ -171,12 +171,12 @@ public class PurchaseRequestServiceImpl implements PurchaseRequestService, Print
 
                 DocumentStatus documentStatus = new DocumentStatus();
                 documentStatus.setId(com.noreco1.fireflyv2.model.enums.DocumentStatus.DOCUMENT_CREATED.getId());
+                documentStatus.setStatus("Document Created");
                 rv.setDocumentStatus(documentStatus);
 
                 rv.setTransaction(generatorFacade.transaction());
                 rv.setCreatedBy(createdBy);
                 rv.setDepartment(employee != null ? employee.getDepartment() : null);
-                rv.setCreatedAt(new java.util.Date());
                 rv.setUpdatedAt(new java.util.Date());
                 existingRv = rv;
 
@@ -636,16 +636,21 @@ public class PurchaseRequestServiceImpl implements PurchaseRequestService, Print
 
             List<PurchaseRequest> docs;
 
-            if(isPurchasingOfficer(loggedIn.getId())){
-
-                if(Checker.isValidId(docStatusId)){
+            if (isPurchasingOfficer(loggedIn.getId())) {
+                if (Checker.isValidId(docStatusId)) {
                     docs = purchaseRequestRepo.findByAllowedUserVoucherDateBetweenAndDocumentStatusId(loggedIn.getId(), fromDate, toDate, docStatusId);
                 } else {
-                    docs = purchaseRequestRepo.findByDocumentStatusIdAndVoucherDateBetween(com.noreco1.fireflyv2.model.enums.DocumentStatus.REVIEWED_AND_ACCEPTED.getId(), fromDate, toDate);
+                    // docStatusId == 0 or null → all statuses for purchasing officer: show all REVIEWED_AND_ACCEPTED
+                    docs = purchaseRequestRepo.findByDocumentStatusIdAndVoucherDateBetween(
+                        com.noreco1.fireflyv2.model.enums.DocumentStatus.REVIEWED_AND_ACCEPTED.getId(), fromDate, toDate);
                 }
-
             } else {
-                docs = purchaseRequestRepo.findByAllowedUserVoucherDateBetweenAndDocumentStatusId(loggedIn.getId(), fromDate, toDate, docStatusId);
+                if (Checker.isValidId(docStatusId)) {
+                    docs = purchaseRequestRepo.findByAllowedUserVoucherDateBetweenAndDocumentStatusId(loggedIn.getId(), fromDate, toDate, docStatusId);
+                } else {
+                    // docStatusId == 0 → all statuses for allowed user (no status filter)
+                    docs = purchaseRequestRepo.findByAllowedUserVoucherDateBetween(loggedIn.getId(), fromDate, toDate);
+                }
             }
 
             return this.makeRIVListMap(docs);
@@ -892,6 +897,7 @@ public class PurchaseRequestServiceImpl implements PurchaseRequestService, Print
             params.put("BUDGET_SOURCE", purchaseRequest.getBudgetLineItemDetail() != null ? purchaseRequest.getBudgetLineItemDetail().getTitle() +" - "+ purchaseRequest.getBudgetLineItemDetail().getCode():"");
 
             params.put("WORKFLOW", purchaseRequest.getWorkflow().getId());
+            params.put("DELIVERY_DATE", purchaseRequest.getDeliveryDate());
             params.put("WORK_ORDER", purchaseRequest.getWorkOrder() != null ? purchaseRequest.getWorkOrder().getCode() : "");
             params.put("IS_EMERGENCY_PURCHASE", purchaseRequest.getEmergencyPurchase() ? "Yes" : "No");
             java.net.URL subreportUrl = getClass().getResource("/jasper/vouchers/sub_reports/");
@@ -916,7 +922,9 @@ public class PurchaseRequestServiceImpl implements PurchaseRequestService, Print
                     RVDetail d = new RVDetail();
 
                     d.setId(rvDetailLineDtos.indexOf(dto) + 1);
-                    d.setDescription(dto.getJoDescription() == null ? dto.getItemDescription() : dto.getJoDescription());
+                    boolean hasItem = dto.getItemId() != null && dto.getItemId() != 0;
+                    d.setDescription(hasItem ? dto.getItemDescription() : dto.getJoDescription());
+                    d.setSpecification(hasItem ? dto.getJoDescription() : null);
                     d.setUnitCode(dto.getUnitCode());
                     d.setQuantity(dto.getQuantity());
                     d.setItemGroup(dto.getItemGroup());
