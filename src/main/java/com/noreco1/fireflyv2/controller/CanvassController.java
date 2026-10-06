@@ -6,6 +6,7 @@ import com.noreco1.fireflyv2.controller.response.ProcessDocumentDto;
 import com.noreco1.fireflyv2.model.Canvass;
 import com.noreco1.fireflyv2.model.DocumentStatus;
 import com.noreco1.fireflyv2.service.CanvassService;
+import com.noreco1.fireflyv2.service.implementation.CanvassServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.MessageSource;
@@ -64,5 +65,15 @@ public class CanvassController {
     @GetMapping("/{id}")
     public CanvassDto getById(@PathVariable Integer id) {
         return canvassService.findById(id);
+    }
+
+    /** One-time backfill — call once, then remove or leave harmless. */
+    @GetMapping("/backfill-logs")
+    public Map<String, Object> backfillLogs() {
+        int updated = ((CanvassServiceImpl) canvassService).backfillDocumentLogs();
+        Map<String, Object> result = new java.util.LinkedHashMap<>();
+        result.put("updated", updated);
+        result.put("message", updated + " canvass log(s) backfilled.");
+        return result;
     }
 }

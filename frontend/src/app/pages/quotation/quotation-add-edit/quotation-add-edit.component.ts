@@ -27,7 +27,6 @@ import { forkJoin } from 'rxjs';
         ...COMMON_MAIN_PAGE_IMPORTS,
         LaddaModule,
         FlatpickrDirective,
-        ItemQuickCreateModalComponent
     ],
     providers: [provideFlatpickrDefaults(), ...SHARED_PROVIDERS, provideIcons({ tablerSearch, tablerPlus, tablerTrash, tablerArrowLeft, tablerDeviceFloppy, tablerX, tablerCheck })],
     templateUrl: './quotation-add-edit.component.html'

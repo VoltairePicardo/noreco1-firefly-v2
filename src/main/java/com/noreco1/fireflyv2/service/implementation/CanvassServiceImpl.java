@@ -26,8 +26,8 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
-import java.math.BigDecimal;
 import java.util.*;
 
 @Service(value = "cnvsServiceImpl")
@@ -132,18 +132,24 @@ public class CanvassServiceImpl implements CanvassService, PrintableVoucher {
                 Object latestCanvassCode = canvassRepo.findLatestCanvassCodeByYear(voucherYear, "%-"+departmentAbbreviation+"-%");
                 canvass.setCode(generatorFacade.voucherCode("CF-"+departmentAbbreviation, (latestCanvassCode == null ? "" : String.valueOf(latestCanvassCode)), canvass.getVoucherDate()));
 
-                DocumentStatus documentStatus = new DocumentStatus();
-                documentStatus.setId(com.noreco1.fireflyv2.model.enums.DocumentStatus.DOCUMENT_CREATED.getId());
-                canvass.setDocumentStatus(documentStatus);
-
                 Workflow wf = new Workflow();
                 wf.setId(com.noreco1.fireflyv2.model.enums.Workflow.CANVASS.getId());
+
+                // Load full DocumentStatus via workflow action map so status string is populated
+                // (plain new DocumentStatus() with only ID set causes documentStatus.getStatus() = null in logs)
+                List<DocumentWorkflowActionMap> initMaps = workflowActionMapRepo.findDocumentCreatedAndWorkflowId(wf.getId());
+                DocumentStatus documentStatus;
+                if (!Checker.collectionIsEmpty(initMaps) && initMaps.get(0).getAfterActionDocumentStatus() != null) {
+                    documentStatus = initMaps.get(0).getAfterActionDocumentStatus();
+                } else {
+                    documentStatus = new DocumentStatus();
+                    documentStatus.setId(com.noreco1.fireflyv2.model.enums.DocumentStatus.DOCUMENT_CREATED.getId());
+                }
+                canvass.setDocumentStatus(documentStatus);
 
                 canvass.setTransaction(generatorFacade.transaction());
                 canvass.setWorkflow(wf);
                 canvass.setCreatedBy(createdBy);
-                canvass.setCreatedAt(new Date());
-                canvass.setUpdatedAt(new Date());
                 existingCanvass = canvass;
             } else {
                 existingCanvass = canvassRepo.findById(canvass.getId()).orElse(null);
@@ -154,7 +160,6 @@ public class CanvassServiceImpl implements CanvassService, PrintableVoucher {
             existingCanvass.setVoucherDate(canvass.getVoucherDate());
             existingCanvass.setYear(voucherYear);
             existingCanvass.setSupplier(canvass.getSupplier());
-            existingCanvass.setUpdatedAt(new Date());
 
             this.model = canvassRepo.save(existingCanvass);
 
@@ -169,78 +174,29 @@ public class CanvassServiceImpl implements CanvassService, PrintableVoucher {
 
                 if (insertMode) { // log action only when adding document
                     documentProcessingFacade.processAction(this.model.getTransaction(), null, this.model.getWorkflow(), createdBy);
-                    oldMap = null;
                 }
 
                 ArrayList<CanvassDetailDto> canvassDetails = canvass.getCanvassDetails();
                 for(CanvassDetailDto canvassDetailLine: canvassDetails) {
+                    PurchaseRequestDetail purchaseRequestDetail = new PurchaseRequestDetail();
+                    purchaseRequestDetail.setId(canvassDetailLine.getRvDetailId());
 
-                    // save only with unit price if has supplier
-                    // save all if no supplier
-                    boolean hasPrice1 = canvassDetailLine.getPriceSupplier1() != null && canvassDetailLine.getPriceSupplier1().compareTo(BigDecimal.ZERO) > 0;
-                    boolean hasPrice2 = canvassDetailLine.getPriceSupplier2() != null && canvassDetailLine.getPriceSupplier2().compareTo(BigDecimal.ZERO) > 0;
-                    boolean hasPrice3 = canvassDetailLine.getPriceSupplier3() != null && canvassDetailLine.getPriceSupplier3().compareTo(BigDecimal.ZERO) > 0;
+                    CanvassDetail canvassDetail = new CanvassDetail();
+                    canvassDetail.setCanvass(this.model);
+                    canvassDetail.setPurchaseRequestDetail(purchaseRequestDetail);
+                    canvassDetail.setUnitPrice(canvassDetailLine.getUnitPrice());
 
-                    boolean hasPrice = hasPrice1 || hasPrice2 || hasPrice3;
-
-                    boolean save = canvass.getSuppliers().isEmpty() || hasPrice;
-                    if(save) {
-
-                        PurchaseRequestDetail purchaseRequestDetail = new PurchaseRequestDetail();
-                        purchaseRequestDetail.setId(canvassDetailLine.getRvDetailId());
-
-                        if(hasPrice) {
-
-                            // save multiple lines, with supplier
-                            // first supplier: has supplier and price is set
-                            if(canvass.getSuppliers().size() > 0 && canvass.getSuppliers().get(0) != null && hasPrice1) {
-
-                                CanvassDetail canvassDetail1 = new CanvassDetail();
-                                canvassDetail1.setCanvass(this.model);
-                                canvassDetail1.setPurchaseRequestDetail(purchaseRequestDetail);
-                                canvassDetail1.setUnitPrice(canvassDetailLine.getPriceSupplier1());
-                                canvassDetail1.setSupplier(canvass.getSuppliers().get(0));
-
-                                canvassDetailRepo.save(canvassDetail1);
-                            }
-                            // second
-                            if(canvass.getSuppliers().size() > 1 && canvass.getSuppliers().get(1) != null && hasPrice2) {
-
-                                CanvassDetail canvassDetail2 = new CanvassDetail();
-                                canvassDetail2.setCanvass(this.model);
-                                canvassDetail2.setPurchaseRequestDetail(purchaseRequestDetail);
-                                canvassDetail2.setUnitPrice(canvassDetailLine.getPriceSupplier2());
-                                canvassDetail2.setSupplier(canvass.getSuppliers().get(1));
-
-                                canvassDetailRepo.save(canvassDetail2);
-                            }
-                            // last
-                            if(canvass.getSuppliers().size() > 2 && canvass.getSuppliers().get(2) != null && hasPrice3) {
-
-                                CanvassDetail canvassDetail3 = new CanvassDetail();
-                                canvassDetail3.setCanvass(this.model);
-                                canvassDetail3.setPurchaseRequestDetail(purchaseRequestDetail);
-                                canvassDetail3.setUnitPrice(canvassDetailLine.getPriceSupplier3());
-                                canvassDetail3.setSupplier(canvass.getSuppliers().get(2));
-
-                                canvassDetailRepo.save(canvassDetail3);
-                            }
-
-                        } else {
-                            // creating canvass form only. save 1
-                            CanvassDetail canvassDetail = new CanvassDetail();
-                            canvassDetail.setCanvass(this.model);
-                            canvassDetail.setPurchaseRequestDetail(purchaseRequestDetail);
-                            canvassDetail.setUnitPrice(canvassDetailLine.getUnitPrice());
-
-                            canvassDetailRepo.save(canvassDetail);
-
-                        }
-                    }
+                    canvassDetailRepo.save(canvassDetail);
                 }
+
+                // Refetch to ensure all EAGER associations (esp. documentStatus) are fully loaded
+                Canvass savedForLog = canvassRepo.findById(this.model.getId()).orElse(null);
+
                 // generic document logging here
-                // old value only
-                DocumentLog log = documentLoggerFacade.log(this.model.getTransaction(), authenticationFacade.getLoggedIn(), oldMap, null);
+                // for insert: log new state so documentStatus is captured; for update: log old state
+                Map logNewMap = (insertMode && savedForLog != null) ? this.forLogMapMain(savedForLog) : null;
+                Map logOldMap = insertMode ? null : oldMap;
+                DocumentLog log = documentLoggerFacade.log(this.model.getTransaction(), authenticationFacade.getLoggedIn(), logOldMap, logNewMap);
 
                 response.setLogId(log != null ? log.getId() : 0);
                 response.setModelId(this.model.getId());
@@ -458,15 +414,22 @@ public class CanvassServiceImpl implements CanvassService, PrintableVoucher {
         Canvass canvass =  canvassRepo.findById(postData.getDocumentId()).orElse(null);
 
         if (canvass != null) {
+            Map oldMap = this.forLogMapMain(canvass);
+
             DocumentWorkflowActionMap actionMap = workflowActionMapRepo.findById(postData.getWorkflowActionsDto().getActionMapId()).orElse(null);
             DocumentStatus afterActionDocumentStatus = actionMap.getAfterActionDocumentStatus();
 
             canvass.setDocumentStatus(afterActionDocumentStatus);
-            canvass.setUpdatedAt(null);
             canvass = canvassRepo.save(canvass);
 
             if (canvass != null) {
                 documentProcessingFacade.processAction(canvass.getTransaction(), actionMap, null, processedBy);
+
+                // log the new state so status changes appear in document logs
+                Canvass savedForLog = canvassRepo.findById(canvass.getId()).orElse(null);
+                if (savedForLog != null) {
+                    documentLoggerFacade.log(canvass.getTransaction(), processedBy, oldMap, this.forLogMapMain(savedForLog));
+                }
 
                 response.setSuccessMessage("Document successfully processed");
                 response.setSuccess(true);
@@ -506,6 +469,43 @@ public class CanvassServiceImpl implements CanvassService, PrintableVoucher {
         }
 
         return null;
+    }
+
+    /**
+     * One-time backfill: for existing DocumentLog entries where newValue has "documentStatus": null,
+     * replace with the actual status string from the canvass's DocumentStatus (EAGER-loaded from DB).
+     * Returns the number of logs updated.
+     */
+    @Transactional
+    public int backfillDocumentLogs() {
+        ObjectMapper mapper = new ObjectMapper();
+        int updated = 0;
+
+        List<Canvass> allCanvasses = canvassRepo.findAll();
+        for (Canvass canvass : allCanvasses) {
+            if (canvass.getTransaction() == null || canvass.getDocumentStatus() == null) continue;
+
+            String statusStr = canvass.getDocumentStatus().getStatus();
+            if (statusStr == null) continue;
+
+            List<DocumentLog> logs = documentLogRepo.findAllByTransactionIdOrderByCreatedAtDesc(
+                    canvass.getTransaction().getId());
+
+            for (DocumentLog log : logs) {
+                if (log.getNewValue() == null || log.getNewValue().isEmpty()) continue;
+                try {
+                    @SuppressWarnings("unchecked")
+                    Map<String, Object> map = mapper.readValue(log.getNewValue(), Map.class);
+                    if (map.containsKey("documentStatus") && map.get("documentStatus") == null) {
+                        map.put("documentStatus", statusStr);
+                        log.setNewValue(mapper.writeValueAsString(map));
+                        documentLogRepo.save(log);
+                        updated++;
+                    }
+                } catch (Exception ignored) {}
+            }
+        }
+        return updated;
     }
 
     private Map forLogMapMain(Canvass canvass) {
