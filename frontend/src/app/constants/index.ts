@@ -9,7 +9,7 @@ export const startYear = 2026
 
 export const credits = {
   website: '',
-  name: 'Tri-Nvent Systems Inc',
+  name: 'Hosen Peak Trading and Services',
   buyLink: '',
 }
 
