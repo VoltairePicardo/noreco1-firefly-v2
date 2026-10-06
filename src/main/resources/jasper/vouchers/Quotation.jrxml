@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.21.5.final using JasperReports Library version 6.21.5-74d586df47b25dbd05bd0957999819196e59934a  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Quotation" language="groovy" pageWidth="1008" pageHeight="612" orientation="Landscape" columnWidth="968" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isSummaryWithPageHeaderAndFooter="true" uuid="35ca8ff4-a809-4876-bba1-aa2ccf18bd28">
 	<property name="ireport.zoom" value="0.9982500000000011"/>
 	<property name="ireport.x" value="0"/>
@@ -77,42 +78,46 @@
 	<title>
 		<band height="103" splitType="Stretch">
 			<textField isBlankWhenNull="true">
-				<reportElement x="0" y="40" width="968" height="14" uuid="45a9411e-9c4b-46f2-8c49-065e8cc57c02"/>
+				<reportElement x="0" y="30" width="968" height="14" uuid="45a9411e-9c4b-46f2-8c49-065e8cc57c02"/>
 				<textElement textAlignment="Center">
 					<font fontName="Calibri Light" size="10"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{PURCHASING_CONTACT}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="0" y="54" width="968" height="30" uuid="036a6e21-12dc-4ea3-b4ed-13ea2138cf69"/>
+				<reportElement x="0" y="44" width="968" height="25" uuid="036a6e21-12dc-4ea3-b4ed-13ea2138cf69">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="16" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{REPORT_TITLE}]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement x="0" y="10" width="968" height="16" isPrintWhenDetailOverflows="true" uuid="2812661e-be59-4d6c-b6d2-9523618f3cf4"/>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement x="-1" y="0" width="969" height="16" isPrintWhenDetailOverflows="true" uuid="2812661e-be59-4d6c-b6d2-9523618f3cf4"/>
 				<textElement textAlignment="Center" markup="html">
 					<font fontName="Calibri" size="12" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{COMP_NAME}]]></textFieldExpression>
 			</textField>
 			<image isLazy="true" onErrorType="Icon">
-				<reportElement x="140" y="4" width="87" height="74" uuid="305092cf-609d-4e48-8a21-d5b9eaa096cd"/>
+				<reportElement x="0" y="0" width="69" height="69" uuid="305092cf-609d-4e48-8a21-d5b9eaa096cd">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
 				<imageExpression><![CDATA[$P{LOGO_PATH}]]></imageExpression>
 			</image>
 			<textField isBlankWhenNull="true">
-				<reportElement x="0" y="26" width="968" height="14" uuid="5f2540e3-8318-434c-a648-5954d91590b8"/>
+				<reportElement x="-1" y="16" width="969" height="14" uuid="5f2540e3-8318-434c-a648-5954d91590b8"/>
 				<textElement textAlignment="Center">
 					<font fontName="Calibri Light" size="10"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{COMP_ADDR}]]></textFieldExpression>
 			</textField>
 			<rectangle>
-				<reportElement x="0" y="85" width="968" height="18" uuid="46f7f00e-464b-4006-8507-04f0e919afe4"/>
+				<reportElement x="0" y="80" width="968" height="22" uuid="46f7f00e-464b-4006-8507-04f0e919afe4"/>
 			</rectangle>
 			<staticText>
-				<reportElement x="0" y="85" width="100" height="18" uuid="c11069ca-25a1-4f11-8063-13e361f746bd"/>
+				<reportElement x="0" y="80" width="100" height="22" uuid="c11069ca-25a1-4f11-8063-13e361f746bd"/>
 				<box leftPadding="2"/>
 				<textElement verticalAlignment="Middle">
 					<font isBold="true"/>
@@ -120,7 +125,7 @@
 				<text><![CDATA[SOQ NUMBER]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="718" y="85" width="100" height="18" uuid="696b3c0e-d0f3-491d-9b47-849de42c996e"/>
+				<reportElement x="718" y="80" width="100" height="22" uuid="696b3c0e-d0f3-491d-9b47-849de42c996e"/>
 				<box leftPadding="2"/>
 				<textElement verticalAlignment="Middle">
 					<font isBold="true"/>
@@ -128,12 +133,12 @@
 				<text><![CDATA[DATE PREPARED]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="100" y="85" width="190" height="18" uuid="1e97d904-cf23-4f78-b568-f443674e7e04"/>
+				<reportElement x="100" y="80" width="190" height="22" uuid="1e97d904-cf23-4f78-b568-f443674e7e04"/>
 				<textElement verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$P{VOUCHER_NO}]]></textFieldExpression>
 			</textField>
 			<textField pattern="MMMMM dd, yyyy">
-				<reportElement x="818" y="85" width="150" height="18" uuid="aa2a3972-178f-4963-ace5-5fe4e30de031"/>
+				<reportElement x="818" y="80" width="150" height="22" uuid="aa2a3972-178f-4963-ace5-5fe4e30de031"/>
 				<textElement verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$P{DATE_PREPARED}]]></textFieldExpression>
 			</textField>
@@ -202,7 +207,7 @@
 				</textElement>
 				<text><![CDATA[SUPPLIER/FIRM]]></text>
 			</staticText>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement x="398" y="20" width="190" height="25" isPrintInFirstWholeBand="true" uuid="f6229708-6f67-4de6-b085-5a83f2de1d70"/>
 				<box>
 					<topPen lineWidth="1.0"/>
@@ -214,7 +219,7 @@
 				</textElement>
 				<textFieldExpression><![CDATA[$P{SUPPLIER1}]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement x="588" y="20" width="190" height="25" isPrintInFirstWholeBand="true" uuid="9ca9821b-4a17-4371-8d96-063955f0bd77"/>
 				<box>
 					<topPen lineWidth="1.0"/>
@@ -226,7 +231,7 @@
 				</textElement>
 				<textFieldExpression><![CDATA[$P{SUPPLIER2}]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement x="778" y="20" width="190" height="25" isPrintInFirstWholeBand="true" uuid="e311207c-1de3-486d-9d22-4a3d0a92942d"/>
 				<box>
 					<topPen lineWidth="1.0"/>
@@ -344,7 +349,7 @@
 	</columnHeader>
 	<detail>
 		<band height="20">
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="39" height="20" uuid="c4bf1cda-d7b0-4e11-8ba8-80123588f751"/>
 				<box>
 					<leftPen lineWidth="1.0"/>
@@ -355,7 +360,7 @@
 				</textElement>
 				<textFieldExpression><![CDATA[$F{count}]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" pattern="#,##0" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" pattern="#,##0" isBlankWhenNull="true">
 				<reportElement stretchType="RelativeToTallestObject" x="39" y="0" width="39" height="20" uuid="3675dd7b-2125-40db-96b8-8fc255bd6c89"/>
 				<box>
 					<leftPen lineWidth="1.0"/>
@@ -366,7 +371,7 @@
 				</textElement>
 				<textFieldExpression><![CDATA[$F{quantity}]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement stretchType="RelativeToTallestObject" x="78" y="0" width="39" height="20" uuid="b51f1871-7477-4bc9-9c81-7e9ace84e8a8"/>
 				<box>
 					<leftPen lineWidth="1.0"/>
@@ -377,7 +382,7 @@
 				</textElement>
 				<textFieldExpression><![CDATA[$F{unit}]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement stretchType="RelativeToTallestObject" x="117" y="0" width="281" height="20" uuid="997d4968-b284-4220-9a04-f8d3741707c5"/>
 				<box leftPadding="2">
 					<leftPen lineWidth="1.0"/>
@@ -389,7 +394,7 @@
 				</textElement>
 				<textFieldExpression><![CDATA[$F{particulars}]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement stretchType="RelativeToTallestObject" x="418" y="0" width="54" height="20" uuid="905e47e7-1a2a-4f69-bd93-57f1ebdb6cbb"/>
 				<box>
 					<leftPen lineWidth="1.0"/>
@@ -400,7 +405,7 @@
 				</textElement>
 				<textFieldExpression><![CDATA[$F{supplier1Brand}]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement stretchType="RelativeToTallestObject" x="608" y="0" width="54" height="20" uuid="c0d8b9cb-ba8b-44d0-9d12-028caf5eb711"/>
 				<box>
 					<leftPen lineWidth="1.0"/>
@@ -411,7 +416,7 @@
 				</textElement>
 				<textFieldExpression><![CDATA[$F{supplier2Brand}]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement stretchType="RelativeToTallestObject" x="798" y="0" width="54" height="20" uuid="fcce088f-1371-4a80-b446-ca0f03dedebb"/>
 				<box>
 					<leftPen lineWidth="1.0"/>
@@ -422,7 +427,7 @@
 				</textElement>
 				<textFieldExpression><![CDATA[$F{supplier3Brand}]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" pattern="#,##0.00;(#,##0.00)" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" pattern="#,##0.00;(#,##0.00)" isBlankWhenNull="true">
 				<reportElement stretchType="RelativeToTallestObject" x="472" y="0" width="54" height="20" uuid="63c34fc1-8429-4c9d-9c03-6a475ed9c242"/>
 				<box rightPadding="2">
 					<leftPen lineWidth="1.0"/>
@@ -433,7 +438,7 @@
 				</textElement>
 				<textFieldExpression><![CDATA[$F{supplier1UnitCost}]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" pattern="#,##0.00;(#,##0.00)" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" pattern="#,##0.00;(#,##0.00)" isBlankWhenNull="true">
 				<reportElement stretchType="RelativeToTallestObject" x="662" y="0" width="54" height="20" uuid="49e267da-b4ff-41fb-b220-035a2bd2260c"/>
 				<box rightPadding="2">
 					<leftPen lineWidth="1.0"/>
@@ -444,7 +449,7 @@
 				</textElement>
 				<textFieldExpression><![CDATA[$F{supplier2UnitCost}]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" pattern="#,##0.00;(#,##0.00)" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" pattern="#,##0.00;(#,##0.00)" isBlankWhenNull="true">
 				<reportElement stretchType="RelativeToTallestObject" x="852" y="0" width="54" height="20" uuid="6ab75beb-445c-44d8-a9d5-7850d00fd975"/>
 				<box rightPadding="2">
 					<leftPen lineWidth="1.0"/>
@@ -455,7 +460,7 @@
 				</textElement>
 				<textFieldExpression><![CDATA[$F{supplier3UnitCost}]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" pattern="#,##0.00;(#,##0.00)" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" pattern="#,##0.00;(#,##0.00)" isBlankWhenNull="true">
 				<reportElement stretchType="RelativeToTallestObject" x="526" y="0" width="62" height="20" uuid="64acebaa-8440-424d-ae95-bbf80e79cfb9"/>
 				<box rightPadding="2">
 					<leftPen lineWidth="1.0"/>
@@ -466,7 +471,7 @@
 				</textElement>
 				<textFieldExpression><![CDATA[$F{supplier1Amount}]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" pattern="#,##0.00;(#,##0.00)" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" pattern="#,##0.00;(#,##0.00)" isBlankWhenNull="true">
 				<reportElement stretchType="RelativeToTallestObject" x="716" y="0" width="62" height="20" uuid="6201085d-75f4-40e4-bfce-2823bf99f883"/>
 				<box rightPadding="2">
 					<leftPen lineWidth="1.0"/>
@@ -477,7 +482,7 @@
 				</textElement>
 				<textFieldExpression><![CDATA[$F{supplier2Amount}]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" pattern="#,##0.00;(#,##0.00)" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" pattern="#,##0.00;(#,##0.00)" isBlankWhenNull="true">
 				<reportElement stretchType="RelativeToTallestObject" x="906" y="0" width="62" height="20" uuid="df9b2b0b-6a28-4933-b34d-a39136799488"/>
 				<box rightPadding="2">
 					<leftPen lineWidth="1.0"/>
@@ -533,12 +538,12 @@
 	<pageFooter>
 		<band height="15">
 			<textField>
-				<reportElement x="398" y="0" width="74" height="15" uuid="5b4bd51f-5f3c-4af9-812a-9dd3d002a405"/>
+				<reportElement x="0" y="0" width="74" height="15" uuid="5b4bd51f-5f3c-4af9-812a-9dd3d002a405"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
 			</textField>
 			<textField evaluationTime="Report">
-				<reportElement x="472" y="0" width="40" height="15" uuid="f1bd260c-d124-42ba-bd8a-106c684f88f4"/>
+				<reportElement x="74" y="0" width="40" height="15" uuid="f1bd260c-d124-42ba-bd8a-106c684f88f4"/>
 				<textElement verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
 			</textField>
@@ -648,7 +653,7 @@
 				</textElement>
 				<text><![CDATA[The item/s listed above is/are recommended to be awarded to:]]></text>
 			</staticText>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement x="458" y="21" width="170" height="23" uuid="af890d6d-8f67-43f2-a030-8d27566573a2"/>
 				<box>
 					<bottomPen lineWidth="0.0"/>
@@ -658,7 +663,7 @@
 				</textElement>
 				<textFieldExpression><![CDATA[$P{TERMS1}.getDeliveryTimeAndCompletion()]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement x="458" y="44" width="170" height="23" uuid="60bc04df-75c2-485c-a20f-f81ddb34ec38"/>
 				<box>
 					<bottomPen lineWidth="0.0"/>
@@ -668,7 +673,7 @@
 				</textElement>
 				<textFieldExpression><![CDATA[$P{TERMS1}.getWarrantyPeriod()]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement x="458" y="67" width="170" height="23" uuid="0bccb59a-ee4e-4116-b958-9aaad9667a57"/>
 				<box>
 					<bottomPen lineWidth="0.0"/>
@@ -678,7 +683,7 @@
 				</textElement>
 				<textFieldExpression><![CDATA[$P{TERMS1}.getTermsOfPayment()]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement x="458" y="90" width="170" height="23" uuid="0847a2c8-2b4c-4b45-8d00-608d104ec587"/>
 				<box>
 					<bottomPen lineWidth="0.0"/>
@@ -688,7 +693,7 @@
 				</textElement>
 				<textFieldExpression><![CDATA[$P{TERMS1}.getPlaceOfDelivery()]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement x="628" y="21" width="170" height="23" uuid="ea3cd311-cb8e-44d2-9064-ef07c27d095f"/>
 				<box>
 					<bottomPen lineWidth="0.0"/>
@@ -698,7 +703,7 @@
 				</textElement>
 				<textFieldExpression><![CDATA[$P{TERMS2}.getDeliveryTimeAndCompletion()]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement x="628" y="90" width="170" height="23" uuid="3e02f3c8-db63-42f5-adbc-0a6efd44f0ee"/>
 				<box>
 					<bottomPen lineWidth="0.0"/>
@@ -708,7 +713,7 @@
 				</textElement>
 				<textFieldExpression><![CDATA[$P{TERMS2}.getPlaceOfDelivery()]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement x="628" y="44" width="170" height="23" uuid="b8b63456-81c0-4ff6-8a4e-9428bc396324"/>
 				<box>
 					<bottomPen lineWidth="0.0"/>
@@ -718,7 +723,7 @@
 				</textElement>
 				<textFieldExpression><![CDATA[$P{TERMS2}.getWarrantyPeriod()]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement x="628" y="67" width="170" height="23" uuid="4f93a817-8e3e-4646-91d0-b024834a3e62"/>
 				<box>
 					<bottomPen lineWidth="0.0"/>
@@ -728,7 +733,7 @@
 				</textElement>
 				<textFieldExpression><![CDATA[$P{TERMS2}.getTermsOfPayment()]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement x="798" y="44" width="170" height="23" uuid="51685483-6ebf-4e59-995f-ae5f77b60664"/>
 				<box>
 					<bottomPen lineWidth="0.0"/>
@@ -738,7 +743,7 @@
 				</textElement>
 				<textFieldExpression><![CDATA[$P{TERMS3}.getWarrantyPeriod()]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement x="798" y="67" width="170" height="23" uuid="71d33be8-9525-40c3-9297-110b84e63d45"/>
 				<box>
 					<bottomPen lineWidth="0.0"/>
@@ -748,7 +753,7 @@
 				</textElement>
 				<textFieldExpression><![CDATA[$P{TERMS3}.getTermsOfPayment()]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement x="798" y="90" width="170" height="23" uuid="081131c5-7ef0-42cf-a58e-4b390d35c680"/>
 				<box>
 					<bottomPen lineWidth="0.0"/>
@@ -758,7 +763,7 @@
 				</textElement>
 				<textFieldExpression><![CDATA[$P{TERMS3}.getPlaceOfDelivery()]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement x="798" y="21" width="170" height="23" uuid="7dd50142-ed24-4bd9-8649-7235861ffa48"/>
 				<box>
 					<bottomPen lineWidth="0.0"/>

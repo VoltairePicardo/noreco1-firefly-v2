@@ -488,6 +488,10 @@ public class PurchaseRequestDetailServiceImpl implements PurchaseRequestDetailSe
             if (rows != null) {
                 for (Object[] row : rows) {
                     RvDetailDto dto = mapCanvassRow(row);
+                    // row[13] = purchaseRequest.purpose (added for auto-copy to SOQ particulars)
+                    if (row.length > 13 && row[13] != null) {
+                        dto.setRvPurpose((String) row[13]);
+                    }
                     // post-load parentItemId via item lookup (avoids changing query indices)
                     if (dto.getItemId() != null && dto.getItemId() > 0) {
                         Item item = itemRepo.findById(dto.getItemId()).orElse(null);

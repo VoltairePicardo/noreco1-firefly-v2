@@ -17,7 +17,8 @@ export class QuotationMainComponent {
     module   = 'Quotation';
     menuLink = 'quotation';
 
-    flatpickrOptions = { dateFormat: 'Y-m-d', altInput: true, altFormat: 'F j, Y' };
+    flatpickrOptionsFrom: any = { dateFormat: 'Y-m-d', altInput: true, altFormat: 'F j, Y' };
+    flatpickrOptionsTo:   any = { dateFormat: 'Y-m-d', altInput: true, altFormat: 'F j, Y' };
 
     items             = signal<any[]>([]);
 
@@ -37,8 +38,8 @@ export class QuotationMainComponent {
     isLoading         = signal(false);
     selectedStatusId: number | null = null;
 
-    dateFrom: string;
-    dateTo:   string;
+    dateFrom = '';
+    dateTo   = '';
 
     private service      = inject(QuotationService);
     private alertService = inject(AlertService);
@@ -46,13 +47,12 @@ export class QuotationMainComponent {
 
     private toLocalDateStr(d: Date): string { return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
 
-    constructor() {
+    ngOnInit(): void {
         const now     = new Date();
         this.dateFrom = this.toLocalDateStr(new Date(now.getFullYear(), now.getMonth(), 1));
         this.dateTo   = this.toLocalDateStr(new Date(now.getFullYear(), now.getMonth() + 1, 0));
-    }
-
-    ngOnInit(): void {
+        this.flatpickrOptionsFrom = { dateFormat: 'Y-m-d', altInput: true, altFormat: 'F j, Y', defaultDate: this.dateFrom };
+        this.flatpickrOptionsTo   = { dateFormat: 'Y-m-d', altInput: true, altFormat: 'F j, Y', defaultDate: this.dateTo };
         this.loadStatuses();
         this.load();
     }
@@ -67,6 +67,7 @@ export class QuotationMainComponent {
     load(): void {
         if (!this.dateFrom || !this.dateTo) return;
         this.isLoading.set(true);
+        this.items.set([]);
         const req = this.selectedStatusId != null
             ? this.service.listByStatus(this.dateFrom, this.dateTo, this.selectedStatusId)
             : this.service.list(this.dateFrom, this.dateTo);
@@ -79,9 +80,11 @@ export class QuotationMainComponent {
     }
 
     reset(): void {
-        const now        = new Date();
-        this.dateFrom    = this.toLocalDateStr(new Date(now.getFullYear(), now.getMonth(), 1));
-        this.dateTo      = this.toLocalDateStr(new Date(now.getFullYear(), now.getMonth() + 1, 0));
+        const now     = new Date();
+        this.dateFrom = this.toLocalDateStr(new Date(now.getFullYear(), now.getMonth(), 1));
+        this.dateTo   = this.toLocalDateStr(new Date(now.getFullYear(), now.getMonth() + 1, 0));
+        this.flatpickrOptionsFrom = { dateFormat: 'Y-m-d', altInput: true, altFormat: 'F j, Y', defaultDate: this.dateFrom };
+        this.flatpickrOptionsTo   = { dateFormat: 'Y-m-d', altInput: true, altFormat: 'F j, Y', defaultDate: this.dateTo };
         this.selectedStatusId = null;
         this.searchText = '';
         this.load();

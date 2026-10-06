@@ -10,7 +10,7 @@ export class AlertService {
         return Swal.fire({
             icon: 'success',
             title: module + ' ' + action,
-            text: message != "" ? message : (module + ' Successfully ' + action),
+            text: message !== '' ? message : undefined,
             timer: 3000,
             showConfirmButton: false,
             didOpen: () => {

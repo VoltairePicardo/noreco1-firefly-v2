@@ -27,6 +27,9 @@ public interface QuotationRepo extends JpaRepository<Quotation, Integer> {
 
     List<Quotation> findByDateBetweenAndDocumentStatusIdNotIn(Date from, Date to, Collection<Integer> documentStatusIds);
 
+    @Query("SELECT q FROM Quotation q WHERE q.date BETWEEN :from AND :to ORDER BY q.id DESC")
+    List<Quotation> findAllByDateRange(@Param("from") Date from, @Param("to") Date to);
+
     Quotation findFirstByApprovedByGeneralManagerNotNullOrderByIdDesc();
 
     Quotation findFirstByApprovedByFinanceManagerNotNullOrderByIdDesc();

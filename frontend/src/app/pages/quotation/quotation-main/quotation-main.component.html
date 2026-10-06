@@ -9,7 +9,7 @@
             <div class="col-md-2 mt-2">
                 <label class="form-label fw-bold mb-1 fs-xs text-uppercase">From</label>
                 <input type="text" class="form-control" mwlFlatpickr
-                       [options]="flatpickrOptions"
+                       [options]="flatpickrOptionsFrom"
                        [(ngModel)]="dateFrom"
                        [ngModelOptions]="{ standalone: true }"
                        placeholder="Date From"/>
@@ -17,7 +17,7 @@
             <div class="col-md-2 mt-2">
                 <label class="form-label fw-bold mb-1 fs-xs text-uppercase">To</label>
                 <input type="text" class="form-control" mwlFlatpickr
-                       [options]="flatpickrOptions"
+                       [options]="flatpickrOptionsTo"
                        [(ngModel)]="dateTo"
                        [ngModelOptions]="{ standalone: true }"
                        placeholder="Date To"/>
@@ -27,7 +27,7 @@
                 <select class="form-select"
                         [(ngModel)]="selectedStatusId"
                         [ngModelOptions]="{ standalone: true }">
-                    <option [ngValue]="null">— All Pending —</option>
+                    <option [ngValue]="null">— All Statuses —</option>
                     @for (s of statuses(); track s.id) {
                         <option [ngValue]="s.id">{{ s.status }}</option>
                     }
@@ -41,10 +41,10 @@
             </div>
             <div class="col-md-auto mt-2 d-flex gap-2">
                 <button type="button" class="btn btn-success fw-bold" (click)="load()">
-                    <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Search
+                    <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Search
                 </button>
                 <button type="button" class="btn btn-danger fw-bold" (click)="reset()">
-                    <ng-icon name="tablerRefresh" class="ps-0 pe-2 fw-bold"></ng-icon>Reset
+                    <ng-icon name="tablerRefresh" class="ps-0 pe-3 fw-bold"></ng-icon>Reset
                 </button>
             </div>
             <div class="col-md-auto ms-auto mt-2">

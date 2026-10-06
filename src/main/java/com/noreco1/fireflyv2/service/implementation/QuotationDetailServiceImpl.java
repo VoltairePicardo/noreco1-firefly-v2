@@ -57,9 +57,9 @@ public class QuotationDetailServiceImpl implements QuotationDetailService {
             dto.setPurchaseRequestDetailId(prd.getId());
             dto.setId(quotationItem.getId());
             dto.setItemDescription(prd.getItem() == null ? prd.getJoDescription() : prd.getItem().getDescription());
-            dto.setRvNo(prd.getPurchaseRequest().getCode());
+            dto.setRvNo(prd.getPurchaseRequest() != null ? prd.getPurchaseRequest().getCode() : "");
             dto.setQuantity(prd.getQuantity());
-            dto.setUnitCode(prd.getUnitMeasure().getCode());
+            dto.setUnitCode(prd.getUnitMeasure() != null ? prd.getUnitMeasure().getCode() : "");
 
             if (resolved != null) {
                 dto.setNewItemId(resolved.getId() != null ? resolved.getId().longValue() : null);
