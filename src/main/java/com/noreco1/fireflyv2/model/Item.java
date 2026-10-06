@@ -6,10 +6,9 @@ import lombok.*;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
-import jakarta.validation.constraints.NotBlank;
-
 import jakarta.persistence.*;
 import java.math.BigDecimal;
+import java.util.Date;
 
 @Getter
 @Setter
@@ -91,7 +90,49 @@ public class Item {
     @Column
     private String barcode;
 
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    @NotFound(action = NotFoundAction.IGNORE)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "FK_parentItemId")
+    private Item parentItem;
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    @NotFound(action = NotFoundAction.IGNORE)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "FK_documentStatusId", nullable = true, columnDefinition = "0")
+    private DocumentStatus documentStatus;
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    @NotFound(action = NotFoundAction.IGNORE)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "FK_createdByUserId")
+    private User createdBy;
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    @NotFound(action = NotFoundAction.IGNORE)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "FK_approvedById")
+    private User approvedBy;
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    @NotFound(action = NotFoundAction.IGNORE)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "FK_transactionId")
+    private Transaction transaction;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column
+    private Date createdAt;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column
+    private Date updatedAt;
+
     @Transient
     private String base64Image = "";
+
+    public Item(Integer id) {
+        this.id = id;
+    }
 
 }

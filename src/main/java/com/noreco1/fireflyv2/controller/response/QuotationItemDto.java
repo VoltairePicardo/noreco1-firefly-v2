@@ -18,6 +18,12 @@ public class QuotationItemDto {
 
     private List<QuotationItemDetailDto> details = new ArrayList<>();
 
+    private Long newItemId;
+    private String newItemDescription;
+    private Boolean isChildItem;
+    private Boolean isApprovedItem;
+    private Integer originalItemId;   // item.id from prd.getItem() — used as parentItemId for the quick-create modal
+
     public QuotationItemDto() {
     }
 
@@ -105,4 +111,19 @@ public class QuotationItemDto {
     public void setUnitCode(String unitCode) {
         this.unitCode = unitCode;
     }
+
+    public Long getNewItemId() { return newItemId; }
+    public void setNewItemId(Long newItemId) { this.newItemId = newItemId; }
+
+    public String getNewItemDescription() { return newItemDescription; }
+    public void setNewItemDescription(String newItemDescription) { this.newItemDescription = newItemDescription; }
+
+    public Boolean getIsChildItem() { return isChildItem; }
+    public void setIsChildItem(Boolean isChildItem) { this.isChildItem = isChildItem; }
+
+    public Boolean getIsApprovedItem() { return isApprovedItem; }
+    public void setIsApprovedItem(Boolean isApprovedItem) { this.isApprovedItem = isApprovedItem; }
+
+    public Integer getOriginalItemId() { return originalItemId; }
+    public void setOriginalItemId(Integer originalItemId) { this.originalItemId = originalItemId; }
 }

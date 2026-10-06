@@ -7,6 +7,7 @@ import java.math.BigDecimal;
  */
 public class RVDetail {
     private String description;
+    private String specification;
     private Integer id;
     private String unitCode;
     private BigDecimal quantity;
@@ -21,6 +22,14 @@ public class RVDetail {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getSpecification() {
+        return specification;
+    }
+
+    public void setSpecification(String specification) {
+        this.specification = specification;
     }
 
     public Integer getId() {

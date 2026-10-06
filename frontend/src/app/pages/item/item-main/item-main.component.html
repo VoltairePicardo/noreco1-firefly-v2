@@ -95,10 +95,12 @@
                                                 } @else { — }
                                             </td>
                                             <td>
-                                                @if (data.isActive) {
-                                                    <span class="badge bg-success">Active</span>
+                                                @if (data.documentStatus) {
+                                                    <span class="badge {{ statusBadge(data.documentStatus.id).cls }}">
+                                                        {{ statusBadge(data.documentStatus.id).label }}
+                                                    </span>
                                                 } @else {
-                                                    <span class="badge bg-secondary">Inactive</span>
+                                                    <span class="badge bg-success">Approved</span>
                                                 }
                                             </td>
                                             <td class="text-nowrap">
@@ -108,11 +110,13 @@
                                                        class="btn btn-light btn-icon btn-sm rounded-circle">
                                                         <ng-icon name="tablerEye" class="fs-lg"></ng-icon>
                                                     </a>
-                                                    <a href="javascript:void(0)" ngbTooltip="Edit"
-                                                       [routerLink]="['/' + menuLink, data.id, 'edit']"
-                                                       class="btn btn-light btn-icon btn-sm rounded-circle">
-                                                        <ng-icon name="tablerEdit" class="fs-lg"></ng-icon>
-                                                    </a>
+                                                    @if ((isInventoryOfficer() && (data.documentStatus?.id === 5 || data.documentStatus?.id === 7)) || (data.documentStatus?.id === 1 && data.createdBy?.id == currentUserId)) {
+                                                        <a href="javascript:void(0)" ngbTooltip="Edit"
+                                                           [routerLink]="['/' + menuLink, data.id, 'edit']"
+                                                           class="btn btn-light btn-icon btn-sm rounded-circle">
+                                                            <ng-icon name="tablerEdit" class="fs-lg"></ng-icon>
+                                                        </a>
+                                                    }
                                                     <!-- TODO: Confirm with PM before enabling delete
                                                     <button type="button" ngbTooltip="Delete"
                                                             class="btn btn-light btn-icon btn-sm rounded-circle text-danger"

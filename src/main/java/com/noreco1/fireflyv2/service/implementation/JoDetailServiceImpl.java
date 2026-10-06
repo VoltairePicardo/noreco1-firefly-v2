@@ -1,5 +1,6 @@
 package com.noreco1.fireflyv2.service.implementation;
 
+import com.noreco1.fireflyv2.model.Item;
 import com.noreco1.fireflyv2.model.JoDetail;
 import com.noreco1.fireflyv2.repo.JoDetailRepo;
 import com.noreco1.fireflyv2.controller.response.JoDetailDto;
@@ -34,10 +35,11 @@ public class JoDetailServiceImpl implements JoDetailService {
                 lineDto.setRvDetailId(line.getPurchaseRequestDetail().getId());
                 lineDto.setJobOrderId(line.getJobOrder().getId());
                 lineDto.setQuantity(line.getQuantity());
-                if(line.getPurchaseRequestDetail().getItem() != null) {
-                    lineDto.setItemId(line.getPurchaseRequestDetail().getItem().getId());
-                    lineDto.setItemCode(line.getPurchaseRequestDetail().getItem().getCode());
-                    lineDto.setItemDescription(line.getPurchaseRequestDetail().getItem().getDescription());
+                Item resolvedItem = line.getPurchaseRequestDetail().getNewItem();
+                if (resolvedItem != null) {
+                    lineDto.setItemId(resolvedItem.getId());
+                    lineDto.setItemCode(resolvedItem.getCode());
+                    lineDto.setItemDescription(resolvedItem.getDescription());
                 }
                 lineDto.setUnitCode(line.getPurchaseRequestDetail().getUnitMeasure().getCode());
                 lineDto.setUnitPrice(line.getUnitPrice());
@@ -70,9 +72,10 @@ public class JoDetailServiceImpl implements JoDetailService {
                 lineDto.setRvDetailId(line.getPurchaseRequestDetail().getId());
                 lineDto.setJobOrderId(line.getJobOrder().getId());
                 lineDto.setQuantity(line.getQuantity());
-                if(line.getPurchaseRequestDetail().getItem() != null) {
-                    lineDto.setItemCode(line.getPurchaseRequestDetail().getItem().getCode());
-                    lineDto.setItemDescription(line.getPurchaseRequestDetail().getItem().getDescription());
+                Item resolvedItem = line.getPurchaseRequestDetail().getNewItem();
+                if (resolvedItem != null) {
+                    lineDto.setItemCode(resolvedItem.getCode());
+                    lineDto.setItemDescription(resolvedItem.getDescription());
                 }
                 lineDto.setUnitCode(line.getPurchaseRequestDetail().getUnitMeasure().getCode());
                 lineDto.setUnitPrice(line.getUnitPrice());

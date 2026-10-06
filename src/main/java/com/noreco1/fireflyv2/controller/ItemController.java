@@ -5,6 +5,7 @@ import com.noreco1.fireflyv2.common.facade.FileFacade;
 import com.noreco1.fireflyv2.common.helpers.Checker;
 import com.noreco1.fireflyv2.common.helpers.ReportUtil;
 import com.noreco1.fireflyv2.controller.response.PostResponse;
+import com.noreco1.fireflyv2.controller.response.ProcessDocumentDto;
 import com.noreco1.fireflyv2.model.Item;
 import com.noreco1.fireflyv2.model.enums.ProjectAttachmentPrefix;
 import com.noreco1.fireflyv2.service.DownloadService;
@@ -49,8 +50,10 @@ public class ItemController {
             @RequestParam(required = false) Integer accountId,
             @RequestParam(required = false) Integer categoryId,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
-        return itemService.list(q, accountId, categoryId, page, size);
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) Integer excludeId,
+            @RequestParam(defaultValue = "false") boolean noParent) {
+        return itemService.list(q, accountId, categoryId, page, size, excludeId, noParent);
     }
 
     @GetMapping("/{id}")
@@ -96,6 +99,16 @@ public class ItemController {
     @PostMapping("/delete/{id}")
     public PostResponse delete(@PathVariable Integer id) {
         return itemService.deleteById(id);
+    }
+
+    @PostMapping("/process")
+    public PostResponse process(@RequestBody ProcessDocumentDto dto) {
+        return itemService.process(dto);
+    }
+
+    @GetMapping("/is-inventory-officer")
+    public ResponseEntity<Boolean> isInventoryOfficer() {
+        return ResponseEntity.ok(itemService.isInventoryOfficer());
     }
 
     @RequestMapping(value = "/export")

@@ -20,7 +20,8 @@
                             <div class="col-md-3 mt-2">
                                 <label for="code" class="form-label">Code</label>
                                 <input id="code" type="text" class="form-control"
-                                       placeholder="Item Code" formControlName="code" maxlength="64"/>
+                                       placeholder="Item Code" formControlName="code" maxlength="64"
+                                       (input)="onDuplicateSearch($any($event.target).value)"/>
                             </div>
                             <div class="col-md-6 mt-2">
                                 <label for="description" class="form-label">Description <span class="text-danger">*</span></label>
@@ -28,20 +29,24 @@
                                        placeholder="Item Description" formControlName="description"
                                        [class]="submit && !form.get('description')?.errors ? 'is-valid'
                                               : submit &&  form.get('description')?.errors ? 'is-invalid' : ''"
-                                       required/>
+                                       required
+                                       (input)="onDuplicateSearch($any($event.target).value)"/>
                                 <div class="invalid-feedback">Please provide a description.</div>
                             </div>
                             <div class="col-md-3 mt-2">
-                                <label for="unitId" class="form-label">Unit of Measure</label>
-                                <select id="unitId" class="form-select" formControlName="unitId">
+                                <label for="unitId" class="form-label">Unit of Measure <span class="text-danger">*</span></label>
+                                <select id="unitId" class="form-select" formControlName="unitId"
+                                        [class]="submit && form.get('unitId')?.errors ? 'form-select is-invalid' : submit && !form.get('unitId')?.errors ? 'form-select is-valid' : 'form-select'">
                                     <option [ngValue]="null">-- Select Unit --</option>
                                     @for (unit of units(); track unit.id) {
                                         <option [ngValue]="unit.id">{{ unit.code }} - {{ unit.description }}</option>
                                     }
                                 </select>
+                                <div class="invalid-feedback">Please select a unit.</div>
                             </div>
                         </div>
 
+                        @if (showFullForm) {
                         <div class="row">
                             <div class="col-md-3 mt-2">
                                 <label for="reorderPoint" class="form-label">Reorder Point</label>
@@ -64,8 +69,27 @@
                                        placeholder="Barcode" formControlName="barcode"/>
                             </div>
                         </div>
+                        }
 
                         <div class="row">
+                            <div class="col-md-4 mt-2">
+                                <label class="form-label">Parent Item</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control"
+                                           [value]="selectedParentItem ? ((selectedParentItem.code ? selectedParentItem.code + ' — ' : '') + selectedParentItem.description) : ''"
+                                           readonly placeholder="Select Parent Item (optional)"/>
+                                    @if (selectedParentItem) {
+                                        <button type="button" class="btn btn-danger fw-bold" (click)="clearParentItem()">
+                                            <ng-icon name="tablerX" class="fw-bold"></ng-icon>
+                                        </button>
+                                    } @else {
+                                        <button type="button" class="btn btn-success fw-bold" (click)="openParentItemBrowse()">
+                                            <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
+                                        </button>
+                                    }
+                                </div>
+                            </div>
+                            @if (showFullForm) {
                             <div class="col-md-4 mt-2">
                                 <label for="inventoryCategoryId" class="form-label">Inventory Category</label>
                                 <select id="inventoryCategoryId" class="form-select" formControlName="inventoryCategoryId">
@@ -75,6 +99,11 @@
                                     }
                                 </select>
                             </div>
+                            }
+                        </div>
+
+                        @if (showFullForm) {
+                        <div class="row">
                             <div class="col-md-4 mt-2">
                                 <label class="form-label">Asset Account</label>
                                 <div class="input-group">
@@ -142,9 +171,42 @@
                                 }
                             </div>
                         </div>
+                        }
 
-                                                <hr class="border-dashed mx-n3 mt-3"/>
-                                                <div class="d-flex gap-2 justify-content-end align-items-center mt-3">
+                        @if (duplicates().length > 0) {
+                            <div class="row mt-3">
+                                <div class="col-12">
+                                    <p class="text-uppercase fs-xs fw-semibold text-muted mb-1">Possible Duplicates</p>
+                                    <table class="table table-custom table-centered table-hover w-100 mb-0">
+                                        <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                                            <tr class="text-uppercase fs-xxs">
+                                                <th>Code</th>
+                                                <th>Description</th>
+                                                <th>Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @for (dup of duplicates(); track dup.id) {
+                                                <tr>
+                                                    <td>{{ dup.code || '—' }}</td>
+                                                    <td>{{ dup.description }}</td>
+                                                    <td>
+                                                        @if (dup.documentStatus?.id === 7) { <span class="badge bg-success">Approved</span> }
+                                                        @else if (dup.documentStatus?.id === 5) { <span class="badge bg-warning text-dark">For Approval</span> }
+                                                        @else if (dup.documentStatus?.id === 1) { <span class="badge bg-secondary">Draft</span> }
+                                                        @else if (dup.documentStatus?.id === 8) { <span class="badge bg-danger">Denied</span> }
+                                                        @else { <span class="badge bg-success">Approved</span> }
+                                                    </td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        }
+
+                        <hr class="border-dashed mx-n3 mt-3"/>
+                        <div class="d-flex gap-2 justify-content-end align-items-center mt-3">
                             <a [routerLink]="['/' + menuLink]" class="btn btn-light fw-bold">
                                 <ng-icon name="tablerArrowLeft" class="ps-0 pe-3 fw-bold"></ng-icon>Back
                             </a>
@@ -157,6 +219,15 @@
                                     {{ editMode ? 'Update' : 'Save ' + module }}
                                 }
                             </button>
+                            @if (approveAction()) {
+                                <button type="button" class="btn btn-primary fw-bold" [disabled]="formSubmit" (click)="saveAndApprove()">
+                                    @if (formSubmit) {
+                                        <span class="spinner-border spinner-border-sm me-2" role="status"></span>Processing...
+                                    } @else {
+                                        <ng-icon name="tablerCircleCheck" class="ps-0 pe-3 fw-bold"></ng-icon>Save & Approve
+                                    }
+                                </button>
+                            }
                         </div>
                     </form>
                     }

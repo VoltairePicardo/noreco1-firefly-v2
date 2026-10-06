@@ -90,7 +90,20 @@
                             <tr>
                                 <td class="text-muted">{{ idx + 1 }}</td>
                                 <td class="fw-bold text-nowrap">{{ item.rvNumber || '—' }}</td>
-                                <td>{{ item.itemDescription }}</td>
+                                <td>
+                                    {{ item.itemDescription }}
+                                    @if (item.isChildItem && item.isApprovedItem) {
+                                        <span class="badge bg-success-subtle text-success ms-2">Approved</span>
+                                    } @else if (item.isChildItem && !item.isApprovedItem) {
+                                        <span class="badge bg-warning-subtle text-warning ms-2">Pending Approval</span>
+                                    } @else {
+                                        <span class="badge bg-danger-subtle text-danger ms-2">Parent Item</span>
+                                        <button type="button" class="btn btn-sm btn-success fw-bold ms-2"
+                                                (click)="openItemModal(idx)">
+                                            <ng-icon name="tablerPlus" class="ps-0 pe-1 fw-bold"></ng-icon>Add Child Item
+                                        </button>
+                                    }
+                                </td>
                                 <td>{{ item.unitCode }}</td>
                                 <td class="text-center fw-bold">{{ item.quantity }}</td>
                                 @for (i of supplierSlots; track i) {
@@ -184,8 +197,9 @@
                             <td>
                                 @if (suppliers[i]) {
                                     <input type="text" class="form-control form-control-sm"
-                                           placeholder="e.g. 1 year"
-                                           [(ngModel)]="terms[i].warrantyPeriod"/>
+                                           placeholder="e.g. 12"
+                                           [(ngModel)]="terms[i].warrantyPeriod"
+                                           (input)="numericOnly($event, terms[i], 'warrantyPeriod')"/>
                                 }
                             </td>
                         }
@@ -195,9 +209,10 @@
                         @for (i of supplierSlots; track i) {
                             <td>
                                 @if (suppliers[i]) {
-                                    <input type="number" class="form-control form-control-sm"
+                                    <input type="text" class="form-control form-control-sm"
                                            placeholder="e.g. 30"
-                                           [(ngModel)]="terms[i].termsOfPayment"/>
+                                           [(ngModel)]="terms[i].termsOfPayment"
+                                           (input)="numericOnly($event, terms[i], 'termsOfPayment')"/>
                                 }
                             </td>
                         }

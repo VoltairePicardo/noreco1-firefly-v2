@@ -13,10 +13,12 @@ const httpOptions = {
 export class ItemService {
     private http = inject(HttpClient);
 
-    list(q = '', accountId: number | null = null, page = 0, size = 10, categoryId: number | null = null): Observable<any> {
+    list(q = '', accountId: number | null = null, page = 0, size = 10, categoryId: number | null = null, excludeId: number | null = null, noParent = false): Observable<any> {
         let params = new HttpParams().set('q', q).set('page', page).set('size', size);
         if (accountId != null) params = params.set('accountId', accountId);
         if (categoryId != null) params = params.set('categoryId', categoryId);
+        if (excludeId != null) params = params.set('excludeId', excludeId);
+        if (noParent) params = params.set('noParent', true);
         return this.http.get(`${BASE_API}/item/list`, { params });
     }
 
@@ -53,6 +55,14 @@ export class ItemService {
 
     remove(id: number): Observable<any> {
         return this.http.post(`${BASE_API}/item/delete/${id}`, {}, httpOptions);
+    }
+
+    process(payload: { documentId: number; remarks: string; workflowActionsDto: { actionMapId: number } }): Observable<any> {
+        return this.http.post(`${BASE_API}/item/process`, payload, httpOptions);
+    }
+
+    isInventoryOfficer(): Observable<boolean> {
+        return this.http.get<boolean>(`${BASE_API}/item/is-inventory-officer`);
     }
 
     // Returns Page<ItemStock> — item.id is itemStockId, item.item contains the actual Item entity

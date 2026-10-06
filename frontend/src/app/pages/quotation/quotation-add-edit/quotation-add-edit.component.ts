@@ -15,7 +15,8 @@ import { BrowseRvItemsModalComponent } from '@/app/shared/modals/browse-rv-items
 import { BrowseSupplierModalComponent } from '@/app/shared/modals/browse-supplier-modal/browse-supplier-modal.component';
 import { BrowseEntityModalComponent } from '@/app/shared/modals/browse-entity-modal/browse-entity-modal.component';
 import { provideIcons } from '@ng-icons/core';
-import { tablerSearch, tablerPlus, tablerTrash, tablerArrowLeft, tablerDeviceFloppy, tablerX } from '@ng-icons/tabler-icons';
+import { tablerSearch, tablerPlus, tablerTrash, tablerArrowLeft, tablerDeviceFloppy, tablerX, tablerCheck } from '@ng-icons/tabler-icons';
+import { ItemQuickCreateModalComponent } from '../item-quick-create-modal/item-quick-create-modal.component';
 import { forkJoin } from 'rxjs';
 
 @Component({
@@ -25,9 +26,9 @@ import { forkJoin } from 'rxjs';
         ...COMMON_ADD_EDIT_PAGE_IMPORTS,
         ...COMMON_MAIN_PAGE_IMPORTS,
         LaddaModule,
-        FlatpickrDirective
+        FlatpickrDirective,
     ],
-    providers: [provideFlatpickrDefaults(), ...SHARED_PROVIDERS, provideIcons({ tablerSearch, tablerPlus, tablerTrash, tablerArrowLeft, tablerDeviceFloppy, tablerX })],
+    providers: [provideFlatpickrDefaults(), ...SHARED_PROVIDERS, provideIcons({ tablerSearch, tablerPlus, tablerTrash, tablerArrowLeft, tablerDeviceFloppy, tablerX, tablerCheck })],
     templateUrl: './quotation-add-edit.component.html'
 })
 export class QuotationAddEditComponent {
@@ -42,6 +43,12 @@ export class QuotationAddEditComponent {
     submitted  = false;
 
     flatpickrOptions = { dateFormat: 'Y-m-d', altInput: true, altFormat: 'F j, Y' };
+
+    numericOnly(event: Event, obj: any, key: string): void {
+        const val = (event.target as HTMLInputElement).value.replace(/[^0-9.]/g, '');
+        obj[key] = val;
+        (event.target as HTMLInputElement).value = val;
+    }
 
     quotationDate = '';
     particular    = '';
@@ -122,12 +129,17 @@ export class QuotationAddEditComponent {
                     if (header.generalManagerObj)   { this.generalManager = header.generalManagerObj; this.isTotalMoreThan100k = true; }
 
                     this.lineItems = (details || []).map((d: any) => ({
-                        rvDetailId:      d.purchaseRequestDetailId,
-                        rvNumber:        d.rvNo || '',
-                        itemDescription: d.itemDescription || '',
-                        unitCode:        d.unitCode || '',
-                        quantity:        d.quantity || 0,
-                        available:       d.available ?? true,
+                        rvDetailId:         d.purchaseRequestDetailId,
+                        rvNumber:           d.rvNo || '',
+                        itemDescription:    d.itemDescription || '',
+                        unitCode:           d.unitCode || '',
+                        quantity:           d.quantity || 0,
+                        available:          d.available ?? true,
+                        originalItemId:     d.originalItemId ?? null,
+                        isChildItem:        d.isChildItem ?? false,
+                        isApprovedItem:     d.isApprovedItem ?? false,
+                        newItemId:          d.newItemId ?? null,
+                        newItemDescription: null,
                         details: [
                             { brand: d.details?.[0]?.brand || null, price: d.details?.[0]?.price || 0, awarded: d.details?.[0]?.awarded || false },
                             { brand: d.details?.[1]?.brand || null, price: d.details?.[1]?.price || 0, awarded: d.details?.[1]?.awarded || false },
@@ -156,12 +168,17 @@ export class QuotationAddEditComponent {
                 const existing = new Set(this.lineItems.map((li: any) => li.rvDetailId));
                 result.data.filter((item: any) => !existing.has(item.id)).forEach((item: any) => {
                     this.lineItems.push({
-                        rvDetailId:      item.id,
-                        rvNumber:        item.rvNumber || '',
-                        itemDescription: item.itemDescription || '',
-                        unitCode:        item.unitCode || '',
-                        quantity:        item.quantity || 0,
-                        available:       true,
+                        rvDetailId:         item.id,
+                        rvNumber:           item.rvNumber || '',
+                        itemDescription:    item.itemDescription || '',
+                        unitCode:           item.unitCode || '',
+                        quantity:           item.quantity || 0,
+                        available:          true,
+                        originalItemId:     item.itemId ?? null,
+                        isChildItem:        item.parentItemId != null,
+                        isApprovedItem:     false,
+                        newItemId:          null,
+                        newItemDescription: null,
                         details: [
                             { brand: null, price: 0, awarded: false },
                             { brand: null, price: 0, awarded: false },
@@ -176,6 +193,27 @@ export class QuotationAddEditComponent {
     removeLineItem(index: number): void {
         this.lineItems.splice(index, 1);
         this.recalcTotal();
+    }
+
+    async openItemModal(rowIndex: number): Promise<void> {
+        const line = this.lineItems[rowIndex];
+        try {
+            const result = await this.modalService.openModal(
+                ItemQuickCreateModalComponent,
+                {
+                    parentItemId:          line.originalItemId ?? null,
+                    parentItemDescription: line.itemDescription,
+                },
+                { size: 'xl', centered: true }
+            );
+            if (result?.id) {
+                this.lineItems[rowIndex].newItemId          = result.id;
+                this.lineItems[rowIndex].newItemDescription = result.description;
+                this.lineItems[rowIndex].isChildItem        = true;
+                this.lineItems[rowIndex].isApprovedItem     = result.isApproved ?? false;
+                this.lineItems[rowIndex].itemDescription    = result.description;
+            }
+        } catch { }
     }
 
     async openSupplierBrowse(index: number): Promise<void> {
@@ -256,6 +294,7 @@ export class QuotationAddEditComponent {
             quotationDetails: this.lineItems.map(item => ({
                 purchaseRequestDetailId: item.rvDetailId,
                 available: item.available ?? true,
+                newItemId: item.newItemId ?? null,
                 details: activeSuppliers.map(x => ({
                     supplier: { id: x.supplier.id, accountNumber: x.supplier.accountNumber },
                     brand:    item.details[x.index]?.brand ? { id: item.details[x.index].brand.id } : null,

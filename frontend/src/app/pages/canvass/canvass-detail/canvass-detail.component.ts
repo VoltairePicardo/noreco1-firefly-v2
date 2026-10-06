@@ -4,6 +4,7 @@ import { COMMON_ALL_PAGE_IMPORTS } from '@/app/shared/providers/shared-providers
 import { FormsModule } from '@angular/forms';
 import { provideIcons } from '@ng-icons/core';
 import { tablerPrinter, tablerEdit, tablerArrowLeft, tablerCheck, tablerEye, tablerEyeOff } from '@ng-icons/tabler-icons';
+import { DocumentLogsComponent } from '@/app/shared/components/document-logs/document-logs.component';
 import { AlertService } from '@/app/shared/services/alert.service';
 import { forkJoin } from 'rxjs';
 import { CanvassService } from '../canvass.service';
@@ -13,7 +14,7 @@ const TERMINAL_STATUSES = ['Approved', 'Denied', 'Cancelled'];
 
 @Component({
     selector: 'app-canvass-detail',
-    imports: [...COMMON_ALL_PAGE_IMPORTS, SharedModule, FormsModule, RouterLink],
+    imports: [...COMMON_ALL_PAGE_IMPORTS, SharedModule, FormsModule, RouterLink, DocumentLogsComponent],
     providers: [provideIcons({ tablerPrinter, tablerEdit, tablerArrowLeft, tablerCheck, tablerEye, tablerEyeOff })],
     templateUrl: './canvass-detail.component.html'
 })
@@ -32,9 +33,7 @@ export class CanvassDetailComponent {
     remarks            = '';
     processingWorkflow = false;
 
-    logs        : any[] = [];
-    showLogs    = false;
-    logsLoading = false;
+    showLogs = false;
 
     private service      = inject(CanvassService);
     private route        = inject(ActivatedRoute);
@@ -61,7 +60,6 @@ export class CanvassDetailComponent {
                 if (header?.id) {
                     this.data      = header;
                     this.lineItems = details || [];
-                    this.logs      = [];
                     this.showLogs  = false;
                     this.loadWorkflowActions();
                 } else {
@@ -126,21 +124,6 @@ export class CanvassDetailComponent {
                 this.alertService.error(this.module, 'An error occurred.', '');
             }
         });
-    }
-
-    toggleLogs(): void {
-        this.showLogs = !this.showLogs;
-        if (this.showLogs && this.logs.length === 0) {
-            this.logsLoading = true;
-            this.service.getDocumentLogs(this.data.transId).subscribe({
-                next: (logs) => { this.logs = logs || []; this.logsLoading = false; },
-                error: () => { this.logsLoading = false; }
-            });
-        }
-    }
-
-    getLogField(value: string, key: string): string {
-        try { return JSON.parse(value)?.[key] || ''; } catch { return ''; }
     }
 
     print(): void {

@@ -4,6 +4,7 @@ import { AlertService } from '@/app/shared/services/alert.service';
 import { ItemService } from '../item.service';
 import { ModalService } from '@/app/shared/modals/modal-service';
 import { BrowseCOAModalComponent } from '@/app/shared/modals/browse-coa-modal/browse-coa-modal.component';
+import { AuthService } from '@/app/pages/auth/auth.service';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -17,8 +18,10 @@ export class ItemMainComponent {
     subModule = '';
     menuLink  = 'item';
 
-    items         = signal<any[]>([]);
-    isLoading     = signal(false);
+    items              = signal<any[]>([]);
+    isLoading          = signal(false);
+    isInventoryOfficer = signal(false);
+    currentUserId: number | null = null;
     pageNumber    = signal(0);
     totalPages    = signal(0);
     totalElements = signal(0);
@@ -29,8 +32,13 @@ export class ItemMainComponent {
     private service      = inject(ItemService);
     private alertService = inject(AlertService);
     private modalService = inject(ModalService);
+    private authService  = inject(AuthService);
 
-    ngOnInit(): void { this.load(); }
+    ngOnInit(): void {
+        this.currentUserId = this.authService.getUser()?.user?.id ?? null;
+        this.service.isInventoryOfficer().subscribe({ next: v => this.isInventoryOfficer.set(v), error: () => {} });
+        this.load();
+    }
 
     load(page = 0): void {
         this.isLoading.set(true);
@@ -60,6 +68,16 @@ export class ItemMainComponent {
     }
 
     clearAccount(): void { this.selectedAccount = null; }
+
+    statusBadge(statusId: number): { label: string; cls: string } {
+        const map: Record<number, { label: string; cls: string }> = {
+            1: { label: 'Draft',        cls: 'bg-secondary' },
+            5: { label: 'For Approval', cls: 'bg-warning text-dark' },
+            7: { label: 'Approved',     cls: 'bg-success' },
+            8: { label: 'Denied',       cls: 'bg-danger' },
+        };
+        return map[statusId] ?? { label: 'Unknown', cls: 'bg-secondary' };
+    }
 
     delete(id: number, description: string): void {
         Swal.fire({

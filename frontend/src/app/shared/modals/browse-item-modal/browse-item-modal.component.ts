@@ -17,6 +17,8 @@ import { ItemService } from '@/app/pages/item/item.service';
 })
 export class BrowseItemModalComponent implements OnInit {
     @Input() inventoryLocationId?: number;
+    @Input() excludeId?: number;
+    @Input() noParent = false;
 
     activeModal = inject(NgbActiveModal);
     private service = inject(ItemService);
@@ -51,7 +53,7 @@ export class BrowseItemModalComponent implements OnInit {
         this.loading = true;
         const obs = this.inventoryLocationId
             ? this.service.listByLocation(this.inventoryLocationId, this.searchText, this.page - 1, this.pageSize)
-            : this.service.list(this.searchText, null, this.page - 1, this.pageSize, this.selectedCategoryId);
+            : this.service.list(this.searchText, null, this.page - 1, this.pageSize, this.selectedCategoryId, this.excludeId ?? null, this.noParent);
         obs.subscribe({
             next: (res) => {
                 const raw = res.content || [];

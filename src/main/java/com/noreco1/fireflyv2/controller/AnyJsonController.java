@@ -362,19 +362,28 @@ public class AnyJsonController {
             }
             dto.put("createdBy", createdBy);
 
-            // parse newValue JSON to extract action (documentStatus) and remarks
+            // parse newValue JSON to extract action (documentStatus), remarks, and detail fields
             String action  = null;
             String remarks = null;
+            Map<String, Object> detail = new LinkedHashMap<>();
             if (log.getNewValue() != null && !log.getNewValue().isEmpty()) {
                 try {
                     @SuppressWarnings("unchecked")
                     Map<String, Object> newValueMap = mapper.readValue(log.getNewValue(), Map.class);
                     action  = (String) newValueMap.get("documentStatus");
                     remarks = (String) newValueMap.get("remarks");
+                    detail.put("code",                newValueMap.get("code"));
+                    detail.put("purpose",             newValueMap.get("purpose"));
+                    detail.put("rvType",              newValueMap.get("rvType"));
+                    detail.put("approvedBy",          newValueMap.get("approvedBy"));
+                    detail.put("inventoryCheckedBy",  newValueMap.get("inventoryCheckedBy"));
+                    detail.put("reviewedAcceptedBy",  newValueMap.get("reviewedAcceptedBy"));
+                    detail.put("estimatedAmount",     newValueMap.get("estimatedAmount"));
                 } catch (Exception ignored) { }
             }
             dto.put("action",  action  != null ? action  : "");
             dto.put("remarks", remarks != null ? remarks : "");
+            dto.put("detail",  detail);
 
             result.add(dto);
         }
@@ -661,8 +670,19 @@ public class AnyJsonController {
     @Transactional(readOnly = true)
     @GetMapping(value = "/budget-line-items")
     public List<Map<String, Object>> getBudgetLineItems() {
-        return budgetLineItemDetailRepo.findAllByBudgetLineItemDocumentStatusIdOrderByCodeAsc(7)
-            .stream()
+        User loggedIn = authenticationFacade.getLoggedIn();
+        Employee employee = employeeRepo.findOneByAccountNumber(loggedIn.getAccountNo());
+
+        List<BudgetLineItemDetail> items;
+        if (employee != null && employee.getDivision() != null) {
+            items = budgetLineItemDetailRepo.findAllByBudgetLineItemDocumentStatusIdAndBudgetLineItemDivisionIdOrderByCodeAsc(7, employee.getDivision().getId());
+        } else if (employee != null && employee.getDepartment() != null) {
+            items = budgetLineItemDetailRepo.findAllByBudgetLineItemDocumentStatusIdAndBudgetLineItemDepartmentIdOrderByCodeAsc(7, employee.getDepartment().getId());
+        } else {
+            items = budgetLineItemDetailRepo.findAllByBudgetLineItemDocumentStatusIdOrderByCodeAsc(7);
+        }
+
+        return items.stream()
             .map(b -> {
                 Map<String, Object> m = new LinkedHashMap<>();
                 m.put("id", b.getId());
@@ -694,10 +714,12 @@ public class AnyJsonController {
     public Map<String, Object> getBudgetLineItemBalance(@PathVariable Integer id) {
         int reviewed  = com.noreco1.fireflyv2.model.enums.DocumentStatus.REVIEWED_AND_ACCEPTED.getId();
         int cancelled = com.noreco1.fireflyv2.model.enums.DocumentStatus.CANCELLED.getId();
+        int denied    = com.noreco1.fireflyv2.model.enums.DocumentStatus.DENIED.getId();
         Map<String, Object> m = new LinkedHashMap<>();
-        m.put("quantityBalance",  budgetLineItemDetailRepo.getBudgetLineItemDetailQuantityBalance(reviewed,  id));
-        m.put("amountBalanceCV",  budgetLineItemDetailRepo.getBudgetLineItemDetailAmountBalanceCV(cancelled, id));
-        m.put("amountBalancePOJO", budgetLineItemDetailRepo.getBudgetLineItemDetailAmountBalancePOJO(cancelled, id));
+        m.put("quantityBalance",     budgetLineItemDetailRepo.getBudgetLineItemDetailQuantityBalance(reviewed,  id));
+        m.put("amountBalanceCV",     budgetLineItemDetailRepo.getBudgetLineItemDetailAmountBalanceCV(cancelled, id));
+        m.put("amountBalancePOJO",   budgetLineItemDetailRepo.getBudgetLineItemDetailAmountBalancePOJO(cancelled, id));
+        m.put("amountBalancePOJOPR", budgetLineItemDetailRepo.getBudgetLineItemDetailAmountBalancePOJOPR(cancelled, denied, id));
         return m;
     }
 

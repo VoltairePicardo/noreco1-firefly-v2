@@ -1,0 +1,108 @@
+<div class="modal-header">
+    <h5 class="modal-title fw-semibold">Add Child Item</h5>
+    @if (parentItemDescription) {
+        <small class="text-muted ms-3">for: <strong>{{ parentItemDescription }}</strong></small>
+    }
+    <button type="button" class="btn-close ms-auto" (click)="activeModal.dismiss()"></button>
+</div>
+
+<div class="modal-body">
+    <p class="fs-xs text-uppercase fw-semibold text-muted mb-3">Item Details</p>
+
+    <div class="row g-3 mb-3">
+        <div class="col-md-4">
+            <label class="form-label fw-bold">Code</label>
+            <input type="text" class="form-control" [(ngModel)]="code" name="code"
+                   placeholder="Item Code" maxlength="64"/>
+        </div>
+        <div class="col-md-8">
+            <label class="form-label fw-bold">Description <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" [(ngModel)]="description" name="description"
+                   placeholder="Item Description" required/>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-3">
+        <div class="col-md-6">
+            <label class="form-label fw-bold">Unit of Measure <span class="text-danger">*</span></label>
+            <select class="form-select" [(ngModel)]="unitId" name="unitId">
+                <option [ngValue]="null">-- Select Unit --</option>
+                @for (u of units(); track u.id) {
+                    <option [ngValue]="u.id">{{ u.code }} - {{ u.description }}</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-6">
+            <label class="form-label fw-bold">Inventory Category</label>
+            <select class="form-select" [(ngModel)]="inventoryCategoryId" name="inventoryCategoryId">
+                <option [ngValue]="null">-- Select Category --</option>
+                @for (c of categories(); track c.id) {
+                    <option [ngValue]="c.id">{{ c.description }}</option>
+                }
+            </select>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-3">
+        <div class="col-md-4">
+            <label class="form-label fw-bold">Reorder Point</label>
+            <input type="number" class="form-control" [(ngModel)]="reorderPoint" name="reorderPoint"
+                   placeholder="0.00" step="0.01"/>
+        </div>
+        <div class="col-md-4">
+            <label class="form-label fw-bold">Ideal Qty</label>
+            <input type="number" class="form-control" [(ngModel)]="idealQty" name="idealQty"
+                   placeholder="0.00" step="0.01"/>
+        </div>
+        <div class="col-md-4">
+            <label class="form-label fw-bold">Location</label>
+            <input type="text" class="form-control" [(ngModel)]="location" name="location"
+                   placeholder="Location"/>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-3">
+        <div class="col-md-6">
+            <label class="form-label fw-bold">Barcode</label>
+            <input type="text" class="form-control" [(ngModel)]="barcode" name="barcode"
+                   placeholder="Barcode"/>
+        </div>
+        <div class="col-md-6 d-flex align-items-end pb-2">
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" [(ngModel)]="hasSerialNumbers"
+                       name="hasSerialNumbers" id="hasSerialNumbers"/>
+                <label class="form-check-label fw-bold" for="hasSerialNumbers">Has Serial Numbers</label>
+            </div>
+        </div>
+    </div>
+
+    @if (parentItemDescription) {
+        <hr/>
+        <p class="fs-xs text-uppercase fw-semibold text-muted mb-2">Parent Item</p>
+        <div class="mb-2">
+            <input type="text" class="form-control" [value]="parentItemDescription" readonly/>
+        </div>
+    }
+</div>
+
+<div class="modal-footer d-flex gap-2 justify-content-end">
+    <button type="button" class="btn btn-light fw-bold" (click)="activeModal.dismiss()">
+        <ng-icon name="tablerArrowLeft" class="ps-0 pe-3 fw-bold"></ng-icon>Cancel
+    </button>
+    @if (isInventoryOfficer()) {
+        <button type="button" class="btn btn-success fw-bold" [disabled]="isLoading()" (click)="save(true)">
+            @if (isLoading()) {
+                <span class="spinner-border spinner-border-sm me-2" role="status"></span>Processing...
+            } @else {
+                <ng-icon name="tablerCheck" class="ps-0 pe-3 fw-bold"></ng-icon>Save &amp; Approve
+            }
+        </button>
+    }
+    <button type="button" class="btn btn-primary fw-bold" [disabled]="isLoading()" (click)="save(false)">
+        @if (isLoading()) {
+            <span class="spinner-border spinner-border-sm me-2" role="status"></span>Saving...
+        } @else {
+            <ng-icon name="tablerCheck" class="ps-0 pe-3 fw-bold"></ng-icon>Save
+        }
+    </button>
+</div>

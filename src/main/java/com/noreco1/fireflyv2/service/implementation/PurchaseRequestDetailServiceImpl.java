@@ -487,7 +487,14 @@ public class PurchaseRequestDetailServiceImpl implements PurchaseRequestDetailSe
 
             if (rows != null) {
                 for (Object[] row : rows) {
-                    rvDetailDtos.add(mapCanvassRow(row));
+                    RvDetailDto dto = mapCanvassRow(row);
+                    // post-load parentItemId via item lookup (avoids changing query indices)
+                    if (dto.getItemId() != null && dto.getItemId() > 0) {
+                        Item item = itemRepo.findById(dto.getItemId()).orElse(null);
+                        dto.setParentItemId(item != null && item.getParentItem() != null
+                                ? item.getParentItem().getId() : null);
+                    }
+                    rvDetailDtos.add(dto);
                 }
             }
         } catch (Exception ex) {

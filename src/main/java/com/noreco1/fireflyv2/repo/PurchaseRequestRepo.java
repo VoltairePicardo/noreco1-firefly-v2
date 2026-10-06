@@ -177,6 +177,20 @@ public interface PurchaseRequestRepo extends JpaRepository<PurchaseRequest, Inte
                                                                                  @Param("to") Date to,
                                                                                  @Param("documentStatusId") Integer documentStatusId);
 
+    @Query(value = "select " +
+            "la.* " +
+            "from PurchaseRequest la  " +
+            "LEFT JOIN `User` createUser on la.FK_createdByUserId = createUser.id " +
+            "LEFT JOIN `User` approveUser on la.FK_approvedByUserId = approveUser.id " +
+            "LEFT JOIN `User` inventoryCheckUser on la.FK_inventoryCheckedByUserId = inventoryCheckUser.id " +
+            "LEFT JOIN `User` reviewedAcceptedBy on la.FK_reviewedAcceptedByUserId = reviewedAcceptedBy.id  " +
+            "WHERE la.voucherDate BETWEEN :from AND :to " +
+            "AND (createUser.id = :userId OR approveUser.id = :userId OR inventoryCheckUser.id = :userId OR reviewedAcceptedBy.id = :userId)",
+            nativeQuery = true)
+    List<PurchaseRequest> findByAllowedUserVoucherDateBetween(@Param("userId") Integer userId,
+                                                              @Param("from") Date from,
+                                                              @Param("to") Date to);
+
     List<PurchaseRequest> findByDocumentStatusIdNotIn(List<Integer> integers);
 
     List<PurchaseRequest> findByDocumentStatusId(Integer status);

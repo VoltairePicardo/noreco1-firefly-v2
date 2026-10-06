@@ -4,7 +4,7 @@ import { AlertService } from '@/app/shared/services/alert.service';
 import { COMMON_ALL_PAGE_IMPORTS, COMMON_MAIN_PAGE_IMPORTS, SHARED_PROVIDERS } from '@/app/shared/providers/shared-providers';
 import { SharedModule } from '@/app/shared/shared.module';
 import { provideIcons } from '@ng-icons/core';
-import { tablerArrowLeft, tablerPrinter, tablerEdit, tablerCheck, tablerEye, tablerEyeOff } from '@ng-icons/tabler-icons';
+import { tablerArrowLeft, tablerPrinter, tablerEdit, tablerCheck, tablerEye, tablerEyeOff, tablerAlertTriangle } from '@ng-icons/tabler-icons';
 import { QuotationService } from '../quotation.service';
 import { forkJoin } from 'rxjs';
 
@@ -17,7 +17,7 @@ const TERMINAL_STATUSES = ['Approved', 'Denied', 'Cancelled'];
         ...COMMON_MAIN_PAGE_IMPORTS,
         SharedModule
     ],
-    providers: [...SHARED_PROVIDERS, provideIcons({ tablerArrowLeft, tablerPrinter, tablerEdit, tablerCheck, tablerEye, tablerEyeOff })],
+    providers: [...SHARED_PROVIDERS, provideIcons({ tablerArrowLeft, tablerPrinter, tablerEdit, tablerCheck, tablerEye, tablerEyeOff, tablerAlertTriangle })],
     templateUrl: './quotation-detail.component.html'
 })
 export class QuotationDetailComponent {
@@ -171,5 +171,17 @@ export class QuotationDetailComponent {
             }
         }
         return total;
+    }
+
+    get notChildItems(): any[] {
+        return this.lineItems.filter((item: any) => !item.isChildItem);
+    }
+
+    get notApprovedItems(): any[] {
+        return this.lineItems.filter((item: any) => item.isChildItem && !item.isApprovedItem);
+    }
+
+    get processingNotAllowed(): boolean {
+        return this.notChildItems.length > 0 || this.notApprovedItems.length > 0;
     }
 }

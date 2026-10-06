@@ -30,6 +30,7 @@ public class RvDetailDto {
     private String requestedBy = "";
     private Date deliveryDate;
     private Integer inventoryCategoryId;
+    private Integer parentItemId;
 
     public RvDetailDto() {}
 
@@ -244,4 +245,7 @@ public class RvDetailDto {
     public void setInventoryCategoryId(Integer inventoryCategoryId) {
         this.inventoryCategoryId = inventoryCategoryId;
     }
+
+    public Integer getParentItemId() { return parentItemId; }
+    public void setParentItemId(Integer parentItemId) { this.parentItemId = parentItemId; }
 }
