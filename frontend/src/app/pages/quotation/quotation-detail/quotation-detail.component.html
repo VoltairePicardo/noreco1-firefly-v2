@@ -201,26 +201,43 @@
         @if (awardedSummary.length > 0) {
             <hr class="my-3"/>
             <div class="fs-xs text-uppercase fw-semibold text-muted mb-2">Awarded To</div>
-            <div class="table-responsive">
-                <table class="table table-sm table-bordered w-100 mb-0">
-                    <thead class="bg-light align-middle bg-opacity-25 thead-sm">
-                        <tr class="text-uppercase fs-xxs">
-                            <th>Supplier</th>
-                            <th class="text-center">Item Nos.</th>
-                            <th class="text-end" style="width:140px">Total Amount</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @for (row of awardedSummary; track row.supplierName) {
-                            <tr>
-                                <td class="fw-bold">{{ row.supplierName }}</td>
-                                <td class="text-center">{{ row.itemNos }}</td>
-                                <td class="text-end fw-bold">{{ row.total | number:'1.2-2' }}</td>
+            @for (row of awardedSummary; track row.supplierName) {
+                <div class="fw-bold mb-1">{{ row.supplierName }}</div>
+                <div class="table-responsive mb-3">
+                    <table class="table table-sm table-bordered w-100 mb-0">
+                        <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                            <tr class="text-uppercase fs-xxs">
+                                <th style="width:40px">#</th>
+                                <th>Description</th>
+                                <th>Brand</th>
+                                <th class="text-center" style="width:60px">Unit</th>
+                                <th class="text-center" style="width:60px">Qty</th>
+                                <th class="text-end" style="width:110px">Unit Price</th>
+                                <th class="text-end" style="width:120px">Amount</th>
                             </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
+                        </thead>
+                        <tbody>
+                            @for (item of row.items; track item.no) {
+                                <tr>
+                                    <td class="text-muted text-center">{{ item.no }}</td>
+                                    <td>{{ item.description }}</td>
+                                    <td class="small text-muted">{{ item.brand || '—' }}</td>
+                                    <td class="text-center">{{ item.unitCode }}</td>
+                                    <td class="text-center fw-bold">{{ item.quantity }}</td>
+                                    <td class="text-end">{{ item.price | number:'1.2-2' }}</td>
+                                    <td class="text-end fw-bold">{{ item.amount | number:'1.2-2' }}</td>
+                                </tr>
+                            }
+                        </tbody>
+                        <tfoot>
+                            <tr class="table-light fw-bold">
+                                <td colspan="6" class="text-end">Total:</td>
+                                <td class="text-end">{{ row.total | number:'1.2-2' }}</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            }
         }
 
         <!-- Terms & Conditions -->

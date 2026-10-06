@@ -190,21 +190,30 @@ export class QuotationDetailComponent {
         return total;
     }
 
-    get awardedSummary(): { supplierName: string; itemNos: string; total: number }[] {
-        const result: { supplierName: string; itemNos: string; total: number }[] = [];
+    get awardedSummary(): { supplierName: string; items: { no: number; description: string; unitCode: string; quantity: number; price: number; brand: string; amount: number }[]; total: number }[] {
+        const result: { supplierName: string; items: { no: number; description: string; unitCode: string; quantity: number; price: number; brand: string; amount: number }[]; total: number }[] = [];
         this.suppliersList.forEach((sup: any, si: number) => {
             let total = 0;
-            const itemNos: number[] = [];
+            const items: { no: number; description: string; unitCode: string; quantity: number; price: number; brand: string; amount: number }[] = [];
             this.lineItems.forEach((item: any, idx: number) => {
                 if (item.available === false) return;
                 const detail = item.details?.[si];
                 if (detail?.awarded && detail?.price) {
-                    total += Number(detail.price) * Number(item.quantity || 0);
-                    itemNos.push(idx + 1);
+                    const amount = Number(detail.price) * Number(item.quantity || 0);
+                    total += amount;
+                    items.push({
+                        no:          idx + 1,
+                        description: item.itemDescription || '—',
+                        unitCode:    item.unitCode || '—',
+                        quantity:    Number(item.quantity || 0),
+                        price:       Number(detail.price || 0),
+                        brand:       detail.brand?.name || '',
+                        amount,
+                    });
                 }
             });
-            if (itemNos.length > 0) {
-                result.push({ supplierName: sup.name, itemNos: itemNos.join(', '), total });
+            if (items.length > 0) {
+                result.push({ supplierName: sup.name, items, total });
             }
         });
         return result;
