@@ -26,7 +26,8 @@
                             <div class="col-md-6 mt-2">
                                 <label for="description" class="form-label">Description <span class="text-danger">*</span></label>
                                 <input id="description" type="text" class="form-control"
-                                       placeholder="Item Description" formControlName="description"
+                                       placeholder="Auto-generated from the fields below" formControlName="description"
+                                       readonly
                                        [class]="submit && !form.get('description')?.errors ? 'is-valid'
                                               : submit &&  form.get('description')?.errors ? 'is-invalid' : ''"
                                        required
@@ -99,7 +100,74 @@
                                     }
                                 </select>
                             </div>
+                            <div class="col-md-4 mt-2">
+                                <label for="subCategoryId" class="form-label">Sub Category</label>
+                                <select id="subCategoryId" class="form-select" formControlName="subCategoryId">
+                                    <option [ngValue]="null">-- Select Sub Category --</option>
+                                    @for (sub of subCategories(); track sub.id) {
+                                        <option [ngValue]="sub.id">{{ sub.description }}</option>
+                                    }
+                                </select>
+                            </div>
                             }
+                        </div>
+
+                        <div class="col-12">
+                            <hr class="border-dashed mx-n3 mt-3"/>
+                            <div class="fs-sm fw-semibold mb-2">Item Specifications</div>
+                        </div>
+                        <div class="row">
+                            @if (!selectedParentItem) {
+                            <div class="col-md-3 mt-2">
+                                <label for="genericName" class="form-label">Generic Name<i>(if no Parent Item)</i></label>
+                                <input id="genericName" type="text" class="form-control"
+                                       placeholder="Generic Name" formControlName="genericName"/>
+                            </div>
+                            }
+                            <div class="col-md-3 mt-2">
+                                <label for="size" class="form-label">Size</label>
+                                <input id="size" type="text" class="form-control"
+                                       placeholder="Size" formControlName="size"/>
+                            </div>
+                            <div class="col-md-3 mt-2">
+                                <label for="rating" class="form-label">Rating</label>
+                                <input id="rating" type="text" class="form-control"
+                                       placeholder="Rating" formControlName="rating"/>
+                            </div>
+                            <div class="col-md-3 mt-2">
+                                <label for="specification" class="form-label">Specification</label>
+                                <input id="specification" type="text" class="form-control"
+                                       placeholder="Specification" formControlName="specification"/>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-3 mt-2">
+                                <label for="brandId" class="form-label">Brand</label>
+                                <select id="brandId" class="form-select" formControlName="brandId">
+                                    <option [ngValue]="null">-- Select Brand --</option>
+                                    @for (b of brands(); track b.id) {
+                                        <option [ngValue]="b.id">{{ b.name }}</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-md-3 mt-2">
+                                <label for="manufacturer" class="form-label">Manufacturer</label>
+                                <input id="manufacturer" type="text" class="form-control"
+                                       placeholder="Manufacturer" formControlName="manufacturer"/>
+                            </div>
+                            <div class="col-md-3 mt-2">
+                                <label for="partNumber" class="form-label">Part Number</label>
+                                <input id="partNumber" type="text" class="form-control"
+                                       placeholder="Part Number" formControlName="partNumber"/>
+                            </div>
+                            <div class="col-md-3 mt-2">
+                                <label for="remarks" class="form-label">Remarks</label>
+                                <input id="remarks" type="text" class="form-control"
+                                       placeholder="Remarks" formControlName="remarks"/>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <hr class="border-dashed mx-n3 mt-3 mb-0"/>
                         </div>
 
                         @if (showFullForm) {
@@ -205,8 +273,9 @@
                             </div>
                         }
 
-                        <hr class="border-dashed mx-n3 mt-3"/>
-                        <div class="d-flex gap-2 justify-content-end align-items-center mt-3">
+                        <div class="col-12">
+                            <hr class="border-dashed mx-n3 mt-3"/>
+                            <div class="d-flex gap-2 justify-content-end align-items-center mt-3">
                             <a [routerLink]="['/' + menuLink]" class="btn btn-light fw-bold">
                                 <ng-icon name="tablerArrowLeft" class="ps-0 pe-3 fw-bold"></ng-icon>Back
                             </a>
@@ -228,6 +297,7 @@
                                     }
                                 </button>
                             }
+                            </div>
                         </div>
                     </form>
                     }

@@ -26,6 +26,15 @@ export class ItemService {
         return this.http.get<any[]>(`${BASE_API}/json/inventory-categories`);
     }
 
+    getBrands(): Observable<any[]> {
+        return this.http.get<any[]>(`${BASE_API}/json/brands`);
+    }
+
+    // Returns the category with its subCategories [{ id, description }]
+    getCategoryWithSubCategories(categoryId: number): Observable<any> {
+        return this.http.get<any>(`${BASE_API}/inventory-category/${categoryId}`);
+    }
+
     getData(id: number): Observable<any> {
         return this.http.get(`${BASE_API}/item/${id}`);
     }

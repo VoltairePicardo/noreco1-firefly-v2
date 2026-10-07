@@ -31,6 +31,8 @@ export class ItemAddEditComponent {
 
     units      = signal<any[]>([]);
     categories = signal<any[]>([]);
+    subCategories = signal<any[]>([]);
+    brands     = signal<any[]>([]);
 
     isInventoryOfficer = signal(false);
     duplicates         = signal<any[]>([]);
@@ -56,7 +58,8 @@ export class ItemAddEditComponent {
     ngOnInit(): void {
         this.service.isInventoryOfficer().subscribe({ next: v => this.isInventoryOfficer.set(v), error: () => {} });
         this.service.listUnits().subscribe({ next: d => this.units.set(d), error: () => {} });
-        this.service.listCategories().subscribe({ next: d => this.categories.set(d), error: () => {} });
+        this.service.getCategories().subscribe({ next: d => this.categories.set(d), error: () => {} });
+        this.service.getBrands().subscribe({ next: d => { this.brands.set(d); this.refreshDescription(); }, error: () => {} });
 
         this.dupSearch$.pipe(
             debounceTime(400),
@@ -109,10 +112,52 @@ export class ItemAddEditComponent {
             inventoryCategoryId: [data?.inventoryCategory?.id || null],
             hasSerialNumbers:    [data?.hasSerialNumbers      ?? false],
             barcode:             [data?.barcode               || ''],
+            subCategoryId:       [data?.subCategory?.id       || null],
+            genericName:         [data?.genericName           || ''],
+            size:                [data?.size                  || ''],
+            rating:              [data?.rating                || ''],
+            specification:       [data?.specification         || ''],
+            brandId:             [data?.brand?.id             || null],
+            manufacturer:        [data?.manufacturer          || ''],
+            partNumber:          [data?.partNumber            || ''],
+            remarks:             [data?.remarks               || ''],
         });
+
+        this.loadSubCategories(this.validationForm.get('inventoryCategoryId')?.value);
+        this.validationForm.get('inventoryCategoryId')?.valueChanges.subscribe(catId => {
+            this.validationForm.get('subCategoryId')?.setValue(null);
+            this.loadSubCategories(catId);
+        });
+        ['genericName', 'size', 'rating', 'specification', 'brandId'].forEach(name =>
+            this.validationForm.get(name)?.valueChanges.subscribe(() => this.refreshDescription()));
 
         if (data?.description) {
             this.dupSearch$.next(data.description);
+        }
+    }
+
+    private loadSubCategories(categoryId: number | null): void {
+        if (!categoryId) { this.subCategories.set([]); return; }
+        this.service.getCategoryWithSubCategories(categoryId).subscribe({
+            next: c => this.subCategories.set(c?.subCategories ?? []),
+            error: () => this.subCategories.set([])
+        });
+    }
+
+    // Mirrors the backend rule: parent name (or generic name), size, rating, specification, brand name.
+    // The backend rebuilds it on save; this is only a live preview. Left as-is when no part is filled in.
+    private refreshDescription(): void {
+        const f = this.validationForm;
+        if (!f) return;
+        const v = f.value;
+        const brand = this.brands().find(b => b.id === v.brandId);
+        const text = [
+            this.selectedParentItem ? this.selectedParentItem.description : v.genericName,
+            v.size, v.rating, v.specification, brand?.name
+        ].map(p => (p ?? '').toString().trim()).filter(p => p).join(', ');
+        if (text) {
+            f.get('description')?.setValue(text, { emitEvent: false });
+            this.dupSearch$.next(text);
         }
     }
 
@@ -160,11 +205,12 @@ export class ItemAddEditComponent {
             );
             if (result?.action === 'select' && result?.data) {
                 this.selectedParentItem = result.data;
+                this.refreshDescription();
             }
         } catch { }
     }
 
-    clearParentItem(): void { this.selectedParentItem = null; }
+    clearParentItem(): void { this.selectedParentItem = null; this.refreshDescription(); }
 
     async openAssetAccountBrowse(): Promise<void> {
         try {
@@ -218,6 +264,15 @@ export class ItemAddEditComponent {
             inventoryCategory: v.inventoryCategoryId ? { id: v.inventoryCategoryId } : null,
             hasSerialNumbers:  v.hasSerialNumbers,
             barcode:           v.barcode,
+            subCategory:       v.subCategoryId ? { id: v.subCategoryId } : null,
+            genericName:       v.genericName,
+            size:              v.size,
+            rating:            v.rating,
+            specification:     v.specification,
+            brand:             v.brandId ? { id: v.brandId } : null,
+            manufacturer:      v.manufacturer,
+            partNumber:        v.partNumber,
+            remarks:           v.remarks,
         };
     }
 
