@@ -186,6 +186,16 @@ export class ItemDetailsComponent implements OnInit {
                 inventoryCategory: v.inventoryCategoryId ? { id: v.inventoryCategoryId }        : null,
                 hasSerialNumbers:  v.hasSerialNumbers,
                 barcode:           v.barcode,
+                // not editable here — pass through so approval doesn't blank them
+                subCategory:       item.subCategory ? { id: item.subCategory.id } : null,
+                genericName:       item.genericName,
+                size:              item.size,
+                rating:            item.rating,
+                specification:     item.specification,
+                brand:             item.brand ? { id: item.brand.id } : null,
+                manufacturer:      item.manufacturer,
+                partNumber:        item.partNumber,
+                remarks:           item.remarks,
             };
 
             this.service.update(payload).subscribe({

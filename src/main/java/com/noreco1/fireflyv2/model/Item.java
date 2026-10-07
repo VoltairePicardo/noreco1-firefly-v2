@@ -131,6 +131,39 @@ public class Item {
     @Transient
     private String base64Image = "";
 
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    @NotFound(action = NotFoundAction.IGNORE)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "FK_subCategoryId")
+    private InventorySubCategory subCategory;
+
+    @Column
+    private String genericName;
+
+    @Column
+    private String size;
+
+    @Column
+    private String rating;
+
+    @Column
+    private String specification;
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    @NotFound(action = NotFoundAction.IGNORE)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "FK_brandId")
+    private Brand brand;
+
+    @Column
+    private String manufacturer;
+
+    @Column
+    private String partNumber;
+
+    @Column
+    private String remarks;
+
     public Item(Integer id) {
         this.id = id;
     }
