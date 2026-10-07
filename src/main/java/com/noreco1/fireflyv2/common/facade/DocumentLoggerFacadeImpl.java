@@ -1319,8 +1319,8 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
             map.put("documentStatus", quotationDto.getDocumentStatus());
             map.put("createdBy",      quotationDto.getPreparedBy());
 
-            if (quotationDto.getApprovedByFinanceManager() != null && !quotationDto.getApprovedByFinanceManager().isEmpty())
-                map.put("approvedByFinanceOfficer", quotationDto.getApprovedByFinanceManager());
+            if (quotationDto.getNotedByObj() != null)
+                map.put("notedBy", quotationDto.getNotedByObj().get("fullName"));
             if (quotationDto.getApprovedByGeneralManager() != null && !quotationDto.getApprovedByGeneralManager().isEmpty())
                 map.put("approvedByGeneralManager", quotationDto.getApprovedByGeneralManager());
 

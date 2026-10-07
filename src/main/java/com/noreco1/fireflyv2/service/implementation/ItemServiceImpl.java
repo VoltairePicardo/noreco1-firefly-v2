@@ -202,6 +202,12 @@ public class ItemServiceImpl implements ItemService {
 
 
     private void applyGeneratedDescription(Item item) {
+
+        boolean hasAttributes = java.util.stream.Stream.of(item.getSize(), item.getRating(), item.getSpecification())
+                .anyMatch(s -> s != null && !s.isBlank())
+                || (item.getBrand() != null && item.getBrand().getId() != null);
+        if (!hasAttributes) return;
+
         Item parent = item.getParentItem() != null && item.getParentItem().getId() != null
                 ? itemRepo.findById(item.getParentItem().getId()).orElse(null) : null;
         Brand brand = item.getBrand() != null && item.getBrand().getId() != null
