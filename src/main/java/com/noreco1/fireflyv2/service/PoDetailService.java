@@ -5,6 +5,7 @@ import com.noreco1.fireflyv2.controller.response.PoDetailDto;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Personal on 5/15/2015.
@@ -18,4 +19,5 @@ public interface PoDetailService {
     BigDecimal getCashFlowItemAmountBalanceByType(Integer cashFlowItemId, String type);
 
     BigDecimal getDefaultEstimatedAmount(List<Integer> itemIds);
+    Map<String, Object> getSoqPriceAndBrand(Integer supplierAccountNo, Integer rvDetailId);
 }

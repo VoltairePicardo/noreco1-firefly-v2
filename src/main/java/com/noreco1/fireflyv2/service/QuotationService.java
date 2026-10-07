@@ -37,6 +37,9 @@ public interface QuotationService extends VoucherService {
     List<Map> datasourceAbstractOfQuotation(Integer id);
     List<QuotationTerm> getTerms(Integer id);
 
+    @Transactional(readOnly = true)
+    Map<String, Object> getAwardedTermsByPr(Integer prId);
+
     Map getDefaultSignatoryMoreThen100k();
 
     Map getDefaultSignatoryMoreThen300k();

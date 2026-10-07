@@ -168,10 +168,12 @@ public interface PurchaseRequestDetailRepo extends JpaRepository<PurchaseRequest
             "ORDER BY e.code", nativeQuery = true)
     List<Object[]> findPurchaseRequestsForJo(@Param("rvTypes") List<Integer> rvTypes);
 
-    @Query(value = "SELECT DISTINCT e.id, e.code, e.voucherDate, e.purpose, e.deliveryDate, u.fullName " +
+    @Query(value = "SELECT DISTINCT e.id, e.code, e.voucherDate, e.purpose, e.deliveryDate, u.fullName, " +
+            "blid.id AS budgetLineItemDetailId, blid.title AS budgetLineItemDetailTitle, blid.code AS budgetLineItemDetailCode " +
             "FROM PurchaseRequestDetail rvd " +
             "JOIN PurchaseRequest e ON rvd.FK_PurchaseRequestId = e.id " +
             "LEFT JOIN `User` u ON e.FK_createdByUserId = u.id " +
+            "LEFT JOIN BudgetLineItemDetail blid ON blid.id = e.FK_budgetLineItemDetailId " +
             "WHERE e.rvType IN (:rvTypes) " +
             "AND (rvd.quantity - rvd.poQuantity) > 0 " +
             "AND e.FK_documentStatusId = 55 " +
@@ -201,7 +203,7 @@ public interface PurchaseRequestDetailRepo extends JpaRepository<PurchaseRequest
             "rd.withdrawQuantity, " +
             "pd.id as poDetailId " +
             "FROM PurchaseRequestDetail rd " +
-            "LEFT JOIN PoDetail pd ON rd.id = pd.FK_purchaseRequestDetailId " +
+            "LEFT JOIN PurchaseOrderDetail pd ON rd.id = pd.FK_purchaseRequestDetailId " +
             "INNER JOIN ItemStock ist ON ist.FK_itemId = rd.FK_itemId " +
             "INNER JOIN Item i ON ist.FK_itemId = i.id " +
             "INNER JOIN UnitMeasure u ON i.FK_unitId = u.id " +
@@ -227,7 +229,7 @@ public interface PurchaseRequestDetailRepo extends JpaRepository<PurchaseRequest
             "            rd.quantity, " +
             "SUM(pd.deliveredQuantity) - rd.withdrawQuantity AS withdrawableQty, SUM(pd.deliveredQuantity), rd.withdrawQuantity " +
             "FROM PurchaseRequestDetail rd " +
-            "INNER JOIN PoDetail pd ON rd.id = pd.FK_PurchaseRequestDetailId " +
+            "INNER JOIN PurchaseOrderDetail pd ON rd.id = pd.FK_PurchaseRequestDetailId " +
             "INNER JOIN ItemStock ist ON ist.FK_itemId = rd.FK_itemId " +
             "INNER JOIN Item i ON ist.FK_itemId = i.id " +
             "INNER JOIN UnitMeasure u ON i.FK_unitId = u.id " +
@@ -253,8 +255,8 @@ public interface PurchaseRequestDetailRepo extends JpaRepository<PurchaseRequest
 
     @Query(value = "SELECT rvd.* FROM PurchaseRequestDetail rvd " +
             "JOIN PurchaseRequest e ON rvd.FK_PurchaseRequestId = e.id " +
-            "JOIN PoDetail ON rvd.id = PoDetail.FK_PurchaseRequestDetailId " +
-            "WHERE PoDetail.FK_purchaseOrderId = :poId " +
+            "JOIN PurchaseOrderDetail ON rvd.id = PurchaseOrderDetail.FK_PurchaseRequestDetailId " +
+            "WHERE PurchaseOrderDetail.FK_purchaseOrderId = :poId " +
             "group by rvd.id", nativeQuery = true)
     public List<PurchaseRequestDetail> findPurchaseRequestDetailsByCancelledPOId(@Param("poId")Integer poId);
 

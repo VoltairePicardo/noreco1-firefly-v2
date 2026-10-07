@@ -26,7 +26,7 @@ public interface PurchaseOrderRepo extends JpaRepository<PurchaseOrder, Integer>
             "sup.name, " +
             "po.term, " +
             "po.amount, " +
-            "(SELECT COUNT(id) FROM PoDetail WHERE FK_purchaseOrderId = po.id) AS noOfItems, " +
+            "(SELECT COUNT(id) FROM PurchaseOrderDetail WHERE FK_purchaseOrderId = po.id) AS noOfItems, " +
             "d.status " +
             "FROM PurchaseOrder po " +
             "INNER JOIN Supplier sup ON sup.FK_accountNo = po.FK_vendorAccountNo " +
@@ -43,7 +43,7 @@ public interface PurchaseOrderRepo extends JpaRepository<PurchaseOrder, Integer>
             "sup.name, " +
             "po.term, " +
             "po.amount, " +
-            "(SELECT COUNT(id) FROM PoDetail WHERE FK_purchaseOrderId = po.id) AS noOfItems, " +
+            "(SELECT COUNT(id) FROM PurchaseOrderDetail WHERE FK_purchaseOrderId = po.id) AS noOfItems, " +
             "d.status " +
             "FROM PurchaseOrder po " +
             "INNER JOIN Supplier sup ON sup.FK_accountNo = po.FK_vendorAccountNo " +
@@ -61,7 +61,7 @@ public interface PurchaseOrderRepo extends JpaRepository<PurchaseOrder, Integer>
             "sup.name, " +
             "doc.term, " +
             "doc.amount, " +
-            "(SELECT COUNT(id) FROM PoDetail WHERE FK_purchaseOrderId = doc.id) AS noOfItems, " +
+            "(SELECT COUNT(id) FROM PurchaseOrderDetail WHERE FK_purchaseOrderId = doc.id) AS noOfItems, " +
             "d.status " +
             "FROM PurchaseOrder doc " +
             "INNER JOIN Supplier sup ON sup.FK_accountNo = doc.FK_vendorAccountNo " +
@@ -80,9 +80,9 @@ public interface PurchaseOrderRepo extends JpaRepository<PurchaseOrder, Integer>
             "FROM PurchaseOrder p " +
             "INNER JOIN Supplier s ON s.FK_accountNo = p.FK_vendorAccountNo " +
             "WHERE p.FK_documentStatusId = :documentStatusId " +
-            "AND p.id IN (SELECT pod.FK_purchaseOrderId FROM poDetail pod WHERE pod.quantity > pod.deliveredQuantity + " +
+            "AND p.id IN (SELECT pod.FK_purchaseOrderId FROM PurchaseOrderDetail pod WHERE pod.quantity > pod.deliveredQuantity + " +
             "(SELECT COALESCE(SUM(rrd.quantityReceived), 0) FROM ReceivingReportDetail rrd INNER JOIN ReceivingReport rr ON rrd.FK_receivingReportId = rr.id " +
-            "WHERE rrd.FK_poDetailId = pod.id AND rr.FK_documentStatusId NOT IN (7,8,26))) " +
+            "WHERE rrd.FK_PurchaseOrderDetailId = pod.id AND rr.FK_documentStatusId NOT IN (7,8,26))) " +
             "AND (p.code LIKE :filter OR s.name LIKE :filter) " +
             "AND p.id NOT IN (SELECT it.FK_purchaseOrderId FROM ItemTesting it WHERE it.FK_purchaseOrderId IS NOT null) " +
             "ORDER BY p.code" +
@@ -91,9 +91,9 @@ public interface PurchaseOrderRepo extends JpaRepository<PurchaseOrder, Integer>
                     "FROM PurchaseOrder p " +
                     "INNER JOIN Supplier s ON s.FK_accountNo = p.FK_vendorAccountNo " +
                     "WHERE p.FK_documentStatusId = :documentStatusId " +
-                    "AND p.id IN (SELECT pod.FK_purchaseOrderId FROM poDetail pod WHERE pod.quantity > pod.deliveredQuantity + " +
+                    "AND p.id IN (SELECT pod.FK_purchaseOrderId FROM PurchaseOrderDetail pod WHERE pod.quantity > pod.deliveredQuantity + " +
                     "(SELECT COALESCE(SUM(rrd.quantityReceived), 0) FROM ReceivingReportDetail rrd INNER JOIN ReceivingReport rr ON rrd.FK_receivingReportId = rr.id " +
-                    "WHERE rrd.FK_poDetailId = pod.id AND rr.FK_documentStatusId NOT IN (7,8,26))) " +
+                    "WHERE rrd.FK_PurchaseOrderDetailId = pod.id AND rr.FK_documentStatusId NOT IN (7,8,26))) " +
                     "AND (p.code LIKE :filter OR s.name LIKE :filter)" +
                     "AND p.id NOT IN (SELECT it.FK_purchaseOrderId FROM ItemTesting it WHERE it.FK_purchaseOrderId IS NOT null) ",
             nativeQuery = true)
@@ -105,9 +105,9 @@ public interface PurchaseOrderRepo extends JpaRepository<PurchaseOrder, Integer>
     List<PurchaseOrder> findByDocumentStatusId(Integer status);
 
     // use of checking if PO has items delivered or RR
-    @Query(value = "SELECT PurchaseOrder.id as poid, PoDetail.id as podId, ReceivingReportDetail.id as rrdId from PurchaseOrder " +
-            "LEFT JOIN PoDetail ON PurchaseOrder.id = PoDetail.FK_purchaseOrderId " +
-            "LEFT JOIN ReceivingReportDetail ON PoDetail.id = ReceivingReportDetail.FK_poDetailId " +
+    @Query(value = "SELECT PurchaseOrder.id as poid, PurchaseOrderDetail.id as podId, ReceivingReportDetail.id as rrdId from PurchaseOrder " +
+            "LEFT JOIN PurchaseOrderDetail ON PurchaseOrder.id = PurchaseOrderDetail.FK_purchaseOrderId " +
+            "LEFT JOIN ReceivingReportDetail ON PurchaseOrderDetail.id = ReceivingReportDetail.FK_PurchaseOrderDetailId " +
             "LEFT JOIN ReceivingReport ON ReceivingReport.id = ReceivingReportDetail.FK_receivingReportId " +
             "WHERE PurchaseOrder.id = :poId " +
             "AND ReceivingReport.FK_documentStatusId NOT IN (8, 26) " +
@@ -121,13 +121,13 @@ public interface PurchaseOrderRepo extends JpaRepository<PurchaseOrder, Integer>
             "INNER JOIN Supplier s ON s.FK_accountNo = p.FK_vendorAccountNo " +
             "WHERE p.FK_documentStatusId = :documentStatusId " +
             "AND p.id IN ( " +
-            "  SELECT pod.FK_purchaseOrderId FROM poDetail pod WHERE pod.quantity > pod.deliveredQuantity " +
+            "  SELECT pod.FK_purchaseOrderId FROM PurchaseOrderDetail pod WHERE pod.quantity > pod.deliveredQuantity " +
             "  + " +
             "  ( " +
             "  SELECT " +
             "  COALESCE(SUM(itd.unitsReceivedQuantity), 0) " +
             "  FROM ItemTestingDetail itd " +
-            "  WHERE itd.FK_poDetailId = pod.id " +
+            "  WHERE itd.FK_PurchaseOrderDetailId = pod.id " +
             "  ) " +
             ") " +
             "AND (p.code LIKE :filter OR s.name LIKE :filter) ",
@@ -136,13 +136,13 @@ public interface PurchaseOrderRepo extends JpaRepository<PurchaseOrder, Integer>
                     "INNER JOIN Supplier s ON s.FK_accountNo = p.FK_vendorAccountNo " +
                     "WHERE p.FK_documentStatusId = :documentStatusId " +
                     "AND p.id IN ( " +
-                    "  SELECT pod.FK_purchaseOrderId FROM poDetail pod WHERE pod.quantity > pod.deliveredQuantity " +
+                    "  SELECT pod.FK_purchaseOrderId FROM PurchaseOrderDetail pod WHERE pod.quantity > pod.deliveredQuantity " +
                     "  + " +
                     "  ( " +
                     "  SELECT " +
                     "  COALESCE(SUM(itd.unitsReceivedQuantity), 0) " +
                     "  FROM ItemTestingDetail itd " +
-                    "  WHERE itd.FK_poDetailId = pod.id " +
+                    "  WHERE itd.FK_PurchaseOrderDetailId = pod.id " +
                     "  ) " +
                     ")  " +
                     "AND (p.code LIKE :filter OR s.name LIKE :filter) ", nativeQuery = true)
@@ -153,9 +153,9 @@ public interface PurchaseOrderRepo extends JpaRepository<PurchaseOrder, Integer>
             "FROM PurchaseOrder p " +
             "INNER JOIN Supplier s ON s.FK_accountNo = p.FK_vendorAccountNo " +
             "WHERE p.FK_documentStatusId = :documentStatusId " +
-            "AND p.id IN (SELECT pod.FK_purchaseOrderId FROM poDetail pod WHERE pod.quantity > pod.deliveredQuantity + " +
+            "AND p.id IN (SELECT pod.FK_purchaseOrderId FROM PurchaseOrderDetail pod WHERE pod.quantity > pod.deliveredQuantity + " +
             "(SELECT COALESCE(SUM(rrd.quantityReceived), 0) FROM ReceivingReportDetail rrd INNER JOIN ReceivingReport rr ON rrd.FK_receivingReportId = rr.id " +
-            "WHERE rrd.FK_poDetailId = pod.id AND rr.FK_documentStatusId NOT IN (7,8,26))) " +
+            "WHERE rrd.FK_PurchaseOrderDetailId = pod.id AND rr.FK_documentStatusId NOT IN (7,8,26))) " +
             "AND (p.code LIKE :filter OR s.name LIKE :filter) " +
             "AND p.id IN (SELECT it.FK_purchaseOrderId FROM ItemTesting it) " +
             "\n#pageable\n",
@@ -163,9 +163,9 @@ public interface PurchaseOrderRepo extends JpaRepository<PurchaseOrder, Integer>
                     "FROM PurchaseOrder p " +
                     "INNER JOIN Supplier s ON s.FK_accountNo = p.FK_vendorAccountNo " +
                     "WHERE p.FK_documentStatusId = :documentStatusId " +
-                    "AND p.id IN (SELECT pod.FK_purchaseOrderId FROM poDetail pod WHERE pod.quantity > pod.deliveredQuantity + " +
+                    "AND p.id IN (SELECT pod.FK_purchaseOrderId FROM PurchaseOrderDetail pod WHERE pod.quantity > pod.deliveredQuantity + " +
                     "(SELECT COALESCE(SUM(rrd.quantityReceived), 0) FROM ReceivingReportDetail rrd INNER JOIN ReceivingReport rr ON rrd.FK_receivingReportId = rr.id " +
-                    "WHERE rrd.FK_poDetailId = pod.id AND rr.FK_documentStatusId NOT IN (7,8,26))) " +
+                    "WHERE rrd.FK_PurchaseOrderDetailId = pod.id AND rr.FK_documentStatusId NOT IN (7,8,26))) " +
                     "AND (p.code LIKE :filter OR s.name LIKE :filter)" +
                     "AND p.id IN (SELECT it.FK_purchaseOrderId FROM ItemTesting it) ",
             nativeQuery = true)
@@ -173,8 +173,8 @@ public interface PurchaseOrderRepo extends JpaRepository<PurchaseOrder, Integer>
                                                                       @Param("filter") String filter, Pageable pageable);
 
     @Query(value = "SELECT * FROM PurchaseOrder po " +
-            "JOIN PoDetail pod ON po.id = pod.FK_purchaseOrderId " +
-            "LEFT JOIN ReceivingReportDetail rrd ON pod.id = rrd.FK_poDetailId " +
+            "JOIN PurchaseOrderDetail pod ON po.id = pod.FK_purchaseOrderId " +
+            "LEFT JOIN ReceivingReportDetail rrd ON pod.id = rrd.FK_PurchaseOrderDetailId " +
             "WHERE po.FK_documentStatusId = :statusId " +
             "AND rrd.id IS null", nativeQuery = true)
     public List<PurchaseOrder> findPurchaseOrdersForCV(@Param("statusId") Integer statusId);
@@ -186,10 +186,10 @@ public interface PurchaseOrderRepo extends JpaRepository<PurchaseOrder, Integer>
             "AND p.id IN (" +
             "  SELECT " +
             "  pod.FK_purchaseOrderId " +
-            "  FROM poDetail pod " +
+            "  FROM PurchaseOrderDetail pod " +
             "  WHERE pod.quantity > pod.deliveredQuantity + " +
             "  (SELECT COALESCE(SUM(rrd.quantityReceived), 0) FROM ReceivingReportDetail rrd INNER JOIN ReceivingReport rr ON rrd.FK_receivingReportId = rr.id " +
-            "  WHERE rrd.FK_poDetailId = pod.id AND rr.FK_documentStatusId NOT IN (7,8,26))" +
+            "  WHERE rrd.FK_PurchaseOrderDetailId = pod.id AND rr.FK_documentStatusId NOT IN (7,8,26))" +
             ") " +
             "AND (p.code LIKE :filter OR s.name LIKE :filter) " +
             "AND p.id NOT IN (SELECT it.FK_purchaseOrderId FROM ItemTesting it WHERE it.FK_purchaseOrderId IS NOT NULL) " +
@@ -203,10 +203,10 @@ public interface PurchaseOrderRepo extends JpaRepository<PurchaseOrder, Integer>
                     "AND p.id IN (" +
                     "  SELECT " +
                     "  pod.FK_purchaseOrderId " +
-                    "  FROM poDetail pod " +
+                    "  FROM PurchaseOrderDetail pod " +
                     "  WHERE pod.quantity > pod.deliveredQuantity + " +
                     "  (SELECT COALESCE(SUM(rrd.quantityReceived), 0) FROM ReceivingReportDetail rrd INNER JOIN ReceivingReport rr ON rrd.FK_receivingReportId = rr.id " +
-                    "  WHERE rrd.FK_poDetailId = pod.id AND rr.FK_documentStatusId NOT IN (7,8,26))" +
+                    "  WHERE rrd.FK_PurchaseOrderDetailId = pod.id AND rr.FK_documentStatusId NOT IN (7,8,26))" +
                     ") " +
                     "AND (p.code LIKE :filter OR s.name LIKE :filter) " +
                     "AND p.id NOT IN (SELECT it.FK_purchaseOrderId FROM ItemTesting it WHERE it.FK_purchaseOrderId IS NOT NULL) " +

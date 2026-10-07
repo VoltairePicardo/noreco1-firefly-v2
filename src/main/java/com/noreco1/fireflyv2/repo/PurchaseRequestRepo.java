@@ -203,7 +203,7 @@ public interface PurchaseRequestRepo extends JpaRepository<PurchaseRequest, Inte
             "from PurchaseRequest rv " +
             "JOIN PurchaseRequestDetail ON rv.id = PurchaseRequestDetail.FK_purchaseRequestId " +
             "JOIN CanvassDetail ON PurchaseRequestDetail.id = CanvassDetail.FK_purchaseRequestDetailId " +
-            "WHERE PurchaseRequestDetail.id not in (select PoDetail.FK_purchaseRequestDetailId from PoDetail JOIN PurchaseOrder ON PoDetail.FK_purchaseOrderId = PurchaseOrder.id AND PurchaseOrder.FK_documentStatusId != 26 ) " +
+            "WHERE PurchaseRequestDetail.id not in (select PurchaseOrderDetail.FK_purchaseRequestDetailId from PurchaseOrderDetail JOIN PurchaseOrder ON PurchaseOrderDetail.FK_purchaseOrderId = PurchaseOrder.id AND PurchaseOrder.FK_documentStatusId != 26 ) " +
             "AND PurchaseRequestDetail.id not in (select QuotationItem.FK_purchaseRequestDetailId FROM QuotationItem JOIN Quotation ON QuotationItem.FK_quotationId = Quotation.id AND Quotation.FK_documentStatusId != 26) " +
             "AND PurchaseRequestDetail.id not in (select JoDetail.FK_purchaseRequestDetailId from JoDetail JOIN JobOrder ON JoDetail.FK_jobOrderId = JobOrder.id AND JobOrder.FK_documentStatusId != 26) " +
             "GROUP BY rv.id  ORDER BY rv.id DESC", nativeQuery = true)
@@ -231,7 +231,7 @@ public interface PurchaseRequestRepo extends JpaRepository<PurchaseRequest, Inte
             "LEFT JOIN Canvass c ON cd.FK_canvassId = c.id " +
             "LEFT JOIN QuotationDetail qd ON rd.id = qd.FK_purchaseRequestDetailId " +
             "LEFT JOIN Quotation q ON qd.FK_quotationId = q.id " +
-            "LEFT JOIN PoDetail pd ON pd.FK_purchaseRequestDetailId = rd.id " +
+            "LEFT JOIN PurchaseOrderDetail pd ON pd.FK_purchaseRequestDetailId = rd.id " +
             "LEFT JOIN purchaseorder po ON pd.FK_purchaseOrderId = po.id " +
             "INNER JOIN ReceivingReportDetail rrd ON rd.id = rrd.FK_purchaseRequestDetailId " +
             "INNER JOIN ReceivingReport rr ON rr.id = rrd.FK_receivingReportId " +
@@ -239,7 +239,7 @@ public interface PurchaseRequestRepo extends JpaRepository<PurchaseRequest, Inte
             "WHERE IF(pd.FK_purchaseRequestDetailId IS NULL, true, " +
             "rv.id IN (SELECT rd.FK_PurchaseRequestId " +
             "FROM PurchaseRequestDetail rd " +
-            "INNER JOIN PoDetail pd ON rd.id = pd.FK_purchaseRequestDetailId " +
+            "INNER JOIN PurchaseOrderDetail pd ON rd.id = pd.FK_purchaseRequestDetailId " +
             "GROUP BY rd.id " +
             "HAVING SUM(pd.deliveredQuantity) > SUM(rd.withdrawQuantity) OR (pd.id IS NULL AND rd.withdrawquantity<rd.quantity)) " +
             ") AND rr.FK_inventoryLocationId = :invLocId AND rv.FK_createdByUserId = :userId " +
@@ -252,7 +252,7 @@ public interface PurchaseRequestRepo extends JpaRepository<PurchaseRequest, Inte
                     "LEFT JOIN Canvass c ON cd.FK_canvassId = c.id " +
                     "LEFT JOIN QuotationDetail qd ON rd.id = qd.FK_purchaseRequestDetailId " +
                     "LEFT JOIN Quotation q ON qd.FK_quotationId = q.id " +
-                    "LEFT JOIN PoDetail pd ON pd.FK_purchaseRequestDetailId = rd.id " +
+                    "LEFT JOIN PurchaseOrderDetail pd ON pd.FK_purchaseRequestDetailId = rd.id " +
                     "LEFT JOIN purchaseorder po ON pd.FK_purchaseOrderId = po.id " +
                     "INNER JOIN ReceivingReportDetail rrd ON rd.id = rrd.FK_purchaseRequestDetailId " +
 
@@ -261,7 +261,7 @@ public interface PurchaseRequestRepo extends JpaRepository<PurchaseRequest, Inte
                     "WHERE IF(pd.FK_purchaseRequestDetailId IS NULL, true, " +
                     "rv.id IN (SELECT rd.FK_PurchaseRequestId " +
                     "FROM PurchaseRequestDetail rd " +
-                    "INNER JOIN PoDetail pd ON rd.id = pd.FK_purchaseRequestDetailId " +
+                    "INNER JOIN PurchaseOrderDetail pd ON rd.id = pd.FK_purchaseRequestDetailId " +
                     "GROUP BY rd.id " +
                     "HAVING SUM(pd.deliveredQuantity) > SUM(rd.withdrawQuantity) OR (pd.id IS NULL AND rd.withdrawquantity<rd.quantity)) " +
                     ") AND rr.FK_inventoryLocationId = :invLocId AND rv.FK_createdByUserId = :userId " +
@@ -284,7 +284,7 @@ public interface PurchaseRequestRepo extends JpaRepository<PurchaseRequest, Inte
             "LEFT JOIN Canvass c ON cd.FK_canvassId = c.id " +
             "LEFT JOIN QuotationDetail qd ON rd.id = qd.FK_purchaseRequestDetailId " +
             "LEFT JOIN Quotation q ON qd.FK_quotationId = q.id " +
-            "LEFT JOIN PoDetail pd ON pd.FK_purchaseRequestDetailId = rd.id " +
+            "LEFT JOIN PurchaseOrderDetail pd ON pd.FK_purchaseRequestDetailId = rd.id " +
             "LEFT JOIN purchaseorder po ON pd.FK_purchaseOrderId = po.id " +
             "INNER JOIN ReceivingReportDetail rrd ON rd.id = rrd.FK_purchaseRequestDetailId " +
             "INNER JOIN ReceivingReport rr ON rr.id = rrd.FK_receivingReportId " +
@@ -292,7 +292,7 @@ public interface PurchaseRequestRepo extends JpaRepository<PurchaseRequest, Inte
             "WHERE IF(pd.FK_purchaseRequestDetailId IS NULL, true, " +
             "rv.id IN (SELECT rd.FK_PurchaseRequestId " +
             "FROM PurchaseRequestDetail rd " +
-            "INNER JOIN PoDetail pd ON rd.id = pd.FK_purchaseRequestDetailId " +
+            "INNER JOIN PurchaseOrderDetail pd ON rd.id = pd.FK_purchaseRequestDetailId " +
             "GROUP BY rd.id " +
             "HAVING SUM(pd.deliveredQuantity) > SUM(rd.withdrawQuantity) OR (pd.id IS NULL AND rd.withdrawquantity<rd.quantity)) " +
             ") AND rr.FK_inventoryLocationId = :invLocId AND rv.FK_createdByUserId = :userId " +
@@ -306,7 +306,7 @@ public interface PurchaseRequestRepo extends JpaRepository<PurchaseRequest, Inte
                     "LEFT JOIN Canvass c ON cd.FK_canvassId = c.id " +
                     "LEFT JOIN QuotationDetail qd ON rd.id = qd.FK_purchaseRequestDetailId " +
                     "LEFT JOIN Quotation q ON qd.FK_quotationId = q.id " +
-                    "LEFT JOIN PoDetail pd ON pd.FK_purchaseRequestDetailId = rd.id " +
+                    "LEFT JOIN PurchaseOrderDetail pd ON pd.FK_purchaseRequestDetailId = rd.id " +
                     "LEFT JOIN purchaseorder po ON pd.FK_purchaseOrderId = po.id " +
                     "INNER JOIN ReceivingReportDetail rrd ON rd.id = rrd.FK_purchaseRequestDetailId " +
                     "INNER JOIN ReceivingReport rr ON rr.id = rrd.FK_receivingReportId " +
@@ -314,7 +314,7 @@ public interface PurchaseRequestRepo extends JpaRepository<PurchaseRequest, Inte
                     "WHERE IF(pd.FK_purchaseRequestDetailId IS NULL, true, " +
                     "rv.id IN (SELECT rd.FK_PurchaseRequestId " +
                     "FROM PurchaseRequestDetail rd " +
-                    "INNER JOIN PoDetail pd ON rd.id = pd.FK_purchaseRequestDetailId " +
+                    "INNER JOIN PurchaseOrderDetail pd ON rd.id = pd.FK_purchaseRequestDetailId " +
                     "GROUP BY rd.id " +
                     "HAVING SUM(pd.deliveredQuantity) > SUM(rd.withdrawQuantity) OR (pd.id IS NULL AND rd.withdrawquantity<rd.quantity)) " +
                     ") AND rr.FK_inventoryLocationId = :invLocId AND rv.FK_createdByUserId = :userId " +

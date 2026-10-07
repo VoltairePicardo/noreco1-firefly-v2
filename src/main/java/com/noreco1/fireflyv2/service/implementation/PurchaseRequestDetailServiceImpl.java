@@ -346,6 +346,15 @@ public class PurchaseRequestDetailServiceImpl implements PurchaseRequestDetailSe
                 map.put("purpose",      row[3]);
                 map.put("deliveryDate", row[4]);
                 map.put("preparedBy",   row[5]);
+                if (row.length > 6 && row[6] != null) {
+                    Map<String, Object> blid = new HashMap<>();
+                    blid.put("id",    row[6]);
+                    blid.put("title", row[7]);
+                    blid.put("code",  row[8]);
+                    map.put("budgetLineItemDetail", blid);
+                } else {
+                    map.put("budgetLineItemDetail", null);
+                }
                 result.add(map);
             }
         }

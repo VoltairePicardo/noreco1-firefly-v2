@@ -459,15 +459,15 @@ public class DocumentDtoerImpl implements DocumentDtoer {
                             boolean allowCancel = true;
                             if(row.getDocumentStatus().getId().equals(DocumentStatus.APPROVED.getId())) {
                                 // check if RV has PO
-                                List<PoDetail> poDetails = poDetailRepo.findByPurchaseRequestDetailPurchaseRequestId(row.getId());
+                                List<PurchaseOrderDetail> purchaseOrderDetails = poDetailRepo.findByPurchaseRequestDetailPurchaseRequestId(row.getId());
 
                                 // allow to cancel approved RV that has no PO yet
-                                if(!poDetails.isEmpty()) {
+                                if(!purchaseOrderDetails.isEmpty()) {
 
                                     allowCancel = false;    // if has PO, cancel is not allowed
 
                                     // but if PO is cancelled or disapproved, cancellation will be allowed
-                                    PurchaseOrder purchaseOrder = poDetails.get(0).getPurchaseOrder();
+                                    PurchaseOrder purchaseOrder = purchaseOrderDetails.get(0).getPurchaseOrder();
                                     if(purchaseOrder != null) {
                                         allowCancel =  purchaseOrder.getDocumentStatus().getId().equals(DocumentStatus.CANCELLED.getId()) ||
                                                     purchaseOrder.getDocumentStatus().getId().equals(DocumentStatus.DENIED.getId());
@@ -784,15 +784,15 @@ public class DocumentDtoerImpl implements DocumentDtoer {
                             boolean allowCancel = true;
                             if(row.getDocumentStatus().getId().equals(DocumentStatus.APPROVED.getId())) {
                                 // check if RV has PO
-                                List<PoDetail> poDetails = poDetailRepo.findByPurchaseRequestDetailPurchaseRequestId(row.getPurchaseRequest().getId());
+                                List<PurchaseOrderDetail> purchaseOrderDetails = poDetailRepo.findByPurchaseRequestDetailPurchaseRequestId(row.getPurchaseRequest().getId());
 
                                 // Allow to cancel approved SOQ as long as RIV has no PO yet.
-                                if(!poDetails.isEmpty()) {
+                                if(!purchaseOrderDetails.isEmpty()) {
 
                                     allowCancel = false;    // if has PO, cancel is not allowed
 
                                     // but if PO is cancelled or disapproved, cancellation will be allowed
-                                    PurchaseOrder purchaseOrder = poDetails.get(0).getPurchaseOrder();
+                                    PurchaseOrder purchaseOrder = purchaseOrderDetails.get(0).getPurchaseOrder();
                                     if(purchaseOrder != null) {
                                         allowCancel =  purchaseOrder.getDocumentStatus().getId().equals(DocumentStatus.CANCELLED.getId()) ||
                                                 purchaseOrder.getDocumentStatus().getId().equals(DocumentStatus.DENIED.getId());

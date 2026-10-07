@@ -3,12 +3,14 @@ package com.noreco1.fireflyv2.controller;
 import com.noreco1.fireflyv2.model.PurchaseOrderBudgetDetail;
 import com.noreco1.fireflyv2.controller.response.PoDetailDto;
 import com.noreco1.fireflyv2.service.PoDetailService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Personal on 5/15/2015.
@@ -31,6 +33,11 @@ public class PoDetailController {
     @GetMapping(value = "/canvass-price/{supplierAccountNo}/{rvDetailId}")
     public BigDecimal getPoDetails(@PathVariable Integer supplierAccountNo, @PathVariable Integer rvDetailId, HttpServletRequest request) {
         return poDetailService.getItemCanvassPrice(supplierAccountNo, rvDetailId);
+    }
+
+    @GetMapping(value = "/soq-data/{supplierAccountNo}/{rvDetailId}")
+    public ResponseEntity<Map<String, Object>> getSoqData(@PathVariable Integer supplierAccountNo, @PathVariable Integer rvDetailId) {
+        return ResponseEntity.ok(poDetailService.getSoqPriceAndBrand(supplierAccountNo, rvDetailId));
     }
 
     @GetMapping(value = "/pod-for-item-testing/{poId}")

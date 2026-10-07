@@ -1,7 +1,6 @@
 package com.noreco1.fireflyv2.repo;
 
 import com.noreco1.fireflyv2.model.AccountsPayableVoucherLink;
-import com.noreco1.fireflyv2.model.PoDetail;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

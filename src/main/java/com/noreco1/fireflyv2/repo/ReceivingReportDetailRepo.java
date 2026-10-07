@@ -15,7 +15,7 @@ public interface ReceivingReportDetailRepo extends JpaRepository<ReceivingReport
     List<ReceivingReportDetail> findByReceivingReportId(Integer rrId);
     Long deleteByReceivingReportId(Integer rrId);
 
-    ReceivingReportDetail findByPoDetailIdAndReceivingReportDocumentStatusIdNotIn(Integer id, List<Integer> integers);
+    ReceivingReportDetail findByPurchaseOrderDetailIdAndReceivingReportDocumentStatusIdNotIn(Integer id, List<Integer> integers);
 
-    List<ReceivingReportDetail> findAllByPoDetailPurchaseRequestDetailPurchaseRequestIdOrderByReceivingReportCode(Integer purchaseRequestId);
+    List<ReceivingReportDetail> findAllByPurchaseOrderDetailPurchaseRequestDetailPurchaseRequestIdOrderByReceivingReportCode(Integer purchaseRequestId);
 }

@@ -668,6 +668,18 @@ public class QuotationServiceImpl implements QuotationService, PrintableVoucher 
         return this.quotationTermRepo.findAllByQuotationId(id);
     }
 
+    @Transactional(readOnly = true)
+    @Override
+    public Map<String, Object> getAwardedTermsByPr(Integer prId) {
+        QuotationTerm term = quotationTermRepo.findAwardedTermByPurchaseRequestId(prId);
+        if (term == null) return null;
+        Map<String, Object> result = new LinkedHashMap<>();
+        result.put("termsOfPayment", term.getTermsOfPayment());
+        result.put("placeOfDelivery", term.getPlaceOfDelivery());
+        result.put("deliveryTimeAndCompletion", term.getDeliveryTimeAndCompletion());
+        return result;
+    }
+
     @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Map getDefaultSignatoryMoreThen100k() {

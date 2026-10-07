@@ -43,4 +43,7 @@ public class DocumentLog {
     @Column(nullable = false, updatable = false)
     private Date createdAt;
 
+    @Column
+    private String action;
+
 }

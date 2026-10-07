@@ -69,6 +69,10 @@ export class PurchaseOrderService {
         return this.http.get<number>(`${BASE_API}/po-detail/canvass-price/${supplierAccountNo}/${rvDetailId}`);
     }
 
+    getSoqData(supplierAccountNo: number, rvDetailId: number): Observable<any> {
+        return this.http.get<any>(`${BASE_API}/po-detail/soq-data/${supplierAccountNo}/${rvDetailId}`);
+    }
+
     getRvDetailsForPo(): Observable<any[]> {
         return this.http.get<any[]>(`${BASE_API}/rv-detail/rvd/type/canvass`);
     }
@@ -111,5 +115,22 @@ export class PurchaseOrderService {
             `${BASE_API}/purchase-order/for-item-testing/${DOCUMENT_STATUS_APPROVED}/paged`,
             { params }
         );
+    }
+
+    getBrands(): Observable<any[]> {
+        const params = new HttpParams().set('q', '').set('page', 0).set('size', 500);
+        return this.http.get<any>(`${BASE_API}/brand/list`, { params });
+    }
+
+    getBudgetLineItemBalance(budgetLineItemDetailId: number): Observable<{ amountBalanceCV: number; amountBalancePOJO: number }> {
+        return this.http.get<any>(`${BASE_API}/json/budget-line-item-balance/${budgetLineItemDetailId}`);
+    }
+
+    getAwardedSoqTerms(prId: number): Observable<any> {
+        return this.http.get<any>(`${BASE_API}/quotation/awarded-terms/${prId}`);
+    }
+
+    getSetting(code: string): Observable<any> {
+        return this.http.get<any>(`${BASE_API}/json/setting/${code}`);
     }
 }

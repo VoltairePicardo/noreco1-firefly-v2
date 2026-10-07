@@ -56,7 +56,7 @@ public interface ReceivingReportRepo extends JpaRepository<ReceivingReport, Inte
             "po.useCreditCard " +
             "FROM ReceivingReport rr " +
             "JOIN ReceivingReportDetail rrd ON rr.id = rrd.FK_receivingReportId " +
-            "JOIN PoDetail pod ON pod.id = rrd.FK_poDetailId " +
+            "JOIN PurchaseOrderDetail pod ON pod.id = rrd.FK_poDetailId " +
             "JOIN PurchaseOrder po ON pod.FK_purchaseOrderId = po.id " +
             "LEFT JOIN CashAdvance ca ON po.FK_cashAdvanceId = ca.id " +
             "LEFT JOIN CashAdvanceLiquidation cal ON ca.id = cal.FK_cashAdvanceId " +
@@ -85,7 +85,7 @@ public interface ReceivingReportRepo extends JpaRepository<ReceivingReport, Inte
             "FROM ReceivingReport rr " +
             "JOIN Supplier s ON rr.FK_supplierId = s.id  " +
             "JOIN ReceivingReportDetail rrd ON rr.id = rrd.FK_receivingReportId " +
-            "JOIN PoDetail pod ON pod.id = rrd.FK_poDetailId " +
+            "JOIN PurchaseOrderDetail pod ON pod.id = rrd.FK_poDetailId " +
             "JOIN PurchaseOrder po ON pod.FK_purchaseOrderId = po.id " +
             "LEFT JOIN CashAdvance ca ON po.FK_cashAdvanceId = ca.id " +
             "LEFT JOIN CashAdvanceLiquidation cal ON ca.id = cal.FK_cashAdvanceId AND cal.FK_documentStatusId = 7 " +
@@ -103,7 +103,7 @@ public interface ReceivingReportRepo extends JpaRepository<ReceivingReport, Inte
                     "FROM ReceivingReport rr " +
                     "JOIN Supplier s ON rr.FK_supplierId = s.id  " +
                     "JOIN ReceivingReportDetail rrd ON rr.id = rrd.FK_receivingReportId " +
-                    "JOIN PoDetail pod ON pod.id = rrd.FK_poDetailId " +
+                    "JOIN PurchaseOrderDetail pod ON pod.id = rrd.FK_poDetailId " +
                     "JOIN PurchaseOrder po ON pod.FK_purchaseOrderId = po.id " +
                     "LEFT JOIN CashAdvance ca ON po.FK_cashAdvanceId = ca.id " +
                     "LEFT JOIN CashAdvanceLiquidation cal ON ca.id = cal.FK_cashAdvanceId AND cal.FK_documentStatusId = 7 " +
@@ -121,7 +121,7 @@ public interface ReceivingReportRepo extends JpaRepository<ReceivingReport, Inte
             "rr.* " +
             "FROM ReceivingReport rr " +
             "JOIN ReceivingReportDetail rrd ON rr.id = rrd.FK_receivingReportId " +
-            "JOIN PoDetail pod ON pod.id = rrd.FK_poDetailId " +
+            "JOIN PurchaseOrderDetail pod ON pod.id = rrd.FK_poDetailId " +
             "JOIN PurchaseOrder po ON pod.FK_purchaseOrderId = po.id " +
             "LEFT JOIN CashAdvance ca ON po.FK_cashAdvanceId = ca.id " +
             "LEFT JOIN CashAdvanceLiquidation cal ON ca.id = cal.FK_cashAdvanceId AND cal.FK_documentStatusId = 7 " +
@@ -137,7 +137,7 @@ public interface ReceivingReportRepo extends JpaRepository<ReceivingReport, Inte
                     "COUNT(DISTINCT rr.id) " +
                     "FROM ReceivingReport rr " +
                     "JOIN ReceivingReportDetail rrd ON rr.id = rrd.FK_receivingReportId " +
-                    "JOIN PoDetail pod ON pod.id = rrd.FK_poDetailId " +
+                    "JOIN PurchaseOrderDetail pod ON pod.id = rrd.FK_poDetailId " +
                     "JOIN PurchaseOrder po ON pod.FK_purchaseOrderId = po.id " +
                     "LEFT JOIN CashAdvance ca ON po.FK_cashAdvanceId = ca.id " +
                     "LEFT JOIN CashAdvanceLiquidation cal ON ca.id = cal.FK_cashAdvanceId AND cal.FK_documentStatusId = 7 " +
@@ -154,8 +154,8 @@ public interface ReceivingReportRepo extends JpaRepository<ReceivingReport, Inte
             "*  " +
             "FROM ReceivingReport   " +
             "JOIN ReceivingReportDetail ON ReceivingReport.id = ReceivingReportDetail.FK_receivingReportId " +
-            "JOIN PoDetail ON ReceivingReportDetail.FK_poDetailId = PoDetail.id " +
-            "JOIN PurchaseOrder ON PoDetail.FK_purchaseOrderId = PurchaseOrder.id " +
+            "JOIN PurchaseOrderDetail ON ReceivingReportDetail.FK_poDetailId = PurchaseOrderDetail.id " +
+            "JOIN PurchaseOrder ON PurchaseOrderDetail.FK_purchaseOrderId = PurchaseOrder.id " +
             "JOIN Supplier ON ReceivingReport.FK_supplierId = Supplier.id  " +
             "WHERE ReceivingReport.FK_documentStatusId = :documentStatusId  " +
             "AND (ReceivingReport.confirmedForJv = 0 OR ReceivingReport.confirmedForJv IS NULL) " +
@@ -180,8 +180,8 @@ public interface ReceivingReportRepo extends JpaRepository<ReceivingReport, Inte
                     "COUNT(*)  " +
                     "FROM ReceivingReport   " +
                     "JOIN ReceivingReportDetail ON ReceivingReport.id = ReceivingReportDetail.FK_receivingReportId " +
-                    "JOIN PoDetail ON ReceivingReportDetail.FK_poDetailId = PoDetail.id " +
-                    "JOIN PurchaseOrder ON PoDetail.FK_purchaseOrderId = PurchaseOrder.id " +
+                    "JOIN PurchaseOrderDetail ON ReceivingReportDetail.FK_poDetailId = PurchaseOrderDetail.id " +
+                    "JOIN PurchaseOrder ON PurchaseOrderDetail.FK_purchaseOrderId = PurchaseOrder.id " +
                     "JOIN Supplier ON ReceivingReport.FK_supplierId = Supplier.id  " +
                     "WHERE ReceivingReport.FK_documentStatusId = :documentStatusId  " +
                     "AND (ReceivingReport.confirmedForJv = 0 OR ReceivingReport.confirmedForJv IS NULL) " +
@@ -207,8 +207,8 @@ public interface ReceivingReportRepo extends JpaRepository<ReceivingReport, Inte
             "ReceivingReport.*  " +
             "FROM ReceivingReport " +
             "JOIN ReceivingReportDetail ON ReceivingReport.id = ReceivingReportDetail.FK_receivingReportId " +
-            "JOIN PoDetail ON ReceivingReportDetail.FK_poDetailId = PoDetail.id " +
-            "JOIN PurchaseOrder ON PoDetail.FK_purchaseOrderId = PurchaseOrder.id " +
+            "JOIN PurchaseOrderDetail ON ReceivingReportDetail.FK_poDetailId = PurchaseOrderDetail.id " +
+            "JOIN PurchaseOrder ON PurchaseOrderDetail.FK_purchaseOrderId = PurchaseOrder.id " +
             "JOIN Supplier ON ReceivingReport.FK_supplierId = Supplier.id  " +
             "WHERE ReceivingReport.FK_documentStatusId = :documentStatusId  " +
             "AND (ReceivingReport.confirmedForJv = 0 OR ReceivingReport.confirmedForJv IS NULL)  " +
@@ -232,8 +232,8 @@ public interface ReceivingReportRepo extends JpaRepository<ReceivingReport, Inte
                     "COUNT(*)  " +
                     "FROM ReceivingReport " +
                     "JOIN ReceivingReportDetail ON ReceivingReport.id = ReceivingReportDetail.FK_receivingReportId " +
-                    "JOIN PoDetail ON ReceivingReportDetail.FK_poDetailId = PoDetail.id " +
-                    "JOIN PurchaseOrder ON PoDetail.FK_purchaseOrderId = PurchaseOrder.id " +
+                    "JOIN PurchaseOrderDetail ON ReceivingReportDetail.FK_poDetailId = PurchaseOrderDetail.id " +
+                    "JOIN PurchaseOrder ON PurchaseOrderDetail.FK_purchaseOrderId = PurchaseOrder.id " +
                     "JOIN Supplier ON ReceivingReport.FK_supplierId = Supplier.id  " +
                     "WHERE ReceivingReport.FK_documentStatusId = :documentStatusId  " +
                     "AND (ReceivingReport.confirmedForJv = 0 OR ReceivingReport.confirmedForJv IS NULL)  " +
@@ -256,7 +256,7 @@ public interface ReceivingReportRepo extends JpaRepository<ReceivingReport, Inte
 
     @Query(value = "SELECT rr.* FROM ReceivingReport rr " +
             "JOIN ReceivingReportDetail rrd ON rr.id = rrd.FK_receivingReportId " +
-            "JOIN PoDetail pod ON pod.id = rrd.FK_poDetailId " +
+            "JOIN PurchaseOrderDetail pod ON pod.id = rrd.FK_poDetailId " +
             "JOIN PurchaseOrder po ON po.id = pod.FK_purchaseOrderId " +
             "WHERE rr.FK_documentStatusId = :documentStatusId " +
             "AND (po.FK_vehicleId > 0 OR po.FK_vehicleId IS NOT NULL) " +
@@ -278,7 +278,7 @@ public interface ReceivingReportRepo extends JpaRepository<ReceivingReport, Inte
             "\n#pageable\n",
             countQuery = "SELECT COUNT(*) FROM ReceivingReport rr " +
                     "JOIN ReceivingReportDetail rrd ON rr.id = rrd.FK_receivingReportId " +
-                    "JOIN PoDetail pod ON pod.id = rrd.FK_poDetailId " +
+                    "JOIN PurchaseOrderDetail pod ON pod.id = rrd.FK_poDetailId " +
                     "JOIN PurchaseOrder po ON po.id = pod.FK_purchaseOrderId " +
                     "WHERE rr.FK_documentStatusId = :documentStatusId " +
                     "AND (po.FK_vehicleId > 0 OR po.FK_vehicleId IS NOT NULL) " +
@@ -302,7 +302,7 @@ public interface ReceivingReportRepo extends JpaRepository<ReceivingReport, Inte
 
     @Query(value = "SELECT rr.* FROM ReceivingReport rr " +
             "JOIN ReceivingReportDetail rrd ON rr.id = rrd.FK_receivingReportId " +
-            "JOIN PoDetail pod ON pod.id = rrd.FK_poDetailId " +
+            "JOIN PurchaseOrderDetail pod ON pod.id = rrd.FK_poDetailId " +
             "JOIN PurchaseOrder po ON po.id = pod.FK_purchaseOrderId " +
             "WHERE rr.FK_documentStatusId = :documentStatusId " +
             "AND (po.FK_vehicleId > 0 OR po.FK_vehicleId IS NOT NULL) " +
@@ -324,7 +324,7 @@ public interface ReceivingReportRepo extends JpaRepository<ReceivingReport, Inte
             "\n#pageable\n",
             countQuery = "SELECT COUNT(*) FROM ReceivingReport rr " +
                     "JOIN ReceivingReportDetail rrd ON rr.id = rrd.FK_receivingReportId " +
-                    "JOIN PoDetail pod ON pod.id = rrd.FK_poDetailId " +
+                    "JOIN PurchaseOrderDetail pod ON pod.id = rrd.FK_poDetailId " +
                     "JOIN PurchaseOrder po ON po.id = pod.FK_purchaseOrderId " +
                     "WHERE rr.FK_documentStatusId = :documentStatusId " +
                     "AND (po.FK_vehicleId > 0 OR po.FK_vehicleId IS NOT NULL) " +

@@ -16,6 +16,7 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.MessageSource;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -95,6 +97,12 @@ public class QuotationController {
 
     @Autowired
     private DownloadService downloadService;
+
+    @GetMapping("/awarded-terms/{prId}")
+    public ResponseEntity<Map<String, Object>> getAwardedTermsByPr(@PathVariable Integer prId) {
+        Map<String, Object> result = quotationService.getAwardedTermsByPr(prId);
+        return ResponseEntity.ok(result);
+    }
 
     @RequestMapping(value="/export/{quotationId}")
     public void exportToPdf(@PathVariable Integer quotationId,
