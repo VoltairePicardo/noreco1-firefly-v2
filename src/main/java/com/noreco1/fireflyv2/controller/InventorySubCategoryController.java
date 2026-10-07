@@ -3,10 +3,11 @@ package com.noreco1.fireflyv2.controller;
 import com.noreco1.fireflyv2.controller.response.InventorySubCategoryDto;
 import com.noreco1.fireflyv2.controller.response.PostResponse;
 import com.noreco1.fireflyv2.service.InventorySubCategoryService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,14 +28,16 @@ public class InventorySubCategoryController {
     }
 
     @PostMapping("/create")
-    public PostResponse create(@RequestBody InventorySubCategoryDto dto) {
-        BindingResult bindingResult = new BeanPropertyBindingResult(dto, "inventorySubCategory");
+    public PostResponse create(@RequestBody @Valid InventorySubCategoryDto dto,
+                               HttpServletRequest request,
+                               BindingResult bindingResult) {
         return inventorySubCategoryService.processCreate(dto, bindingResult, messageSource);
     }
 
     @PostMapping("/update")
-    public PostResponse update(@RequestBody InventorySubCategoryDto dto) {
-        BindingResult bindingResult = new BeanPropertyBindingResult(dto, "inventorySubCategory");
+    public PostResponse update(@RequestBody @Valid InventorySubCategoryDto dto,
+                               HttpServletRequest request,
+                               BindingResult bindingResult) {
         return inventorySubCategoryService.processUpdate(dto, bindingResult, messageSource);
     }
 }
