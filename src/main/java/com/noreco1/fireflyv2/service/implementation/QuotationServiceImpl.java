@@ -842,7 +842,7 @@ public class QuotationServiceImpl implements QuotationService, PrintableVoucher 
             messageFormatter.buildErrorMessages();
             response = messageFormatter.getResponse();
         } else {
-            User createdBy = authenticationFacade.getLoggedIn();
+            User user = authenticationFacade.getLoggedIn();
             User approvedByFinanceManager = quotation.getApprovingOfficer() != null ? userRepo.findOneByAccountNo(quotation.getApprovingOfficer().getAccountNo()):null;
             User approvedByGeneralManager = quotation.getApprovedByGeneralManager() != null ? userRepo.findOneByAccountNo(quotation.getApprovedByGeneralManager().getAccountNo()):null;
             User notedByUser = quotation.getNotedBy() != null ? userRepo.findOneByAccountNo(quotation.getNotedBy().getAccountNo()) : null;
@@ -861,7 +861,7 @@ public class QuotationServiceImpl implements QuotationService, PrintableVoucher 
                 quotation.setDocumentStatus(documentStatus);
 
                 quotation.setTransaction(generatorFacade.transaction());
-                quotation.setCreatedBy(createdBy);
+                quotation.setCreatedBy(user);
                 existingQuotation = quotation;
             } else {
                 existingQuotation = quotationRepo.findById(quotation.getId()).orElse(null);
@@ -880,7 +880,7 @@ public class QuotationServiceImpl implements QuotationService, PrintableVoucher 
             existingQuotation.setWorkflow(wf);
             existingQuotation.setDate(quotation.getDate());
             existingQuotation.setParticular(quotation.getParticular());
-            existingQuotation.setCreatedBy(authenticationFacade.getLoggedIn());
+            if (insertMode) existingQuotation.setCreatedBy(user);
             existingQuotation.setApprovingOfficer(approvedByFinanceManager);
             existingQuotation.setApprovedByGeneralManager(approvedByGeneralManager);
             existingQuotation.setNotedBy(notedByUser);
@@ -901,7 +901,7 @@ public class QuotationServiceImpl implements QuotationService, PrintableVoucher 
                 }
 
                 if (insertMode) { // log action only when adding document
-                    documentProcessingFacade.processAction(this.model.getTransaction(), null, this.model.getWorkflow(), createdBy);
+                    documentProcessingFacade.processAction(this.model.getTransaction(), null, this.model.getWorkflow(), user);
                 }
 
                 ArrayList<QuotationItemDto> details = quotation.getQuotationDetails();
@@ -951,7 +951,7 @@ public class QuotationServiceImpl implements QuotationService, PrintableVoucher 
                 Map newMap = insertMode ? documentLoggerFacade.makeLog(quotationRepo.findById(this.model.getId()).orElse(this.model)) : null;
 
                 // generic document logging here
-                DocumentLog log = documentLoggerFacade.log(this.model.getTransaction(), createdBy, oldMap, newMap);
+                DocumentLog log = documentLoggerFacade.log(this.model.getTransaction(), user, oldMap, newMap);
 
                 response.setLogId(log != null ? log.getId() : 0);
                 response.setModelId(this.model.getId());
