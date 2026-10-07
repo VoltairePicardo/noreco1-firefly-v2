@@ -637,7 +637,8 @@ public class MemorandumReceiptServiceImpl implements MemorandumReceiptService, P
                 dto.setCreatedByUser(user);
 
                 dto.setDepartmentName(entity.getStockWithdrawal().getDepartment().getName());
-                dto.setInventoryCategoryTypeId(entity.getStockWithdrawal().getInventoryCategory().getType());
+                InventoryCategoryType categoryType = entity.getStockWithdrawal().getInventoryCategory().getType();
+                dto.setInventoryCategoryTypeId(categoryType != null ? categoryType.getId() : null);
 
                 return dto;
         });

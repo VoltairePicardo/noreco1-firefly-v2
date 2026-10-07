@@ -1182,21 +1182,21 @@ public class AccountingReportDtoerImpl implements AccountingReportDtoer {
             }
             List<StockWithdrawal> list;
             if(documentTypeId > 0 && inventoryLocationId > 0 && documentStatusId > 0) {
-                list = stockWithdrawalRepo.findByVoucherDateBetweenAndInventoryLocationIdAndDocumentStatusIdAndInventoryCategoryTypeOrderByInventoryCategoryTypeAscInventoryLocationIdAscCodeAsc(fromDate, toDate, inventoryLocationId, documentStatusId, documentTypeId);
+                list = stockWithdrawalRepo.findByVoucherDateBetweenAndInventoryLocationIdAndDocumentStatusIdAndInventoryCategoryTypeIdOrderByInventoryCategoryTypeIdAscInventoryLocationIdAscCodeAsc(fromDate, toDate, inventoryLocationId, documentStatusId, documentTypeId);
             } else if(documentTypeId > 0 && inventoryLocationId > 0) {
-                list = stockWithdrawalRepo.findByVoucherDateBetweenAndInventoryLocationIdAndInventoryCategoryTypeOrderByInventoryCategoryTypeAscInventoryLocationIdAscCodeAsc(fromDate, toDate, inventoryLocationId, documentTypeId);
+                list = stockWithdrawalRepo.findByVoucherDateBetweenAndInventoryLocationIdAndInventoryCategoryTypeIdOrderByInventoryCategoryTypeIdAscInventoryLocationIdAscCodeAsc(fromDate, toDate, inventoryLocationId, documentTypeId);
             } else if(documentTypeId > 0 &&  documentStatusId > 0) {
-                list = stockWithdrawalRepo.findByVoucherDateBetweenAndDocumentStatusIdAndInventoryCategoryTypeOrderByInventoryCategoryTypeAscInventoryLocationIdAscCodeAsc(fromDate, toDate, documentStatusId, documentTypeId);
+                list = stockWithdrawalRepo.findByVoucherDateBetweenAndDocumentStatusIdAndInventoryCategoryTypeIdOrderByInventoryCategoryTypeIdAscInventoryLocationIdAscCodeAsc(fromDate, toDate, documentStatusId, documentTypeId);
             } else if(inventoryLocationId > 0 && documentStatusId > 0) {
-                list = stockWithdrawalRepo.findByVoucherDateBetweenAndInventoryLocationIdAndDocumentStatusIdOrderByInventoryCategoryTypeAscInventoryLocationIdAscCodeAsc(fromDate, toDate, inventoryLocationId, documentStatusId);
+                list = stockWithdrawalRepo.findByVoucherDateBetweenAndInventoryLocationIdAndDocumentStatusIdOrderByInventoryCategoryTypeIdAscInventoryLocationIdAscCodeAsc(fromDate, toDate, inventoryLocationId, documentStatusId);
             } else if(inventoryLocationId > 0) {
-                list = stockWithdrawalRepo.findByVoucherDateBetweenAndInventoryLocationIdOrderByInventoryCategoryTypeAscInventoryLocationIdAscCodeAsc(fromDate, toDate, inventoryLocationId);
+                list = stockWithdrawalRepo.findByVoucherDateBetweenAndInventoryLocationIdOrderByInventoryCategoryTypeIdAscInventoryLocationIdAscCodeAsc(fromDate, toDate, inventoryLocationId);
             } else if(documentStatusId > 0) {
-                list = stockWithdrawalRepo.findByVoucherDateBetweenAndDocumentStatusIdOrderByInventoryCategoryTypeAscInventoryLocationIdAscCodeAsc(fromDate, toDate, documentStatusId);
+                list = stockWithdrawalRepo.findByVoucherDateBetweenAndDocumentStatusIdOrderByInventoryCategoryTypeIdAscInventoryLocationIdAscCodeAsc(fromDate, toDate, documentStatusId);
             }  else if(documentTypeId > 0 ) {
-                list = stockWithdrawalRepo.findByVoucherDateBetweenAndInventoryCategoryTypeOrderByInventoryCategoryTypeAscInventoryLocationIdAscCodeAsc(fromDate, toDate, documentTypeId);
+                list = stockWithdrawalRepo.findByVoucherDateBetweenAndInventoryCategoryTypeIdOrderByInventoryCategoryTypeIdAscInventoryLocationIdAscCodeAsc(fromDate, toDate, documentTypeId);
             } else {
-                list = stockWithdrawalRepo.findByVoucherDateBetweenOrderByInventoryCategoryTypeAscInventoryLocationIdAscCodeAsc(fromDate, toDate);
+                list = stockWithdrawalRepo.findByVoucherDateBetweenOrderByInventoryCategoryTypeIdAscInventoryLocationIdAscCodeAsc(fromDate, toDate);
             }
             if(!list.isEmpty()) {
                 for (StockWithdrawal sw: list) {

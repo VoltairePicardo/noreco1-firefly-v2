@@ -381,7 +381,8 @@ public class StockWithdrawalServiceImpl implements StockWithdrawalService, Print
                     dto.setDepartmentName(entity.getDepartment().getName());
                 }
                 if (entity.getInventoryCategory() != null) {
-                    dto.setInventoryCategoryTypeId(entity.getInventoryCategory().getType());
+                    InventoryCategoryType categoryType = entity.getInventoryCategory().getType();
+                    dto.setInventoryCategoryTypeId(categoryType != null ? categoryType.getId() : null);
                 }
 
                 return dto;
@@ -413,30 +414,30 @@ public class StockWithdrawalServiceImpl implements StockWithdrawalService, Print
                 Integer typeInt = Integer.parseInt(type);
                 Integer locationInt = Integer.parseInt(location);
                 Integer statusInt = Integer.parseInt(status);
-                list = stockWithdrawalRepo.findByVoucherDateBetweenAndInventoryLocationIdAndDocumentStatusIdAndInventoryCategoryTypeOrderByInventoryCategoryTypeAscInventoryLocationIdAscCodeAsc(fromDate, toDate, locationInt, statusInt, typeInt);
+                list = stockWithdrawalRepo.findByVoucherDateBetweenAndInventoryLocationIdAndDocumentStatusIdAndInventoryCategoryTypeIdOrderByInventoryCategoryTypeIdAscInventoryLocationIdAscCodeAsc(fromDate, toDate, locationInt, statusInt, typeInt);
             } else if (!Checker.isStringNullAndEmpty(type) && !Checker.isStringNullAndEmpty(location)) {
                 Integer typeInt = Integer.parseInt(type);
                 Integer locationInt = Integer.parseInt(location);
-                list = stockWithdrawalRepo.findByVoucherDateBetweenAndInventoryLocationIdAndInventoryCategoryTypeOrderByInventoryCategoryTypeAscInventoryLocationIdAscCodeAsc(fromDate, toDate, locationInt, typeInt);
+                list = stockWithdrawalRepo.findByVoucherDateBetweenAndInventoryLocationIdAndInventoryCategoryTypeIdOrderByInventoryCategoryTypeIdAscInventoryLocationIdAscCodeAsc(fromDate, toDate, locationInt, typeInt);
             } else if (!Checker.isStringNullAndEmpty(type) && !Checker.isStringNullAndEmpty(status)) {
                 Integer typeInt = Integer.parseInt(type);
                 Integer statusInt = Integer.parseInt(status);
-                list = stockWithdrawalRepo.findByVoucherDateBetweenAndDocumentStatusIdAndInventoryCategoryTypeOrderByInventoryCategoryTypeAscInventoryLocationIdAscCodeAsc(fromDate, toDate, statusInt, typeInt);
+                list = stockWithdrawalRepo.findByVoucherDateBetweenAndDocumentStatusIdAndInventoryCategoryTypeIdOrderByInventoryCategoryTypeIdAscInventoryLocationIdAscCodeAsc(fromDate, toDate, statusInt, typeInt);
             } else if (!Checker.isStringNullAndEmpty(location) && !Checker.isStringNullAndEmpty(status)) {
                 Integer locationInt = Integer.parseInt(location);
                 Integer statusInt = Integer.parseInt(status);
-                list = stockWithdrawalRepo.findByVoucherDateBetweenAndInventoryLocationIdAndDocumentStatusIdOrderByInventoryCategoryTypeAscInventoryLocationIdAscCodeAsc(fromDate, toDate, locationInt, statusInt);
+                list = stockWithdrawalRepo.findByVoucherDateBetweenAndInventoryLocationIdAndDocumentStatusIdOrderByInventoryCategoryTypeIdAscInventoryLocationIdAscCodeAsc(fromDate, toDate, locationInt, statusInt);
             } else if (!Checker.isStringNullAndEmpty(location)) {
                 Integer locationInt = Integer.parseInt(location);
-                list = stockWithdrawalRepo.findByVoucherDateBetweenAndInventoryLocationIdOrderByInventoryCategoryTypeAscInventoryLocationIdAscCodeAsc(fromDate, toDate, locationInt);
+                list = stockWithdrawalRepo.findByVoucherDateBetweenAndInventoryLocationIdOrderByInventoryCategoryTypeIdAscInventoryLocationIdAscCodeAsc(fromDate, toDate, locationInt);
             } else if (!Checker.isStringNullAndEmpty(status)) {
                 Integer statusInt = Integer.parseInt(status);
-                list = stockWithdrawalRepo.findByVoucherDateBetweenAndDocumentStatusIdOrderByInventoryCategoryTypeAscInventoryLocationIdAscCodeAsc(fromDate, toDate, statusInt);
+                list = stockWithdrawalRepo.findByVoucherDateBetweenAndDocumentStatusIdOrderByInventoryCategoryTypeIdAscInventoryLocationIdAscCodeAsc(fromDate, toDate, statusInt);
             } else if (!Checker.isStringNullAndEmpty(type)) {
                 Integer typeInt = Integer.parseInt(type);
-                list = stockWithdrawalRepo.findByVoucherDateBetweenAndInventoryCategoryTypeOrderByInventoryCategoryTypeAscInventoryLocationIdAscCodeAsc(fromDate, toDate, typeInt);
+                list = stockWithdrawalRepo.findByVoucherDateBetweenAndInventoryCategoryTypeIdOrderByInventoryCategoryTypeIdAscInventoryLocationIdAscCodeAsc(fromDate, toDate, typeInt);
             } else {
-                list = stockWithdrawalRepo.findByVoucherDateBetweenOrderByInventoryCategoryTypeAscInventoryLocationIdAscCodeAsc(fromDate, toDate);
+                list = stockWithdrawalRepo.findByVoucherDateBetweenOrderByInventoryCategoryTypeIdAscInventoryLocationIdAscCodeAsc(fromDate, toDate);
             }
         } catch (Exception e) {
             e.printStackTrace();

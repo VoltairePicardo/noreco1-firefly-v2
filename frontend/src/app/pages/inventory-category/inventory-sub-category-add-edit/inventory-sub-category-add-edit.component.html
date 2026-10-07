@@ -1,0 +1,53 @@
+<div class="container-fluid">
+    <app-page-title [title]="module" [subTitle]="subModule()" [menuLink]="menuLink"/>
+
+    @if (isLoading()) {
+        <div class="d-flex align-items-center gap-2 text-muted py-4">
+            <span class="spinner-border spinner-border-sm" role="status"></span> Loading...
+        </div>
+    } @else if (form) {
+        <form novalidate (ngSubmit)="validSubmit()" [formGroup]="form">
+            <div class="row g-3">
+                <div class="col-xl-12">
+                    <app-ui-card [title]="module + ' Information'">
+                        <div class="col-xl-12 p-3" card-body>
+
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="category" class="form-label fw-bold">Category</label>
+                                    <input id="category" type="text" class="form-control" readonly
+                                           [value]="categoryDescription()"/>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="description" class="form-label fw-bold">Description <span class="text-danger">*</span></label>
+                                    <input id="description" type="text" class="form-control"
+                                           placeholder="Enter description" formControlName="description"
+                                           [class.is-invalid]="invalid('description')"
+                                           [class.is-valid]="submitted() && !invalid('description')"
+                                           required/>
+                                    <div class="invalid-feedback">Description is required.</div>
+                                </div>
+                            </div>
+
+                            <hr class="border-dashed mx-n3 mt-3"/>
+                            <div class="d-flex gap-2 justify-content-end align-items-center mt-3">
+                                <a [routerLink]="['/' + menuLink, categoryId, 'detail']" class="btn btn-light fw-bold">
+                                    <ng-icon name="tablerArrowLeft" class="ps-0 pe-3 fs-lg fw-bold"></ng-icon>Back
+                                </a>
+                                <button type="submit" class="btn btn-primary fw-bold" [disabled]="saving()">
+                                    @if (saving()) {
+                                        <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                                        {{ editMode ? 'Updating...' : 'Saving...' }}
+                                    } @else {
+                                        {{ editMode ? 'Update' : 'Save' }}
+                                    }
+                                </button>
+                            </div>
+
+                        </div>
+                    </app-ui-card>
+                </div>
+            </div>
+        </form>
+    }
+</div>
