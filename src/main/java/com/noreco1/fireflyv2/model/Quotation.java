@@ -69,4 +69,9 @@ public class Quotation extends Document implements Serializable {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="FK_approvedByFinanceManagerUserId")
     private User approvedByFinanceManager;
+
+    @NotFound(action = NotFoundAction.IGNORE)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="FK_notedByUserId")
+    private User notedBy;
 }

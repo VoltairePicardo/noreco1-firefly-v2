@@ -29,6 +29,7 @@ public class QuotationDto {
 
     private Map<String, Object> approvingOfficerObj;
     private Map<String, Object> generalManagerObj;
+    private Map<String, Object> notedByObj;
 
     public Integer getId() {
         return id;
@@ -154,4 +155,6 @@ public class QuotationDto {
     public void setApprovingOfficerObj(Map<String, Object> approvingOfficerObj) { this.approvingOfficerObj = approvingOfficerObj; }
     public Map<String, Object> getGeneralManagerObj() { return generalManagerObj; }
     public void setGeneralManagerObj(Map<String, Object> generalManagerObj) { this.generalManagerObj = generalManagerObj; }
+    public Map<String, Object> getNotedByObj() { return notedByObj; }
+    public void setNotedByObj(Map<String, Object> notedByObj) { this.notedByObj = notedByObj; }
 }

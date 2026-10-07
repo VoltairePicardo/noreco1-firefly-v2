@@ -16,7 +16,9 @@ import com.noreco1.fireflyv2.service.QuotationDetailService;
 import com.noreco1.fireflyv2.service.QuotationService;
 import com.noreco1.fireflyv2.validator.QuotationValidator;
 import net.sf.jasperreports.engine.JRDataSource;
+import net.sf.jasperreports.engine.JasperCompileManager;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
+import net.sf.jasperreports.engine.xml.JRXmlLoader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
@@ -32,6 +34,7 @@ import java.util.*;
 
 import static java.util.Collections.*;
 
+@lombok.extern.slf4j.Slf4j
 @Service(value = "quotationServiceImpl")
 public class QuotationServiceImpl implements QuotationService, PrintableVoucher {
 
@@ -137,6 +140,12 @@ public class QuotationServiceImpl implements QuotationService, PrintableVoucher 
                     gmMap.put("accountNo", quotation.getApprovedByGeneralManager().getAccountNo());
                     gmMap.put("fullName", quotation.getApprovedByGeneralManager().getFullName());
                     quotationDto.setGeneralManagerObj(gmMap);
+                }
+                if (quotation.getNotedBy() != null) {
+                    Map<String, Object> notedByMap = new HashMap<>();
+                    notedByMap.put("accountNo", quotation.getNotedBy().getAccountNo());
+                    notedByMap.put("fullName", quotation.getNotedBy().getFullName());
+                    quotationDto.setNotedByObj(notedByMap);
                 }
                 quotationDto.setCreatedAt(quotation.getCreatedAt());
                 quotationDto.setUpdatedAt(quotation.getUpdatedAt());
@@ -836,6 +845,7 @@ public class QuotationServiceImpl implements QuotationService, PrintableVoucher 
             User createdBy = authenticationFacade.getLoggedIn();
             User approvedByFinanceManager = quotation.getApprovingOfficer() != null ? userRepo.findOneByAccountNo(quotation.getApprovingOfficer().getAccountNo()):null;
             User approvedByGeneralManager = quotation.getApprovedByGeneralManager() != null ? userRepo.findOneByAccountNo(quotation.getApprovedByGeneralManager().getAccountNo()):null;
+            User notedByUser = quotation.getNotedBy() != null ? userRepo.findOneByAccountNo(quotation.getNotedBy().getAccountNo()) : null;
 
             Quotation existingQuotation;
 
@@ -873,6 +883,7 @@ public class QuotationServiceImpl implements QuotationService, PrintableVoucher 
             existingQuotation.setCreatedBy(authenticationFacade.getLoggedIn());
             existingQuotation.setApprovingOfficer(approvedByFinanceManager);
             existingQuotation.setApprovedByGeneralManager(approvedByGeneralManager);
+            existingQuotation.setNotedBy(notedByUser);
             existingQuotation.setYear(quotationYear);
 
             this.model = quotationRepo.save(existingQuotation);
@@ -1038,8 +1049,14 @@ public class QuotationServiceImpl implements QuotationService, PrintableVoucher 
         if(quotation != null) {
 
             params.put("REPORT_TITLE", "SUMMARY OF QUOTATIONS");
-            java.net.URL subreportUrl = getClass().getResource("/jasper/vouchers/sub_reports/");
-            params.put("SUBREPORT_DIR", subreportUrl != null ? subreportUrl.toString() + "/" : "jasper/vouchers/sub_reports/");
+
+            // Compile awards subreport at runtime to avoid .jasper version mismatch
+            try {
+                java.io.InputStream awardsStream = getClass().getResourceAsStream("/jasper/vouchers/sub_reports/Quotation_awards.jrxml");
+                params.put("SUBREPORT_AWARDS", JasperCompileManager.compileReport(JRXmlLoader.load(awardsStream)));
+            } catch (Exception e) {
+                log.error("Failed to compile quotation awards subreport: {}", e.getMessage(), e);
+            }
 
             params.put("DATE_PREPARED", quotation.getCreatedAt());
             params.put("VOUCHER_NO", quotation.getCode());
