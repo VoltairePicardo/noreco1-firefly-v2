@@ -102,6 +102,9 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService, Printable
     PurchaseOrderBudgetDetailRepo purchaseOrderBudgetDetailRepo;
 
     @Autowired
+    BudgetLineItemDetailRepo budgetLineItemDetailRepo;
+
+    @Autowired
     Environment env;
 
     @Autowired
@@ -148,8 +151,8 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService, Printable
 
             Integer voucherYear = Integer.parseInt(GlobalConstant.YYYY_DATE_FORMAT.format(purchaseOrder.getVoucherDate()));
 
-            User budgetCheckedBy = userRepo.findOneByAccountNo(purchaseOrder.getBudgetCheckedBy().getAccountNo());
-            User checkedBy = userRepo.findOneByAccountNo(purchaseOrder.getCheckedBy().getAccountNo());
+            User budgetCheckedBy = purchaseOrder.getBudgetCheckedBy() != null ? userRepo.findOneByAccountNo(purchaseOrder.getBudgetCheckedBy().getAccountNo()) : null;
+            User checkedBy = purchaseOrder.getCheckedBy() != null ? userRepo.findOneByAccountNo(purchaseOrder.getCheckedBy().getAccountNo()) : null;
             User approvedBy = userRepo.findOneByAccountNo(purchaseOrder.getApprovingOfficer().getAccountNo());
 
             Boolean insertMode = purchaseOrder.getId() == null;
@@ -342,6 +345,7 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService, Printable
                 map.put("supplier", row[3]);
                 map.put("amount", row[5]);
                 map.put("status", row[7]);
+                map.put("preparedBy", row[8]);
                 mapList.add(map);
             }
             return mapList;
@@ -429,7 +433,9 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService, Printable
 
                     if (purchaseRequest.getBudgetLineItemDetail() != null) {
                         this.reportMeta.put("BUDGET_LINE_ITEM", purchaseRequest.getBudgetLineItemDetail().getTitle() + " - " + purchaseRequest.getBudgetLineItemDetail().getCode());
-                        this.reportMeta.put("BUDGET_LINE_ITEM_BALANCE", voucher.getBudgetLineItemBalancePOJORFP());
+                        int cancelled = com.noreco1.fireflyv2.model.enums.DocumentStatus.CANCELLED.getId();
+                        BigDecimal liveBalance = budgetLineItemDetailRepo.getBudgetLineItemDetailAmountBalancePOJO(cancelled, purchaseRequest.getBudgetLineItemDetail().getId());
+                        this.reportMeta.put("BUDGET_LINE_ITEM_BALANCE", liveBalance != null ? liveBalance : BigDecimal.ZERO);
                     }
                 }
 
@@ -449,6 +455,9 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService, Printable
 
             }
         }
+
+        // Always ensure BUDGET_LINE_ITEM_BALANCE has a value so the JRXML parameter is never null
+        this.reportMeta.putIfAbsent("BUDGET_LINE_ITEM_BALANCE", BigDecimal.ZERO);
 
         return details;
     }
@@ -711,10 +720,29 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService, Printable
         if (purchaseOrder != null) {
             params.put("VOUCHER_NO", purchaseOrder.getCode());
             params.put("V_DATE", purchaseOrder.getVoucherDate());
-            params.put("PREPAREDBY", purchaseOrder.getCreatedBy().getFullName());
-            params.put("NOTEDBY", purchaseOrder.getApprovingOfficer().getFullName());
-            params.put("NOTEDBY_POS", purchaseOrder.getApprovingOfficer().getPosition() != null
-                    ? purchaseOrder.getApprovingOfficer().getPosition().getName() : "");
+            // Prepared By: createdBy user, fallback to logged-in user
+            User preparedByUser = purchaseOrder.getCreatedBy() != null ? purchaseOrder.getCreatedBy() : authenticationFacade.getLoggedIn();
+            params.put("PREPAREDBY", preparedByUser != null ? preparedByUser.getFullName() : "");
+            params.put("PREPAREDBY_POS", preparedByUser != null && preparedByUser.getPosition() != null ? preparedByUser.getPosition().getName() : "");
+
+            // Checked By (print label): maps to budgetCheckedBy DB field
+            params.put("CHECKEDBY", purchaseOrder.getBudgetCheckedBy() != null ? purchaseOrder.getBudgetCheckedBy().getFullName() : "");
+            params.put("CHECKEDBY_POS", purchaseOrder.getBudgetCheckedBy() != null && purchaseOrder.getBudgetCheckedBy().getPosition() != null
+                    ? purchaseOrder.getBudgetCheckedBy().getPosition().getName() : "");
+
+            // Audited By (print label): maps to checkedBy DB field
+            params.put("AUDITEDBY", purchaseOrder.getCheckedBy() != null ? purchaseOrder.getCheckedBy().getFullName() : "");
+            params.put("AUDITEDBY_POS", purchaseOrder.getCheckedBy() != null && purchaseOrder.getCheckedBy().getPosition() != null
+                    ? purchaseOrder.getCheckedBy().getPosition().getName() : "");
+
+            // Approved By (print label): General Manager from PO_SIGNATORIES setting
+            Map poSignatories = settingFacade.getByCode("PO_SIGNATORIES");
+            User gmApprover = null;
+            if (poSignatories != null && poSignatories.get("approvedByAccountNo") != null) {
+                gmApprover = userRepo.findOneByAccountNo(Integer.parseInt(String.valueOf(poSignatories.get("approvedByAccountNo"))));
+            }
+            params.put("APPROVEDBY", gmApprover != null ? gmApprover.getFullName() : "");
+            params.put("APPROVEDBY_POS", gmApprover != null && gmApprover.getPosition() != null ? gmApprover.getPosition().getName() : "");
 
             Supplier supplier = supplierRepo.findOneByAccountNumber(purchaseOrder.getVendor().getAccountNo());
 
@@ -725,11 +753,11 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService, Printable
                 params.put("SUPPLIER_TIN", supplier.getTin());
             }
 
-            if(Checker.isAmountGreaterThanZero(purchaseOrder.getPaymentTerm())) {
+            if (purchaseOrder.getPaymentTerm() != null && purchaseOrder.getPaymentTerm() > 0) {
                 String termInWords = NumberToWord.convert(new BigDecimal(purchaseOrder.getPaymentTerm()));
-                params.put("PAYMENT_TERM", "Within "+termInWords.toLowerCase()+"("+purchaseOrder.getPaymentTerm()+") calendar days after complete delivery");
+                params.put("PAYMENT_TERM", "Within " + termInWords.toLowerCase() + " (" + purchaseOrder.getPaymentTerm() + ") calendar days after complete delivery");
             } else {
-                params.put("PAYMENT_TERM", purchaseOrder.getPaymentTerm()+" DAYS");
+                params.put("PAYMENT_TERM", purchaseOrder.getPaymentTerm() != null ? purchaseOrder.getPaymentTerm() + " DAYS" : "");
             }
 
             String deliveryTerm;

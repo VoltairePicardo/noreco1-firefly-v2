@@ -43,7 +43,7 @@ public class DocumentLog {
     @Column(nullable = false, updatable = false)
     private Date createdAt;
 
-    @Column
+    @Transient
     private String action;
 
 }

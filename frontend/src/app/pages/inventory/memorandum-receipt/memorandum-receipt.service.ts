@@ -46,7 +46,7 @@ export class MemorandumReceiptService {
     }
 
     getDocumentLogs(transId: number): Observable<DocumentLog[]> {
-        return this.http.post<DocumentLog[]>(`${BASE_URL}/document/${transId}/logs`, {}, httpOptions);
+        return this.http.get<DocumentLog[]>(`${BASE_URL}/json/document-logs/${transId}`);
     }
 
     print(id: number): void {

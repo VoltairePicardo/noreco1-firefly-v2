@@ -256,6 +256,24 @@ public class PurchaseOrderController {
         return response;
     }
 
+    @PostMapping(value = "/create", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public PostResponse createJson(@RequestBody @Valid PurchaseOrder purchaseOrder, BindingResult bindingResult, HttpServletRequest request) {
+        PostResponse response = purchaseOrderService.processCreate(purchaseOrder, bindingResult, messageSource, request);
+        if (Checker.documentSaved(response)) {
+            purchaseOrderService.logNewValue(response.getLogId());
+        }
+        return response;
+    }
+
+    @PostMapping(value = "/update", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public PostResponse updateJson(@RequestBody @Valid PurchaseOrder purchaseOrder, BindingResult bindingResult, HttpServletRequest request) {
+        PostResponse response = purchaseOrderService.processUpdate(purchaseOrder, bindingResult, messageSource, request, null);
+        if (Checker.documentSaved(response)) {
+            purchaseOrderService.logNewValue(response.getLogId());
+        }
+        return response;
+    }
+
     @PostMapping("/process")
     public PostResponse process(@RequestBody ProcessDocumentDto postData, BindingResult bindingResult) {
         return purchaseOrderService.process(postData, bindingResult, messageSource);

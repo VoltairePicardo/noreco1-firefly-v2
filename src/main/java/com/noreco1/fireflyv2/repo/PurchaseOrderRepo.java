@@ -27,10 +27,12 @@ public interface PurchaseOrderRepo extends JpaRepository<PurchaseOrder, Integer>
             "po.term, " +
             "po.amount, " +
             "(SELECT COUNT(id) FROM PurchaseOrderDetail WHERE FK_purchaseOrderId = po.id) AS noOfItems, " +
-            "d.status " +
+            "d.status, " +
+            "u.fullName " +
             "FROM PurchaseOrder po " +
             "INNER JOIN Supplier sup ON sup.FK_accountNo = po.FK_vendorAccountNo " +
             "INNER JOIN DocumentStatus d ON d.id = po.FK_documentStatusId " +
+            "LEFT JOIN User u ON u.id = po.FK_createdByUserId " +
             "WHERE po.voucherDate >= :from AND po.voucherDate <= :to " +
             "AND po.FK_documentStatusId = :documentStatusId " +
             "ORDER BY po.code", nativeQuery = true)
@@ -44,10 +46,12 @@ public interface PurchaseOrderRepo extends JpaRepository<PurchaseOrder, Integer>
             "po.term, " +
             "po.amount, " +
             "(SELECT COUNT(id) FROM PurchaseOrderDetail WHERE FK_purchaseOrderId = po.id) AS noOfItems, " +
-            "d.status " +
+            "d.status, " +
+            "u.fullName " +
             "FROM PurchaseOrder po " +
             "INNER JOIN Supplier sup ON sup.FK_accountNo = po.FK_vendorAccountNo " +
             "INNER JOIN DocumentStatus d ON d.id = po.FK_documentStatusId " +
+            "LEFT JOIN User u ON u.id = po.FK_createdByUserId " +
             "WHERE po.voucherDate >= :from AND po.voucherDate <= :to " +
             "ORDER BY po.code", nativeQuery = true)
     public List<Object[]> findForSummaryByDateRange(@Param("from") String from, @Param("to") String to);
@@ -62,10 +66,12 @@ public interface PurchaseOrderRepo extends JpaRepository<PurchaseOrder, Integer>
             "doc.term, " +
             "doc.amount, " +
             "(SELECT COUNT(id) FROM PurchaseOrderDetail WHERE FK_purchaseOrderId = doc.id) AS noOfItems, " +
-            "d.status " +
+            "d.status, " +
+            "u.fullName " +
             "FROM PurchaseOrder doc " +
             "INNER JOIN Supplier sup ON sup.FK_accountNo = doc.FK_vendorAccountNo " +
             "INNER JOIN DocumentStatus d ON d.id = doc.FK_documentStatusId " +
+            "LEFT JOIN User u ON u.id = doc.FK_createdByUserId " +
             "WHERE doc.voucherDate >= :from AND doc.voucherDate <= :to " +
             "AND doc.FK_documentStatusId != :documentStatusId " +
             "ORDER BY doc.code", nativeQuery = true)

@@ -46,7 +46,7 @@ export class WithdrawalService {
     }
 
     getDocumentLogs(transId: number): Observable<any[]> {
-        return this.http.post<any[]>(`${BASE_API}/document/${transId}/logs`, {}, httpOptions);
+        return this.http.get<any[]>(`${BASE_API}/json/document-logs/${transId}`);
     }
 
     print(id: number): void {

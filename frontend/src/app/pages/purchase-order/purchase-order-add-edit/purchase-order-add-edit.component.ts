@@ -57,7 +57,9 @@ export class PurchaseOrderAddEditComponent {
     purchaseRequest: any = null;
     useCreditCard        = false;
     cashAdvance: any     = null;
-    approvedBy: any = null;
+    approvedBy: any      = null;
+    checkedBy: any       = null;
+    budgetCheckedBy: any = null;
 
     // Budget line item (auto-populated from PR)
     budgetLineItemDetail: any       = null;
@@ -136,7 +138,9 @@ export class PurchaseOrderAddEditComponent {
                     this.purchaseRequest = header.purchaseRequest || null;
                     this.useCreditCard   = header.useCreditCard || false;
                     this.cashAdvance     = header.cashAdvance || null;
-                    this.approvedBy = header.approvedBy || null;
+                    this.approvedBy      = header.approvedBy      || null;
+                    this.checkedBy       = header.checkedBy       || null;
+                    this.budgetCheckedBy = header.budgetCheckedBy || null;
 
                     this.lineItems = (details || []).map((d: any) => ({
                         rvDetailId:      d.rvDetailId,
@@ -274,7 +278,7 @@ export class PurchaseOrderAddEditComponent {
 
     // ─── Signatory Browse ─────────────────────────────────────────────────────
 
-    async openSignatoryBrowse(field: 'approvedBy'): Promise<void> {
+    async openSignatoryBrowse(field: 'approvedBy' | 'checkedBy' | 'budgetCheckedBy'): Promise<void> {
         try {
             const result = await this.modalService.openModal(
                 BrowseEntityModalComponent,
@@ -383,7 +387,7 @@ export class PurchaseOrderAddEditComponent {
             return;
         }
         if (!this.approvedBy) {
-            this.alertService.warning(this.module, 'Please select a Noted By officer.', '');
+            this.alertService.warning(this.module, 'Please select an Approved By officer.', '');
             return;
         }
 
@@ -401,7 +405,9 @@ export class PurchaseOrderAddEditComponent {
             useCreditCard:           this.useCreditCard,
             purchaseRequest:         this.purchaseRequest?.id ? { id: this.purchaseRequest.id } : null,
             cashAdvance:             this.cashAdvance?.id     ? { id: this.cashAdvance.id }     : null,
-            approvingOfficer:        this.approvedBy?.accountNo ? { accountNo: this.approvedBy.accountNo } : null,
+            approvingOfficer:        this.approvedBy?.accountNo      ? { accountNo: this.approvedBy.accountNo }      : null,
+            checkedBy:               this.checkedBy?.accountNo       ? { accountNo: this.checkedBy.accountNo }       : null,
+            budgetCheckedBy:         this.budgetCheckedBy?.accountNo ? { accountNo: this.budgetCheckedBy.accountNo } : null,
             poDetails: this.lineItems.map(li => ({
                 rvDetailId:      li.rvDetailId,
                 rvNumber:        li.rvNumber,

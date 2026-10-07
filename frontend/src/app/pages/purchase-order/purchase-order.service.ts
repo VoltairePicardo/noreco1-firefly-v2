@@ -19,10 +19,8 @@ export class PurchaseOrderService {
     private downloadService = inject(DownloadService);
 
     listByDateRange(from: string, to: string, statusId?: number | null): Observable<any[]> {
-        const url = statusId
-            ? `${BASE_API}/purchase-order/list/${from}/${to}/${statusId}`
-            : `${BASE_API}/purchase-order/list/${from}/${to}`;
-        return this.http.get<any[]>(url);
+        const id = statusId ?? 0;
+        return this.http.get<any[]>(`${BASE_API}/purchase-order/list/${from}/${to}/${id}`);
     }
 
     getDocumentStatuses(): Observable<any[]> {
@@ -62,7 +60,7 @@ export class PurchaseOrderService {
     }
 
     getDocumentLogs(transId: number): Observable<any[]> {
-        return this.http.post<any[]>(`${BASE_API}/document/${transId}/logs`, {}, httpOptions);
+        return this.http.get<any[]>(`${BASE_API}/json/document-logs/${transId}`);
     }
 
     getCanvassPrice(supplierAccountNo: number, rvDetailId: number): Observable<number> {

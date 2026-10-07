@@ -59,6 +59,49 @@
             </div>
         }
 
+        <!-- Mark as Received -->
+        @if (isApproved() && !data.receivedDate) {
+            <hr class="my-3"/>
+            <div class="fs-xs text-uppercase fw-semibold text-muted mb-2">Mark as Received</div>
+            @if (!showSupplierReceived) {
+                <button type="button" class="btn btn-success fw-bold btn-sm"
+                        (click)="showSupplierReceived = true">
+                    Mark as Received
+                </button>
+            } @else {
+                <div class="row g-3 align-items-end">
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold">Received Date <span class="text-danger">*</span></label>
+                        <input type="text" mwlFlatpickr [options]="flatpickrOptions"
+                               class="form-control" [(ngModel)]="receivedDate" placeholder="Select date"/>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold">Received By <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" [(ngModel)]="receivedBy" placeholder="Name"/>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold">Expected Delivery Date</label>
+                        <input type="text" mwlFlatpickr [options]="flatpickrOptions"
+                               class="form-control" [(ngModel)]="expectedDeliveryDate" placeholder="Select date"/>
+                    </div>
+                    <div class="col-md-auto d-flex gap-2">
+                        <button type="button" class="btn btn-primary fw-bold"
+                                [disabled]="processingReceived"
+                                (click)="saveSupplierReceived()">
+                            @if (processingReceived) {
+                                <span class="spinner-border spinner-border-sm me-2"></span>
+                            } @else {
+                                <ng-icon name="tablerCheck" class="ps-0 pe-3 fw-bold"></ng-icon>
+                            }
+                            Save
+                        </button>
+                        <button type="button" class="btn btn-light fw-bold"
+                                (click)="showSupplierReceived = false">Cancel</button>
+                    </div>
+                </div>
+            }
+        }
+
         <hr class="my-3"/>
 
         <!-- Header Info -->
@@ -165,13 +208,13 @@
             <div class="row g-3">
                 @if (data.budgetCheckedBy) {
                     <div class="col-md-4">
-                        <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Budget Checked By</div>
+                        <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Checked By</div>
                         <div>{{ data.budgetCheckedBy?.name || '—' }}</div>
                     </div>
                 }
                 @if (data.checkedBy) {
                     <div class="col-md-4">
-                        <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Checked By</div>
+                        <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Audited By</div>
                         <div>{{ data.checkedBy?.name || '—' }}</div>
                     </div>
                 }
@@ -255,54 +298,6 @@
             <p class="text-muted mb-0 fs-sm">No attachments.</p>
         }
 
-        <!-- Supplier Received Form -->
-        @if (isApproved() && !data.receivedDate) {
-            <hr class="my-3"/>
-            <div class="d-flex align-items-center justify-content-between mb-2">
-                <div class="fs-xs text-uppercase fw-semibold text-muted">Mark as Received</div>
-                @if (!showSupplierReceived) {
-                    <button type="button" class="btn btn-success fw-bold btn-sm"
-                            (click)="showSupplierReceived = true">
-                        Mark as Received
-                    </button>
-                }
-            </div>
-            @if (showSupplierReceived) {
-                <div class="row g-3 align-items-end">
-                    <div class="col-md-3">
-                        <label class="form-label fw-bold">Received Date <span class="text-danger">*</span></label>
-                        <input type="text" mwlFlatpickr [options]="flatpickrOptions"
-                               class="form-control" [(ngModel)]="receivedDate" placeholder="Select date"/>
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label fw-bold">Received By <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" [(ngModel)]="receivedBy" placeholder="Name"/>
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label fw-bold">Expected Delivery Date</label>
-                        <input type="text" mwlFlatpickr [options]="flatpickrOptions"
-                               class="form-control" [(ngModel)]="expectedDeliveryDate" placeholder="Select date"/>
-                    </div>
-                    <div class="col-md-auto d-flex gap-2">
-                        <button type="button" class="btn btn-primary fw-bold"
-                                [disabled]="processingReceived"
-                                (click)="saveSupplierReceived()">
-                            @if (processingReceived) {
-                                <span class="spinner-border spinner-border-sm me-2"></span>
-                            } @else {
-                                <ng-icon name="tablerCheck" class="ps-0 pe-3 fw-bold"></ng-icon>
-                            }
-                            Save
-                        </button>
-                        <button type="button" class="btn btn-light fw-bold"
-                                (click)="showSupplierReceived = false">Cancel</button>
-                    </div>
-                </div>
-            } @else {
-                <p class="text-muted mb-0 fs-sm">Click "Mark as Received" to record receipt.</p>
-            }
-        }
-
     </div>
 </div>
 
@@ -330,20 +325,85 @@
                                     <th class="text-nowrap">By</th>
                                     <th class="text-nowrap">Action</th>
                                     <th>Remarks</th>
+                                    <th></th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @for (log of logs; track log.id) {
                                     <tr class="align-middle">
                                         <td class="text-nowrap text-muted fs-xs">{{ log.createdAt | date:'MM/dd/yyyy hh:mm a' }}</td>
-                                        <td class="text-nowrap">{{ log.createdBy?.fullName || '—' }}</td>
+                                                                        <td class="text-nowrap">{{ log.createdBy?.fullName || '—' }}</td>
                                         <td class="text-nowrap">
                                             <span class="badge bg-secondary bg-opacity-25 text-dark border">
-                                                {{ log.action || '—' }}
+                                                {{ parseLogStatus(log) || '—' }}
                                             </span>
                                         </td>
                                         <td>{{ log.remarks || '—' }}</td>
+                                        <td class="text-end">
+                                            <button type="button" class="btn btn-light btn-icon btn-sm rounded-circle"
+                                                    (click)="toggleLog(log.id)"
+                                                    [ngbTooltip]="expandedLogs.has(log.id) ? 'Collapse' : 'Expand'">
+                                                <ng-icon [name]="expandedLogs.has(log.id) ? 'tablerChevronUp' : 'tablerChevronDown'" class="fs-sm"></ng-icon>
+                                            </button>
+                                        </td>
                                     </tr>
+                                    @if (expandedLogs.has(log.id)) {
+                                        @let snap = parseLogSnapshot(log);
+                                        <tr class="table-light">
+                                            <td colspan="5" class="px-4 py-3">
+                                                @if (snap) {
+                                                    <div class="row g-2 fs-xs">
+                                                        <div class="col-md-3">
+                                                            <span class="text-muted text-uppercase fw-semibold d-block">PO No.</span>
+                                                            <span>{{ snap.code || '—' }}</span>
+                                                        </div>
+                                                        <div class="col-md-3">
+                                                            <span class="text-muted text-uppercase fw-semibold d-block">Date</span>
+                                                            <span>{{ snap.voucherDate | date:'MM/dd/yyyy' }}</span>
+                                                        </div>
+                                                        <div class="col-md-3">
+                                                            <span class="text-muted text-uppercase fw-semibold d-block">Status</span>
+                                                            <span>{{ snap.documentStatus || '—' }}</span>
+                                                        </div>
+                                                        <div class="col-md-3">
+                                                            <span class="text-muted text-uppercase fw-semibold d-block">Amount</span>
+                                                            <span>{{ snap.amount | number:'1.2-2' }}</span>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <span class="text-muted text-uppercase fw-semibold d-block">Supplier</span>
+                                                            <span>{{ snap.vendor || '—' }}</span>
+                                                        </div>
+                                                        <div class="col-md-3">
+                                                            <span class="text-muted text-uppercase fw-semibold d-block">Payment Term</span>
+                                                            <span>{{ snap.term != null ? snap.term + ' day(s)' : '—' }}</span>
+                                                        </div>
+                                                        <div class="col-md-3">
+                                                            <span class="text-muted text-uppercase fw-semibold d-block">Delivery Address</span>
+                                                            <span>{{ snap.deliveryAddress || '—' }}</span>
+                                                        </div>
+                                                        <div class="col-md-3">
+                                                            <span class="text-muted text-uppercase fw-semibold d-block">Prepared By</span>
+                                                            <span>{{ snap.createdBy || '—' }}</span>
+                                                        </div>
+                                                        <div class="col-md-3">
+                                                            <span class="text-muted text-uppercase fw-semibold d-block">Checked By</span>
+                                                            <span>{{ snap.budgetCheckedBy || '—' }}</span>
+                                                        </div>
+                                                        <div class="col-md-3">
+                                                            <span class="text-muted text-uppercase fw-semibold d-block">Audited By</span>
+                                                            <span>{{ snap.checkedBy || '—' }}</span>
+                                                        </div>
+                                                        <div class="col-md-3">
+                                                            <span class="text-muted text-uppercase fw-semibold d-block">Approved By</span>
+                                                            <span>{{ snap.approvedBy || '—' }}</span>
+                                                        </div>
+                                                    </div>
+                                                } @else {
+                                                    <span class="text-muted fs-xs">No snapshot data.</span>
+                                                }
+                                            </td>
+                                        </tr>
+                                    }
                                 }
                             </tbody>
                         </table>
