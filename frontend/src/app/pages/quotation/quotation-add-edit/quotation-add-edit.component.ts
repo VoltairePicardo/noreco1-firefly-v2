@@ -42,7 +42,10 @@ export class QuotationAddEditComponent {
     formSubmit = false;
     submitted  = false;
 
-    flatpickrOptions = { dateFormat: 'Y-m-d', altInput: true, altFormat: 'F j, Y' };
+    flatpickrOptions     = { dateFormat: 'Y-m-d', altInput: true, altFormat: 'F j, Y' };
+    readonlyDateOptions  = { dateFormat: 'Y-m-d', altInput: true, altFormat: 'F j, Y', clickOpens: false, allowInput: false };
+
+    compareBrand(a: any, b: any): boolean { return a?.id === b?.id; }
 
     numericOnly(event: Event, obj: any, key: string): void {
         const val = (event.target as HTMLInputElement).value.replace(/[^0-9.]/g, '');
@@ -166,7 +169,8 @@ export class QuotationAddEditComponent {
             );
             if (result?.action === 'select' && result?.data?.length) {
                 const existing = new Set(this.lineItems.map((li: any) => li.rvDetailId));
-                result.data.filter((item: any) => !existing.has(item.id)).forEach((item: any) => {
+                const newItems = result.data.filter((item: any) => !existing.has(item.id));
+                newItems.forEach((item: any) => {
                     this.lineItems.push({
                         rvDetailId:         item.id,
                         rvNumber:           item.rvNumber || '',
@@ -186,6 +190,23 @@ export class QuotationAddEditComponent {
                         ]
                     });
                 });
+
+                // Auto-copy PR particulars: collect unique purposes for newly added PRs only
+                const existingRvNumbers = new Set<string>(
+                    this.lineItems.slice(0, this.lineItems.length - newItems.length).map((li: any) => li.rvNumber)
+                );
+                const purposeByRv = new Map<string, string>(); // rvNumber → purpose
+                newItems.forEach((item: any) => {
+                    if (item.rvPurpose && item.rvNumber && !existingRvNumbers.has(item.rvNumber) && !purposeByRv.has(item.rvNumber)) {
+                        purposeByRv.set(item.rvNumber, item.rvPurpose);
+                    }
+                });
+                if (purposeByRv.size > 0) {
+                    const newPurposes = Array.from(purposeByRv.values()).join('; ');
+                    this.particular = this.particular.trim()
+                        ? `${this.particular.trim()}; ${newPurposes}`
+                        : newPurposes;
+                }
             }
         } catch { }
     }
@@ -276,7 +297,7 @@ export class QuotationAddEditComponent {
         this.submitted = true;
 
         if (!this.quotationDate) { this.alertService.warning(this.module, 'Please provide a quotation date.', ''); return; }
-        if (!this.particular?.trim()) { this.alertService.warning(this.module, 'Please provide a particular.', ''); return; }
+        if (!this.particular?.trim()) { this.alertService.warning(this.module, 'Please provide particulars.', ''); return; }
         if (this.lineItems.length === 0) { this.alertService.warning(this.module, 'Please add at least one item.', ''); return; }
         if (!this.approvingOfficer) { this.alertService.warning(this.module, 'Please select a Finance Manager.', ''); return; }
         if (this.isTotalMoreThan100k && !this.generalManager) { this.alertService.warning(this.module, 'Total exceeds ₱100,000 — please select a General Manager.', ''); return; }
@@ -320,7 +341,7 @@ export class QuotationAddEditComponent {
             next: (res: any) => {
                 this.formSubmit = false;
                 if (res?.success) {
-                    this.alertService.success(this.module, res.successMessage || 'Saved successfully.', '');
+                    this.alertService.success(this.module, this.editMode ? 'Updated' : 'Saved', '');
                     this.router.navigate(['/' + this.menuLink, res.modelId, 'detail']);
                 } else {
                     this.alertService.error(this.module, res?.failureMessage || 'Save failed.', '');

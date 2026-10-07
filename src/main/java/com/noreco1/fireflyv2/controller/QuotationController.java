@@ -44,8 +44,8 @@ public class QuotationController {
     private HttpServletRequest httpServletRequest;
 
     @GetMapping("/list/{from}/{to}")
-    public List<QuotationListDto> listPending(@PathVariable String from, @PathVariable String to) {
-        return quotationService.findByDateRangePending(from, to);
+    public List<QuotationListDto> list(@PathVariable String from, @PathVariable String to) {
+        return quotationService.findByDateRange(from, to);
     }
 
     @GetMapping("/list/{from}/{to}/{statusId}")

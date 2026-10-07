@@ -381,9 +381,10 @@ public class AnyJsonController {
                     detail.put("estimatedAmount",     newValueMap.get("estimatedAmount"));
                 } catch (Exception ignored) { }
             }
-            dto.put("action",  action  != null ? action  : "");
-            dto.put("remarks", remarks != null ? remarks : "");
-            dto.put("detail",  detail);
+            dto.put("action",   action  != null ? action  : "");
+            dto.put("remarks",  remarks != null ? remarks : "");
+            dto.put("detail",   detail);
+            dto.put("newValue", log.getNewValue());
 
             result.add(dto);
         }

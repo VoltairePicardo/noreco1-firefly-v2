@@ -17,6 +17,9 @@ import com.noreco1.fireflyv2.service.QuotationDetailService;
 import com.noreco1.fireflyv2.service.QuotationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -1291,37 +1294,54 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
     }
 
     @Override
+    @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.READ_UNCOMMITTED)
     public Map makeLog(Quotation quotation) {
         Map map = new HashMap();
         try {
+            // Fetch DTO within this REQUIRES_NEW TX — avoids LazyInitializationException from
+            // the outer TX's detached proxies, and READ_UNCOMMITTED sees outer TX's uncommitted inserts
+            QuotationDto quotationDto = quotationService.findById(quotation.getId());
 
-            // main data
-            map.put("id", quotation.getId());
-            map.put("code", quotation.getCode());
-            map.put("date", quotation.getDate());
-            map.put("requisitionVoucherCode", quotation.getPurchaseRequest().getCode());
-            map.put("documentStatus", quotation.getDocumentStatus().getStatus());
-            map.put("createdBy", quotation.getCreatedBy() != null ? quotation.getCreatedBy().getFullName() : "");
+            map.put("id",             quotationDto.getId());
+            map.put("code",           quotationDto.getCode());
+            map.put("date",           quotationDto.getDate());
+            map.put("particular",     quotationDto.getParticular());
+            map.put("documentStatus", quotationDto.getDocumentStatus());
+            map.put("createdBy",      quotationDto.getPreparedBy());
 
-            if(quotation.getApprovingOfficer() != null) map.put("approvedByFinanceOfficer", quotation.getApprovingOfficer().getFullName());
-            if(quotation.getApprovedByGeneralManager() != null) map.put("approvedByGeneralManager", quotation.getApprovedByGeneralManager().getFullName());
+            if (quotationDto.getApprovedByFinanceManager() != null && !quotationDto.getApprovedByFinanceManager().isEmpty())
+                map.put("approvedByFinanceOfficer", quotationDto.getApprovedByFinanceManager());
+            if (quotationDto.getApprovedByGeneralManager() != null && !quotationDto.getApprovedByGeneralManager().isEmpty())
+                map.put("approvedByGeneralManager", quotationDto.getApprovedByGeneralManager());
 
-            map.put("transactionId", quotation.getTransaction().getId());
-            map.put("workflow", quotation.getWorkflow() != null ? quotation.getWorkflow().getName():"");
-            map.put("createdAt", quotation.getCreatedAt());
-            map.put("updatedAt", quotation.getUpdatedAt());
+            map.put("transactionId", quotationDto.getTransId());
+            map.put("createdAt",     quotationDto.getCreatedAt());
+            map.put("updatedAt",     quotationDto.getUpdatedAt());
 
-            if (quotation.getSuppliers().size() == 0){
-                QuotationDto quotationDto = quotationService.findById(quotation.getId());
-                map.put("suppliers", quotationDto.getSuppliers());
+            map.put("suppliers", quotationDto.getSuppliers());
+
+            List<QuotationItemDto> quotationDetailDto = quotationDetailService.getQuotationDetails(quotation.getId());
+            map.put("quotationItems", quotationDetailDto);
+
+            // Serialize terms as plain Maps to avoid QuotationTerm → Quotation circular reference
+            List<Map<String, Object>> termMaps = new ArrayList<>();
+            for (QuotationTerm t : quotationService.getTerms(quotation.getId())) {
+                Map<String, Object> tm = new LinkedHashMap<>();
+                if (t.getSupplier() != null) {
+                    Map<String, Object> supMap = new LinkedHashMap<>();
+                    supMap.put("id",   t.getSupplier().getId());
+                    supMap.put("name", t.getSupplier().getName());
+                    tm.put("supplier", supMap);
+                } else {
+                    tm.put("supplier", null);
+                }
+                tm.put("deliveryTimeAndCompletion", t.getDeliveryTimeAndCompletion());
+                tm.put("warrantyPeriod",            t.getWarrantyPeriod());
+                tm.put("termsOfPayment",            t.getTermsOfPayment());
+                tm.put("placeOfDelivery",           t.getPlaceOfDelivery());
+                termMaps.add(tm);
             }
-
-            if (quotation.getQuotationDetails().size() == 0) {
-                List<QuotationItemDto> quotationDetailDto = quotationDetailService.getQuotationDetails(quotation.getId());
-                map.put("quotationItems", quotationDetailDto);
-            }
-
-            map.put("terms", quotationService.getTerms(quotation.getId()));
+            map.put("terms", termMaps);
 
         } catch (Exception ex) {
             ex.printStackTrace();

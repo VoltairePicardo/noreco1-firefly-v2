@@ -74,9 +74,6 @@ public class QuotationServiceImpl implements QuotationService, PrintableVoucher 
     PurchaseRequestRepo PurchaseRequestRepo;
 
     @Autowired
-    EmployeeRepo employeeRepo;
-
-    @Autowired
     SignatureFacade signatureFacade;
 
     @Autowired
@@ -144,12 +141,7 @@ public class QuotationServiceImpl implements QuotationService, PrintableVoucher 
                 quotationDto.setCreatedAt(quotation.getCreatedAt());
                 quotationDto.setUpdatedAt(quotation.getUpdatedAt());
 
-                List<QuotationItemDetail> itemDetails = this.quotationItemDetailRepo.findAllByQuotationItemQuotationId(quotationId);
-                if(Checker.collectionIsNotEmpty(itemDetails)) {
-                    for(QuotationItemDetail quotationItemDetail: itemDetails) {
-                        quotationDto.getSuppliers().add(quotationItemDetail.getSupplier());
-                    }
-                }
+                quotationDto.setSuppliers(this.quotationItemDetailRepo.findDistinctSuppliersByQuotationId(quotationId));
 
                 List<QuotationTerm> quotationTerms = this.getTerms(quotationId);
                 quotationDto.setTerms(quotationTerms);
@@ -176,7 +168,7 @@ public class QuotationServiceImpl implements QuotationService, PrintableVoucher 
                 quotationListDto.setId(quotation.getId());
                 quotationListDto.setCode(quotation.getCode());
                 quotationListDto.setDate(quotation.getDate());
-                quotationListDto.setRequisitionVoucherCode(quotation.getPurchaseRequest() != null ? quotation.getPurchaseRequest().getCode() : "");
+                quotationListDto.setRequisitionVoucherCode(getPrCodesForQuotation(quotation.getId()));
                 quotationListDto.setDocumentStatus(quotation.getDocumentStatus().getStatus());
 
                 quotationListDto.setPreparedBy(quotation.getCreatedBy().getFullName());
@@ -213,7 +205,7 @@ public class QuotationServiceImpl implements QuotationService, PrintableVoucher 
                     quotationListDto.setId(quotation.getId());
                     quotationListDto.setCode(quotation.getCode());
                     quotationListDto.setDate(quotation.getDate());
-                    quotationListDto.setRequisitionVoucherCode(quotation.getPurchaseRequest() != null ? quotation.getPurchaseRequest().getCode() : "");
+                    quotationListDto.setRequisitionVoucherCode(getPrCodesForQuotation(quotation.getId()));
                     quotationListDto.setDocumentStatus(quotation.getDocumentStatus().getStatus());
 
                     quotationListDto.setPreparedBy(quotation.getCreatedBy().getFullName());
@@ -260,7 +252,7 @@ public class QuotationServiceImpl implements QuotationService, PrintableVoucher 
                     quotationListDto.setId(quotation.getId());
                     quotationListDto.setCode(quotation.getCode());
                     quotationListDto.setDate(quotation.getDate());
-                    quotationListDto.setRequisitionVoucherCode(quotation.getPurchaseRequest() != null ? quotation.getPurchaseRequest().getCode() : "");
+                    quotationListDto.setRequisitionVoucherCode(getPrCodesForQuotation(quotation.getId()));
                     quotationListDto.setDocumentStatus(quotation.getDocumentStatus().getStatus());
 
                     quotationListDto.setPreparedBy(quotation.getCreatedBy().getFullName());
@@ -275,6 +267,38 @@ public class QuotationServiceImpl implements QuotationService, PrintableVoucher 
             ex.printStackTrace();
         }
         return null;
+    }
+
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
+    @Override
+    public List<QuotationListDto> findByDateRange(String from, String to) {
+        try {
+            java.util.Date fromDate = DateHelper.strToDate(from, "yyyy-MM-dd");
+            java.util.Date toDate   = DateHelper.strToDate(to,   "yyyy-MM-dd");
+
+            if (fromDate == null) fromDate = new java.util.Date(0);
+            if (toDate   == null) toDate   = new java.util.Date();
+
+            List<Quotation> quotations = quotationRepo.findAllByDateRange(fromDate, toDate);
+
+            List<QuotationListDto> returnQuotations = new ArrayList<>();
+            if (!Checker.collectionIsEmpty(quotations)) {
+                for (Quotation quotation : quotations) {
+                    QuotationListDto dto = new QuotationListDto();
+                    dto.setId(quotation.getId());
+                    dto.setCode(quotation.getCode());
+                    dto.setDate(quotation.getDate());
+                    dto.setRequisitionVoucherCode(getPrCodesForQuotation(quotation.getId()));
+                    dto.setDocumentStatus(quotation.getDocumentStatus().getStatus());
+                    dto.setPreparedBy(quotation.getCreatedBy().getFullName());
+                    returnQuotations.add(dto);
+                }
+            }
+            return returnQuotations;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return new ArrayList<>();
     }
 
     @Transactional(isolation = Isolation.READ_UNCOMMITTED)
@@ -820,8 +844,8 @@ public class QuotationServiceImpl implements QuotationService, PrintableVoucher 
             } else {
                 existingQuotation = quotationRepo.findById(quotation.getId()).orElse(null);
             }
-            // use for document logging
-            Map oldMap = documentLoggerFacade.makeLog(existingQuotation);
+            // use for document logging (skip for insert: entity not in DB yet, findById(null) would poison the TX)
+            Map oldMap = insertMode ? null : documentLoggerFacade.makeLog(existingQuotation);
 
             Workflow wf = new Workflow();
 
@@ -834,7 +858,6 @@ public class QuotationServiceImpl implements QuotationService, PrintableVoucher 
             existingQuotation.setWorkflow(wf);
             existingQuotation.setDate(quotation.getDate());
             existingQuotation.setParticular(quotation.getParticular());
-            existingQuotation.setPurchaseRequest(quotation.getPurchaseRequest());
             existingQuotation.setCreatedBy(authenticationFacade.getLoggedIn());
             existingQuotation.setApprovingOfficer(approvedByFinanceManager);
             existingQuotation.setApprovedByGeneralManager(approvedByGeneralManager);
@@ -856,7 +879,6 @@ public class QuotationServiceImpl implements QuotationService, PrintableVoucher 
 
                 if (insertMode) { // log action only when adding document
                     documentProcessingFacade.processAction(this.model.getTransaction(), null, this.model.getWorkflow(), createdBy);
-                    oldMap = null;
                 }
 
                 ArrayList<QuotationItemDto> details = quotation.getQuotationDetails();
@@ -902,9 +924,11 @@ public class QuotationServiceImpl implements QuotationService, PrintableVoucher 
 
                 }
 
+                // snapshot AFTER items/terms saved so the log captures full data
+                Map newMap = insertMode ? documentLoggerFacade.makeLog(quotationRepo.findById(this.model.getId()).orElse(this.model)) : null;
+
                 // generic document logging here
-                // old value only
-                DocumentLog log = documentLoggerFacade.log(this.model.getTransaction(), createdBy, oldMap, null);
+                DocumentLog log = documentLoggerFacade.log(this.model.getTransaction(), createdBy, oldMap, newMap);
 
                 response.setLogId(log != null ? log.getId() : 0);
                 response.setModelId(this.model.getId());
@@ -982,6 +1006,14 @@ public class QuotationServiceImpl implements QuotationService, PrintableVoucher 
 
     private Map forLogMapMain(Quotation quotation) {
         return documentLoggerFacade.makeLog(quotation);
+    }
+
+    private String getPrCodesForQuotation(Integer quotationId) {
+        try {
+            List<String> codes = quotationItemRepo.findDistinctPrCodesByQuotationId(quotationId);
+            if (codes != null && !codes.isEmpty()) return String.join(", ", codes);
+        } catch (Exception ignored) {}
+        return "";
     }
 
     @Override

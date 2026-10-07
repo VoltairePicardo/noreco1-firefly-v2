@@ -14,21 +14,20 @@
         <!-- Header -->
         <div class="row g-3 mb-3">
             <div class="col-md-3">
-                <label class="form-label fw-bold">Date <span class="text-danger">*</span></label>
+                <label class="form-label fw-bold">Date</label>
                 <input type="text" class="form-control" mwlFlatpickr
-                       [options]="flatpickrOptions"
+                       [options]="readonlyDateOptions"
                        [(ngModel)]="quotationDate"
-                       [class.is-invalid]="submitted && !quotationDate"
-                       placeholder="Select date"/>
-                <div class="invalid-feedback">Please provide a date.</div>
+                       readonly
+                       placeholder=""/>
             </div>
             <div class="col-md-9">
-                <label class="form-label fw-bold">Particular <span class="text-danger">*</span></label>
+                <label class="form-label fw-bold">Particulars <span class="text-danger">*</span></label>
                 <textarea class="form-control" rows="2"
-                          placeholder="Enter particular"
+                          placeholder="Enter particulars"
                           [(ngModel)]="particular"
                           [class.is-invalid]="submitted && !particular.trim()"></textarea>
-                <div class="invalid-feedback">Please provide a particular.</div>
+                <div class="invalid-feedback">Please provide particulars.</div>
             </div>
         </div>
 
@@ -37,7 +36,7 @@
 
         <div class="d-flex justify-content-end mb-2">
             <button type="button" class="btn btn-success fw-bold" (click)="openPrBrowse()">
-                <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse PR/WR Items
+                <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse PR/WR Items
             </button>
         </div>
 
@@ -69,7 +68,7 @@
                                     </span>
                                     <button type="button" class="btn btn-success btn-sm fw-bold ms-auto"
                                             (click)="openSupplierBrowse(i)">
-                                        <ng-icon name="tablerSearch" class="ps-0 pe-1 fw-bold"></ng-icon>Browse
+                                        <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
                                     </button>
                                     @if (suppliers[i]) {
                                         <button type="button" class="btn btn-light btn-icon btn-sm rounded-circle"
@@ -100,7 +99,7 @@
                                         <span class="badge bg-danger-subtle text-danger ms-2">Parent Item</span>
                                         <button type="button" class="btn btn-sm btn-success fw-bold ms-2"
                                                 (click)="openItemModal(idx)">
-                                            <ng-icon name="tablerPlus" class="ps-0 pe-1 fw-bold"></ng-icon>Add Child Item
+                                            <ng-icon name="tablerPlus" class="ps-0 pe-3 fw-bold"></ng-icon>Add Child Item
                                         </button>
                                     }
                                 </td>
@@ -117,7 +116,8 @@
                                     <td>
                                         @if (suppliers[i]) {
                                             <select class="form-select form-select-sm" style="min-width:110px"
-                                                    [(ngModel)]="item.details[i].brand">
+                                                    [(ngModel)]="item.details[i].brand"
+                                                    [compareWith]="compareBrand">
                                                 <option [ngValue]="null">— Brand —</option>
                                                 @for (b of brands; track b.id) {
                                                     <option [ngValue]="b">{{ b.name }}</option>
@@ -150,7 +150,7 @@
                             </tr>
                         }
                         <tr class="table-light fw-bold">
-                            <td colspan="14" class="text-end pe-2">Total (Lowest Price × Qty):</td>
+                            <td colspan="14" class="text-end pe-3">Total (Lowest Price × Qty):</td>
                             <td class="text-end fw-bold">{{ totalAmount | number:'1.2-2' }}</td>
                             <td></td>
                         </tr>
@@ -246,7 +246,7 @@
                            placeholder="Browse Finance Manager"/>
                     <button type="button" class="btn btn-success fw-bold"
                             (click)="openSignatoryBrowse('approvingOfficer')">
-                        <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
+                        <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
                     </button>
                 </div>
                 @if (submitted && !approvingOfficer) {
@@ -254,24 +254,25 @@
                 }
             </div>
 
-            @if (isTotalMoreThan100k) {
-                <div class="col-md-6">
-                    <label class="form-label fw-bold">Approved By General Manager <span class="text-danger">*</span></label>
-                    <div class="input-group">
-                        <input type="text" class="form-control" readonly
-                               [value]="generalManager?.fullName || generalManager?.name || ''"
-                               [class.is-invalid]="submitted && isTotalMoreThan100k && !generalManager"
-                               placeholder="Browse General Manager"/>
-                        <button type="button" class="btn btn-success fw-bold"
-                                (click)="openSignatoryBrowse('generalManager')">
-                            <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
-                        </button>
-                    </div>
-                    @if (submitted && isTotalMoreThan100k && !generalManager) {
-                        <div class="text-danger small mt-1">Please select a General Manager.</div>
-                    }
+            <div class="col-md-6">
+                <label class="form-label fw-bold">
+                    Approved By General Manager
+                    @if (isTotalMoreThan100k) { <span class="text-danger">*</span> }
+                </label>
+                <div class="input-group">
+                    <input type="text" class="form-control" readonly
+                           [value]="generalManager?.fullName || generalManager?.name || ''"
+                           [class.is-invalid]="submitted && isTotalMoreThan100k && !generalManager"
+                           placeholder="Browse General Manager"/>
+                    <button type="button" class="btn btn-success fw-bold"
+                            (click)="openSignatoryBrowse('generalManager')">
+                        <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
+                    </button>
                 </div>
-            }
+                @if (submitted && isTotalMoreThan100k && !generalManager) {
+                    <div class="text-danger small mt-1">Please select a General Manager.</div>
+                }
+            </div>
         </div>
 
         <!-- Footer -->

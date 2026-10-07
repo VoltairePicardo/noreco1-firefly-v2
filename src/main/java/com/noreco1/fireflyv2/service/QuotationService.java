@@ -24,6 +24,9 @@ public interface QuotationService extends VoucherService {
     @Transactional(readOnly = true)
     List<QuotationListDto> findByDateRangePending(String from, String to);
 
+    @Transactional(readOnly = true)
+    List<QuotationListDto> findByDateRange(String from, String to);
+
     List<QuotationDetail> getForQuotationSummary(Integer rivId);
 
     List<QuotationDetail> getRvDetailByRvId(Integer rivId);

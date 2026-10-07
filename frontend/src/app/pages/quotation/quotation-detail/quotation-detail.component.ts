@@ -140,14 +140,31 @@ export class QuotationDetailComponent {
         if (this.showLogs && this.logs.length === 0) {
             this.logsLoading = true;
             this.service.getDocumentLogs(this.data.transId).subscribe({
-                next: (logs) => { this.logs = logs || []; this.logsLoading = false; },
+                next: (logs) => {
+                    this.logs = (logs || []).map((log: any) => ({
+                        ...log,
+                        parsed: this.parseLog(log)
+                    }));
+                    this.logsLoading = false;
+                },
                 error: () => { this.logsLoading = false; }
             });
         }
     }
 
-    getLogField(value: string, key: string): string {
-        try { return JSON.parse(value)?.[key] || ''; } catch { return ''; }
+    parseLog(log: any): any {
+        try {
+            const raw = log.newValue || log.oldValue;
+            if (!raw) return null;
+            return JSON.parse(raw);
+        } catch { return null; }
+    }
+
+    logSupplierNames(parsed: any): string[] {
+        const items: any[] = parsed?.quotationItems || [];
+        if (!items.length) return [];
+        const details: any[] = items[0]?.details || [];
+        return details.map((d: any) => d?.supplier?.name || '').filter((n: string) => n);
     }
 
     print(): void {
@@ -171,6 +188,35 @@ export class QuotationDetailComponent {
             }
         }
         return total;
+    }
+
+    get awardedSummary(): { supplierName: string; items: { no: number; description: string; unitCode: string; quantity: number; price: number; brand: string; amount: number }[]; total: number }[] {
+        const result: { supplierName: string; items: { no: number; description: string; unitCode: string; quantity: number; price: number; brand: string; amount: number }[]; total: number }[] = [];
+        this.suppliersList.forEach((sup: any, si: number) => {
+            let total = 0;
+            const items: { no: number; description: string; unitCode: string; quantity: number; price: number; brand: string; amount: number }[] = [];
+            this.lineItems.forEach((item: any, idx: number) => {
+                if (item.available === false) return;
+                const detail = item.details?.[si];
+                if (detail?.awarded && detail?.price) {
+                    const amount = Number(detail.price) * Number(item.quantity || 0);
+                    total += amount;
+                    items.push({
+                        no:          idx + 1,
+                        description: item.itemDescription || '—',
+                        unitCode:    item.unitCode || '—',
+                        quantity:    Number(item.quantity || 0),
+                        price:       Number(detail.price || 0),
+                        brand:       detail.brand?.name || '',
+                        amount,
+                    });
+                }
+            });
+            if (items.length > 0) {
+                result.push({ supplierName: sup.name, items, total });
+            }
+        });
+        return result;
     }
 
     get notChildItems(): any[] {

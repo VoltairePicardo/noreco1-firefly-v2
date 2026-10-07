@@ -1332,9 +1332,9 @@ public class SignatureFacadeImpl implements SignatureFacade {
                     case QUOTATION_SUMMARY: {
                         Quotation voucher = (Quotation) document;
 
-                        Map map = settingFacade.getByCode("DEFAULT_CREATED_BY_QUOTATION");
-
-                        Employee preparedBy = employeeRepo.findOneByAccountNumber((Integer) map.get("preparedByAccountNo"));
+                        Employee preparedBy = voucher.getCreatedBy() != null
+                                ? employeeRepo.findOneByAccountNumber(voucher.getCreatedBy().getAccountNo())
+                                : null;
                         Employee approvedByProcurementOfficer = employeeRepo.findOneByAccountNumber(voucher.getApprovingOfficer().getAccountNo());
                         Employee approvedByFinanceManager = voucher.getApprovedByFinanceManager() != null ? employeeRepo.findOneByAccountNumber(voucher.getApprovedByFinanceManager().getAccountNo()):null;
                         Employee approvedByGeneralManager = voucher.getApprovedByGeneralManager() != null ? employeeRepo.findOneByAccountNumber(voucher.getApprovedByGeneralManager().getAccountNo()):null;

@@ -134,7 +134,7 @@ public interface PurchaseRequestDetailRepo extends JpaRepository<PurchaseRequest
             "rvd.item.id, rvd.item.code, rvd.item.description, " +
             "rvd.unitMeasure.id, rvd.unitMeasure.code, " +
             "rvd.purchaseRequest.id, rvd.purchaseRequest.code, rvd.purchaseRequest.voucherDate, " +
-            "rvd.purchaseRequest.createdBy.fullName " +
+            "rvd.purchaseRequest.createdBy.fullName, rvd.purchaseRequest.purpose " +
             "FROM PurchaseRequestDetail rvd " +
             "WHERE rvd.purchaseRequest.rvType IN (:rvTypes) " +
             "AND rvd.purchaseRequest.documentStatus.id = :approvedStatusId " +
