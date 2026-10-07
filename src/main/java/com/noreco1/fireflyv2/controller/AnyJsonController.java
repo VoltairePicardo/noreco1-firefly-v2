@@ -434,7 +434,6 @@ public class AnyJsonController {
     }
 
     @GetMapping(value = "/inventory-categories")
-    
     public List<InventoryCategory> getItemCategories() {
         return inventoryCategoryRepo.findAll();
     }

@@ -7,6 +7,7 @@ import com.noreco1.fireflyv2.common.facade.GeneratorFacade;
 import com.noreco1.fireflyv2.controller.response.PostResponse;
 import com.noreco1.fireflyv2.controller.response.ProcessDocumentDto;
 import com.noreco1.fireflyv2.model.*;
+import com.noreco1.fireflyv2.repo.BrandRepo;
 import com.noreco1.fireflyv2.repo.DocumentStatusRepo;
 import com.noreco1.fireflyv2.repo.DocumentWorkflowActionMapRepo;
 import com.noreco1.fireflyv2.repo.ItemRepo;
@@ -27,6 +28,9 @@ public class ItemServiceImpl implements ItemService {
 
     @Autowired
     private ItemRepo itemRepo;
+
+    @Autowired
+    private BrandRepo brandRepo;
 
     @Autowired
     private DocumentStatusRepo documentStatusRepo;
@@ -107,6 +111,7 @@ public class ItemServiceImpl implements ItemService {
         item.setId(null);
         PostResponse res = new PostResponse();
         try {
+            applyGeneratedDescription(item);
             if (itemRepo.existsByDescriptionIgnoreCase(item.getDescription())) {
                 res.setFailureMessage("An item with the same description already exists.");
                 return res;
@@ -146,6 +151,7 @@ public class ItemServiceImpl implements ItemService {
         try {
             Item existing = itemRepo.findById(item.getId()).orElse(null);
             if (existing == null) { res.setFailureMessage("Item not found."); return res; }
+            applyGeneratedDescription(item);
             boolean isCreator = existing.getCreatedBy() != null && existing.getCreatedBy().getId().equals(authFacade.getLoggedIn() != null ? authFacade.getLoggedIn().getId() : null);
             boolean isIO = isInventoryOfficer();
             int statusId = existing.getDocumentStatus() != null ? existing.getDocumentStatus().getId() : 7;
@@ -174,6 +180,15 @@ public class ItemServiceImpl implements ItemService {
             existing.setHasSerialNumbers(item.getHasSerialNumbers());
             existing.setBarcode(item.getBarcode());
             existing.setParentItem(item.getParentItem());
+            existing.setSubCategory(item.getSubCategory());
+            existing.setGenericName(item.getGenericName());
+            existing.setSize(item.getSize());
+            existing.setRating(item.getRating());
+            existing.setSpecification(item.getSpecification());
+            existing.setBrand(item.getBrand());
+            existing.setManufacturer(item.getManufacturer());
+            existing.setPartNumber(item.getPartNumber());
+            existing.setRemarks(item.getRemarks());
             existing.setUpdatedAt(new java.util.Date());
             itemRepo.save(existing);
             res.setModelId(existing.getId());
@@ -183,6 +198,27 @@ public class ItemServiceImpl implements ItemService {
             res.setFailureMessage(e.getMessage());
         }
         return res;
+    }
+
+
+    private void applyGeneratedDescription(Item item) {
+        Item parent = item.getParentItem() != null && item.getParentItem().getId() != null
+                ? itemRepo.findById(item.getParentItem().getId()).orElse(null) : null;
+        Brand brand = item.getBrand() != null && item.getBrand().getId() != null
+                ? brandRepo.findById(item.getBrand().getId()).orElse(null) : null;
+
+        String generated = java.util.stream.Stream.of(
+                        parent != null ? parent.getDescription() : item.getGenericName(),
+                        item.getSize(),
+                        item.getRating(),
+                        item.getSpecification(),
+                        brand != null ? brand.getName() : null)
+                .filter(p -> p != null && !p.isBlank())
+                .map(String::trim)
+                .collect(java.util.stream.Collectors.joining(", "));
+        if (!generated.isEmpty()) {
+            item.setDescription(generated);
+        }
     }
 
     @Override

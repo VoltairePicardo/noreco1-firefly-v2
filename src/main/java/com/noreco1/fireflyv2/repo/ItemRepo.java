@@ -17,7 +17,7 @@ public interface ItemRepo extends JpaRepository<Item, Integer> {
     Page<Item> findAllByOrderByDescriptionAsc(Pageable pageable);
 
     @Override
-    @EntityGraph(attributePaths = {"unit", "inventoryCategory", "assetAccount", "expenseAccount", "parentItem"})
+    @EntityGraph(attributePaths = {"unit", "inventoryCategory", "assetAccount", "expenseAccount", "parentItem", "subCategory", "brand"})
     java.util.Optional<Item> findById(Integer id);
 
     List<Item> findAllByOrderByDescriptionAsc();
