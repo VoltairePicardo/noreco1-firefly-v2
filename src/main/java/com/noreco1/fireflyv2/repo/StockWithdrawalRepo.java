@@ -90,14 +90,14 @@ public interface StockWithdrawalRepo extends JpaRepository<StockWithdrawal, Inte
                                                                                                                         @Param("documentStatus") Integer id,
                                                                                                                         @Param("invLocId") Integer invLocId, Pageable pageable);
 
-    List<StockWithdrawal> findByVoucherDateBetweenOrderByInventoryCategoryTypeAscInventoryLocationIdAscCodeAsc(Date from, Date to);
-    List<StockWithdrawal> findByVoucherDateBetweenAndInventoryLocationIdOrderByInventoryCategoryTypeAscInventoryLocationIdAscCodeAsc(Date from, Date to, Integer locationId);
-    List<StockWithdrawal> findByVoucherDateBetweenAndInventoryCategoryTypeOrderByInventoryCategoryTypeAscInventoryLocationIdAscCodeAsc(Date from, Date to, Integer type);
-    List<StockWithdrawal> findByVoucherDateBetweenAndDocumentStatusIdOrderByInventoryCategoryTypeAscInventoryLocationIdAscCodeAsc(Date from, Date to, Integer statusId);
-    List<StockWithdrawal> findByVoucherDateBetweenAndInventoryLocationIdAndDocumentStatusIdOrderByInventoryCategoryTypeAscInventoryLocationIdAscCodeAsc(Date from, Date to, Integer locationId, Integer statusId);
-    List<StockWithdrawal> findByVoucherDateBetweenAndInventoryLocationIdAndInventoryCategoryTypeOrderByInventoryCategoryTypeAscInventoryLocationIdAscCodeAsc(Date from, Date to, Integer locationId, Integer type);
-    List<StockWithdrawal> findByVoucherDateBetweenAndDocumentStatusIdAndInventoryCategoryTypeOrderByInventoryCategoryTypeAscInventoryLocationIdAscCodeAsc(Date from, Date to, Integer statusId, Integer type);
-    List<StockWithdrawal> findByVoucherDateBetweenAndInventoryLocationIdAndDocumentStatusIdAndInventoryCategoryTypeOrderByInventoryCategoryTypeAscInventoryLocationIdAscCodeAsc(Date from, Date to, Integer locationId, Integer statusId, Integer type);
+    List<StockWithdrawal> findByVoucherDateBetweenOrderByInventoryCategoryTypeIdAscInventoryLocationIdAscCodeAsc(Date from, Date to);
+    List<StockWithdrawal> findByVoucherDateBetweenAndInventoryLocationIdOrderByInventoryCategoryTypeIdAscInventoryLocationIdAscCodeAsc(Date from, Date to, Integer locationId);
+    List<StockWithdrawal> findByVoucherDateBetweenAndInventoryCategoryTypeIdOrderByInventoryCategoryTypeIdAscInventoryLocationIdAscCodeAsc(Date from, Date to, Integer type);
+    List<StockWithdrawal> findByVoucherDateBetweenAndDocumentStatusIdOrderByInventoryCategoryTypeIdAscInventoryLocationIdAscCodeAsc(Date from, Date to, Integer statusId);
+    List<StockWithdrawal> findByVoucherDateBetweenAndInventoryLocationIdAndDocumentStatusIdOrderByInventoryCategoryTypeIdAscInventoryLocationIdAscCodeAsc(Date from, Date to, Integer locationId, Integer statusId);
+    List<StockWithdrawal> findByVoucherDateBetweenAndInventoryLocationIdAndInventoryCategoryTypeIdOrderByInventoryCategoryTypeIdAscInventoryLocationIdAscCodeAsc(Date from, Date to, Integer locationId, Integer type);
+    List<StockWithdrawal> findByVoucherDateBetweenAndDocumentStatusIdAndInventoryCategoryTypeIdOrderByInventoryCategoryTypeIdAscInventoryLocationIdAscCodeAsc(Date from, Date to, Integer statusId, Integer type);
+    List<StockWithdrawal> findByVoucherDateBetweenAndInventoryLocationIdAndDocumentStatusIdAndInventoryCategoryTypeIdOrderByInventoryCategoryTypeIdAscInventoryLocationIdAscCodeAsc(Date from, Date to, Integer locationId, Integer statusId, Integer type);
 
     List<StockWithdrawal> findByVoucherDateBetweenAndDocumentStatusIdNotIn(Date from, Date to, Collection<Integer> documentStatusIds);
 

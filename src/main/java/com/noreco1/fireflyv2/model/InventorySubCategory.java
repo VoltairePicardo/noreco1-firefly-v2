@@ -1,24 +1,22 @@
 package com.noreco1.fireflyv2.model;
 
-import lombok.*;
-
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
-import java.io.Serializable;
-
+@Entity
 @Getter
 @Setter
-@ToString
-@EqualsAndHashCode
-@Entity
-@NoArgsConstructor
+@RequiredArgsConstructor
 @AllArgsConstructor
-public class InventoryCategory implements Serializable{
+public class InventorySubCategory {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column
     private Integer id;
 
     @Column
@@ -26,7 +24,7 @@ public class InventoryCategory implements Serializable{
 
     @NotFound(action = NotFoundAction.IGNORE)
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "FK_inventoryCategoryTypeId")
-    private InventoryCategoryType type;
+    @JoinColumn(name = "FK_inventoryCategoryId")
+    private InventoryCategory inventoryCategory;
 
 }

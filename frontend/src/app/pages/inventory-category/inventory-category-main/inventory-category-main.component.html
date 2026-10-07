@@ -1,0 +1,101 @@
+<div class="container-fluid">
+    <app-page-title [title]="module" [subTitle]="subModule" [menuLink]="menuLink"/>
+
+    <div class="card">
+        <div class="card-header">
+            <div class="row g-2 align-items-center w-100">
+                <div class="col-12 col-md-4">
+                    <div class="app-search">
+                        <input type="text" class="form-control"
+                               placeholder="Search by description..."
+                               aria-label="Search by description"
+                               [(ngModel)]="searchText"
+                               (keyup.enter)="search()"
+                               [ngModelOptions]="{ standalone: true }"/>
+                        <ng-icon name="tablerSearch" class="app-search-icon text-muted"></ng-icon>
+                    </div>
+                </div>
+                <div class="col-12 col-md-auto d-flex gap-2">
+                    <button type="button" class="btn btn-success fw-bold" (click)="search()">
+                        <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Search
+                    </button>
+                    <button type="button" class="btn btn-danger fw-bold" (click)="clearSearch()">
+                        <ng-icon name="tablerRefresh" class="ps-0 pe-3 fw-bold"></ng-icon>Reset
+                    </button>
+                </div>
+                <div class="col-12 col-md d-flex justify-content-md-end">
+                    <button type="button" class="btn btn-primary d-flex align-items-center gap-1 fw-bold"
+                            [routerLink]="['/' + menuLink + '/create']">
+                        <ng-icon name="tablerPlus" class="fw-bold fs-lg"></ng-icon>
+                        Create {{ module }}
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xl-12">
+
+                    <div class="row">
+                        <div class="table-responsive">
+                            <table class="table table-custom table-centered table-select table-hover w-100 mb-0">
+                                <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                                <tr class="text-uppercase fs-xxs">
+                                    <th>Id</th>
+                                    <th>Description</th>
+                                    <th>Type</th>
+                                    <th><span class="visually-hidden">Actions</span></th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                    @if (inventoryCategories().length > 0) {
+                                        @for (data of inventoryCategories(); track data.id) {
+                                            <tr>
+                                                <td class="fw-bold">{{ data.id }}</td>
+                                                <td class="fw-bold">{{ data.description }}</td>
+                                                <td>{{ data.type?.description || '—' }}</td>
+                                                <td class="text-nowrap">
+                                                    <div class="d-flex justify-content-end gap-1">
+                                                        <a href="javascript:void(0)" ngbTooltip="View" aria-label="View"
+                                                           [routerLink]="['/' + menuLink, data.id, 'detail']"
+                                                           class="btn btn-light btn-icon btn-sm rounded-circle">
+                                                            <ng-icon name="tablerEye" class="fs-lg"></ng-icon>
+                                                        </a>
+                                                        <a href="javascript:void(0)" ngbTooltip="Edit" aria-label="Edit"
+                                                           [routerLink]="['/' + menuLink, data.id, 'edit']"
+                                                           class="btn btn-light btn-icon btn-sm rounded-circle">
+                                                            <ng-icon name="tablerEdit" class="fs-lg"></ng-icon>
+                                                        </a>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        }
+                                    } @else {
+                                        <tr class="no-results">
+                                            <td colspan="3" class="text-center text-muted py-3">
+                                                @if (isLoading()) {
+                                                    <span class="spinner-border spinner-border-sm me-2" role="status"></span>Loading...
+                                                } @else { Nothing found. }
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    @if (totalElements() > pageSize) {
+                        <div class="d-flex justify-content-center mt-3">
+                            <ngb-pagination
+                                [collectionSize]="totalElements()"
+                                [page]="pageNumber() + 1"
+                                [pageSize]="pageSize"
+                                [maxSize]="5"
+                                (pageChange)="onPageChange($event)">
+                            </ngb-pagination>
+                        </div>
+                    }
+
+            </div>
+        </div>
+    </div>
+</div>

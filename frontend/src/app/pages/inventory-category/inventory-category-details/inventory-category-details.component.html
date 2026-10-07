@@ -1,0 +1,75 @@
+<div class="container-fluid">
+    <app-page-title [title]="module" [subTitle]="subModule" [menuLink]="menuLink"/>
+</div>
+
+<app-ui-card [title]="module + ' Details'">
+    <div class="col-xl-12 p-3" card-body>
+        @if (isLoading()) {
+            <div class="d-flex align-items-center gap-2 text-muted py-2">
+                <span class="spinner-border spinner-border-sm" role="status"></span>
+                Loading...
+            </div>
+        } @else {
+        <div class="row">
+            <div class="col-sm-6">
+                <dl class="row mb-0">
+                    <dt class="col-sm-4 fw-normal">Description</dt>
+                    <dd class="col-sm-8 fw-bold">{{ data().description || '—' }}</dd>
+
+                    <dt class="col-sm-4 fw-normal">Type</dt>
+                    <dd class="col-sm-8 fw-bold">{{ data().type?.description || '—' }}</dd>
+                </dl>
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center mt-4 mb-2">
+            <h5 class="fw-bold mb-0">Sub Categories</h5>
+            <a [routerLink]="['/' + menuLink, data().id, 'sub-category', 'create']" class="btn btn-primary btn-sm fw-bold gap-1">
+                <ng-icon name="tablerPlus" class="ps-0 pe-2 fw-bold fs-md"></ng-icon>Add Sub Category
+            </a>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-custom table-centered table-hover w-100 mb-0">
+                <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                    <tr class="text-uppercase fs-xxs">
+                        <th>Id</th>
+                        <th>Description</th>
+                        <th><span class="visually-hidden">Actions</span></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (sub of data().subCategories; track sub.id) {
+                        <tr>
+                            <td class="fw-bold">{{ sub.id }}</td>
+                            <td class="fw-bold">{{ sub.description }}</td>
+                            <td class="text-nowrap">
+                                <div class="d-flex justify-content-end">
+                                    <a title="Edit" aria-label="Edit sub category"
+                                       [routerLink]="['/' + menuLink, data().id, 'sub-category', sub.id, 'edit']"
+                                       class="btn btn-light btn-icon btn-sm rounded-circle">
+                                        <ng-icon name="tablerEdit" class="fs-lg"></ng-icon>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    } @empty {
+                        <tr class="no-results">
+                            <td colspan="3" class="text-center text-muted py-3">No sub categories.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        }
+        <hr class="border-dashed mx-n3 mt-4"/>
+        <div class="d-flex justify-content-end gap-2">
+            <a [routerLink]="['/' + menuLink]" class="btn btn-light fw-bold">
+                <ng-icon name="tablerArrowLeft" class="ps-0 pe-3 fw-bold"></ng-icon>Back
+            </a>
+            <button type="button" class="btn btn-primary fw-bold"
+                    [routerLink]="['/' + menuLink, data().id, 'edit']">
+                <ng-icon name="tablerPencil" class="ps-0 pe-3 fw-bold"></ng-icon>Edit
+            </button>
+        </div>
+    </div>
+</app-ui-card>

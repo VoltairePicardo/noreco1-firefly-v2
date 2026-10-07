@@ -158,6 +158,11 @@ export const PAGES_ROUTES: Routes = [
         data: { title: 'Miscellaneous Charges' },
     },
     {
+        path: 'inventory-category',
+        loadChildren: () => import('./inventory-category/inventory-category.route').then(m => m.INVENTORY_CATEGORY_ROUTES),
+        data: { title: 'Inventory Categories' },
+    },
+    {
         path: 'inventory-location',
         loadChildren: () => import('./inventory-location/inventory-location.route').then(m => m.INVENTORY_LOCATION_ROUTES),
         data: { title: 'Inventory Locations' },
