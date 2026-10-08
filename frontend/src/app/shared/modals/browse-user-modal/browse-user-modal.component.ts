@@ -42,6 +42,9 @@ export class BrowseUserModalComponent implements OnInit {
                 this.total = res.totalElements ?? res.page?.totalElements ?? this.items.length;
                 this.loading = false;
                 this.cdr.markForCheck();
+                if (this.items.length === 1 && this.total === 1) {
+                    this.select(this.items[0]);
+                }
             },
             error: () => {
                 this.loading = false;
