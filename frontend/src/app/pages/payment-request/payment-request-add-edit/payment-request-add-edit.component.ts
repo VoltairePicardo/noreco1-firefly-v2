@@ -400,13 +400,19 @@ export class PaymentRequestAddEditComponent {
             return;
         }
 
+        // a sub item row must always have a sub item selected
+        if (this.budgetSubItemRows.some(r => !r.budgetSubItemId)) {
+            this.alertService.warning(this.module, 'Validation', 'Please select a budget sub item on every sub item row, or remove the empty row.');
+            return;
+        }
+
         // same validation as the old system: line items with sub items require sub item details
         if (this.budgetLineItemRows.some(r => r.hasSubItems)) {
             if (this.budgetSubItemRows.length === 0) {
                 this.alertService.warning(this.module, 'Validation', 'Please add budget line sub item.');
                 return;
             }
-            if (this.budgetSubItemRows.some(r => !r.budgetSubItemId) || this.budgetSubTotal <= 0) {
+            if (this.budgetSubTotal <= 0) {
                 this.alertService.warning(this.module, 'Validation', 'Please input complete budget sub item details.');
                 return;
             }

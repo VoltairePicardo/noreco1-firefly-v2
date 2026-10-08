@@ -209,6 +209,9 @@ public class PaymentRequestServiceImpl implements PaymentRequestService, Printab
                     ArrayList<PaymentRequestBudgetDetail> budgetDetails = paymentRequest.getBudgetDetails();
                     for (PaymentRequestBudgetDetail paymentRequestBudgetDetail : budgetDetails){
 
+                        // a detail without a saved sub item would reference a transient BudgetSubItem
+                        if (paymentRequestBudgetDetail.getBudgetSubItem() == null || paymentRequestBudgetDetail.getBudgetSubItem().getId() == null) continue;
+
                         PaymentRequestBudgetDetail newPaymentRequestBudgetDetail = new PaymentRequestBudgetDetail();
 
                         PaymentRequest pr = new PaymentRequest();

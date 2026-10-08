@@ -676,13 +676,8 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
     }
 
     @Override
-<<<<<<< Updated upstream
     public Map makeLog(JobOrderAcceptance joa) {
-        Map map = new HashMap();
-=======
-    public Map makeLog(JoAcceptance joa) {
         Map map = new LinkedHashMap();
->>>>>>> Stashed changes
         try {
 
             // main data
