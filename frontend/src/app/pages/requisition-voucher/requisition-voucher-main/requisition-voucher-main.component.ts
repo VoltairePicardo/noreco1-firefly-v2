@@ -46,10 +46,45 @@ export class RequisitionVoucherMainComponent {
     private service      = inject(RequisitionVoucherService);
     private alertService = inject(AlertService);
 
+    private readonly filterKey = 'requisition-voucher-main-filters';
+
     ngOnInit(): void {
         this.setDefaultDates();
+        const restoredPage = this.restoreFilters();
         this.loadStatuses();
-        this.load();
+        this.load(restoredPage);
+    }
+
+    ngOnDestroy(): void {
+        this.saveFilters();
+    }
+
+    private saveFilters(): void {
+        try {
+            sessionStorage.setItem(this.filterKey, JSON.stringify({
+                fromDate: this.fromDate,
+                toDate: this.toDate,
+                status: this.selectedStatus(),
+                searchText: this.searchText,
+                page: this.page
+            }));
+        } catch { /* storage unavailable */ }
+    }
+
+    /** Restores saved filters and returns the saved page number. */
+    private restoreFilters(): number {
+        try {
+            const raw = sessionStorage.getItem(this.filterKey);
+            if (!raw) return 1;
+            const f = JSON.parse(raw);
+            this.fromDate   = f.fromDate ?? this.fromDate;
+            this.toDate     = f.toDate ?? this.toDate;
+            this.searchText = f.searchText ?? '';
+            this.selectedStatus.set(f.status ?? null);
+            return f.page || 1;
+        } catch {
+            return 1;
+        }
     }
 
     setDefaultDates(): void {
@@ -68,7 +103,7 @@ export class RequisitionVoucherMainComponent {
         });
     }
 
-    load(): void {
+    load(page = 1): void {
         this.isLoading.set(true);
         const obs = (this.fromDate && this.toDate)
             ? this.service.listByDateRange(this.fromDate, this.toDate, this.selectedStatus())
@@ -76,7 +111,7 @@ export class RequisitionVoucherMainComponent {
 
         obs.subscribe({
             next: (data) => { this.records.set(data || []);
-            this.page = 1; this.isLoading.set(false); },
+            this.page = page; this.isLoading.set(false); },
             error: () => { this.alertService.error(this.module, 'Load', ''); this.isLoading.set(false); }
         });
     }
