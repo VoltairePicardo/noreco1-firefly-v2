@@ -85,7 +85,7 @@ public class CheckVoucher extends Voucher implements Serializable {
     private ReceivingReport receivingReport = new ReceivingReport();
 
     @Transient
-    private JoAcceptance joAcceptance = new JoAcceptance();
+    private JobOrderAcceptance jobOrderAcceptance = new JobOrderAcceptance();
 
     @NotFound(action = NotFoundAction.IGNORE)
     @ManyToOne(fetch = FetchType.LAZY)

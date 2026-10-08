@@ -37,7 +37,7 @@ import java.util.*;
 @Service(value = "joaServiceImpl")
 public class JoAcceptanceServiceImpl implements JoAcceptanceService, PrintableVoucher {
 
-    private JoAcceptance model;
+    private JobOrderAcceptance model;
 
     @Autowired
     GeneratorFacade generatorFacade;
@@ -95,8 +95,8 @@ public class JoAcceptanceServiceImpl implements JoAcceptanceService, PrintableVo
 
     @Override
     @Transactional(readOnly = true)
-    public JoAcceptance findByCode(String code) {
-        List<JoAcceptance> pos = joAcceptanceRepo.findByCode(code);
+    public JobOrderAcceptance findByCode(String code) {
+        List<JobOrderAcceptance> pos = joAcceptanceRepo.findByCode(code);
 
         if (!Checker.collectionIsEmpty(pos)) {
             return pos.get(0);
@@ -106,14 +106,14 @@ public class JoAcceptanceServiceImpl implements JoAcceptanceService, PrintableVo
     @Override
     @Transactional
     public PostResponse processUpdate(DocumentNoApproval v, BindingResult bindingResult, MessageSource messageSource) {
-        JoAcceptance joAcceptance = (JoAcceptance) v;
-        return this.processCreate(joAcceptance, bindingResult, messageSource);
+        JobOrderAcceptance jobOrderAcceptance = (JobOrderAcceptance) v;
+        return this.processCreate(jobOrderAcceptance, bindingResult, messageSource);
     }
 
     @Override
     @Transactional
     public PostResponse processCreate(DocumentNoApproval v, BindingResult bindingResult, MessageSource messageSource) {
-        JoAcceptance joAcceptance = (JoAcceptance) v;
+        JobOrderAcceptance jobOrderAcceptance = (JobOrderAcceptance) v;
         PostResponse response = new PostResponse();
         response.setSuccess(false);
 
@@ -121,35 +121,35 @@ public class JoAcceptanceServiceImpl implements JoAcceptanceService, PrintableVo
 
         JoAcceptanceValidator validator = new JoAcceptanceValidator();
         validator.setService(this);
-        validator.validate(joAcceptance, bindingResult);
+        validator.validate(jobOrderAcceptance, bindingResult);
 
         if (bindingResult.hasErrors()) {
             messageFormatter.buildErrorMessages();
             response = messageFormatter.getResponse();
         } else {
             User createdBy = authenticationFacade.getLoggedIn();
-            JoAcceptance existingJoa = null;
+            JobOrderAcceptance existingJoa = null;
 
-            Integer voucherYear = Integer.parseInt(GlobalConstant.YYYY_DATE_FORMAT.format(joAcceptance.getVoucherDate()));
+            Integer voucherYear = Integer.parseInt(GlobalConstant.YYYY_DATE_FORMAT.format(jobOrderAcceptance.getVoucherDate()));
 
-            User inspectedBy = joAcceptance.getInspectedBy() != null ? userRepo.findOneByAccountNo(joAcceptance.getInspectedBy().getAccountNo()):null;
+            User inspectedBy = jobOrderAcceptance.getInspectedBy() != null ? userRepo.findOneByAccountNo(jobOrderAcceptance.getInspectedBy().getAccountNo()):null;
 
-            Boolean insertMode = joAcceptance.getId() == null;
+            Boolean insertMode = jobOrderAcceptance.getId() == null;
             if (insertMode) { // insert mode
 
                 Object latestJoaCode = joAcceptanceRepo.findLatestJoAcceptanceCodeByYear(voucherYear);
-                joAcceptance.setCode(generatorFacade.voucherCodeNoOffice("JOA", (latestJoaCode == null ? "" : String.valueOf(latestJoaCode)), joAcceptance.getVoucherDate(), GlobalConstant.COUNTER_PAD_4));
+                jobOrderAcceptance.setCode(generatorFacade.voucherCodeNoOffice("JOA", (latestJoaCode == null ? "" : String.valueOf(latestJoaCode)), jobOrderAcceptance.getVoucherDate(), GlobalConstant.COUNTER_PAD_4));
 
                 DocumentStatus documentStatus = new DocumentStatus();
                 documentStatus.setId(com.noreco1.fireflyv2.model.enums.DocumentStatus.DOCUMENT_CREATED.getId());
-                joAcceptance.setDocumentStatus(documentStatus);
+                jobOrderAcceptance.setDocumentStatus(documentStatus);
 
-                joAcceptance.setTransaction(generatorFacade.transaction());
-                joAcceptance.setCreatedBy(createdBy);
-                joAcceptance.setHasPayReq(false);
-                existingJoa = joAcceptance;
+                jobOrderAcceptance.setTransaction(generatorFacade.transaction());
+                jobOrderAcceptance.setCreatedBy(createdBy);
+                jobOrderAcceptance.setHasPayReq(false);
+                existingJoa = jobOrderAcceptance;
             } else {
-                existingJoa = joAcceptanceRepo.findById(joAcceptance.getId()).orElse(null);
+                existingJoa = joAcceptanceRepo.findById(jobOrderAcceptance.getId()).orElse(null);
             }
             // use for document logging
             Map oldMap = this.forLogMapMain(existingJoa);
@@ -162,22 +162,22 @@ public class JoAcceptanceServiceImpl implements JoAcceptanceService, PrintableVo
                 wf.setId(com.noreco1.fireflyv2.model.enums.Workflow.JOA.getId());
             }
 
-            joAcceptance.setWorkflow(wf);
-            existingJoa.setVendor(joAcceptance.getVendor());
-            existingJoa.setJobOrder(joAcceptance.getJobOrder());
-            existingJoa.setVoucherDate(joAcceptance.getVoucherDate());
+            jobOrderAcceptance.setWorkflow(wf);
+            existingJoa.setVendor(jobOrderAcceptance.getVendor());
+            existingJoa.setJobOrder(jobOrderAcceptance.getJobOrder());
+            existingJoa.setVoucherDate(jobOrderAcceptance.getVoucherDate());
             existingJoa.setYear(voucherYear);
             existingJoa.setInspectedBy(inspectedBy);
-            existingJoa.setAmount(joAcceptance.getAmount());
-            existingJoa.setType(joAcceptance.getType());
-            existingJoa.setNetAmount(joAcceptance.getNetAmount());
-            existingJoa.setAdjustment(joAcceptance.getAdjustment());
-            existingJoa.setInvoiceNumber(joAcceptance.getInvoiceNumber());
-            existingJoa.setInvoiceDate(joAcceptance.getInvoiceDate());
+            existingJoa.setAmount(jobOrderAcceptance.getAmount());
+            existingJoa.setType(jobOrderAcceptance.getType());
+            existingJoa.setNetAmount(jobOrderAcceptance.getNetAmount());
+            existingJoa.setAdjustment(jobOrderAcceptance.getAdjustment());
+            existingJoa.setInvoiceNumber(jobOrderAcceptance.getInvoiceNumber());
+            existingJoa.setInvoiceDate(jobOrderAcceptance.getInvoiceDate());
 
             boolean isFullPayment = false;
 
-            ArrayList<JoAcceptanceDetailDto> joaDetails = joAcceptance.getJoAcceptanceDetails();
+            ArrayList<JoAcceptanceDetailDto> joaDetails = jobOrderAcceptance.getJoAcceptanceDetails();
             for(JoAcceptanceDetailDto joAcceptanceDetailLine: joaDetails) {
                 boolean itemFullyAccepted = joAcceptanceDetailLine.getRemainingAmount().equals(joAcceptanceDetailLine.getItemAmount());
 
@@ -197,7 +197,7 @@ public class JoAcceptanceServiceImpl implements JoAcceptanceService, PrintableVo
                 // end: update default signatories
 
                 if (!insertMode) {
-                    joAcceptanceDetailRepo.deleteByJoAcceptanceId(existingJoa.getId());
+                    joAcceptanceDetailRepo.deleteByJobOrderAcceptanceId(existingJoa.getId());
                 }
 
                 if (insertMode) { // log action only when adding document
@@ -205,31 +205,31 @@ public class JoAcceptanceServiceImpl implements JoAcceptanceService, PrintableVo
                     oldMap = null;
                 }
 
-                ArrayList<JoAcceptanceDetailDto> joAcceptanceDetails = joAcceptance.getJoAcceptanceDetails();
+                ArrayList<JoAcceptanceDetailDto> joAcceptanceDetails = jobOrderAcceptance.getJoAcceptanceDetails();
                 for(JoAcceptanceDetailDto joAcceptanceDetailLine: joAcceptanceDetails) {
 
-                    JoAcceptanceDetail joAcceptanceDetail = new JoAcceptanceDetail();
+                    JobOrderAcceptanceDetail jobOrderAcceptanceDetail = new JobOrderAcceptanceDetail();
 
-                    JoAcceptance joa1 = new JoAcceptance();
+                    JobOrderAcceptance joa1 = new JobOrderAcceptance();
                     joa1.setId(this.model.getId());
-                    joAcceptanceDetail.setJoAcceptance(joa1);
+                    jobOrderAcceptanceDetail.setJobOrderAcceptance(joa1);
 
-                    JoDetail joDetail = new JoDetail();
-                    joDetail.setId(joAcceptanceDetailLine.getJoDetailId());
-                    joDetail.setAcceptedAmount(joAcceptanceDetailLine.getAcceptedAmount());
-                    joAcceptanceDetail.setJoDetail(joDetail);
+                    JobOrderDetail jobOrderDetail = new JobOrderDetail();
+                    jobOrderDetail.setId(joAcceptanceDetailLine.getJoDetailId());
+                    jobOrderDetail.setAcceptedAmount(joAcceptanceDetailLine.getAcceptedAmount());
+                    jobOrderAcceptanceDetail.setJobOrderDetail(jobOrderDetail);
 
-                    joAcceptanceDetail.setQuantity(joAcceptanceDetailLine.getQuantity());
-                    joAcceptanceDetail.setUnitPrice(joAcceptanceDetailLine.getUnitPrice());
-                    joAcceptanceDetail.setVat(joAcceptanceDetailLine.getVat());
-                    joAcceptanceDetail.setDiscount(joAcceptanceDetailLine.getDiscount());
-                    joAcceptanceDetail.setAmount(joAcceptanceDetailLine.getItemAmount());
-                    joAcceptanceDetail.setAdjustment(joAcceptanceDetailLine.getAdjustment());
-                    joAcceptanceDetail.setNetAmount(joAcceptanceDetailLine.getNetAmount());
+                    jobOrderAcceptanceDetail.setQuantity(joAcceptanceDetailLine.getQuantity());
+                    jobOrderAcceptanceDetail.setUnitPrice(joAcceptanceDetailLine.getUnitPrice());
+                    jobOrderAcceptanceDetail.setVat(joAcceptanceDetailLine.getVat());
+                    jobOrderAcceptanceDetail.setDiscount(joAcceptanceDetailLine.getDiscount());
+                    jobOrderAcceptanceDetail.setAmount(joAcceptanceDetailLine.getItemAmount());
+                    jobOrderAcceptanceDetail.setAdjustment(joAcceptanceDetailLine.getAdjustment());
+                    jobOrderAcceptanceDetail.setNetAmount(joAcceptanceDetailLine.getNetAmount());
 
-                    JoAcceptanceDetail newJoad = joAcceptanceDetailRepo.save(joAcceptanceDetail);
+                    JobOrderAcceptanceDetail newJoad = joAcceptanceDetailRepo.save(jobOrderAcceptanceDetail);
                     if(newJoad != null){
-                        joDetailRepo.updateAcceptedAmountById(joDetail.getId(), joDetail.getAcceptedAmount());
+                        joDetailRepo.updateAcceptedAmountById(jobOrderDetail.getId(), jobOrderDetail.getAcceptedAmount());
                     }
                 }
                 // generic document logging here
@@ -282,7 +282,7 @@ public class JoAcceptanceServiceImpl implements JoAcceptanceService, PrintableVo
     @Override
     @Transactional(readOnly = true)
     public org.springframework.data.domain.Page<ApvPurchasingDocumentDto> findAllApprovedForApvPaged(String query, Pageable pageable) {
-        org.springframework.data.domain.Page<JoAcceptance> joAcceptances;
+        org.springframework.data.domain.Page<JobOrderAcceptance> joAcceptances;
         if(query != null){
             joAcceptances = joAcceptanceRepo.findAllByQueryForApv("%"+query+"%", com.noreco1.fireflyv2.model.enums.DocumentStatus.APPROVED.getId(), DocumentType.JOA.getId(), pageable);
         } else {
@@ -311,7 +311,7 @@ public class JoAcceptanceServiceImpl implements JoAcceptanceService, PrintableVo
     @Override
     public Page<CvVoucherDto> findAllApprovedForCvPaged(String query, Pageable pageable) {
 
-        org.springframework.data.domain.Page<JoAcceptance> joAcceptances;
+        org.springframework.data.domain.Page<JobOrderAcceptance> joAcceptances;
 
         if(query != null){
             joAcceptances = joAcceptanceRepo.findAllByQueryAndDocumentStatusForCv("%"+query+"%", com.noreco1.fireflyv2.model.enums.DocumentStatus.APPROVED.getId(), pageable);
@@ -334,7 +334,7 @@ public class JoAcceptanceServiceImpl implements JoAcceptanceService, PrintableVo
                 dto.setExtensionUrl("jo-acceptance");
                 dto.setBudgetLineItemDetail(null);
 
-                List<JoDetail> details = joDetailRepo.findByJobOrderId(entity.getJobOrder().getId());
+                List<JobOrderDetail> details = joDetailRepo.findByJobOrderId(entity.getJobOrder().getId());
                 if(!details.isEmpty()){
 
                     if(details.get(0).getPurchaseRequestDetail() != null){
@@ -359,7 +359,7 @@ public class JoAcceptanceServiceImpl implements JoAcceptanceService, PrintableVo
         DocumentLog documentLog = documentLogRepo.findById(logId).orElse(null);
 
         if (documentLog != null) {
-            JoAcceptance doc = joAcceptanceRepo.findOneByTransactionId(documentLog.getTransaction().getId());
+            JobOrderAcceptance doc = joAcceptanceRepo.findOneByTransactionId(documentLog.getTransaction().getId());
 
             if (doc != null) {
                 Map map = forLogMapMain(doc);
@@ -379,11 +379,11 @@ public class JoAcceptanceServiceImpl implements JoAcceptanceService, PrintableVo
     public List<JoAcceptanceListDto> findAll() {
         try {
 
-            List<JoAcceptance> vouchers = joAcceptanceRepo.findAll();
+            List<JobOrderAcceptance> vouchers = joAcceptanceRepo.findAll();
 
             List<JoAcceptanceListDto> returnVouchers = new ArrayList<>();
             if (!Checker.collectionIsEmpty(vouchers)) {
-                for(JoAcceptance joa : vouchers) {
+                for(JobOrderAcceptance joa : vouchers) {
                     JoAcceptanceListDto joAcceptanceListDto = new JoAcceptanceListDto();
                     joAcceptanceListDto.setId(joa.getId());
                     joAcceptanceListDto.setVoucherDate(joa.getVoucherDate());
@@ -411,11 +411,11 @@ public class JoAcceptanceServiceImpl implements JoAcceptanceService, PrintableVo
     @Override
     public List<JoAcceptanceListDto> findByPayReq() {
 
-        List<JoAcceptance> vouchers = joAcceptanceRepo.findByPayReqAndStatusId(false, com.noreco1.fireflyv2.model.enums.DocumentStatus.APPROVED.getId());
+        List<JobOrderAcceptance> vouchers = joAcceptanceRepo.findByPayReqAndStatusId(false, com.noreco1.fireflyv2.model.enums.DocumentStatus.APPROVED.getId());
 
         List<JoAcceptanceListDto> returnVouchers = new ArrayList<>();
         if (!Checker.collectionIsEmpty(vouchers)) {
-            for(JoAcceptance joa : vouchers) {
+            for(JobOrderAcceptance joa : vouchers) {
                 JoAcceptanceListDto joAcceptanceListDto = new JoAcceptanceListDto();
                 joAcceptanceListDto.setId(joa.getId());
                 joAcceptanceListDto.setVoucherDate(joa.getVoucherDate());
@@ -474,7 +474,7 @@ public class JoAcceptanceServiceImpl implements JoAcceptanceService, PrintableVo
                 toDate = new java.util.Date();
             }
 
-            List<JoAcceptance> docs = joAcceptanceRepo.findByDocumentStatusIdAndVoucherDateBetweenAndCreatedById(id, fromDate, toDate, authenticationFacade.getLoggedIn().getId());
+            List<JobOrderAcceptance> docs = joAcceptanceRepo.findByDocumentStatusIdAndVoucherDateBetweenAndCreatedById(id, fromDate, toDate, authenticationFacade.getLoggedIn().getId());
             return this.makeJOAListMap(docs);
         }catch (Exception ex) {
             ex.printStackTrace();
@@ -505,7 +505,7 @@ public class JoAcceptanceServiceImpl implements JoAcceptanceService, PrintableVo
                     com.noreco1.fireflyv2.model.enums.DocumentStatus.CANCELLED.getId()
             };
 
-            List<JoAcceptance> docs = joAcceptanceRepo.findByVoucherDateBetweenAndDocumentStatusIdNotInAndCreatedById(fromDate, toDate, Arrays.asList(ids), authenticationFacade.getLoggedIn().getId());
+            List<JobOrderAcceptance> docs = joAcceptanceRepo.findByVoucherDateBetweenAndDocumentStatusIdNotInAndCreatedById(fromDate, toDate, Arrays.asList(ids), authenticationFacade.getLoggedIn().getId());
             return this.makeJOAListMap(docs);
 
         }catch (Exception ex) {
@@ -518,7 +518,7 @@ public class JoAcceptanceServiceImpl implements JoAcceptanceService, PrintableVo
     @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public JoAcceptanceDto findById(Integer id) {
-        JoAcceptance joa =  joAcceptanceRepo.findById(id).orElse(null);
+        JobOrderAcceptance joa =  joAcceptanceRepo.findById(id).orElse(null);
         JoAcceptanceDto joaDto = new JoAcceptanceDto();
 
         List<Object[]> list = joAcceptanceRepo.findJobOrderById(id);
@@ -532,6 +532,7 @@ public class JoAcceptanceServiceImpl implements JoAcceptanceService, PrintableVo
                 joDto.setAmount(v.getAmount());
                 joDto.setVendor(v.getVendor());
                 joDto.setLocalCode(v.getCode());
+                joDto.setVoucherDate(v.getVoucherDate());
                 joDto.setTransId(v.getTransaction().getId());
             }
         }
@@ -571,34 +572,34 @@ public class JoAcceptanceServiceImpl implements JoAcceptanceService, PrintableVo
     public HashMap reportParameters(Integer id, HttpServletRequest request) {
         HashMap<String, Object> params = ReportUtil.setupSharedReportHeaders(request);
 
-        JoAcceptance joAcceptance = joAcceptanceRepo.findById(id).orElse(null);
+        JobOrderAcceptance jobOrderAcceptance = joAcceptanceRepo.findById(id).orElse(null);
 
-        if (joAcceptance != null) {
+        if (jobOrderAcceptance != null) {
 
-            Employee preparedBy = employeeRepo.findOneByAccountNumber(joAcceptance.getCreatedBy().getAccountNo());
+            Employee preparedBy = employeeRepo.findOneByAccountNumber(jobOrderAcceptance.getCreatedBy().getAccountNo());
 
-            if(joAcceptance.getInspectedBy() != null){
-                Employee inspectedBy = employeeRepo.findOneByAccountNumber(joAcceptance.getInspectedBy().getAccountNo());
+            if(jobOrderAcceptance.getInspectedBy() != null){
+                Employee inspectedBy = employeeRepo.findOneByAccountNumber(jobOrderAcceptance.getInspectedBy().getAccountNo());
 
                 params.put("INSPECTEDBY", inspectedBy.getName());
                 params.put("INSPECTEDBY_POS", inspectedBy.getPosition() == null ? "":inspectedBy.getPosition().getName());
                 params.put("INSPECTEDBY_HEADER", "Inspected By: ");
 
             }
-            params.put("VOUCHER_NO", joAcceptance.getCode());
-            params.put("V_DATE", joAcceptance.getVoucherDate());
-            params.put("JO_DESCRIPTION", joAcceptance.getJobOrder().getDescription());
-            params.put("INVOICE_DATE", joAcceptance.getInvoiceDate());
-            params.put("INVOICE_NUMBER", joAcceptance.getInvoiceNumber());
+            params.put("VOUCHER_NO", jobOrderAcceptance.getCode());
+            params.put("V_DATE", jobOrderAcceptance.getVoucherDate());
+            params.put("JO_DESCRIPTION", jobOrderAcceptance.getJobOrder().getDescription());
+            params.put("INVOICE_DATE", jobOrderAcceptance.getInvoiceDate());
+            params.put("INVOICE_NUMBER", jobOrderAcceptance.getInvoiceNumber());
             params.put("PREPAREDBY", preparedBy.getName());
             params.put("PREPAREDBY_POS", preparedBy.getPosition() == null ? "":preparedBy.getPosition().getName());
-            params.put("SUPPLIER", joAcceptance.getVendor().getName());
-            params.put("SUPPLIER_ADDRESS", joAcceptance.getVendor().getAddress());
-            params.put("AMOUNT", joAcceptance.getNetAmount());
-            params.put("AMOUNT_IN_WORDS", CurrencyIntoWords.convert(joAcceptance.getNetAmount()) + "  (Php. " + new DecimalFormat("#,##0.00").format(joAcceptance.getNetAmount()) + ")");
-            params.put("PAYMENT_TYPE", joAcceptance.getIsFullPayment() ? "full" : "partial");
-            params.put("JO_NO", joAcceptance.getJobOrder().getCode());
-            params = signatureFacade.getDocumentSignature(params, com.noreco1.fireflyv2.model.enums.DocumentType.JOA, joAcceptance);
+            params.put("SUPPLIER", jobOrderAcceptance.getVendor().getName());
+            params.put("SUPPLIER_ADDRESS", jobOrderAcceptance.getVendor().getAddress());
+            params.put("AMOUNT", jobOrderAcceptance.getNetAmount());
+            params.put("AMOUNT_IN_WORDS", CurrencyIntoWords.convert(jobOrderAcceptance.getNetAmount()) + "  (Php. " + new DecimalFormat("#,##0.00").format(jobOrderAcceptance.getNetAmount()) + ")");
+            params.put("PAYMENT_TYPE", jobOrderAcceptance.getIsFullPayment() ? "full" : "partial");
+            params.put("JO_NO", jobOrderAcceptance.getJobOrder().getCode());
+            params = signatureFacade.getDocumentSignature(params, com.noreco1.fireflyv2.model.enums.DocumentType.JOA, jobOrderAcceptance);
         }
 
         return params;
@@ -608,7 +609,7 @@ public class JoAcceptanceServiceImpl implements JoAcceptanceService, PrintableVo
     public JRDataSource datasource(Integer id) {
         List<JOADetail> details = new ArrayList<>();
 
-        JoAcceptance voucher = joAcceptanceRepo.findById(id).orElse(null);
+        JobOrderAcceptance voucher = joAcceptanceRepo.findById(id).orElse(null);
         if (voucher != null) {
             List<JoAcceptanceDetailDto> joAcceptanceDetailDtos = joAcceptanceDetailDto.getJoaDetails(id);
 
@@ -637,34 +638,34 @@ public class JoAcceptanceServiceImpl implements JoAcceptanceService, PrintableVo
         PostResponse response = new PostResponse();
 
         User processedBy = authenticationFacade.getLoggedIn();
-        JoAcceptance joAcceptance =  joAcceptanceRepo.findById(postData.getDocumentId()).orElse(null);
+        JobOrderAcceptance jobOrderAcceptance =  joAcceptanceRepo.findById(postData.getDocumentId()).orElse(null);
 
-        if (joAcceptance != null) {
+        if (jobOrderAcceptance != null) {
             // for logging
-            Map oldMap = this.forLogMapMain(joAcceptance);
+            Map oldMap = this.forLogMapMain(jobOrderAcceptance);
             DocumentWorkflowActionMap actionMap = workflowActionMapRepo.findById(postData.getWorkflowActionsDto().getActionMapId()).orElse(null);
             DocumentStatus afterActionDocumentStatus = actionMap.getAfterActionDocumentStatus();
 
             // set dynamic property here
             if (actionMap.getPropSignatureType() != null) {
                 try {
-                    ClassHelper.setSignatoryValue(joAcceptance, joAcceptance.getClass().getName(), actionMap.getPropSignatureType(), processedBy);
+                    ClassHelper.setSignatoryValue(jobOrderAcceptance, jobOrderAcceptance.getClass().getName(), actionMap.getPropSignatureType(), processedBy);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
 
-            joAcceptance.setDocumentStatus(afterActionDocumentStatus);
-            joAcceptance.setUpdatedAt(null);
-            joAcceptance = joAcceptanceRepo.save(joAcceptance);
+            jobOrderAcceptance.setDocumentStatus(afterActionDocumentStatus);
+            jobOrderAcceptance.setUpdatedAt(null);
+            jobOrderAcceptance = joAcceptanceRepo.save(jobOrderAcceptance);
 
             // for logging
-            Map newMap = this.forLogMapMain(joAcceptance);
+            Map newMap = this.forLogMapMain(jobOrderAcceptance);
             newMap.put("remarks", postData.getRemarks());
 
-            if (joAcceptance != null) {
-                documentProcessingFacade.processAction(joAcceptance.getTransaction(), actionMap, null, processedBy);
-                documentLoggerFacade.log(joAcceptance.getTransaction(), authenticationFacade.getLoggedIn(), oldMap, newMap);
+            if (jobOrderAcceptance != null) {
+                documentProcessingFacade.processAction(jobOrderAcceptance.getTransaction(), actionMap, null, processedBy);
+                documentLoggerFacade.log(jobOrderAcceptance.getTransaction(), authenticationFacade.getLoggedIn(), oldMap, newMap);
 
                 response.setSuccessMessage("Document successfully processed");
                 response.setSuccess(true);
@@ -697,30 +698,30 @@ public class JoAcceptanceServiceImpl implements JoAcceptanceService, PrintableVo
 
     @Override
     public List<DocumentStatus> getDocumentsStatuses() {
-        JoAcceptance jo = joAcceptanceRepo.findFirstByOrderByIdAsc();
+        JobOrderAcceptance jo = joAcceptanceRepo.findFirstByOrderByIdAsc();
         if (jo != null) {
             return documentDtoer.getDocumentStatuses(jo.getWorkflow().getId());
         }
         return null;
     }
 
-    private Map forLogMapMain(JoAcceptance joa) {
+    private Map forLogMapMain(JobOrderAcceptance joa) {
         return documentLoggerFacade.makeLog(joa);
     }
 
-    private List<Map> makeJOAListMap(List<JoAcceptance> cs ) {
+    private List<Map> makeJOAListMap(List<JobOrderAcceptance> cs ) {
 
         List<Map> mapList = new ArrayList<>();
 
         if (!Checker.collectionIsEmpty(cs)) {
-            for(JoAcceptance c:cs) {
+            for(JobOrderAcceptance c:cs) {
                 mapList.add(composeJOAMap(c));
             }
         }
         return mapList;
     }
 
-    private Map composeJOAMap(JoAcceptance r) {
+    private Map composeJOAMap(JobOrderAcceptance r) {
         Map map = new HashMap();
 
         map.put("id", r.getId());

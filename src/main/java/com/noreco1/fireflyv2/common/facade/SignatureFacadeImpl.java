@@ -1,7 +1,6 @@
 package com.noreco1.fireflyv2.common.facade;
 
 import com.noreco1.fireflyv2.model.*;
-import com.noreco1.fireflyv2.model.enums.*;
 import com.noreco1.fireflyv2.model.enums.DocumentStatus;
 import com.noreco1.fireflyv2.model.enums.DocumentType;
 import com.noreco1.fireflyv2.model.enums.Workflow;
@@ -15,7 +14,6 @@ import org.springframework.stereotype.Component;
 import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 
 /**
@@ -535,7 +533,7 @@ public class SignatureFacadeImpl implements SignatureFacade {
                     break;
 
                     case JOA: {
-                        JoAcceptance joa = (JoAcceptance) document;
+                        JobOrderAcceptance joa = (JobOrderAcceptance) document;
 
                         Employee preparar = employeeRepo.findOneByAccountNumber(joa.getCreatedBy().getAccountNo());
                         Employee inspectedBy = joa.getInspectedBy() != null ? employeeRepo.findOneByAccountNumber(joa.getInspectedBy().getAccountNo()):null;

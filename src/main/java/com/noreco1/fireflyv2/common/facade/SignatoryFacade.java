@@ -16,7 +16,7 @@ public interface SignatoryFacade {
     void po(PurchaseOrder po);
     void quotation(Quotation quotation);
     void jo(JobOrder jo);
-    void joAcceptance(JoAcceptance joAcceptance);
+    void joAcceptance(JobOrderAcceptance jobOrderAcceptance);
     void ca(CashAdvance cashAdvance);
     void cal(CashAdvanceLiquidation cashAdvanceLiquidation);
     void pr(PaymentRequest paymentRequest);

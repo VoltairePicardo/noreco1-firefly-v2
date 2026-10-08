@@ -709,13 +709,13 @@ public class DocumentDtoerImpl implements DocumentDtoer {
                     break;
                 case JOA:
 
-                    List<JoAcceptance> docsJoa = joAcceptanceRepo.findByVoucherDateBetweenAndDocumentStatusIdNotIn(
+                    List<JobOrderAcceptance> docsJoa = joAcceptanceRepo.findByVoucherDateBetweenAndDocumentStatusIdNotIn(
                             fromDate,
                             toDate,
                             Arrays.asList(nonPendingStatusIds));
 
                     if (!docsJoa.isEmpty()) {
-                        for (JoAcceptance row:docsJoa) {
+                        for (JobOrderAcceptance row:docsJoa) {
                             Map map = this.composeDocCommonDataMap(row);
                             map.put("amount", row.getAmount());
                             map.put("date", row.getVoucherDate());

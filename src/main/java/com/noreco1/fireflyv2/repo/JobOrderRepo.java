@@ -29,9 +29,9 @@ public interface JobOrderRepo extends JpaRepository<JobOrder, Integer> {
             "INNER JOIN JobOrder jo ON jo.FK_vendorAccountNo = s.accountNo " +
             "WHERE jo.FK_documentStatusId = :statusId " +
             "AND jo.id NOT IN (" +
-            "SELECT jod1.FK_jobOrderId FROM JoDetail jod1 " +
-            "WHERE (SELECT sum(jod.amount) FROM JoDetail jod WHERE jod.FK_jobOrderId = jod1.FK_jobOrderId) " +
-            "= (SELECT sum(jod.acceptedAmount) FROM JoDetail jod WHERE jod.FK_jobOrderId = jod1.FK_jobOrderId) " +
+            "SELECT jod1.FK_jobOrderId FROM JobOrderDetail jod1 " +
+            "WHERE (SELECT sum(jod.amount) FROM JobOrderDetail jod WHERE jod.FK_jobOrderId = jod1.FK_jobOrderId) " +
+            "= (SELECT sum(jod.acceptedAmount) FROM JobOrderDetail jod WHERE jod.FK_jobOrderId = jod1.FK_jobOrderId) " +
             "GROUP BY jod1.FK_jobOrderId)", nativeQuery = true)
     public List<JobOrder> findJobOrderSuppliersForJoa(@Param("statusId") Integer statusId);
 
@@ -39,15 +39,15 @@ public interface JobOrderRepo extends JpaRepository<JobOrder, Integer> {
             "WHERE jo.FK_vendorAccountNo = :accountNo " +
             "AND jo.FK_documentStatusId = :statusId " +
             "AND jo.id NOT IN (" +
-            "SELECT jod1.FK_jobOrderId FROM JoDetail jod1 " +
-            "WHERE (SELECT sum(jod.amount) FROM JoDetail jod WHERE jod.FK_jobOrderId = jod1.FK_jobOrderId) " +
-            "= (SELECT sum(jod.acceptedAmount) FROM JoDetail jod WHERE jod.FK_jobOrderId = jod1.FK_jobOrderId) " +
+            "SELECT jod1.FK_jobOrderId FROM JobOrderDetail jod1 " +
+            "WHERE (SELECT sum(jod.amount) FROM JobOrderDetail jod WHERE jod.FK_jobOrderId = jod1.FK_jobOrderId) " +
+            "= (SELECT sum(jod.acceptedAmount) FROM JobOrderDetail jod WHERE jod.FK_jobOrderId = jod1.FK_jobOrderId) " +
             "GROUP BY jod1.FK_jobOrderId)", nativeQuery = true)
     public List<JobOrder> findJobOrdersForJoa(@Param("accountNo") Integer accountNo,
                                               @Param("statusId") Integer statusId);
 
     @Query(value = "SELECT * FROM JobOrder jo " +
-            "LEFT JOIN JoAcceptance joa ON jo.id = joa.FK_jobOrderId " +
+            "LEFT JOIN JobOrderAcceptance joa ON jo.id = joa.FK_jobOrderId " +
             "WHERE jo.FK_documentStatusId = :statusId " +
             "AND joa.id IS null", nativeQuery = true)
     public List<JobOrder> findJobOrdersForCV(@Param("statusId") Integer statusId);
@@ -60,7 +60,7 @@ public interface JobOrderRepo extends JpaRepository<JobOrder, Integer> {
             "sup.name, " +
             "jo.term, " +
             "jo.amount, " +
-            "(SELECT COUNT(id) FROM JoDetail WHERE FK_jobOrderId = jo.id) AS noOfItems, " +
+            "(SELECT COUNT(id) FROM JobOrderDetail WHERE FK_jobOrderId = jo.id) AS noOfItems, " +
             "d.status " +
             "FROM JobOrder jo " +
             "INNER JOIN Supplier sup ON sup.FK_accountNo = jo.FK_vendorAccountNo " +
@@ -78,7 +78,7 @@ public interface JobOrderRepo extends JpaRepository<JobOrder, Integer> {
             "sup.name, " +
             "jo.term, " +
             "jo.amount, " +
-            "(SELECT COUNT(id) FROM JoDetail WHERE FK_jobOrderId = jo.id) AS noOfItems, " +
+            "(SELECT COUNT(id) FROM JobOrderDetail WHERE FK_jobOrderId = jo.id) AS noOfItems, " +
             "d.status " +
             "FROM JobOrder jo " +
             "INNER JOIN Supplier sup ON sup.FK_accountNo = jo.FK_vendorAccountNo " +
@@ -96,7 +96,7 @@ public interface JobOrderRepo extends JpaRepository<JobOrder, Integer> {
             "sup.name, " +
             "doc.term, " +
             "doc.amount, " +
-            "(SELECT COUNT(id) FROM JoDetail WHERE FK_jobOrderId = doc.id) AS noOfItems, " +
+            "(SELECT COUNT(id) FROM JobOrderDetail WHERE FK_jobOrderId = doc.id) AS noOfItems, " +
             "d.status " +
             "FROM JobOrder doc " +
             "INNER JOIN Supplier sup ON sup.FK_accountNo = doc.FK_vendorAccountNo " +
@@ -120,7 +120,7 @@ public interface JobOrderRepo extends JpaRepository<JobOrder, Integer> {
             " FROM JobOrder p  " +
             " INNER JOIN Supplier s ON s.FK_accountNo = p.FK_vendorAccountNo  " +
             " WHERE p.FK_documentStatusId = :documentStatusId " +
-            " AND p.id IN (SELECT jod.FK_jobOrderId FROM JoDetail jod WHERE jod.quantity > jod.deliveredQuantity +  " +
+            " AND p.id IN (SELECT jod.FK_jobOrderId FROM JobOrderDetail jod WHERE jod.quantity > jod.deliveredQuantity +  " +
             " (SELECT COALESCE(SUM(rrd.quantityReceived), 0) FROM ReceivingReportDetail rrd INNER JOIN ReceivingReport rr ON rrd.FK_receivingReportId = rr.id  " +
             " WHERE rrd.FK_poDetailId = jod.id AND rr.FK_documentStatusId NOT IN (7,8,26))) " +
             "AND (p.code LIKE :filter OR s.name LIKE :filter OR p.description LIKE :filter) " +
@@ -129,7 +129,7 @@ public interface JobOrderRepo extends JpaRepository<JobOrder, Integer> {
                     " FROM JobOrder p  " +
                     " INNER JOIN Supplier s ON s.FK_accountNo = p.FK_vendorAccountNo  " +
                     " WHERE p.FK_documentStatusId = :documentStatusId " +
-                    " AND p.id IN (SELECT jod.FK_jobOrderId FROM JoDetail jod WHERE jod.quantity > jod.deliveredQuantity +  " +
+                    " AND p.id IN (SELECT jod.FK_jobOrderId FROM JobOrderDetail jod WHERE jod.quantity > jod.deliveredQuantity +  " +
                     " (SELECT COALESCE(SUM(rrd.quantityReceived), 0) FROM ReceivingReportDetail rrd INNER JOIN ReceivingReport rr ON rrd.FK_receivingReportId = rr.id  " +
                     " WHERE rrd.FK_poDetailId = jod.id AND rr.FK_documentStatusId NOT IN (7,8,26))) " +
                     "AND (p.code LIKE :filter OR s.name LIKE :filter OR p.description LIKE :filter)",
@@ -141,7 +141,7 @@ public interface JobOrderRepo extends JpaRepository<JobOrder, Integer> {
             " FROM JobOrder p  " +
             " INNER JOIN Supplier s ON s.FK_accountNo = p.FK_vendorAccountNo  " +
             " WHERE p.FK_documentStatusId = :documentStatusId " +
-            " AND p.id IN (SELECT jod.FK_jobOrderId FROM JoDetail jod WHERE jod.quantity > jod.deliveredQuantity +  " +
+            " AND p.id IN (SELECT jod.FK_jobOrderId FROM JobOrderDetail jod WHERE jod.quantity > jod.deliveredQuantity +  " +
             " (SELECT COALESCE(SUM(rrd.quantityReceived), 0) FROM ReceivingReportDetail rrd INNER JOIN ReceivingReport rr ON rrd.FK_receivingReportId = rr.id  " +
             " WHERE rrd.FK_poDetailId = jod.id AND rr.FK_documentStatusId NOT IN (7,8,26))) " +
             "AND (p.code LIKE :filter OR s.name LIKE :filter OR p.description LIKE :filter) " +
@@ -151,7 +151,7 @@ public interface JobOrderRepo extends JpaRepository<JobOrder, Integer> {
                     " FROM JobOrder p  " +
                     " INNER JOIN Supplier s ON s.FK_accountNo = p.FK_vendorAccountNo  " +
                     " WHERE p.FK_documentStatusId = :documentStatusId " +
-                    " AND p.id IN (SELECT jod.FK_jobOrderId FROM JoDetail jod WHERE jod.quantity > jod.deliveredQuantity +  " +
+                    " AND p.id IN (SELECT jod.FK_jobOrderId FROM JobOrderDetail jod WHERE jod.quantity > jod.deliveredQuantity +  " +
                     " (SELECT COALESCE(SUM(rrd.quantityReceived), 0) FROM ReceivingReportDetail rrd INNER JOIN ReceivingReport rr ON rrd.FK_receivingReportId = rr.id  " +
                     " WHERE rrd.FK_poDetailId = jod.id AND rr.FK_documentStatusId NOT IN (7,8,26))) " +
                     "AND (p.code LIKE :filter OR s.name LIKE :filter OR p.description LIKE :filter)" +

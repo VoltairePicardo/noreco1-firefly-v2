@@ -28,6 +28,6 @@ public class CheckVoucherJoAcceptance implements Serializable {
 
     @ManyToOne
     @JoinColumn(name = "FK_joAcceptanceId")
-    private JoAcceptance joAcceptance;
+    private JobOrderAcceptance jobOrderAcceptance;
 
 }

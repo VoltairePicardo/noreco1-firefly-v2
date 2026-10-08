@@ -215,7 +215,7 @@ public class JobOrderServiceImpl implements JobOrderService, PrintableVoucher {
                 ArrayList<JoDetailDto> poDetails = jobOrder.getJoDetails();
                 for(JoDetailDto poDetailLine: poDetails) {
 
-                    JoDetail poDetail = new JoDetail();
+                    JobOrderDetail poDetail = new JobOrderDetail();
 
                     JobOrder jo1 = new JobOrder();
                     jo1.setId(this.model.getId());
@@ -232,7 +232,7 @@ public class JobOrderServiceImpl implements JobOrderService, PrintableVoucher {
                     poDetail.setDiscount(poDetailLine.getDiscount());
                     poDetail.setAmount(poDetailLine.getItemAmount());
 
-                    JoDetail newJod = joDetailRepo.save(poDetail);
+                    JobOrderDetail newJod = joDetailRepo.save(poDetail);
                     if(newJod != null){
                         PurchaseRequestDetailRepo.updatePoQuantityById(purchaseRequestDetail.getId(), purchaseRequestDetail.getPoQuantity());
                     }
@@ -616,15 +616,15 @@ public class JobOrderServiceImpl implements JobOrderService, PrintableVoucher {
             joDto.setCashFlowItemBalanceCV(jo.getCashFlowItemBalanceCV());
             joDto.setCashFlowItemTotal(jo.getCashFlowItemTotal());
 
-            List<JoDetail> joDetails = joDetailRepo.findByJobOrderId(jo.getId());
+            List<JobOrderDetail> jobOrderDetails = joDetailRepo.findByJobOrderId(jo.getId());
 
-            if(!joDetails.isEmpty()){
+            if(!jobOrderDetails.isEmpty()){
 
-                for(JoDetail joDetail : joDetails){
+                for(JobOrderDetail jobOrderDetail : jobOrderDetails){
 
-                    if(joDetail.getPurchaseRequestDetail() != null){
+                    if(jobOrderDetail.getPurchaseRequestDetail() != null){
 
-                        joDto.setPurchaseRequest(joDetail.getPurchaseRequestDetail().getPurchaseRequest());
+                        joDto.setPurchaseRequest(jobOrderDetail.getPurchaseRequestDetail().getPurchaseRequest());
 
                     }
 
@@ -668,14 +668,14 @@ public class JobOrderServiceImpl implements JobOrderService, PrintableVoucher {
                 params.put("CASH_FLOW_ITEM_AMOUNT", BigDecimal.ZERO);
             }
 
-            List<JoDetail> joDetails = this.joDetailRepo.findByJobOrderId(jobOrder.getId());
+            List<JobOrderDetail> jobOrderDetails = this.joDetailRepo.findByJobOrderId(jobOrder.getId());
 
             PurchaseRequest purchaseRequest = null;
 
-            if(Checker.collectionIsNotEmpty(joDetails)){
-                for (JoDetail joDetail : joDetails){
+            if(Checker.collectionIsNotEmpty(jobOrderDetails)){
+                for (JobOrderDetail jobOrderDetail : jobOrderDetails){
                     if(purchaseRequest == null) {
-                        PurchaseRequestDetail purchaseRequestDetail = this.purchaseRequestDetailRepo.findById(joDetail.getPurchaseRequestDetail().getId()).orElse(null);
+                        PurchaseRequestDetail purchaseRequestDetail = this.purchaseRequestDetailRepo.findById(jobOrderDetail.getPurchaseRequestDetail().getId()).orElse(null);
                         if(purchaseRequestDetail != null) {
                             purchaseRequest = purchaseRequestDetail.getPurchaseRequest();
                         }
@@ -719,9 +719,9 @@ public class JobOrderServiceImpl implements JobOrderService, PrintableVoucher {
         JobOrder voucher = jobOrderRepo.findById(id).orElse(null);
         if (voucher != null) {
 
-            List<JoDetail> works = joDetailRepo.findWorksByJobOrderId(voucher.getId());
+            List<JobOrderDetail> works = joDetailRepo.findWorksByJobOrderId(voucher.getId());
             if (!works.isEmpty()) {
-                for(JoDetail detail:works) {
+                for(JobOrderDetail detail:works) {
 
                     JODetail d = new JODetail();
                     d.setId(detail.getId());
@@ -735,7 +735,7 @@ public class JobOrderServiceImpl implements JobOrderService, PrintableVoucher {
                 }
             }
 
-            List<JoDetail> materials = joDetailRepo.findMaterialsByJobOrderId(voucher.getId());
+            List<JobOrderDetail> materials = joDetailRepo.findMaterialsByJobOrderId(voucher.getId());
             if (!materials.isEmpty()) {
 
                 if (!works.isEmpty()) {
@@ -749,7 +749,7 @@ public class JobOrderServiceImpl implements JobOrderService, PrintableVoucher {
                     details.add(blank2);
                 }
 
-                for(JoDetail detail:materials) {
+                for(JobOrderDetail detail:materials) {
 
                     JODetail d = new JODetail();
                     d.setId(detail.getId());

@@ -383,7 +383,7 @@ public class DocumentCancellationServiceImpl implements DocumentCancellationServ
                     break;
                 case JOA:
 
-                    JoAcceptance joa = joAcceptanceRepo.findOneByTransactionId(documentTransId);
+                    JobOrderAcceptance joa = joAcceptanceRepo.findOneByTransactionId(documentTransId);
                     if (joa != null) {
 
                         oldValuesMap = documentLoggerFacade.makeLog(joa); // old values, prior to cancellation
@@ -915,7 +915,7 @@ public class DocumentCancellationServiceImpl implements DocumentCancellationServ
                     break;
                 case JOA:
 
-                    JoAcceptance joa = joAcceptanceRepo.findOneByTransactionId(documentTransId);
+                    JobOrderAcceptance joa = joAcceptanceRepo.findOneByTransactionId(documentTransId);
                     if (joa != null) {
 
                         oldValuesMap = documentLoggerFacade.makeLog(joa);

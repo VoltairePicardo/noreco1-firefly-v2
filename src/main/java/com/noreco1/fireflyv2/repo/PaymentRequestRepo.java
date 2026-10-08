@@ -35,16 +35,16 @@ public interface PaymentRequestRepo extends JpaRepository<PaymentRequest, Intege
     @Query(value = "SELECT  " +
             "DISTINCT PaymentRequest.id, " +
             "PaymentRequest.code as code, " +
-            "JoAcceptance.netAmount, " +
-            "CONCAT(JoAcceptance.code, ' - ', slentity.name) as particulars, " +
+            "JobOrderAcceptance.netAmount, " +
+            "CONCAT(JobOrderAcceptance.code, ' - ', slentity.name) as particulars, " +
             "PaymentRequest.voucherDate, " +
             "u.fullName as preparedBy, " +
             "slentity.accountNo as accountNo, " +
             "slentity.name as slentityName " +
             "FROM PaymentRequest " +
-            "JOIN JoAcceptance ON PaymentRequest.FK_joAcceptanceId = JoAcceptance.id " +
+            "JOIN JobOrderAcceptance ON PaymentRequest.FK_joAcceptanceId = JobOrderAcceptance.id " +
             "JOIN User u ON PaymentRequest.FK_createdByUserId = u.id  " +
-            "JOIN slentity ON JoAcceptance.FK_vendorAccountNo = slentity.accountNo " +
+            "JOIN slentity ON JobOrderAcceptance.FK_vendorAccountNo = slentity.accountNo " +
             "WHERE PaymentRequest.FK_documentStatusId = :documentStatusId " +
             "AND PaymentRequest.id NOT IN (SELECT a.FK_linkedDocumentId FROM AccountsPayableVoucherLink a " +
             "INNER JOIN AccountsPayableVoucher apv ON a.FK_accountsPayableVoucherId = apv.id " +
@@ -79,7 +79,7 @@ public interface PaymentRequestRepo extends JpaRepository<PaymentRequest, Intege
             "joa.netAmount, " +
             "d.status " +
             "FROM PaymentRequest doc " +
-            "INNER JOIN JoAcceptance joa on joa.id = doc.FK_joAcceptanceId " +
+            "INNER JOIN JobOrderAcceptance joa on joa.id = doc.FK_joAcceptanceId " +
             "INNER JOIN Supplier sup ON sup.FK_accountNo = joa.FK_vendorAccountNo " +
             "INNER JOIN DocumentStatus d ON d.id = doc.FK_documentStatusId " +
             "WHERE doc.voucherDate >= :from AND doc.voucherDate <= :to " +
@@ -97,7 +97,7 @@ public interface PaymentRequestRepo extends JpaRepository<PaymentRequest, Intege
             "joa.netAmount, " +
             "d.status " +
             "FROM PaymentRequest doc " +
-            "INNER JOIN JoAcceptance joa on joa.id = doc.FK_joAcceptanceId " +
+            "INNER JOIN JobOrderAcceptance joa on joa.id = doc.FK_joAcceptanceId " +
             "INNER JOIN Supplier sup ON sup.FK_accountNo = joa.FK_vendorAccountNo " +
             "INNER JOIN DocumentStatus d ON d.id = doc.FK_documentStatusId " +
             "WHERE doc.voucherDate >= :from AND doc.voucherDate <= :to " +
@@ -114,7 +114,7 @@ public interface PaymentRequestRepo extends JpaRepository<PaymentRequest, Intege
             "joa.netAmount, " +
             "d.status " +
             "FROM PaymentRequest doc " +
-            "INNER JOIN JoAcceptance joa on joa.id = doc.FK_joAcceptanceId " +
+            "INNER JOIN JobOrderAcceptance joa on joa.id = doc.FK_joAcceptanceId " +
             "INNER JOIN Supplier sup ON sup.FK_accountNo = joa.FK_vendorAccountNo " +
             "INNER JOIN DocumentStatus d ON d.id = doc.FK_documentStatusId " +
             "WHERE doc.voucherDate >= :from AND doc.voucherDate <= :to " +

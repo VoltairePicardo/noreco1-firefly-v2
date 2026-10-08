@@ -26,7 +26,7 @@ public interface DocumentLoggerFacade {
     Map makeLog(CashAdvanceLiquidation voucher);
     Map makeLog(MaterialIssueRegister voucher);
     Map makeLog(Canvass voucher);
-    Map makeLog(JoAcceptance voucher);
+    Map makeLog(JobOrderAcceptance voucher);
     Map makeLog(PaymentRequest voucher);
 //    Map makeLog(BankDeposit bankDeposit);
     Map makeLog(Budget budget);

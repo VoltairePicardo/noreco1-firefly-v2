@@ -77,7 +77,7 @@ public class DocumentInquiryServiceImpl implements DocumentInquiryService {
         List<Canvass> canvassList = canvassRepo.findAll();
         List<CashReceipts> cashReceiptsList = cashReceiptsRepo.findAll();
         List<CheckVoucher> cvList = checkVoucherRepo.findAll();
-        List<JoAcceptance> joAcceptanceList = joAcceptanceRepo.findAll();
+        List<JobOrderAcceptance> jobOrderAcceptanceList = joAcceptanceRepo.findAll();
         List<JobOrder> joList = jobOrderRepo.findAll();
         List<JournalVoucher> jvList = journalVoucherRepo.findAll();
         List<MaterialIssueRegister> mirList = materialIssueRegisterRepo.findAll();
@@ -85,7 +85,7 @@ public class DocumentInquiryServiceImpl implements DocumentInquiryService {
         List<PurchaseRequest> rvList = PurchaseRequestRepo.findAll();
         List<SalesVoucher> salesVoucherList = salesVoucherRepo.findAll();
 
-        return this.documentsToDTO(apvList, canvassList, cashReceiptsList, cvList, joAcceptanceList, joList, jvList, mirList, poList, rvList, salesVoucherList);
+        return this.documentsToDTO(apvList, canvassList, cashReceiptsList, cvList, jobOrderAcceptanceList, joList, jvList, mirList, poList, rvList, salesVoucherList);
     }
 
     @Transactional(isolation = Isolation.READ_UNCOMMITTED)
@@ -120,7 +120,7 @@ public class DocumentInquiryServiceImpl implements DocumentInquiryService {
             String amount = docTypeId == DocumentType.RV.getId() || docTypeId == DocumentType.CF.getId() ? "" : ", doc.amount ";
             String rvTypeId = docTypeId == DocumentType.RV.getId() ? ", doc.rvType " : "";
             String fkId = docTypeId != DocumentType.PR.getId() ? "" : ", joa.id AS fkId ";
-            String forPr = docTypeId != DocumentType.PR.getId() ? "INNER JOIN Supplier supp ON supp.FK_accountNo = doc.FK_vendorAccountNo " : "INNER JOIN JoAcceptance joa ON joa.id = doc.FK_joAcceptanceId INNER JOIN Supplier supp ON supp.FK_accountNo = joa.FK_vendorAccountNo ";
+            String forPr = docTypeId != DocumentType.PR.getId() ? "INNER JOIN Supplier supp ON supp.FK_accountNo = doc.FK_vendorAccountNo " : "INNER JOIN JobOrderAcceptance joa ON joa.id = doc.FK_joAcceptanceId INNER JOIN Supplier supp ON supp.FK_accountNo = joa.FK_vendorAccountNo";
 
             String allVouchersJoinQuery = " JOIN generalledger gl ON doc.FK_transactionId = gl.FK_transactionId " +
                     "LEFT JOIN SegmentAccount sa ON gl.FK_segmentAccountId = sa.id " +
@@ -590,7 +590,7 @@ public class DocumentInquiryServiceImpl implements DocumentInquiryService {
             String amount = docTypeId == DocumentType.RV.getId() || docTypeId == DocumentType.CF.getId() ? "" : ", doc.amount ";
             String rvTypeId = docTypeId == DocumentType.RV.getId() ? ", doc.rvType " : "";
             String fkId = docTypeId != DocumentType.PR.getId() ? "" : ", joa.id AS fkId ";
-            String forPr = docTypeId != DocumentType.PR.getId() ? "INNER JOIN Supplier supp ON supp.FK_accountNo = doc.FK_vendorAccountNo " : "INNER JOIN JoAcceptance joa ON joa.id = doc.FK_joAcceptanceId INNER JOIN Supplier supp ON supp.FK_accountNo = joa.FK_vendorAccountNo ";
+            String forPr = docTypeId != DocumentType.PR.getId() ? "INNER JOIN Supplier supp ON supp.FK_accountNo = doc.FK_vendorAccountNo " : "INNER JOIN JobOrderAcceptance joa ON joa.id = doc.FK_joAcceptanceId INNER JOIN Supplier supp ON supp.FK_accountNo = joa.FK_vendorAccountNo";
             String sql = "SELECT " +
                     "DISTINCT " +
                     "doc.id, " +
@@ -666,7 +666,7 @@ public class DocumentInquiryServiceImpl implements DocumentInquiryService {
         List<Canvass> canvassList = canvassRepo.findByDocumentStatusId(status);
         List<CashReceipts> cashReceiptsList = cashReceiptsRepo.findByDocumentStatusId(status);
         List<CheckVoucher> cvList = checkVoucherRepo.findByDocumentStatusId(status);
-        List<JoAcceptance> joAcceptanceList = joAcceptanceRepo.findByDocumentStatusId(status);
+        List<JobOrderAcceptance> jobOrderAcceptanceList = joAcceptanceRepo.findByDocumentStatusId(status);
         List<JobOrder> joList = jobOrderRepo.findByDocumentStatusId(status);
         List<JournalVoucher> jvList = journalVoucherRepo.findByDocumentStatusId(status);
         List<MaterialIssueRegister> mirList = materialIssueRegisterRepo.findByDocumentStatusId(status);
@@ -674,7 +674,7 @@ public class DocumentInquiryServiceImpl implements DocumentInquiryService {
         List<PurchaseRequest> rvList = PurchaseRequestRepo.findByDocumentStatusId(status);
         List<SalesVoucher> salesVoucherList = salesVoucherRepo.findByDocumentStatusId(status);
 
-        return this.documentsToDTO(apvList, canvassList, cashReceiptsList, cvList, joAcceptanceList, joList, jvList, mirList, poList, rvList, salesVoucherList);
+        return this.documentsToDTO(apvList, canvassList, cashReceiptsList, cvList, jobOrderAcceptanceList, joList, jvList, mirList, poList, rvList, salesVoucherList);
     }
 
     @Transactional(isolation = Isolation.READ_UNCOMMITTED)
@@ -689,7 +689,7 @@ public class DocumentInquiryServiceImpl implements DocumentInquiryService {
         List<Canvass> canvassList = canvassRepo.findByDocumentStatusIdNotIn(Arrays.asList(nonPendingStatusIds));
         List<CashReceipts> cashReceiptsList = cashReceiptsRepo.findByDocumentStatusIdNotIn(Arrays.asList(nonPendingStatusIds));
         List<CheckVoucher> cvList = checkVoucherRepo.findByDocumentStatusIdNotIn(Arrays.asList(nonPendingStatusIds));
-        List<JoAcceptance> joAcceptanceList = joAcceptanceRepo.findByDocumentStatusIdNotIn(Arrays.asList(nonPendingStatusIds));
+        List<JobOrderAcceptance> jobOrderAcceptanceList = joAcceptanceRepo.findByDocumentStatusIdNotIn(Arrays.asList(nonPendingStatusIds));
         List<JobOrder> joList = jobOrderRepo.findByDocumentStatusIdNotIn(Arrays.asList(nonPendingStatusIds));
         List<JournalVoucher> jvList = journalVoucherRepo.findByDocumentStatusIdNotIn(Arrays.asList(nonPendingStatusIds));
         List<MaterialIssueRegister> mirList = materialIssueRegisterRepo.findByDocumentStatusIdNotIn(Arrays.asList(nonPendingStatusIds));
@@ -697,7 +697,7 @@ public class DocumentInquiryServiceImpl implements DocumentInquiryService {
         List<PurchaseRequest> rvList = PurchaseRequestRepo.findByDocumentStatusIdNotIn(Arrays.asList(nonPendingStatusIds));
         List<SalesVoucher> salesVoucherList = salesVoucherRepo.findByDocumentStatusIdNotIn(Arrays.asList(nonPendingStatusIds));
 
-        return this.documentsToDTO(apvList, canvassList, cashReceiptsList, cvList, joAcceptanceList, joList, jvList, mirList, poList, rvList, salesVoucherList);
+        return this.documentsToDTO(apvList, canvassList, cashReceiptsList, cvList, jobOrderAcceptanceList, joList, jvList, mirList, poList, rvList, salesVoucherList);
     }
 
     @Transactional(isolation = Isolation.READ_UNCOMMITTED)
@@ -764,7 +764,7 @@ public class DocumentInquiryServiceImpl implements DocumentInquiryService {
         return returnDocuments;
     }
 
-    private List<DocInqListDto> documentsToDTO(List<AccountsPayableVoucher> apvList, List<Canvass> canvassList, List<CashReceipts> cashReceiptsList, List<CheckVoucher> cvList, List<JoAcceptance> joAcceptanceList, List<JobOrder> joList, List<JournalVoucher> jvList, List<MaterialIssueRegister> mirList, List<PurchaseOrder> poList, List<PurchaseRequest> rvList, List<SalesVoucher> salesVoucherList) {
+    private List<DocInqListDto> documentsToDTO(List<AccountsPayableVoucher> apvList, List<Canvass> canvassList, List<CashReceipts> cashReceiptsList, List<CheckVoucher> cvList, List<JobOrderAcceptance> jobOrderAcceptanceList, List<JobOrder> joList, List<JournalVoucher> jvList, List<MaterialIssueRegister> mirList, List<PurchaseOrder> poList, List<PurchaseRequest> rvList, List<SalesVoucher> salesVoucherList) {
         List<DocInqListDto> returnDocuments = new ArrayList<>();
         if (!Checker.collectionIsEmpty(apvList)) {
             for (AccountsPayableVoucher line : apvList) {
@@ -828,9 +828,9 @@ public class DocumentInquiryServiceImpl implements DocumentInquiryService {
                 returnDocuments.add(docInqListDto);
             }
         }
-        if (!Checker.collectionIsEmpty(joAcceptanceList)) {
+        if (!Checker.collectionIsEmpty(jobOrderAcceptanceList)) {
 
-            for (JoAcceptance line : joAcceptanceList) {
+            for (JobOrderAcceptance line : jobOrderAcceptanceList) {
                 DocInqListDto docInqListDto = new DocInqListDto();
                 docInqListDto.setId(line.getId());
                 docInqListDto.setLocalCode(line.getCode());

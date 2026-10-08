@@ -49,7 +49,7 @@ public interface BudgetLineItemDetailRepo extends JpaRepository<BudgetLineItemDe
             "  UNION ALL " +
             "  " +
             "  SELECT SUM(jod.amount*-1) AS totalAmount FROM JobOrder jo " +
-            "  INNER JOIN JoDetail jod ON jod.FK_jobOrderId = jo.id " +
+            "  INNER JOIN JobOrderDetail jod ON jod.FK_jobOrderId = jo.id " +
             "  INNER JOIN PurchaseRequestDetail prd ON prd.id = jod.FK_purchaseRequestDetailId " +
             "  INNER JOIN PurchaseRequest pr ON pr.id = prd.FK_purchaseRequestId " +
             "  WHERE jo.FK_documentStatusId = :documentStatusId AND pr.FK_budgetLineItemDetailId = :budgetLineItemDetailId " +
@@ -139,7 +139,7 @@ public interface BudgetLineItemDetailRepo extends JpaRepository<BudgetLineItemDe
             "  UNION ALL " +
             "  " +
             "  SELECT SUM(jod.amount*-1) AS totalAmount FROM JobOrder jo " +
-            "  INNER JOIN JoDetail jod ON jod.FK_jobOrderId = jo.id " +
+            "  INNER JOIN JobOrderDetail jod ON jod.FK_jobOrderId = jo.id " +
             "  INNER JOIN PurchaseRequestDetail prd ON prd.id = jod.FK_purchaseRequestDetailId " +
             "  INNER JOIN PurchaseRequest pr ON pr.id = prd.FK_purchaseRequestId " +
             "  WHERE jo.FK_documentStatusId != :documentStatusId AND pr.FK_budgetLineItemDetailId = :budgetLineItemDetailId " +
@@ -175,7 +175,7 @@ public interface BudgetLineItemDetailRepo extends JpaRepository<BudgetLineItemDe
             "  WHERE po.FK_documentStatusId != :cancelledStatusId AND pr.FK_budgetLineItemDetailId = :budgetLineItemDetailId " +
             "  UNION ALL " +
             "  SELECT SUM(jod.amount*-1) AS totalAmount FROM JobOrder jo " +
-            "  INNER JOIN JoDetail jod ON jod.FK_jobOrderId = jo.id " +
+            "  INNER JOIN JobOrderDetail jod ON jod.FK_jobOrderId = jo.id " +
             "  INNER JOIN PurchaseRequestDetail prd ON prd.id = jod.FK_purchaseRequestDetailId " +
             "  INNER JOIN PurchaseRequest pr ON pr.id = prd.FK_purchaseRequestId " +
             "  WHERE jo.FK_documentStatusId != :cancelledStatusId AND pr.FK_budgetLineItemDetailId = :budgetLineItemDetailId " +

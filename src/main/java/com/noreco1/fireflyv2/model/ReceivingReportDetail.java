@@ -85,13 +85,13 @@ public class ReceivingReportDetail {
     @NotFound(action = NotFoundAction.IGNORE)
     @ManyToOne
     @JoinColumn(name = "FK_joDetailId")
-    private JoDetail joDetail;
+    private JobOrderDetail jobOrderDetail;
 
     public ReceivingReportDetail(ReceivingReport receivingReport, PurchaseOrderDetail purchaseOrderDetail, ItemTransactionDetail itemTransactionDetail,
                                  PurchaseRequestDetail purchaseRequestDetail, Item item, String deliveryNumber, BigDecimal quantityOrdered,
                                  BigDecimal quantityReceived, BigDecimal unitPrice, BigDecimal amount, BigDecimal discount,
                                  BigDecimal vat, BigDecimal adjustment, BigDecimal netAmount, BigDecimal netVatUnitPrice,
-                                 BigDecimal netVatAmount, BigDecimal deliveredQuantity, JoDetail joDetail) {
+                                 BigDecimal netVatAmount, BigDecimal deliveredQuantity, JobOrderDetail jobOrderDetail) {
         this.receivingReport = receivingReport;
         this.purchaseOrderDetail = purchaseOrderDetail;
         this.itemTransactionDetail = itemTransactionDetail;
@@ -109,7 +109,7 @@ public class ReceivingReportDetail {
         this.netVatUnitPrice = netVatUnitPrice;
         this.netVatAmount = netVatAmount;
         this.deliveredQuantity = deliveredQuantity;
-        this.joDetail = joDetail;
+        this.jobOrderDetail = jobOrderDetail;
     }
 
 }

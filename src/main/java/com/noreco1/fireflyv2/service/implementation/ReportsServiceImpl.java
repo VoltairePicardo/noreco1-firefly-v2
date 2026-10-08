@@ -2824,7 +2824,7 @@ public class ReportsServiceImpl implements ReportsService, Bir1601E {
                 String amount = docTypeId == DocumentType.RV.getId() || docTypeId == DocumentType.CF.getId() ? "" : ", doc.amount ";
                 String rvTypeId = docTypeId == DocumentType.RV.getId() ? ", doc.rvType " : "";
                 String fkId = docTypeId != DocumentType.PR.getId() ? "" : ", joa.id AS fkId ";
-                String forPr = docTypeId != DocumentType.PR.getId() ? "INNER JOIN Supplier supp ON supp.FK_accountNo = doc.FK_vendorAccountNo " : "INNER JOIN JoAcceptance joa ON joa.id = doc.FK_joAcceptanceId INNER JOIN Supplier supp ON supp.FK_accountNo = joa.FK_vendorAccountNo ";
+                String forPr = docTypeId != DocumentType.PR.getId() ? "INNER JOIN Supplier supp ON supp.FK_accountNo = doc.FK_vendorAccountNo " : "INNER JOIN JobOrderAcceptance joa ON joa.id = doc.FK_joAcceptanceId INNER JOIN Supplier supp ON supp.FK_accountNo = joa.FK_vendorAccountNo";
                 String sql = "SELECT " +
                         "doc.id, " +
                         "doc.code, " +
@@ -2905,7 +2905,7 @@ public class ReportsServiceImpl implements ReportsService, Bir1601E {
                 String amount = docTypeId == DocumentType.RV.getId() || docTypeId == DocumentType.CF.getId() ? "" : ", doc.amount ";
                 String rvTypeId = docTypeId == DocumentType.RV.getId() ? ", doc.rvType " : "";
                 String fkId = docTypeId != DocumentType.PR.getId() ? "" : ", joa.id AS fkId ";
-                String forPr = docTypeId != DocumentType.PR.getId() ? "INNER JOIN Supplier supp ON supp.FK_accountNo = doc.FK_vendorAccountNo " : "INNER JOIN JoAcceptance joa ON joa.id = doc.FK_joAcceptanceId INNER JOIN Supplier supp ON supp.FK_accountNo = joa.FK_vendorAccountNo ";
+                String forPr = docTypeId != DocumentType.PR.getId() ? "INNER JOIN Supplier supp ON supp.FK_accountNo = doc.FK_vendorAccountNo " : "INNER JOIN JobOrderAcceptance joa ON joa.id = doc.FK_joAcceptanceId INNER JOIN Supplier supp ON supp.FK_accountNo = joa.FK_vendorAccountNo";
                 String sql = "SELECT " +
                         "doc.id, " +
                         "doc.code, " +

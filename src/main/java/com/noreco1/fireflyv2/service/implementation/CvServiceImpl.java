@@ -26,7 +26,6 @@ import com.noreco1.fireflyv2.validator.CvValidator;
 import lombok.RequiredArgsConstructor;
 import net.sf.jasperreports.engine.JRDataSource;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
@@ -280,10 +279,10 @@ public class CvServiceImpl implements CvService, PrintableVoucher, PrintableCheq
 
             // save jo acceptance
             checkVoucherJoAcceptanceRepo.deleteByCheckVoucherId(this.model.getId());
-            if (cv.getJoAcceptance() != null && cv.getJoAcceptance().getId() != null) {
+            if (cv.getJobOrderAcceptance() != null && cv.getJobOrderAcceptance().getId() != null) {
                 CheckVoucherJoAcceptance checkVoucherJoAcceptance = new CheckVoucherJoAcceptance();
                 checkVoucherJoAcceptance.setCheckVoucher(this.model);
-                checkVoucherJoAcceptance.setJoAcceptance(cv.getJoAcceptance());
+                checkVoucherJoAcceptance.setJobOrderAcceptance(cv.getJobOrderAcceptance());
                 checkVoucherJoAcceptanceRepo.save(checkVoucherJoAcceptance);
             }
 
@@ -457,15 +456,15 @@ public class CvServiceImpl implements CvService, PrintableVoucher, PrintableCheq
             CvVoucherDto joaDto = null;
             if(checkVoucherJoAcceptance != null){
                 joaDto = new CvVoucherDto();
-                joaDto.setVoucherDate(checkVoucherJoAcceptance.getJoAcceptance().getVoucherDate());
-                joaDto.setLocalCode(checkVoucherJoAcceptance.getJoAcceptance().getCode());
-                joaDto.setId(checkVoucherJoAcceptance.getJoAcceptance().getId());
-                joaDto.setPreparedBy(checkVoucherJoAcceptance.getJoAcceptance().getCreatedBy().getFullName());
-                joaDto.setAmount(checkVoucherJoAcceptance.getJoAcceptance().getAmount());
-                joaDto.setParticulars(checkVoucherJoAcceptance.getJoAcceptance().getCode());
-                joaDto.setTransId(checkVoucherJoAcceptance.getJoAcceptance().getTransaction().getId());
-                joaDto.setSlentityAccountNo(checkVoucherJoAcceptance.getJoAcceptance().getVendor().getAccountNo());
-                joaDto.setSlentityName(checkVoucherJoAcceptance.getJoAcceptance().getVendor().getName());
+                joaDto.setVoucherDate(checkVoucherJoAcceptance.getJobOrderAcceptance().getVoucherDate());
+                joaDto.setLocalCode(checkVoucherJoAcceptance.getJobOrderAcceptance().getCode());
+                joaDto.setId(checkVoucherJoAcceptance.getJobOrderAcceptance().getId());
+                joaDto.setPreparedBy(checkVoucherJoAcceptance.getJobOrderAcceptance().getCreatedBy().getFullName());
+                joaDto.setAmount(checkVoucherJoAcceptance.getJobOrderAcceptance().getAmount());
+                joaDto.setParticulars(checkVoucherJoAcceptance.getJobOrderAcceptance().getCode());
+                joaDto.setTransId(checkVoucherJoAcceptance.getJobOrderAcceptance().getTransaction().getId());
+                joaDto.setSlentityAccountNo(checkVoucherJoAcceptance.getJobOrderAcceptance().getVendor().getAccountNo());
+                joaDto.setSlentityName(checkVoucherJoAcceptance.getJobOrderAcceptance().getVendor().getName());
             }
 
             List<CheckVoucherCheque> checkVoucherCheques = chequeRepo.findByTransactionId(checkVoucher.getTransaction().getId());

@@ -14,9 +14,8 @@
         <!-- Header -->
         <div class="row g-3 mb-3">
             <div class="col-md-3">
-                <label class="form-label fw-bold">Voucher Date <span class="text-danger">*</span></label>
-                <input type="text" mwlFlatpickr [options]="flatpickrOptions"
-                       class="form-control" [(ngModel)]="voucherDate" placeholder="Select date"/>
+                <label class="form-label fw-bold">Voucher Date</label>
+                <input type="text" class="form-control bg-light" [value]="voucherDate" readonly/>
             </div>
             <div class="col-md-4">
                 <label class="form-label fw-bold">Supplier</label>

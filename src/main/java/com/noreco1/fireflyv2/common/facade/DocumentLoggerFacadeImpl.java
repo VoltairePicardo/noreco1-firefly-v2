@@ -672,7 +672,7 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
     }
 
     @Override
-    public Map makeLog(JoAcceptance joa) {
+    public Map makeLog(JobOrderAcceptance joa) {
         Map map = new HashMap();
         try {
 

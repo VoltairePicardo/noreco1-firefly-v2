@@ -103,7 +103,8 @@ export class JoAcceptanceAddEditComponent {
                         unitCode:            d.unitCode || '',
                         quantity:            d.quantity || 0,
                         unitPrice:           d.unitPrice || 0,
-                        remainingAmount:     d.remainingAmount || 0,
+                        // add back this JOA's own amount so the user can re-enter up to that ceiling
+                        remainingAmount:     +(d.remainingAmount || 0) + +(d.itemAmount || 0),
                         acceptedAmount:      d.acceptedAmount || 0,
                         // base = total accumulated minus what THIS JOA originally accepted
                         baseAcceptedAmount:  +(d.acceptedAmount || 0) - +(d.itemAmount || 0),
@@ -111,6 +112,7 @@ export class JoAcceptanceAddEditComponent {
                         adjustment:          d.adjustment || 0,
                         netAmount:           d.netAmount || 0,
                     }));
+                    this.recalculateTotals();
                 }
             },
             error: () => {

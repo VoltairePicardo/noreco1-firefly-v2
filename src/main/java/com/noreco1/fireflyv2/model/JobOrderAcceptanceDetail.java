@@ -15,9 +15,10 @@ import java.math.BigDecimal;
 @ToString
 @EqualsAndHashCode
 @Entity
+@Table(name = "JobOrderAcceptanceDetail")
 @NoArgsConstructor
 @AllArgsConstructor
-public class JoAcceptanceDetail implements Serializable {
+public class JobOrderAcceptanceDetail implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column
@@ -27,13 +28,13 @@ public class JoAcceptanceDetail implements Serializable {
     @NotFound(action = NotFoundAction.IGNORE)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="FK_joAcceptanceId")
-    private JoAcceptance joAcceptance;
+    private JobOrderAcceptance jobOrderAcceptance;
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     @NotFound(action = NotFoundAction.IGNORE)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="FK_joDetailId")
-    private JoDetail joDetail;
+    private JobOrderDetail jobOrderDetail;
 
     @Column
     private BigDecimal quantity = BigDecimal.ZERO;
@@ -56,8 +57,8 @@ public class JoAcceptanceDetail implements Serializable {
     @Column
     private BigDecimal netAmount = BigDecimal.ZERO;
 
-    public JoAcceptanceDetail(JoDetail joDetail) {
-        this.joDetail = joDetail;
+    public JobOrderAcceptanceDetail(JobOrderDetail jobOrderDetail) {
+        this.jobOrderDetail = jobOrderDetail;
     }
 
 }

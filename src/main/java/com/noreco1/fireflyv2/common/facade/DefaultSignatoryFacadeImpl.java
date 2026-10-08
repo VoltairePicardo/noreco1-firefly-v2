@@ -472,11 +472,11 @@ public class DefaultSignatoryFacadeImpl implements SignatoryFacade {
     }
 
     @Override
-    public void joAcceptance(JoAcceptance joAcceptance) {
+    public void joAcceptance(JobOrderAcceptance jobOrderAcceptance) {
         try {
             Map<String,Integer> map = new HashMap<>();
 
-            map.put("inspectedByAccountNo", joAcceptance.getInspectedBy().getAccountNo());
+            map.put("inspectedByAccountNo", jobOrderAcceptance.getInspectedBy().getAccountNo());
 
             String settingValue = new ObjectMapper().writeValueAsString(map);
 
@@ -487,7 +487,7 @@ public class DefaultSignatoryFacadeImpl implements SignatoryFacade {
                 settingRepo.save(exSetting);
             } else {
                 Setting setting = new Setting();
-                setting.setCreatedBy(joAcceptance.getCreatedBy());
+                setting.setCreatedBy(jobOrderAcceptance.getCreatedBy());
                 setting.setCode(this.JO_ACCEPTANCE_SIGNATORIES);
                 setting.setDescription(this.JO_ACCEPTANCE_SIGNATORIES_DESC);
                 setting.setValue(settingValue);

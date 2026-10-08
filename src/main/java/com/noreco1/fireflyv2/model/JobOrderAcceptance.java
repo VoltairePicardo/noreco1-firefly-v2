@@ -19,10 +19,11 @@ import java.util.Date;
 @ToString
 @EqualsAndHashCode(callSuper = true)
 @Entity
+@Table(name = "JobOrderAcceptance")
 @JsonIgnoreProperties(ignoreUnknown = true)
 @NoArgsConstructor
 @AllArgsConstructor
-public class JoAcceptance extends DocumentNoApproval implements Serializable {
+public class JobOrderAcceptance extends DocumentNoApproval implements Serializable {
 
     @NotNull(message = "Please enter voucher date.")
     @Column

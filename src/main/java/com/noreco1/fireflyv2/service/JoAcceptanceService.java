@@ -1,7 +1,7 @@
 package com.noreco1.fireflyv2.service;
 
 import com.noreco1.fireflyv2.model.DocumentNoApproval;
-import com.noreco1.fireflyv2.model.JoAcceptance;
+import com.noreco1.fireflyv2.model.JobOrderAcceptance;
 import com.noreco1.fireflyv2.controller.response.*;
 import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
@@ -17,7 +17,7 @@ import java.util.Map;
  * Created by Personal on 7/7/2015.
  */
 public interface JoAcceptanceService extends VoucherService {
-    public JoAcceptance findByCode(String code);
+    public JobOrderAcceptance findByCode(String code);
 
     @Transactional(readOnly = true)
     public JoAcceptanceDto findById(Integer joaId);

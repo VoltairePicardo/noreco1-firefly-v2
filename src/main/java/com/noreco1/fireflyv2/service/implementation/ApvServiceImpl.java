@@ -312,11 +312,11 @@ public class ApvServiceImpl implements ApvService, PrintableVoucher {
                 }
 
                 if (withJobOrderAcceptanceId) { // Job Order Acceptance
-                    JoAcceptance joAcceptance = joAcceptanceRepo.findById(apv.getJoAcceptanceId()).orElse(null);
+                    JobOrderAcceptance jobOrderAcceptance = joAcceptanceRepo.findById(apv.getJoAcceptanceId()).orElse(null);
 
                     AccountsPayableVoucherLink apvLink = new AccountsPayableVoucherLink();
                     apvLink.setAccountsPayableVoucher(this.model);
-                    apvLink.setDocumentId(joAcceptance.getId());
+                    apvLink.setDocumentId(jobOrderAcceptance.getId());
 
                     DocumentType t = new DocumentType();
                     t.setId(com.noreco1.fireflyv2.model.enums.DocumentType.JOA.getId());
@@ -611,14 +611,14 @@ public class ApvServiceImpl implements ApvService, PrintableVoucher {
                         }
 
                     } else if( payableVoucherLink.getDocumentType().getId() == com.noreco1.fireflyv2.model.enums.DocumentType.JOA.getId()){
-                        List<JoAcceptanceDetail> details = joAcceptanceDetailRepo.findAllByJoAcceptanceId(payableVoucherLink.getDocumentId());
+                        List<JobOrderAcceptanceDetail> details = joAcceptanceDetailRepo.findAllByJoAcceptanceId(payableVoucherLink.getDocumentId());
                         if(!details.isEmpty()){
 
-                            if(details.get(0).getJoDetail() != null){
+                            if(details.get(0).getJobOrderDetail() != null){
 
-                                if(details.get(0).getJoDetail().getPurchaseRequestDetail().getPurchaseRequest().getBudgetLineItemDetail() != null){
+                                if(details.get(0).getJobOrderDetail().getPurchaseRequestDetail().getPurchaseRequest().getBudgetLineItemDetail() != null){
 
-                                    dto.setBudgetLineItemDetail(details.get(0).getJoDetail().getPurchaseRequestDetail().getPurchaseRequest().getBudgetLineItemDetail());
+                                    dto.setBudgetLineItemDetail(details.get(0).getJobOrderDetail().getPurchaseRequestDetail().getPurchaseRequest().getBudgetLineItemDetail());
 
                                 }
 

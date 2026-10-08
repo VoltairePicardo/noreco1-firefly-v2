@@ -563,10 +563,10 @@ public class CreditCardPurchaseRequestServiceImpl implements CreditCardPurchaseR
 
             if(creditCardPurchaseRequest.getJobOrder() != null){
                 JobOrder linkJO = creditCardPurchaseRequest.getJobOrder();
-                List<JoDetail> joDetails = this.joDetailRepo.findByJobOrderId(linkJO.getId());
-                if(Checker.collectionIsNotEmpty(joDetails)){
-                    for (JoDetail joDetail : joDetails){
-                        Integer accountNo = joDetail.getPurchaseRequestDetail().getPurchaseRequest().getCreatedBy().getAccountNo();
+                List<JobOrderDetail> jobOrderDetails = this.joDetailRepo.findByJobOrderId(linkJO.getId());
+                if(Checker.collectionIsNotEmpty(jobOrderDetails)){
+                    for (JobOrderDetail jobOrderDetail : jobOrderDetails){
+                        Integer accountNo = jobOrderDetail.getPurchaseRequestDetail().getPurchaseRequest().getCreatedBy().getAccountNo();
                         Employee employee = this.employeeRepo.findOneByAccountNumber(accountNo);
                         if(employee != null && Checker.isValidId(employee.getId())){
                             requestedBy = employee.getName();
@@ -622,16 +622,16 @@ public class CreditCardPurchaseRequestServiceImpl implements CreditCardPurchaseR
 
         if(creditCardPurchaseRequest.getJobOrder() != null){
             JobOrder linkJO = creditCardPurchaseRequest.getJobOrder();
-            List<JoDetail> joDetails = this.joDetailRepo.findByJobOrderId(linkJO.getId());
-            if(Checker.collectionIsNotEmpty(joDetails)){
-                for (JoDetail joDetail : joDetails){
+            List<JobOrderDetail> jobOrderDetails = this.joDetailRepo.findByJobOrderId(linkJO.getId());
+            if(Checker.collectionIsNotEmpty(jobOrderDetails)){
+                for (JobOrderDetail jobOrderDetail : jobOrderDetails){
                     Map map = new HashMap();
 
-                    map.put("quantity", joDetail.getQuantity());
-                    map.put("itemCode", joDetail.getPurchaseRequestDetail().getItem() != null ? joDetail.getPurchaseRequestDetail().getItem().getCode() : "");
-                    map.put("itemDescription", joDetail.getPurchaseRequestDetail().getItem() != null ? joDetail.getPurchaseRequestDetail().getItem().getDescription() : joDetail.getPurchaseRequestDetail().getJoDescription());
-                    map.put("unitPrice", joDetail.getUnitPrice());
-                    map.put("total", joDetail.getAmount());
+                    map.put("quantity", jobOrderDetail.getQuantity());
+                    map.put("itemCode", jobOrderDetail.getPurchaseRequestDetail().getItem() != null ? jobOrderDetail.getPurchaseRequestDetail().getItem().getCode() : "");
+                    map.put("itemDescription", jobOrderDetail.getPurchaseRequestDetail().getItem() != null ? jobOrderDetail.getPurchaseRequestDetail().getItem().getDescription() : jobOrderDetail.getPurchaseRequestDetail().getJoDescription());
+                    map.put("unitPrice", jobOrderDetail.getUnitPrice());
+                    map.put("total", jobOrderDetail.getAmount());
 
                     details.add(map);
                 }

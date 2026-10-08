@@ -499,8 +499,8 @@ public class ReceivingReportServiceImpl implements ReceivingReportService, Print
                     rr.put("isJO", receivingReport.getIsJO());
 
                     Map joMap = new HashMap();
-                    joMap.put("id", rrDetail.getJoDetail().getJobOrder().getId());
-                    joMap.put("joDesc", rrDetail.getJoDetail().getJobOrder().getCode() + " : " + rrDetail.getJoDetail().getJobOrder().getVendor().getName());
+                    joMap.put("id", rrDetail.getJobOrderDetail().getJobOrder().getId());
+                    joMap.put("joDesc", rrDetail.getJobOrderDetail().getJobOrder().getCode() + " : " + rrDetail.getJobOrderDetail().getJobOrder().getVendor().getName());
 
                     rr.put("jobOrder", joMap);
                 }
@@ -543,7 +543,7 @@ public class ReceivingReportServiceImpl implements ReceivingReportService, Print
                     Map detailMap = new HashMap();
 
                     if(receivingReport.getIsJO()) {
-                        detailMap.put("id", detail.getJoDetail() != null ? detail.getJoDetail().getId() : 0);
+                        detailMap.put("id", detail.getJobOrderDetail() != null ? detail.getJobOrderDetail().getId() : 0);
                     } else if(detail.getPurchaseOrderDetail() != null) {
                         detailMap.put("id", detail.getPurchaseOrderDetail().getId());
                     } else {

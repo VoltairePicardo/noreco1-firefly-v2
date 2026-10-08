@@ -94,14 +94,14 @@ public interface DocumentRepo extends JpaRepository<Document, Integer> {
 
             "UNION  " +
             "SELECT   " +
-            " JoAcceptance.id,   " +
-            " JoAcceptance.FK_transactionId,   " +
-            " JoAcceptance.amount,   " +
-            " JoAcceptance.code,   " +
-            " CONCAT('Has Payment Request: ', IF(JoAcceptance.hasPayReq = 0, 'YES', 'NO')) as hasPayReq,   " +
-            " JoAcceptance.voucherDate,   " +
+            " JobOrderAcceptance.id,   " +
+            " JobOrderAcceptance.FK_transactionId,   " +
+            " JobOrderAcceptance.amount,   " +
+            " JobOrderAcceptance.code,   " +
+            " CONCAT('Has Payment Request: ', IF(JobOrderAcceptance.hasPayReq = 0, 'YES', 'NO')) as hasPayReq,   " +
+            " JobOrderAcceptance.voucherDate,   " +
             " 'JO Acceptance' as documentType   " +
-            " FROM JoAcceptance   " +
+            " FROM JobOrderAcceptance   " +
             " WHERE 0 < (SELECT COUNT(FK_userId) FROM UserRole WHERE UserRole.FK_roleId IN :roleIds AND UserRole.FK_userId IN (FK_createdByUserId, FK_approvedByUserId, FK_auditByUserId)) " +
             " " +
 
@@ -155,18 +155,18 @@ public interface DocumentRepo extends JpaRepository<Document, Integer> {
             "SELECT doc.id, doc.code, doc.deliveryDate as voucherDate, doc.createdAt, 'Receiving Report' as docType FROM ReceivingReport doc " +
             "JOIN ReceivingReportDetail ON doc.id = ReceivingReportDetail.FK_receivingReportId " +
             "LEFT JOIN PurchaseOrderDetail ON ReceivingReportDetail.FK_poDetailId = PurchaseOrderDetail.id " +
-            "LEFT JOIN JoDetail ON ReceivingReportDetail.FK_joDetailId = JoDetail.id " +
+            "LEFT JOIN JobOrderDetail ON ReceivingReportDetail.FK_joDetailId = JobOrderDetail.id " +
             "LEFT JOIN PurchaseRequestDetail ON PurchaseOrderDetail.FK_PurchaseRequestDetailId = PurchaseRequestDetail.id " +
-            "WHERE PurchaseOrderDetail.FK_PurchaseRequestDetailId = :rvdId OR JoDetail.FK_PurchaseRequestDetailId = :rvdId  GROUP BY doc.id " +
+            "WHERE PurchaseOrderDetail.FK_PurchaseRequestDetailId = :rvdId OR JobOrderDetail.FK_PurchaseRequestDetailId = :rvdId  GROUP BY doc.id " +
             "UNION " +
             "SELECT doc.id, doc.code, doc.voucherDate, doc.createdAt, 'Job Order' as docType FROM JobOrder doc " +
-            "INNER JOIN JoDetail jod ON jod.FK_jobOrderId = doc.id " +
+            "INNER JOIN JobOrderDetail jod ON jod.FK_jobOrderId = doc.id " +
             "INNER JOIN PurchaseRequestDetail rvd ON rvd.id = jod.FK_PurchaseRequestDetailId " +
             "WHERE rvd.id = :rvdId " +
             "UNION " +
-            "SELECT doc.id, doc.code, doc.voucherDate, doc.createdAt, 'JO Acceptance' as docType FROM JoAcceptance doc " +
+            "SELECT doc.id, doc.code, doc.voucherDate, doc.createdAt, 'JO Acceptance' as docType FROM JobOrderAcceptance doc " +
             "INNER JOIN JobOrder jo ON jo.id = doc.FK_jobOrderId " +
-            "INNER JOIN JoDetail jod ON jod.FK_jobOrderId = jo.id " +
+            "INNER JOIN JobOrderDetail jod ON jod.FK_jobOrderId = jo.id " +
             "INNER JOIN PurchaseRequestDetail rvd ON rvd.id = jod.FK_PurchaseRequestDetailId " +
             "WHERE rvd.id = :rvdId " +
             "UNION " +
@@ -180,10 +180,10 @@ public interface DocumentRepo extends JpaRepository<Document, Integer> {
             "SELECT doc.id, doc.code, doc.voucherDate, doc.createdAt, 'Accounts Payable Voucher' as docType FROM AccountsPayablevoucher doc " +
             "JOIN AccountsPayablevoucherLink ON doc.id = AccountsPayablevoucherLink.FK_accountsPayableVoucherId " +
             "JOIN PaymentRequest ON AccountsPayablevoucherLink.FK_linkedDocumentId = PaymentRequest.id " +
-            "JOIN JoAcceptance ON PaymentRequest.FK_joAcceptanceId = JoAcceptance.id " +
-            "JOIN JoAcceptanceDetail ON JoAcceptance.id = JoAcceptanceDetail.FK_JoAcceptanceId " +
-            "JOIN JoDetail ON JoAcceptanceDetail.FK_joDetailId = JoDetail.id " +
-            "WHERE JoDetail.FK_PurchaseRequestDetailId = :rvdId AND FK_documentTypeId = 22 GROUP BY doc.id " + // 22 - Payment Request
+            "JOIN JobOrderAcceptance ON PaymentRequest.FK_joAcceptanceId = JobOrderAcceptance.id " +
+            "JOIN JobOrderAcceptanceDetail ON JobOrderAcceptance.id = JobOrderAcceptanceDetail.FK_JoAcceptanceId " +
+            "JOIN JobOrderDetail ON JobOrderAcceptanceDetail.FK_joDetailId = JobOrderDetail.id " +
+            "WHERE JobOrderDetail.FK_PurchaseRequestDetailId = :rvdId AND FK_documentTypeId = 22 GROUP BY doc.id " + // 22 - Payment Request
             "UNION " +
             "SELECT doc.id, doc.code, doc.voucherDate, doc.createdAt, 'Check Voucher' as docType FROM CheckVoucher doc " +
             "JOIN CheckVoucherApv ON doc.id = CheckVoucherApv.FK_checkVoucherId " +
@@ -199,22 +199,22 @@ public interface DocumentRepo extends JpaRepository<Document, Integer> {
             "JOIN AccountsPayablevoucher ON CheckVoucherApv.FK_accountsPayableVoucherId = AccountsPayablevoucher.id " +
             "JOIN AccountsPayablevoucherLink ON AccountsPayablevoucher.id = AccountsPayablevoucherLink.FK_accountsPayableVoucherId " +
             "JOIN PaymentRequest ON AccountsPayablevoucherLink.FK_linkedDocumentId = PaymentRequest.id " +
-            "JOIN JoAcceptance ON PaymentRequest.FK_joAcceptanceId = JoAcceptance.id " +
-            "JOIN JoAcceptanceDetail ON JoAcceptance.id = JoAcceptanceDetail.FK_JoAcceptanceId " +
-            "JOIN JoDetail ON JoAcceptanceDetail.FK_joDetailId = JoDetail.id " +
-            "WHERE JoDetail.FK_PurchaseRequestDetailId = :rvdId AND FK_documentTypeId = 22 GROUP BY doc.id " + // 22 - Payment Request
+            "JOIN JobOrderAcceptance ON PaymentRequest.FK_joAcceptanceId = JobOrderAcceptance.id " +
+            "JOIN JobOrderAcceptanceDetail ON JobOrderAcceptance.id = JobOrderAcceptanceDetail.FK_JoAcceptanceId " +
+            "JOIN JobOrderDetail ON JobOrderAcceptanceDetail.FK_joDetailId = JobOrderDetail.id " +
+            "WHERE JobOrderDetail.FK_PurchaseRequestDetailId = :rvdId AND FK_documentTypeId = 22 GROUP BY doc.id " + // 22 - Payment Request
             "UNION " +
             "SELECT doc.id, doc.code, doc.voucherDate, doc.createdAt, 'Payment Request' as docType FROM PaymentRequest doc " +
-            "INNER JOIN JoAcceptance joa ON joa.id = doc.FK_joAcceptanceId " +
+            "INNER JOIN JobOrderAcceptance joa ON joa.id = doc.FK_joAcceptanceId " +
             "INNER JOIN JobOrder jo ON jo.id = joa.FK_jobOrderId " +
-            "INNER JOIN JoDetail jod ON jod.FK_jobOrderId = jo.id " +
+            "INNER JOIN JobOrderDetail jod ON jod.FK_jobOrderId = jo.id " +
             "INNER JOIN PurchaseRequestDetail rvd ON rvd.id = jod.FK_PurchaseRequestDetailId " +
             "WHERE rvd.id = :rvdId", nativeQuery = true)
     public List<Object[]>  findDocumentCyclesByRvdId(@Param("rvdId")Integer rvdId);
 
-    @Query(value = "SELECT doc.id, doc.code, doc.voucherDate, doc.createdAt, 'JO Acceptance' as docType FROM JoAcceptance doc " +
+    @Query(value = "SELECT doc.id, doc.code, doc.voucherDate, doc.createdAt, 'JO Acceptance' as docType FROM JobOrderAcceptance doc " +
             "INNER JOIN JobOrder jo ON jo.id = doc.FK_jobOrderId " +
-            "INNER JOIN JoDetail jod ON jod.FK_jobOrderId = jo.id " +
+            "INNER JOIN JobOrderDetail jod ON jod.FK_jobOrderId = jo.id " +
             "INNER JOIN PurchaseRequestDetail rvd ON rvd.id = jod.FK_PurchaseRequestDetailId " +
             "WHERE rvd.id = :rvdId", nativeQuery = true)
     public List<Object[]>  findJoAcceptanceByRvdId(@Param("rvdId")Integer rvdId);
@@ -760,17 +760,17 @@ public interface DocumentRepo extends JpaRepository<Document, Integer> {
 
             "UNION  " +
             "SELECT " +
-            "JoAcceptance.id, " +
-            "JoAcceptance.FK_transactionId, " +
-            "JoAcceptance.amount, " +
-            "JoAcceptance.code, " +
-            "CONCAT('Has Payment Request: ', IF(JoAcceptance.hasPayReq = 0, 'YES', 'NO')) as hasPayReq, " +
-            "JoAcceptance.voucherDate, " +
+            "JobOrderAcceptance.id, " +
+            "JobOrderAcceptance.FK_transactionId, " +
+            "JobOrderAcceptance.amount, " +
+            "JobOrderAcceptance.code, " +
+            "CONCAT('Has Payment Request: ', IF(JobOrderAcceptance.hasPayReq = 0, 'YES', 'NO')) as hasPayReq, " +
+            "JobOrderAcceptance.voucherDate, " +
             "'JO Acceptance' as documentType " +
-            "FROM JoAcceptance " +
-            "JOIN User inspectedBy ON JoAcceptance.FK_inspectedByUserId = inspectedBy.id " +
-            "WHERE JoAcceptance.FK_createdByUserId = :signatoryUserId AND FK_documentStatusId NOT IN (7,8,26,14,32,10,29,30,31) " + /*Approved,Denied,Cancelled,Deleted,Canvassed,Closed,APV Created,CV Created,Replenished*/
-            "OR (inspectedBy.id  = :signatoryUserId AND JoAcceptance.FK_documentStatusId = 5) " +  /*For Approval*/
+            "FROM JobOrderAcceptance " +
+            "JOIN User inspectedBy ON JobOrderAcceptance.FK_inspectedByUserId = inspectedBy.id " +
+            "WHERE JobOrderAcceptance.FK_createdByUserId = :signatoryUserId AND FK_documentStatusId NOT IN (7,8,26,14,32,10,29,30,31) " + /*Approved,Denied,Cancelled,Deleted,Canvassed,Closed,APV Created,CV Created,Replenished*/
+            "OR (inspectedBy.id  = :signatoryUserId AND JobOrderAcceptance.FK_documentStatusId = 5) " +  /*For Approval*/
 
             "UNION  " +
             "SELECT " +
@@ -1196,26 +1196,26 @@ public interface DocumentRepo extends JpaRepository<Document, Integer> {
             "FROM QuotationDetail LEFT OUTER JOIN PurchaseOrderDetail ON PurchaseOrderDetail.FK_PurchaseRequestDetailId = QuotationDetail.FK_PurchaseRequestDetailId " +
             "WHERE PurchaseOrderDetail.id IS NULL) " +
             "AND Quotation.id IN (select FK_quotationId " +
-            "FROM QuotationDetail LEFT OUTER JOIN JoDetail ON JoDetail.FK_PurchaseRequestDetailId = QuotationDetail.FK_PurchaseRequestDetailId " +
-            "WHERE JoDetail.id IS NULL) " +
+            "FROM QuotationDetail LEFT OUTER JOIN JobOrderDetail ON JobOrderDetail.FK_PurchaseRequestDetailId = QuotationDetail.FK_PurchaseRequestDetailId " +
+            "WHERE JobOrderDetail.id IS NULL) " +
 
             "UNION " +
 
             "SELECT " +
-            "JoAcceptance.id, " +
-            "JoAcceptance.FK_transactionId, " +
-            "JoAcceptance.amount, " +
-            "JoAcceptance.code, " +
-            "IF(JoAcceptance.hasPayReq, 'Has Payment Request', 'No Payment Request') AS hasPayReq, " +
-            "JoAcceptance.voucherDate, " +
+            "JobOrderAcceptance.id, " +
+            "JobOrderAcceptance.FK_transactionId, " +
+            "JobOrderAcceptance.amount, " +
+            "JobOrderAcceptance.code, " +
+            "IF(JobOrderAcceptance.hasPayReq, 'Has Payment Request', 'No Payment Request') AS hasPayReq, " +
+            "JobOrderAcceptance.voucherDate, " +
             "'JO Acceptance' AS documentType, " +
             "'No RFP' AS tag " +
-            "FROM JoAcceptance " +
+            "FROM JobOrderAcceptance " +
             "CROSS JOIN UserRole ur " +
             "WHERE FK_documentStatusId = 7 /* Approved */" +
             "AND ur.FK_userId = :signatoryUserId " +
             "AND ur.FK_roleId IN (:purchasingRoleIds) /* Show all if UserGroup/Role is Purchasing Officer */" +
-            "AND !JoAcceptance.hasPayReq " +
+            "AND !JobOrderAcceptance.hasPayReq " +
 
             "UNION " +
 
@@ -1272,7 +1272,7 @@ public interface DocumentRepo extends JpaRepository<Document, Integer> {
             "WHERE FK_documentStatusId = 7 /* Approved */" +
             "AND ur.FK_userId = :signatoryUserId " +
             "AND ur.FK_roleId IN (:purchasingRoleIds) " +
-            "AND JobOrder.id NOT IN (SELECT FK_jobOrderId FROM JoAcceptance) " +
+            "AND JobOrder.id NOT IN (SELECT FK_jobOrderId FROM JobOrderAcceptance) " +
 
             "UNION " +
 
@@ -1547,22 +1547,22 @@ public interface DocumentRepo extends JpaRepository<Document, Integer> {
             "JOIN PurchaseOrderDetail ON ReceivingReportDetail.FK_poDetailId = PurchaseOrderDetail.id " +
             "WHERE doc.FK_transactionId = :transId " +
             "UNION " +
-            "SELECT JoDetail.FK_PurchaseRequestDetailId, doc.id FROM CheckVoucher doc " +
+            "SELECT JobOrderDetail.FK_PurchaseRequestDetailId, doc.id FROM CheckVoucher doc " +
             "JOIN CheckVoucherApv ON doc.id = CheckVoucherApv.FK_checkVoucherId " +
             "JOIN AccountsPayablevoucher ON CheckVoucherApv.FK_accountsPayableVoucherId = AccountsPayablevoucher.id " +
             "JOIN AccountsPayablevoucherLink ON AccountsPayablevoucher.id = AccountsPayablevoucherLink.FK_accountsPayableVoucherId " +
             "JOIN PaymentRequest ON AccountsPayablevoucherLink.FK_linkedDocumentId = PaymentRequest.id " +
-            "JOIN JoAcceptance ON PaymentRequest.FK_joAcceptanceId = JoAcceptance.id " +
-            "JOIN JoAcceptanceDetail ON JoAcceptance.id = JoAcceptanceDetail.FK_JoAcceptanceId " +
-            "JOIN JoDetail ON JoAcceptanceDetail.FK_joDetailId = JoDetail.id " +
+            "JOIN JobOrderAcceptance ON PaymentRequest.FK_joAcceptanceId = JobOrderAcceptance.id " +
+            "JOIN JobOrderAcceptanceDetail ON JobOrderAcceptance.id = JobOrderAcceptanceDetail.FK_JoAcceptanceId " +
+            "JOIN JobOrderDetail ON JobOrderAcceptanceDetail.FK_joDetailId = JobOrderDetail.id " +
             "WHERE doc.FK_transactionId = :transId " +
             "UNION " +
-            "SELECT JoDetail.FK_PurchaseRequestDetailId, doc.id FROM AccountsPayablevoucher doc " +
+            "SELECT JobOrderDetail.FK_PurchaseRequestDetailId, doc.id FROM AccountsPayablevoucher doc " +
             "JOIN AccountsPayablevoucherLink ON doc.id = AccountsPayablevoucherLink.FK_accountsPayableVoucherId " +
             "JOIN PaymentRequest ON AccountsPayablevoucherLink.FK_linkedDocumentId = PaymentRequest.id " +
-            "JOIN JoAcceptance ON PaymentRequest.FK_joAcceptanceId = JoAcceptance.id " +
-            "JOIN JoAcceptanceDetail ON JoAcceptance.id = JoAcceptanceDetail.FK_JoAcceptanceId " +
-            "JOIN JoDetail ON JoAcceptanceDetail.FK_joDetailId = JoDetail.id " +
+            "JOIN JobOrderAcceptance ON PaymentRequest.FK_joAcceptanceId = JobOrderAcceptance.id " +
+            "JOIN JobOrderAcceptanceDetail ON JobOrderAcceptance.id = JobOrderAcceptanceDetail.FK_JoAcceptanceId " +
+            "JOIN JobOrderDetail ON JobOrderAcceptanceDetail.FK_joDetailId = JobOrderDetail.id " +
             "WHERE doc.FK_transactionId = :transId GROUP BY FK_PurchaseRequestDetailId) " +
             "AS PurchaseRequestDetailIds GROUP BY id LIMIT 1", nativeQuery = true)
     List<Object[]> findRVItemDetailIds(@Param("transId")Integer transId);
@@ -1689,19 +1689,19 @@ public interface DocumentRepo extends JpaRepository<Document, Integer> {
             " UNION  " +
             "   " +
             " SELECT  " +
-            " JoAcceptance.id, " +
-            " JoAcceptance.FK_transactionId,  " +
-            " JoAcceptance.amount,  " +
-            " JoAcceptance.code,  " +
-            " CONCAT('Has Payment Request: ', IF(JoAcceptance.hasPayReq = 0, 'YES', 'NO')) as hasPayReq,  " +
-            " JoAcceptance.voucherDate, " +
+            " JobOrderAcceptance.id, " +
+            " JobOrderAcceptance.FK_transactionId,  " +
+            " JobOrderAcceptance.amount,  " +
+            " JobOrderAcceptance.code,  " +
+            " CONCAT('Has Payment Request: ', IF(JobOrderAcceptance.hasPayReq = 0, 'YES', 'NO')) as hasPayReq,  " +
+            " JobOrderAcceptance.voucherDate, " +
             " 'JO Acceptance' as documentType,  " +
             " DocumentStatus.`status`,  " +
             " DocumentStatus.id AS documentStatusId, " +
-            " JoAcceptance.FK_transactionId AS transId " +
-            " FROM JoAcceptance  " +
-            " INNER JOIN DocumentStatus ON DocumentStatus.id = JoAcceptance.FK_DocumentStatusId  " +
-            " WHERE JoAcceptance.code LIKE :query " +
+            " JobOrderAcceptance.FK_transactionId AS transId " +
+            " FROM JobOrderAcceptance  " +
+            " INNER JOIN DocumentStatus ON DocumentStatus.id = JobOrderAcceptance.FK_DocumentStatusId  " +
+            " WHERE JobOrderAcceptance.code LIKE :query " +
             "  " +
             " UNION  " +
             "  " +

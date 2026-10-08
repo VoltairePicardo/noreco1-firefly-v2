@@ -1,7 +1,7 @@
 package com.noreco1.fireflyv2.service.implementation;
 
 import com.noreco1.fireflyv2.model.Item;
-import com.noreco1.fireflyv2.model.JoDetail;
+import com.noreco1.fireflyv2.model.JobOrderDetail;
 import com.noreco1.fireflyv2.repo.JoDetailRepo;
 import com.noreco1.fireflyv2.controller.response.JoDetailDto;
 import com.noreco1.fireflyv2.service.JoDetailService;
@@ -24,12 +24,12 @@ public class JoDetailServiceImpl implements JoDetailService {
     @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<JoDetailDto> getJoDetails(Integer joId) {
-        List<JoDetail> joDetails = joDetailRepo.findByJobOrderId(joId);
+        List<JobOrderDetail> jobOrderDetails = joDetailRepo.findByJobOrderId(joId);
 
         List<JoDetailDto> joDetailDtos = new ArrayList<>();
 
-        if (joDetails != null) {
-            for (JoDetail line : joDetails) {
+        if (jobOrderDetails != null) {
+            for (JobOrderDetail line : jobOrderDetails) {
                 JoDetailDto lineDto = new JoDetailDto();
                 lineDto.setId(line.getId());
                 lineDto.setRvDetailId(line.getPurchaseRequestDetail().getId());
@@ -61,12 +61,12 @@ public class JoDetailServiceImpl implements JoDetailService {
     @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<JoDetailDto> getJoDetailsForJoa(Integer joId) {
-        List<JoDetail> joDetails = joDetailRepo.findJoDetailsForJoa(joId, com.noreco1.fireflyv2.model.enums.DocumentStatus.APPROVED.getId());
+        List<JobOrderDetail> jobOrderDetails = joDetailRepo.findJoDetailsForJoa(joId, com.noreco1.fireflyv2.model.enums.DocumentStatus.APPROVED.getId());
 
         List<JoDetailDto> joDetailDtos = new ArrayList<>();
 
-        if (joDetails != null) {
-            for (JoDetail line : joDetails) {
+        if (jobOrderDetails != null) {
+            for (JobOrderDetail line : jobOrderDetails) {
                 JoDetailDto lineDto = new JoDetailDto();
                 lineDto.setId(line.getId());
                 lineDto.setRvDetailId(line.getPurchaseRequestDetail().getId());

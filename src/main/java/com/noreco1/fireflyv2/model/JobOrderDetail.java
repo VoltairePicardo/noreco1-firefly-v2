@@ -15,9 +15,10 @@ import java.math.BigDecimal;
 @ToString
 @EqualsAndHashCode
 @Entity
+@Table(name = "JobOrderDetail")
 @NoArgsConstructor
 @AllArgsConstructor
-public class JoDetail implements Serializable {
+public class JobOrderDetail implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column
@@ -53,7 +54,7 @@ public class JoDetail implements Serializable {
     @Column
     private BigDecimal acceptedAmount = BigDecimal.ZERO;
 
-    public JoDetail(PurchaseRequestDetail purchaseRequestDetail) {
+    public JobOrderDetail(PurchaseRequestDetail purchaseRequestDetail) {
         this.purchaseRequestDetail = purchaseRequestDetail;
     }
 

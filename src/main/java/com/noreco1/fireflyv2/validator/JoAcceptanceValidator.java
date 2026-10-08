@@ -1,6 +1,6 @@
 package com.noreco1.fireflyv2.validator;
 
-import com.noreco1.fireflyv2.model.JoAcceptance;
+import com.noreco1.fireflyv2.model.JobOrderAcceptance;
 import com.noreco1.fireflyv2.service.JoAcceptanceService;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
@@ -13,12 +13,12 @@ public class JoAcceptanceValidator implements Validator {
 
     @Override
     public boolean supports(Class<?> aClass) {
-        return JoAcceptance.class.isAssignableFrom(aClass);
+        return JobOrderAcceptance.class.isAssignableFrom(aClass);
     }
 
     @Override
     public void validate(Object o, Errors errors) {
-        JoAcceptance joa = (JoAcceptance) o;
+        JobOrderAcceptance joa = (JobOrderAcceptance) o;
 
     }
 

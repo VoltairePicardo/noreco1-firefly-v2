@@ -205,7 +205,7 @@ public interface PurchaseRequestRepo extends JpaRepository<PurchaseRequest, Inte
             "JOIN CanvassDetail ON PurchaseRequestDetail.id = CanvassDetail.FK_purchaseRequestDetailId " +
             "WHERE PurchaseRequestDetail.id not in (select PurchaseOrderDetail.FK_purchaseRequestDetailId from PurchaseOrderDetail JOIN PurchaseOrder ON PurchaseOrderDetail.FK_purchaseOrderId = PurchaseOrder.id AND PurchaseOrder.FK_documentStatusId != 26 ) " +
             "AND PurchaseRequestDetail.id not in (select QuotationItem.FK_purchaseRequestDetailId FROM QuotationItem JOIN Quotation ON QuotationItem.FK_quotationId = Quotation.id AND Quotation.FK_documentStatusId != 26) " +
-            "AND PurchaseRequestDetail.id not in (select JoDetail.FK_purchaseRequestDetailId from JoDetail JOIN JobOrder ON JoDetail.FK_jobOrderId = JobOrder.id AND JobOrder.FK_documentStatusId != 26) " +
+            "AND PurchaseRequestDetail.id not in (select JobOrderDetail.FK_purchaseRequestDetailId from JobOrderDetail JOIN JobOrder ON JobOrderDetail.FK_jobOrderId = JobOrder.id AND JobOrder.FK_documentStatusId != 26)" +
             "GROUP BY rv.id  ORDER BY rv.id DESC", nativeQuery = true)
     List<PurchaseRequest> findPurchaseRequestsWithQuotations();
 

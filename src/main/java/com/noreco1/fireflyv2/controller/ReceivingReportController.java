@@ -298,9 +298,9 @@ public class ReceivingReportController {
             Integer detailRefId = row.get("id") instanceof Number n ? n.intValue() : null;
             if (detailRefId != null && detailRefId > 0) {
                 if (isJO) {
-                    JoDetail jd = new JoDetail();
+                    JobOrderDetail jd = new JobOrderDetail();
                     jd.setId(detailRefId);
-                    detail.setJoDetail(jd);
+                    detail.setJobOrderDetail(jd);
                 } else if (!isRV && !isIFR) {
                     PurchaseOrderDetail pd = new PurchaseOrderDetail();
                     pd.setId(detailRefId);
