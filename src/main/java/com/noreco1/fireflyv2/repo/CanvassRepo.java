@@ -81,7 +81,7 @@ public interface CanvassRepo extends JpaRepository<Canvass, Integer> {
 
     @Query(value = "select Canvass.* from Canvass " +
             "JOIN CanvassDetail on Canvass.id = CanvassDetail.FK_canvassId " +
-            "WHERE CanvassDetail.FK_PurchaseRequestDetailId NOT IN (Select PoDetail.FK_PurchaseRequestDetailId  FROM PoDetail) " +
+            "WHERE CanvassDetail.FK_PurchaseRequestDetailId NOT IN (Select PurchaseOrderDetail.FK_PurchaseRequestDetailId  FROM PurchaseOrderDetail) " +
             "AND Canvass.voucherDate BETWEEN :from AND :to " +
             "AND Canvass.FK_documentStatusId NOT IN (:documentStatusIds) group by Canvass.id", nativeQuery = true)
     List<Canvass> findByVoucherDateBetweenAndPendingAndOfficeId(@Param("from") Date from, @Param("to") Date to, @Param("documentStatusIds") Collection<Integer> documentStatusIds);

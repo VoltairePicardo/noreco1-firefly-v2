@@ -19,10 +19,8 @@ export class PurchaseOrderService {
     private downloadService = inject(DownloadService);
 
     listByDateRange(from: string, to: string, statusId?: number | null): Observable<any[]> {
-        const url = statusId
-            ? `${BASE_API}/purchase-order/list/${from}/${to}/${statusId}`
-            : `${BASE_API}/purchase-order/list/${from}/${to}`;
-        return this.http.get<any[]>(url);
+        const id = statusId ?? 0;
+        return this.http.get<any[]>(`${BASE_API}/purchase-order/list/${from}/${to}/${id}`);
     }
 
     getDocumentStatuses(): Observable<any[]> {
@@ -62,11 +60,15 @@ export class PurchaseOrderService {
     }
 
     getDocumentLogs(transId: number): Observable<any[]> {
-        return this.http.post<any[]>(`${BASE_API}/document/${transId}/logs`, {}, httpOptions);
+        return this.http.get<any[]>(`${BASE_API}/json/document-logs/${transId}`);
     }
 
     getCanvassPrice(supplierAccountNo: number, rvDetailId: number): Observable<number> {
         return this.http.get<number>(`${BASE_API}/po-detail/canvass-price/${supplierAccountNo}/${rvDetailId}`);
+    }
+
+    getSoqData(supplierAccountNo: number, rvDetailId: number): Observable<any> {
+        return this.http.get<any>(`${BASE_API}/po-detail/soq-data/${supplierAccountNo}/${rvDetailId}`);
     }
 
     getRvDetailsForPo(): Observable<any[]> {
@@ -111,5 +113,22 @@ export class PurchaseOrderService {
             `${BASE_API}/purchase-order/for-item-testing/${DOCUMENT_STATUS_APPROVED}/paged`,
             { params }
         );
+    }
+
+    getBrands(): Observable<any[]> {
+        const params = new HttpParams().set('q', '').set('page', 0).set('size', 500);
+        return this.http.get<any>(`${BASE_API}/brand/list`, { params });
+    }
+
+    getBudgetLineItemBalance(budgetLineItemDetailId: number): Observable<{ amountBalanceCV: number; amountBalancePOJO: number }> {
+        return this.http.get<any>(`${BASE_API}/json/budget-line-item-balance/${budgetLineItemDetailId}`);
+    }
+
+    getAwardedSoqTerms(prId: number): Observable<any> {
+        return this.http.get<any>(`${BASE_API}/quotation/awarded-terms/${prId}`);
+    }
+
+    getSetting(code: string): Observable<any> {
+        return this.http.get<any>(`${BASE_API}/json/setting/${code}`);
     }
 }

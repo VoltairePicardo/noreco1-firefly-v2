@@ -271,7 +271,7 @@ public class ReceivingReportServiceImpl implements ReceivingReportService, Print
                     for (ReceivingReportDetail detail: rrDetails) {
                         if(detail.getQuantityReceived().compareTo(BigDecimal.ZERO) == 1) {
 
-                            if(detail.getPoDetail() == null || !Checker.isValidId(detail.getPoDetail().getId())) {  // receive item without PO
+                            if(detail.getPurchaseOrderDetail() == null || !Checker.isValidId(detail.getPurchaseOrderDetail().getId())) {  // receive item without PO
 
                                 if (supplier.isVatable() && detail.getAmount().compareTo(BigDecimal.ZERO) > 0) {
 
@@ -505,8 +505,8 @@ public class ReceivingReportServiceImpl implements ReceivingReportService, Print
                     rr.put("jobOrder", joMap);
                 }
 
-                if (rrDetail.getPoDetail() != null) {
-                    PurchaseOrder purchaseOrder = rrDetail.getPoDetail().getPurchaseOrder();
+                if (rrDetail.getPurchaseOrderDetail() != null) {
+                    PurchaseOrder purchaseOrder = rrDetail.getPurchaseOrderDetail().getPurchaseOrder();
 
                     Map poMap = new HashMap();
                     poMap.put("id", purchaseOrder.getId());
@@ -544,8 +544,8 @@ public class ReceivingReportServiceImpl implements ReceivingReportService, Print
 
                     if(receivingReport.getIsJO()) {
                         detailMap.put("id", detail.getJoDetail() != null ? detail.getJoDetail().getId() : 0);
-                    } else if(detail.getPoDetail() != null) {
-                        detailMap.put("id", detail.getPoDetail().getId());
+                    } else if(detail.getPurchaseOrderDetail() != null) {
+                        detailMap.put("id", detail.getPurchaseOrderDetail().getId());
                     } else {
                         detailMap.put("id", 0);
                     }
@@ -558,7 +558,7 @@ public class ReceivingReportServiceImpl implements ReceivingReportService, Print
                     detailMap.put("unitCode", detail.getItem().getUnit().getCode());
                     detailMap.put("unitPrice", detail.getUnitPrice());
                     detailMap.put("itemAmount", detail.getAmount());
-                    detailMap.put("deliveredQuantity", detail.getPoDetail() != null ? detail.getPoDetail().getDeliveredQuantity() : 0);
+                    detailMap.put("deliveredQuantity", detail.getPurchaseOrderDetail() != null ? detail.getPurchaseOrderDetail().getDeliveredQuantity() : 0);
                     detailMap.put("quantityReceived", detail.getQuantityReceived());
                     detailMap.put("adjustment", detail.getAdjustment());
                     detailMap.put("netAmount", detail.getNetAmount());
@@ -620,7 +620,7 @@ public class ReceivingReportServiceImpl implements ReceivingReportService, Print
             if(!rrDetails.isEmpty() ) {
                 ReceivingReportDetail rrDetail = rrDetails.get(0);
                 params.put("DELIVERY_NUMBER", rrDetail.getDeliveryNumber());
-                params.put("PO_NO", rrDetail.getPoDetail() != null ? rrDetail.getPoDetail().getPurchaseOrder().getCode() : "");
+                params.put("PO_NO", rrDetail.getPurchaseOrderDetail() != null ? rrDetail.getPurchaseOrderDetail().getPurchaseOrder().getCode() : "");
                 params.put("RV_NO", rrDetail.getPurchaseRequestDetail() != null ? rrDetail.getPurchaseRequestDetail().getPurchaseRequest().getCode() : "");
                 params.put("WO_NO", rrDetail.getPurchaseRequestDetail() != null ? (rrDetail.getPurchaseRequestDetail().getPurchaseRequest().getWorkOrder() != null ? rrDetail.getPurchaseRequestDetail().getPurchaseRequest().getWorkOrder().getCode() : "") : "");
 
@@ -628,7 +628,7 @@ public class ReceivingReportServiceImpl implements ReceivingReportService, Print
                 if (rrDetail.getPurchaseRequestDetail() != null) {
                     params.put("QTY_1", "Requested");
                 }
-                if (rrDetail.getPoDetail() != null) {
+                if (rrDetail.getPurchaseOrderDetail() != null) {
                     params.put("QTY_1", "Ordered");
                 }
             }
@@ -778,12 +778,12 @@ public class ReceivingReportServiceImpl implements ReceivingReportService, Print
                             }
 
                             // update PO detail deliveredQuantity
-                            if (rrd.getPoDetail() != null) {
-                                PoDetail poDetail = poDetailRepo.findById(rrd.getPoDetail().getId()).orElse(null);
-                                if (poDetail != null) {
-                                    poDetail.setDeliveredQuantity(rrd.getQuantityReceived().add(poDetail.getDeliveredQuantity()));
+                            if (rrd.getPurchaseOrderDetail() != null) {
+                                PurchaseOrderDetail purchaseOrderDetail = poDetailRepo.findById(rrd.getPurchaseOrderDetail().getId()).orElse(null);
+                                if (purchaseOrderDetail != null) {
+                                    purchaseOrderDetail.setDeliveredQuantity(rrd.getQuantityReceived().add(purchaseOrderDetail.getDeliveredQuantity()));
                                     // save
-                                    poDetailRepo.save(poDetail);
+                                    poDetailRepo.save(purchaseOrderDetail);
                                 }
                             }
                             if (rrd.getItemTransactionDetail() != null) {
@@ -868,28 +868,28 @@ public class ReceivingReportServiceImpl implements ReceivingReportService, Print
 
                 List<ReceivingReportDetail> details = receivingReportDetailRepo.findByReceivingReportId(entity.getId());
                 for(ReceivingReportDetail d : details){
-                    if(d.getPoDetail() != null && d.getPoDetail().getPurchaseOrder() != null) {
+                    if(d.getPurchaseOrderDetail() != null && d.getPurchaseOrderDetail().getPurchaseOrder() != null) {
 
                         if(pos.isEmpty()){
-                            poNos = d.getPoDetail().getPurchaseOrder().getCode();
-                            pos.add(d.getPoDetail().getPurchaseOrder().getId());
+                            poNos = d.getPurchaseOrderDetail().getPurchaseOrder().getCode();
+                            pos.add(d.getPurchaseOrderDetail().getPurchaseOrder().getId());
                         } else {
                             boolean add = true;
                             for (Integer i : pos) {
-                                if (d.getPoDetail().getPurchaseOrder().getId().equals(i)) {
+                                if (d.getPurchaseOrderDetail().getPurchaseOrder().getId().equals(i)) {
                                     add = false;
                                     break;
                                 }
                             }
                             if(add){
-                                poNos += ", " + d.getPoDetail().getPurchaseOrder().getCode();
+                                poNos += ", " + d.getPurchaseOrderDetail().getPurchaseOrder().getCode();
                             }
                         }
                     }
                 }
 
                 ReceivingReportDetail firstPoDetail = details.stream()
-                        .filter(d -> d.getPoDetail() != null && d.getPoDetail().getPurchaseOrder() != null)
+                        .filter(d -> d.getPurchaseOrderDetail() != null && d.getPurchaseOrderDetail().getPurchaseOrder() != null)
                         .findFirst().orElse(null);
 
                 dto.setVoucherDate(entity.getDeliveryDate());
@@ -901,7 +901,7 @@ public class ReceivingReportServiceImpl implements ReceivingReportService, Print
                 dto.setSlentityAccountNo(entity.getSupplier().getAccountNumber());
                 dto.setSlentityName(entity.getSupplier().getName());
                 dto.setInvoiceDate(entity.getInvoiceDate());
-                dto.setPaymentTerm(firstPoDetail != null ? firstPoDetail.getPoDetail().getPurchaseOrder().getPaymentTerm() : null);
+                dto.setPaymentTerm(firstPoDetail != null ? firstPoDetail.getPurchaseOrderDetail().getPurchaseOrder().getPaymentTerm() : null);
                 dto.setTransactionId(entity.getTransaction().getId());
                 dto.setQuantity(entity.getTotalQuantity());
 
@@ -930,21 +930,21 @@ public class ReceivingReportServiceImpl implements ReceivingReportService, Print
 
                 List<ReceivingReportDetail> details = receivingReportDetailRepo.findByReceivingReportId(entity.getId());
                 for(ReceivingReportDetail d : details){
-                    if(d.getPoDetail() != null && d.getPoDetail().getPurchaseOrder() != null) {
+                    if(d.getPurchaseOrderDetail() != null && d.getPurchaseOrderDetail().getPurchaseOrder() != null) {
 
                         if(pos.isEmpty()){
-                            poNos = d.getPoDetail().getPurchaseOrder().getCode();
-                            pos.add(d.getPoDetail().getPurchaseOrder().getId());
+                            poNos = d.getPurchaseOrderDetail().getPurchaseOrder().getCode();
+                            pos.add(d.getPurchaseOrderDetail().getPurchaseOrder().getId());
                         } else {
                             boolean add = true;
                             for (Integer i : pos) {
-                                if (d.getPoDetail().getPurchaseOrder().getId().equals(i)) {
+                                if (d.getPurchaseOrderDetail().getPurchaseOrder().getId().equals(i)) {
                                     add = false;
                                     break;
                                 }
                             }
                             if(add){
-                                poNos += ", " + d.getPoDetail().getPurchaseOrder().getCode();
+                                poNos += ", " + d.getPurchaseOrderDetail().getPurchaseOrder().getCode();
                             }
                         }
                     }
@@ -959,7 +959,7 @@ public class ReceivingReportServiceImpl implements ReceivingReportService, Print
                 dto.setSlentityAccountNo(entity.getSupplier().getAccountNumber());
                 dto.setSlentityName(entity.getSupplier().getName());
                 dto.setInvoiceDate(entity.getInvoiceDate());
-                dto.setPaymentTerm(details.get(0).getPoDetail().getPurchaseOrder().getPaymentTerm());
+                dto.setPaymentTerm(details.get(0).getPurchaseOrderDetail().getPurchaseOrder().getPaymentTerm());
 
                 return dto;
         });

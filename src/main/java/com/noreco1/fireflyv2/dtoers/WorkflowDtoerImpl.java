@@ -473,6 +473,11 @@ public class WorkflowDtoerImpl implements WorkflowDtoer {
                                             quotation.getDocumentStatus().getId().equals(DocumentStatus.RETURNED_TO_CREATOR.getId()))) {
                                 allowUser = true;
                             }
+                            if (quotation.getNotedBy() != null &&
+                                    quotation.getNotedBy().getId().equals(currentUser.getId()) &&
+                                    quotation.getDocumentStatus().getId().equals(DocumentStatus.FOR_APPROVAL.getId())) {
+                                allowUser = true;
+                            }
                         }
 
                         break;

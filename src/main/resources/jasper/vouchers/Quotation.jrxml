@@ -45,6 +45,11 @@
 	<parameter name="APPROVED_BY_FINANCE_MANAGER_SIGN" class="java.lang.String"/>
 	<parameter name="APPROVED_BY_FINANCE_MANAGER_TIME" class="java.sql.Timestamp"/>
 	<parameter name="PURCHASING_CONTACT" class="java.lang.String"/>
+	<parameter name="NOTED_BY" class="java.lang.String"/>
+	<parameter name="NOTED_BY_POS" class="java.lang.String"/>
+	<parameter name="NOTED_BY_SIGN" class="java.lang.String"/>
+	<parameter name="NOTED_BY_TIME" class="java.sql.Timestamp"/>
+	<parameter name="SUBREPORT_AWARDS" class="net.sf.jasperreports.engine.JasperReport" isForPrompting="false"/>
 	<field name="count" class="java.lang.Integer"/>
 	<field name="quantity" class="java.math.BigDecimal"/>
 	<field name="unit" class="java.lang.String"/>
@@ -555,7 +560,7 @@
 		</band>
 	</pageFooter>
 	<summary>
-		<band height="226" splitType="Immediate">
+		<band height="320" splitType="Immediate">
 			<staticText>
 				<reportElement positionType="Float" x="0" y="176" width="968" height="20" uuid="c00a3478-125e-4859-b19e-f6672140800a"/>
 				<textElement verticalAlignment="Middle"/>
@@ -791,64 +796,65 @@
 			<subreport>
 				<reportElement x="0" y="129" width="967" height="47" uuid="2fa96d38-7de5-4da2-9559-00dceeb80fd1"/>
 				<dataSourceExpression><![CDATA[$P{AWARDED_SUPPLIER_ITEMS_DS}]]></dataSourceExpression>
-				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "Quotation_awards.jasper"]]></subreportExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_AWARDS}]]></subreportExpression>
 			</subreport>
 			<line>
 				<reportElement x="967" y="21" width="1" height="91" uuid="513d036a-dd2d-4517-b878-1b913837cb9b"/>
 			</line>
-			<subreport>
-				<reportElement x="0" y="196" width="967" height="30" uuid="dd00e7e3-a0a6-4b27-ace9-9ab1f7700846"/>
-				<subreportParameter name="APPROVED_BY_PROCUREMENT_OFFICER_POS">
-					<subreportParameterExpression><![CDATA[$P{APPROVED_BY_PROCUREMENT_OFFICER_POS}]]></subreportParameterExpression>
-				</subreportParameter>
-				<subreportParameter name="APPROVED_BY_PROCUREMENT_OFFICER_SIGN">
-					<subreportParameterExpression><![CDATA[$P{APPROVED_BY_PROCUREMENT_OFFICER_SIGN}]]></subreportParameterExpression>
-				</subreportParameter>
-				<subreportParameter name="APPROVED_BY_FINANCE_MANAGER">
-					<subreportParameterExpression><![CDATA[$P{APPROVED_BY_FINANCE_MANAGER}]]></subreportParameterExpression>
-				</subreportParameter>
-				<subreportParameter name="APPROVED_BY_PROCUREMENT_OFFICER">
-					<subreportParameterExpression><![CDATA[$P{APPROVED_BY_PROCUREMENT_OFFICER}]]></subreportParameterExpression>
-				</subreportParameter>
-				<subreportParameter name="APPROVED_BY_GENERAL_MANAGER">
-					<subreportParameterExpression><![CDATA[$P{APPROVED_BY_GENERAL_MANAGER}]]></subreportParameterExpression>
-				</subreportParameter>
-				<subreportParameter name="APPROVED_BY_GENERAL_MANAGER_TIME">
-					<subreportParameterExpression><![CDATA[$P{APPROVED_BY_GENERAL_MANAGER_TIME}]]></subreportParameterExpression>
-				</subreportParameter>
-				<subreportParameter name="APPROVED_BY_GENERAL_MANAGER_SIGN">
-					<subreportParameterExpression><![CDATA[$P{APPROVED_BY_GENERAL_MANAGER_SIGN}]]></subreportParameterExpression>
-				</subreportParameter>
-				<subreportParameter name="PREPARED_BY_TIME">
-					<subreportParameterExpression><![CDATA[$P{PREPARED_BY_TIME}]]></subreportParameterExpression>
-				</subreportParameter>
-				<subreportParameter name="APPROVED_BY_FINANCE_MANAGER_SIGN">
-					<subreportParameterExpression><![CDATA[$P{APPROVED_BY_FINANCE_MANAGER_SIGN}]]></subreportParameterExpression>
-				</subreportParameter>
-				<subreportParameter name="PREPARED_BY_POS">
-					<subreportParameterExpression><![CDATA[$P{PREPARED_BY_POS}]]></subreportParameterExpression>
-				</subreportParameter>
-				<subreportParameter name="PREPARED_BY_SIGN">
-					<subreportParameterExpression><![CDATA[$P{PREPARED_BY_SIGN}]]></subreportParameterExpression>
-				</subreportParameter>
-				<subreportParameter name="APPROVED_BY_FINANCE_MANAGER_POS">
-					<subreportParameterExpression><![CDATA[$P{APPROVED_BY_FINANCE_MANAGER_POS}]]></subreportParameterExpression>
-				</subreportParameter>
-				<subreportParameter name="APPROVED_BY_FINANCE_MANAGER_TIME">
-					<subreportParameterExpression><![CDATA[$P{APPROVED_BY_FINANCE_MANAGER_TIME}]]></subreportParameterExpression>
-				</subreportParameter>
-				<subreportParameter name="APPROVED_BY_GENERAL_MANAGER_POS">
-					<subreportParameterExpression><![CDATA[$P{APPROVED_BY_GENERAL_MANAGER_POS}]]></subreportParameterExpression>
-				</subreportParameter>
-				<subreportParameter name="APPROVED_BY_PROCUREMENT_OFFICER_TIME">
-					<subreportParameterExpression><![CDATA[$P{APPROVED_BY_PROCUREMENT_OFFICER_TIME}]]></subreportParameterExpression>
-				</subreportParameter>
-				<subreportParameter name="PREPARED_BY">
-					<subreportParameterExpression><![CDATA[$P{PREPARED_BY}]]></subreportParameterExpression>
-				</subreportParameter>
-				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
-				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "Quotation_Workflow_"  + $P{WORKFLOW} + ".jasper"]]></subreportExpression>
-			</subreport>
+			<staticText>
+				<reportElement x="109" y="196" width="200" height="20" uuid="a1b2c3d4-d5e6-7890-abcd-ef1234567801"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Prepared By:]]></text>
+			</staticText>
+			<image hAlign="Center" isLazy="true" onErrorType="Blank">
+				<reportElement x="109" y="216" width="200" height="40" uuid="a1b2c3d4-d5e6-7890-abcd-ef1234567802"/>
+				<imageExpression><![CDATA[$P{PREPARED_BY_SIGN}]]></imageExpression>
+			</image>
+			<textField isBlankWhenNull="true">
+				<reportElement x="109" y="256" width="200" height="15" uuid="a1b2c3d4-d5e6-7890-abcd-ef1234567803"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$P{PREPARED_BY_TIME}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="109" y="271" width="200" height="20" uuid="a1b2c3d4-d5e6-7890-abcd-ef1234567804"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$P{PREPARED_BY}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="109" y="291" width="200" height="20" uuid="a1b2c3d4-d5e6-7890-abcd-ef1234567805"/>
+				<box>
+					<topPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$P{PREPARED_BY_POS}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="708" y="196" width="200" height="20" uuid="a1b2c3d4-d5e6-7890-abcd-ef1234567806"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Noted By:]]></text>
+			</staticText>
+			<image hAlign="Center" isLazy="true" onErrorType="Blank">
+				<reportElement x="708" y="216" width="200" height="40" uuid="a1b2c3d4-d5e6-7890-abcd-ef1234567807"/>
+				<imageExpression><![CDATA[$P{NOTED_BY_SIGN}]]></imageExpression>
+			</image>
+			<textField isBlankWhenNull="true">
+				<reportElement x="708" y="256" width="200" height="15" uuid="a1b2c3d4-d5e6-7890-abcd-ef1234567808"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$P{NOTED_BY_TIME}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="708" y="271" width="200" height="20" uuid="a1b2c3d4-d5e6-7890-abcd-ef1234567809"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$P{NOTED_BY}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="708" y="291" width="200" height="20" uuid="a1b2c3d4-d5e6-7890-abcd-ef1234567810"/>
+				<box>
+					<topPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$P{NOTED_BY_POS}]]></textFieldExpression>
+			</textField>
 		</band>
 	</summary>
 </jasperReport>

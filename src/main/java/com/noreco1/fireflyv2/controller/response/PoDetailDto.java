@@ -22,6 +22,8 @@ public class PoDetailDto {
     private BigDecimal quantity = BigDecimal.ZERO;
     private BigDecimal vat = BigDecimal.ZERO;
     private BigDecimal discount = BigDecimal.ZERO;
+    private BigDecimal vatPercentage = BigDecimal.ZERO;
+    private BigDecimal discountPercentage = BigDecimal.ZERO;
     private BigDecimal unitPrice = BigDecimal.ZERO;
     private BigDecimal itemAmount = BigDecimal.ZERO;
     private BigDecimal rvdQuantity = BigDecimal.ZERO;

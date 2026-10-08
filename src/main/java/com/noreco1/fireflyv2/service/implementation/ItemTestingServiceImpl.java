@@ -6,7 +6,6 @@ import com.noreco1.fireflyv2.common.helpers.DateHelper;
 import com.noreco1.fireflyv2.common.helpers.MessageFormatter;
 import com.noreco1.fireflyv2.common.helpers.ReportUtil;
 import com.noreco1.fireflyv2.model.*;
-import com.noreco1.fireflyv2.model.enums.*;
 import com.noreco1.fireflyv2.repo.*;
 import com.noreco1.fireflyv2.controller.response.ItemTestingDto;
 import com.noreco1.fireflyv2.controller.response.PostResponse;
@@ -216,7 +215,7 @@ public class ItemTestingServiceImpl implements ItemTestingService, PrintableVouc
 
                 for(ItemTestingDetail itemTestingDetail : items){
                     Item item       = itemTestingDetail.getItem();
-                    PoDetail pod    = itemTestingDetail.getPoDetail();
+                    PurchaseOrderDetail pod    = itemTestingDetail.getPurchaseOrderDetail();
                     if (item == null) continue;
 
                     ItemTestingDetail detail = new ItemTestingDetail();
@@ -239,7 +238,7 @@ public class ItemTestingServiceImpl implements ItemTestingService, PrintableVouc
                     detail.setItemCode(item.getCode());
                     detail.setUnitCode(item.getUnit() != null ? item.getUnit().getCode() : null);
                     detail.setItemDescription(item.getDescription());
-                    detail.setPoDetail(pod);
+                    detail.setPurchaseOrderDetail(pod);
                     detail.setQuantity(pod != null ? pod.getQuantity() : BigDecimal.ZERO);
                     detail.setQuantityReceived(itemTestingDetail.getQuantity());
                     detail.setDeliveredQuantity(totalItemQuantityTested);
@@ -305,8 +304,8 @@ public class ItemTestingServiceImpl implements ItemTestingService, PrintableVouc
 
                         Map detailMap = new HashMap();
 
-                        String poNo = (detail.getPoDetail() != null && detail.getPoDetail().getPurchaseOrder() != null)
-                                ? detail.getPoDetail().getPurchaseOrder().getCode() : "";
+                        String poNo = (detail.getPurchaseOrderDetail() != null && detail.getPurchaseOrderDetail().getPurchaseOrder() != null)
+                                ? detail.getPurchaseOrderDetail().getPurchaseOrder().getCode() : "";
 
                         detailMap.put("id", counter++);
                         detailMap.put("code", detail.getItem().getCode());
@@ -341,7 +340,7 @@ public class ItemTestingServiceImpl implements ItemTestingService, PrintableVouc
 
     @Transactional(isolation = Isolation.READ_UNCOMMITTED, readOnly = true)
     @Override
-    public List<com.noreco1.fireflyv2.model.PoDetail> getPurchaseOrderDetailsForItemTesting(Integer poId) {
+    public List<PurchaseOrderDetail> getPurchaseOrderDetailsForItemTesting(Integer poId) {
         return poDetailRepo.findByPurchaseOrderId(poId);
     }
 
@@ -355,8 +354,8 @@ public class ItemTestingServiceImpl implements ItemTestingService, PrintableVouc
                 if (incoming.getItem() != null && incoming.getItem().getId() != null) {
                     fresh.setItem(itemRepo.findById(incoming.getItem().getId()).orElse(null));
                 }
-                if (incoming.getPoDetail() != null && incoming.getPoDetail().getId() != null) {
-                    fresh.setPoDetail(poDetailRepo.findById(incoming.getPoDetail().getId()).orElse(null));
+                if (incoming.getPurchaseOrderDetail() != null && incoming.getPurchaseOrderDetail().getId() != null) {
+                    fresh.setPurchaseOrderDetail(poDetailRepo.findById(incoming.getPurchaseOrderDetail().getId()).orElse(null));
                 }
 
                 BigDecimal unitsReceived = incoming.getUnitsReceivedQuantity() != null ? incoming.getUnitsReceivedQuantity() : BigDecimal.ZERO;

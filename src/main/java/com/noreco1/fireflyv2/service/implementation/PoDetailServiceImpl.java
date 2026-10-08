@@ -1,10 +1,7 @@
 package com.noreco1.fireflyv2.service.implementation;
 
 import com.noreco1.fireflyv2.common.helpers.Checker;
-import com.noreco1.fireflyv2.common.helpers.StringFormatter;
 import com.noreco1.fireflyv2.model.*;
-import com.noreco1.fireflyv2.model.DocumentType;
-import com.noreco1.fireflyv2.model.enums.*;
 import com.noreco1.fireflyv2.model.enums.DocumentStatus;
 import com.noreco1.fireflyv2.repo.*;
 import com.noreco1.fireflyv2.controller.response.PoDetailDto;
@@ -17,7 +14,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -31,6 +30,9 @@ public class PoDetailServiceImpl implements PoDetailService {
 
     @Autowired
     CanvassDetailRepo canvassDetailRepo;
+
+    @Autowired
+    QuotationItemDetailRepo quotationItemDetailRepo;
 
     @Autowired
     ReceivingReportDetailRepo receivingReportDetailRepo;
@@ -47,12 +49,12 @@ public class PoDetailServiceImpl implements PoDetailService {
     @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<PoDetailDto> getPoDetails(Integer poId) {
-        List<PoDetail> poDetails = poDetailRepo.findByPurchaseOrderId(poId);
+        List<PurchaseOrderDetail> purchaseOrderDetails = poDetailRepo.findByPurchaseOrderId(poId);
 
         List<PoDetailDto> poDetailDtos = new ArrayList<>();
 
-        if (poDetails != null) {
-            for (PoDetail line : poDetails) {
+        if (purchaseOrderDetails != null) {
+            for (PurchaseOrderDetail line : purchaseOrderDetails) {
                 PoDetailDto lineDto = new PoDetailDto();
                 lineDto.setId(line.getId());
                 lineDto.setRvDetailId(line.getPurchaseRequestDetail().getId());
@@ -65,6 +67,8 @@ public class PoDetailServiceImpl implements PoDetailService {
                 lineDto.setUnitPrice(line.getUnitPrice());
                 lineDto.setVat(line.getVat());
                 lineDto.setDiscount(line.getDiscount());
+                lineDto.setVatPercentage(line.getVatPercentage());
+                lineDto.setDiscountPercentage(line.getDiscountPercentage());
                 lineDto.setItemAmount(line.getAmount());
                 lineDto.setRvdQuantity(line.getPurchaseRequestDetail().getQuantity());
                 lineDto.setRemainingQuantity(line.getPurchaseRequestDetail().getQuantity().subtract(line.getPurchaseRequestDetail().getPoQuantity()));
@@ -83,7 +87,7 @@ public class PoDetailServiceImpl implements PoDetailService {
     @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public List<PoDetailDto> getPoDetailsForItemTesting(Integer poId) {
-        List<PoDetail> poDetails = poDetailRepo.findByPurchaseOrderId(poId);
+        List<PurchaseOrderDetail> purchaseOrderDetails = poDetailRepo.findByPurchaseOrderId(poId);
 
         List<PoDetailDto> poDetailDtos = new ArrayList<>();
         Integer[] nonPendingStatusIds = { // override this inside switch/case statement
@@ -92,9 +96,9 @@ public class PoDetailServiceImpl implements PoDetailService {
                 DocumentStatus.CANCELLED.getId()
         };
 
-        if (poDetails != null) {
-            for (PoDetail line : poDetails) {
-                ReceivingReportDetail receivingReportDetail = receivingReportDetailRepo.findByPoDetailIdAndReceivingReportDocumentStatusIdNotIn(line.getId(), Arrays.asList(nonPendingStatusIds));
+        if (purchaseOrderDetails != null) {
+            for (PurchaseOrderDetail line : purchaseOrderDetails) {
+                ReceivingReportDetail receivingReportDetail = receivingReportDetailRepo.findByPurchaseOrderDetailIdAndReceivingReportDocumentStatusIdNotIn(line.getId(), Arrays.asList(nonPendingStatusIds));
 
                 BigDecimal totalItemQuantityTested = itemTestingDetailRepo.getTotalQuantityTestedByPoDetailId(line.getId());
 
@@ -111,6 +115,8 @@ public class PoDetailServiceImpl implements PoDetailService {
                 lineDto.setUnitPrice(line.getUnitPrice());
                 lineDto.setVat(line.getVat());
                 lineDto.setDiscount(line.getDiscount());
+                lineDto.setVatPercentage(line.getVatPercentage());
+                lineDto.setDiscountPercentage(line.getDiscountPercentage());
                 lineDto.setItemAmount(line.getAmount());
                 lineDto.setRvdQuantity(line.getPurchaseRequestDetail().getQuantity());
                 lineDto.setRemainingQuantity(line.getPurchaseRequestDetail().getQuantity().subtract(line.getPurchaseRequestDetail().getPoQuantity()));
@@ -133,11 +139,11 @@ public class PoDetailServiceImpl implements PoDetailService {
 
         try {
 
-            List<PoDetail> poDetails = poDetailRepo.findPoDetailWithItemTestingByPoId(poId);
+            List<PurchaseOrderDetail> purchaseOrderDetails = poDetailRepo.findPoDetailWithItemTestingByPoId(poId);
 
-            if (poDetails != null) {
+            if (purchaseOrderDetails != null) {
 
-                for (PoDetail line : poDetails) {
+                for (PurchaseOrderDetail line : purchaseOrderDetails) {
 
                     PoDetailDto lineDto = new PoDetailDto();
 
@@ -243,9 +249,9 @@ public class PoDetailServiceImpl implements PoDetailService {
         try {
 
             for (Integer itemId : itemIds){
-                PoDetail poDetail = this.poDetailRepo.findFirstByPurchaseRequestDetailItemIdOrderByIdDesc(itemId);
-                if(poDetail != null && Checker.isValidId(poDetail.getId())){
-                    defaultAmount = defaultAmount.add(poDetail.getAmount());
+                PurchaseOrderDetail purchaseOrderDetail = this.poDetailRepo.findFirstByPurchaseRequestDetailItemIdOrderByIdDesc(itemId);
+                if(purchaseOrderDetail != null && Checker.isValidId(purchaseOrderDetail.getId())){
+                    defaultAmount = defaultAmount.add(purchaseOrderDetail.getAmount());
                 }
             }
 
@@ -255,5 +261,31 @@ public class PoDetailServiceImpl implements PoDetailService {
 
         return defaultAmount;
 
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public Map<String, Object> getSoqPriceAndBrand(Integer supplierAccountNo, Integer rvDetailId) {
+        Map<String, Object> result = new HashMap<>();
+
+        QuotationItemDetail detail = quotationItemDetailRepo
+                .findOneByQuotationItemPurchaseRequestDetailIdAndSupplierAccountNumberAndIsAwardedTrue(rvDetailId, supplierAccountNo);
+
+        if (detail != null) {
+            result.put("price", detail.getPrice());
+            result.put("brand", detail.getBrand());
+        } else {
+            // Fallback to canvass price (no brand available from canvass)
+            Supplier supplier = supplierRepo.findOneByAccountNumber(supplierAccountNo);
+            if (supplier != null) {
+                CanvassDetail canvass = canvassDetailRepo.findBySupplierIdAndPurchaseRequestDetailId(supplier.getId(), rvDetailId);
+                if (canvass != null) {
+                    result.put("price", canvass.getUnitPrice());
+                    result.put("brand", null);
+                }
+            }
+        }
+
+        return result;
     }
 }

@@ -41,8 +41,8 @@ export class ItemQuickCreateModalComponent implements OnInit {
     private alertService = inject(AlertService);
 
     ngOnInit(): void {
-        this.itemService.listUnits().subscribe({ next: d => this.units.set(d), error: () => {} });
-        this.itemService.listCategories().subscribe({ next: d => this.categories.set(d), error: () => {} });
+        this.itemService.listUnits().subscribe({ next: (d: any) => this.units.set(d?.content ?? d ?? []), error: () => {} });
+        this.itemService.listCategories().subscribe({ next: (d: any) => this.categories.set(d?.content ?? d ?? []), error: () => {} });
         this.itemService.isInventoryOfficer().subscribe({ next: v => this.isInventoryOfficer.set(v), error: () => {} });
     }
 

@@ -238,39 +238,19 @@
 
         <div class="row g-3 mb-4">
             <div class="col-md-6">
-                <label class="form-label fw-bold">Approved By Finance Manager <span class="text-danger">*</span></label>
+                <label class="form-label fw-bold">Noted By <span class="text-danger">*</span></label>
                 <div class="input-group">
                     <input type="text" class="form-control" readonly
-                           [value]="approvingOfficer?.fullName || approvingOfficer?.name || ''"
-                           [class.is-invalid]="submitted && !approvingOfficer"
-                           placeholder="Browse Finance Manager"/>
+                           [value]="notedBy?.fullName || notedBy?.name || ''"
+                           [class.is-invalid]="submitted && !notedBy"
+                           placeholder="Browse Noted By"/>
                     <button type="button" class="btn btn-success fw-bold"
-                            (click)="openSignatoryBrowse('approvingOfficer')">
+                            (click)="openSignatoryBrowse('notedBy')">
                         <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
                     </button>
                 </div>
-                @if (submitted && !approvingOfficer) {
-                    <div class="text-danger small mt-1">Please select a Finance Manager.</div>
-                }
-            </div>
-
-            <div class="col-md-6">
-                <label class="form-label fw-bold">
-                    Approved By General Manager
-                    @if (isTotalMoreThan100k) { <span class="text-danger">*</span> }
-                </label>
-                <div class="input-group">
-                    <input type="text" class="form-control" readonly
-                           [value]="generalManager?.fullName || generalManager?.name || ''"
-                           [class.is-invalid]="submitted && isTotalMoreThan100k && !generalManager"
-                           placeholder="Browse General Manager"/>
-                    <button type="button" class="btn btn-success fw-bold"
-                            (click)="openSignatoryBrowse('generalManager')">
-                        <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
-                    </button>
-                </div>
-                @if (submitted && isTotalMoreThan100k && !generalManager) {
-                    <div class="text-danger small mt-1">Please select a General Manager.</div>
+                @if (submitted && !notedBy) {
+                    <div class="text-danger small mt-1">Please select a Noted By.</div>
                 }
             </div>
         </div>

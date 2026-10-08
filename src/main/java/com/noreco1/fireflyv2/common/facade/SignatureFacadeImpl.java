@@ -38,6 +38,9 @@ public class SignatureFacadeImpl implements SignatureFacade {
     @Autowired
     SettingFacade settingFacade;
 
+    @Autowired
+    AuthenticationFacade authenticationFacade;
+
     @Override
     public HashMap getDocumentSignature(HashMap<String, Object> params, DocumentType docType, Object document) {
         Integer transId = 0;
@@ -1332,24 +1335,21 @@ public class SignatureFacadeImpl implements SignatureFacade {
                     case QUOTATION_SUMMARY: {
                         Quotation voucher = (Quotation) document;
 
-                        Employee preparedBy = voucher.getCreatedBy() != null
-                                ? employeeRepo.findOneByAccountNumber(voucher.getCreatedBy().getAccountNo())
+                        com.noreco1.fireflyv2.model.User createdByUser = voucher.getCreatedBy() != null
+                                ? voucher.getCreatedBy()
+                                : authenticationFacade.getLoggedIn();
+                        Employee preparedBy = createdByUser != null
+                                ? employeeRepo.findOneByAccountNumber(createdByUser.getAccountNo())
                                 : null;
-                        Employee approvedByProcurementOfficer = employeeRepo.findOneByAccountNumber(voucher.getApprovingOfficer().getAccountNo());
-                        Employee approvedByFinanceManager = voucher.getApprovedByFinanceManager() != null ? employeeRepo.findOneByAccountNumber(voucher.getApprovedByFinanceManager().getAccountNo()):null;
-                        Employee approvedByGeneralManager = voucher.getApprovedByGeneralManager() != null ? employeeRepo.findOneByAccountNumber(voucher.getApprovedByGeneralManager().getAccountNo()):null;
+                        Employee notedByEmployee = voucher.getNotedBy() != null
+                                ? employeeRepo.findOneByAccountNumber(voucher.getNotedBy().getAccountNo())
+                                : null;
 
                         params.put("PREPARED_BY", preparedBy == null ? "" : preparedBy.getName());
                         params.put("PREPARED_BY_POS", preparedBy == null ? "" : preparedBy.getPosition() == null ? "" : preparedBy.getPosition().getName());
 
-                        params.put("APPROVED_BY_PROCUREMENT_OFFICER", approvedByProcurementOfficer == null ? "" : approvedByProcurementOfficer.getName());
-                        params.put("APPROVED_BY_PROCUREMENT_OFFICER_POS", approvedByProcurementOfficer == null ? "" : approvedByProcurementOfficer.getPosition() == null ? "" : approvedByProcurementOfficer.getPosition().getName());
-
-                        params.put("APPROVED_BY_FINANCE_MANAGER", approvedByFinanceManager == null ? "" : approvedByFinanceManager.getName());
-                        params.put("APPROVED_BY_FINANCE_MANAGER_POS", approvedByFinanceManager == null ? "" : approvedByFinanceManager.getPosition() == null ? "" : approvedByFinanceManager.getPosition().getName());
-
-                        params.put("APPROVED_BY_GENERAL_MANAGER", approvedByGeneralManager == null ? "" : approvedByGeneralManager.getName());
-                        params.put("APPROVED_BY_GENERAL_MANAGER_POS", approvedByGeneralManager == null ? "" : approvedByGeneralManager.getPosition() == null ? "" : approvedByGeneralManager.getPosition().getName());
+                        params.put("NOTED_BY", notedByEmployee == null ? "" : notedByEmployee.getName());
+                        params.put("NOTED_BY_POS", notedByEmployee == null ? "" : notedByEmployee.getPosition() == null ? "" : notedByEmployee.getPosition().getName());
 
                         for (Object[] a : actions) {
                             Integer docStatId = Integer.parseInt(a[0].toString());
@@ -1387,47 +1387,11 @@ public class SignatureFacadeImpl implements SignatureFacade {
 //
 //                            }
 
-                            if(voucher.getWorkflow().getId().equals(com.noreco1.fireflyv2.model.enums.Workflow.QUOTATION_SUMMARY_LEVEL_1.getId())){
-
-                                if (docStatId.equals(DocumentStatus.FOR_APPROVAL.getId())) {
-                                    if (preparedBy != null && preparedBy.getSignature() != null) {
-                                        params.put("PREPARED_BY_SIGN", env.getProperty("path.attachments") + preparedBy.getSignature().getFilename());
-                                        params.put("PREPARED_BY_TIME", time);
-                                    }
+                            if (docStatId.equals(DocumentStatus.FOR_APPROVAL.getId())) {
+                                if (preparedBy != null && preparedBy.getSignature() != null) {
+                                    params.put("PREPARED_BY_SIGN", env.getProperty("path.attachments") + preparedBy.getSignature().getFilename());
+                                    params.put("PREPARED_BY_TIME", time);
                                 }
-
-                                if (docStatId.equals(DocumentStatus.FOR_GM_APPROVAL.getId())) {
-                                    if (approvedByProcurementOfficer != null && approvedByProcurementOfficer.getSignature() != null) {
-                                        params.put("APPROVED_BY_PROCUREMENT_OFFICER_SIGN", env.getProperty("path.attachments") + approvedByProcurementOfficer.getSignature().getFilename());
-                                        params.put("APPROVED_BY_PROCUREMENT_OFFICER_TIME", time);
-                                    }
-                                }
-
-                                if (docStatId.equals(DocumentStatus.APPROVED.getId())) {
-                                    if (approvedByGeneralManager != null && approvedByGeneralManager.getSignature() != null) {
-                                        params.put("APPROVED_BY_GENERAL_MANAGER_SIGN", env.getProperty("path.attachments") + approvedByGeneralManager.getSignature().getFilename());
-                                        params.put("APPROVED_BY_GENERAL_MANAGER_TIME", time);
-                                    }
-                                }
-
-                            }
-
-                            if(voucher.getWorkflow().getId().equals(com.noreco1.fireflyv2.model.enums.Workflow.QUOTATION_SUMMARY.getId())){
-
-                                if (docStatId.equals(DocumentStatus.FOR_APPROVAL.getId())) {
-                                    if (preparedBy.getSignature() != null) {
-                                        params.put("PREPARED_BY_SIGN", env.getProperty("path.attachments") + preparedBy.getSignature().getFilename());
-                                        params.put("PREPARED_BY_TIME", time);
-                                    }
-                                }
-
-                                if (docStatId.equals(DocumentStatus.APPROVED.getId())) {
-                                    if (approvedByProcurementOfficer.getSignature() != null) {
-                                        params.put("APPROVED_BY_PROCUREMENT_OFFICER_SIGN", env.getProperty("path.attachments") + approvedByProcurementOfficer.getSignature().getFilename());
-                                        params.put("APPROVED_BY_PROCUREMENT_OFFICER_TIME", time);
-                                    }
-                                }
-
                             }
 
                         }

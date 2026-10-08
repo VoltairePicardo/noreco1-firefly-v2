@@ -8492,9 +8492,9 @@ public class ReportsServiceImpl implements ReportsService, Bir1601E {
     private List<LinkedDocumentWrapper> linkedPurchaseOrders(Integer purchaseRequestId) {
         Set<LinkedDocumentWrapper> stringSet = new LinkedHashSet<>();
 
-        List<PoDetail> poDetails = this.poDetailRepo.findAllByPurchaseRequestDetailPurchaseRequestIdOrderByPurchaseOrderCode(purchaseRequestId);
+        List<PurchaseOrderDetail> purchaseOrderDetails = this.poDetailRepo.findAllByPurchaseRequestDetailPurchaseRequestIdOrderByPurchaseOrderCode(purchaseRequestId);
 
-        for (PoDetail detail : poDetails) {
+        for (PurchaseOrderDetail detail : purchaseOrderDetails) {
             if (detail.getPurchaseOrder() != null && detail.getPurchaseOrder().getCode() != null) {
                 stringSet.add(new LinkedDocumentWrapper(detail.getPurchaseOrder().getCode()));
             }
@@ -8506,7 +8506,7 @@ public class ReportsServiceImpl implements ReportsService, Bir1601E {
     private List<LinkedDocumentWrapper> linkedReceivingReports(Integer purchaseRequestId) {
         Set<LinkedDocumentWrapper> stringSet = new LinkedHashSet<>();
 
-        List<ReceivingReportDetail> receivingReportDetails = this.receivingReportDetailRepo.findAllByPoDetailPurchaseRequestDetailPurchaseRequestIdOrderByReceivingReportCode(purchaseRequestId);
+        List<ReceivingReportDetail> receivingReportDetails = this.receivingReportDetailRepo.findAllByPurchaseOrderDetailPurchaseRequestDetailPurchaseRequestIdOrderByReceivingReportCode(purchaseRequestId);
 
         for (ReceivingReportDetail detail : receivingReportDetails) {
             if (detail.getReceivingReport() != null && detail.getReceivingReport().getCode() != null) {
@@ -8520,7 +8520,7 @@ public class ReportsServiceImpl implements ReportsService, Bir1601E {
     private List<LinkedDocumentWrapper> linkedAccountPayableVouchers(Integer purchaseRequestId) {
         Set<LinkedDocumentWrapper> stringSet = new LinkedHashSet<>();
 
-        List<ReceivingReportDetail> receivingReportDetails = this.receivingReportDetailRepo.findAllByPoDetailPurchaseRequestDetailPurchaseRequestIdOrderByReceivingReportCode(purchaseRequestId);
+        List<ReceivingReportDetail> receivingReportDetails = this.receivingReportDetailRepo.findAllByPurchaseOrderDetailPurchaseRequestDetailPurchaseRequestIdOrderByReceivingReportCode(purchaseRequestId);
 
         for (ReceivingReportDetail detail : receivingReportDetails) {
             Integer receivingReportId = detail.getReceivingReport().getId();
@@ -8536,7 +8536,7 @@ public class ReportsServiceImpl implements ReportsService, Bir1601E {
     private List<LinkedDocumentWrapper> linkedCheckVouchers(Integer purchaseRequestId) {
         Set<LinkedDocumentWrapper> stringSet = new LinkedHashSet<>();
 
-        List<ReceivingReportDetail> receivingReportDetails = this.receivingReportDetailRepo.findAllByPoDetailPurchaseRequestDetailPurchaseRequestIdOrderByReceivingReportCode(purchaseRequestId);
+        List<ReceivingReportDetail> receivingReportDetails = this.receivingReportDetailRepo.findAllByPurchaseOrderDetailPurchaseRequestDetailPurchaseRequestIdOrderByReceivingReportCode(purchaseRequestId);
 
         for (ReceivingReportDetail detail : receivingReportDetails) {
             Integer receivingReportId = detail.getReceivingReport().getId();
@@ -8550,7 +8550,7 @@ public class ReportsServiceImpl implements ReportsService, Bir1601E {
     }
 
     private Boolean checkIfReleased(Integer purchaseRequestId) {
-        List<ReceivingReportDetail> receivingReportDetails = receivingReportDetailRepo.findAllByPoDetailPurchaseRequestDetailPurchaseRequestIdOrderByReceivingReportCode(purchaseRequestId);
+        List<ReceivingReportDetail> receivingReportDetails = receivingReportDetailRepo.findAllByPurchaseOrderDetailPurchaseRequestDetailPurchaseRequestIdOrderByReceivingReportCode(purchaseRequestId);
 
         for (ReceivingReportDetail detail : receivingReportDetails) {
             Integer receivingReportId = detail.getReceivingReport().getId();

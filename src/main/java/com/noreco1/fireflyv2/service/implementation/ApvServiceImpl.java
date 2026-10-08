@@ -26,15 +26,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import com.noreco1.fireflyv2.common.helpers.CurrencyIntoWords;
 
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.validation.Valid;
+
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -446,21 +442,21 @@ public class ApvServiceImpl implements ApvService, PrintableVoucher {
                         ArrayList<Integer> pos = new ArrayList<>();
                         String poNos = "";
                         for(ReceivingReportDetail d : details){
-                            if(d.getPoDetail() != null && d.getPoDetail().getPurchaseOrder() != null) {
+                            if(d.getPurchaseOrderDetail() != null && d.getPurchaseOrderDetail().getPurchaseOrder() != null) {
 
                                 if(pos.isEmpty()){
-                                    poNos = d.getPoDetail().getPurchaseOrder().getCode();
-                                    pos.add(d.getPoDetail().getPurchaseOrder().getId());
+                                    poNos = d.getPurchaseOrderDetail().getPurchaseOrder().getCode();
+                                    pos.add(d.getPurchaseOrderDetail().getPurchaseOrder().getId());
                                 } else {
                                     boolean add = true;
                                     for (Integer i : pos) {
-                                        if (d.getPoDetail().getPurchaseOrder().getId().equals(i)) {
+                                        if (d.getPurchaseOrderDetail().getPurchaseOrder().getId().equals(i)) {
                                             add = false;
                                             break;
                                         }
                                     }
                                     if(add){
-                                        poNos += ", " + d.getPoDetail().getPurchaseOrder().getCode();
+                                        poNos += ", " + d.getPurchaseOrderDetail().getPurchaseOrder().getCode();
                                     }
                                 }
                             }
@@ -475,7 +471,7 @@ public class ApvServiceImpl implements ApvService, PrintableVoucher {
                         rrMap.put("slEntityAccountNo", receivingReport.getSupplier().getAccountNumber());
                         rrMap.put("slEntityName", receivingReport.getSupplier().getName());
                         rrMap.put("invoiceDate", receivingReport.getInvoiceDate());
-                        rrMap.put("paymentTerm", details.get(0).getPoDetail().getPurchaseOrder().getPaymentTerm());
+                        rrMap.put("paymentTerm", details.get(0).getPurchaseOrderDetail().getPurchaseOrder().getPaymentTerm());
 
                         receivingReports.add(rrMap);
                     }
@@ -792,9 +788,9 @@ public class ApvServiceImpl implements ApvService, PrintableVoucher {
                                     invoice = ""; // show once only
 
                                     // get PO details
-                                    if(rrDetail.getPoDetail() != null) {
+                                    if(rrDetail.getPurchaseOrderDetail() != null) {
 
-                                        PurchaseOrder purchaseOrder = rrDetail.getPoDetail().getPurchaseOrder();
+                                        PurchaseOrder purchaseOrder = rrDetail.getPurchaseOrderDetail().getPurchaseOrder();
 
                                         if (purchaseOrder != null) {
 

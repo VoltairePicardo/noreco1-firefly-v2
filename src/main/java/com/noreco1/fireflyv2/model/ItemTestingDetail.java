@@ -36,7 +36,7 @@ public class ItemTestingDetail implements Serializable {
     @NotFound(action = NotFoundAction.IGNORE)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "FK_poDetailId")
-    private PoDetail poDetail;
+    private PurchaseOrderDetail purchaseOrderDetail;
 
     @Column
     private BigDecimal quantity;

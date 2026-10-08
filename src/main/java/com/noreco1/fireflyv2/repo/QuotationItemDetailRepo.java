@@ -17,4 +17,5 @@ public interface QuotationItemDetailRepo extends JpaRepository<QuotationItemDeta
     long deleteByQuotationItemQuotationId(Integer qid);
     QuotationItemDetail findOneByQuotationItemPurchaseRequestDetailIdAndIsAwardedTrue(Integer rvDetailId);
     QuotationItemDetail findOneByQuotationItemPurchaseRequestDetailIdAndSupplierAccountNumber(Integer rvDetailId, Integer accountNumber);
+    QuotationItemDetail findOneByQuotationItemPurchaseRequestDetailIdAndSupplierAccountNumberAndIsAwardedTrue(Integer rvDetailId, Integer accountNumber);
 }

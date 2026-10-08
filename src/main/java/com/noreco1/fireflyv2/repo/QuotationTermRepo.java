@@ -16,4 +16,12 @@ public interface QuotationTermRepo extends JpaRepository<QuotationTerm, Integer>
             "WHERE FK_purchaseRequestDetailId = :rvDetailId AND qterm.FK_supplierId = :supplierId " +
             "GROUP BY qterm.id LIMIT 1;", nativeQuery = true)
     List<QuotationTerm> findByRvDetailAndSupplier(@Param("rvDetailId") Integer rvDetailId, @Param("supplierId") Integer supplierId);
+
+    @Query(value = "SELECT qterm.* FROM Quotation q " +
+            "JOIN QuotationItem qi ON qi.FK_quotationId = q.id " +
+            "JOIN QuotationItemDetail qid ON qid.FK_quotationItemId = qi.id AND qid.isAwarded = 1 " +
+            "JOIN QuotationTerm qterm ON qterm.FK_quotationId = q.id AND qterm.FK_supplierId = qid.FK_supplierId " +
+            "WHERE q.FK_purchaseRequestId = :prId " +
+            "GROUP BY qterm.id LIMIT 1", nativeQuery = true)
+    QuotationTerm findAwardedTermByPurchaseRequestId(@Param("prId") Integer prId);
 }

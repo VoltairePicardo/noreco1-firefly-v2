@@ -34,7 +34,7 @@ public interface CanvassDetailRepo extends JpaRepository<CanvassDetail, Integer>
             "FROM PurchaseRequest rv " +
             "JOIN PurchaseRequestDetail ON rv.id = PurchaseRequestDetail.FK_PurchaseRequestId " +
             "JOIN CanvassDetail ON PurchaseRequestDetail.id = CanvassDetail.FK_PurchaseRequestDetailId " +
-            "WHERE PurchaseRequestDetail.id not in (select PoDetail.FK_PurchaseRequestDetailId from PoDetail JOIN PurchaseOrder ON PoDetail.FK_purchaseOrderId = PurchaseOrder.id AND PurchaseOrder.FK_documentStatusId != 26) " +
+            "WHERE PurchaseRequestDetail.id not in (select PurchaseOrderDetail.FK_PurchaseRequestDetailId from PurchaseOrderDetail JOIN PurchaseOrder ON PurchaseOrderDetail.FK_purchaseOrderId = PurchaseOrder.id AND PurchaseOrder.FK_documentStatusId != 26) " +
             "AND PurchaseRequestDetail.id not in (select JoDetail.FK_PurchaseRequestDetailId from JoDetail JOIN JobOrder ON JoDetail.FK_jobOrderId = JobOrder.id AND JobOrder.FK_documentStatusId != 26) " +
             "AND rv.id = :rvId " +
             "GROUP BY PurchaseRequestDetail.id ORDER BY PurchaseRequestDetail.id", nativeQuery = true)

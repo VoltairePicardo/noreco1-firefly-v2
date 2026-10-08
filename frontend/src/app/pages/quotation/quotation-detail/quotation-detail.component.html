@@ -295,24 +295,24 @@
         }
 
         <!-- Signatories -->
-        @if (data.approvedByFinanceManager || data.approvedByGeneralManager) {
-            <hr class="my-3"/>
-            <div class="fs-xs text-uppercase fw-semibold text-muted mb-2">Signatories</div>
-            <div class="row g-3">
-                @if (data.approvedByFinanceManager) {
-                    <div class="col-md-4">
-                        <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Approved by Finance Manager</div>
-                        <div>{{ data.approvedByFinanceManager }}</div>
-                    </div>
-                }
-                @if (data.approvedByGeneralManager) {
-                    <div class="col-md-4">
-                        <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Approved by General Manager</div>
-                        <div>{{ data.approvedByGeneralManager }}</div>
-                    </div>
-                }
+        <hr class="my-3"/>
+        <div class="fs-xs text-uppercase fw-semibold text-muted mb-2">Signatories</div>
+        <div class="row g-3">
+            <div class="col-md-4">
+                <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Prepared By</div>
+                <div>{{ data.preparedBy || '—' }}</div>
             </div>
-        }
+            <div class="col-md-4">
+                <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Noted By</div>
+                <div>{{ data.notedByObj?.fullName || '—' }}</div>
+            </div>
+            @if (data.generalManagerObj) {
+                <div class="col-md-4">
+                    <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Approved By</div>
+                    <div>{{ data.generalManagerObj?.fullName || '—' }}</div>
+                </div>
+            }
+        </div>
 
     </div>
 </div>
@@ -375,13 +375,15 @@
                                         <div>{{ log.parsed?.createdBy || '—' }}</div>
                                     </div>
                                     <div class="col-md-4">
-                                        <div class="fs-xs text-muted text-uppercase fw-bold">Finance Manager</div>
-                                        <div>{{ log.parsed?.approvedByFinanceOfficer || '—' }}</div>
+                                        <div class="fs-xs text-muted text-uppercase fw-bold">Noted By</div>
+                                        <div>{{ log.parsed?.notedBy || '—' }}</div>
                                     </div>
-                                    <div class="col-md-4">
-                                        <div class="fs-xs text-muted text-uppercase fw-bold">General Manager</div>
-                                        <div>{{ log.parsed?.approvedByGeneralManager || '—' }}</div>
-                                    </div>
+                                    @if (log.parsed?.approvedByGeneralManager) {
+                                        <div class="col-md-4">
+                                            <div class="fs-xs text-muted text-uppercase fw-bold">Approved By</div>
+                                            <div>{{ log.parsed?.approvedByGeneralManager }}</div>
+                                        </div>
+                                    }
                                 </div>
 
                                 <!-- Items snapshot -->

@@ -175,15 +175,15 @@ public class DocumentCancellationServiceImpl implements DocumentCancellationServ
                         purchaseOrderRepo.save(po);
 
                         // update RV details poQuantity
-                        List<PoDetail> poDetails = this.poDetailRepo.findByPurchaseOrderId(po.getId());
-                        for(PoDetail poDetail: poDetails) {
+                        List<PurchaseOrderDetail> purchaseOrderDetails = this.poDetailRepo.findByPurchaseOrderId(po.getId());
+                        for(PurchaseOrderDetail purchaseOrderDetail : purchaseOrderDetails) {
 
-                            PurchaseRequestDetail purchaseRequestDetail = this.PurchaseRequestDetailRepo.getOne(poDetail.getPurchaseRequestDetail().getId());
+                            PurchaseRequestDetail purchaseRequestDetail = this.PurchaseRequestDetailRepo.getOne(purchaseOrderDetail.getPurchaseRequestDetail().getId());
                             if(purchaseRequestDetail != null) {
 
                                 BigDecimal oldPoQuantity = purchaseRequestDetail.getPoQuantity();
 
-                                purchaseRequestDetail.setPoQuantity(oldPoQuantity.subtract(poDetail.getQuantity()));
+                                purchaseRequestDetail.setPoQuantity(oldPoQuantity.subtract(purchaseOrderDetail.getQuantity()));
                                 this.PurchaseRequestDetailRepo.save(purchaseRequestDetail);
                             }
                         }
@@ -729,15 +729,15 @@ public class DocumentCancellationServiceImpl implements DocumentCancellationServ
                         purchaseOrderRepo.save(po);
 
                         // update RV details poQuantity
-                        List<PoDetail> poDetails = this.poDetailRepo.findByPurchaseOrderId(po.getId());
-                        for(PoDetail poDetail: poDetails) {
+                        List<PurchaseOrderDetail> purchaseOrderDetails = this.poDetailRepo.findByPurchaseOrderId(po.getId());
+                        for(PurchaseOrderDetail purchaseOrderDetail : purchaseOrderDetails) {
 
-                            PurchaseRequestDetail purchaseRequestDetail = this.PurchaseRequestDetailRepo.getOne(poDetail.getPurchaseRequestDetail().getId());
+                            PurchaseRequestDetail purchaseRequestDetail = this.PurchaseRequestDetailRepo.getOne(purchaseOrderDetail.getPurchaseRequestDetail().getId());
                             if(purchaseRequestDetail != null) {
 
                                 BigDecimal oldPoQuantity = purchaseRequestDetail.getPoQuantity();
 
-                                purchaseRequestDetail.setPoQuantity(oldPoQuantity.add(poDetail.getQuantity()));
+                                purchaseRequestDetail.setPoQuantity(oldPoQuantity.add(purchaseOrderDetail.getQuantity()));
                                 this.PurchaseRequestDetailRepo.save(purchaseRequestDetail);
                             }
                         }

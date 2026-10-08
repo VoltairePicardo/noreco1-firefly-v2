@@ -57,12 +57,20 @@ export class PurchaseOrderAddEditComponent {
     purchaseRequest: any = null;
     useCreditCard        = false;
     cashAdvance: any     = null;
-    budgetCheckedBy: any = null;
-    checkedBy: any       = null;
     approvedBy: any      = null;
+    checkedBy: any       = null;
+    budgetCheckedBy: any = null;
+
+    // Budget line item (auto-populated from PR)
+    budgetLineItemDetail: any       = null;
+    budgetAmountBalanceCV: number | null   = null;
+    budgetAmountBalancePOJO: number | null = null;
+
+    vatRate = 12; // overwritten from INPUT_TAX_RATE setting on init
 
     // Reference data
     deliveryTerms = signal<any[]>(DELIVERY_TERMS_FALLBACK);
+    brands: any[]    = [];
     lineItems: any[] = [];
 
     private service      = inject(PurchaseOrderService);
@@ -71,9 +79,19 @@ export class PurchaseOrderAddEditComponent {
     private router       = inject(Router);
     private alertService = inject(AlertService);
 
+    compareBrand(a: any, b: any): boolean { return a?.id === b?.id; }
+
     ngOnInit(): void {
         this.service.getDeliveryTerms().subscribe({
             next: (terms) => { if (terms?.length) this.deliveryTerms.set(terms); },
+            error: () => {}
+        });
+        this.service.getBrands().subscribe({
+            next: (res: any) => { this.brands = res.content ?? res ?? []; },
+            error: () => {}
+        });
+        this.service.getSetting('INPUT_TAX_RATE').subscribe({
+            next: (v: any) => { if (v != null) this.vatRate = Number(v) || 12; },
             error: () => {}
         });
 
@@ -84,6 +102,13 @@ export class PurchaseOrderAddEditComponent {
                 this.editMode = true;
                 this.subModule = 'Edit';
                 this.loadForEdit();
+            } else {
+                // Create mode: default voucherDate to today
+                const today = new Date();
+                const yyyy = today.getFullYear();
+                const mm = String(today.getMonth() + 1).padStart(2, '0');
+                const dd = String(today.getDate()).padStart(2, '0');
+                this.voucherDate = `${yyyy}-${mm}-${dd}`;
             }
         });
     }
@@ -113,9 +138,9 @@ export class PurchaseOrderAddEditComponent {
                     this.purchaseRequest = header.purchaseRequest || null;
                     this.useCreditCard   = header.useCreditCard || false;
                     this.cashAdvance     = header.cashAdvance || null;
+                    this.approvedBy      = header.approvedBy      || null;
+                    this.checkedBy       = header.checkedBy       || null;
                     this.budgetCheckedBy = header.budgetCheckedBy || null;
-                    this.checkedBy       = header.checkedBy || null;
-                    this.approvedBy      = header.approvedBy || null;
 
                     this.lineItems = (details || []).map((d: any) => ({
                         rvDetailId:      d.rvDetailId,
@@ -125,9 +150,9 @@ export class PurchaseOrderAddEditComponent {
                         unitCode:        d.unitCode || '',
                         quantity:        d.quantity || 0,
                         unitPrice:       d.unitPrice || 0,
-                        vat:             d.vat || 0,
-                        discount:        d.discount || 0,
-                        brand:           d.brand?.name || d.brand || '',
+                        vat:             d.vatPercentage ?? 0,
+                        discount:        d.discountPercentage ?? 0,
+                        brand:           d.brand || null,
                     }));
                 }
             },
@@ -151,6 +176,36 @@ export class PurchaseOrderAddEditComponent {
             if (result?.action === 'select' && result?.data) {
                 const pr = result.data;
                 this.purchaseRequest = { localCode: pr.code, id: pr.id };
+
+                // 7a: copy purpose
+                if (pr.purpose) this.purpose = pr.purpose;
+
+                // 7b: budget line item + balances
+                this.budgetLineItemDetail    = pr.budgetLineItemDetail ?? null;
+                this.budgetAmountBalanceCV   = null;
+                this.budgetAmountBalancePOJO = null;
+                if (this.budgetLineItemDetail?.id) {
+                    this.service.getBudgetLineItemBalance(this.budgetLineItemDetail.id).subscribe({
+                        next: (bal) => {
+                            this.budgetAmountBalanceCV   = bal?.amountBalanceCV   ?? null;
+                            this.budgetAmountBalancePOJO = bal?.amountBalancePOJO ?? null;
+                        },
+                        error: () => {}
+                    });
+                }
+
+                // 7c: awarded SOQ terms
+                this.service.getAwardedSoqTerms(pr.id).subscribe({
+                    next: (terms: any) => {
+                        if (terms) {
+                            if (terms.termsOfPayment           != null) this.paymentTerm               = terms.termsOfPayment;
+                            if (terms.placeOfDelivery)                  this.deliveryAddress           = terms.placeOfDelivery;
+                            if (terms.deliveryTimeAndCompletion)        this.deliveryTimeAndCompletion = terms.deliveryTimeAndCompletion;
+                        }
+                    },
+                    error: () => {}
+                });
+
                 this.service.getPurchaseRequestItems(pr.id).subscribe({
                     next: (items) => {
                         const existing = new Set(this.lineItems.map((li: any) => li.rvDetailId));
@@ -166,11 +221,11 @@ export class PurchaseOrderAddEditComponent {
                                 unitPrice:       0,
                                 vat:             0,
                                 discount:        0,
-                                brand:           '',
+                                brand:           null,
                             });
                         });
                         if (this.vendor?.accountNumber && toAdd.length > 0) {
-                            this.fetchCanvassPricesForItems(this.vendor.accountNumber, toAdd.map((i: any) => i.id));
+                            this.fetchSoqDataForItems(this.vendor.accountNumber, toAdd.map((i: any) => i.id));
                         }
                     },
                     error: () => this.alertService.error(this.module, 'Failed to load PR items.', '')
@@ -190,8 +245,11 @@ export class PurchaseOrderAddEditComponent {
             );
             if (result?.action === 'select' && result?.data) {
                 this.vendor = result.data;
+                // Auto-set VAT% on all line items based on supplier vatable status
+                const vatPct = this.vendor?.vatable ? this.vatRate : 0;
+                this.lineItems.forEach(li => li.vat = vatPct);
                 if (this.lineItems.length > 0 && result.data?.accountNumber) {
-                    this.fetchCanvassPrices(result.data.accountNumber);
+                    this.fetchSoqData(result.data.accountNumber);
                 }
             }
         } catch {
@@ -220,7 +278,7 @@ export class PurchaseOrderAddEditComponent {
 
     // ─── Signatory Browse ─────────────────────────────────────────────────────
 
-    async openSignatoryBrowse(field: 'budgetCheckedBy' | 'checkedBy' | 'approvedBy'): Promise<void> {
+    async openSignatoryBrowse(field: 'approvedBy' | 'checkedBy' | 'budgetCheckedBy'): Promise<void> {
         try {
             const result = await this.modalService.openModal(
                 BrowseEntityModalComponent,
@@ -233,22 +291,28 @@ export class PurchaseOrderAddEditComponent {
         } catch { }
     }
 
-    fetchCanvassPrices(supplierAccountNo: number): void {
+    fetchSoqData(supplierAccountNo: number): void {
         this.lineItems.forEach(li => {
             if (li.rvDetailId) {
-                this.service.getCanvassPrice(supplierAccountNo, li.rvDetailId).subscribe({
-                    next: (price) => { if (price) li.unitPrice = price; },
+                this.service.getSoqData(supplierAccountNo, li.rvDetailId).subscribe({
+                    next: (data: any) => {
+                        if (data?.price != null) li.unitPrice = data.price;
+                        if (data?.brand != null) li.brand = data.brand;
+                    },
                     error: () => {}
                 });
             }
         });
     }
 
-    fetchCanvassPricesForItems(supplierAccountNo: number, rvDetailIds: number[]): void {
+    fetchSoqDataForItems(supplierAccountNo: number, rvDetailIds: number[]): void {
         const targets = this.lineItems.filter(li => rvDetailIds.includes(li.rvDetailId));
         targets.forEach(li => {
-            this.service.getCanvassPrice(supplierAccountNo, li.rvDetailId).subscribe({
-                next: (price) => { if (price) li.unitPrice = price; },
+            this.service.getSoqData(supplierAccountNo, li.rvDetailId).subscribe({
+                next: (data: any) => {
+                    if (data?.price != null) li.unitPrice = data.price;
+                    if (data?.brand != null) li.brand = data.brand;
+                },
                 error: () => {}
             });
         });
@@ -261,11 +325,10 @@ export class PurchaseOrderAddEditComponent {
     // ─── Computed ────────────────────────────────────────────────────────────
 
     lineItemAmount(li: any): number {
-        const price = +(li.unitPrice || 0);
+        const price = +(li.unitPrice || 0);  // VAT-inclusive SOQ price
         const qty   = +(li.quantity  || 0);
-        const vat   = +(li.vat       || 0);
         const disc  = +(li.discount  || 0);
-        return (price * qty) * (1 + vat / 100) * (1 - disc / 100);
+        return price * qty * (1 - disc / 100);
     }
 
     get totalAmount(): number {
@@ -323,14 +386,6 @@ export class PurchaseOrderAddEditComponent {
             this.alertService.warning(this.module, 'Please add at least one item.', '');
             return;
         }
-        if (!this.budgetCheckedBy) {
-            this.alertService.warning(this.module, 'Please select a Budget Checked By officer.', '');
-            return;
-        }
-        if (!this.checkedBy) {
-            this.alertService.warning(this.module, 'Please select a Checked By officer.', '');
-            return;
-        }
         if (!this.approvedBy) {
             this.alertService.warning(this.module, 'Please select an Approved By officer.', '');
             return;
@@ -350,9 +405,9 @@ export class PurchaseOrderAddEditComponent {
             useCreditCard:           this.useCreditCard,
             purchaseRequest:         this.purchaseRequest?.id ? { id: this.purchaseRequest.id } : null,
             cashAdvance:             this.cashAdvance?.id     ? { id: this.cashAdvance.id }     : null,
-            budgetCheckedBy:         this.budgetCheckedBy?.accountNo ? { accountNo: this.budgetCheckedBy.accountNo } : null,
-            checkedBy:               this.checkedBy?.accountNo       ? { accountNo: this.checkedBy.accountNo }       : null,
             approvingOfficer:        this.approvedBy?.accountNo      ? { accountNo: this.approvedBy.accountNo }      : null,
+            checkedBy:               this.checkedBy?.accountNo       ? { accountNo: this.checkedBy.accountNo }       : null,
+            budgetCheckedBy:         this.budgetCheckedBy?.accountNo ? { accountNo: this.budgetCheckedBy.accountNo } : null,
             poDetails: this.lineItems.map(li => ({
                 rvDetailId:      li.rvDetailId,
                 rvNumber:        li.rvNumber,
@@ -360,10 +415,12 @@ export class PurchaseOrderAddEditComponent {
                 itemDescription: li.itemDescription,
                 unitCode:        li.unitCode,
                 quantity:        li.quantity,
-                unitPrice:       li.unitPrice || 0,
-                vat:             li.vat || 0,
-                discount:        li.discount || 0,
-                brand:           li.brand ? { name: li.brand } : null,
+                unitPrice:          li.unitPrice || 0,  // VAT-inclusive SOQ price; backend divides out VAT
+                vatPercentage:      +(li.vat     || 0),  // percentage e.g. 12
+                discountPercentage: +(li.discount || 0),  // percentage e.g. 5
+                vat:                0,  // backend computes amount
+                discount:           0,  // backend computes amount
+                brand:           li.brand?.id ? { id: li.brand.id } : null,
             }))
         };
 

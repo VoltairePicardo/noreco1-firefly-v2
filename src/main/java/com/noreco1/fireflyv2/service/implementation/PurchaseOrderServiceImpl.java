@@ -30,6 +30,7 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import jakarta.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 
 /**
@@ -101,6 +102,9 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService, Printable
     PurchaseOrderBudgetDetailRepo purchaseOrderBudgetDetailRepo;
 
     @Autowired
+    BudgetLineItemDetailRepo budgetLineItemDetailRepo;
+
+    @Autowired
     Environment env;
 
     @Autowired
@@ -147,8 +151,8 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService, Printable
 
             Integer voucherYear = Integer.parseInt(GlobalConstant.YYYY_DATE_FORMAT.format(purchaseOrder.getVoucherDate()));
 
-            User budgetCheckedBy = userRepo.findOneByAccountNo(purchaseOrder.getBudgetCheckedBy().getAccountNo());
-            User checkedBy = userRepo.findOneByAccountNo(purchaseOrder.getCheckedBy().getAccountNo());
+            User budgetCheckedBy = purchaseOrder.getBudgetCheckedBy() != null ? userRepo.findOneByAccountNo(purchaseOrder.getBudgetCheckedBy().getAccountNo()) : null;
+            User checkedBy = purchaseOrder.getCheckedBy() != null ? userRepo.findOneByAccountNo(purchaseOrder.getCheckedBy().getAccountNo()) : null;
             User approvedBy = userRepo.findOneByAccountNo(purchaseOrder.getApprovingOfficer().getAccountNo());
 
             Boolean insertMode = purchaseOrder.getId() == null;
@@ -211,34 +215,56 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService, Printable
 
                 ArrayList<PoDetailDto> poDetails = purchaseOrder.getPoDetails();
                 for(PoDetailDto poDetailLine: poDetails) {
-                    PoDetail poDetail = new PoDetail();
+                    PurchaseOrderDetail purchaseOrderDetail = new PurchaseOrderDetail();
 
                     PurchaseOrder po1 = new PurchaseOrder();
                     po1.setId(this.model.getId());
-                    poDetail.setPurchaseOrder(po1);
+                    purchaseOrderDetail.setPurchaseOrder(po1);
 
                     PurchaseRequestDetail purchaseRequestDetail = new PurchaseRequestDetail();
                     purchaseRequestDetail.setId(poDetailLine.getRvDetailId());
                     purchaseRequestDetail.setPoQuantity(poDetailLine.getPoQuantity());
-                    poDetail.setPurchaseRequestDetail(purchaseRequestDetail);
+                    purchaseOrderDetail.setPurchaseRequestDetail(purchaseRequestDetail);
 
-                    poDetail.setQuantity(poDetailLine.getQuantity());
-                    poDetail.setUnitPrice(poDetailLine.getUnitPrice());
-                    poDetail.setVat(poDetailLine.getVat());
-                    poDetail.setDiscount(poDetailLine.getDiscount());
-                    poDetail.setAmount(poDetailLine.getItemAmount());
+                    BigDecimal soqPrice = poDetailLine.getUnitPrice();  // VAT-inclusive SOQ price from frontend
+                    BigDecimal qty      = poDetailLine.getQuantity();
+                    BigDecimal vatPct   = poDetailLine.getVatPercentage()      != null ? poDetailLine.getVatPercentage()      : BigDecimal.ZERO;
+                    BigDecimal discPct  = poDetailLine.getDiscountPercentage() != null ? poDetailLine.getDiscountPercentage() : BigDecimal.ZERO;
 
-                    if(poDetailLine.getBrand() != null && poDetailLine.getBrand().getId() != null) poDetail.setBrand(poDetailLine.getBrand());
+                    BigDecimal hundred    = BigDecimal.valueOf(100);
+                    BigDecimal vatDivisor = BigDecimal.ONE.add(vatPct.divide(hundred, 10, RoundingMode.HALF_UP));
+                    BigDecimal discFactor = BigDecimal.ONE.subtract(discPct.divide(hundred, 10, RoundingMode.HALF_UP));
+
+                    BigDecimal amount        = soqPrice.multiply(qty).multiply(discFactor).setScale(4, RoundingMode.HALF_UP);
+                    BigDecimal unitPriceExcl = vatPct.compareTo(BigDecimal.ZERO) == 0
+                                                ? soqPrice
+                                                : soqPrice.divide(vatDivisor, 4, RoundingMode.HALF_UP);
+                    BigDecimal vatAmount  = amount.multiply(vatPct)
+                                               .divide(hundred.add(vatPct), 4, RoundingMode.HALF_UP);
+                    BigDecimal discAmount = soqPrice.multiply(qty)
+                                               .multiply(discPct.divide(hundred, 10, RoundingMode.HALF_UP))
+                                               .setScale(4, RoundingMode.HALF_UP);
+
+                    purchaseOrderDetail.setQuantity(qty);
+                    purchaseOrderDetail.setUnitPrice(unitPriceExcl);
+                    purchaseOrderDetail.setVat(vatAmount);
+                    purchaseOrderDetail.setDiscount(discAmount);
+                    purchaseOrderDetail.setAmount(amount);
+                    purchaseOrderDetail.setVatPercentage(vatPct);
+                    purchaseOrderDetail.setDiscountPercentage(discPct);
+
+                    if(poDetailLine.getBrand() != null && poDetailLine.getBrand().getId() != null) purchaseOrderDetail.setBrand(poDetailLine.getBrand());
 
                     if(!poDetailLine.getQuantity().equals(BigDecimal.ZERO)) {
-                        PoDetail newPod = poDetailRepo.save(poDetail);
+                        poDetailRepo.save(purchaseOrderDetail);
                     }
                     purchaseRequestDetailRepo.updatePoQuantityById(purchaseRequestDetail.getId(), purchaseRequestDetail.getPoQuantity());
                 }
 
                 // generic document logging here
                 // old value only
-                DocumentLog log = documentLoggerFacade.log(this.model.getTransaction(), authenticationFacade.getLoggedIn(), oldMap, null);
+                String logAction = insertMode ? "Document Created" : "Document Updated";
+                DocumentLog log = documentLoggerFacade.log(this.model.getTransaction(), authenticationFacade.getLoggedIn(), oldMap, null, logAction);
 
                 response.setLogId(log != null ? log.getId() : 0);
                 response.setModelId(this.model.getId());
@@ -319,6 +345,7 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService, Printable
                 map.put("supplier", row[3]);
                 map.put("amount", row[5]);
                 map.put("status", row[7]);
+                map.put("preparedBy", row[8]);
                 mapList.add(map);
             }
             return mapList;
@@ -406,7 +433,9 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService, Printable
 
                     if (purchaseRequest.getBudgetLineItemDetail() != null) {
                         this.reportMeta.put("BUDGET_LINE_ITEM", purchaseRequest.getBudgetLineItemDetail().getTitle() + " - " + purchaseRequest.getBudgetLineItemDetail().getCode());
-                        this.reportMeta.put("BUDGET_LINE_ITEM_BALANCE", voucher.getBudgetLineItemBalancePOJORFP());
+                        int cancelled = com.noreco1.fireflyv2.model.enums.DocumentStatus.CANCELLED.getId();
+                        BigDecimal liveBalance = budgetLineItemDetailRepo.getBudgetLineItemDetailAmountBalancePOJO(cancelled, purchaseRequest.getBudgetLineItemDetail().getId());
+                        this.reportMeta.put("BUDGET_LINE_ITEM_BALANCE", liveBalance != null ? liveBalance : BigDecimal.ZERO);
                     }
                 }
 
@@ -426,6 +455,9 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService, Printable
 
             }
         }
+
+        // Always ensure BUDGET_LINE_ITEM_BALANCE has a value so the JRXML parameter is never null
+        this.reportMeta.putIfAbsent("BUDGET_LINE_ITEM_BALANCE", BigDecimal.ZERO);
 
         return details;
     }
@@ -656,15 +688,15 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService, Printable
             poDto.setReceivedBy(po.getReceivedBy());
             poDto.setExpectedDeliveryDate(po.getExpectedDeliveryDate());
 
-            List<PoDetail> poDetails = poDetailRepo.findByPurchaseOrderId(po.getId());
+            List<PurchaseOrderDetail> purchaseOrderDetails = poDetailRepo.findByPurchaseOrderId(po.getId());
 
-            if(!poDetails.isEmpty()){
+            if(!purchaseOrderDetails.isEmpty()){
 
-                for(PoDetail poDetail : poDetails){
+                for(PurchaseOrderDetail purchaseOrderDetail : purchaseOrderDetails){
 
-                    if(poDetail.getPurchaseRequestDetail() != null){
+                    if(purchaseOrderDetail.getPurchaseRequestDetail() != null){
 
-                        poDto.setPurchaseRequest(poDetail.getPurchaseRequestDetail().getPurchaseRequest());
+                        poDto.setPurchaseRequest(purchaseOrderDetail.getPurchaseRequestDetail().getPurchaseRequest());
 
                     }
 
@@ -688,9 +720,29 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService, Printable
         if (purchaseOrder != null) {
             params.put("VOUCHER_NO", purchaseOrder.getCode());
             params.put("V_DATE", purchaseOrder.getVoucherDate());
-            params.put("APPROVEDBY", purchaseOrder.getApprovingOfficer().getFullName());
-            params.put("CHECKEDBY", purchaseOrder.getCheckedBy().getFullName());
-            params.put("PREPAREDBY", purchaseOrder.getCreatedBy().getFullName());
+            // Prepared By: createdBy user, fallback to logged-in user
+            User preparedByUser = purchaseOrder.getCreatedBy() != null ? purchaseOrder.getCreatedBy() : authenticationFacade.getLoggedIn();
+            params.put("PREPAREDBY", preparedByUser != null ? preparedByUser.getFullName() : "");
+            params.put("PREPAREDBY_POS", preparedByUser != null && preparedByUser.getPosition() != null ? preparedByUser.getPosition().getName() : "");
+
+            // Checked By (print label): maps to budgetCheckedBy DB field
+            params.put("CHECKEDBY", purchaseOrder.getBudgetCheckedBy() != null ? purchaseOrder.getBudgetCheckedBy().getFullName() : "");
+            params.put("CHECKEDBY_POS", purchaseOrder.getBudgetCheckedBy() != null && purchaseOrder.getBudgetCheckedBy().getPosition() != null
+                    ? purchaseOrder.getBudgetCheckedBy().getPosition().getName() : "");
+
+            // Audited By (print label): maps to checkedBy DB field
+            params.put("AUDITEDBY", purchaseOrder.getCheckedBy() != null ? purchaseOrder.getCheckedBy().getFullName() : "");
+            params.put("AUDITEDBY_POS", purchaseOrder.getCheckedBy() != null && purchaseOrder.getCheckedBy().getPosition() != null
+                    ? purchaseOrder.getCheckedBy().getPosition().getName() : "");
+
+            // Approved By (print label): General Manager from PO_SIGNATORIES setting
+            Map poSignatories = settingFacade.getByCode("PO_SIGNATORIES");
+            User gmApprover = null;
+            if (poSignatories != null && poSignatories.get("approvedByAccountNo") != null) {
+                gmApprover = userRepo.findOneByAccountNo(Integer.parseInt(String.valueOf(poSignatories.get("approvedByAccountNo"))));
+            }
+            params.put("APPROVEDBY", gmApprover != null ? gmApprover.getFullName() : "");
+            params.put("APPROVEDBY_POS", gmApprover != null && gmApprover.getPosition() != null ? gmApprover.getPosition().getName() : "");
 
             Supplier supplier = supplierRepo.findOneByAccountNumber(purchaseOrder.getVendor().getAccountNo());
 
@@ -701,11 +753,11 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService, Printable
                 params.put("SUPPLIER_TIN", supplier.getTin());
             }
 
-            if(Checker.isAmountGreaterThanZero(purchaseOrder.getPaymentTerm())) {
+            if (purchaseOrder.getPaymentTerm() != null && purchaseOrder.getPaymentTerm() > 0) {
                 String termInWords = NumberToWord.convert(new BigDecimal(purchaseOrder.getPaymentTerm()));
-                params.put("PAYMENT_TERM", "Within "+termInWords.toLowerCase()+"("+purchaseOrder.getPaymentTerm()+") calendar days after complete delivery");
+                params.put("PAYMENT_TERM", "Within " + termInWords.toLowerCase() + " (" + purchaseOrder.getPaymentTerm() + ") calendar days after complete delivery");
             } else {
-                params.put("PAYMENT_TERM", purchaseOrder.getPaymentTerm()+" DAYS");
+                params.put("PAYMENT_TERM", purchaseOrder.getPaymentTerm() != null ? purchaseOrder.getPaymentTerm() + " DAYS" : "");
             }
 
             String deliveryTerm;
@@ -794,7 +846,8 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService, Printable
 
             if (purchaseOrder != null) {
                 documentProcessingFacade.processAction(purchaseOrder.getTransaction(), actionMap, null, processedBy);
-                documentLoggerFacade.log(purchaseOrder.getTransaction(), authenticationFacade.getLoggedIn(), oldMap, newMap);
+                String wfAction = actionMap.getWorkflowAction() != null ? actionMap.getWorkflowAction().getAction() : null;
+                documentLoggerFacade.log(purchaseOrder.getTransaction(), authenticationFacade.getLoggedIn(), oldMap, newMap, wfAction);
 
                 response.setSuccessMessage("Document successfully processed");
                 response.setSuccess(true);

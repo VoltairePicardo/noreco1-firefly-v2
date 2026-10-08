@@ -49,7 +49,7 @@ public class PurchaseOrder extends Document implements Serializable {
 
     @NotFound(action=NotFoundAction.IGNORE)
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "FK_budgetCheckedByUserId")
+    @JoinColumn(name = "FK_auditedByUserId")
     private User budgetCheckedBy;
 
     @Transient

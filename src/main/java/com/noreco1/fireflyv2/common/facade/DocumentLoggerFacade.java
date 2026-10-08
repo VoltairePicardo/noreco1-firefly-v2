@@ -9,6 +9,7 @@ import java.util.Map;
  */
 public interface DocumentLoggerFacade {
     DocumentLog log(Transaction transaction, User user, Map oldMap, Map newMap);
+    DocumentLog log(Transaction transaction, User user, Map oldMap, Map newMap, String action);
     DocumentLog update(DocumentLog documentLog, Map oldMap, Map newMap);
     Map getLedgerAndFileLog(Map mainLogMap, Integer transId);
 

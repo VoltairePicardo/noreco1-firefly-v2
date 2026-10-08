@@ -30,7 +30,7 @@ public interface BudgetSubItemRepo extends JpaRepository<BudgetSubItem, Integer>
             "  UNION ALL " +
             "   " +
             "  SELECT SUM(pod.amount*-1) AS totalAmount FROM PurchaseOrder po " +
-            "  INNER JOIN PoDetail pod ON pod.FK_purchaseOrderId = po.id " +
+            "  INNER JOIN PurchaseOrderDetail pod ON pod.FK_purchaseOrderId = po.id " +
             "  INNER JOIN PurchaseRequestDetail prd ON prd.id = pod.FK_purchaseRequestDetailId " +
             "  INNER JOIN PurchaseRequest pr ON pr.id = prd.FK_purchaseRequestId " +
             "  WHERE po.FK_documentStatusId != :documentStatusId AND pr.FK_budgetSubItemId = :budgetLineSubItemDetailId " +

@@ -16,8 +16,7 @@
 
             <div class="col-md-3">
                 <label class="form-label fw-bold">Date <span class="text-danger">*</span></label>
-                <input type="text" mwlFlatpickr [options]="flatpickrOptions"
-                       class="form-control" [(ngModel)]="voucherDate" placeholder="Select date"/>
+                <input type="text" class="form-control" [value]="voucherDate" readonly/>
             </div>
 
             <div class="col-md-5">
@@ -28,7 +27,7 @@
                            readonly placeholder="Browse purchase request..."/>
                     @if (!editMode) {
                         <button type="button" class="btn btn-success fw-bold" (click)="openPurchaseRequestBrowse()">
-                            <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
+                            <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
                         </button>
                     }
                 </div>
@@ -41,10 +40,28 @@
                            readonly placeholder="Browse supplier..."/>
                     <button type="button" class="btn btn-success fw-bold"
                             (click)="openVendorBrowse()">
-                        <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
+                        <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
                     </button>
                 </div>
             </div>
+
+            @if (budgetLineItemDetail) {
+                <div class="col-md-5">
+                    <label class="form-label fw-bold">Budget Line Item</label>
+                    <input type="text" class="form-control"
+                           [value]="budgetLineItemDetail?.title || budgetLineItemDetail?.code || ''"
+                           readonly />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Budget Balances</label>
+                    <div class="d-flex gap-3 align-items-center pt-1">
+                        <span class="text-muted fs-xs">CV:</span>
+                        <span class="fw-semibold">{{ budgetAmountBalanceCV != null ? (budgetAmountBalanceCV | number:'1.2-2') : '—' }}</span>
+                        <span class="text-muted fs-xs">PO/JO:</span>
+                        <span class="fw-semibold">{{ budgetAmountBalancePOJO != null ? (budgetAmountBalancePOJO | number:'1.2-2') : '—' }}</span>
+                    </div>
+                </div>
+            }
 
             <div class="col-md-3">
                 <label class="form-label fw-bold">Delivery Term</label>
@@ -92,7 +109,7 @@
                            [value]="cashAdvance?.localCode || cashAdvance?.code || ''"
                            readonly placeholder="Browse cash advance..."/>
                     <button type="button" class="btn btn-success fw-bold" (click)="openCashAdvanceBrowse()">
-                        <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
+                        <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
                     </button>
                 </div>
             </div>
@@ -155,9 +172,14 @@
                                                [(ngModel)]="item.discount" min="0" max="100" step="0.01"/>
                                     </td>
                                     <td>
-                                        <input type="text" class="form-control form-control-sm"
-                                               style="min-width:100px"
-                                               [(ngModel)]="item.brand" placeholder="Brand"/>
+                                        <select class="form-select form-select-sm" style="min-width:120px"
+                                                [(ngModel)]="item.brand"
+                                                [compareWith]="compareBrand">
+                                            <option [ngValue]="null">— Brand —</option>
+                                            @for (b of brands; track b.id) {
+                                                <option [ngValue]="b">{{ b.name }}</option>
+                                            }
+                                        </select>
                                     </td>
                                     <td class="text-end text-nowrap">{{ lineItemAmount(item) | number:'1.2-2' }}</td>
                                     <td>
@@ -192,32 +214,32 @@
                 <div class="fs-xs text-uppercase fw-semibold text-muted mb-2">Signatories</div>
             </div>
             <div class="col-md-4">
-                <label class="form-label fw-bold">Budget Checked By</label>
+                <label class="form-label fw-bold">Checked By</label>
                 <div class="input-group">
                     <input type="text" class="form-control" [value]="budgetCheckedBy?.name || ''"
                            readonly placeholder="Browse officer..."/>
                     <button type="button" class="btn btn-success fw-bold" (click)="openSignatoryBrowse('budgetCheckedBy')">
-                        <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
+                        <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
                     </button>
                 </div>
             </div>
             <div class="col-md-4">
-                <label class="form-label fw-bold">Checked By</label>
+                <label class="form-label fw-bold">Audited By</label>
                 <div class="input-group">
                     <input type="text" class="form-control" [value]="checkedBy?.name || ''"
                            readonly placeholder="Browse officer..."/>
                     <button type="button" class="btn btn-success fw-bold" (click)="openSignatoryBrowse('checkedBy')">
-                        <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
+                        <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
                     </button>
                 </div>
             </div>
             <div class="col-md-4">
-                <label class="form-label fw-bold">Approved By</label>
+                <label class="form-label fw-bold">Approved By <span class="text-danger">*</span></label>
                 <div class="input-group">
                     <input type="text" class="form-control" [value]="approvedBy?.name || ''"
                            readonly placeholder="Browse officer..."/>
                     <button type="button" class="btn btn-success fw-bold" (click)="openSignatoryBrowse('approvedBy')">
-                        <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
+                        <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
                     </button>
                 </div>
             </div>
@@ -230,7 +252,7 @@
             <div class="d-flex align-items-center gap-3 mb-2">
                 <div class="fs-xs text-uppercase fw-semibold text-muted">Attachments</div>
                 <button type="button" class="btn btn-success fw-bold btn-sm" (click)="openFilePicker()">
-                    <ng-icon name="tablerPaperclip" class="ps-0 pe-2 fw-bold"></ng-icon>Attach Files
+                    <ng-icon name="tablerPaperclip" class="ps-0 pe-3 fw-bold"></ng-icon>Attach Files
                 </button>
                 <small class="text-muted">JPG, PNG, PDF only</small>
             </div>

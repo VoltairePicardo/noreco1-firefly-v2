@@ -73,10 +73,10 @@ export class ItemDetailsComponent implements OnInit {
             this.showApprovalForm.set(true);
             this.initApprovalForm();
             if (this.units().length === 0) {
-                this.service.listUnits().subscribe({ next: d => this.units.set(d), error: () => {} });
+                this.service.listUnits().subscribe({ next: (d: any) => this.units.set(d?.content ?? d ?? []), error: () => {} });
             }
             if (this.categories().length === 0) {
-                this.service.listCategories().subscribe({ next: d => this.categories.set(d), error: () => {} });
+                this.service.listCategories().subscribe({ next: (d: any) => this.categories.set(d?.content ?? d ?? []), error: () => {} });
             }
         } else {
             this.showApprovalForm.set(false);

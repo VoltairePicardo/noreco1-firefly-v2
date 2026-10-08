@@ -302,9 +302,9 @@ public class ReceivingReportController {
                     jd.setId(detailRefId);
                     detail.setJoDetail(jd);
                 } else if (!isRV && !isIFR) {
-                    PoDetail pd = new PoDetail();
+                    PurchaseOrderDetail pd = new PurchaseOrderDetail();
                     pd.setId(detailRefId);
-                    detail.setPoDetail(pd);
+                    detail.setPurchaseOrderDetail(pd);
                 }
             }
 

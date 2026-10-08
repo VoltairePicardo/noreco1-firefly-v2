@@ -67,8 +67,8 @@ export class QuotationAddEditComponent {
     lineItems: any[] = [];
     brands: any[]    = [];
 
-    approvingOfficer: any = null;
     generalManager:   any = null;
+    notedBy:          any = null;
     isTotalMoreThan100k   = false;
 
     readonly supplierSlots = [0, 1, 2];
@@ -128,8 +128,8 @@ export class QuotationAddEditComponent {
                         }
                     });
 
-                    if (header.approvingOfficerObj) this.approvingOfficer = header.approvingOfficerObj;
                     if (header.generalManagerObj)   { this.generalManager = header.generalManagerObj; this.isTotalMoreThan100k = true; }
+                    if (header.notedByObj)          this.notedBy = header.notedByObj;
 
                     this.lineItems = (details || []).map((d: any) => ({
                         rvDetailId:         d.purchaseRequestDetailId,
@@ -250,7 +250,7 @@ export class QuotationAddEditComponent {
         this.suppliers[index] = null;
     }
 
-    async openSignatoryBrowse(field: 'approvingOfficer' | 'generalManager'): Promise<void> {
+    async openSignatoryBrowse(field: 'generalManager' | 'notedBy'): Promise<void> {
         try {
             const result = await this.modalService.openModal(BrowseEntityModalComponent, {}, { size: 'lg', centered: true });
             if (result?.action === 'select' && result?.data) {
@@ -299,8 +299,7 @@ export class QuotationAddEditComponent {
         if (!this.quotationDate) { this.alertService.warning(this.module, 'Please provide a quotation date.', ''); return; }
         if (!this.particular?.trim()) { this.alertService.warning(this.module, 'Please provide particulars.', ''); return; }
         if (this.lineItems.length === 0) { this.alertService.warning(this.module, 'Please add at least one item.', ''); return; }
-        if (!this.approvingOfficer) { this.alertService.warning(this.module, 'Please select a Finance Manager.', ''); return; }
-        if (this.isTotalMoreThan100k && !this.generalManager) { this.alertService.warning(this.module, 'Total exceeds ₱100,000 — please select a General Manager.', ''); return; }
+        if (!this.notedBy) { this.alertService.warning(this.module, 'Please select a Noted By.', ''); return; }
 
         this.formSubmit = true;
 
@@ -330,8 +329,8 @@ export class QuotationAddEditComponent {
                 termsOfPayment:            this.terms[x.index]?.termsOfPayment            ?? null,
                 placeOfDelivery:           this.terms[x.index]?.placeOfDelivery           || '',
             })),
-            approvingOfficer:         this.approvingOfficer ? { accountNo: this.approvingOfficer.accountNo } : null,
-            approvedByGeneralManager: this.generalManager   ? { accountNo: this.generalManager.accountNo }   : null,
+            approvedByGeneralManager: this.generalManager ? { accountNo: this.generalManager.accountNo } : null,
+            notedBy:                  this.notedBy        ? { accountNo: this.notedBy.accountNo }        : null,
         };
 
         if (this.editMode) payload.id = this.id;

@@ -4,7 +4,7 @@ import { COMMON_ALL_PAGE_IMPORTS, COMMON_MAIN_PAGE_IMPORTS, SHARED_PROVIDERS } f
 import { FormsModule } from '@angular/forms';
 import { FlatpickrDefaults, FlatpickrModule } from 'angularx-flatpickr';
 import { provideIcons } from '@ng-icons/core';
-import { tablerPrinter, tablerEdit, tablerArrowLeft, tablerPhoto, tablerFile, tablerCheck, tablerEye, tablerEyeOff } from '@ng-icons/tabler-icons';
+import { tablerPrinter, tablerEdit, tablerArrowLeft, tablerPhoto, tablerFile, tablerCheck, tablerEye, tablerEyeOff, tablerChevronDown, tablerChevronUp } from '@ng-icons/tabler-icons';
 import { AlertService } from '@/app/shared/services/alert.service';
 import { forkJoin } from 'rxjs';
 import { PurchaseOrderService } from '../purchase-order.service';
@@ -15,7 +15,7 @@ const TERMINAL_STATUSES = ['Approved', 'Denied', 'Cancelled'];
 @Component({
     selector: 'app-purchase-order-detail',
     imports: [...COMMON_ALL_PAGE_IMPORTS, ...COMMON_MAIN_PAGE_IMPORTS, SharedModule, FormsModule, FlatpickrModule, RouterLink],
-    providers: [...SHARED_PROVIDERS, FlatpickrDefaults, provideIcons({ tablerPrinter, tablerEdit, tablerArrowLeft, tablerPhoto, tablerFile, tablerCheck, tablerEye, tablerEyeOff })],
+    providers: [...SHARED_PROVIDERS, FlatpickrDefaults, provideIcons({ tablerPrinter, tablerEdit, tablerArrowLeft, tablerPhoto, tablerFile, tablerCheck, tablerEye, tablerEyeOff, tablerChevronDown, tablerChevronUp })],
     templateUrl: './purchase-order-detail.component.html'
 })
 export class PurchaseOrderDetailComponent {
@@ -47,6 +47,7 @@ export class PurchaseOrderDetailComponent {
     logs        : any[] = [];
     showLogs    = false;
     logsLoading = false;
+    expandedLogs = new Set<number>();
 
     private service      = inject(PurchaseOrderService);
     private route        = inject(ActivatedRoute);
@@ -113,6 +114,20 @@ export class PurchaseOrderDetailComponent {
 
     isApproved(): boolean {
         return this.data?.documentStatus?.status === 'Approved';
+    }
+
+    parseLogStatus(log: any): string {
+        try { return JSON.parse(log.newValue)?.documentStatus ?? '—'; }
+        catch { return '—'; }
+    }
+
+    parseLogSnapshot(log: any): any {
+        try { return JSON.parse(log.newValue) ?? null; }
+        catch { return null; }
+    }
+
+    toggleLog(id: number): void {
+        this.expandedLogs.has(id) ? this.expandedLogs.delete(id) : this.expandedLogs.add(id);
     }
 
     processWorkflow(): void {

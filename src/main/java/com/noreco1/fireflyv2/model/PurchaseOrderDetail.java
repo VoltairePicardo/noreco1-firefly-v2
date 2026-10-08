@@ -2,7 +2,6 @@ package com.noreco1.fireflyv2.model;
 
 import lombok.*;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
@@ -15,9 +14,10 @@ import java.math.BigDecimal;
 @ToString
 @EqualsAndHashCode
 @Entity
+@Table(name = "PurchaseOrderDetail")
 @NoArgsConstructor
 @AllArgsConstructor
-public class PoDetail implements Serializable {
+public class PurchaseOrderDetail implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -52,13 +52,19 @@ public class PoDetail implements Serializable {
     @Column
     private BigDecimal amount = BigDecimal.ZERO;
 
+    @Column
+    private BigDecimal vatPercentage = BigDecimal.ZERO;
+
+    @Column
+    private BigDecimal discountPercentage = BigDecimal.ZERO;
+
     @NotFound(action = NotFoundAction.IGNORE)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="FK_brandId", updatable = false)
     private Brand brand;
 
-    public PoDetail(PurchaseOrder purchaseOrder, PurchaseRequestDetail purchaseRequestDetail, BigDecimal quantity, BigDecimal deliveredQuantity,
-                    BigDecimal unitPrice, BigDecimal vat, BigDecimal discount, BigDecimal amount, Brand brand) {
+    public PurchaseOrderDetail(PurchaseOrder purchaseOrder, PurchaseRequestDetail purchaseRequestDetail, BigDecimal quantity, BigDecimal deliveredQuantity,
+                               BigDecimal unitPrice, BigDecimal vat, BigDecimal discount, BigDecimal amount, Brand brand) {
         this.purchaseOrder = purchaseOrder;
         this.purchaseRequestDetail = purchaseRequestDetail;
         this.quantity = quantity;

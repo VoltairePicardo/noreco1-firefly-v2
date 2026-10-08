@@ -114,6 +114,16 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
     }
 
     @Override
+    public DocumentLog log(Transaction transaction, User user, Map oldMap, Map newMap, String action) {
+        DocumentLog dl = this.log(transaction, user, oldMap, newMap);
+        if (action != null && dl != null) {
+            dl.setAction(action);
+            documentLogRepo.save(dl);
+        }
+        return dl;
+    }
+
+    @Override
     public DocumentLog update(DocumentLog documentLog, Map oldMap, Map newMap) {
         ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
         try {
@@ -855,7 +865,7 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
                 Map detailsMap = new HashMap();
 
                 Map poDetailMap = new HashMap();
-                poDetailMap.put("id", details.getPoDetail() != null ? details.getPoDetail().getId() : 0);
+                poDetailMap.put("id", details.getPurchaseOrderDetail() != null ? details.getPurchaseOrderDetail().getId() : 0);
                 poDetailMap.put("unit", details.getItem().getUnit().getCode());
 
                 Map itemMap = new HashMap();
@@ -878,7 +888,7 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
                 detailsList.add(detailsMap);
 
                 if(!poSet) {
-                    map.put("poNumber", details.getPoDetail() != null ? details.getPoDetail().getPurchaseOrder().getCode() : "Repaired Items");
+                    map.put("poNumber", details.getPurchaseOrderDetail() != null ? details.getPurchaseOrderDetail().getPurchaseOrder().getCode() : "Repaired Items");
                     poSet = true;
                 }
             }
@@ -1309,8 +1319,8 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
             map.put("documentStatus", quotationDto.getDocumentStatus());
             map.put("createdBy",      quotationDto.getPreparedBy());
 
-            if (quotationDto.getApprovedByFinanceManager() != null && !quotationDto.getApprovedByFinanceManager().isEmpty())
-                map.put("approvedByFinanceOfficer", quotationDto.getApprovedByFinanceManager());
+            if (quotationDto.getNotedByObj() != null)
+                map.put("notedBy", quotationDto.getNotedByObj().get("fullName"));
             if (quotationDto.getApprovedByGeneralManager() != null && !quotationDto.getApprovedByGeneralManager().isEmpty())
                 map.put("approvedByGeneralManager", quotationDto.getApprovedByGeneralManager());
 

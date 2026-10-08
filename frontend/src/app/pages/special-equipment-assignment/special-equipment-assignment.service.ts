@@ -42,7 +42,7 @@ export class SpecialEquipmentAssignmentService {
     }
 
     getDocumentLogs(transId: number): Observable<any[]> {
-        return this.http.post<any[]>(`${BASE_URL}/document/${transId}/logs`, {}, httpOptions);
+        return this.http.get<any[]>(`${BASE_URL}/json/document-logs/${transId}`);
     }
 
     print(id: number): void {

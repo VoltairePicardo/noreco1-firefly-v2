@@ -1,7 +1,5 @@
 package com.noreco1.fireflyv2.service.implementation;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.noreco1.fireflyv2.common.GlobalConstant;
 import com.noreco1.fireflyv2.common.facade.*;
 import com.noreco1.fireflyv2.common.helpers.*;
@@ -9,7 +7,6 @@ import com.noreco1.fireflyv2.dtoers.DocumentDtoer;
 import com.noreco1.fireflyv2.model.*;
 import com.noreco1.fireflyv2.model.DocumentStatus;
 import com.noreco1.fireflyv2.model.Workflow;
-import com.noreco1.fireflyv2.model.enums.*;
 import com.noreco1.fireflyv2.model.enums.DocumentType;
 import com.noreco1.fireflyv2.repo.*;
 import com.noreco1.fireflyv2.controller.response.CreditCardPurchaseRequestBatchDto;
@@ -29,8 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 
 import jakarta.servlet.http.HttpServletRequest;
-import java.math.BigDecimal;
-import java.text.DecimalFormat;
+
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -549,10 +545,10 @@ public class CreditCardPurchaseRequestServiceImpl implements CreditCardPurchaseR
 
             if(creditCardPurchaseRequest.getPurchaseOrder() != null){
                 PurchaseOrder linkPO = creditCardPurchaseRequest.getPurchaseOrder();
-                List<PoDetail> poDetails = this.poDetailRepo.findByPurchaseOrderId(linkPO.getId());
-                if(Checker.collectionIsNotEmpty(poDetails)){
-                    for (PoDetail poDetail : poDetails){
-                        Integer accountNo = poDetail.getPurchaseRequestDetail().getPurchaseRequest().getCreatedBy().getAccountNo();
+                List<PurchaseOrderDetail> purchaseOrderDetails = this.poDetailRepo.findByPurchaseOrderId(linkPO.getId());
+                if(Checker.collectionIsNotEmpty(purchaseOrderDetails)){
+                    for (PurchaseOrderDetail purchaseOrderDetail : purchaseOrderDetails){
+                        Integer accountNo = purchaseOrderDetail.getPurchaseRequestDetail().getPurchaseRequest().getCreatedBy().getAccountNo();
                         Employee employee = this.employeeRepo.findOneByAccountNumber(accountNo);
                         if(employee != null && Checker.isValidId(employee.getId())){
                             requestedBy = employee.getName();
@@ -608,16 +604,16 @@ public class CreditCardPurchaseRequestServiceImpl implements CreditCardPurchaseR
 
         if(creditCardPurchaseRequest.getPurchaseOrder() != null){
             PurchaseOrder linkPO = creditCardPurchaseRequest.getPurchaseOrder();
-            List<PoDetail> poDetails = this.poDetailRepo.findByPurchaseOrderId(linkPO.getId());
-            if(Checker.collectionIsNotEmpty(poDetails)){
-                for (PoDetail poDetail : poDetails){
+            List<PurchaseOrderDetail> purchaseOrderDetails = this.poDetailRepo.findByPurchaseOrderId(linkPO.getId());
+            if(Checker.collectionIsNotEmpty(purchaseOrderDetails)){
+                for (PurchaseOrderDetail purchaseOrderDetail : purchaseOrderDetails){
                     Map map = new HashMap();
 
-                    map.put("quantity", poDetail.getQuantity());
-                    map.put("itemCode", poDetail.getPurchaseRequestDetail().getItem().getCode());
-                    map.put("itemDescription", poDetail.getPurchaseRequestDetail().getItem().getDescription());
-                    map.put("unitPrice", poDetail.getUnitPrice());
-                    map.put("total", poDetail.getAmount());
+                    map.put("quantity", purchaseOrderDetail.getQuantity());
+                    map.put("itemCode", purchaseOrderDetail.getPurchaseRequestDetail().getItem().getCode());
+                    map.put("itemDescription", purchaseOrderDetail.getPurchaseRequestDetail().getItem().getDescription());
+                    map.put("unitPrice", purchaseOrderDetail.getUnitPrice());
+                    map.put("total", purchaseOrderDetail.getAmount());
 
                     details.add(map);
                 }

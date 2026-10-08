@@ -148,16 +148,16 @@ public interface DocumentRepo extends JpaRepository<Document, Integer> {
             "WHERE QuotationDetail.FK_PurchaseRequestDetailId = :rvdId GROUP BY doc.id " +
             "UNION " +
             "SELECT doc.id, doc.code, doc.voucherDate, doc.createdAt, 'Purchase Order' as docType FROM PurchaseOrder doc " +
-            "INNER JOIN PoDetail pod ON pod.FK_purchaseOrderId = doc.id " +
+            "INNER JOIN PurchaseOrderDetail pod ON pod.FK_purchaseOrderId = doc.id " +
             "INNER JOIN PurchaseRequestDetail rvd ON rvd.id = pod.FK_PurchaseRequestDetailId " +
             "WHERE rvd.id = :rvdId " +
             "UNION " +
             "SELECT doc.id, doc.code, doc.deliveryDate as voucherDate, doc.createdAt, 'Receiving Report' as docType FROM ReceivingReport doc " +
             "JOIN ReceivingReportDetail ON doc.id = ReceivingReportDetail.FK_receivingReportId " +
-            "LEFT JOIN PoDetail ON ReceivingReportDetail.FK_poDetailId = PoDetail.id " +
+            "LEFT JOIN PurchaseOrderDetail ON ReceivingReportDetail.FK_poDetailId = PurchaseOrderDetail.id " +
             "LEFT JOIN JoDetail ON ReceivingReportDetail.FK_joDetailId = JoDetail.id " +
-            "LEFT JOIN PurchaseRequestDetail ON PoDetail.FK_PurchaseRequestDetailId = PurchaseRequestDetail.id " +
-            "WHERE PoDetail.FK_PurchaseRequestDetailId = :rvdId OR JoDetail.FK_PurchaseRequestDetailId = :rvdId  GROUP BY doc.id " +
+            "LEFT JOIN PurchaseRequestDetail ON PurchaseOrderDetail.FK_PurchaseRequestDetailId = PurchaseRequestDetail.id " +
+            "WHERE PurchaseOrderDetail.FK_PurchaseRequestDetailId = :rvdId OR JoDetail.FK_PurchaseRequestDetailId = :rvdId  GROUP BY doc.id " +
             "UNION " +
             "SELECT doc.id, doc.code, doc.voucherDate, doc.createdAt, 'Job Order' as docType FROM JobOrder doc " +
             "INNER JOIN JoDetail jod ON jod.FK_jobOrderId = doc.id " +
@@ -174,8 +174,8 @@ public interface DocumentRepo extends JpaRepository<Document, Integer> {
             "INNER JOIN AccountsPayablevoucherLink ON doc.id = AccountsPayablevoucherLink.FK_accountsPayableVoucherId " +
             "INNER JOIN ReceivingReport ON AccountsPayablevoucherLink.FK_linkedDocumentId = ReceivingReport.id " +
             "INNER JOIN ReceivingReportDetail ON ReceivingReport.id = ReceivingReportDetail.FK_receivingReportId " +
-            "INNER JOIN PoDetail ON ReceivingReportDetail.FK_poDetailId = PoDetail.id " +
-            "WHERE PoDetail.FK_PurchaseRequestDetailId = :rvdId AND FK_documentTypeId = 3 GROUP BY doc.id " + // 3 - RR
+            "INNER JOIN PurchaseOrderDetail ON ReceivingReportDetail.FK_poDetailId = PurchaseOrderDetail.id " +
+            "WHERE PurchaseOrderDetail.FK_PurchaseRequestDetailId = :rvdId AND FK_documentTypeId = 3 GROUP BY doc.id " + // 3 - RR
             "UNION " +
             "SELECT doc.id, doc.code, doc.voucherDate, doc.createdAt, 'Accounts Payable Voucher' as docType FROM AccountsPayablevoucher doc " +
             "JOIN AccountsPayablevoucherLink ON doc.id = AccountsPayablevoucherLink.FK_accountsPayableVoucherId " +
@@ -191,8 +191,8 @@ public interface DocumentRepo extends JpaRepository<Document, Integer> {
             "JOIN AccountsPayablevoucherLink ON AccountsPayablevoucher.id = AccountsPayablevoucherLink.FK_accountsPayableVoucherId " +
             "JOIN ReceivingReport ON AccountsPayablevoucherLink.FK_linkedDocumentId = ReceivingReport.id " +
             "JOIN ReceivingReportDetail ON ReceivingReport.id = ReceivingReportDetail.FK_receivingReportId " +
-            "JOIN PoDetail ON ReceivingReportDetail.FK_poDetailId = PoDetail.id " +
-            "WHERE PoDetail.FK_PurchaseRequestDetailId = :rvdId AND FK_documentTypeId = 3 GROUP BY doc.id " + // 3 - RR
+            "JOIN PurchaseOrderDetail ON ReceivingReportDetail.FK_poDetailId = PurchaseOrderDetail.id " +
+            "WHERE PurchaseOrderDetail.FK_PurchaseRequestDetailId = :rvdId AND FK_documentTypeId = 3 GROUP BY doc.id " + // 3 - RR
             "UNION " +
             "SELECT doc.id, doc.code, doc.voucherDate, doc.createdAt, 'Check Voucher' as docType FROM CheckVoucher doc " +
             "JOIN CheckVoucherApv ON doc.id = CheckVoucherApv.FK_checkVoucherId " +
@@ -1193,8 +1193,8 @@ public interface DocumentRepo extends JpaRepository<Document, Integer> {
             "AND ur.FK_userId = :signatoryUserId " +
             "AND ur.FK_roleId IN (:purchasingRoleIds) /* Show all if UserGroup/Role is Purchasing Officer */" +
             "AND Quotation.id IN (SELECT FK_quotationId " +
-            "FROM QuotationDetail LEFT OUTER JOIN PoDetail ON PoDetail.FK_PurchaseRequestDetailId = QuotationDetail.FK_PurchaseRequestDetailId " +
-            "WHERE PoDetail.id IS NULL) " +
+            "FROM QuotationDetail LEFT OUTER JOIN PurchaseOrderDetail ON PurchaseOrderDetail.FK_PurchaseRequestDetailId = QuotationDetail.FK_PurchaseRequestDetailId " +
+            "WHERE PurchaseOrderDetail.id IS NULL) " +
             "AND Quotation.id IN (select FK_quotationId " +
             "FROM QuotationDetail LEFT OUTER JOIN JoDetail ON JoDetail.FK_PurchaseRequestDetailId = QuotationDetail.FK_PurchaseRequestDetailId " +
             "WHERE JoDetail.id IS NULL) " +
@@ -1531,20 +1531,20 @@ public interface DocumentRepo extends JpaRepository<Document, Integer> {
     Page<Object[]> findAllForPrepaymentLinking(@Param("accountId") Integer accountId, @Param("accountNo") Integer accountNo, @Param("query") String query, Pageable pageable);
 
     @Query(value = "SELECT * FROM " +
-            "(SELECT PoDetail.FK_PurchaseRequestDetailId, doc.id FROM AccountsPayablevoucher doc " +
+            "(SELECT PurchaseOrderDetail.FK_PurchaseRequestDetailId, doc.id FROM AccountsPayablevoucher doc " +
             "INNER JOIN AccountsPayablevoucherLink ON doc.id = AccountsPayablevoucherLink.FK_accountsPayableVoucherId " +
             "INNER JOIN ReceivingReport ON AccountsPayablevoucherLink.FK_linkedDocumentId = ReceivingReport.id " +
             "INNER JOIN ReceivingReportDetail ON ReceivingReport.id = ReceivingReportDetail.FK_receivingReportId " +
-            "INNER JOIN PoDetail ON ReceivingReportDetail.FK_poDetailId = PoDetail.id " +
+            "INNER JOIN PurchaseOrderDetail ON ReceivingReportDetail.FK_poDetailId = PurchaseOrderDetail.id " +
             "WHERE doc.FK_transactionId = :transId GROUP BY FK_PurchaseRequestDetailId " +
             "UNION " +
-            "SELECT PoDetail.FK_PurchaseRequestDetailId, doc.id FROM CheckVoucher doc " +
+            "SELECT PurchaseOrderDetail.FK_PurchaseRequestDetailId, doc.id FROM CheckVoucher doc " +
             "JOIN CheckVoucherApv ON doc.id = CheckVoucherApv.FK_checkVoucherId " +
             "JOIN AccountsPayablevoucher ON CheckVoucherApv.FK_accountsPayableVoucherId = AccountsPayablevoucher.id " +
             "JOIN AccountsPayablevoucherLink ON AccountsPayablevoucher.id = AccountsPayablevoucherLink.FK_accountsPayableVoucherId " +
             "JOIN ReceivingReport ON AccountsPayablevoucherLink.FK_linkedDocumentId = ReceivingReport.id " +
             "JOIN ReceivingReportDetail ON ReceivingReport.id = ReceivingReportDetail.FK_receivingReportId " +
-            "JOIN PoDetail ON ReceivingReportDetail.FK_poDetailId = PoDetail.id " +
+            "JOIN PurchaseOrderDetail ON ReceivingReportDetail.FK_poDetailId = PurchaseOrderDetail.id " +
             "WHERE doc.FK_transactionId = :transId " +
             "UNION " +
             "SELECT JoDetail.FK_PurchaseRequestDetailId, doc.id FROM CheckVoucher doc " +
