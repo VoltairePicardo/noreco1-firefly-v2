@@ -241,7 +241,7 @@ public class PaymentRequestServiceImpl implements PaymentRequestService, Printab
 
                     // generic document logging here
                     // old value only
-                    DocumentLog log = documentLoggerFacade.log(this.model.getTransaction(), authenticationFacade.getLoggedIn(), oldMap, null);
+                    DocumentLog log = documentLoggerFacade.log(this.model.getTransaction(), createdBy, oldMap, null);
 
                     response.setLogId(log != null ? log.getId() : 0);
                     response.setModelId(this.model.getId());

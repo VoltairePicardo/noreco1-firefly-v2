@@ -2,6 +2,9 @@ import { ChangeDetectionStrategy, Component, computed, effect, inject, input, si
 import { DatePipe } from '@angular/common';
 import {AnyJSONService, DocumentLog} from '@/app/shared/services/any-json.service';
 
+/** Log keys that are not shown in the history. */
+const HIDDEN_LOG_KEYS = new Set(['files']);
+
 interface LogEntry {
     label: string;
     value: string;
@@ -90,10 +93,12 @@ export class DocumentLogsComponent {
         if (log.newValue) {
             try {
                 const parsed = JSON.parse(log.newValue) as Record<string, unknown>;
-                entries = Object.entries(parsed).map(([key, value]) => ({
-                    label: this.humanizeKey(key),
-                    value: this.formatValue(value),
-                }));
+                entries = Object.entries(parsed)
+                    .filter(([key]) => !HIDDEN_LOG_KEYS.has(key))
+                    .map(([key, value]) => ({
+                        label: this.humanizeKey(key),
+                        value: this.formatValue(value),
+                    }));
             } catch {
                 entries = [{ label: 'Value', value: log.newValue }];
             }

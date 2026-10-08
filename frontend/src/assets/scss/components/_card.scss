@@ -48,6 +48,13 @@
     }
 }
 
+// Card Footer
+.card-footer {
+    &.border-dashed {
+        border-top-style: dashed !important;
+    }
+}
+
 // Custom Card Style
 .card-out-of-container {
     margin-left: calc(calc($spacer + $card-border-width) * -1);

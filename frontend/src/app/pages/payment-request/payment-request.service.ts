@@ -59,6 +59,19 @@ export class PaymentRequestService {
         return this.http.get<any[]>(`${BASE_API}/json/budget-sub-items/${budgetLineItemDetailId}`);
     }
 
+    getBudgetDetails(id: number): Observable<any[]> {
+        return this.http.get<any[]>(`${BASE_API}/payment-request/${id}/budget-details`);
+    }
+
+    getBudgetLineItemDetailBalance(id: number, type?: string): Observable<number> {
+        const params = type ? new HttpParams().set('type', type) : undefined;
+        return this.http.get<number>(`${BASE_API}/budget-line-item/detail-amount-balance/${id}`, { params });
+    }
+
+    getBudgetSubItemBalance(id: number, type: string): Observable<number> {
+        return this.http.get<number>(`${BASE_API}/budget-sub-item/amount-balance/${id}`, { params: new HttpParams().set('type', type) });
+    }
+
     getFiles(id: number): Observable<any[]> {
         return this.http.get<any[]>(`${BASE_API}/payment-request/${id}/files`);
     }
