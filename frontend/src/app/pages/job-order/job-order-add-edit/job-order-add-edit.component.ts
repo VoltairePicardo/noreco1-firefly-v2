@@ -59,6 +59,9 @@ export class JobOrderAddEditComponent {
                 this.editMode  = true;
                 this.subModule = 'Edit';
                 this.loadForEdit();
+            } else {
+                const today = new Date();
+                this.voucherDate = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
             }
         });
     }
@@ -108,7 +111,7 @@ export class JobOrderAddEditComponent {
 
     async openVendorBrowse(): Promise<void> {
         try {
-            const result = await this.modalService.openModal(BrowseEntityModalComponent, {}, { size: 'lg', centered: true });
+            const result = await this.modalService.openModal(BrowseEntityModalComponent, { defaultClassificationId: 2 }, { size: 'lg', centered: true });
             if (result?.action === 'select' && result?.data) {
                 this.vendor = result.data;
             }
@@ -161,6 +164,23 @@ export class JobOrderAddEditComponent {
     }
 
     removeLineItem(index: number): void { this.lineItems.splice(index, 1); }
+
+    onPaymentTermChange(): void {
+        const n = this.paymentTerm;
+        this.paymentTermInWords = (n != null && n > 0) ? this.numToWords(n) : '';
+    }
+
+    private numToWords(n: number): string {
+        const ones = ['', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine',
+                      'ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen',
+                      'seventeen', 'eighteen', 'nineteen'];
+        const tens = ['', '', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety'];
+        if (n < 20)    return ones[n];
+        if (n < 100)   return tens[Math.floor(n / 10)] + (n % 10 ? '-' + ones[n % 10] : '');
+        if (n < 1000)  return ones[Math.floor(n / 100)] + ' hundred' + (n % 100 ? ' ' + this.numToWords(n % 100) : '');
+        if (n < 1000000) return this.numToWords(Math.floor(n / 1000)) + ' thousand' + (n % 1000 ? ' ' + this.numToWords(n % 1000) : '');
+        return String(n);
+    }
 
     // ─── Computed ────────────────────────────────────────────────────────────
 

@@ -1,6 +1,7 @@
 package com.noreco1.fireflyv2.controller;
 
 import com.noreco1.fireflyv2.common.GlobalConstant;
+import com.noreco1.fireflyv2.common.helpers.Checker;
 import com.noreco1.fireflyv2.controller.response.JoDetailDto;
 import com.noreco1.fireflyv2.controller.response.JoDto;
 import com.noreco1.fireflyv2.controller.response.JoListDto;
@@ -85,13 +86,21 @@ public class JobOrderController {
     @PostMapping("/create")
     public PostResponse create(@RequestBody JobOrder jobOrder, HttpServletRequest request) {
         BindingResult bindingResult = new BeanPropertyBindingResult(jobOrder, "jobOrder");
-        return jobOrderService.processCreate(jobOrder, bindingResult, messageSource, request);
+        PostResponse response = jobOrderService.processCreate(jobOrder, bindingResult, messageSource, request);
+        if (Checker.documentSaved(response)) {
+            jobOrderService.logNewValue(response.getLogId());
+        }
+        return response;
     }
 
     @PostMapping("/update")
     public PostResponse update(@RequestBody JobOrder jobOrder, HttpServletRequest request) {
         BindingResult bindingResult = new BeanPropertyBindingResult(jobOrder, "jobOrder");
-        return jobOrderService.processUpdate(jobOrder, bindingResult, messageSource, request, Collections.emptyList());
+        PostResponse response = jobOrderService.processUpdate(jobOrder, bindingResult, messageSource, request, Collections.emptyList());
+        if (Checker.documentSaved(response)) {
+            jobOrderService.logNewValue(response.getLogId());
+        }
+        return response;
     }
 
     @PostMapping("/process")

@@ -85,9 +85,8 @@ public interface JobOrderRepo extends JpaRepository<JobOrder, Integer> {
             "INNER JOIN DocumentStatus d ON d.id = jo.FK_documentStatusId " +
             "WHERE jo.voucherDate >= :from AND jo.voucherDate <= :to " +
             "ORDER BY jo.code", nativeQuery = true)
-    public List<Object[]> findForSummaryByDateRange(@Param("from") String from, @Param("to") String to);
+    List<Object[]> findForSummaryByDateRange(@Param("from") String from, @Param("to") String to);
 
-    public JobOrder findOneByTransactionId(Integer transId);
 
     @Query(value = "SELECT " +
             "doc.id, " +
@@ -105,7 +104,8 @@ public interface JobOrderRepo extends JpaRepository<JobOrder, Integer> {
             "WHERE doc.voucherDate >= :from AND doc.voucherDate <= :to " +
             "AND doc.FK_documentStatusId != :documentStatusId " +
             "ORDER BY doc.code", nativeQuery = true)
-    public List<Object[]> findForSummaryByDateRangeAndStatusPending(@Param("from") String from, @Param("to") String to, @Param("documentStatusId") Integer documentStatusId);
+    List<Object[]> findForSummaryByDateRangeAndStatusPending(@Param("from") String from, @Param("to") String to, @Param("documentStatusId") Integer documentStatusId);
+    List<JobOrder> findByVoucherDateBetween(Date from, Date to);
     List<JobOrder> findByVoucherDateBetweenAndDocumentStatusIdNotIn(Date from, Date to, Collection<Integer> documentStatusIds);
     List<JobOrder> findByDocumentStatusIdAndVoucherDateBetween(Integer statusId, Date from, Date to);
     List<JobOrder> findByVoucherDateBetweenAndDocumentStatusIdNotInAndOfficeId(Date from, Date to, Collection<Integer> documentStatusIds, Integer officeId);
@@ -159,6 +159,6 @@ public interface JobOrderRepo extends JpaRepository<JobOrder, Integer> {
             nativeQuery = true)
     Page<JobOrder> findAllForCreditCardPurchaseRequestByStatusAndFilter(@Param("documentStatusId") Integer documentStatusId,
                                                                         @Param("filter") String filter, Pageable pageable);
-
+    JobOrder findOneByTransactionId(Integer transId);
     Page<JobOrder> findByCodeContainingIgnoreCase(String code, Pageable pageable);
 }

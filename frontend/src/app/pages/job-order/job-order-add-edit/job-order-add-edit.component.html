@@ -13,13 +13,13 @@
 
         <!-- Header -->
         <div class="row g-3 mb-4">
-            <div class="col-md-3">
+            <div class="col-md-2">
                 <label class="form-label fw-bold">Date <span class="text-danger">*</span></label>
                 <input type="text" mwlFlatpickr [options]="flatpickrOptions"
                        class="form-control" [(ngModel)]="voucherDate" placeholder="Select date"
-                       [disabled]="editMode"/>
+                       disabled/>
             </div>
-            <div class="col-md-5">
+            <div class="col-md-4">
                 <label class="form-label fw-bold">Supplier <span class="text-danger">*</span></label>
                 <div class="input-group">
                     <input type="text" class="form-control" [value]="vendor?.name || ''"
@@ -31,12 +31,12 @@
             </div>
             <div class="col-md-3">
                 <label class="form-label fw-bold">Payment Term (days)</label>
-                <input type="number" class="form-control" [(ngModel)]="paymentTerm" min="0" placeholder="e.g. 30"/>
+                <input type="number" class="form-control" [(ngModel)]="paymentTerm" (ngModelChange)="onPaymentTermChange()" min="0" placeholder="e.g. 30"/>
             </div>
             <div class="col-md-3">
                 <label class="form-label fw-bold">Payment Term in Words</label>
                 <input type="text" class="form-control" [(ngModel)]="paymentTermInWords"
-                       placeholder="e.g. Thirty (30) calendar days"/>
+                       placeholder="Auto-filled from payment term" readonly/>
             </div>
             <div class="col-md-6">
                 <label class="form-label fw-bold">Purpose / Scope of Work</label>
@@ -178,8 +178,12 @@
             </a>
             <button type="button" class="btn btn-primary fw-bold"
                     [disabled]="formSubmit" (click)="save()">
-                <ng-icon name="tablerCheck" class="ps-0 pe-3 fw-bold"></ng-icon>
-                {{ editMode ? 'Update' : 'Save ' + module }}
+                @if (formSubmit) {
+                    <span class="spinner-border spinner-border-sm me-2" role="status"></span>Saving...
+                } @else {
+                    <ng-icon name="tablerCheck" class="ps-0 pe-3 fw-bold"></ng-icon>
+                    {{ editMode ? 'Update' : 'Save ' + module }}
+                }
             </button>
         </div>
 

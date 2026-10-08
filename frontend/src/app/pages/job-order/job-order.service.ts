@@ -15,10 +15,8 @@ export class JobOrderService {
     private downloadService = inject(DownloadService);
 
     listByDateRange(from: string, to: string, statusId?: number | null): Observable<any[]> {
-        const url = statusId
-            ? `${BASE_API}/job-order/list/${from}/${to}/${statusId}`
-            : `${BASE_API}/job-order/list/${from}/${to}`;
-        return this.http.get<any[]>(url);
+        const id = statusId ?? 0;
+        return this.http.get<any[]>(`${BASE_API}/job-order/list/${from}/${to}/${id}`);
     }
 
     getDocumentStatuses(): Observable<any[]> {

@@ -101,6 +101,9 @@ public class JobOrderServiceImpl implements JobOrderService, PrintableVoucher {
     PurchaseRequestDetailRepo purchaseRequestDetailRepo;
 
     @Autowired
+    BudgetLineItemDetailRepo budgetLineItemDetailRepo;
+
+    @Autowired
     Environment env;
 
     @Override
@@ -250,14 +253,14 @@ public class JobOrderServiceImpl implements JobOrderService, PrintableVoucher {
     }
 
     @Override
+    @Transactional
     public void logNewValue(Integer logId) {
         DocumentLog documentLog = documentLogRepo.findById(logId).orElse(null);
 
         if (documentLog != null) {
-            JobOrder doc = jobOrderRepo.findOneByTransactionId(documentLog.getTransaction().getId());
-
-            if (doc != null) {
-                Map map = forLogMapMain(doc);
+            JobOrder jobOrder = jobOrderRepo.findOneByTransactionId(documentLog.getTransaction().getId());
+            if (jobOrder != null) {
+                Map map = forLogMapMain(jobOrder);
 
                 documentLoggerFacade.update(documentLog, null, map);
             }
@@ -391,7 +394,12 @@ public class JobOrderServiceImpl implements JobOrderService, PrintableVoucher {
                 toDate = new java.util.Date();
             }
 
-            List<JobOrder> docs = jobOrderRepo.findByDocumentStatusIdAndVoucherDateBetween(id, fromDate, toDate);
+            List<JobOrder> docs;
+            if (id == 0) {
+                docs = jobOrderRepo.findByVoucherDateBetween(fromDate, toDate);
+            } else {
+                docs = jobOrderRepo.findByDocumentStatusIdAndVoucherDateBetween(id, fromDate, toDate);
+            }
             return this.makeJOListMap(docs);
         }catch (Exception ex) {
             ex.printStackTrace();
@@ -491,7 +499,8 @@ public class JobOrderServiceImpl implements JobOrderService, PrintableVoucher {
 
         try {
 
-            JobOrder existingJo = this.jobOrderRepo.findOneByTransactionId(dto.getTransId());
+            JobOrder existingJo= this.jobOrderRepo.findOneByTransactionId(dto.getTransId());
+
 
             if(existingJo.getBudgetCheckedBy().getAccountNo().equals(authenticationFacade.getLoggedIn().getAccountNo())){
 
@@ -651,13 +660,6 @@ public class JobOrderServiceImpl implements JobOrderService, PrintableVoucher {
                 params.put("PAYMENT_TERM", jobOrder.getPaymentTermInWords());
             }
 
-            if (jobOrder.getBudgetLineItemDetail() != null) {
-                params.put("BUDGET_LINE_ITEM", jobOrder.getBudgetLineItemDetail().getTitle() + " - " + jobOrder.getBudgetLineItemDetail().getCode());
-            } else {
-                params.put("BUDGET_LINE_ITEM", "");
-            }
-            params.put("BUDGET_LINE_ITEM_BALANCE", jobOrder.getBudgetLineItemBalancePOJORFP());
-
             JobOrderBudgetDetail jobOrderBudgetDetail = jobOrderBudgetDetailRepo.findFirstByJobOrderIdOrderByIdAsc(jobOrder.getId());
 
             if(jobOrderBudgetDetail != null){
@@ -692,7 +694,16 @@ public class JobOrderServiceImpl implements JobOrderService, PrintableVoucher {
                     params.put("REQUESTED_BY_SIGN", env.getProperty("path.attachments") + requestedBy.getSignature().getFilename());
                 }
 
+                if (purchaseRequest.getBudgetLineItemDetail() != null) {
+                    params.put("BUDGET_LINE_ITEM", purchaseRequest.getBudgetLineItemDetail().getTitle() + " - " + purchaseRequest.getBudgetLineItemDetail().getCode());
+                    int cancelled = com.noreco1.fireflyv2.model.enums.DocumentStatus.CANCELLED.getId();
+                    BigDecimal liveBalance = budgetLineItemDetailRepo.getBudgetLineItemDetailAmountBalancePOJO(cancelled, purchaseRequest.getBudgetLineItemDetail().getId());
+                    params.put("BUDGET_LINE_ITEM_BALANCE", liveBalance != null ? liveBalance : BigDecimal.ZERO);
+                }
+
             }
+            params.putIfAbsent("BUDGET_LINE_ITEM", "");
+            params.putIfAbsent("BUDGET_LINE_ITEM_BALANCE", BigDecimal.ZERO);
 
             params = signatureFacade.getDocumentSignature(params, com.noreco1.fireflyv2.model.enums.DocumentType.JO, jobOrder);
         }
@@ -701,6 +712,7 @@ public class JobOrderServiceImpl implements JobOrderService, PrintableVoucher {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public JRDataSource datasource(Integer id) {
         List<JODetail> details = new ArrayList<>();
 

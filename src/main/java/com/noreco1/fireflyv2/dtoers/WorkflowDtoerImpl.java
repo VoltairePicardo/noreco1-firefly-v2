@@ -284,6 +284,7 @@ public class WorkflowDtoerImpl implements WorkflowDtoer {
 
                     case JO:
                         voucher = jobOrderRepo.findOneByTransactionId(transId);
+
                         if (voucher != null) {
                             JobOrder aj = (JobOrder) voucher;
                             if (aj.getCreatedBy().getId().equals(currentUser.getId()) &&
