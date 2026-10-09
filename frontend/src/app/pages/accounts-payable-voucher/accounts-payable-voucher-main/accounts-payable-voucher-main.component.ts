@@ -11,13 +11,13 @@ import { AccountsPayableVoucherService } from '../accounts-payable-voucher.servi
 import { FlatpickrDirective, provideFlatpickrDefaults } from 'angularx-flatpickr';
 import { monthStart, monthEnd } from '@/app/shared/utils/date.utils';
 import { provideIcons } from '@ng-icons/core';
-import { tablerSearch, tablerRefresh, tablerPlus, tablerEye, tablerEdit, tablerThumbUp } from '@ng-icons/tabler-icons';
+import { tablerSearch, tablerRefresh, tablerPlus, tablerEye, tablerEdit, tablerThumbUp, tablerChevronLeft, tablerChevronRight } from '@ng-icons/tabler-icons';
 
 @Component({
     selector: 'app-accounts-payable-voucher-main',
     imports: [...COMMON_ALL_PAGE_IMPORTS, ...COMMON_MAIN_PAGE_IMPORTS, FlatpickrDirective, FormsModule, RouterLink],
     providers: [provideFlatpickrDefaults(), ...SHARED_PROVIDERS,
-        provideIcons({ tablerSearch, tablerRefresh, tablerPlus, tablerEye, tablerEdit, tablerThumbUp })],
+        provideIcons({ tablerSearch, tablerRefresh, tablerPlus, tablerEye, tablerEdit, tablerThumbUp, tablerChevronLeft, tablerChevronRight })],
     templateUrl: './accounts-payable-voucher-main.component.html'
 })
 export class AccountsPayableVoucherMainComponent {

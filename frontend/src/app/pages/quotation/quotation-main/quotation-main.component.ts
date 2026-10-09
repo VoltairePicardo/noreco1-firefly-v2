@@ -5,12 +5,12 @@ import { AlertService } from '@/app/shared/services/alert.service';
 import { QuotationService } from '../quotation.service';
 import { FlatpickrDirective, provideFlatpickrDefaults } from 'angularx-flatpickr';
 import { provideIcons } from '@ng-icons/core';
-import { tablerSearch, tablerRefresh, tablerPlus, tablerEye, tablerEdit } from '@ng-icons/tabler-icons';
+import { tablerSearch, tablerRefresh, tablerPlus, tablerEye, tablerEdit, tablerChevronLeft, tablerChevronRight } from '@ng-icons/tabler-icons';
 
 @Component({
     selector: 'app-quotation-main',
     imports: [...COMMON_ALL_PAGE_IMPORTS, ...COMMON_MAIN_PAGE_IMPORTS, FlatpickrDirective],
-    providers: [provideFlatpickrDefaults(), ...SHARED_PROVIDERS, provideIcons({ tablerSearch, tablerRefresh, tablerPlus, tablerEye, tablerEdit })],
+    providers: [provideFlatpickrDefaults(), ...SHARED_PROVIDERS, provideIcons({ tablerSearch, tablerRefresh, tablerPlus, tablerEye, tablerEdit, tablerChevronLeft, tablerChevronRight })],
     templateUrl: './quotation-main.component.html'
 })
 export class QuotationMainComponent {
@@ -27,11 +27,14 @@ export class QuotationMainComponent {
 
     searchText = '';
 
-    get pagedRecords(): any[] {
+    get filteredRecords(): any[] {
         const q = this.searchText.trim().toLowerCase();
-        const filtered = q ? this.items().filter((r: any) => (r.code || '').toLowerCase().includes(q)) : this.items();
+        return q ? this.items().filter((r: any) => (r.code || '').toLowerCase().includes(q)) : this.items();
+    }
+
+    get pagedRecords(): any[] {
         const start = (this.page - 1) * this.pageSize;
-        return filtered.slice(start, start + this.pageSize);
+        return this.filteredRecords.slice(start, start + this.pageSize);
     }
 
     statuses          = signal<any[]>([]);
