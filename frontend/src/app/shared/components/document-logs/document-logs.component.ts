@@ -48,13 +48,13 @@ interface LogRow {
                                 <td>
                                     <dl class="row gy-1 mb-0">
                                         @for (entry of row.entries; track entry.label) {
-                                            <dt class="col-5 col-sm-4 fs-xs fw-normal">{{ entry.label }}</dt>
-                                            <dd class="col-7 col-sm-8 fs-xs mb-0 fw-semibold">{{ entry.value }}</dd>
+                                            <dt class="col-4 col-sm-4 fs-xs fw-normal">{{ entry.label }}</dt>
+                                            <dd class="col-8 col-sm-8 fs-xs mb-0 fw-semibold">{{ entry.value }}</dd>
                                         }
                                     </dl>
                                 </td>
-                                <td class="text-nowrap fs-xs fw-semibold">{{ row.userName }}</td>
-                                <td class="text-nowrap fs-xs fw-semibold">{{ row.createdAt | date:'MMM dd, yyyy hh:mm:ss a' }}</td>
+                                <td class="text-nowrap fs-xs">{{ row.userName }}</td>
+                                <td class="text-nowrap fs-xs">{{ row.createdAt | date:'MMM dd, yyyy hh:mm:ss a' }}</td>
                             </tr>
                         }
                     </tbody>
