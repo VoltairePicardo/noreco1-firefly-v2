@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -43,6 +44,14 @@ public class BudgetLineItemController {
     @GetMapping("/default-signatories")
     public Map defaultSignatories() {
         return budgetLineItemService.defaultSignatories();
+    }
+
+    // type = CV | CA | PCL | PCV | POJO; omitted = PO/JO/RFP balance (as used by Payment Request)
+    @GetMapping("/detail-amount-balance/{id}")
+    public BigDecimal detailAmountBalance(@PathVariable Integer id, @RequestParam(value = "type", required = false) String type) {
+        return type == null
+                ? budgetLineItemService.getBudgetLineItemDetailAmountBalance(id)
+                : budgetLineItemService.getBudgetLineItemDetailAmountBalanceByType(id, type);
     }
 
     @GetMapping("/{id}")

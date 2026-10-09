@@ -2,6 +2,9 @@ import { ChangeDetectionStrategy, Component, computed, effect, inject, input, si
 import { DatePipe } from '@angular/common';
 import {AnyJSONService, DocumentLog} from '@/app/shared/services/any-json.service';
 
+/** Log keys that are not shown in the history. */
+const HIDDEN_LOG_KEYS = new Set(['files']);
+
 interface LogEntry {
     label: string;
     value: string;
@@ -45,13 +48,13 @@ interface LogRow {
                                 <td>
                                     <dl class="row gy-1 mb-0">
                                         @for (entry of row.entries; track entry.label) {
-                                            <dt class="col-5 col-sm-4 fs-xs fw-normal">{{ entry.label }}</dt>
-                                            <dd class="col-7 col-sm-8 fs-xs mb-0 fw-semibold">{{ entry.value }}</dd>
+                                            <dt class="col-4 col-sm-4 fs-xs fw-normal">{{ entry.label }}</dt>
+                                            <dd class="col-8 col-sm-8 fs-xs mb-0 fw-semibold">{{ entry.value }}</dd>
                                         }
                                     </dl>
                                 </td>
-                                <td class="text-nowrap fs-xs fw-semibold">{{ row.userName }}</td>
-                                <td class="text-nowrap fs-xs fw-semibold">{{ row.createdAt | date:'MMM dd, yyyy hh:mm:ss a' }}</td>
+                                <td class="text-nowrap fs-xs">{{ row.userName }}</td>
+                                <td class="text-nowrap fs-xs">{{ row.createdAt | date:'MMM dd, yyyy hh:mm:ss a' }}</td>
                             </tr>
                         }
                     </tbody>
@@ -90,10 +93,12 @@ export class DocumentLogsComponent {
         if (log.newValue) {
             try {
                 const parsed = JSON.parse(log.newValue) as Record<string, unknown>;
-                entries = Object.entries(parsed).map(([key, value]) => ({
-                    label: this.humanizeKey(key),
-                    value: this.formatValue(value),
-                }));
+                entries = Object.entries(parsed)
+                    .filter(([key]) => !HIDDEN_LOG_KEYS.has(key))
+                    .map(([key, value]) => ({
+                        label: this.humanizeKey(key),
+                        value: this.formatValue(value),
+                    }));
             } catch {
                 entries = [{ label: 'Value', value: log.newValue }];
             }
