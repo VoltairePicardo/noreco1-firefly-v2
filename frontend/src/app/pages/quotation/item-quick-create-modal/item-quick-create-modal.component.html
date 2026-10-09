@@ -1,87 +1,145 @@
 <div class="modal-header">
-    <h5 class="modal-title fw-semibold">Add Child Item</h5>
-    @if (parentItemDescription) {
-        <small class="text-muted ms-3">for: <strong>{{ parentItemDescription }}</strong></small>
-    }
+    <h5 class="modal-title fw-semibold">Quick Create Item</h5>
     <button type="button" class="btn-close ms-auto" (click)="activeModal.dismiss()"></button>
 </div>
 
 <div class="modal-body">
-    <p class="fs-xs text-uppercase fw-semibold text-muted mb-3">Item Details</p>
+    @if (validationForm) {
+    <form [formGroup]="validationForm" novalidate>
 
-    <div class="row g-3 mb-3">
-        <div class="col-md-4">
-            <label class="form-label fw-bold">Code</label>
-            <input type="text" class="form-control" [(ngModel)]="code" name="code"
-                   placeholder="Item Code" maxlength="64"/>
-        </div>
-        <div class="col-md-8">
-            <label class="form-label fw-bold">Description <span class="text-danger">*</span></label>
-            <input type="text" class="form-control" [(ngModel)]="description" name="description"
-                   placeholder="Item Description" required/>
-        </div>
-    </div>
-
-    <div class="row g-3 mb-3">
-        <div class="col-md-6">
-            <label class="form-label fw-bold">Unit of Measure <span class="text-danger">*</span></label>
-            <select class="form-select" [(ngModel)]="unitId" name="unitId">
-                <option [ngValue]="null">-- Select Unit --</option>
-                @for (u of units(); track u.id) {
-                    <option [ngValue]="u.id">{{ u.code }} - {{ u.description }}</option>
-                }
-            </select>
-        </div>
-        <div class="col-md-6">
-            <label class="form-label fw-bold">Inventory Category</label>
-            <select class="form-select" [(ngModel)]="inventoryCategoryId" name="inventoryCategoryId">
-                <option [ngValue]="null">-- Select Category --</option>
-                @for (c of categories(); track c.id) {
-                    <option [ngValue]="c.id">{{ c.description }}</option>
-                }
-            </select>
-        </div>
-    </div>
-
-    <div class="row g-3 mb-3">
-        <div class="col-md-4">
-            <label class="form-label fw-bold">Reorder Point</label>
-            <input type="number" class="form-control" [(ngModel)]="reorderPoint" name="reorderPoint"
-                   placeholder="0.00" step="0.01"/>
-        </div>
-        <div class="col-md-4">
-            <label class="form-label fw-bold">Ideal Qty</label>
-            <input type="number" class="form-control" [(ngModel)]="idealQty" name="idealQty"
-                   placeholder="0.00" step="0.01"/>
-        </div>
-        <div class="col-md-4">
-            <label class="form-label fw-bold">Location</label>
-            <input type="text" class="form-control" [(ngModel)]="location" name="location"
-                   placeholder="Location"/>
-        </div>
-    </div>
-
-    <div class="row g-3 mb-3">
-        <div class="col-md-6">
-            <label class="form-label fw-bold">Barcode</label>
-            <input type="text" class="form-control" [(ngModel)]="barcode" name="barcode"
-                   placeholder="Barcode"/>
-        </div>
-        <div class="col-md-6 d-flex align-items-end pb-2">
-            <div class="form-check form-switch">
-                <input class="form-check-input" type="checkbox" [(ngModel)]="hasSerialNumbers"
-                       name="hasSerialNumbers" id="hasSerialNumbers"/>
-                <label class="form-check-label fw-bold" for="hasSerialNumbers">Has Serial Numbers</label>
+        <div class="row g-3">
+            <div class="col-md-3">
+                <label class="form-label fw-bold">Code</label>
+                <input type="text" class="form-control" formControlName="code"
+                       placeholder="Item Code" maxlength="64"/>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label fw-bold">Description <span class="text-danger">*</span></label>
+                <input type="hidden" formControlName="description"/>
+                <input #descInput type="text" class="form-control"
+                       placeholder="Auto-generated from fields below"
+                       [value]="descriptionDisplay()"
+                       readonly
+                       [class.is-invalid]="submit && form.get('description')?.errors"
+                       [class.is-valid]="submit && !form.get('description')?.errors"/>
+                <div class="invalid-feedback">Please provide a description.</div>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label fw-bold">Unit of Measure <span class="text-danger">*</span></label>
+                <select class="form-select" formControlName="unitId"
+                        [class.is-invalid]="submit && form.get('unitId')?.errors"
+                        [class.is-valid]="submit && !form.get('unitId')?.errors">
+                    <option [ngValue]="null">-- Select Unit --</option>
+                    @for (u of units(); track u.id) {
+                        <option [ngValue]="u.id">{{ u.code }} - {{ u.description }}</option>
+                    }
+                </select>
+                <div class="invalid-feedback">Please select a unit.</div>
             </div>
         </div>
-    </div>
 
-    @if (parentItemDescription) {
-        <hr/>
-        <p class="fs-xs text-uppercase fw-semibold text-muted mb-2">Parent Item</p>
-        <div class="mb-2">
-            <input type="text" class="form-control" [value]="parentItemDescription" readonly/>
+        <div class="row g-3 mt-0">
+            <div class="col-md-12">
+                <label class="form-label fw-bold">Parent Item</label>
+                <div class="input-group">
+                    <input type="text" class="form-control"
+                           [value]="selectedParentItem ? ((selectedParentItem.code ? selectedParentItem.code + ' — ' : '') + selectedParentItem.description) : ''"
+                           readonly placeholder="Select Parent Item (optional)"/>
+                    @if (selectedParentItem) {
+                        <button type="button" class="btn btn-danger fw-bold" (click)="clearParentItem()">
+                            <ng-icon name="tablerX" class="fw-bold"></ng-icon>
+                        </button>
+                    } @else {
+                        <button type="button" class="btn btn-success fw-bold" (click)="openParentItemBrowse()">
+                            <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
+                        </button>
+                    }
+                </div>
+            </div>
         </div>
+
+        <hr class="border-dashed mt-3 mb-0"/>
+        <div class="fs-sm fw-semibold mt-2 mb-2">Item Specifications</div>
+
+        <div class="row g-3">
+            @if (!selectedParentItem) {
+            <div class="col-md-3">
+                <label class="form-label fw-bold">Generic Name</label>
+                <input type="text" class="form-control" formControlName="genericName"
+                       placeholder="Generic Name"/>
+            </div>
+            }
+            <div class="col-md-3">
+                <label class="form-label fw-bold">Size</label>
+                <input type="text" class="form-control" formControlName="size" placeholder="Size"/>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label fw-bold">Rating</label>
+                <input type="text" class="form-control" formControlName="rating" placeholder="Rating"/>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label fw-bold">Specification</label>
+                <input type="text" class="form-control" formControlName="specification"
+                       placeholder="Specification"/>
+            </div>
+        </div>
+
+        <div class="row g-3 mt-0">
+            <div class="col-md-3">
+                <label class="form-label fw-bold">Brand</label>
+                <select class="form-select" formControlName="brandId">
+                    <option [ngValue]="null">-- Select Brand --</option>
+                    @for (b of brands(); track b.id) {
+                        <option [ngValue]="b.id">{{ b.name }}</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label fw-bold">Manufacturer</label>
+                <input type="text" class="form-control" formControlName="manufacturer"
+                       placeholder="Manufacturer"/>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label fw-bold">Part Number</label>
+                <input type="text" class="form-control" formControlName="partNumber"
+                       placeholder="Part Number"/>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label fw-bold">Remarks</label>
+                <input type="text" class="form-control" formControlName="remarks" placeholder="Remarks"/>
+            </div>
+        </div>
+
+        @if (duplicates().length > 0) {
+            <div class="mt-3">
+                <p class="text-uppercase fs-xs fw-semibold text-muted mb-1">Possible Duplicates</p>
+                <table class="table table-custom table-centered table-hover w-100 mb-0">
+                    <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                        <tr class="text-uppercase fs-xxs">
+                            <th>Code</th>
+                            <th>Description</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (dup of duplicates(); track dup.id) {
+                            <tr>
+                                <td>{{ dup.code || '—' }}</td>
+                                <td>{{ dup.description }}</td>
+                                <td>
+                                    @if (dup.documentStatus?.id === 7) { <span class="badge bg-success">Approved</span> }
+                                    @else if (dup.documentStatus?.id === 5) { <span class="badge bg-warning text-dark">For Approval</span> }
+                                    @else if (dup.documentStatus?.id === 1) { <span class="badge bg-secondary">Draft</span> }
+                                    @else { <span class="badge bg-success">Approved</span> }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+
+    </form>
     }
 </div>
 
@@ -89,20 +147,11 @@
     <button type="button" class="btn btn-light fw-bold" (click)="activeModal.dismiss()">
         <ng-icon name="tablerArrowLeft" class="ps-0 pe-3 fw-bold"></ng-icon>Cancel
     </button>
-    @if (isInventoryOfficer()) {
-        <button type="button" class="btn btn-success fw-bold" [disabled]="isLoading()" (click)="save(true)">
-            @if (isLoading()) {
-                <span class="spinner-border spinner-border-sm me-2" role="status"></span>Processing...
-            } @else {
-                <ng-icon name="tablerCheck" class="ps-0 pe-3 fw-bold"></ng-icon>Save &amp; Approve
-            }
-        </button>
-    }
-    <button type="button" class="btn btn-primary fw-bold" [disabled]="isLoading()" (click)="save(false)">
+    <button type="button" class="btn btn-primary fw-bold" [disabled]="isLoading()" (click)="save()">
         @if (isLoading()) {
             <span class="spinner-border spinner-border-sm me-2" role="status"></span>Saving...
         } @else {
-            <ng-icon name="tablerCheck" class="ps-0 pe-3 fw-bold"></ng-icon>Save
+            <ng-icon name="tablerCheck" class="ps-0 pe-3 fw-bold"></ng-icon>Save Item
         }
     </button>
 </div>

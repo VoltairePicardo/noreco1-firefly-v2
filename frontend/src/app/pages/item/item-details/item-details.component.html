@@ -54,8 +54,11 @@
                     </div>
                     <div class="col-md-6">
                         <label class="form-label fw-bold">Description <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" formControlName="description"
-                               placeholder="Item Description"
+                        <input type="hidden" formControlName="description"/>
+                        <input #approvalDescInput type="text" class="form-control"
+                               placeholder="Auto-generated from fields below"
+                               [value]="approvalDescriptionDisplay()"
+                               readonly
                                [class.is-invalid]="approvalForm()!.get('description')?.invalid && approvalForm()!.get('description')?.touched"/>
                         <div class="invalid-feedback">Description is required.</div>
                     </div>
@@ -131,7 +134,7 @@
                         </div>
                     </div>
 
-                    <!-- Row 4: Inventory Category, Parent Item, Toggles -->
+                    <!-- Row 4: Inventory Category, Sub Category, Parent Item, Toggles -->
                     <div class="col-md-3">
                         <label class="form-label fw-bold">Inventory Category</label>
                         <select class="form-select" formControlName="inventoryCategoryId">
@@ -141,7 +144,16 @@
                             }
                         </select>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold">Sub Category</label>
+                        <select class="form-select" formControlName="subCategoryId">
+                            <option [ngValue]="null">-- Select Sub Category --</option>
+                            @for (sub of subCategories(); track sub.id) {
+                                <option [ngValue]="sub.id">{{ sub.description }}</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-4">
                         <label class="form-label fw-bold">Parent Item</label>
                         <div class="input-group">
                             <input type="text" class="form-control" readonly
@@ -149,7 +161,7 @@
                                    placeholder="Optional Parent Item"/>
                             @if (selectedParentItem()) {
                                 <button type="button" class="btn btn-danger fw-bold"
-                                        (click)="selectedParentItem.set(null)" [disabled]="processing()">
+                                        (click)="clearParentItemApproval()" [disabled]="processing()">
                                     <ng-icon name="tablerX" class="fw-bold"></ng-icon>
                                 </button>
                             } @else {
@@ -160,7 +172,7 @@
                             }
                         </div>
                     </div>
-                    <div class="col-md-3 d-flex align-items-end pb-1">
+                    <div class="col-md-2 d-flex align-items-end pb-1">
                         <div class="d-flex flex-column gap-2">
                             <div class="form-check form-switch">
                                 <input class="form-check-input" type="checkbox" id="dtlIsActive" formControlName="isActive"/>
@@ -171,6 +183,51 @@
                                 <label class="form-check-label" for="dtlHasSerial">Has Serial Numbers</label>
                             </div>
                         </div>
+                    </div>
+
+                    <!-- Row 5: Spec fields -->
+                    <div class="col-12">
+                        <hr class="border-dashed mt-1 mb-0"/>
+                        <div class="fs-xs text-uppercase fw-semibold text-muted mt-2 mb-2">Item Specifications</div>
+                    </div>
+                    @if (!selectedParentItem()) {
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold">Generic Name</label>
+                        <input type="text" class="form-control" formControlName="genericName" placeholder="Generic Name"/>
+                    </div>
+                    }
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold">Size</label>
+                        <input type="text" class="form-control" formControlName="size" placeholder="Size"/>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold">Rating</label>
+                        <input type="text" class="form-control" formControlName="rating" placeholder="Rating"/>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold">Specification</label>
+                        <input type="text" class="form-control" formControlName="specification" placeholder="Specification"/>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold">Brand</label>
+                        <select class="form-select" formControlName="brandId">
+                            <option [ngValue]="null">-- Select Brand --</option>
+                            @for (b of brands(); track b.id) {
+                                <option [ngValue]="b.id">{{ b.name }}</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold">Manufacturer</label>
+                        <input type="text" class="form-control" formControlName="manufacturer" placeholder="Manufacturer"/>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold">Part Number</label>
+                        <input type="text" class="form-control" formControlName="partNumber" placeholder="Part Number"/>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold">Remarks</label>
+                        <input type="text" class="form-control" formControlName="remarks" placeholder="Remarks"/>
                     </div>
 
                     @if (duplicates().length > 0) {
@@ -258,6 +315,37 @@
             </div>
         </div>
 
+        <hr class="border-dashed mx-n3 mt-3 mb-0"/>
+        <div class="fs-xs text-uppercase fw-semibold text-muted mt-3 mb-2">Item Specifications</div>
+        <div class="row">
+            <div class="col-sm-6">
+                <dl class="row mb-0">
+                    <dt class="col-sm-4 fw-normal">Generic Name</dt>
+                    <dd class="col-sm-8 fw-bold">{{ data()?.genericName || '—' }}</dd>
+                    <dt class="col-sm-4 fw-normal">Size</dt>
+                    <dd class="col-sm-8 fw-bold">{{ data()?.size || '—' }}</dd>
+                    <dt class="col-sm-4 fw-normal">Rating</dt>
+                    <dd class="col-sm-8 fw-bold">{{ data()?.rating || '—' }}</dd>
+                    <dt class="col-sm-4 fw-normal">Specification</dt>
+                    <dd class="col-sm-8 fw-bold">{{ data()?.specification || '—' }}</dd>
+                </dl>
+            </div>
+            <div class="col-sm-6">
+                <dl class="row mb-0">
+                    <dt class="col-sm-5 fw-normal">Brand</dt>
+                    <dd class="col-sm-7 fw-bold">{{ data()?.brand?.name || '—' }}</dd>
+                    <dt class="col-sm-5 fw-normal">Manufacturer</dt>
+                    <dd class="col-sm-7 fw-bold">{{ data()?.manufacturer || '—' }}</dd>
+                    <dt class="col-sm-5 fw-normal">Part Number</dt>
+                    <dd class="col-sm-7 fw-bold">{{ data()?.partNumber || '—' }}</dd>
+                    <dt class="col-sm-5 fw-normal">Sub Category</dt>
+                    <dd class="col-sm-7 fw-bold">{{ data()?.subCategory?.description || '—' }}</dd>
+                    <dt class="col-sm-5 fw-normal">Remarks</dt>
+                    <dd class="col-sm-7 fw-bold">{{ data()?.remarks || '—' }}</dd>
+                </dl>
+            </div>
+        </div>
+
         @if (data()?.base64Image) {
             <div class="row mt-3">
                 <div class="col-sm-12">
@@ -275,12 +363,14 @@
 
         <hr class="border-dashed mx-n3 mt-3"/>
         <div class="d-flex justify-content-end gap-2">
-            <button type="button" class="btn btn-light fw-bold" [routerLink]="['/' + menuLink]">
+            <button type="button" class="btn btn-light fw-bold" [routerLink]="['/' + menuLink]"
+                    [disabled]="showApprovalForm()">
                 <ng-icon name="tablerArrowLeft" class="ps-0 pe-3 fw-bold"></ng-icon>Back
             </button>
             @if ((isInventoryOfficer() && (data()?.documentStatus?.id === 5 || data()?.documentStatus?.id === 7)) || (data()?.documentStatus?.id === 1 && data()?.createdBy?.id == currentUserId)) {
                 <button type="button" class="btn btn-primary fw-bold"
-                        [routerLink]="['/' + menuLink, data()?.id, 'edit']">
+                        [routerLink]="['/' + menuLink, data()?.id, 'edit']"
+                        [disabled]="showApprovalForm()">
                     <ng-icon name="tablerPencil" class="ps-0 pe-3 fw-bold"></ng-icon>Edit
                 </button>
             }

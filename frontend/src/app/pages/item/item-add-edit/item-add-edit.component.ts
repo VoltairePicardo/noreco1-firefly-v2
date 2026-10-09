@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, ElementRef, inject, signal, ViewChild } from '@angular/core';
 import { FormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AlertService } from '@/app/shared/services/alert.service';
@@ -34,10 +34,13 @@ export class ItemAddEditComponent {
     subCategories = signal<any[]>([]);
     brands     = signal<any[]>([]);
 
-    isInventoryOfficer = signal(false);
-    duplicates         = signal<any[]>([]);
-    currentItem        = signal<any>(null);
-    approveAction      = signal<WorkflowActionOption | null>(null);
+    isInventoryOfficer  = signal(false);
+    duplicates          = signal<any[]>([]);
+    currentItem         = signal<any>(null);
+    approveAction       = signal<WorkflowActionOption | null>(null);
+    descriptionDisplay  = signal('');
+
+    @ViewChild('descInput') private descInput?: ElementRef<HTMLInputElement>;
 
     private dupSearch$ = new Subject<string>();
 
@@ -101,6 +104,8 @@ export class ItemAddEditComponent {
             };
         }
 
+        this.descriptionDisplay.set(data?.description || '');
+
         this.validationForm = this.fb.group({
             code:                [data?.code                  || ''],
             description:         [data?.description           || '', Validators.required],
@@ -129,7 +134,8 @@ export class ItemAddEditComponent {
             this.loadSubCategories(catId);
         });
         ['genericName', 'size', 'rating', 'specification', 'brandId'].forEach(name =>
-            this.validationForm.get(name)?.valueChanges.subscribe(() => this.refreshDescription()));
+            this.validationForm.get(name)?.valueChanges.subscribe(val =>
+                this.refreshDescription({ [name]: val })));
 
         if (data?.description) {
             this.dupSearch$.next(data.description);
@@ -146,16 +152,21 @@ export class ItemAddEditComponent {
 
     // Mirrors the backend rule: parent name (or generic name), size, rating, specification, brand name.
     // The backend rebuilds it on save; this is only a live preview. Left as-is when no part is filled in.
-    private refreshDescription(): void {
+    // override: pass the just-emitted valueChanges value so we don't read a stale f.value snapshot.
+    private refreshDescription(override: Record<string, any> = {}): void {
         const f = this.validationForm;
         if (!f) return;
-        const v = f.value;
+        const v = { ...f.value, ...override };
         const brand = this.brands().find(b => b.id === v.brandId);
         const text = [
             this.selectedParentItem ? this.selectedParentItem.description : v.genericName,
             v.size, v.rating, v.specification, brand?.name
         ].map(p => (p ?? '').toString().trim()).filter(p => p).join(', ');
         if (text) {
+            this.descriptionDisplay.set(text);
+            if (this.descInput?.nativeElement) {
+                this.descInput.nativeElement.value = text; // direct DOM — no CD scheduling wait
+            }
             f.get('description')?.setValue(text, { emitEvent: false });
             this.dupSearch$.next(text);
         }
@@ -189,7 +200,9 @@ export class ItemAddEditComponent {
     get form(): UntypedFormGroup { return this.validationForm; }
 
     get showFullForm(): boolean {
-        return this.editMode;
+        if (!this.editMode) return false;
+        const statusId = this.currentItem()?.documentStatus?.id;
+        return statusId === 5 || statusId === 7;
     }
 
     onDuplicateSearch(value: string): void {

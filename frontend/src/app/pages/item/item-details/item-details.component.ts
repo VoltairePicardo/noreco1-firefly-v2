@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, inject, OnInit, signal, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AlertService } from '@/app/shared/services/alert.service';
 import { COMMON_ALL_PAGE_IMPORTS } from '@/app/shared/providers/shared-providers';
@@ -12,6 +12,7 @@ import { ModalService } from '@/app/shared/modals/modal-service';
 import { BrowseCOAModalComponent } from '@/app/shared/modals/browse-coa-modal/browse-coa-modal.component';
 import { BrowseItemModalComponent } from '@/app/shared/modals/browse-item-modal/browse-item-modal.component';
 import { AuthService } from '@/app/pages/auth/auth.service';
+import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
 import Swal from 'sweetalert2';
 
@@ -37,12 +38,18 @@ export class ItemDetailsComponent implements OnInit {
     // Approval form state
     units            = signal<any[]>([]);
     categories       = signal<any[]>([]);
+    brands           = signal<any[]>([]);
+    subCategories    = signal<any[]>([]);
     showApprovalForm = signal(false);
     approvalForm     = signal<UntypedFormGroup | null>(null);
+    approvalDescriptionDisplay = signal('');
     selectedAssetAccount   = signal<any>(null);
     selectedExpenseAccount = signal<any>(null);
     selectedParentItem     = signal<any>(null);
     duplicates             = signal<any[]>([]);
+
+    @ViewChild('approvalDescInput') private approvalDescInput?: ElementRef<HTMLInputElement>;
+    private dupSearch$ = new Subject<string>();
 
     selectedAction: WorkflowActionOption | null = null;
     remarks = '';
@@ -61,6 +68,15 @@ export class ItemDetailsComponent implements OnInit {
     ngOnInit(): void {
         this.currentUserId = this.authService.getUser()?.user?.id ?? null;
         this.service.isInventoryOfficer().subscribe({ next: v => this.isInventoryOfficer.set(v), error: () => {} });
+
+        this.dupSearch$.pipe(
+            debounceTime(400),
+            distinctUntilChanged(),
+            switchMap(q => q.trim().length > 1
+                ? this.service.list(q, null, 0, 5, null, this.data()?.id)
+                : [{ content: [] }])
+        ).subscribe({ next: (res: any) => this.duplicates.set(res.content ?? []), error: () => {} });
+
         this.route.paramMap.subscribe(params => {
             const idParam = params.get('id');
             const id = idParam != null && /^\d+$/.test(idParam) ? Number(idParam) : null;
@@ -71,16 +87,20 @@ export class ItemDetailsComponent implements OnInit {
     onActionChange(): void {
         if (this.selectedAction?.actionId === 5) { // APPROVE
             this.showApprovalForm.set(true);
-            this.initApprovalForm();
             if (this.units().length === 0) {
                 this.service.listUnits().subscribe({ next: (d: any) => this.units.set(d?.content ?? d ?? []), error: () => {} });
             }
             if (this.categories().length === 0) {
                 this.service.listCategories().subscribe({ next: (d: any) => this.categories.set(d?.content ?? d ?? []), error: () => {} });
             }
+            if (this.brands().length === 0) {
+                this.service.getBrands().subscribe({ next: (d: any) => { this.brands.set(d ?? []); this.refreshApprovalDescription(); }, error: () => {} });
+            }
+            this.initApprovalForm();
         } else {
             this.showApprovalForm.set(false);
             this.approvalForm.set(null);
+            this.subCategories.set([]);
             this.duplicates.set([]);
         }
     }
@@ -99,6 +119,9 @@ export class ItemDetailsComponent implements OnInit {
             accountTitle: item.expenseAccount.title
         } : null);
 
+        this.approvalDescriptionDisplay.set(item?.description || '');
+        this.subCategories.set([]);
+
         const form = this.fb.group({
             code:                [item?.code                  || ''],
             description:         [item?.description           || '', Validators.required],
@@ -110,17 +133,56 @@ export class ItemDetailsComponent implements OnInit {
             inventoryCategoryId: [item?.inventoryCategory?.id || null],
             hasSerialNumbers:    [item?.hasSerialNumbers      ?? false],
             barcode:             [item?.barcode               || ''],
+            subCategoryId:       [item?.subCategory?.id       || null],
+            genericName:         [item?.genericName           || ''],
+            size:                [item?.size                  || ''],
+            rating:              [item?.rating                || ''],
+            specification:       [item?.specification         || ''],
+            brandId:             [item?.brand?.id             || null],
+            manufacturer:        [item?.manufacturer          || ''],
+            partNumber:          [item?.partNumber            || ''],
+            remarks:             [item?.remarks               || ''],
         });
 
-        form.get('description')!.valueChanges.pipe(
-            debounceTime(400),
-            distinctUntilChanged(),
-            switchMap((q: string) => q?.trim().length > 1
-                ? this.service.list(q, null, 0, 5, null, item?.id)
-                : [{ content: [] }])
-        ).subscribe({ next: (res: any) => this.duplicates.set(res.content ?? []), error: () => {} });
+        ['genericName', 'size', 'rating', 'specification', 'brandId'].forEach(name =>
+            form.get(name)?.valueChanges.subscribe(val =>
+                this.refreshApprovalDescription({ [name]: val })));
+
+        form.get('inventoryCategoryId')?.valueChanges.subscribe(catId => {
+            form.get('subCategoryId')?.setValue(null);
+            this.loadApprovalSubCategories(catId);
+        });
+        this.loadApprovalSubCategories(form.get('inventoryCategoryId')?.value);
 
         this.approvalForm.set(form);
+        this.refreshApprovalDescription();
+    }
+
+    private loadApprovalSubCategories(categoryId: number | null): void {
+        if (!categoryId) { this.subCategories.set([]); return; }
+        this.service.getCategoryWithSubCategories(categoryId).subscribe({
+            next: c => this.subCategories.set(c?.subCategories ?? []),
+            error: () => this.subCategories.set([])
+        });
+    }
+
+    private refreshApprovalDescription(override: Record<string, any> = {}): void {
+        const f = this.approvalForm();
+        if (!f) return;
+        const v = { ...f.value, ...override };
+        const brand = this.brands().find(b => b.id === v.brandId);
+        const text = [
+            this.selectedParentItem() ? this.selectedParentItem().description : v.genericName,
+            v.size, v.rating, v.specification, brand?.name
+        ].map(p => (p ?? '').toString().trim()).filter(p => p).join(', ');
+        if (text) {
+            this.approvalDescriptionDisplay.set(text);
+            if (this.approvalDescInput?.nativeElement) {
+                this.approvalDescInput.nativeElement.value = text;
+            }
+            f.get('description')?.setValue(text, { emitEvent: false });
+            this.dupSearch$.next(text);
+        }
     }
 
     async openAssetBrowse(): Promise<void> {
@@ -144,8 +206,16 @@ export class ItemDetailsComponent implements OnInit {
                 { excludeId: this.data()?.id },
                 { size: 'lg', centered: true }
             );
-            if (result?.action === 'select' && result?.data) { this.selectedParentItem.set(result.data); }
+            if (result?.action === 'select' && result?.data) {
+                this.selectedParentItem.set(result.data);
+                this.refreshApprovalDescription();
+            }
         } catch {}
+    }
+
+    clearParentItemApproval(): void {
+        this.selectedParentItem.set(null);
+        this.refreshApprovalDescription();
     }
 
     processWorkflow(): void {
@@ -186,16 +256,15 @@ export class ItemDetailsComponent implements OnInit {
                 inventoryCategory: v.inventoryCategoryId ? { id: v.inventoryCategoryId }        : null,
                 hasSerialNumbers:  v.hasSerialNumbers,
                 barcode:           v.barcode,
-                // not editable here — pass through so approval doesn't blank them
-                subCategory:       item.subCategory ? { id: item.subCategory.id } : null,
-                genericName:       item.genericName,
-                size:              item.size,
-                rating:            item.rating,
-                specification:     item.specification,
-                brand:             item.brand ? { id: item.brand.id } : null,
-                manufacturer:      item.manufacturer,
-                partNumber:        item.partNumber,
-                remarks:           item.remarks,
+                subCategory:       v.subCategoryId  ? { id: v.subCategoryId }  : null,
+                genericName:       v.genericName,
+                size:              v.size,
+                rating:            v.rating,
+                specification:     v.specification,
+                brand:             v.brandId ? { id: v.brandId } : null,
+                manufacturer:      v.manufacturer,
+                partNumber:        v.partNumber,
+                remarks:           v.remarks,
             };
 
             this.service.update(payload).subscribe({
