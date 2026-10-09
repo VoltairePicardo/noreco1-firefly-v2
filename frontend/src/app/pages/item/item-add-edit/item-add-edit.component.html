@@ -25,13 +25,13 @@
                             </div>
                             <div class="col-md-6 mt-2">
                                 <label for="description" class="form-label">Description <span class="text-danger">*</span></label>
-                                <input id="description" type="text" class="form-control"
-                                       placeholder="Auto-generated from the fields below" formControlName="description"
+                                <input type="hidden" formControlName="description"/>
+                                <input #descInput id="description" type="text" class="form-control"
+                                       placeholder="Auto-generated from the fields below"
+                                       [value]="descriptionDisplay()"
                                        readonly
                                        [class]="submit && !form.get('description')?.errors ? 'is-valid'
-                                              : submit &&  form.get('description')?.errors ? 'is-invalid' : ''"
-                                       required
-                                       (input)="onDuplicateSearch($any($event.target).value)"/>
+                                              : submit &&  form.get('description')?.errors ? 'is-invalid' : ''"/>
                                 <div class="invalid-feedback">Please provide a description.</div>
                             </div>
                             <div class="col-md-3 mt-2">
