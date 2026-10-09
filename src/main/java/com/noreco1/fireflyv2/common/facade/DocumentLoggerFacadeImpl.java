@@ -152,6 +152,10 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
         return documentLog;
     }
 
+    private String formatAmount(Number amount) {
+        return amount == null ? null : new java.text.DecimalFormat("#,##0.00").format(amount);
+    }
+
     @Override
     public Map getLedgerAndFileLog(Map mainLogMap, Integer transId) {
         // ledgers
@@ -170,7 +174,7 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
             List<Map> files = new ArrayList();
 
             for (Object[] row : objects) {
-                Map fileMap = new HashMap();
+                Map fileMap = new LinkedHashMap();
                 fileMap.put("id", row[0]);
                 fileMap.put("filename", row[1]);
                 fileMap.put("originalFilename", row[2]);
@@ -178,7 +182,7 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
                 fileMap.put("updatedAt", row[4]);
 
                 // logs file by prefix
-                if(!Checker.isStringNullAndEmpty(String.valueOf(row[5]))) {
+                if(row[5] != null && !Checker.isStringNullAndEmpty(String.valueOf(row[5]))) {
 
                     List<Map> filesByPrefix = new ArrayList();
 
@@ -199,7 +203,7 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
 
     @Override
     public Map makeLog(PurchaseRequest rv) {
-        Map map = new HashMap();
+        Map map = new LinkedHashMap();
         try {
 
             // main data
@@ -227,13 +231,13 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
             map.put("durationStart", rv.getDurationStart());
             map.put("durationEnd", rv.getDurationEnd());
             map.put("employee", rv.getEmployee() != null ? rv.getEmployee().getName() : null);
-            map.put("createdAt", rv.getCreatedAt());
-                map.put("updatedAt", rv.getUpdatedAt() != null ? rv.getUpdatedAt() : new Date());
             map.put("bacDate", rv.getBacDate());
             map.put("modeOfProcurement", rv.getModeOfProcurement() == null ? "":rv.getModeOfProcurement());
             map.put("estimatedAmount", rv.getEstimatedAmount());
 
             map = this.getLedgerAndFileLog(map, rv.getTransaction().getId());
+            map.put("createdAt", rv.getCreatedAt());
+            map.put("updatedAt", rv.getUpdatedAt() != null ? rv.getUpdatedAt() : new Date());
         } catch (Exception ex) {
             Logger.getLogger(DocumentLoggerFacadeImpl.class.getName()).log(Level.SEVERE, null, ex);
             throw new RuntimeException(ex);
@@ -243,7 +247,7 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
 
     @Override
     public Map makeLog(PurchaseOrder po) {
-        Map map = new HashMap();
+        Map map = new LinkedHashMap();
         try {
 
             // main data
@@ -259,8 +263,6 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
             map.put("approvedBy", po.getApprovingOfficer() != null ? po.getApprovingOfficer().getFullName() : "");
             map.put("transactionId", po.getTransaction().getId());
             map.put("workflow", po.getWorkflow() != null ? po.getWorkflow().getName():"");
-            map.put("createdAt", po.getCreatedAt());
-            map.put("updatedAt", po.getUpdatedAt());
             map.put("amount", po.getAmount());
             map.put("deliveryTerm", po.getDeliveryTerm());
             map.put("deliveryAddress", po.getDeliveryAddress());
@@ -268,6 +270,8 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
             map.put("term", po.getPaymentTerm());
 
             map = this.getLedgerAndFileLog(map, po.getTransaction().getId());
+            map.put("createdAt", po.getCreatedAt());
+            map.put("updatedAt", po.getUpdatedAt());
         } catch (Exception ex) {
             Logger.getLogger(DocumentLoggerFacadeImpl.class.getName()).log(Level.SEVERE, null, ex);
             throw new RuntimeException(ex);
@@ -277,7 +281,7 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
 
     @Override
     public Map makeLog(AccountsPayableVoucher voucher) {
-        Map map = new HashMap();
+        Map map = new LinkedHashMap();
         try {
 
             // main data
@@ -293,13 +297,13 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
             map.put("checkedBy", voucher.getChecker() != null ? voucher.getChecker().getFullName() : "");
             map.put("approvedBy", voucher.getApprovingOfficer() != null ? voucher.getApprovingOfficer().getFullName() : "");
             map.put("workflow", voucher.getWorkflow() != null ? voucher.getWorkflow().getName() : "");
-            map.put("createdAt", voucher.getCreatedAt());
-            map.put("updatedAt", voucher.getUpdatedAt());
             map.put("invoiceDate", voucher.getInvoiceDate());
             map.put("paymentTerm", voucher.getPaymentTerm());
             map.put("dueDate", voucher.getDueDate());
 
             map = this.getLedgerAndFileLog(map, voucher.getTransaction().getId());
+            map.put("createdAt", voucher.getCreatedAt());
+            map.put("updatedAt", voucher.getUpdatedAt());
         } catch (Exception ex) {
             Logger.getLogger(DocumentLoggerFacadeImpl.class.getName()).log(Level.SEVERE, null, ex);
             throw new RuntimeException(ex);
@@ -309,7 +313,7 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
 
     @Override
     public Map makeLog(CheckVoucher cv) {
-        Map map = new HashMap();
+        Map map = new LinkedHashMap();
         try {
 
             // main data
@@ -332,12 +336,12 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
             map.put("approvedBy", cv.getApprovingOfficer() != null ? cv.getApprovingOfficer().getFullName() : "");
             map.put("secondCheckSign", cv.getSecondCheckSign() == null ? "" : cv.getSecondCheckSign().getFullName());
             map.put("workflow", cv.getWorkflow() != null ? cv.getWorkflow().getName() : "");
-            map.put("createdAt", cv.getCreatedAt());
-            map.put("updatedAt", cv.getUpdatedAt());
             map.put("rrNumber", cv.getRrNumber());
             map.put("additionalPayeeInfo", cv.getAdditionalPayeeInfo());
 
             map = this.getLedgerAndFileLog(map, cv.getTransaction().getId());
+            map.put("createdAt", cv.getCreatedAt());
+            map.put("updatedAt", cv.getUpdatedAt());
         } catch (Exception ex) {
             Logger.getLogger(DocumentLoggerFacadeImpl.class.getName()).log(Level.SEVERE, null, ex);
             throw new RuntimeException(ex);
@@ -347,7 +351,7 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
 
     @Override
     public Map makeLog(JournalVoucher jv) {
-        Map map = new HashMap();
+        Map map = new LinkedHashMap();
         try {
 
             // main data
@@ -367,11 +371,11 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
             map.put("auditedBy", jv.getAuditingOfficer() != null ? jv.getAuditingOfficer().getFullName() : "");
             map.put("approvedBy", jv.getApprovingOfficer() != null ? jv.getApprovingOfficer().getFullName() : "");
             map.put("workflow", jv.getWorkflow() != null ? jv.getWorkflow().getName() : "");
-            map.put("createdAt", jv.getCreatedAt());
-            map.put("updatedAt", jv.getUpdatedAt());
             map.put("payable", jv.getPayable() ? "Yes" : "No");
 
             map = this.getLedgerAndFileLog(map, jv.getTransaction().getId());
+            map.put("createdAt", jv.getCreatedAt());
+            map.put("updatedAt", jv.getUpdatedAt());
         } catch (Exception ex) {
             Logger.getLogger(DocumentLoggerFacadeImpl.class.getName()).log(Level.SEVERE, null, ex);
             throw new RuntimeException(ex);
@@ -381,7 +385,7 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
 
     @Override
     public Map makeLog(CashReceipts cashReceipts) {
-        Map map = new HashMap();
+        Map map = new LinkedHashMap();
         try {
 
             // main data
@@ -396,10 +400,10 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
             map.put("createdBy", cashReceipts.getCreatedBy() != null ? cashReceipts.getCreatedBy().getFullName() : "");
             map.put("approvedBy", cashReceipts.getApprovingOfficer() != null ? cashReceipts.getApprovingOfficer().getFullName() : "");
             map.put("workflow", cashReceipts.getWorkflow() != null ? cashReceipts.getWorkflow().getName() : "");
-            map.put("createdAt", cashReceipts.getCreatedAt());
-            map.put("updatedAt", cashReceipts.getUpdatedAt());
 
             map = this.getLedgerAndFileLog(map, cashReceipts.getTransaction().getId());
+            map.put("createdAt", cashReceipts.getCreatedAt());
+            map.put("updatedAt", cashReceipts.getUpdatedAt());
         } catch (Exception ex) {
             Logger.getLogger(DocumentLoggerFacadeImpl.class.getName()).log(Level.SEVERE, null, ex);
             throw new RuntimeException(ex);
@@ -409,7 +413,7 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
 
     @Override
     public Map makeLog(JobOrder jo) {
-        Map map = new HashMap();
+        Map map = new LinkedHashMap();
         try {
 
             // main data
@@ -427,8 +431,6 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
             map.put("approvedBy", jo.getApprovingOfficer() != null ? jo.getApprovingOfficer().getFullName() : "");
             map.put("transactionId", jo.getTransaction().getId());
             map.put("workflow", jo.getWorkflow() != null ? jo.getWorkflow().getName() : "");
-            map.put("createdAt", jo.getCreatedAt());
-            map.put("updatedAt", jo.getUpdatedAt());
             map.put("amount", jo.getAmount());
             map.put("paymentTerm", jo.getPaymentTerm());
             map.put("paymentTermInWords", jo.getPaymentTermInWords());
@@ -436,6 +438,8 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
             map.put("budgetCheckedBy", jo.getBudgetCheckedBy() != null ? jo.getBudgetCheckedBy().getFullName() : "");
 
             map = this.getLedgerAndFileLog(map, jo.getTransaction().getId());
+            map.put("createdAt", jo.getCreatedAt());
+            map.put("updatedAt", jo.getUpdatedAt());
         } catch (Exception ex) {
             Logger.getLogger(DocumentLoggerFacadeImpl.class.getName()).log(Level.SEVERE, null, ex);
             throw new RuntimeException(ex);
@@ -445,7 +449,7 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
 
     @Override
     public Map makeLog(SalesVoucher salesVoucher) {
-        Map map = new HashMap();
+        Map map = new LinkedHashMap();
         try {
 
             // main data
@@ -460,10 +464,10 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
             map.put("createdBy", salesVoucher.getCreatedBy() != null ? salesVoucher.getCreatedBy().getFullName() : "");
             map.put("approvedBy", salesVoucher.getApprovingOfficer() != null ? salesVoucher.getApprovingOfficer().getFullName() : "");
             map.put("workflow", salesVoucher.getWorkflow() != null ? salesVoucher.getWorkflow().getName() : "");
-            map.put("createdAt", salesVoucher.getCreatedAt());
-            map.put("updatedAt", salesVoucher.getUpdatedAt());
 
             map = this.getLedgerAndFileLog(map, salesVoucher.getTransaction().getId());
+            map.put("createdAt", salesVoucher.getCreatedAt());
+            map.put("updatedAt", salesVoucher.getUpdatedAt());
         } catch (Exception ex) {
             Logger.getLogger(DocumentLoggerFacadeImpl.class.getName()).log(Level.SEVERE, null, ex);
             throw new RuntimeException(ex);
@@ -473,7 +477,7 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
 
     @Override
     public Map makeLog(PettyCashTrans pcv) {
-        Map map = new HashMap();
+        Map map = new LinkedHashMap();
 
         try {
             // main data
@@ -489,8 +493,6 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
             map.put("approvedBy", pcv.getApprovingOfficer() != null ? pcv.getApprovingOfficer().getFullName() : "");
             map.put("releasedBy", pcv.getReleasingOfficer() != null ? pcv.getReleasingOfficer().getFullName() : "");
             map.put("workflow", pcv.getWorkflow() != null ? pcv.getWorkflow().getName() : "");
-            map.put("createdAt", pcv.getCreatedAt());
-            map.put("updatedAt", pcv.getUpdatedAt());
             map.put("office", pcv.getOffice() != null ? pcv.getOffice().getName() : "");
 
             List<PettyCashTransDetail> transDetails = pettyCashTransDetailRepo.findByPettyCashTransId(pcv.getId());
@@ -498,7 +500,7 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
             List<Map> transDetailsMap = new ArrayList<>();
 
             for(PettyCashTransDetail detail:transDetails) {
-                Map row = new HashMap();
+                Map row = new LinkedHashMap();
 
                 row.put("amount", detail.getAmount());
                 row.put("remarks", detail.getRemarks());
@@ -509,6 +511,8 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
 
             map.put("pettyCashTransDetails", transDetailsMap);
 
+            map.put("createdAt", pcv.getCreatedAt());
+            map.put("updatedAt", pcv.getUpdatedAt());
         } catch (Exception ex) {
             Logger.getLogger(DocumentLoggerFacadeImpl.class.getName()).log(Level.SEVERE, null, ex);
 
@@ -520,7 +524,7 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
 
     @Override
     public Map makeLog(CashAdvance ca) {
-        Map map = new HashMap();
+        Map map = new LinkedHashMap();
         List<CashAdvanceParticular> cashAdvanceParticulars = new ArrayList<>();
         List<CashAdvanceParticularDto> particulars = new ArrayList<>();
 
@@ -553,12 +557,12 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
             map.put("recommendedBy", ca.getRecommendedBy() != null ? ca.getRecommendedBy().getFullName() : "");
             map.put("approvedBy", ca.getApprovingOfficer() != null ? ca.getApprovingOfficer().getFullName() : "");
             map.put("workflow", ca.getWorkflow() != null ? ca.getWorkflow().getName() : "");
-            map.put("createdAt", ca.getCreatedAt());
-            map.put("updatedAt", ca.getUpdatedAt());
             map.put("particulars", particulars);
             map.put("isLiquidated", ca.isLiquidated());
 
             map = this.getLedgerAndFileLog(map, ca.getTransaction().getId());
+            map.put("createdAt", ca.getCreatedAt());
+            map.put("updatedAt", ca.getUpdatedAt());
         } catch (Exception ex) {
             Logger.getLogger(DocumentLoggerFacadeImpl.class.getName()).log(Level.SEVERE, null, ex);
             throw new RuntimeException(ex);
@@ -569,7 +573,7 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
 
     @Override
     public Map makeLog(CashAdvanceLiquidation cal) {
-        Map map = new HashMap();
+        Map map = new LinkedHashMap();
         List<CashAdvanceLiquidationItem> cashAdvanceLiquidationItems = new ArrayList<>();
         List<CashAdvanceLiquidationItemDto> items = new ArrayList<>();
 
@@ -601,11 +605,11 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
             map.put("recommendedBy", cal.getRecommendedBy() != null ? cal.getRecommendedBy().getFullName() : "");
             map.put("approvedBy", cal.getApprovingOfficer() != null ? cal.getApprovingOfficer().getFullName() : "");
             map.put("workflow", cal.getWorkflow() != null ? cal.getWorkflow().getName() : "");
-            map.put("createdAt", cal.getCreatedAt());
-            map.put("updatedAt", cal.getUpdatedAt());
             map.put("cashAdvanceLiquidationItems", items);
 
             map = this.getLedgerAndFileLog(map, cal.getTransaction().getId());
+            map.put("createdAt", cal.getCreatedAt());
+            map.put("updatedAt", cal.getUpdatedAt());
         } catch (Exception ex) {
             Logger.getLogger(DocumentLoggerFacadeImpl.class.getName()).log(Level.SEVERE, null, ex);
             throw new RuntimeException(ex);
@@ -617,7 +621,7 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
     @Override
     public Map makeLog(MaterialIssueRegister miv) {
 
-        Map map = new HashMap();
+        Map map = new LinkedHashMap();
         try {
 
             // main data
@@ -634,10 +638,10 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
             map.put("checkedBy", miv.getChecker() != null ? miv.getChecker().getFullName() : "");
             map.put("approvedBy", miv.getApprovingOfficer() != null ? miv.getApprovingOfficer().getFullName() : "");
             map.put("workflow", miv.getWorkflow() != null ? miv.getWorkflow().getName() : "");
-            map.put("createdAt", miv.getCreatedAt());
-            map.put("updatedAt", miv.getUpdatedAt());
 
             map = this.getLedgerAndFileLog(map, miv.getTransaction().getId());
+            map.put("createdAt", miv.getCreatedAt());
+            map.put("updatedAt", miv.getUpdatedAt());
         } catch (Exception ex) {
             Logger.getLogger(DocumentLoggerFacadeImpl.class.getName()).log(Level.SEVERE, null, ex);
             throw new RuntimeException(ex);
@@ -647,7 +651,7 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
 
     @Override
     public Map makeLog(Canvass canvass) {
-        Map map = new HashMap();
+        Map map = new LinkedHashMap();
         try {
 
             // main data
@@ -660,10 +664,10 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
             map.put("supplier", canvass.getSupplier() != null ? canvass.getSupplier().getName() : "");
             map.put("transactionId", canvass.getTransaction().getId());
             map.put("workflow", canvass.getWorkflow() != null ? canvass.getWorkflow().getName() : "");
-            map.put("createdAt", canvass.getCreatedAt());
-            map.put("updatedAt", canvass.getUpdatedAt());
 
             map = this.getLedgerAndFileLog(map, canvass.getTransaction().getId());
+            map.put("createdAt", canvass.getCreatedAt());
+            map.put("updatedAt", canvass.getUpdatedAt());
         } catch (Exception ex) {
             Logger.getLogger(DocumentLoggerFacadeImpl.class.getName()).log(Level.SEVERE, null, ex);
             throw new RuntimeException(ex);
@@ -673,7 +677,7 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
 
     @Override
     public Map makeLog(JobOrderAcceptance joa) {
-        Map map = new HashMap();
+        Map map = new LinkedHashMap();
         try {
 
             // main data
@@ -687,8 +691,6 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
             map.put("inspectedBy", joa.getInspectedBy() != null ? joa.getInspectedBy().getFullName() : "");
             map.put("transactionId", joa.getTransaction().getId());
             map.put("workflow", joa.getWorkflow() != null ? joa.getWorkflow().getName(): "");
-            map.put("createdAt", joa.getCreatedAt());
-            map.put("updatedAt", joa.getUpdatedAt());
             map.put("amount", joa.getAmount());
             map.put("adjustment", joa.getAdjustment());
             map.put("netAmount", joa.getNetAmount());
@@ -698,6 +700,8 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
             map.put("invoiceDate", joa.getInvoiceDate());
 
             map = this.getLedgerAndFileLog(map, joa.getTransaction().getId());
+            map.put("createdAt", joa.getCreatedAt());
+            map.put("updatedAt", joa.getUpdatedAt());
         } catch (Exception ex) {
             Logger.getLogger(DocumentLoggerFacadeImpl.class.getName()).log(Level.SEVERE, null, ex);
             throw new RuntimeException(ex);
@@ -707,28 +711,30 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
 
     @Override
     public Map makeLog(PaymentRequest pr) {
-        Map map = new HashMap();
+        Map map = new LinkedHashMap();
         try {
 
             // main data
             map.put("id", pr.getId());
             map.put("code", pr.getCode());
+            map.put("invoiceNumber", pr.getInvoiceNumber() == null ? "" : pr.getInvoiceNumber());
+            map.put("invoiceDate", pr.getInvoiceDate());
             map.put("voucherDate", pr.getVoucherDate());
+            map.put("dueDate", pr.getDueDate());
             map.put("year", pr.getYear());
             map.put("documentStatus", pr.getDocumentStatus().getStatus());
             map.put("vendor", pr.getVendor() != null ? pr.getVendor().getName() : "");
-            map.put("amount", pr.getAmount());
+            map.put("amount", formatAmount(pr.getAmount()));
             map.put("createdBy", pr.getCreatedBy() != null ? pr.getCreatedBy().getFullName() : "");
             map.put("transactionId", pr.getTransaction().getId());
             map.put("workflow", pr.getWorkflow() != null ? pr.getWorkflow().getName() : "");
-            map.put("createdAt", pr.getCreatedAt());
-            map.put("updatedAt", pr.getUpdatedAt());
 //            map.put("budgetLineItemDetail", pr.getBudgetLineItemDetail().getCode());
-            map.put("invoiceDate", pr.getInvoiceDate());
-            map.put("invoiceNumber", pr.getInvoiceNumber() == null ? "" : pr.getInvoiceNumber());
-            map.put("dueDate", pr.getDueDate());
 
             map = this.getLedgerAndFileLog(map, pr.getTransaction().getId());
+
+            // keep timestamps last
+            map.put("createdAt", pr.getCreatedAt());
+            map.put("updatedAt", pr.getUpdatedAt());
         } catch (Exception ex) {
             Logger.getLogger(DocumentLoggerFacadeImpl.class.getName()).log(Level.SEVERE, null, ex);
             throw new RuntimeException(ex);
@@ -738,7 +744,7 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
 
     /*@Override
     public Map makeLog(BankDeposit bankDeposit) {
-        Map map = new HashMap();
+        Map map = new LinkedHashMap();
         try {
 
             // main data
@@ -754,10 +760,10 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
             map.put("checkedBy", bankDeposit.getChecker().getFullName());
             map.put("approvedBy", bankDeposit.getApprovingOfficer().getFullName());
             map.put("workflow", bankDeposit.getWorkflow().getName());
-            map.put("createdAt", bankDeposit.getCreatedAt());
-            map.put("updatedAt", bankDeposit.getUpdatedAt());
 
             map = this.getLedgerAndFileLog(map, bankDeposit.getTransaction().getId());
+            map.put("createdAt", bankDeposit.getCreatedAt());
+            map.put("updatedAt", bankDeposit.getUpdatedAt());
         } catch (Exception ex) {
             Logger.getLogger(DocumentLoggerFacadeImpl.class.getName()).log(Level.SEVERE, null, ex);
             throw new RuntimeException(ex);
@@ -767,7 +773,7 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
 
     @Override
     public Map makeLog(Budget budget    ) {
-        Map map = new HashMap();
+        Map map = new LinkedHashMap();
         try {
 
             // main data
@@ -783,10 +789,10 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
 //            map.put("checkedBy", budget.getChecker().getFullName());
 //            map.put("approvedBy", budget.getApprovingOfficer().getFullName());
 //            map.put("workflow", budget.getWorkflow().getName());
-            map.put("createdAt", budget.getCreatedAt());
-            map.put("updatedAt", budget.getUpdatedAt());
 
 //            map = this.getLedgerAndFileLog(map, budget.getTransaction().getId());
+            map.put("createdAt", budget.getCreatedAt());
+            map.put("updatedAt", budget.getUpdatedAt());
         } catch (Exception ex) {
             Logger.getLogger(DocumentLoggerFacadeImpl.class.getName()).log(Level.SEVERE, null, ex);
             throw new RuntimeException(ex);
@@ -796,7 +802,7 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
 
     @Override
     public Map makeLog(AdjustmentJournal aj) {
-        Map map = new HashMap();
+        Map map = new LinkedHashMap();
         try {
             // main data
             map.put("id", aj.getId());
@@ -814,12 +820,12 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
 //            map.put("auditedBy", aj.getAuditor().getFullName());
             map.put("approvedBy", aj.getApprovingOfficer() != null ? aj.getApprovingOfficer().getFullName() : "");
             map.put("workflow", aj.getWorkflow() != null ? aj.getWorkflow().getName() : "");
-            map.put("createdAt", aj.getCreatedAt());
-            map.put("updatedAt", aj.getUpdatedAt());
             map.put("transactionType", aj.getTransactionType());
 
 
             map = this.getLedgerAndFileLog(map, aj.getTransaction().getId());
+            map.put("createdAt", aj.getCreatedAt());
+            map.put("updatedAt", aj.getUpdatedAt());
         } catch (Exception ex) {
             Logger.getLogger(DocumentLoggerFacadeImpl.class.getName()).log(Level.SEVERE, null, ex);
             throw new RuntimeException(ex);
@@ -829,7 +835,7 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
 
     @Override
     public Map makeLog(ReceivingReport rr) {
-        Map map = new HashMap();
+        Map map = new LinkedHashMap();
         try {
             // main data
             map.put("id", rr.getId());
@@ -847,8 +853,6 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
             map.put("checkedBy", rr.getChecker() != null ? rr.getChecker().getFullName() : "");
             map.put("approvedBy", rr.getApprovingOfficer() != null ? rr.getApprovingOfficer().getFullName() : "");
             map.put("workflow", rr.getWorkflow() != null ? rr.getWorkflow().getName() : "");
-            map.put("createdAt", rr.getCreatedAt());
-            map.put("updatedAt", rr.getUpdatedAt());
             map.put("transactionType", rr.getTransactionType());
             map.put("transactionId", rr.getTransaction().getId());
             map.put("documentStatus", rr.getDocumentStatus().getStatus());
@@ -862,13 +866,13 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
 
             for (ReceivingReportDetail details:rr.getRrDetails()) {
 
-                Map detailsMap = new HashMap();
+                Map detailsMap = new LinkedHashMap();
 
-                Map poDetailMap = new HashMap();
+                Map poDetailMap = new LinkedHashMap();
                 poDetailMap.put("id", details.getPurchaseOrderDetail() != null ? details.getPurchaseOrderDetail().getId() : 0);
                 poDetailMap.put("unit", details.getItem().getUnit().getCode());
 
-                Map itemMap = new HashMap();
+                Map itemMap = new LinkedHashMap();
                 itemMap.put("id", details.getItem().getId());
                 itemMap.put("code", details.getItem().getCode());
                 itemMap.put("desc", details.getItem().getDescription());
@@ -896,6 +900,8 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
             map.put("rrDetails", detailsList);
 
             map = this.getLedgerAndFileLog(map, rr.getTransaction().getId());
+            map.put("createdAt", rr.getCreatedAt());
+            map.put("updatedAt", rr.getUpdatedAt());
         } catch (Exception ex) {
             Logger.getLogger(DocumentLoggerFacadeImpl.class.getName()).log(Level.SEVERE, null, ex);
             throw new RuntimeException(ex);
@@ -905,7 +911,7 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
 
     @Override
     public Map makeLog(StockWithdrawal sw) {
-        Map map = new HashMap();
+        Map map = new LinkedHashMap();
         try {
             // main data
             map.put("id", sw.getId());
@@ -917,8 +923,6 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
             map.put("inventoryLocation", sw.getInventoryLocation() != null ? sw.getInventoryLocation().getDescription() : "");
             map.put("inventoryCategory", sw.getInventoryCategory() != null ? sw.getInventoryCategory().getDescription() : "");
             map.put("workflow", sw.getWorkflow() != null ? sw.getWorkflow().getName() : "");
-            map.put("createdAt", sw.getCreatedAt());
-            map.put("updatedAt", sw.getUpdatedAt());
             map.put("transactionId", sw.getTransaction().getId());
             map.put("documentStatus", sw.getDocumentStatus().getStatus());
             map.put("year", Integer.parseInt(GlobalConstant.YYYY_DATE_FORMAT.format(sw.getYear())));
@@ -932,14 +936,14 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
 
                 //TODO: Stock Withdrawal Details Logger
 
-                Map detailsMap = new HashMap();
+                Map detailsMap = new LinkedHashMap();
 
-                Map itemMap = new HashMap();
+                Map itemMap = new LinkedHashMap();
                 itemMap.put("id", details.getItemId());
                 itemMap.put("code", details.getItemCode());
                 itemMap.put("desc", details.getItemDescription());
 
-                Map unitMap = new HashMap();
+                Map unitMap = new LinkedHashMap();
                 unitMap.put("id", details.getUnitId());
                 unitMap.put("code", details.getUnitCode());
 
@@ -954,6 +958,8 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
             map.put("details", detailsList);
 
             map = this.getLedgerAndFileLog(map, sw.getTransaction().getId());
+            map.put("createdAt", sw.getCreatedAt());
+            map.put("updatedAt", sw.getUpdatedAt());
         } catch (Exception ex) {
             Logger.getLogger(DocumentLoggerFacadeImpl.class.getName()).log(Level.SEVERE, null, ex);
             throw new RuntimeException(ex);
@@ -963,7 +969,7 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
 
     @Override
     public Map makeLog(StockRelease sr) {
-        Map map = new HashMap();
+        Map map = new LinkedHashMap();
         try {
             // main data
             map.put("id", sr.getId());
@@ -977,8 +983,6 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
             }
             map.put("receivedBy", sr.getReceivedBy() != null ? sr.getReceivedBy().getFullName() : "");
             map.put("workflow", sr.getWorkflow() != null ? sr.getWorkflow().getName() : "");
-            map.put("createdAt", sr.getCreatedAt());
-            map.put("updatedAt", sr.getUpdatedAt());
             map.put("transactionId", sr.getTransaction().getId());
             map.put("documentStatus", sr.getDocumentStatus().getStatus());
             map.put("year", Integer.parseInt(GlobalConstant.YYYY_DATE_FORMAT.format(sr.getYear())));
@@ -992,14 +996,14 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
 
                 //TODO: Stock Withdrawal Details Logger
 
-                Map detailsMap = new HashMap();
+                Map detailsMap = new LinkedHashMap();
 
-                Map itemMap = new HashMap();
+                Map itemMap = new LinkedHashMap();
                 itemMap.put("id", details.getItemId());
                 itemMap.put("code", details.getItemCode());
                 itemMap.put("desc", details.getItemDescription());
 
-                Map unitMap = new HashMap();
+                Map unitMap = new LinkedHashMap();
                 unitMap.put("id", details.getUnitId());
                 unitMap.put("code", details.getUnitCode());
 
@@ -1015,6 +1019,8 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
             map.put("details", detailsList);
 
             map = this.getLedgerAndFileLog(map, sr.getTransaction().getId());
+            map.put("createdAt", sr.getCreatedAt());
+            map.put("updatedAt", sr.getUpdatedAt());
         } catch (Exception ex) {
             Logger.getLogger(DocumentLoggerFacadeImpl.class.getName()).log(Level.SEVERE, null, ex);
             throw new RuntimeException(ex);
@@ -1024,7 +1030,7 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
 
     @Override
     public Map makeLog(MaterialCreditTicket materialCreditTicket) {
-        Map map = new HashMap();
+        Map map = new LinkedHashMap();
         try {
             // main data
             map.put("id", materialCreditTicket.getId());
@@ -1036,8 +1042,6 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
             map.put("requestedBy", materialCreditTicket.getStockRelease() != null && materialCreditTicket.getStockRelease().getReceivedBy() != null ? materialCreditTicket.getStockRelease().getReceivedBy().getFullName() : "");
             map.put("approvedBy", materialCreditTicket.getApprovingOfficer() != null ? materialCreditTicket.getApprovingOfficer().getFullName() : "");
             map.put("workflow", materialCreditTicket.getWorkflow() != null ? materialCreditTicket.getWorkflow().getName() : "");
-            map.put("createdAt", materialCreditTicket.getCreatedAt());
-            map.put("updatedAt", materialCreditTicket.getUpdatedAt());
             map.put("transactionId", materialCreditTicket.getTransaction().getId());
             map.put("documentStatus", materialCreditTicket.getDocumentStatus().getStatus());
             map.put("year", Integer.parseInt(GlobalConstant.YYYY_DATE_FORMAT.format(materialCreditTicket.getYear())));
@@ -1051,14 +1055,14 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
 
                 //TODO: Stock Withdrawal Details Logger
 
-                Map detailsMap = new HashMap();
+                Map detailsMap = new LinkedHashMap();
 
-                Map itemMap = new HashMap();
+                Map itemMap = new LinkedHashMap();
                 itemMap.put("id", details.getItemId());
                 itemMap.put("code", details.getItemCode());
                 itemMap.put("desc", details.getItemDescription());
 
-                Map unitMap = new HashMap();
+                Map unitMap = new LinkedHashMap();
                 unitMap.put("id", details.getUnitId());
                 unitMap.put("code", details.getUnitCode());
 
@@ -1074,6 +1078,8 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
             map.put("details", detailsList);
 
             map = this.getLedgerAndFileLog(map, materialCreditTicket.getTransaction().getId());
+            map.put("createdAt", materialCreditTicket.getCreatedAt());
+            map.put("updatedAt", materialCreditTicket.getUpdatedAt());
         } catch (Exception ex) {
             Logger.getLogger(DocumentLoggerFacadeImpl.class.getName()).log(Level.SEVERE, null, ex);
             throw new RuntimeException(ex);
@@ -1083,7 +1089,7 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
 
     @Override
     public Map makeLog(StockAdjustment stockAdjustment) {
-        Map map = new HashMap();
+        Map map = new LinkedHashMap();
         try {
             // main data
             map.put("id", stockAdjustment.getId());
@@ -1095,8 +1101,6 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
             map.put("checkedBy", stockAdjustment.getChecker() != null ? stockAdjustment.getChecker().getFullName() : "");
             map.put("approvedBy", stockAdjustment.getApprovingOfficer() != null ? stockAdjustment.getApprovingOfficer().getFullName() : "");
             map.put("workflow", stockAdjustment.getWorkflow() != null ? stockAdjustment.getWorkflow().getName() : "");
-            map.put("createdAt", stockAdjustment.getCreatedAt());
-            map.put("updatedAt", stockAdjustment.getUpdatedAt());
             map.put("transactionId", stockAdjustment.getTransaction().getId());
             map.put("documentStatus", stockAdjustment.getDocumentStatus().getStatus());
             map.put("year", Integer.parseInt(GlobalConstant.YYYY_DATE_FORMAT.format(stockAdjustment.getYear())));
@@ -1110,14 +1114,14 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
 
                 //TODO: Stock Withdrawal Details Logger
 
-                Map detailsMap = new HashMap();
+                Map detailsMap = new LinkedHashMap();
 
-                Map itemMap = new HashMap();
+                Map itemMap = new LinkedHashMap();
                 itemMap.put("id", details.getItemId());
                 itemMap.put("code", details.getItemCode());
                 itemMap.put("desc", details.getItemDescription());
 
-                Map unitMap = new HashMap();
+                Map unitMap = new LinkedHashMap();
                 unitMap.put("id", details.getUnitId());
                 unitMap.put("code", details.getUnitCode());
 
@@ -1135,6 +1139,8 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
             map.put("details", detailsList);
 
             map = this.getLedgerAndFileLog(map, stockAdjustment.getTransaction().getId());
+            map.put("createdAt", stockAdjustment.getCreatedAt());
+            map.put("updatedAt", stockAdjustment.getUpdatedAt());
         } catch (Exception ex) {
             Logger.getLogger(DocumentLoggerFacadeImpl.class.getName()).log(Level.SEVERE, null, ex);
             throw new RuntimeException(ex);
@@ -1144,7 +1150,7 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
 
     @Override
     public Map makeLog(MaterialSalvageTicket materialSalvageTicket) {
-        Map map = new HashMap();
+        Map map = new LinkedHashMap();
         try {
             // main data
             map.put("id", materialSalvageTicket.getId());
@@ -1156,8 +1162,6 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
             map.put("returnedBy", materialSalvageTicket.getReturnedBy() != null ? materialSalvageTicket.getReturnedBy().getFullName() : "");
             map.put("receivedBy", materialSalvageTicket.getReceivedBy() != null ? materialSalvageTicket.getReceivedBy().getFullName() : "");
             map.put("workflow", materialSalvageTicket.getWorkflow() != null ? materialSalvageTicket.getWorkflow().getName() : "");
-            map.put("createdAt", materialSalvageTicket.getCreatedAt());
-            map.put("updatedAt", materialSalvageTicket.getUpdatedAt());
             map.put("transactionId", materialSalvageTicket.getTransaction().getId());
             map.put("documentStatus", materialSalvageTicket.getDocumentStatus().getStatus());
             map.put("year", Integer.parseInt(GlobalConstant.YYYY_DATE_FORMAT.format(materialSalvageTicket.getYear())));
@@ -1166,14 +1170,14 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
 
             for (ItemTransactionDetailDto details : materialSalvageTicket.getDetails()) {
 
-                Map detailsMap = new HashMap();
+                Map detailsMap = new LinkedHashMap();
 
-                Map itemMap = new HashMap();
+                Map itemMap = new LinkedHashMap();
                 itemMap.put("id", details.getItemId());
                 itemMap.put("code", details.getItemCode());
                 itemMap.put("desc", details.getItemDescription());
 
-                Map unitMap = new HashMap();
+                Map unitMap = new LinkedHashMap();
                 unitMap.put("id", details.getUnitId());
                 unitMap.put("code", details.getUnitCode());
 
@@ -1189,6 +1193,8 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
             map.put("details", detailsList);
 
             map = this.getLedgerAndFileLog(map, materialSalvageTicket.getTransaction().getId());
+            map.put("createdAt", materialSalvageTicket.getCreatedAt());
+            map.put("updatedAt", materialSalvageTicket.getUpdatedAt());
         } catch (Exception ex) {
             Logger.getLogger(DocumentLoggerFacadeImpl.class.getName()).log(Level.SEVERE, null, ex);
             throw new RuntimeException(ex);
@@ -1198,7 +1204,7 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
 
     @Override
     public Map makeLog(StockTransfer stockTransfer) {
-        Map map = new HashMap();
+        Map map = new LinkedHashMap();
         try {
             // main data
             map.put("id", stockTransfer.getId());
@@ -1211,8 +1217,6 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
             map.put("createdBy", stockTransfer.getCreatedBy() != null ? stockTransfer.getCreatedBy().getFullName() : "");
             map.put("approvedBy", stockTransfer.getApprovingOfficer() != null ? stockTransfer.getApprovingOfficer().getFullName() : "");
             map.put("workflow", stockTransfer.getWorkflow() != null ? stockTransfer.getWorkflow().getName() : "");
-            map.put("createdAt", stockTransfer.getCreatedAt());
-            map.put("updatedAt", stockTransfer.getUpdatedAt());
             map.put("transactionId", stockTransfer.getTransaction().getId());
             map.put("documentStatus", stockTransfer.getDocumentStatus().getStatus());
             map.put("year", Integer.parseInt(GlobalConstant.YYYY_DATE_FORMAT.format(stockTransfer.getYear())));
@@ -1221,14 +1225,14 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
 
             for (ItemTransactionDetailDto details : stockTransfer.getDetails()) {
 
-                Map detailsMap = new HashMap();
+                Map detailsMap = new LinkedHashMap();
 
-                Map itemMap = new HashMap();
+                Map itemMap = new LinkedHashMap();
                 itemMap.put("id", details.getItemId());
                 itemMap.put("code", details.getItemCode());
                 itemMap.put("desc", details.getItemDescription());
 
-                Map unitMap = new HashMap();
+                Map unitMap = new LinkedHashMap();
                 unitMap.put("id", details.getUnitId());
                 unitMap.put("code", details.getUnitCode());
 
@@ -1244,6 +1248,8 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
             map.put("details", detailsList);
 
             map = this.getLedgerAndFileLog(map, stockTransfer.getTransaction().getId());
+            map.put("createdAt", stockTransfer.getCreatedAt());
+            map.put("updatedAt", stockTransfer.getUpdatedAt());
         } catch (Exception ex) {
             Logger.getLogger(DocumentLoggerFacadeImpl.class.getName()).log(Level.SEVERE, null, ex);
             throw new RuntimeException(ex);
@@ -1253,7 +1259,7 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
 
     @Override
     public Map makeLog(StockReceive stockReceive) {
-        Map map = new HashMap();
+        Map map = new LinkedHashMap();
         try {
             // main data
             map.put("id", stockReceive.getId());
@@ -1265,8 +1271,6 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
 //            map.put("checkedBy", stockReceive.getCheckedBy().getFullName());
 //            map.put("approvedBy", stockReceive.getApprovingOfficer().getFullName());
             map.put("workflow", stockReceive.getWorkflow() != null ? stockReceive.getWorkflow().getName() : "");
-            map.put("createdAt", stockReceive.getCreatedAt());
-            map.put("updatedAt", stockReceive.getUpdatedAt());
             map.put("transactionId", stockReceive.getTransaction().getId());
             map.put("documentStatus", stockReceive.getDocumentStatus().getStatus());
             map.put("year", Integer.parseInt(GlobalConstant.YYYY_DATE_FORMAT.format(stockReceive.getYear())));
@@ -1275,14 +1279,14 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
 
             for (ItemTransactionDetailDto details : stockReceive.getDetails()) {
 
-                Map detailsMap = new HashMap();
+                Map detailsMap = new LinkedHashMap();
 
-                Map itemMap = new HashMap();
+                Map itemMap = new LinkedHashMap();
                 itemMap.put("id", details.getItemId());
                 itemMap.put("code", details.getItemCode());
                 itemMap.put("desc", details.getItemDescription());
 
-                Map unitMap = new HashMap();
+                Map unitMap = new LinkedHashMap();
                 unitMap.put("id", details.getUnitId());
                 unitMap.put("code", details.getUnitCode());
 
@@ -1296,6 +1300,8 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
             map.put("details", detailsList);
 
             map = this.getLedgerAndFileLog(map, stockReceive.getTransaction().getId());
+            map.put("createdAt", stockReceive.getCreatedAt());
+            map.put("updatedAt", stockReceive.getUpdatedAt());
         } catch (Exception ex) {
             Logger.getLogger(DocumentLoggerFacadeImpl.class.getName()).log(Level.SEVERE, null, ex);
             throw new RuntimeException(ex);
@@ -1306,7 +1312,7 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.READ_UNCOMMITTED)
     public Map makeLog(Quotation quotation) {
-        Map map = new HashMap();
+        Map map = new LinkedHashMap();
         try {
             // Fetch DTO within this REQUIRES_NEW TX — avoids LazyInitializationException from
             // the outer TX's detached proxies, and READ_UNCOMMITTED sees outer TX's uncommitted inserts
@@ -1325,8 +1331,6 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
                 map.put("approvedByGeneralManager", quotationDto.getApprovedByGeneralManager());
 
             map.put("transactionId", quotationDto.getTransId());
-            map.put("createdAt",     quotationDto.getCreatedAt());
-            map.put("updatedAt",     quotationDto.getUpdatedAt());
 
             map.put("suppliers", quotationDto.getSuppliers());
 
@@ -1353,6 +1357,8 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
             }
             map.put("terms", termMaps);
 
+            map.put("createdAt",     quotationDto.getCreatedAt());
+            map.put("updatedAt",     quotationDto.getUpdatedAt());
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -1361,7 +1367,7 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
 
     @Override
     public Map makeLog(Project project) {
-        Map map = new HashMap();
+        Map map = new LinkedHashMap();
         try {
             // main data
             map.put("id", project.getId());
@@ -1379,13 +1385,13 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
          /*   map.put("funding", project.getProjectFunding().getDescription());
             map.put("fundingMarkup", project.getProjectFunding().getMarkup());*/
             map.put("createdBy", project.getCreatedBy() != null ? project.getCreatedBy().getFullName() : "");
-            map.put("createdAt", project.getCreatedAt());
-            map.put("updatedAt", project.getUpdatedAt());
             map.put("year", Integer.parseInt(GlobalConstant.YYYY_DATE_FORMAT.format(project.getYear())));
             map.put("documentStatus", project.getDocumentStatus().getStatus());
 
             map = this.getLedgerAndFileLog(map, project.getTransaction().getId());
 
+            map.put("createdAt", project.getCreatedAt());
+            map.put("updatedAt", project.getUpdatedAt());
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -1394,7 +1400,7 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
 
     @Override
     public Map makeLog(SiteInspectionReport report) {
-        Map map = new HashMap();
+        Map map = new LinkedHashMap();
         try {
             // main data
             map.put("id", report.getId());
@@ -1404,8 +1410,6 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
             map.put("createdBy", report.getCreatedBy() != null ? report.getCreatedBy().getFullName() : "");
             map.put("checker", report.getChecker() != null ? report.getChecker().getFullName() : "");
             map.put("noted", report.getNotedBy() != null ? report.getNotedBy().getFullName() : "");
-            map.put("createdAt", report.getCreatedAt());
-            map.put("updatedAt", report.getUpdatedAt());
             map.put("year", Integer.parseInt(GlobalConstant.YYYY_DATE_FORMAT.format(report.getYear())));
             map.put("documentStatus", report.getDocumentStatus().getStatus());
 
@@ -1431,6 +1435,8 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
                 map.put("workOrder", report.getWorkOrder().getCode());
             }
 
+            map.put("createdAt", report.getCreatedAt());
+            map.put("updatedAt", report.getUpdatedAt());
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -1440,7 +1446,7 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
 
     @Override
     public Map makeLog(CostEstimate costEstimate) {
-        Map map = new HashMap();
+        Map map = new LinkedHashMap();
         try {
             // main data
             map.put("id", costEstimate.getId());
@@ -1456,8 +1462,6 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
             map.put("freightHandling", costEstimate.getFreightHandling());
             map.put("contingency", costEstimate.getContingency());
             map.put("createdBy", costEstimate.getCreatedBy() != null ? costEstimate.getCreatedBy().getFullName() : "");
-            map.put("createdAt", costEstimate.getCreatedAt());
-            map.put("updatedAt", costEstimate.getUpdatedAt());
             map.put("year", Integer.parseInt(GlobalConstant.YYYY_DATE_FORMAT.format(costEstimate.getYear())));
             map.put("documentStatus", costEstimate.getDocumentStatus().getStatus());
 
@@ -1465,14 +1469,14 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
 
             for (CostEstimateDetailDto details : costEstimate.getDetails()) {
 
-                Map detailsMap = new HashMap();
+                Map detailsMap = new LinkedHashMap();
 
-                Map itemMap = new HashMap();
+                Map itemMap = new LinkedHashMap();
                 itemMap.put("id", details.getItemId());
                 itemMap.put("code", details.getItemCode());
                 itemMap.put("desc", details.getItemDescription());
 
-                Map unitMap = new HashMap();
+                Map unitMap = new LinkedHashMap();
                 unitMap.put("id", details.getUnitId());
                 unitMap.put("code", details.getUnitCode());
 
@@ -1491,7 +1495,7 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
 
             List assemblyUnits = new ArrayList();
             for (CostEstimateAssemblyUnit unit : costEstimate.getCostEstimateAssemblyUnits()) {
-                Map unitMap = new HashMap();
+                Map unitMap = new LinkedHashMap();
 
                 unitMap.put("assemblyUnit", unit.getAssemblyUnit().getDescription());
                 unitMap.put("quantity", unit.getQuantity());
@@ -1503,6 +1507,8 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
 
             map.put("assemblyUnits", assemblyUnits);
             map.put("details", detailsList);
+            map.put("createdAt", costEstimate.getCreatedAt());
+            map.put("updatedAt", costEstimate.getUpdatedAt());
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -1511,7 +1517,7 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
 
     @Override
     public Map makeLog(BillOfMaterial billOfMaterial) {
-        Map map = new HashMap();
+        Map map = new LinkedHashMap();
         try {
             // main data
             map.put("id", billOfMaterial.getId());
@@ -1527,8 +1533,6 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
             map.put("freightHandling", billOfMaterial.getFreightHandling());
             map.put("contingency", billOfMaterial.getContingency());
             map.put("createdBy", billOfMaterial.getCreatedBy() != null ? billOfMaterial.getCreatedBy().getFullName() : "");
-            map.put("createdAt", billOfMaterial.getCreatedAt());
-            map.put("updatedAt", billOfMaterial.getUpdatedAt());
             map.put("year", Integer.parseInt(GlobalConstant.YYYY_DATE_FORMAT.format(billOfMaterial.getYear())));
             map.put("documentStatus", billOfMaterial.getDocumentStatus().getStatus());
 
@@ -1536,14 +1540,14 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
 
             for (BillOfMaterialDetailDto details : billOfMaterial.getDetails()) {
 
-                Map detailsMap = new HashMap();
+                Map detailsMap = new LinkedHashMap();
 
-                Map itemMap = new HashMap();
+                Map itemMap = new LinkedHashMap();
                 itemMap.put("id", details.getItemId());
                 itemMap.put("code", details.getItemCode());
                 itemMap.put("desc", details.getItemDescription());
 
-                Map unitMap = new HashMap();
+                Map unitMap = new LinkedHashMap();
                 unitMap.put("id", details.getUnitId());
                 unitMap.put("code", details.getUnitCode());
 
@@ -1562,7 +1566,7 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
 
             List assemblyUnits = new ArrayList();
             for (BillOfMaterialAssemblyUnit unit : billOfMaterial.getBillOfMaterialAssemblyUnits()) {
-                Map unitMap = new HashMap();
+                Map unitMap = new LinkedHashMap();
 
                 unitMap.put("assemblyUnit", unit.getAssemblyUnit().getDescription());
                 unitMap.put("quantity", unit.getQuantity());
@@ -1574,6 +1578,8 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
 
             map.put("assemblyUnits", assemblyUnits);
             map.put("details", detailsList);
+            map.put("createdAt", billOfMaterial.getCreatedAt());
+            map.put("updatedAt", billOfMaterial.getUpdatedAt());
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -1582,7 +1588,7 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
 
 	@Override
     public Map makeLog(ProjectAcceptanceReport projectAcceptanceReport) {
-        Map map = new HashMap();
+        Map map = new LinkedHashMap();
         try {
             // main data
             map.put("id", projectAcceptanceReport.getId());
@@ -1599,10 +1605,10 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
             map.put("notedBy", projectAcceptanceReport.getNotedBy() != null ? projectAcceptanceReport.getNotedBy().getFullName() : "");
             map.put("recommendedBy", projectAcceptanceReport.getRecommendedBy() != null ? projectAcceptanceReport.getRecommendedBy().getFullName() : "");
             map.put("approvedBy", projectAcceptanceReport.getApprovedBy() != null ? projectAcceptanceReport.getApprovedBy().getFullName() : "");
-            map.put("createdAt", projectAcceptanceReport.getCreatedAt());
-            map.put("updatedAt", projectAcceptanceReport.getUpdatedAt());
             map.put("documentStatus", projectAcceptanceReport.getDocumentStatus().getStatus());
 
+            map.put("createdAt", projectAcceptanceReport.getCreatedAt());
+            map.put("updatedAt", projectAcceptanceReport.getUpdatedAt());
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -1611,7 +1617,7 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
 
     @Override
     public Map makeLog(ProjectAcceptanceCertification projectAcceptanceCertification) {
-        Map map = new HashMap();
+        Map map = new LinkedHashMap();
         try {
             // main data
             map.put("id", projectAcceptanceCertification.getId());
@@ -1623,10 +1629,10 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
             map.put("transactionId", projectAcceptanceCertification.getTransaction().getId());
             map.put("createdBy", projectAcceptanceCertification.getCreatedBy() != null ? projectAcceptanceCertification.getCreatedBy().getFullName() : "");
             map.put("approvedBy", projectAcceptanceCertification.getApprovingOfficer() != null ? projectAcceptanceCertification.getApprovingOfficer().getFullName() : "");
-            map.put("createdAt", projectAcceptanceCertification.getCreatedAt());
-            map.put("updatedAt", projectAcceptanceCertification.getUpdatedAt());
             map.put("documentStatus", projectAcceptanceCertification.getDocumentStatus().getStatus());
 
+            map.put("createdAt", projectAcceptanceCertification.getCreatedAt());
+            map.put("updatedAt", projectAcceptanceCertification.getUpdatedAt());
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -1635,7 +1641,7 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
 
     @Override
     public Map makeLog(MemorandumReceipt memorandumReceipt) {
-        Map map = new HashMap();
+        Map map = new LinkedHashMap();
         try {
             // main data
             map.put("id", memorandumReceipt.getId());
@@ -1650,9 +1656,9 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
             List detailsList = new ArrayList();
             for (MemorandumReceiptDetail detail : memorandumReceipt.getMemorandumReceiptDetails()) {
 
-                Map detailsMap = new HashMap();
+                Map detailsMap = new LinkedHashMap();
 
-                Map itemMap = new HashMap();
+                Map itemMap = new LinkedHashMap();
                 itemMap.put("id", detail.getStockWithdrawalDetail().getItem().getId());
                 itemMap.put("code", detail.getStockWithdrawalDetail().getItem().getCode());
                 itemMap.put("desc", detail.getStockWithdrawalDetail().getItem().getDescription());
@@ -1675,7 +1681,7 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
 
     @Override
     public Map makeLog(ItemsForRepair itemsForRepair) {
-        Map map = new HashMap();
+        Map map = new LinkedHashMap();
         try {
             // main data
             map.put("id", itemsForRepair.getId());
@@ -1686,8 +1692,6 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
             map.put("particulars", itemsForRepair.getParticulars());
             map.put("createdBy", itemsForRepair.getCreatedBy() != null ? itemsForRepair.getCreatedBy().getFullName() : "");
             map.put("workflow", itemsForRepair.getWorkflow() != null ? itemsForRepair.getWorkflow().getName() : "");
-            map.put("createdAt", itemsForRepair.getCreatedAt());
-            map.put("updatedAt", itemsForRepair.getUpdatedAt());
             map.put("transactionId", itemsForRepair.getTransaction().getId());
             map.put("documentStatus", itemsForRepair.getDocumentStatus().getStatus());
             map.put("year", Integer.parseInt(GlobalConstant.YYYY_DATE_FORMAT.format(itemsForRepair.getYear())));
@@ -1696,14 +1700,14 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
 
             for (ItemTransactionDetailDto details : itemsForRepair.getDetails()) {
 
-                Map detailsMap = new HashMap();
+                Map detailsMap = new LinkedHashMap();
 
-                Map itemMap = new HashMap();
+                Map itemMap = new LinkedHashMap();
                 itemMap.put("id", details.getItemId());
                 itemMap.put("code", details.getItemCode());
                 itemMap.put("desc", details.getItemDescription());
 
-                Map unitMap = new HashMap();
+                Map unitMap = new LinkedHashMap();
                 unitMap.put("id", details.getUnitId());
                 unitMap.put("code", details.getUnitCode());
 
@@ -1717,6 +1721,8 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
             map.put("details", detailsList);
 
             map = this.getLedgerAndFileLog(map, itemsForRepair.getTransaction().getId());
+            map.put("createdAt", itemsForRepair.getCreatedAt());
+            map.put("updatedAt", itemsForRepair.getUpdatedAt());
         } catch (Exception ex) {
             Logger.getLogger(DocumentLoggerFacadeImpl.class.getName()).log(Level.SEVERE, null, ex);
             throw new RuntimeException(ex);
@@ -1727,7 +1733,7 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
     @Override
     public Map makeLog(BudgetLineItem budgetLineItem) {
 
-        Map map = new HashMap();
+        Map map = new LinkedHashMap();
         try {
 
             // main data
@@ -1741,8 +1747,6 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
 
             map.put("transactionId", budgetLineItem.getTransaction().getId());
             map.put("workflow", budgetLineItem.getWorkflow() != null ? budgetLineItem.getWorkflow().getName():"");
-            map.put("createdAt", budgetLineItem.getCreatedAt());
-            map.put("updatedAt", budgetLineItem.getUpdatedAt());
 
             map.put("division", budgetLineItem.getDivision().getName());
 //            map.put("budgetType", budgetLineItem.getBudgetType().getDescription());
@@ -1752,6 +1756,8 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
                 map.put("budgetLineItemDetails", details);
             }
 
+            map.put("createdAt", budgetLineItem.getCreatedAt());
+            map.put("updatedAt", budgetLineItem.getUpdatedAt());
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -1761,7 +1767,7 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
 
     @Override
     public Map makeLog(PettyCashLiquidation pettyCashLiquidation) {
-        Map map = new HashMap();
+        Map map = new LinkedHashMap();
 
         try {
             // main data
@@ -1774,8 +1780,6 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
             map.put("approvedBy", pettyCashLiquidation.getApprovingOfficer().getFullName());
             map.put("receivedBy", pettyCashLiquidation.getReceivingOfficer().getFullName());
             map.put("workflow", pettyCashLiquidation.getWorkflow().getName());
-            map.put("createdAt", pettyCashLiquidation.getCreatedAt());
-            map.put("updatedAt", pettyCashLiquidation.getUpdatedAt());
             map.put("office", pettyCashLiquidation.getOffice().getName());
 
             List<PettyCashLiquidationDetail> transDetails = PettyCashLiquidationDetailRepo.findByPettyCashLiquidationId(pettyCashLiquidation.getId());
@@ -1783,7 +1787,7 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
             List<Map> transDetailsMap = new ArrayList<>();
 
             for (PettyCashLiquidationDetail detail : transDetails) {
-                Map row = new HashMap();
+                Map row = new LinkedHashMap();
 
                 row.put("amount", detail.getAmount());
                 row.put("remarks", detail.getRemarks());
@@ -1794,6 +1798,8 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
 
             map.put("pettyCashLiquidationDetails", transDetailsMap);
 
+            map.put("createdAt", pettyCashLiquidation.getCreatedAt());
+            map.put("updatedAt", pettyCashLiquidation.getUpdatedAt());
         } catch (Exception ex) {
             Logger.getLogger(DocumentLoggerFacadeImpl.class.getName()).log(Level.SEVERE, null, ex);
 
@@ -1804,7 +1810,7 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
     }
     public Map makeLog(ReturnMemorandumReceipt returnMemorandumReceipt) {
 
-        Map map = new HashMap();
+        Map map = new LinkedHashMap();
 
         try {
 
@@ -1820,9 +1826,9 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
             List detailsList = new ArrayList();
             for (ReturnMemorandumReceiptDetail detail : returnMemorandumReceipt.getReturnMemorandumReceiptDetails()) {
 
-                Map detailsMap = new HashMap();
+                Map detailsMap = new LinkedHashMap();
 
-                Map itemMap = new HashMap();
+                Map itemMap = new LinkedHashMap();
                 itemMap.put("id", detail.getStockWithdrawalDetail().getItem().getId());
                 itemMap.put("code", detail.getStockWithdrawalDetail().getItem().getCode());
                 itemMap.put("desc", detail.getStockWithdrawalDetail().getItem().getDescription());
@@ -1848,7 +1854,7 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
     @Override
     public Map makeLog(ReleasedCheque releasedCheque) {
 
-        Map map = new HashMap();
+        Map map = new LinkedHashMap();
 
         try {
 
@@ -1871,7 +1877,7 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
     @Override
     public Map makeLog(CreditCardPurchaseRequest creditCardPurchaseRequest) {
 
-        Map map = new HashMap();
+        Map map = new LinkedHashMap();
 
         try {
 
@@ -1885,10 +1891,7 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
             map.put("createdBy", creditCardPurchaseRequest.getCreatedBy().getFullName());
             map.put("approvedBy", creditCardPurchaseRequest.getApprovingOfficer().getFullName());
             map.put("recommendedBy", creditCardPurchaseRequest.getRecommendingOfficer().getFullName());
-            map.put("createdBy", creditCardPurchaseRequest.getCreatedBy().getFullName());
             map.put("workflow", creditCardPurchaseRequest.getWorkflow() != null ? creditCardPurchaseRequest.getWorkflow().getName() : "");
-            map.put("createdAt", creditCardPurchaseRequest.getCreatedAt());
-            map.put("updatedAt", creditCardPurchaseRequest.getUpdatedAt());
 
             String purchaseOrderCode = creditCardPurchaseRequest.getPurchaseOrder() != null ? (creditCardPurchaseRequest.getPurchaseOrder().getCode() + ":" + (creditCardPurchaseRequest.getPurchaseOrder().getVendor() != null ? creditCardPurchaseRequest.getPurchaseOrder().getVendor().getName() : "")) : "";
             map.put("purchaseOrderCode", purchaseOrderCode);
@@ -1896,6 +1899,8 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
             String jobOrderCode = creditCardPurchaseRequest.getJobOrder() != null ? (creditCardPurchaseRequest.getJobOrder().getCode() + ":" + (creditCardPurchaseRequest.getJobOrder().getVendor() != null ? creditCardPurchaseRequest.getJobOrder().getVendor().getName() : "")) : "";
             map.put("jobOrderCode", jobOrderCode);
 
+            map.put("createdAt", creditCardPurchaseRequest.getCreatedAt());
+            map.put("updatedAt", creditCardPurchaseRequest.getUpdatedAt());
         } catch (Exception ex) {
             Logger.getLogger(DocumentLoggerFacadeImpl.class.getName()).log(Level.SEVERE, null, ex);
             throw new RuntimeException(ex);
@@ -1907,7 +1912,7 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
 
     @Override
     public Map<String, Object> makeLog(TransformerTesting transformerTesting) {
-        Map<String, Object> map = new HashMap<>();
+        Map<String, Object> map = new LinkedHashMap<>();
 
         try {
 
@@ -1992,7 +1997,7 @@ public class DocumentLoggerFacadeImpl implements DocumentLoggerFacade {
 
                 for(SpecialEquipmentAssignmentDetail specialEquipmentAssignmentDetail: specialEquipmentAssignment.getSpecialEquipmentAssignmentDetails()) {
 
-                    Map detailMap = new HashMap();
+                    Map detailMap = new LinkedHashMap();
 
                     detailMap.put("Special Equipment Id", specialEquipmentAssignmentDetail.getSpecialEquipment().getId());
                     detailMap.put("Special Equipment Serial No", specialEquipmentAssignmentDetail.getSpecialEquipment().getSerialNo());

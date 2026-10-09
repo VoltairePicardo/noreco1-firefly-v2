@@ -1,10 +1,12 @@
-import { Component, inject, signal, ViewChild, ElementRef } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AlertService } from '@/app/shared/services/alert.service';
 import { COMMON_ALL_PAGE_IMPORTS, COMMON_MAIN_PAGE_IMPORTS, SHARED_PROVIDERS } from '@/app/shared/providers/shared-providers';
+import { DocumentLogsComponent } from '@/app/shared/components/document-logs/document-logs.component';
+import { AttachmentsComponent } from '@/app/shared/components/attachments/attachments.component';
 import { PaymentRequestService } from '../payment-request.service';
 import { provideIcons } from '@ng-icons/core';
-import { tablerPrinter, tablerEdit, tablerPaperclip, tablerPhoto, tablerFile, tablerTrash, tablerEye, tablerEyeOff, tablerArrowLeft, tablerCheck } from '@ng-icons/tabler-icons';
+import { tablerPrinter, tablerEdit, tablerEye, tablerEyeOff, tablerArrowLeft, tablerCheck } from '@ng-icons/tabler-icons';
 
 const TERMINAL_STATUSES = ['Approved', 'Cancelled', 'Rejected'];
 
@@ -13,14 +15,14 @@ const TERMINAL_STATUSES = ['Approved', 'Cancelled', 'Rejected'];
     imports: [
         ...COMMON_ALL_PAGE_IMPORTS,
         ...COMMON_MAIN_PAGE_IMPORTS,
+        DocumentLogsComponent,
+        AttachmentsComponent,
     ],
     providers: [...SHARED_PROVIDERS,
-        provideIcons({ tablerPrinter, tablerEdit, tablerPaperclip, tablerPhoto, tablerFile, tablerTrash, tablerEye, tablerEyeOff, tablerArrowLeft, tablerCheck })],
+        provideIcons({ tablerPrinter, tablerEdit, tablerEye, tablerEyeOff, tablerArrowLeft, tablerCheck })],
     templateUrl: './payment-request-detail.component.html'
 })
 export class PaymentRequestDetailComponent {
-    @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
-
     module   = 'Payment Request';
     menuLink = 'payment-request';
 
@@ -31,18 +33,13 @@ export class PaymentRequestDetailComponent {
     budgetSubItems: any[]     = [];
     attachments: any[]        = [];
     isLoading    = signal(false);
-    uploadingFiles = false;
+    showLogs       = false;
 
     // Workflow
     workflowActions: any[] = [];
     selectedAction: any    = null;
     remarks                = '';
     processingWorkflow     = false;
-
-    // Logs
-    logs: any[]    = [];
-    showLogs       = false;
-    logsLoading    = false;
 
     private service      = inject(PaymentRequestService);
     private route        = inject(ActivatedRoute);
@@ -154,64 +151,10 @@ export class PaymentRequestDetailComponent {
 
     toggleLogs(): void {
         this.showLogs = !this.showLogs;
-        if (this.showLogs && this.logs.length === 0) {
-            this.loadLogs();
-        }
     }
 
-    loadLogs(): void {
-        if (!this.data?.transId || this.logsLoading) return;
-        this.logsLoading = true;
-        this.service.getDocumentLogs(this.data.transId).subscribe({
-            next: (data) => { this.logs = data || []; this.logsLoading = false; },
-            error: () => { this.logsLoading = false; }
-        });
-    }
-
-    getLogField(value: string, key: string): string {
-        try { return JSON.parse(value)?.[key] || '—'; } catch { return '—'; }
-    }
-
-    // ── Attachments ──────────────────────────────────────────────────────────
-    openFilePicker(): void {
-        this.fileInput.nativeElement.click();
-    }
-
-    onFileSelect(event: Event): void {
-        const input = event.target as HTMLInputElement;
-        if (!input.files || input.files.length === 0) return;
-        const formData = new FormData();
-        const allowed = ['image/jpeg', 'image/png', 'application/pdf'];
-        let added = 0;
-        Array.from(input.files).forEach(f => {
-            if (allowed.includes(f.type)) { formData.append('files', f, f.name); added++; }
-        });
-        input.value = '';
-        if (added === 0) return;
-        this.uploadingFiles = true;
-        this.service.uploadFiles(this.id, formData).subscribe({
-            next: () => { this.uploadingFiles = false; this.loadAttachments(); },
-            error: () => { this.uploadingFiles = false; this.alertService.error(this.module, 'Upload', 'File upload failed.'); }
-        });
-    }
-
-    deleteAttachment(att: any): void {
-        this.alertService.confirm(`Remove <strong>${att.originalFilename}</strong>?`).then(result => {
-            if (!result.isConfirmed) return;
-            this.service.deleteFile(att.id).subscribe({
-                next: () => { this.loadAttachments(); },
-                error: () => { this.alertService.error(this.module, 'Delete', 'Could not delete file.'); }
-            });
-        });
-    }
-
-    isImage(att: any): boolean {
-        return /\.(jpg|jpeg|png)$/i.test(att.originalFilename || '') || (att.mimeType || '').startsWith('image/');
-    }
-
-    fileUrl(fileId: number): string {
-        return this.service.fileUrl(fileId);
-    }
+    // ── Attachments (display only; managed in add-edit) ──────────────────────
+    fileUrl = (fileId: number): string => this.service.fileUrl(fileId);
 
     print(): void {
         this.service.print(this.id);
