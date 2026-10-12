@@ -34,7 +34,7 @@
 			<staticText>
 				<reportElement mode="Transparent" x="0" y="0" width="562" height="20" forecolor="#000000" backcolor="#FFFFFF" uuid="9a054d33-e900-4c8e-93cb-65f3e09e7927"/>
 				<textElement textAlignment="Left" verticalAlignment="Top" rotation="None" markup="none">
-					<font fontName="Calibri" size="14" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<font fontName="SansSerif" size="14" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
 				<text><![CDATA[Work Order Transaction Summary Recap Entries]]></text>
@@ -79,21 +79,21 @@
 				<reportElement x="89" y="0" width="227" height="12" uuid="d434d724-954e-4c6b-a17a-89e72039366b"/>
 				<box leftPadding="0"/>
 				<textElement verticalAlignment="Middle">
-					<font fontName="Arial" size="8" isBold="true" isItalic="false"/>
+					<font fontName="SansSerif" size="8" isBold="true" isItalic="false"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{title}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" pattern=" #,##0.00" isBlankWhenNull="true">
 				<reportElement x="316" y="0" width="100" height="12" uuid="f1102ced-e4ca-43d9-be19-327e4addd63f"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font fontName="Arial" size="8" isBold="false"/>
+					<font fontName="SansSerif" size="8" isBold="false"/>
 				</textElement>
 				<textFieldExpression><![CDATA[($F{debit}.compareTo(new java.math.BigDecimal(0)) ==0 ? null:$F{debit})]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" pattern=" #,##0.00" isBlankWhenNull="true">
 				<reportElement x="416" y="0" width="100" height="12" uuid="c7054397-9e39-4305-8d4b-dc0c3706f257"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font fontName="Arial" size="8" isBold="false"/>
+					<font fontName="SansSerif" size="8" isBold="false"/>
 				</textElement>
 				<textFieldExpression><![CDATA[($F{credit}.compareTo(new java.math.BigDecimal(0)) ==0 ? null:$F{credit})]]></textFieldExpression>
 			</textField>
@@ -101,7 +101,7 @@
 				<reportElement x="0" y="0" width="89" height="12" uuid="ceefa4b9-2894-4898-9c12-a9e8bc0322db"/>
 				<box leftPadding="0"/>
 				<textElement verticalAlignment="Middle">
-					<font fontName="Arial" size="8" isBold="true" isItalic="false"/>
+					<font fontName="SansSerif" size="8" isBold="true" isItalic="false"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{acctCode}]]></textFieldExpression>
 			</textField>
@@ -112,7 +112,7 @@
 			<textField pattern=" #,##0.00" isBlankWhenNull="true">
 				<reportElement mode="Transparent" x="316" y="1" width="100" height="14" forecolor="#000000" backcolor="#FFFFFF" uuid="36b7835e-a7f8-4aa1-ab53-876943d4a223"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None" markup="none">
-					<font fontName="Arial" size="9" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<font fontName="SansSerif" size="9" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$V{glDebitAmount_1}]]></textFieldExpression>
@@ -120,7 +120,7 @@
 			<textField pattern=" #,##0.00" isBlankWhenNull="true">
 				<reportElement mode="Transparent" x="416" y="1" width="100" height="14" forecolor="#000000" backcolor="#FFFFFF" uuid="f970a570-bfc4-4e70-b44f-10de88319f16"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None" markup="none">
-					<font fontName="Arial" size="9" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<font fontName="SansSerif" size="9" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$V{glCreditAmount_1}]]></textFieldExpression>

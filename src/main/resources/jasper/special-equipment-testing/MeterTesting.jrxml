@@ -43,18 +43,18 @@
 			<textField isBlankWhenNull="true">
 				<reportElement x="0" y="0" width="572" height="16" uuid="b0baedf9-1431-4274-b476-aa259d4a9d75"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="Calibri" size="12" isBold="true"/>
+					<font fontName="SansSerif" size="12" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{COMP_NAME}]]></textFieldExpression>
 			</textField>
 			<image isLazy="true" onErrorType="Icon">
-				<reportElement x="57" y="0" width="48" height="39" uuid="b6b4473c-8cae-4e57-9947-563c23bd41f1"/>
+				<reportElement x="0" y="0" width="58" height="58" uuid="b6b4473c-8cae-4e57-9947-563c23bd41f1"/>
 				<imageExpression><![CDATA[$P{LOGO_PATH}]]></imageExpression>
 			</image>
 			<textField>
 				<reportElement x="0" y="16" width="572" height="13" uuid="36b8e464-67fe-4bc6-ad06-4965ea366b4b"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="Calibri" size="10" isBold="false"/>
+					<font fontName="SansSerif" size="10" isBold="false"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{COMP_ADDR}]]></textFieldExpression>
 			</textField>
@@ -183,7 +183,7 @@
 					<rightPen lineWidth="0.5"/>
 				</box>
 				<textElement verticalAlignment="Middle">
-					<font fontName="Courier New" size="9" isBold="true" pdfFontName="Courier"/>
+					<font fontName="SansSerif" size="9" isBold="true" pdfFontName="Courier"/>
 				</textElement>
 				<text><![CDATA[METER]]></text>
 			</staticText>
@@ -271,14 +271,14 @@
 					<bottomPen lineWidth="0.75"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Bottom">
-					<font fontName="Calibri" size="10" isBold="true"/>
+					<font fontName="SansSerif" size="10" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{BILLING_NAME}]]></textFieldExpression>
 			</textField>
 			<staticText>
 				<reportElement positionType="Float" x="19" y="335" width="230" height="14" uuid="4165c8d7-f301-4705-93af-06c9e81028be"/>
 				<textElement textAlignment="Center" verticalAlignment="Top">
-					<font fontName="Calibri" size="9"/>
+					<font fontName="SansSerif" size="9"/>
 				</textElement>
 				<text><![CDATA[Consumer / Representative]]></text>
 			</staticText>
@@ -288,14 +288,14 @@
 					<bottomPen lineWidth="0.75"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Bottom">
-					<font fontName="Calibri" size="10" isBold="true"/>
+					<font fontName="SansSerif" size="10" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{METER_CALIBRATOR}]]></textFieldExpression>
 			</textField>
 			<staticText>
 				<reportElement positionType="Float" x="321" y="335" width="230" height="14" uuid="8717a588-f85a-49e5-9155-68b3171aba41"/>
 				<textElement textAlignment="Center" verticalAlignment="Top">
-					<font fontName="Calibri" size="9"/>
+					<font fontName="SansSerif" size="9"/>
 				</textElement>
 				<text><![CDATA[Meter Calibrator]]></text>
 			</staticText>

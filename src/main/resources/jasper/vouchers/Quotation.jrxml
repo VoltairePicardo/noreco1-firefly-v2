@@ -85,7 +85,7 @@
 			<textField isBlankWhenNull="true">
 				<reportElement x="0" y="30" width="968" height="14" uuid="45a9411e-9c4b-46f2-8c49-065e8cc57c02"/>
 				<textElement textAlignment="Center">
-					<font fontName="Calibri Light" size="10"/>
+					<font fontName="SansSerif" size="10"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{PURCHASING_CONTACT}]]></textFieldExpression>
 			</textField>
@@ -94,19 +94,19 @@
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="16" isBold="true"/>
+					<font fontName="SansSerif" size="11" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{REPORT_TITLE}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement x="-1" y="0" width="969" height="16" isPrintWhenDetailOverflows="true" uuid="2812661e-be59-4d6c-b6d2-9523618f3cf4"/>
 				<textElement textAlignment="Center" markup="html">
-					<font fontName="Calibri" size="12" isBold="true"/>
+					<font fontName="SansSerif" size="12" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{COMP_NAME}]]></textFieldExpression>
 			</textField>
 			<image isLazy="true" onErrorType="Icon">
-				<reportElement x="0" y="0" width="69" height="69" uuid="305092cf-609d-4e48-8a21-d5b9eaa096cd">
+				<reportElement x="0" y="0" width="58" height="58" uuid="305092cf-609d-4e48-8a21-d5b9eaa096cd">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<imageExpression><![CDATA[$P{LOGO_PATH}]]></imageExpression>
@@ -114,7 +114,7 @@
 			<textField isBlankWhenNull="true">
 				<reportElement x="-1" y="16" width="969" height="14" uuid="5f2540e3-8318-434c-a648-5954d91590b8"/>
 				<textElement textAlignment="Center">
-					<font fontName="Calibri Light" size="10"/>
+					<font fontName="SansSerif" size="10"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{COMP_ADDR}]]></textFieldExpression>
 			</textField>
@@ -125,26 +125,30 @@
 				<reportElement x="0" y="80" width="100" height="22" uuid="c11069ca-25a1-4f11-8063-13e361f746bd"/>
 				<box leftPadding="2"/>
 				<textElement verticalAlignment="Middle">
-					<font isBold="true"/>
+					<font fontName="SansSerif" isBold="true"/>
 				</textElement>
 				<text><![CDATA[SOQ NUMBER]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="718" y="80" width="100" height="22" uuid="696b3c0e-d0f3-491d-9b47-849de42c996e"/>
+				<reportElement x="752" y="80" width="100" height="22" uuid="696b3c0e-d0f3-491d-9b47-849de42c996e"/>
 				<box leftPadding="2"/>
 				<textElement verticalAlignment="Middle">
-					<font isBold="true"/>
+					<font fontName="SansSerif" isBold="true"/>
 				</textElement>
 				<text><![CDATA[DATE PREPARED]]></text>
 			</staticText>
 			<textField>
 				<reportElement x="100" y="80" width="190" height="22" uuid="1e97d904-cf23-4f78-b568-f443674e7e04"/>
-				<textElement verticalAlignment="Middle"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="SansSerif"/>
+				</textElement>
 				<textFieldExpression><![CDATA[$P{VOUCHER_NO}]]></textFieldExpression>
 			</textField>
 			<textField pattern="MMMMM dd, yyyy">
-				<reportElement x="818" y="80" width="150" height="22" uuid="aa2a3972-178f-4963-ace5-5fe4e30de031"/>
-				<textElement verticalAlignment="Middle"/>
+				<reportElement x="852" y="80" width="115" height="22" uuid="aa2a3972-178f-4963-ace5-5fe4e30de031"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="SansSerif"/>
+				</textElement>
 				<textFieldExpression><![CDATA[$P{DATE_PREPARED}]]></textFieldExpression>
 			</textField>
 		</band>
@@ -159,7 +163,7 @@
 					<bottomPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font isBold="true"/>
+					<font fontName="SansSerif" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Item No.]]></text>
 			</staticText>
@@ -184,7 +188,7 @@
 					<bottomPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font isBold="true"/>
+					<font fontName="SansSerif" isBold="true"/>
 				</textElement>
 				<text><![CDATA[UNIT]]></text>
 			</staticText>
@@ -197,7 +201,7 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font isBold="true"/>
+					<font fontName="SansSerif" isBold="true"/>
 				</textElement>
 				<text><![CDATA[PARTICULARS]]></text>
 			</staticText>
@@ -208,7 +212,7 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font isBold="true"/>
+					<font fontName="SansSerif" isBold="true"/>
 				</textElement>
 				<text><![CDATA[SUPPLIER/FIRM]]></text>
 			</staticText>
@@ -220,7 +224,7 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font isBold="true"/>
+					<font fontName="SansSerif" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{SUPPLIER1}]]></textFieldExpression>
 			</textField>
@@ -232,7 +236,7 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font isBold="true"/>
+					<font fontName="SansSerif" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{SUPPLIER2}]]></textFieldExpression>
 			</textField>
@@ -244,7 +248,7 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font isBold="true"/>
+					<font fontName="SansSerif" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{SUPPLIER3}]]></textFieldExpression>
 			</textField>
@@ -255,7 +259,7 @@
 					<bottomPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font isBold="true"/>
+					<font fontName="SansSerif" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Brand]]></text>
 			</staticText>
@@ -266,7 +270,7 @@
 					<bottomPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font isBold="true"/>
+					<font fontName="SansSerif" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Unit Cost]]></text>
 			</staticText>
@@ -278,7 +282,7 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font isBold="true"/>
+					<font fontName="SansSerif" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Amount]]></text>
 			</staticText>
@@ -290,7 +294,7 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font isBold="true"/>
+					<font fontName="SansSerif" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Amount]]></text>
 			</staticText>
@@ -301,7 +305,7 @@
 					<bottomPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font isBold="true"/>
+					<font fontName="SansSerif" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Brand]]></text>
 			</staticText>
@@ -312,7 +316,7 @@
 					<bottomPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font isBold="true"/>
+					<font fontName="SansSerif" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Unit Cost]]></text>
 			</staticText>
@@ -323,7 +327,7 @@
 					<bottomPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font isBold="true"/>
+					<font fontName="SansSerif" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Brand]]></text>
 			</staticText>
@@ -334,7 +338,7 @@
 					<bottomPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font isBold="true"/>
+					<font fontName="SansSerif" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Unit Cost]]></text>
 			</staticText>
@@ -346,7 +350,7 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font isBold="true"/>
+					<font fontName="SansSerif" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Amount]]></text>
 			</staticText>
@@ -361,7 +365,7 @@
 					<bottomPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center">
-					<font size="9"/>
+					<font fontName="SansSerif" size="9"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{count}]]></textFieldExpression>
 			</textField>
@@ -372,7 +376,7 @@
 					<bottomPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center">
-					<font size="9"/>
+					<font fontName="SansSerif" size="9"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{quantity}]]></textFieldExpression>
 			</textField>
@@ -383,7 +387,7 @@
 					<bottomPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center">
-					<font size="9"/>
+					<font fontName="SansSerif" size="9"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{unit}]]></textFieldExpression>
 			</textField>
@@ -395,7 +399,7 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement>
-					<font size="9"/>
+					<font fontName="SansSerif" size="9"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{particulars}]]></textFieldExpression>
 			</textField>
@@ -406,7 +410,7 @@
 					<bottomPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="9"/>
+					<font fontName="SansSerif" size="9"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{supplier1Brand}]]></textFieldExpression>
 			</textField>
@@ -417,7 +421,7 @@
 					<bottomPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="9"/>
+					<font fontName="SansSerif" size="9"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{supplier2Brand}]]></textFieldExpression>
 			</textField>
@@ -428,7 +432,7 @@
 					<bottomPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="9"/>
+					<font fontName="SansSerif" size="9"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{supplier3Brand}]]></textFieldExpression>
 			</textField>
@@ -439,7 +443,7 @@
 					<bottomPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font size="9"/>
+					<font fontName="SansSerif" size="9"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{supplier1UnitCost}]]></textFieldExpression>
 			</textField>
@@ -450,7 +454,7 @@
 					<bottomPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font size="9"/>
+					<font fontName="SansSerif" size="9"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{supplier2UnitCost}]]></textFieldExpression>
 			</textField>
@@ -461,7 +465,7 @@
 					<bottomPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font size="9"/>
+					<font fontName="SansSerif" size="9"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{supplier3UnitCost}]]></textFieldExpression>
 			</textField>
@@ -472,7 +476,7 @@
 					<bottomPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font size="9"/>
+					<font fontName="SansSerif" size="9"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{supplier1Amount}]]></textFieldExpression>
 			</textField>
@@ -483,7 +487,7 @@
 					<bottomPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font size="9"/>
+					<font fontName="SansSerif" size="9"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{supplier2Amount}]]></textFieldExpression>
 			</textField>
@@ -495,7 +499,7 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font size="9"/>
+					<font fontName="SansSerif" size="9"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{supplier3Amount}]]></textFieldExpression>
 			</textField>
@@ -508,7 +512,7 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Bottom">
-					<font fontName="DejaVu Sans" size="17" isBold="true"/>
+					<font fontName="SansSerif" size="17" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{supplier1AwardedTo} ? "✓" : ""]]></textFieldExpression>
 			</textField>
@@ -521,7 +525,7 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Bottom">
-					<font fontName="DejaVu Sans" size="17" isBold="true"/>
+					<font fontName="SansSerif" size="17" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{supplier2AwardedTo} ? "✓" : ""]]></textFieldExpression>
 			</textField>
@@ -534,7 +538,7 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Bottom">
-					<font fontName="DejaVu Sans" size="17" isBold="true"/>
+					<font fontName="SansSerif" size="17" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{supplier3AwardedTo} ? "✓" : ""]]></textFieldExpression>
 			</textField>
@@ -544,17 +548,23 @@
 		<band height="15">
 			<textField>
 				<reportElement x="0" y="0" width="74" height="15" uuid="5b4bd51f-5f3c-4af9-812a-9dd3d002a405"/>
-				<textElement textAlignment="Right" verticalAlignment="Middle"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="SansSerif"/>
+				</textElement>
 				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
 			</textField>
 			<textField evaluationTime="Report">
-				<reportElement x="74" y="0" width="40" height="15" uuid="f1bd260c-d124-42ba-bd8a-106c684f88f4"/>
-				<textElement verticalAlignment="Middle"/>
+				<reportElement x="74" y="0" width="43" height="15" uuid="f1bd260c-d124-42ba-bd8a-106c684f88f4"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="SansSerif"/>
+				</textElement>
 				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
 			</textField>
 			<textField pattern="MM/dd/yyyy h.mm a">
-				<reportElement x="813" y="0" width="155" height="15" uuid="8613cff4-5b9d-437a-a5ab-687899128e94"/>
-				<textElement textAlignment="Right" verticalAlignment="Middle"/>
+				<reportElement x="798" y="0" width="170" height="15" uuid="8613cff4-5b9d-437a-a5ab-687899128e94"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="SansSerif"/>
+				</textElement>
 				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
 			</textField>
 		</band>
@@ -563,7 +573,9 @@
 		<band height="320" splitType="Immediate">
 			<staticText>
 				<reportElement positionType="Float" x="0" y="176" width="968" height="20" uuid="c00a3478-125e-4859-b19e-f6672140800a"/>
-				<textElement verticalAlignment="Middle"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="SansSerif"/>
+				</textElement>
 				<text><![CDATA[We hereby certify that the above quotations are authentic, true and correct.  Awarded the same as indicated above to the supplier/bidder and/or advantageous to the Cooperative.]]></text>
 			</staticText>
 			<textField pattern="#,##0.00;(#,##0.00)" isBlankWhenNull="true">
@@ -604,7 +616,7 @@
 					<bottomPen lineWidth="0.0"/>
 				</box>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
-					<font isBold="true"/>
+					<font fontName="SansSerif" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Delivery Time and Completion]]></text>
 			</staticText>
@@ -614,7 +626,7 @@
 					<bottomPen lineWidth="0.0"/>
 				</box>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
-					<font isBold="true"/>
+					<font fontName="SansSerif" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Warranty Period]]></text>
 			</staticText>
@@ -624,7 +636,7 @@
 					<bottomPen lineWidth="0.0"/>
 				</box>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
-					<font isBold="true"/>
+					<font fontName="SansSerif" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Terms of Payment (in days)]]></text>
 			</staticText>
@@ -634,7 +646,7 @@
 					<bottomPen lineWidth="0.0"/>
 				</box>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
-					<font isBold="true"/>
+					<font fontName="SansSerif" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Place of Delivery]]></text>
 			</staticText>
@@ -647,14 +659,14 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font isBold="true"/>
+					<font fontName="SansSerif" isBold="true"/>
 				</textElement>
 				<text><![CDATA[TERMS AND CONDITIONS]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="0" y="114" width="350" height="15" uuid="68362728-21bc-4154-8259-c6e88ca553c8"/>
 				<textElement verticalAlignment="Middle">
-					<font isBold="true"/>
+					<font fontName="SansSerif" isBold="true"/>
 				</textElement>
 				<text><![CDATA[The item/s listed above is/are recommended to be awarded to:]]></text>
 			</staticText>
@@ -664,7 +676,7 @@
 					<bottomPen lineWidth="0.0"/>
 				</box>
 				<textElement>
-					<font size="9"/>
+					<font fontName="SansSerif" size="9"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{TERMS1}.getDeliveryTimeAndCompletion()]]></textFieldExpression>
 			</textField>
@@ -674,7 +686,7 @@
 					<bottomPen lineWidth="0.0"/>
 				</box>
 				<textElement verticalAlignment="Middle">
-					<font size="9"/>
+					<font fontName="SansSerif" size="9"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{TERMS1}.getWarrantyPeriod()]]></textFieldExpression>
 			</textField>
@@ -684,7 +696,7 @@
 					<bottomPen lineWidth="0.0"/>
 				</box>
 				<textElement verticalAlignment="Middle">
-					<font size="9"/>
+					<font fontName="SansSerif" size="9"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{TERMS1}.getTermsOfPayment()]]></textFieldExpression>
 			</textField>
@@ -694,7 +706,7 @@
 					<bottomPen lineWidth="0.0"/>
 				</box>
 				<textElement verticalAlignment="Middle">
-					<font size="9"/>
+					<font fontName="SansSerif" size="9"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{TERMS1}.getPlaceOfDelivery()]]></textFieldExpression>
 			</textField>
@@ -704,7 +716,7 @@
 					<bottomPen lineWidth="0.0"/>
 				</box>
 				<textElement verticalAlignment="Middle">
-					<font size="9"/>
+					<font fontName="SansSerif" size="9"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{TERMS2}.getDeliveryTimeAndCompletion()]]></textFieldExpression>
 			</textField>
@@ -714,7 +726,7 @@
 					<bottomPen lineWidth="0.0"/>
 				</box>
 				<textElement verticalAlignment="Middle">
-					<font size="9"/>
+					<font fontName="SansSerif" size="9"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{TERMS2}.getPlaceOfDelivery()]]></textFieldExpression>
 			</textField>
@@ -724,7 +736,7 @@
 					<bottomPen lineWidth="0.0"/>
 				</box>
 				<textElement verticalAlignment="Middle">
-					<font size="9"/>
+					<font fontName="SansSerif" size="9"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{TERMS2}.getWarrantyPeriod()]]></textFieldExpression>
 			</textField>
@@ -734,7 +746,7 @@
 					<bottomPen lineWidth="0.0"/>
 				</box>
 				<textElement verticalAlignment="Middle">
-					<font size="9"/>
+					<font fontName="SansSerif" size="9"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{TERMS2}.getTermsOfPayment()]]></textFieldExpression>
 			</textField>
@@ -744,7 +756,7 @@
 					<bottomPen lineWidth="0.0"/>
 				</box>
 				<textElement verticalAlignment="Middle">
-					<font size="9"/>
+					<font fontName="SansSerif" size="9"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{TERMS3}.getWarrantyPeriod()]]></textFieldExpression>
 			</textField>
@@ -754,7 +766,7 @@
 					<bottomPen lineWidth="0.0"/>
 				</box>
 				<textElement verticalAlignment="Middle">
-					<font size="9"/>
+					<font fontName="SansSerif" size="9"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{TERMS3}.getTermsOfPayment()]]></textFieldExpression>
 			</textField>
@@ -764,7 +776,7 @@
 					<bottomPen lineWidth="0.0"/>
 				</box>
 				<textElement verticalAlignment="Middle">
-					<font size="9"/>
+					<font fontName="SansSerif" size="9"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{TERMS3}.getPlaceOfDelivery()]]></textFieldExpression>
 			</textField>
@@ -774,7 +786,7 @@
 					<bottomPen lineWidth="0.0"/>
 				</box>
 				<textElement verticalAlignment="Middle">
-					<font size="9"/>
+					<font fontName="SansSerif" size="9"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{TERMS3}.getDeliveryTimeAndCompletion()]]></textFieldExpression>
 			</textField>
@@ -803,7 +815,9 @@
 			</line>
 			<staticText>
 				<reportElement x="109" y="196" width="200" height="20" uuid="a1b2c3d4-d5e6-7890-abcd-ef1234567801"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif"/>
+				</textElement>
 				<text><![CDATA[Prepared By:]]></text>
 			</staticText>
 			<image hAlign="Center" isLazy="true" onErrorType="Blank">
@@ -812,12 +826,16 @@
 			</image>
 			<textField isBlankWhenNull="true">
 				<reportElement x="109" y="256" width="200" height="15" uuid="a1b2c3d4-d5e6-7890-abcd-ef1234567803"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif"/>
+				</textElement>
 				<textFieldExpression><![CDATA[$P{PREPARED_BY_TIME}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
 				<reportElement x="109" y="271" width="200" height="20" uuid="a1b2c3d4-d5e6-7890-abcd-ef1234567804"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif"/>
+				</textElement>
 				<textFieldExpression><![CDATA[$P{PREPARED_BY}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
@@ -825,12 +843,16 @@
 				<box>
 					<topPen lineWidth="0.5"/>
 				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif"/>
+				</textElement>
 				<textFieldExpression><![CDATA[$P{PREPARED_BY_POS}]]></textFieldExpression>
 			</textField>
 			<staticText>
 				<reportElement x="708" y="196" width="200" height="20" uuid="a1b2c3d4-d5e6-7890-abcd-ef1234567806"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif"/>
+				</textElement>
 				<text><![CDATA[Noted By:]]></text>
 			</staticText>
 			<image hAlign="Center" isLazy="true" onErrorType="Blank">
@@ -839,12 +861,16 @@
 			</image>
 			<textField isBlankWhenNull="true">
 				<reportElement x="708" y="256" width="200" height="15" uuid="a1b2c3d4-d5e6-7890-abcd-ef1234567808"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif"/>
+				</textElement>
 				<textFieldExpression><![CDATA[$P{NOTED_BY_TIME}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
 				<reportElement x="708" y="271" width="200" height="20" uuid="a1b2c3d4-d5e6-7890-abcd-ef1234567809"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif"/>
+				</textElement>
 				<textFieldExpression><![CDATA[$P{NOTED_BY}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
@@ -852,7 +878,9 @@
 				<box>
 					<topPen lineWidth="0.5"/>
 				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif"/>
+				</textElement>
 				<textFieldExpression><![CDATA[$P{NOTED_BY_POS}]]></textFieldExpression>
 			</textField>
 		</band>

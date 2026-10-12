@@ -74,16 +74,16 @@ export class GlAccountInquiryMainComponent {
 
     browseAccount(): void {
         const ref = this.modalService.open(BrowseCOAModalComponent, { size: 'xl', centered: true });
-        ref.result.then((account) => {
-            if (account) this.selectedAccount = account;
+        ref.result.then((result) => {
+            if (result?.action === 'select' && result?.data) this.selectedAccount = result.data;
         }, () => {});
     }
 
     browseCheckedBy(): void {
         const ref = this.modalService.open(BrowseEntityModalComponent, { size: 'lg', centered: true });
         ref.componentInstance.types = ['ENTITY_EMPLOYEE'];
-        ref.result.then((entity) => {
-            if (entity) this.checkedBy = entity;
+        ref.result.then((result) => {
+            if (result?.action === 'select' && result?.data) this.checkedBy = result.data;
         }, () => {});
     }
 

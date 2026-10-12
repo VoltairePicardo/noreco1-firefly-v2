@@ -418,7 +418,7 @@ public class LedgerDtoerImpl implements LedgerDtoer {
         details.add(totalD);    // spacing
 
         totalD = new CommonLedgerDetail();
-        totalD.setAccountTitle("<b>TOTAL</b>");
+        totalD.setAccountTitle("TOTAL");
         totalD.setGlCreditAmount(totalGLCredit);
         totalD.setGlDebitAmount(totalGLDebit);
         totalD.setSlCreditAmount(totalSLCredit);

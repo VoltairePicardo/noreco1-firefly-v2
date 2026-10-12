@@ -15,7 +15,7 @@
 				<reportElement positionType="Float" x="0" y="0" width="572" height="15" isRemoveLineWhenBlank="true" forecolor="#000000" uuid="48bbf5c7-2287-4554-b92d-72dbdd558351"/>
 				<box leftPadding="0"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
-					<font fontName="Times New Roman" size="11" isBold="true"/>
+					<font fontName="SansSerif" size="11" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Budget Sub Items]]></text>
 			</staticText>

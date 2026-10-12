@@ -50,15 +50,15 @@ export class SlAccountInquiryMainComponent {
 
     browseAccount(): void {
         const ref = this.modalService.open(BrowseCOAModalComponent, { size: 'xl', centered: true });
-        ref.result.then((account) => {
-            if (account) this.selectedAccount = account;
+        ref.result.then((result) => {
+            if (result?.action === 'select' && result?.data) this.selectedAccount = result.data;
         }, () => {});
     }
 
     browseSLEntity(): void {
         const ref = this.modalService.open(BrowseEntityModalComponent, { size: 'lg', centered: true });
-        ref.result.then((entity) => {
-            if (entity) this.selectedSLEntity = entity;
+        ref.result.then((result) => {
+            if (result?.action === 'select' && result?.data) this.selectedSLEntity = result.data;
         }, () => {});
     }
 

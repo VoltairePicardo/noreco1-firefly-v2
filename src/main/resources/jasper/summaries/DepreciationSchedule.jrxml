@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.21.5.final using JasperReports Library version 6.21.5-74d586df47b25dbd05bd0957999819196e59934a  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="DepreciationSchedule" pageWidth="1008" pageHeight="612" orientation="Landscape" whenNoDataType="NoDataSection" columnWidth="972" leftMargin="18" rightMargin="18" topMargin="20" bottomMargin="20" isFloatColumnFooter="true" uuid="e4394313-b9ac-4414-b768-c128af3e0ffe">
 	<property name="net.sf.jasperreports.export.xls.exclude.origin.keep.first.band.1" value="columnHeader"/>
 	<property name="net.sf.jasperreports.export.xls.exclude.origin.band.1" value="pageHeader"/>
@@ -135,8 +136,8 @@
 			<band height="11">
 				<textField isBlankWhenNull="true">
 					<reportElement x="0" y="0" width="48" height="11" isPrintWhenDetailOverflows="true" uuid="11da4af2-dc53-4cf4-b8db-94773b44019d"/>
-					<textElement>
-						<font size="8"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="SansSerif" size="8"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$F{assetCode}]]></textFieldExpression>
 				</textField>
@@ -159,35 +160,37 @@
 		<band splitType="Stretch"/>
 	</background>
 	<title>
-		<band height="96" splitType="Stretch">
+		<band height="76" splitType="Stretch">
 			<textField isBlankWhenNull="true">
-				<reportElement x="0" y="0" width="972" height="20" uuid="aa1b0e24-110a-493c-bc79-be2e0717c0ac">
+				<reportElement x="0" y="0" width="972" height="16" uuid="aa1b0e24-110a-493c-bc79-be2e0717c0ac">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="SansSerif" size="14" isBold="true"/>
+					<font fontName="SansSerif" size="12" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{COMP_NAME}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="0" y="20" width="972" height="16" uuid="7e478203-cfa8-435f-819d-68c60f2e364a"/>
+				<reportElement x="0" y="16" width="972" height="14" uuid="7e478203-cfa8-435f-819d-68c60f2e364a">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="SansSerif" size="10"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{COMP_ADDR}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement mode="Transparent" x="0" y="36" width="972" height="24" forecolor="#000000" backcolor="#FFFFFF" uuid="f56b2852-2a4e-4982-b448-529f84186f4d">
+				<reportElement mode="Transparent" x="0" y="30" width="972" height="20" forecolor="#000000" backcolor="#FFFFFF" uuid="f56b2852-2a4e-4982-b448-529f84186f4d">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" markup="none">
-					<font fontName="SansSerif" size="16" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<font fontName="SansSerif" size="14" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
 				<text><![CDATA[DEPRECIATION SCHEDULE]]></text>
 			</staticText>
 			<textField isBlankWhenNull="true">
-				<reportElement x="0" y="60" width="972" height="20" uuid="03dcfb44-a990-49b6-80e9-bbe69a277a4e">
+				<reportElement x="0" y="50" width="972" height="16" uuid="03dcfb44-a990-49b6-80e9-bbe69a277a4e">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
@@ -196,8 +199,9 @@
 				<textFieldExpression><![CDATA[$P{RANGE}]]></textFieldExpression>
 			</textField>
 			<image scaleImage="RetainShape" hAlign="Left">
-				<reportElement x="0" y="0" width="100" height="100" uuid="aa776c65-ceda-4aab-a9bf-f5712271393a">
+				<reportElement x="0" y="0" width="66" height="66" uuid="aa776c65-ceda-4aab-a9bf-f5712271393a">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<imageExpression><![CDATA[$P{LOGO_PATH}]]></imageExpression>
 			</image>
@@ -207,15 +211,15 @@
 		<band height="16">
 			<staticText>
 				<reportElement x="48" y="0" width="90" height="15" uuid="2c8de96d-eb3d-4dd4-96bc-90a1eb96e0b2"/>
-				<textElement textAlignment="Left" verticalAlignment="Bottom">
-					<font fontName="Monospaced" isBold="true"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="SansSerif" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Account Code]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="0" y="0" width="48" height="15" uuid="1a57d7c0-1fb7-427e-9baa-17c06ab1e826"/>
-				<textElement textAlignment="Left" verticalAlignment="Bottom">
-					<font fontName="Monospaced" isBold="true"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="SansSerif" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Code]]></text>
 			</staticText>
@@ -224,99 +228,99 @@
 			</line>
 			<staticText>
 				<reportElement x="257" y="0" width="55" height="15" uuid="f7af89f6-5058-43e9-9e94-3c4b34f7faf8"/>
-				<textElement textAlignment="Right" verticalAlignment="Bottom">
-					<font fontName="Monospaced" isBold="true"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="SansSerif" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Jan]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="312" y="0" width="55" height="15" uuid="5a2514d2-72a5-48b0-83c4-8934bd1b5541"/>
-				<textElement textAlignment="Right" verticalAlignment="Bottom">
-					<font fontName="Monospaced" isBold="true"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="SansSerif" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Feb]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="367" y="0" width="55" height="15" uuid="db73e1a0-c450-4ca9-a821-b78883d11afb"/>
-				<textElement textAlignment="Right" verticalAlignment="Bottom">
-					<font fontName="Monospaced" isBold="true"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="SansSerif" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Mar]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="422" y="0" width="55" height="15" uuid="0b9d81e3-bb8e-4580-95b4-c126e50dab95"/>
-				<textElement textAlignment="Right" verticalAlignment="Bottom">
-					<font fontName="Monospaced" isBold="true"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="SansSerif" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Apr]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="477" y="0" width="55" height="15" uuid="0584542e-5d67-4e9c-8dfc-8b98099a170a"/>
-				<textElement textAlignment="Right" verticalAlignment="Bottom">
-					<font fontName="Monospaced" isBold="true"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="SansSerif" isBold="true"/>
 				</textElement>
 				<text><![CDATA[May]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="532" y="0" width="55" height="15" uuid="624ac306-fa1c-4e4f-91ea-867f00bd6d20"/>
-				<textElement textAlignment="Right" verticalAlignment="Bottom">
-					<font fontName="Monospaced" isBold="true"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="SansSerif" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Jun]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="587" y="0" width="55" height="15" uuid="f1f029fd-42dd-46f9-a2e9-521c853cfd05"/>
-				<textElement textAlignment="Right" verticalAlignment="Bottom">
-					<font fontName="Monospaced" isBold="true"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="SansSerif" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Jul]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="642" y="0" width="55" height="15" uuid="3cfe4bac-beee-41af-a249-e99f36274b6a"/>
-				<textElement textAlignment="Right" verticalAlignment="Bottom">
-					<font fontName="Monospaced" isBold="true"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="SansSerif" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Aug]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="697" y="0" width="55" height="15" uuid="5f8042f5-a33e-4252-893a-dcf22eae0964"/>
-				<textElement textAlignment="Right" verticalAlignment="Bottom">
-					<font fontName="Monospaced" isBold="true"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="SansSerif" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Sep]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="752" y="0" width="55" height="15" uuid="23eb0aa7-6589-4f44-b354-8c7e98517389"/>
-				<textElement textAlignment="Right" verticalAlignment="Bottom">
-					<font fontName="Monospaced" isBold="true"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="SansSerif" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Oct]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="807" y="0" width="55" height="15" uuid="cf6d4321-6c7e-462e-9035-b3ee41936b60"/>
-				<textElement textAlignment="Right" verticalAlignment="Bottom">
-					<font fontName="Monospaced" isBold="true"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="SansSerif" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Nov]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="862" y="0" width="55" height="15" uuid="00ba8e77-5009-4527-8525-9bba5748f96a"/>
-				<textElement textAlignment="Right" verticalAlignment="Bottom">
-					<font fontName="Monospaced" isBold="true"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="SansSerif" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Dec]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="917" y="0" width="55" height="15" uuid="20b8105e-3561-4f05-8dd9-422601d7598c"/>
-				<textElement textAlignment="Right" verticalAlignment="Bottom">
-					<font fontName="Monospaced" isBold="true"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="SansSerif" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Total]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="138" y="0" width="119" height="15" uuid="a4ac3c07-eb90-40a1-b88e-5235819e8bc9"/>
-				<textElement textAlignment="Left" verticalAlignment="Bottom">
-					<font fontName="Monospaced" isBold="true"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="SansSerif" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Account]]></text>
 			</staticText>
@@ -326,106 +330,106 @@
 		<band height="11" splitType="Stretch">
 			<textField textAdjust="StretchHeight" pattern="#,##0.00" isBlankWhenNull="true">
 				<reportElement x="257" y="0" width="55" height="11" isPrintWhenDetailOverflows="true" uuid="97d0d7fc-a81d-4699-b3c1-81996ec04eea"/>
-				<textElement textAlignment="Right">
-					<font size="8"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{jan}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" pattern="#,##0.00" isBlankWhenNull="true">
 				<reportElement x="312" y="0" width="55" height="11" isPrintWhenDetailOverflows="true" uuid="d48e3933-96d0-4df8-b4a2-b767f0db09ea"/>
-				<textElement textAlignment="Right">
-					<font size="8"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{feb}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" pattern="#,##0.00" isBlankWhenNull="true">
 				<reportElement x="367" y="0" width="55" height="11" isPrintWhenDetailOverflows="true" uuid="3691c483-e15d-4f2d-8be7-ff406916b67e"/>
-				<textElement textAlignment="Right">
-					<font size="8"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{mar}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" pattern="#,##0.00" isBlankWhenNull="true">
 				<reportElement x="422" y="0" width="55" height="11" isPrintWhenDetailOverflows="true" uuid="1b7e2902-6482-4186-9435-a916fa8b0d5a"/>
-				<textElement textAlignment="Right">
-					<font size="8"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{apr}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" pattern="#,##0.00" isBlankWhenNull="true">
 				<reportElement x="477" y="0" width="55" height="11" isPrintWhenDetailOverflows="true" uuid="644c72a3-23cd-4e0f-bd41-30ee95c7bcb6"/>
-				<textElement textAlignment="Right">
-					<font size="8"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{may}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" pattern="#,##0.00" isBlankWhenNull="true">
 				<reportElement x="532" y="0" width="55" height="11" isPrintWhenDetailOverflows="true" uuid="0690149a-065f-4ac3-9836-fb97aee64ecd"/>
-				<textElement textAlignment="Right">
-					<font size="8"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{jun}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" pattern="#,##0.00" isBlankWhenNull="true">
 				<reportElement x="587" y="0" width="55" height="11" isPrintWhenDetailOverflows="true" uuid="335d1929-1b11-47dc-abc4-1da256f1b2eb"/>
-				<textElement textAlignment="Right">
-					<font size="8"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{jul}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" pattern="#,##0.00" isBlankWhenNull="true">
 				<reportElement x="642" y="0" width="55" height="11" isPrintWhenDetailOverflows="true" uuid="d2b031b5-1a65-4512-aaf5-c30267bf114f"/>
-				<textElement textAlignment="Right">
-					<font size="8"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{aug}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" pattern="#,##0.00" isBlankWhenNull="true">
 				<reportElement x="697" y="0" width="55" height="11" isPrintWhenDetailOverflows="true" uuid="5752b98b-c68a-41e1-a183-2da05cc12911"/>
-				<textElement textAlignment="Right">
-					<font size="8"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{sep}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" pattern="#,##0.00" isBlankWhenNull="true">
 				<reportElement x="752" y="0" width="55" height="11" isPrintWhenDetailOverflows="true" uuid="f19204db-822a-4773-bdc2-a8de9a83c2b3"/>
-				<textElement textAlignment="Right">
-					<font size="8"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{oct}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" pattern="#,##0.00" isBlankWhenNull="true">
 				<reportElement x="807" y="0" width="55" height="11" isPrintWhenDetailOverflows="true" uuid="cf2732b5-2b10-4376-9997-a2c4cd1df3e0"/>
-				<textElement textAlignment="Right">
-					<font size="8"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{nov}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" pattern="#,##0.00" isBlankWhenNull="true">
 				<reportElement x="862" y="0" width="55" height="11" isPrintWhenDetailOverflows="true" uuid="1f020918-fbab-44d2-bce2-b7ddfcb51e1e"/>
-				<textElement textAlignment="Right">
-					<font size="8"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{dec}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" pattern="#,##0.00" isBlankWhenNull="true">
 				<reportElement x="917" y="0" width="55" height="11" isPrintWhenDetailOverflows="true" uuid="a506b581-1313-4e50-823d-660c30160ef9"/>
-				<textElement textAlignment="Right">
-					<font size="8"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{total}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement x="138" y="0" width="119" height="11" isPrintWhenDetailOverflows="true" uuid="001af1cf-24c3-451f-be0b-59db9ead9d5c"/>
-				<textElement>
-					<font size="8"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="SansSerif" size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{assetAccount}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement x="48" y="0" width="90" height="11" isPrintWhenDetailOverflows="true" uuid="f5a8537c-eec2-4cec-8762-aecb929a9cf4"/>
-				<textElement>
-					<font size="8"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="SansSerif" size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{assetAccountCode}]]></textFieldExpression>
 			</textField>
@@ -437,7 +441,7 @@
 				<reportElement x="0" y="1" width="50" height="12" uuid="11bcce65-7a0b-4954-afc4-284ad35f20f3">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
-				<textElement textAlignment="Left">
+				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font fontName="SansSerif" size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of "]]></textFieldExpression>
@@ -447,7 +451,7 @@
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<box leftPadding="3"/>
-				<textElement>
+				<textElement verticalAlignment="Middle">
 					<font fontName="SansSerif" size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
@@ -464,23 +468,23 @@
 			</textField>
 			<staticText>
 				<reportElement positionType="Float" x="23" y="50" width="122" height="20" isRemoveLineWhenBlank="true" uuid="9d081619-ae69-4b62-a2cd-27bf3d97f7d0"/>
-				<textElement textAlignment="Left">
+				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font fontName="SansSerif" size="9" isBold="false"/>
 				</textElement>
 				<text><![CDATA[Prepared by:]]></text>
 			</staticText>
 			<textField isBlankWhenNull="true">
-				<reportElement positionType="Float" x="24" y="94" width="170" height="20" isRemoveLineWhenBlank="true" uuid="bc2e75b9-1c70-4a5c-a40c-da8b2404a98a"/>
+				<reportElement positionType="Float" x="23" y="94" width="170" height="20" isRemoveLineWhenBlank="true" uuid="bc2e75b9-1c70-4a5c-a40c-da8b2404a98a"/>
 				<box>
 					<topPen lineWidth="1.0"/>
 				</box>
-				<textElement textAlignment="Center">
+				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="SansSerif" size="9"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{PREPARAR_POS}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement positionType="Float" x="24" y="74" width="170" height="20" isRemoveLineWhenBlank="true" uuid="01d96ea5-c2a1-4785-a52c-7e9ca07a79cc"/>
+				<reportElement positionType="Float" x="23" y="74" width="170" height="20" isRemoveLineWhenBlank="true" uuid="01d96ea5-c2a1-4785-a52c-7e9ca07a79cc"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="SansSerif" size="10" isBold="true"/>
 				</textElement>
@@ -492,21 +496,21 @@
 		<band height="76">
 			<textField textAdjust="StretchHeight" pattern="#,##0" isBlankWhenNull="true">
 				<reportElement x="138" y="1" width="119" height="14" isPrintWhenDetailOverflows="true" uuid="c76c14b0-1456-4b5c-b06c-d003af55fb13"/>
-				<textElement textAlignment="Left">
-					<font size="8" isBold="true"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="8" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$V{Asset Account Group_COUNT} + " assets"]]></textFieldExpression>
 			</textField>
 			<staticText>
 				<reportElement x="93" y="1" width="45" height="14" uuid="f3defe39-95bc-496b-bfc7-53c8af1bc3b5"/>
-				<textElement textAlignment="Left" verticalAlignment="Bottom">
-					<font fontName="Monospaced" isBold="true"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="SansSerif" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Total:]]></text>
 			</staticText>
 			<textField textAdjust="StretchHeight" pattern="#,##0.00" isBlankWhenNull="true">
 				<reportElement mode="Transparent" x="257" y="1" width="55" height="14" isPrintWhenDetailOverflows="true" forecolor="#000000" backcolor="#FFFFFF" uuid="9dca7121-c63b-41d1-9379-285a541a9551"/>
-				<textElement textAlignment="Right" verticalAlignment="Top" rotation="None" markup="none">
+				<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None" markup="none">
 					<font fontName="SansSerif" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
@@ -517,7 +521,7 @@
 			</line>
 			<textField textAdjust="StretchHeight" pattern="#,##0.00" isBlankWhenNull="true">
 				<reportElement mode="Transparent" x="312" y="1" width="55" height="14" isPrintWhenDetailOverflows="true" forecolor="#000000" backcolor="#FFFFFF" uuid="595fabcc-f6ae-4f3f-9b95-e149ea35daa7"/>
-				<textElement textAlignment="Right" verticalAlignment="Top" rotation="None" markup="none">
+				<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None" markup="none">
 					<font fontName="SansSerif" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
@@ -525,7 +529,7 @@
 			</textField>
 			<textField textAdjust="StretchHeight" pattern="#,##0.00" isBlankWhenNull="true">
 				<reportElement mode="Transparent" x="367" y="1" width="55" height="14" isPrintWhenDetailOverflows="true" forecolor="#000000" backcolor="#FFFFFF" uuid="1f4718b8-3de3-4e9d-a671-ed0ac92bf304"/>
-				<textElement textAlignment="Right" verticalAlignment="Top" rotation="None" markup="none">
+				<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None" markup="none">
 					<font fontName="SansSerif" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
@@ -533,7 +537,7 @@
 			</textField>
 			<textField textAdjust="StretchHeight" pattern="#,##0.00" isBlankWhenNull="true">
 				<reportElement mode="Transparent" x="422" y="1" width="55" height="14" isPrintWhenDetailOverflows="true" forecolor="#000000" backcolor="#FFFFFF" uuid="35925377-9992-44d9-9cf8-4e40bf11d885"/>
-				<textElement textAlignment="Right" verticalAlignment="Top" rotation="None" markup="none">
+				<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None" markup="none">
 					<font fontName="SansSerif" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
@@ -541,7 +545,7 @@
 			</textField>
 			<textField textAdjust="StretchHeight" pattern="#,##0.00" isBlankWhenNull="true">
 				<reportElement mode="Transparent" x="477" y="1" width="55" height="14" isPrintWhenDetailOverflows="true" forecolor="#000000" backcolor="#FFFFFF" uuid="c79da502-21d8-4b2d-8e16-17474b000ba2"/>
-				<textElement textAlignment="Right" verticalAlignment="Top" rotation="None" markup="none">
+				<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None" markup="none">
 					<font fontName="SansSerif" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
@@ -549,7 +553,7 @@
 			</textField>
 			<textField textAdjust="StretchHeight" pattern="#,##0.00" isBlankWhenNull="true">
 				<reportElement mode="Transparent" x="532" y="1" width="55" height="14" isPrintWhenDetailOverflows="true" forecolor="#000000" backcolor="#FFFFFF" uuid="e151bffa-11d2-4474-9cb8-cc9b2276aedc"/>
-				<textElement textAlignment="Right" verticalAlignment="Top" rotation="None" markup="none">
+				<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None" markup="none">
 					<font fontName="SansSerif" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
@@ -557,7 +561,7 @@
 			</textField>
 			<textField textAdjust="StretchHeight" pattern="#,##0.00" isBlankWhenNull="true">
 				<reportElement mode="Transparent" x="587" y="1" width="55" height="14" isPrintWhenDetailOverflows="true" forecolor="#000000" backcolor="#FFFFFF" uuid="d9910710-b6b7-4514-a7a8-3ced0516ade5"/>
-				<textElement textAlignment="Right" verticalAlignment="Top" rotation="None" markup="none">
+				<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None" markup="none">
 					<font fontName="SansSerif" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
@@ -565,7 +569,7 @@
 			</textField>
 			<textField textAdjust="StretchHeight" pattern="#,##0.00" isBlankWhenNull="true">
 				<reportElement mode="Transparent" x="642" y="1" width="55" height="14" isPrintWhenDetailOverflows="true" forecolor="#000000" backcolor="#FFFFFF" uuid="bae9a42b-28c3-45c7-a9df-6abef14e8e0e"/>
-				<textElement textAlignment="Right" verticalAlignment="Top" rotation="None" markup="none">
+				<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None" markup="none">
 					<font fontName="SansSerif" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
@@ -573,7 +577,7 @@
 			</textField>
 			<textField textAdjust="StretchHeight" pattern="#,##0.00" isBlankWhenNull="true">
 				<reportElement mode="Transparent" x="697" y="1" width="55" height="14" isPrintWhenDetailOverflows="true" forecolor="#000000" backcolor="#FFFFFF" uuid="1b966db6-8977-4178-bc26-dc86634e8ed8"/>
-				<textElement textAlignment="Right" verticalAlignment="Top" rotation="None" markup="none">
+				<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None" markup="none">
 					<font fontName="SansSerif" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
@@ -581,7 +585,7 @@
 			</textField>
 			<textField textAdjust="StretchHeight" pattern="#,##0.00" isBlankWhenNull="true">
 				<reportElement mode="Transparent" x="752" y="1" width="55" height="14" isPrintWhenDetailOverflows="true" forecolor="#000000" backcolor="#FFFFFF" uuid="86b436dd-3b5a-4488-adfe-18ae6b550bc8"/>
-				<textElement textAlignment="Right" verticalAlignment="Top" rotation="None" markup="none">
+				<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None" markup="none">
 					<font fontName="SansSerif" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
@@ -589,7 +593,7 @@
 			</textField>
 			<textField textAdjust="StretchHeight" pattern="#,##0.00" isBlankWhenNull="true">
 				<reportElement mode="Transparent" x="807" y="1" width="55" height="14" isPrintWhenDetailOverflows="true" forecolor="#000000" backcolor="#FFFFFF" uuid="b234771b-41a2-4df9-a445-c21edb94b622"/>
-				<textElement textAlignment="Right" verticalAlignment="Top" rotation="None" markup="none">
+				<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None" markup="none">
 					<font fontName="SansSerif" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
@@ -597,7 +601,7 @@
 			</textField>
 			<textField textAdjust="StretchHeight" pattern="#,##0.00" isBlankWhenNull="true">
 				<reportElement mode="Transparent" x="862" y="1" width="55" height="14" isPrintWhenDetailOverflows="true" forecolor="#000000" backcolor="#FFFFFF" uuid="fa7fee2e-eaf0-493e-95fd-398b97017e99"/>
-				<textElement textAlignment="Right" verticalAlignment="Top" rotation="None" markup="none">
+				<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None" markup="none">
 					<font fontName="SansSerif" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
@@ -605,7 +609,7 @@
 			</textField>
 			<textField textAdjust="StretchHeight" pattern="#,##0.00" isBlankWhenNull="true">
 				<reportElement mode="Transparent" x="917" y="2" width="55" height="13" isPrintWhenDetailOverflows="true" forecolor="#000000" backcolor="#FFFFFF" uuid="1b7aef80-e89d-4e3f-9526-c142eb90d18a"/>
-				<textElement textAlignment="Right" verticalAlignment="Top" rotation="None" markup="none">
+				<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None" markup="none">
 					<font fontName="SansSerif" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
@@ -613,8 +617,8 @@
 			</textField>
 			<textField textAdjust="StretchHeight" pattern="#,##0" isBlankWhenNull="true">
 				<reportElement x="138" y="15" width="119" height="14" isPrintWhenDetailOverflows="true" uuid="3d345d3b-3a9a-486e-96a6-fa184f8a9ab1"/>
-				<textElement textAlignment="Left">
-					<font size="8" isBold="true"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="8" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$V{assetAccountDistinctCount} + " unique asset accounts"]]></textFieldExpression>
 			</textField>

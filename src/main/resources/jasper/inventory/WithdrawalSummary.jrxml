@@ -36,13 +36,13 @@
 	<title>
 		<band height="163" splitType="Stretch">
 			<image isLazy="true" onErrorType="Icon">
-				<reportElement x="270" y="0" width="60" height="52" uuid="a572ebb6-75d3-4cc5-adf8-83c0b47be5b6"/>
+				<reportElement x="0" y="0" width="58" height="58" uuid="a572ebb6-75d3-4cc5-adf8-83c0b47be5b6"/>
 				<imageExpression><![CDATA[$P{LOGO_PATH}]]></imageExpression>
 			</image>
 			<textField>
 				<reportElement mode="Transparent" x="1" y="43" width="967" height="24" forecolor="#000000" backcolor="#FFFFFF" uuid="a3b0e4f2-46ac-46a1-b650-63312ce0eb21"/>
 				<textElement textAlignment="Center" verticalAlignment="Top" rotation="None" markup="none">
-					<font fontName="Calibri" size="18" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<font fontName="SansSerif" size="11" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{REPORT_TITLE}]]></textFieldExpression>
@@ -50,21 +50,21 @@
 			<textField isBlankWhenNull="true">
 				<reportElement x="1" y="14" width="967" height="20" uuid="8dc03b87-ce0f-42e3-84cc-ff569c6fde86"/>
 				<textElement textAlignment="Center">
-					<font fontName="Arial" size="10"/>
+					<font fontName="SansSerif" size="10"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{COMP_ADDR}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
 				<reportElement x="1" y="0" width="966" height="20" uuid="ae3d854d-6819-4ef4-9f26-69fb77969167"/>
 				<textElement textAlignment="Center">
-					<font fontName="Arial" size="12" isBold="true"/>
+					<font fontName="SansSerif" size="12" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{COMP_NAME}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
 				<reportElement x="0" y="67" width="968" height="14" uuid="3ae1aa15-ff4f-4986-8516-b17c621d9df3"/>
 				<textElement textAlignment="Center">
-					<font fontName="Arial" size="10"/>
+					<font fontName="SansSerif" size="10"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{RANGE}]]></textFieldExpression>
 			</textField>

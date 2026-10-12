@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.21.5.final using JasperReports Library version 6.21.5-74d586df47b25dbd05bd0957999819196e59934a  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="RequisitionVoucher_Workflow_512" language="groovy" pageWidth="572" pageHeight="752" whenNoDataType="AllSectionsNoDetail" columnWidth="572" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="4aa13322-e70b-476c-9e79-dc0dddc39add">
 	<property name="ireport.zoom" value="0.7513148009015815"/>
 	<property name="ireport.x" value="0"/>
@@ -58,7 +59,7 @@
 				<reportElement mode="Transparent" x="105" y="0" width="148" height="15" forecolor="#000000" backcolor="#FFFFFF" uuid="df0d5764-1c97-4133-ae9d-fe95d5c55330"/>
 				<box rightPadding="2"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle" rotation="None" markup="none">
-					<font fontName="Monospaced" size="10" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<font fontName="SansSerif" size="10" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{ESTIMATED_AMOUNT}]]></textFieldExpression>
@@ -66,21 +67,21 @@
 			<staticText>
 				<reportElement x="1" y="0" width="104" height="15" uuid="10f853d5-3bb6-4fe0-955f-50479a371ddc"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
-					<font fontName="Monospaced" size="10" isBold="false"/>
+					<font fontName="SansSerif" size="10" isBold="false"/>
 				</textElement>
 				<text><![CDATA[Estimated Amount:]]></text>
 			</staticText>
 			<textField pattern="MM/dd/yyyy h.mm a" isBlankWhenNull="true">
 				<reportElement positionType="Float" x="458" y="198" width="117" height="15" uuid="a590cdcc-a356-4089-9826-94697c73bede"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="7"/>
+					<font fontName="SansSerif" size="7"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{REVIEWEDANDACCEPTEDBY_TIME}]]></textFieldExpression>
 			</textField>
 			<textField pattern="" isBlankWhenNull="false">
 				<reportElement positionType="Float" mode="Transparent" x="5" y="138" width="281" height="15" forecolor="#000000" backcolor="#FFFFFF" uuid="5e96b06c-42db-48b0-bad1-86c34f042707"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle" rotation="None" markup="none">
-					<font fontName="Times New Roman" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<font fontName="SansSerif" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{POSITION}]]></textFieldExpression>
@@ -123,7 +124,7 @@
 					<bottomPen lineWidth="0.0"/>
 				</box>
 				<textElement verticalAlignment="Middle">
-					<font fontName="Times New Roman" size="10" isBold="false"/>
+					<font fontName="SansSerif" size="10" isBold="false"/>
 				</textElement>
 				<text><![CDATA[Requested By:]]></text>
 			</staticText>
@@ -133,7 +134,7 @@
 					<topPen lineWidth="1.0"/>
 				</box>
 				<textElement verticalAlignment="Middle">
-					<font fontName="Times New Roman" size="10" isBold="false"/>
+					<font fontName="SansSerif" size="10" isBold="false"/>
 				</textElement>
 				<text><![CDATA[Reviewed and Accepted By:]]></text>
 			</staticText>
@@ -144,7 +145,7 @@
 			<textField pattern="" isBlankWhenNull="false">
 				<reportElement positionType="Float" mode="Transparent" x="295" y="216" width="276" height="15" forecolor="#000000" backcolor="#FFFFFF" uuid="f9d3c56b-ef3c-4f58-b23f-c523e2ec820c"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle" rotation="None" markup="none">
-					<font fontName="Times New Roman" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<font fontName="SansSerif" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{REVIEWEDANDACCEPTEDBY_POS}]]></textFieldExpression>
@@ -152,14 +153,14 @@
 			<textField pattern="MM/dd/yyyy h.mm a" isBlankWhenNull="true">
 				<reportElement positionType="Float" x="143" y="122" width="143" height="15" uuid="8a7606cf-c807-487d-9da9-695097e4d8c4"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="7"/>
+					<font fontName="SansSerif" size="7"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{PREPARAR_TIME}]]></textFieldExpression>
 			</textField>
 			<textField pattern="" isBlankWhenNull="false">
 				<reportElement positionType="Float" mode="Transparent" x="295" y="140" width="276" height="15" forecolor="#000000" backcolor="#FFFFFF" uuid="cdd10316-10a9-41ed-a70c-65320153e143"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle" rotation="None" markup="none">
-					<font fontName="Times New Roman" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<font fontName="SansSerif" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{APPROVEDBY_POS}]]></textFieldExpression>
@@ -170,14 +171,14 @@
 					<bottomPen lineWidth="0.0"/>
 				</box>
 				<textElement verticalAlignment="Middle">
-					<font fontName="Times New Roman" size="10" isBold="false"/>
+					<font fontName="SansSerif" size="10" isBold="false"/>
 				</textElement>
 				<text><![CDATA[Approved By:]]></text>
 			</staticText>
 			<textField pattern="MM/dd/yyyy h.mm a" isBlankWhenNull="true">
 				<reportElement positionType="Float" x="456" y="122" width="115" height="15" uuid="fad35a98-d8f3-4609-8bd5-cac05609273d"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="7"/>
+					<font fontName="SansSerif" size="7"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{APPROVAR_TIME}]]></textFieldExpression>
 			</textField>
@@ -187,7 +188,7 @@
 					<topPen lineWidth="1.0"/>
 				</box>
 				<textElement verticalAlignment="Middle">
-					<font fontName="Times New Roman" size="10" isBold="false"/>
+					<font fontName="SansSerif" size="10" isBold="false"/>
 				</textElement>
 				<text><![CDATA[Inventory Checked By:]]></text>
 			</staticText>
@@ -206,22 +207,22 @@
 			<textField pattern="MM/dd/yyyy h.mm a" isBlankWhenNull="true">
 				<reportElement positionType="Float" x="158" y="198" width="116" height="15" uuid="8ec9a2db-a1be-4d48-9282-9616430c02d6"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="7"/>
+					<font fontName="SansSerif" size="7"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{INVENTORYCHECKEDBY_TIME}]]></textFieldExpression>
 			</textField>
 			<textField pattern="" isBlankWhenNull="false">
 				<reportElement positionType="Float" mode="Transparent" x="10" y="216" width="264" height="15" forecolor="#000000" backcolor="#FFFFFF" uuid="7bb12669-06d3-4e2e-9230-2820c597f393"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle" rotation="None" markup="none">
-					<font fontName="Times New Roman" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<font fontName="SansSerif" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{INVENTORYCHECKEDBY_POS}]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement x="1" y="15" width="570" height="65" isPrintWhenDetailOverflows="true" uuid="d1ac6fa6-5853-40de-96fe-7b3da517826f"/>
 				<textElement>
-					<font fontName="Monospaced" size="10" isBold="false"/>
+					<font fontName="SansSerif" size="10" isBold="false"/>
 				</textElement>
 				<textFieldExpression><![CDATA["Purpose: " + $P{PURPOSE}]]></textFieldExpression>
 			</textField>

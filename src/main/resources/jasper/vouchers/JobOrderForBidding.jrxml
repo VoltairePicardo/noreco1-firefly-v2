@@ -54,14 +54,14 @@
 			<textField isBlankWhenNull="true">
 				<reportElement x="1" y="16" width="572" height="14" uuid="a6715665-534c-47cf-b145-1cc845d4a9b0"/>
 				<textElement textAlignment="Center">
-					<font fontName="Calibri Light" size="10"/>
+					<font fontName="SansSerif" size="10"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{COMP_ADDR}]]></textFieldExpression>
 			</textField>
 			<staticText>
 				<reportElement mode="Transparent" x="1" y="55" width="572" height="21" forecolor="#000000" backcolor="#FFFFFF" uuid="18489830-c25c-4921-a2a4-085af68bd22c"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" markup="none">
-					<font fontName="Calibri" size="16" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<font fontName="SansSerif" size="11" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
 				<text><![CDATA[JOB ORDER]]></text>
@@ -69,14 +69,14 @@
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 				<reportElement x="1" y="0" width="572" height="16" isPrintWhenDetailOverflows="true" uuid="413e6e16-0f96-4cb0-a01c-7e1af0e4756c"/>
 				<textElement textAlignment="Center" markup="html">
-					<font fontName="Calibri" size="12" isBold="true"/>
+					<font fontName="SansSerif" size="12" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{COMP_NAME}]]></textFieldExpression>
 			</textField>
 			<textField pattern="MM/dd/yyyy hh:mm a">
 				<reportElement x="487" y="0" width="86" height="14" uuid="b1986d7c-0148-4d69-be84-53461f44b64c"/>
 				<textElement>
-					<font fontName="Calibri Light" size="9"/>
+					<font fontName="SansSerif" size="9"/>
 				</textElement>
 				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
 			</textField>
@@ -84,7 +84,7 @@
 				<reportElement x="345" y="34" width="58" height="21" uuid="eaee9c48-86b2-42d3-8c32-06921826034b"/>
 				<box bottomPadding="5"/>
 				<textElement textAlignment="Right" verticalAlignment="Bottom">
-					<font fontName="Times New Roman" size="12"/>
+					<font fontName="SansSerif" size="12"/>
 				</textElement>
 				<text><![CDATA[J.O. No.:]]></text>
 			</staticText>
@@ -92,19 +92,19 @@
 				<reportElement x="405" y="34" width="158" height="21" uuid="337a0511-22ad-41c5-a206-4797750bc1bf"/>
 				<box bottomPadding="5"/>
 				<textElement textAlignment="Left" verticalAlignment="Bottom">
-					<font fontName="Times New Roman" size="12"/>
+					<font fontName="SansSerif" size="12"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{VOUCHER_NO}]]></textFieldExpression>
 			</textField>
 			<image isLazy="true" onErrorType="Icon">
-				<reportElement x="0" y="0" width="80" height="70" uuid="f3ad2249-d565-404b-9ca9-f68956abfe40"/>
+				<reportElement x="0" y="0" width="58" height="58" uuid="f3ad2249-d565-404b-9ca9-f68956abfe40"/>
 				<imageExpression><![CDATA[$P{LOGO_PATH}]]></imageExpression>
 			</image>
 			<staticText>
 				<reportElement x="1" y="87" width="70" height="15" uuid="8deea645-5fb9-4258-be4d-43df5eb8c370"/>
 				<box bottomPadding="0"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
-					<font fontName="Times New Roman" size="12"/>
+					<font fontName="SansSerif" size="12"/>
 				</textElement>
 				<text><![CDATA[TO]]></text>
 			</staticText>
@@ -112,7 +112,7 @@
 				<reportElement x="1" y="131" width="70" height="21" uuid="16961cb7-dea7-4850-a810-fa62d7f843aa"/>
 				<box bottomPadding="0"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
-					<font fontName="Times New Roman" size="12"/>
+					<font fontName="SansSerif" size="12"/>
 				</textElement>
 				<text><![CDATA[PURPOSE]]></text>
 			</staticText>
@@ -120,7 +120,7 @@
 				<reportElement x="0" y="152" width="71" height="21" uuid="15f36fb1-dbc8-4166-b00e-2689e7916d5f"/>
 				<box bottomPadding="0"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
-					<font fontName="Times New Roman" size="12"/>
+					<font fontName="SansSerif" size="12"/>
 				</textElement>
 				<text><![CDATA[DATE]]></text>
 			</staticText>
@@ -128,7 +128,7 @@
 				<reportElement x="0" y="173" width="71" height="21" uuid="585ffa21-dcf6-4d1c-89a8-5ab83a4433ba"/>
 				<box bottomPadding="0"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
-					<font fontName="Times New Roman" size="12"/>
+					<font fontName="SansSerif" size="12"/>
 				</textElement>
 				<text><![CDATA[Sir]]></text>
 			</staticText>
@@ -136,7 +136,7 @@
 				<reportElement x="33" y="194" width="502" height="21" uuid="40615ffd-89e7-495d-8436-46b46b931d23"/>
 				<box bottomPadding="0"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
-					<font fontName="Times New Roman" size="12"/>
+					<font fontName="SansSerif" size="12"/>
 				</textElement>
 				<text><![CDATA[Please furnish the following job requirement listed below:]]></text>
 			</staticText>
@@ -149,7 +149,7 @@
 				<reportElement x="71" y="87" width="9" height="15" uuid="61a24e19-4dc6-4f8f-b0fd-3537bc18bd56"/>
 				<box bottomPadding="0"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
-					<font fontName="Times New Roman" size="12"/>
+					<font fontName="SansSerif" size="12"/>
 				</textElement>
 				<text><![CDATA[:]]></text>
 			</staticText>
@@ -157,7 +157,7 @@
 				<reportElement x="71" y="131" width="9" height="21" uuid="38240b08-07d4-4a69-aa6f-0e31008ffc9e"/>
 				<box bottomPadding="0"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
-					<font fontName="Times New Roman" size="12"/>
+					<font fontName="SansSerif" size="12"/>
 				</textElement>
 				<text><![CDATA[:]]></text>
 			</staticText>
@@ -165,7 +165,7 @@
 				<reportElement x="70" y="152" width="10" height="21" uuid="0928e331-6c1f-4be8-843a-75cc65d3c3c9"/>
 				<box bottomPadding="0"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
-					<font fontName="Times New Roman" size="12"/>
+					<font fontName="SansSerif" size="12"/>
 				</textElement>
 				<text><![CDATA[:]]></text>
 			</staticText>
@@ -173,7 +173,7 @@
 				<reportElement x="71" y="173" width="9" height="21" uuid="00dcec77-39b6-4f76-8a34-d51ac1878b59"/>
 				<box bottomPadding="0"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
-					<font fontName="Times New Roman" size="12"/>
+					<font fontName="SansSerif" size="12"/>
 				</textElement>
 				<text><![CDATA[:]]></text>
 			</staticText>
@@ -214,7 +214,7 @@
 					<rightPen lineWidth="0.0"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" markup="none">
-					<font fontName="Times New Roman" size="12" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<font fontName="SansSerif" size="12" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
 				<text><![CDATA[DESCRIPTION OF MARTERIALS/WORKS]]></text>
@@ -229,7 +229,7 @@
 					<rightPen lineWidth="0.0"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" markup="none">
-					<font fontName="Times New Roman" size="12" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<font fontName="SansSerif" size="12" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
 				<text><![CDATA[UNIT]]></text>
@@ -244,7 +244,7 @@
 					<rightPen lineWidth="0.0"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" markup="none">
-					<font fontName="Times New Roman" size="12" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<font fontName="SansSerif" size="12" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
 				<text><![CDATA[QTY]]></text>
@@ -259,7 +259,7 @@
 					<rightPen lineWidth="0.0"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" markup="none">
-					<font fontName="Times New Roman" size="12" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<font fontName="SansSerif" size="12" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
 				<text><![CDATA[UNIT COST]]></text>
@@ -274,7 +274,7 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" markup="none">
-					<font fontName="Times New Roman" size="12" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<font fontName="SansSerif" size="12" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
 				<text><![CDATA[AMOUNT]]></text>
@@ -291,7 +291,7 @@
 					<rightPen lineWidth="0.0"/>
 				</box>
 				<textElement verticalAlignment="Middle">
-					<font fontName="Times New Roman" size="11"/>
+					<font fontName="SansSerif" size="11"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{description}]]></textFieldExpression>
 			</textField>
@@ -302,7 +302,7 @@
 					<rightPen lineWidth="0.0"/>
 				</box>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font fontName="Times New Roman" size="11"/>
+					<font fontName="SansSerif" size="11"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{quantity}]]></textFieldExpression>
 			</textField>
@@ -313,7 +313,7 @@
 					<rightPen lineWidth="0.0"/>
 				</box>
 				<textElement verticalAlignment="Middle">
-					<font fontName="Times New Roman" size="11"/>
+					<font fontName="SansSerif" size="11"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{unitCode}]]></textFieldExpression>
 			</textField>
@@ -324,7 +324,7 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font fontName="Times New Roman" size="11"/>
+					<font fontName="SansSerif" size="11"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{amount}]]></textFieldExpression>
 			</textField>
@@ -335,7 +335,7 @@
 					<rightPen lineWidth="0.0"/>
 				</box>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font fontName="Times New Roman" size="11"/>
+					<font fontName="SansSerif" size="11"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{unitPrice}]]></textFieldExpression>
 			</textField>
@@ -346,21 +346,21 @@
 			<staticText>
 				<reportElement positionType="Float" x="1" y="41" width="109" height="20" isRemoveLineWhenBlank="true" uuid="b93262da-d9eb-469a-98f2-e1052ca7d23d"/>
 				<textElement textAlignment="Left">
-					<font fontName="Times New Roman" size="12" isBold="false" isItalic="true"/>
+					<font fontName="SansSerif" size="12" isBold="false" isItalic="true"/>
 				</textElement>
 				<text><![CDATA[Requested By:]]></text>
 			</staticText>
 			<staticText>
 				<reportElement positionType="Float" x="1" y="149" width="162" height="20" isRemoveLineWhenBlank="true" uuid="863714c9-9720-48c7-a628-c1920e4665a0"/>
 				<textElement textAlignment="Left">
-					<font fontName="Times New Roman" size="12" isBold="false" isItalic="true"/>
+					<font fontName="SansSerif" size="12" isBold="false" isItalic="true"/>
 				</textElement>
 				<text><![CDATA[Checked By:]]></text>
 			</staticText>
 			<staticText>
 				<reportElement positionType="Float" x="327" y="41" width="160" height="20" isRemoveLineWhenBlank="true" uuid="cbbac354-6223-4d61-9d78-7a92c6da6b7a"/>
 				<textElement textAlignment="Left">
-					<font fontName="Times New Roman" size="12" isBold="false" isItalic="true"/>
+					<font fontName="SansSerif" size="12" isBold="false" isItalic="true"/>
 				</textElement>
 				<text><![CDATA[Noted By:]]></text>
 			</staticText>
@@ -370,7 +370,7 @@
 					<bottomPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Bottom">
-					<font fontName="Times New Roman" size="12" isBold="true"/>
+					<font fontName="SansSerif" size="12" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{PREPAREDBY}]]></textFieldExpression>
 			</textField>
@@ -380,7 +380,7 @@
 					<bottomPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Bottom">
-					<font fontName="Times New Roman" size="12" isBold="true"/>
+					<font fontName="SansSerif" size="12" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{CHECKEDBY}]]></textFieldExpression>
 			</textField>
@@ -390,28 +390,28 @@
 					<bottomPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Bottom">
-					<font fontName="Times New Roman" size="12" isBold="true"/>
+					<font fontName="SansSerif" size="12" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{NOTEDBY}]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="327" y="110" width="208" height="20" uuid="7279150e-69f6-4a7b-a7bb-481fa0bab886"/>
 				<textElement textAlignment="Center">
-					<font fontName="Times New Roman" size="12" isBold="true"/>
+					<font fontName="SansSerif" size="12" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{NOTEDBY_POS} == "" || $P{NOTEDBY_POS} == null ? "ISD MANAGER" : $P{NOTEDBY_POS}]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="1" y="218" width="227" height="20" uuid="815f7107-b5dd-4eb8-b54b-5a632a02d55c"/>
 				<textElement textAlignment="Center">
-					<font fontName="Times New Roman" size="12" isBold="true"/>
+					<font fontName="SansSerif" size="12" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{CHECKEDBY_POS}]]></textFieldExpression>
 			</textField>
 			<staticText>
 				<reportElement mode="Transparent" x="298" y="6" width="113" height="19" forecolor="#000000" backcolor="#FFFFFF" uuid="c226df38-82fe-433d-9275-f82cdc9868ef"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" markup="none">
-					<font fontName="Times New Roman" size="12" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<font fontName="SansSerif" size="12" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
 				<text><![CDATA[TOTAL]]></text>
@@ -429,7 +429,7 @@
 			<textField>
 				<reportElement x="0" y="111" width="222" height="20" uuid="a50c093b-7cc6-4305-bfb1-a07f7d2b943f"/>
 				<textElement textAlignment="Center">
-					<font fontName="Times New Roman" size="12" isBold="true"/>
+					<font fontName="SansSerif" size="12" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{PREPAREDBY_POS} == "" || $P{PREPAREDBY_POS} == null ? "PURCHASER" : $P{PREPAREDBY_POS}]]></textFieldExpression>
 			</textField>
@@ -472,21 +472,21 @@
 					<bottomPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Bottom">
-					<font fontName="Times New Roman" size="12" isBold="true"/>
+					<font fontName="SansSerif" size="12" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{SUPPLIER}]]></textFieldExpression>
 			</textField>
 			<staticText>
 				<reportElement x="0" y="332" width="227" height="20" uuid="463c89ae-76db-4689-abae-26aa1cf2f7c5"/>
 				<textElement textAlignment="Center" markup="none">
-					<font fontName="Times New Roman" size="12" isBold="true"/>
+					<font fontName="SansSerif" size="12" isBold="true"/>
 				</textElement>
 				<text><![CDATA[SUPPLIER]]></text>
 			</staticText>
 			<staticText>
 				<reportElement positionType="Float" x="1" y="263" width="162" height="20" isRemoveLineWhenBlank="true" uuid="80771ae6-c2d9-4501-b25e-89efc1d60e6c"/>
 				<textElement textAlignment="Left">
-					<font fontName="Times New Roman" size="12" isBold="false" isItalic="true"/>
+					<font fontName="SansSerif" size="12" isBold="false" isItalic="true"/>
 				</textElement>
 				<text><![CDATA[Conforme:]]></text>
 			</staticText>
@@ -496,7 +496,7 @@
 					<bottomPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Bottom">
-					<font fontName="Times New Roman" size="12" isBold="true"/>
+					<font fontName="SansSerif" size="12" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{APPROVEDBY}]]></textFieldExpression>
 			</textField>
@@ -507,14 +507,14 @@
 			<textField>
 				<reportElement x="327" y="218" width="227" height="20" uuid="c3b58228-2439-4c8a-a8c9-3ebbc426de28"/>
 				<textElement textAlignment="Center">
-					<font fontName="Times New Roman" size="12" isBold="true"/>
+					<font fontName="SansSerif" size="12" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{APPROVEDBY_POS} == "" || $P{APPROVEDBY_POS} == null ? "GENERAL MANAGER" : $P{APPROVEDBY_POS}]]></textFieldExpression>
 			</textField>
 			<staticText>
 				<reportElement positionType="Float" x="327" y="149" width="162" height="20" isRemoveLineWhenBlank="true" uuid="714fdb0d-0fd1-4b61-a8a7-995c960f4a78"/>
 				<textElement textAlignment="Left">
-					<font fontName="Times New Roman" size="12" isBold="false" isItalic="true"/>
+					<font fontName="SansSerif" size="12" isBold="false" isItalic="true"/>
 				</textElement>
 				<text><![CDATA[Approved By:]]></text>
 			</staticText>

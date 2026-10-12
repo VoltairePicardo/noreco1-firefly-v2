@@ -135,42 +135,60 @@
         <!-- Journal Entries -->
         <hr class="my-3"/>
         <div class="fs-xs text-uppercase fw-semibold text-muted mb-2">Journal Entries</div>
-        <div class="table-responsive">
-            <table class="table table-custom table-centered table-hover w-100 mb-0">
-                <thead class="bg-light align-middle bg-opacity-25 thead-sm">
-                    <tr class="text-uppercase fs-xxs">
-                        <th style="width:40px">#</th>
-                        <th>Account Code</th>
-                        <th>Account Title</th>
-                        <th>Particulars</th>
-                        <th class="text-end">Debit</th>
-                        <th class="text-end">Credit</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @for (entry of journalEntries; track $index; let i = $index) {
-                        <tr>
-                            <td>{{ i + 1 }}</td>
-                            <td class="fw-bold">{{ entry.accountCode || entry.account?.accountCode || '—' }}</td>
-                            <td>{{ entry.accountTitle || entry.account?.accountTitle || entry.account?.accountDescription || '—' }}</td>
-                            <td>{{ entry.particulars || '—' }}</td>
-                            <td class="text-end">{{ (entry.glDebitAmount ?? entry.debitAmount ?? 0) | number:'1.2-2' }}</td>
-                            <td class="text-end">{{ (entry.glCreditAmount ?? entry.creditAmount ?? 0) | number:'1.2-2' }}</td>
+
+        @if (isForChecking()) {
+            <!-- Editable journal entries for checker -->
+            <app-journal-entries-form [(entries)]="editableJournalEntries"/>
+            <div class="d-flex justify-content-end mt-3">
+                <button type="button" class="btn btn-primary fw-bold" (click)="updateEntries()"
+                        [disabled]="savingEntries || !isBalanced">
+                    @if (savingEntries) {
+                        <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                    } @else {
+                        <ng-icon name="tablerDeviceFloppy" class="ps-0 pe-3 fw-bold"></ng-icon>
+                    }
+                    Update Entries
+                </button>
+            </div>
+        } @else {
+            <!-- Read-only journal entries -->
+            <div class="table-responsive">
+                <table class="table table-custom table-centered table-hover w-100 mb-0">
+                    <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                        <tr class="text-uppercase fs-xxs">
+                            <th style="width:40px">#</th>
+                            <th>Account Code</th>
+                            <th>Account Title</th>
+                            <th>Particulars</th>
+                            <th class="text-end">Debit</th>
+                            <th class="text-end">Credit</th>
                         </tr>
-                    }
-                    @if (journalEntries.length === 0) {
-                        <tr><td colspan="6" class="text-center text-muted py-3">No journal entries.</td></tr>
-                    }
-                    @if (journalEntries.length > 0) {
-                        <tr class="fw-bold bg-light">
-                            <td colspan="4" class="text-end fw-bold text-uppercase fs-xs">Totals</td>
-                            <td class="text-end">{{ totalDebit | number:'1.2-2' }}</td>
-                            <td class="text-end">{{ totalCredit | number:'1.2-2' }}</td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        </div>
+                    </thead>
+                    <tbody>
+                        @for (entry of journalEntries; track $index; let i = $index) {
+                            <tr>
+                                <td>{{ i + 1 }}</td>
+                                <td class="fw-bold">{{ entry.accountCode || entry.account?.accountCode || '—' }}</td>
+                                <td>{{ entry.accountTitle || entry.account?.accountTitle || entry.account?.accountDescription || '—' }}</td>
+                                <td>{{ entry.particulars || '—' }}</td>
+                                <td class="text-end">{{ (entry.glDebitAmount ?? entry.debitAmount ?? 0) | number:'1.2-2' }}</td>
+                                <td class="text-end">{{ (entry.glCreditAmount ?? entry.creditAmount ?? 0) | number:'1.2-2' }}</td>
+                            </tr>
+                        }
+                        @if (journalEntries.length === 0) {
+                            <tr><td colspan="6" class="text-center text-muted py-3">No journal entries.</td></tr>
+                        }
+                        @if (journalEntries.length > 0) {
+                            <tr class="fw-bold bg-light">
+                                <td colspan="4" class="text-end fw-bold text-uppercase fs-xs">Totals</td>
+                                <td class="text-end">{{ totalDebit | number:'1.2-2' }}</td>
+                                <td class="text-end">{{ totalCredit | number:'1.2-2' }}</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
 
         <!-- Signatories -->
         @if (data.checker || data.recommendingApproval || data.approvingOfficer) {

@@ -52,7 +52,7 @@
 	<title>
 		<band height="231" splitType="Stretch">
 			<image isLazy="true" onErrorType="Icon">
-				<reportElement x="0" y="0" width="72" height="72" uuid="4429c421-e36a-4634-9efa-4440eeefb035">
+				<reportElement x="0" y="0" width="58" height="58" uuid="4429c421-e36a-4634-9efa-4440eeefb035">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<imageExpression><![CDATA[$P{LOGO_PATH}]]></imageExpression>
@@ -72,7 +72,7 @@
 				<textFieldExpression><![CDATA[$P{COMP_ADDR}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement mode="Transparent" x="0" y="30" width="572" height="22" forecolor="#000000" backcolor="#FFFFFF" uuid="18489830-c25c-4921-a2a4-085af68bd22c">
+				<reportElement mode="Transparent" x="0" y="30" width="572" height="20" forecolor="#000000" backcolor="#FFFFFF" uuid="18489830-c25c-4921-a2a4-085af68bd22c">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" markup="none">
@@ -89,9 +89,9 @@
 				<textFieldExpression><![CDATA[$P{VOUCHER_NO}]]></textFieldExpression>
 			</textField>
 			<textField pattern="MMMMM dd, yyyy">
-				<reportElement x="381" y="80" width="192" height="15" uuid="f1e2d3c4-b5a6-7890-fedc-ba9876543210"/>
+				<reportElement x="380" y="76" width="192" height="15" uuid="f1e2d3c4-b5a6-7890-fedc-ba9876543210"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font fontName="Times New Roman" size="10"/>
+					<font fontName="SansSerif" size="10"/>
 				</textElement>
 				<textFieldExpression><![CDATA["DATE: " + $P{V_DATE}]]></textFieldExpression>
 			</textField>

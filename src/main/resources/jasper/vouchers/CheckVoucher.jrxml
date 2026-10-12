@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.21.5.final using JasperReports Library version 6.21.5-74d586df47b25dbd05bd0957999819196e59934a  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="CheckVoucher" pageWidth="612" pageHeight="792" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isFloatColumnFooter="true" uuid="b29c3ba6-1020-4625-9bd3-1937355162ed">
 	<property name="ireport.zoom" value="1.9487171000000079"/>
 	<property name="ireport.x" value="0"/>
@@ -102,21 +103,21 @@
 		<band splitType="Stretch"/>
 	</background>
 	<title>
-		<band height="286" splitType="Stretch">
+		<band height="268" splitType="Stretch">
 			<staticText>
-				<reportElement positionType="FixRelativeToBottom" stretchType="RelativeToBandHeight" x="442" y="188" width="130" height="98" uuid="8ea49892-172e-48c7-9882-11f3f56bfed5"/>
+				<reportElement positionType="FixRelativeToBottom" stretchType="RelativeToBandHeight" x="442" y="170" width="130" height="98" uuid="8ea49892-172e-48c7-9882-11f3f56bfed5"/>
 				<box>
 					<topPen lineWidth="1.0"/>
 					<bottomPen lineWidth="1.0"/>
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="Calibri Light" isBold="true" isItalic="false"/>
+					<font fontName="SansSerif" isBold="true" isItalic="false"/>
 				</textElement>
 				<text><![CDATA[]]></text>
 			</staticText>
 			<staticText>
-				<reportElement positionType="FixRelativeToBottom" stretchType="RelativeToBandHeight" x="0" y="188" width="442" height="98" isPrintWhenDetailOverflows="true" uuid="e57939fb-a160-4214-8121-d92eb47b6177"/>
+				<reportElement positionType="FixRelativeToBottom" stretchType="RelativeToBandHeight" x="0" y="170" width="442" height="98" isPrintWhenDetailOverflows="true" uuid="e57939fb-a160-4214-8121-d92eb47b6177"/>
 				<box>
 					<topPen lineWidth="1.0"/>
 					<leftPen lineWidth="1.0"/>
@@ -124,88 +125,88 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="Calibri Light" isBold="true" isItalic="false"/>
+					<font fontName="SansSerif" isBold="true" isItalic="false"/>
 				</textElement>
 				<text><![CDATA[]]></text>
 			</staticText>
 			<textField isBlankWhenNull="true">
 				<reportElement x="0" y="0" width="572" height="16" uuid="33661038-b33e-4e89-88ff-511c7e229467"/>
-				<textElement textAlignment="Center">
-					<font fontName="Calibri" size="12" isBold="true"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="12" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{COMP_NAME}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
 				<reportElement x="0" y="16" width="572" height="14" uuid="580d651b-2cd9-41d4-8602-26e3006d73e3"/>
-				<textElement textAlignment="Center">
-					<font fontName="Calibri Light" size="10"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="10"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{COMP_ADDR}]]></textFieldExpression>
 			</textField>
 			<image isLazy="true" onErrorType="Icon">
-				<reportElement x="64" y="14" width="60" height="52" uuid="a572ebb6-75d3-4cc5-adf8-83c0b47be5b6"/>
+				<reportElement x="0" y="0" width="58" height="54" uuid="a572ebb6-75d3-4cc5-adf8-83c0b47be5b6"/>
 				<imageExpression><![CDATA[$P{LOGO_PATH}]]></imageExpression>
 			</image>
 			<staticText>
-				<reportElement mode="Transparent" x="0" y="43" width="572" height="24" forecolor="#000000" backcolor="#FFFFFF" uuid="2f442013-6758-488b-8809-46896a79655a"/>
-				<textElement textAlignment="Center" verticalAlignment="Top" rotation="None" markup="none">
-					<font fontName="Calibri" size="16" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				<reportElement mode="Transparent" x="0" y="30" width="572" height="24" forecolor="#000000" backcolor="#FFFFFF" uuid="2f442013-6758-488b-8809-46896a79655a"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="SansSerif" size="14" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
 				<text><![CDATA[CHECK VOUCHER]]></text>
 			</staticText>
 			<staticText>
-				<reportElement mode="Transparent" x="0" y="100" width="33" height="20" forecolor="#000000" backcolor="#FFFFFF" uuid="fb1b12e9-ec02-4a75-92ee-91f5906c09bb"/>
+				<reportElement mode="Transparent" x="0" y="80" width="33" height="20" forecolor="#000000" backcolor="#FFFFFF" uuid="fb1b12e9-ec02-4a75-92ee-91f5906c09bb"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle" rotation="None" markup="none">
-					<font fontName="Calibri Light" size="10" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<font fontName="SansSerif" size="10" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
 				<text><![CDATA[Pay to:]]></text>
 			</staticText>
 			<textField pattern="MMMM dd, yyyy" isBlankWhenNull="true">
-				<reportElement x="446" y="100" width="127" height="20" uuid="6b5c4db0-4eed-48d3-8f2d-11fba0c18c9d"/>
+				<reportElement x="443" y="80" width="127" height="20" uuid="6b5c4db0-4eed-48d3-8f2d-11fba0c18c9d"/>
 				<box>
 					<bottomPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="Calibri Light"/>
+					<font fontName="SansSerif"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{V_DATE}]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement x="33" y="100" width="539" height="20" isPrintWhenDetailOverflows="true" uuid="bec3f5cf-9def-4490-a855-eceda1c2e180"/>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement x="32" y="80" width="539" height="20" isPrintWhenDetailOverflows="true" uuid="bec3f5cf-9def-4490-a855-eceda1c2e180"/>
 				<box leftPadding="5">
 					<bottomPen lineWidth="1.0"/>
 				</box>
 				<textElement verticalAlignment="Middle">
-					<font fontName="Calibri Light" isBold="true"/>
+					<font fontName="SansSerif" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{SUPPLIER_NAME}.toUpperCase()]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement mode="Transparent" x="0" y="123" width="99" height="20" forecolor="#000000" backcolor="#FFFFFF" uuid="d791feee-a898-4046-9d8f-10e0bc11be94"/>
+				<reportElement mode="Transparent" x="0" y="100" width="99" height="20" forecolor="#000000" backcolor="#FFFFFF" uuid="d791feee-a898-4046-9d8f-10e0bc11be94"/>
 				<textElement textAlignment="Left" verticalAlignment="Top" rotation="None" markup="none">
-					<font fontName="Calibri Light" size="10" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<font fontName="SansSerif" size="10" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
 				<text><![CDATA[The sum of PESOS:]]></text>
 			</staticText>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement stretchType="RelativeToBandHeight" x="99" y="123" width="474" height="37" isPrintInFirstWholeBand="true" isPrintWhenDetailOverflows="true" forecolor="#000000" backcolor="#FFFFFF" uuid="7c97dcc0-5d55-4d36-891d-5108d97bc4b4"/>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToBandHeight" x="97" y="100" width="474" height="37" isPrintInFirstWholeBand="true" isPrintWhenDetailOverflows="true" forecolor="#000000" backcolor="#FFFFFF" uuid="7c97dcc0-5d55-4d36-891d-5108d97bc4b4"/>
 				<box leftPadding="0">
 					<bottomPen lineWidth="0.0"/>
 				</box>
 				<textElement textAlignment="Left" verticalAlignment="Top" rotation="None" markup="none">
-					<font fontName="Calibri Light" size="10" isBold="false" isItalic="false"/>
+					<font fontName="SansSerif" size="10" isBold="false" isItalic="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{AMOUNT_IN_WORDS}.toUpperCase()]]></textFieldExpression>
 			</textField>
 			<line>
-				<reportElement x="0" y="161" width="572" height="1" uuid="4ef63a78-c29b-4101-8021-37d9562b77e1"/>
+				<reportElement x="0" y="143" width="572" height="1" uuid="4ef63a78-c29b-4101-8021-37d9562b77e1"/>
 			</line>
 			<staticText>
-				<reportElement x="0" y="168" width="442" height="20" uuid="589d309a-990b-4a9a-8808-b7736a85433a"/>
+				<reportElement x="0" y="150" width="442" height="20" uuid="589d309a-990b-4a9a-8808-b7736a85433a"/>
 				<box>
 					<topPen lineWidth="1.0"/>
 					<leftPen lineWidth="1.0"/>
@@ -213,31 +214,31 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="Calibri" size="11" isBold="true" isItalic="false"/>
+					<font fontName="SansSerif" size="11" isBold="true" isItalic="false"/>
 				</textElement>
 				<text><![CDATA[P A R T I C U L A R S]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="442" y="168" width="130" height="20" uuid="1ad6280a-bdb8-46a0-ae68-49dd18b0498d"/>
+				<reportElement x="442" y="150" width="130" height="20" uuid="1ad6280a-bdb8-46a0-ae68-49dd18b0498d"/>
 				<box>
 					<topPen lineWidth="1.0"/>
 					<bottomPen lineWidth="1.0"/>
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="Calibri" size="11" isBold="true" isItalic="false"/>
+					<font fontName="SansSerif" size="11" isBold="true" isItalic="false"/>
 				</textElement>
 				<text><![CDATA[A M O U N T]]></text>
 			</staticText>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement x="12" y="191" width="410" height="95" isRemoveLineWhenBlank="true" isPrintWhenDetailOverflows="true" uuid="2ba4086d-20d1-4884-97d8-dee8548c43e9"/>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement x="12" y="173" width="410" height="95" isRemoveLineWhenBlank="true" isPrintWhenDetailOverflows="true" uuid="2ba4086d-20d1-4884-97d8-dee8548c43e9"/>
 				<textElement verticalAlignment="Middle">
-					<font fontName="Calibri Light"/>
+					<font fontName="SansSerif"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{REMARKS}]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
-				<reportElement x="446" y="219" width="122" height="20" isRemoveLineWhenBlank="true" uuid="f0698d33-bbd8-4a21-b077-c97e0a1c9f69"/>
+			<textField textAdjust="StretchHeight" pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement x="446" y="201" width="122" height="20" isRemoveLineWhenBlank="true" uuid="f0698d33-bbd8-4a21-b077-c97e0a1c9f69"/>
 				<box>
 					<pen lineStyle="Double"/>
 					<topPen lineStyle="Double"/>
@@ -246,30 +247,23 @@
 					<rightPen lineStyle="Double"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="Calibri Light"/>
+					<font fontName="SansSerif"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{TOTAL}]]></textFieldExpression>
 			</textField>
 			<textField pattern="MM/dd/yyyy hh:mm a">
-				<reportElement x="486" y="0" width="86" height="14" uuid="31eaf789-50b2-40bd-930a-98a3a935cdc5"/>
-				<textElement>
-					<font fontName="Calibri Light" size="9"/>
+				<reportElement x="381" y="0" width="190" height="16" uuid="31eaf789-50b2-40bd-930a-98a3a935cdc5"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="9"/>
 				</textElement>
 				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
 			</textField>
-			<staticText>
-				<reportElement x="377" y="76" width="60" height="15" uuid="05fb2015-2161-4981-b4cb-442ed87a0ec2"/>
-				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font fontName="Times New Roman" size="10"/>
-				</textElement>
-				<text><![CDATA[CV No:]]></text>
-			</staticText>
 			<textField>
-				<reportElement x="437" y="76" width="135" height="15" uuid="abde28c9-499d-4216-b479-1069ee4a80be"/>
+				<reportElement x="381" y="54" width="191" height="15" uuid="abde28c9-499d-4216-b479-1069ee4a80be"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font fontName="Monospaced" size="10"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$P{VOUCHER_NO}]]></textFieldExpression>
+				<textFieldExpression><![CDATA["CV No: "+ $P{VOUCHER_NO}]]></textFieldExpression>
 			</textField>
 		</band>
 	</title>
@@ -408,7 +402,7 @@ Code]]></text>
 				<reportElement x="200" y="0" width="80" height="13" uuid="9c44bc88-92a6-4e6b-898c-4355abc83753"/>
 				<box leftPadding="5"/>
 				<textElement markup="html">
-					<font fontName="Calibri Light" size="9"/>
+					<font fontName="SansSerif" size="9"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{accountCode}]]></textFieldExpression>
 			</textField>
@@ -419,53 +413,53 @@ Code]]></text>
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement markup="html">
-					<font fontName="Calibri Light" size="9"/>
+					<font fontName="SansSerif" size="9"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{accountTitle}]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" pattern="#,##0.00" isBlankWhenNull="true">
 				<reportElement x="280" y="0" width="73" height="13" isPrintWhenDetailOverflows="true" uuid="7aa02ec1-3a06-41b0-bda9-ff982506cdb6"/>
 				<box rightPadding="2">
 					<leftPen lineWidth="1.0"/>
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Right">
-					<font fontName="Calibri Light" size="9"/>
+					<font fontName="SansSerif" size="9"/>
 				</textElement>
 				<textFieldExpression><![CDATA[($F{glDebitAmount} != null && ($F{glDebitAmount}.compareTo(BigDecimal.ZERO) != 0)) ? $F{glDebitAmount} : null]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" pattern="#,##0.00" isBlankWhenNull="true">
 				<reportElement mode="Transparent" x="353" y="0" width="73" height="13" isPrintWhenDetailOverflows="true" forecolor="#000000" backcolor="#FFFFFF" uuid="3bbb05c5-894a-4153-8e9a-75ab12ed9c79"/>
 				<box rightPadding="2">
 					<leftPen lineWidth="1.0"/>
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Right" verticalAlignment="Top" rotation="None" markup="none">
-					<font fontName="Calibri Light" size="9" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<font fontName="SansSerif" size="9" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
 				<textFieldExpression><![CDATA[($F{glCreditAmount} != null && ($F{glCreditAmount}.compareTo(BigDecimal.ZERO) != 0)) ? $F{glCreditAmount} : null]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" pattern="#,##0.00" isBlankWhenNull="true">
 				<reportElement mode="Transparent" x="499" y="0" width="73" height="13" isPrintWhenDetailOverflows="true" forecolor="#000000" backcolor="#FFFFFF" uuid="89f4c1bb-3893-4ea0-8400-262de7c37382"/>
 				<box rightPadding="2">
 					<leftPen lineWidth="1.0"/>
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Right" verticalAlignment="Top" rotation="None" markup="none">
-					<font fontName="Calibri Light" size="9" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<font fontName="SansSerif" size="9" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
 				<textFieldExpression><![CDATA[($F{slCreditAmount} != null && ($F{slCreditAmount}.compareTo(BigDecimal.ZERO) != 0)) ? $F{slCreditAmount} : null]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" pattern="#,##0.00" isBlankWhenNull="true">
 				<reportElement mode="Transparent" x="426" y="0" width="73" height="13" isPrintWhenDetailOverflows="true" forecolor="#000000" backcolor="#FFFFFF" uuid="19713bcd-55fb-4eba-8ab0-f3ebb976cc89"/>
 				<box rightPadding="2">
 					<leftPen lineWidth="1.0"/>
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Right" verticalAlignment="Top" rotation="None" markup="none">
-					<font fontName="Calibri Light" size="9" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<font fontName="SansSerif" size="9" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
 				<textFieldExpression><![CDATA[($F{slDebitAmount} != null && ($F{slDebitAmount}.compareTo(BigDecimal.ZERO) != 0)) ? $F{slDebitAmount} : null]]></textFieldExpression>
@@ -482,7 +476,7 @@ Code]]></text>
 		</band>
 	</columnFooter>
 	<summary>
-		<band height="230">
+		<band height="228">
 			<staticText>
 				<reportElement positionType="Float" x="381" y="23" width="191" height="64" uuid="601498e8-1d01-405c-89d3-d856da19934e"/>
 				<box leftPadding="0">
@@ -492,7 +486,7 @@ Code]]></text>
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="Calibri Light" isBold="true"/>
+					<font fontName="SansSerif" isBold="true"/>
 				</textElement>
 				<text><![CDATA[]]></text>
 			</staticText>
@@ -505,7 +499,7 @@ Code]]></text>
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="Calibri Light" isBold="true"/>
+					<font fontName="SansSerif" isBold="true"/>
 				</textElement>
 				<text><![CDATA[]]></text>
 			</staticText>
@@ -518,7 +512,7 @@ Code]]></text>
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="Calibri Light" isBold="true"/>
+					<font fontName="SansSerif" isBold="true"/>
 				</textElement>
 				<text><![CDATA[]]></text>
 			</staticText>
@@ -531,7 +525,7 @@ Code]]></text>
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="Calibri Light" isBold="true"/>
+					<font fontName="SansSerif" isBold="true"/>
 				</textElement>
 				<text><![CDATA[]]></text>
 			</staticText>
@@ -544,7 +538,7 @@ Code]]></text>
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="Calibri Light" isBold="true"/>
+					<font fontName="SansSerif" isBold="true"/>
 				</textElement>
 				<text><![CDATA[]]></text>
 			</staticText>
@@ -557,7 +551,7 @@ Code]]></text>
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="Calibri Light" isBold="true"/>
+					<font fontName="SansSerif" isBold="true"/>
 				</textElement>
 				<text><![CDATA[]]></text>
 			</staticText>
@@ -570,21 +564,21 @@ Code]]></text>
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="Calibri Light" isBold="true"/>
+					<font fontName="SansSerif" isBold="true"/>
 				</textElement>
 				<text><![CDATA[]]></text>
 			</staticText>
 			<textField isBlankWhenNull="true">
 				<reportElement positionType="Float" x="5" y="62" width="181" height="11" isRemoveLineWhenBlank="true" uuid="fd8cf702-85b3-4eab-afa5-b31b3416171f"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="Calibri Light" size="9"/>
+					<font fontName="SansSerif" size="9"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{PREPARAR}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
 				<reportElement positionType="Float" x="195" y="62" width="181" height="11" isRemoveLineWhenBlank="true" uuid="dea44feb-b09a-4db0-b627-172b74f82619"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="Calibri Light" size="9"/>
+					<font fontName="SansSerif" size="9"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{CHECKER}]]></textFieldExpression>
 			</textField>
@@ -597,7 +591,7 @@ Code]]></text>
 					<topPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center">
-					<font fontName="Calibri Light"/>
+					<font fontName="SansSerif"/>
 				</textElement>
 				<text><![CDATA[Payee]]></text>
 			</staticText>
@@ -607,14 +601,14 @@ Code]]></text>
 					<topPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center">
-					<font fontName="Calibri Light" size="9"/>
+					<font fontName="SansSerif" size="9"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{PREPARAR_POS}]]></textFieldExpression>
 			</textField>
 			<staticText>
 				<reportElement positionType="Float" x="5" y="23" width="122" height="11" isRemoveLineWhenBlank="true" uuid="4b6e80e8-35bc-4983-8d40-078bf9b6340d"/>
 				<textElement>
-					<font fontName="Calibri Light" size="9" isBold="false"/>
+					<font fontName="SansSerif" size="9" isBold="false"/>
 				</textElement>
 				<text><![CDATA[Prepared by:]]></text>
 			</staticText>
@@ -624,7 +618,7 @@ Code]]></text>
 					<topPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Top" rotation="None" markup="none">
-					<font fontName="Calibri Light" size="9" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<font fontName="SansSerif" size="9" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{CHECKER_POS}]]></textFieldExpression>
@@ -632,39 +626,39 @@ Code]]></text>
 			<staticText>
 				<reportElement positionType="Float" x="385" y="30" width="44" height="20" isRemoveLineWhenBlank="true" uuid="c2b55dad-f0dc-4686-8c86-69ae8df8fe5c"/>
 				<textElement verticalAlignment="Top">
-					<font fontName="Calibri Light" size="9" isBold="false"/>
+					<font fontName="SansSerif" size="9" isBold="false"/>
 				</textElement>
 				<text><![CDATA[Check No]]></text>
 			</staticText>
 			<staticText>
 				<reportElement positionType="Float" x="195" y="23" width="139" height="11" isRemoveLineWhenBlank="true" uuid="2e3d9410-330a-44b4-9d7c-d1d59b53fb02"/>
 				<textElement>
-					<font fontName="Calibri Light" size="9" isBold="false"/>
+					<font fontName="SansSerif" size="9" isBold="false"/>
 				</textElement>
 				<text><![CDATA[Checked by:]]></text>
 			</staticText>
 			<staticText>
 				<reportElement positionType="Float" x="385" y="88" width="168" height="15" isRemoveLineWhenBlank="true" uuid="18ce2f05-7e84-499e-84d0-7c1de9650139"/>
 				<textElement>
-					<font fontName="Calibri Light" size="9" isBold="false"/>
+					<font fontName="SansSerif" size="9" isBold="false"/>
 				</textElement>
 				<text><![CDATA[Received by:]]></text>
 			</staticText>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="385" y="113" width="182" height="33" isPrintInFirstWholeBand="true" isPrintWhenDetailOverflows="true" uuid="f7e9c086-09d4-481b-a384-71c2aa369119"/>
 				<box>
 					<bottomPen lineWidth="0.0"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Bottom">
-					<font fontName="Calibri Light" isBold="true"/>
+					<font fontName="SansSerif" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{SUPPLIER_NAME}]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" pattern="" isBlankWhenNull="true">
 				<reportElement mode="Transparent" x="38" y="1" width="534" height="19" isRemoveLineWhenBlank="true" isPrintWhenDetailOverflows="true" forecolor="#000000" backcolor="#FFFFFF" uuid="eb63afd4-973f-464b-bee9-37af553a40f1"/>
 				<box topPadding="10" leftPadding="5"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle" rotation="None" markup="none">
-					<font fontName="Calibri Light" size="10" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<font fontName="SansSerif" size="10" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{NOTES}]]></textFieldExpression>
@@ -672,7 +666,7 @@ Code]]></text>
 			<staticText>
 				<reportElement mode="Transparent" x="0" y="0" width="38" height="20" isRemoveLineWhenBlank="true" forecolor="#000000" backcolor="#FFFFFF" uuid="25111d1d-70c4-43bb-a701-0b830950a1e0"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle" rotation="None" markup="html">
-					<font fontName="Calibri Light" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<font fontName="SansSerif" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
 				<text><![CDATA[NOTES:]]></text>
@@ -683,7 +677,7 @@ Code]]></text>
 					<topPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center">
-					<font fontName="Calibri Light"/>
+					<font fontName="SansSerif"/>
 				</textElement>
 				<text><![CDATA[Date]]></text>
 			</staticText>
@@ -695,10 +689,10 @@ Code]]></text>
 			<line>
 				<reportElement x="0" y="0" width="572" height="1" uuid="40584aea-6836-4122-ad42-43b450966b38"/>
 			</line>
-			<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" pattern="" isBlankWhenNull="true">
 				<reportElement positionType="Float" mode="Transparent" x="431" y="30" width="92" height="30" isRemoveLineWhenBlank="true" isPrintWhenDetailOverflows="true" forecolor="#000000" backcolor="#FFFFFF" uuid="c9bed462-0f63-4cfc-93ca-9d78a8c97e3b"/>
 				<textElement textAlignment="Left" verticalAlignment="Top" rotation="None" markup="html">
-					<font fontName="Calibri Light" size="9" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<font fontName="SansSerif" size="9" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{CHECK_NOS}]]></textFieldExpression>
@@ -739,14 +733,14 @@ Code]]></text>
 			<textField isBlankWhenNull="true">
 				<reportElement positionType="Float" x="100" y="200" width="180" height="11" isRemoveLineWhenBlank="true" uuid="06d78145-f3a4-4187-863b-f9351d2292e3"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="Calibri Light" size="9"/>
+					<font fontName="SansSerif" size="9"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{APPROVAR}]]></textFieldExpression>
 			</textField>
 			<staticText>
 				<reportElement positionType="Float" x="100" y="162" width="180" height="11" isRemoveLineWhenBlank="true" uuid="21bf7fee-bb7e-4c55-a500-adec8dcc0d35"/>
 				<textElement>
-					<font fontName="Calibri Light" size="9" isBold="false"/>
+					<font fontName="SansSerif" size="9" isBold="false"/>
 				</textElement>
 				<text><![CDATA[Approved by:]]></text>
 			</staticText>
@@ -756,7 +750,7 @@ Code]]></text>
 					<topPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center">
-					<font fontName="Calibri Light" size="9"/>
+					<font fontName="SansSerif" size="9"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{APPROVAR_POS}]]></textFieldExpression>
 			</textField>
@@ -770,14 +764,14 @@ Code]]></text>
 					<topPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center">
-					<font fontName="Calibri Light" size="9"/>
+					<font fontName="SansSerif" size="9"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{RECOMMENDAR_POS}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
 				<reportElement positionType="Float" x="5" y="126" width="181" height="11" isRemoveLineWhenBlank="true" uuid="91c808e1-8043-489e-a737-0567c293041e"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="Calibri Light" size="9"/>
+					<font fontName="SansSerif" size="9"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{RECOMMENDAR}]]></textFieldExpression>
 			</textField>
@@ -791,21 +785,21 @@ Code]]></text>
 			<staticText>
 				<reportElement positionType="Float" x="5" y="88" width="181" height="11" isRemoveLineWhenBlank="true" uuid="ad94cd1b-87a0-412b-8c2e-0d7b83b4de89"/>
 				<textElement>
-					<font fontName="Calibri Light" size="9" isBold="false"/>
+					<font fontName="SansSerif" size="9" isBold="false"/>
 				</textElement>
 				<text><![CDATA[Recommending Approval:]]></text>
 			</staticText>
 			<textField isBlankWhenNull="true">
 				<reportElement positionType="Float" x="195" y="126" width="181" height="11" isRemoveLineWhenBlank="true" uuid="495c3d92-9eb5-4e01-9c44-d71a017fb711"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="Calibri Light" size="9"/>
+					<font fontName="SansSerif" size="9"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{AUDITOR}]]></textFieldExpression>
 			</textField>
 			<staticText>
 				<reportElement positionType="Float" x="195" y="88" width="181" height="11" isRemoveLineWhenBlank="true" uuid="6dd9c260-d956-4e7c-b838-a9f0eb3ded19"/>
 				<textElement>
-					<font fontName="Calibri Light" size="9" isBold="false"/>
+					<font fontName="SansSerif" size="9" isBold="false"/>
 				</textElement>
 				<text><![CDATA[Audited by:]]></text>
 			</staticText>
@@ -826,7 +820,7 @@ Code]]></text>
 					<topPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center">
-					<font fontName="Calibri Light" size="9"/>
+					<font fontName="SansSerif" size="9"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{AUDITOR_POS}]]></textFieldExpression>
 			</textField>

@@ -159,7 +159,6 @@ export class MaterialIssuanceAddEditComponent {
             if (result?.action === 'select' && result?.data) {
                 const doc = result.data;
                 this.selectedInventoryDoc = doc;
-                // auto-fill particulars from the document's purpose
                 if (doc?.purpose) {
                     this.particulars = doc.purpose;
                 }
@@ -167,6 +166,22 @@ export class MaterialIssuanceAddEditComponent {
                     this.service.getInventoryDocItems(doc.id).subscribe({
                         next: (items) => { this.inventoryDocItems = items || []; },
                         error: () => { this.inventoryDocItems = []; }
+                    });
+                }
+                if (doc?.transId) {
+                    const isMST = (doc.docType || doc.documentType) === 'MST';
+                    this.service.getMirGlEntries(doc.transId, isMST).subscribe({
+                        next: (entries) => {
+                            this.journalEntries = (entries || []).map((e: any): JournalEntry => ({
+                                account: { id: e.accountId, accountCode: e.code, accountTitle: e.description },
+                                debit:   Number(e.debit)  || null,
+                                credit:  Number(e.credit) || null
+                            }));
+                            if (this.journalEntries.length === 0) {
+                                this.journalEntries = [{ account: null, debit: null, credit: null }];
+                            }
+                        },
+                        error: () => {}
                     });
                 }
             }
@@ -177,6 +192,7 @@ export class MaterialIssuanceAddEditComponent {
         this.selectedInventoryDoc = null;
         this.inventoryDocItems    = [];
         this.particulars          = '';
+        this.journalEntries       = [{ account: null, debit: null, credit: null }];
     }
 
     async openEntityBrowse(key: string): Promise<void> {
@@ -219,7 +235,8 @@ export class MaterialIssuanceAddEditComponent {
             id:                  this.editMode ? this.id : null,
             voucherDate:         this.voucherDate,
             particulars:         this.particulars || null,
-            invDocTransactionId: this.selectedInventoryDoc?.id || null,
+            inventoryDocType:    this.selectedInventoryDoc?.docType || this.selectedInventoryDoc?.documentType || null,
+            invDocTransactionId: this.selectedInventoryDoc?.transId || null,
             amount:              this.totalDebit,
             generalLedgerLines:  this.journalEntries.map(e => ({
                 code:        e.account?.accountCode  || '',

@@ -18,7 +18,7 @@
 	<property name="ireport.zoom" value="0.9982500000000013"/>
 	<property name="ireport.x" value="9"/>
 	<property name="ireport.y" value="0"/>
-	<style name="titleStyle" hAlign="Center" vAlign="Top" fontName="Arial" fontSize="14" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+	<style name="titleStyle" hAlign="Center" vAlign="Top" fontName="SansSerif" fontSize="14" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
 	<style name="detailStyle" hAlign="Left" vAlign="Middle" fontSize="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false">
 		<box leftPadding="5">
 			<topPen lineWidth="1.0"/>
@@ -60,13 +60,13 @@
 	<title>
 		<band height="173" splitType="Stretch">
 			<image isLazy="true" onErrorType="Icon">
-				<reportElement uuid="a572ebb6-75d3-4cc5-adf8-83c0b47be5b6" x="617" y="-9" width="60" height="52"/>
+				<reportElement uuid="a572ebb6-75d3-4cc5-adf8-83c0b47be5b6" x="0" y="0" width="58" height="58"/>
 				<imageExpression><![CDATA[$P{LOGO_PATH}]]></imageExpression>
 			</image>
 			<staticText>
 				<reportElement uuid="97a850ee-d8e0-445e-89de-0f623269d28a" mode="Transparent" x="1" y="43" width="1643" height="24" forecolor="#000000" backcolor="#FFFFFF"/>
 				<textElement textAlignment="Center" verticalAlignment="Top" rotation="None" markup="none">
-					<font fontName="Calibri" size="18" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<font fontName="SansSerif" size="11" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
 				<text><![CDATA[TRANSACTION SUMMARY PER ACCOUNT]]></text>
@@ -74,28 +74,28 @@
 			<textField isBlankWhenNull="true">
 				<reportElement uuid="8dc03b87-ce0f-42e3-84cc-ff569c6fde86" x="1" y="17" width="1643" height="12"/>
 				<textElement textAlignment="Center">
-					<font fontName="Arial" size="10"/>
+					<font fontName="SansSerif" size="10"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{COMP_ADDR}]]></textFieldExpression>
 			</textField>
 			<textField pattern="MM/dd/yyyy hh:mm a">
 				<reportElement uuid="f50810b0-83ee-4d20-9622-690449fae3c6" x="1558" y="0" width="86" height="14"/>
 				<textElement>
-					<font fontName="Arial" size="9"/>
+					<font fontName="SansSerif" size="9"/>
 				</textElement>
 				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
 				<reportElement uuid="ae3d854d-6819-4ef4-9f26-69fb77969167" style="titleStyle" x="1" y="0" width="1643" height="15"/>
 				<textElement textAlignment="Center">
-					<font fontName="Arial" size="13" isBold="true"/>
+					<font fontName="SansSerif" size="12" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{COMP_NAME}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
 				<reportElement uuid="3ae1aa15-ff4f-4986-8516-b17c621d9df3" x="1" y="66" width="1643" height="36"/>
 				<textElement textAlignment="Center">
-					<font fontName="Arial" size="10"/>
+					<font fontName="SansSerif" size="10"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{RANGE}]]></textFieldExpression>
 			</textField>

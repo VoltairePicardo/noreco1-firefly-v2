@@ -1,6 +1,7 @@
 package com.noreco1.fireflyv2.controller;
 
 import com.noreco1.fireflyv2.common.GlobalConstant;
+import com.noreco1.fireflyv2.common.helpers.ReportUtil;
 import com.noreco1.fireflyv2.controller.response.AccountDto;
 import com.noreco1.fireflyv2.controller.response.PostResponse;
 import com.noreco1.fireflyv2.model.Account;
@@ -8,9 +9,13 @@ import com.noreco1.fireflyv2.repo.AccountRepo;
 import com.noreco1.fireflyv2.service.AccountService;
 import com.noreco1.fireflyv2.service.DownloadService;
 import com.noreco1.fireflyv2.service.JasperDatasourceService;
+import com.noreco1.fireflyv2.service.PrintableVoucher;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import net.sf.jasperreports.engine.JRDataSource;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -30,6 +35,10 @@ public class AccountController {
     private final DownloadService downloadService;
     private final JasperDatasourceService jasperDatasourceService;
     private final MessageSource messageSource;
+
+    @Autowired
+    @Qualifier("cvServiceImpl")
+    PrintableVoucher printableVoucher;
 
     public AccountController(AccountService accountService, AccountRepo accountRepo, DownloadService downloadService, JasperDatasourceService jasperDatasourceService, MessageSource messageSource) {
         this.accountService = accountService;
@@ -93,12 +102,9 @@ public class AccountController {
     @GetMapping("/export")
     public void exportToPdf(@RequestParam(value = "type") String type,
                             @RequestParam(value = "token") String token,
-                            HttpServletResponse response) {
-        HashMap<String, Object> params = new HashMap<>();
-        params.put("COMP_NAME",    "NEGROS ORIENTAL I ELECTRIC COOPERATIVE, INC");
-        params.put("COMP_ADDRESS", "Tinaogan, Bindoy, Negros Oriental, Philippines");
-        params.put("SEGMENT",      "");
-        params.put("LOGO_PATH",    null);
+                            HttpServletResponse response, HttpServletRequest request) {
+
+        HashMap<String, Object> params = ReportUtil.setupSharedReportHeaders(request);
         JRDataSource dataSource = jasperDatasourceService.getCoaDataSource();
         String template = GlobalConstant.JASPER_BASE_PATH + "/coa/ChartOfAccounts.jrxml";
         downloadService.download(type, token, response, params, template, dataSource);

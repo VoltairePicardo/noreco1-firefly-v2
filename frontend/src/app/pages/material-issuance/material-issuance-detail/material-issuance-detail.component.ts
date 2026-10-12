@@ -4,12 +4,13 @@ import { AlertService } from '@/app/shared/services/alert.service';
 import { COMMON_ALL_PAGE_IMPORTS, COMMON_MAIN_PAGE_IMPORTS, SHARED_PROVIDERS } from '@/app/shared/providers/shared-providers';
 import { MaterialIssuanceService } from '../material-issuance.service';
 import { provideIcons } from '@ng-icons/core';
-import { tablerArrowLeft, tablerPrinter, tablerEdit, tablerEye, tablerEyeOff, tablerCheck } from '@ng-icons/tabler-icons';
+import { tablerArrowLeft, tablerPrinter, tablerEdit, tablerEye, tablerEyeOff, tablerCheck, tablerDeviceFloppy } from '@ng-icons/tabler-icons';
+import { JournalEntriesFormComponent, JournalEntry } from '@/app/shared/forms/journal-entries-form/journal-entries-form.component';
 
 @Component({
     selector: 'app-material-issuance-detail',
-    imports: [...COMMON_ALL_PAGE_IMPORTS, ...COMMON_MAIN_PAGE_IMPORTS],
-    providers: [...SHARED_PROVIDERS, provideIcons({ tablerArrowLeft, tablerPrinter, tablerEdit, tablerEye, tablerEyeOff, tablerCheck })],
+    imports: [...COMMON_ALL_PAGE_IMPORTS, ...COMMON_MAIN_PAGE_IMPORTS, JournalEntriesFormComponent],
+    providers: [...SHARED_PROVIDERS, provideIcons({ tablerArrowLeft, tablerPrinter, tablerEdit, tablerEye, tablerEyeOff, tablerCheck, tablerDeviceFloppy })],
     templateUrl: './material-issuance-detail.component.html'
 })
 export class MaterialIssuanceDetailComponent {
@@ -22,6 +23,9 @@ export class MaterialIssuanceDetailComponent {
     inventoryDocItems: any[] = [];
     isLoading          = signal(false);
     processingWorkflow = false;
+    savingEntries      = false;
+
+    editableJournalEntries: JournalEntry[] = [];
 
     workflowActions: any[] = [];
     selectedAction: any    = null;
@@ -54,6 +58,14 @@ export class MaterialIssuanceDetailComponent {
                     this.data = data;
                     const rawEntries = data.journalEntries || data.details || [];
                     this.journalEntries = rawEntries.filter((e: any) => e.accountCode);
+                    this.editableJournalEntries = this.journalEntries.map((e: any): JournalEntry => ({
+                        account: { id: e.accountId, accountCode: e.accountCode, accountTitle: e.accountTitle || e.account?.accountTitle || e.description },
+                        debit:   Number(e.glDebitAmount ?? e.debitAmount ?? e.debit) || null,
+                        credit:  Number(e.glCreditAmount ?? e.creditAmount ?? e.credit) || null
+                    }));
+                    if (this.editableJournalEntries.length === 0) {
+                        this.editableJournalEntries = [{ account: null, debit: null, credit: null }];
+                    }
                     this.inventoryDocItems = data.inventoryDocItems || data.inventoryDocument?.details || data.items || [];
                     this.loadWorkflowActions();
                 } else {
@@ -103,6 +115,55 @@ export class MaterialIssuanceDetailComponent {
     isEditable(): boolean {
         const s = this.data?.documentStatus?.status || this.data?.status || '';
         return s === 'Document Created' || s === 'Returned to Creator';
+    }
+
+    isForChecking(): boolean {
+        const s = this.data?.documentStatus?.status || this.data?.status || '';
+        return s.toLowerCase().includes('checking');
+    }
+
+    get totalDebitEditable(): number {
+        return this.editableJournalEntries.reduce((sum, e) => sum + (Number(e.debit) || 0), 0);
+    }
+
+    get totalCreditEditable(): number {
+        return this.editableJournalEntries.reduce((sum, e) => sum + (Number(e.credit) || 0), 0);
+    }
+
+    get isBalanced(): boolean {
+        const d = this.totalDebitEditable, c = this.totalCreditEditable;
+        return this.editableJournalEntries.length > 0 && Math.abs(d - c) < 0.001;
+    }
+
+    updateEntries(): void {
+        if (!this.isBalanced) {
+            this.alertService.warning(this.module, 'Validation', 'Debit and credit totals must be equal.');
+            return;
+        }
+        this.savingEntries = true;
+        const payload = {
+            id:                 this.data.id,
+            amount:             this.totalDebitEditable,
+            generalLedgerLines: this.editableJournalEntries.map(e => ({
+                code:        e.account?.accountCode  || '',
+                description: e.account?.accountTitle || e.account?.accountDescription || '',
+                accountId:   e.account?.id           || null,
+                debit:       Number(e.debit)         || 0,
+                credit:      Number(e.credit)        || 0
+            }))
+        };
+        this.service.updateEntries(payload).subscribe({
+            next: (res) => {
+                this.savingEntries = false;
+                if (res?.success) {
+                    this.alertService.success(this.module, 'Entries updated successfully.', '');
+                    this.loadData();
+                } else {
+                    this.alertService.error(this.module, 'Update Entries', res?.failureMessage || '');
+                }
+            },
+            error: () => { this.savingEntries = false; this.alertService.error(this.module, 'Update Entries', ''); }
+        });
     }
 
     get totalDebit(): number {

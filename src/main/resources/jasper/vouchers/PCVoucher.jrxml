@@ -89,14 +89,14 @@
 			<textField isBlankWhenNull="true">
 				<reportElement x="1" y="16" width="572" height="14" uuid="a6715665-534c-47cf-b145-1cc845d4a9b0"/>
 				<textElement textAlignment="Center">
-					<font fontName="Calibri Light" size="10"/>
+					<font fontName="SansSerif" size="10"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{COMP_ADDR}]]></textFieldExpression>
 			</textField>
 			<staticText>
 				<reportElement mode="Transparent" x="1" y="41" width="572" height="24" forecolor="#000000" backcolor="#FFFFFF" uuid="18489830-c25c-4921-a2a4-085af68bd22c"/>
 				<textElement textAlignment="Center" verticalAlignment="Top" rotation="None" markup="none">
-					<font fontName="SansSerif" size="16" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<font fontName="SansSerif" size="11" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
 				<text><![CDATA[PETTY CASH VOUCHER]]></text>
@@ -104,12 +104,12 @@
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 				<reportElement x="1" y="0" width="572" height="16" isPrintWhenDetailOverflows="true" uuid="413e6e16-0f96-4cb0-a01c-7e1af0e4756c"/>
 				<textElement textAlignment="Center" markup="html">
-					<font fontName="Calibri" size="12" isBold="true"/>
+					<font fontName="SansSerif" size="12" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{COMP_NAME}]]></textFieldExpression>
 			</textField>
 			<image isLazy="true" onErrorType="Icon">
-				<reportElement x="67" y="-5" width="80" height="65" uuid="a4b7b6df-bc3f-4709-bee7-efcd3bd28727"/>
+				<reportElement x="0" y="0" width="58" height="58" uuid="a4b7b6df-bc3f-4709-bee7-efcd3bd28727"/>
 				<imageExpression><![CDATA[$P{LOGO_PATH}]]></imageExpression>
 			</image>
 			<staticText>
@@ -118,7 +118,7 @@
 					<topPen lineWidth="0.0"/>
 				</box>
 				<textElement textAlignment="Left" verticalAlignment="Middle" rotation="None" markup="none">
-					<font fontName="Times New Roman" size="10" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<font fontName="SansSerif" size="10" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
 				<text><![CDATA[Pay to]]></text>
@@ -144,7 +144,7 @@
 					<topPen lineWidth="0.0"/>
 				</box>
 				<textElement textAlignment="Left" verticalAlignment="Middle" rotation="None" markup="none">
-					<font fontName="Times New Roman" size="10" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<font fontName="SansSerif" size="10" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
 				<text><![CDATA[Sum of PESOS]]></text>
@@ -193,14 +193,14 @@
 			<staticText>
 				<reportElement positionType="Float" x="0" y="0" width="200" height="20" isRemoveLineWhenBlank="true" uuid="31b7fcb4-1f5a-44f5-8157-40c4af80bbeb"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
-					<font fontName="Times New Roman" size="10" isBold="false"/>
+					<font fontName="SansSerif" size="10" isBold="false"/>
 				</textElement>
 				<text><![CDATA[Budget Line Item:]]></text>
 			</staticText>
 			<staticText>
 				<reportElement positionType="Float" x="200" y="40" width="7" height="20" isRemoveLineWhenBlank="true" uuid="8784cb24-56ba-47d9-9b06-de1b9048a61d"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
-					<font fontName="Times New Roman" size="11" isBold="false"/>
+					<font fontName="SansSerif" size="11" isBold="false"/>
 				</textElement>
 				<text><![CDATA[:]]></text>
 			</staticText>
@@ -215,7 +215,7 @@
 			<staticText>
 				<reportElement positionType="Float" x="200" y="80" width="7" height="20" isRemoveLineWhenBlank="true" uuid="68bfbe22-2985-4563-8db5-32e32f9bdfad"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
-					<font fontName="Times New Roman" size="11" isBold="false"/>
+					<font fontName="SansSerif" size="11" isBold="false"/>
 				</textElement>
 				<text><![CDATA[:]]></text>
 			</staticText>
@@ -236,21 +236,21 @@
 			<staticText>
 				<reportElement positionType="Float" x="200" y="20" width="7" height="20" isRemoveLineWhenBlank="true" uuid="3711eb0d-8632-421d-802f-ba2a3d5271e2"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
-					<font fontName="Times New Roman" size="11" isBold="false"/>
+					<font fontName="SansSerif" size="11" isBold="false"/>
 				</textElement>
 				<text><![CDATA[:]]></text>
 			</staticText>
 			<staticText>
 				<reportElement positionType="Float" x="0" y="80" width="200" height="20" isRemoveLineWhenBlank="true" uuid="36b3f5a6-0a42-40e2-a56b-6018741bbdd2"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
-					<font fontName="Times New Roman" size="10" isBold="false"/>
+					<font fontName="SansSerif" size="10" isBold="false"/>
 				</textElement>
 				<text><![CDATA[Cash Flow Balance CV]]></text>
 			</staticText>
 			<staticText>
 				<reportElement positionType="Float" x="0" y="60" width="200" height="20" isRemoveLineWhenBlank="true" uuid="abdc781c-20b5-4e07-8bc8-d25892183638"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
-					<font fontName="Times New Roman" size="10" isBold="false"/>
+					<font fontName="SansSerif" size="10" isBold="false"/>
 				</textElement>
 				<text><![CDATA[Cash Flow Balance PO/JO/RFP/CA/PCV]]></text>
 			</staticText>
@@ -264,14 +264,14 @@
 			<staticText>
 				<reportElement positionType="Float" x="200" y="60" width="7" height="20" isRemoveLineWhenBlank="true" uuid="e07370b8-7216-42ab-8ef6-1ce48a2e71f4"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
-					<font fontName="Times New Roman" size="11" isBold="false"/>
+					<font fontName="SansSerif" size="11" isBold="false"/>
 				</textElement>
 				<text><![CDATA[:]]></text>
 			</staticText>
 			<staticText>
 				<reportElement positionType="Float" x="0" y="20" width="200" height="20" isRemoveLineWhenBlank="true" uuid="308ddbf0-0086-444a-a085-57b4627fd556"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
-					<font fontName="Times New Roman" size="10" isBold="false"/>
+					<font fontName="SansSerif" size="10" isBold="false"/>
 				</textElement>
 				<text><![CDATA[Budget Balance PO/JO/RFP/CA/PCV]]></text>
 			</staticText>
@@ -279,28 +279,28 @@
 				<reportElement positionType="Float" x="0" y="120" width="170" height="15" isRemoveLineWhenBlank="true" forecolor="#990099" uuid="6fe70099-cf25-42dc-81aa-7b7c0ef69091"/>
 				<box leftPadding="0"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
-					<font fontName="Times New Roman" size="10" isBold="true"/>
+					<font fontName="SansSerif" size="10" isBold="true"/>
 				</textElement>
 				<text><![CDATA[FUNDS AVAILABLE CHARGE TO]]></text>
 			</staticText>
 			<staticText>
 				<reportElement positionType="Float" x="200" y="0" width="7" height="20" isRemoveLineWhenBlank="true" uuid="df109ee7-7820-4e13-b42f-c25136bfbdd3"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
-					<font fontName="Times New Roman" size="11" isBold="false"/>
+					<font fontName="SansSerif" size="11" isBold="false"/>
 				</textElement>
 				<text><![CDATA[:]]></text>
 			</staticText>
 			<staticText>
 				<reportElement positionType="Float" x="200" y="100" width="7" height="20" isRemoveLineWhenBlank="true" uuid="1ce0f6db-10a5-4fb9-89cc-173d3a033a36"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
-					<font fontName="Times New Roman" size="11" isBold="false"/>
+					<font fontName="SansSerif" size="11" isBold="false"/>
 				</textElement>
 				<text><![CDATA[:]]></text>
 			</staticText>
 			<staticText>
 				<reportElement positionType="Float" x="0" y="100" width="200" height="20" isRemoveLineWhenBlank="true" uuid="cd37bd45-2e28-4826-aa14-4cf755349bc2"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
-					<font fontName="Times New Roman" size="10" isBold="false"/>
+					<font fontName="SansSerif" size="10" isBold="false"/>
 				</textElement>
 				<text><![CDATA[Cash Flow Item Balance]]></text>
 			</staticText>
@@ -328,7 +328,7 @@
 			<staticText>
 				<reportElement positionType="Float" x="0" y="40" width="199" height="20" isRemoveLineWhenBlank="true" uuid="57da8f28-8bbd-4592-9948-b72c511768ce"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
-					<font fontName="Times New Roman" size="10" isBold="false"/>
+					<font fontName="SansSerif" size="10" isBold="false"/>
 				</textElement>
 				<text><![CDATA[Budget Balance CV]]></text>
 			</staticText>

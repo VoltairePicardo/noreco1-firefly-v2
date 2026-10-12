@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.21.5.final using JasperReports Library version 6.21.5-74d586df47b25dbd05bd0957999819196e59934a  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="DepreciationSummary" pageWidth="612" pageHeight="792" whenNoDataType="NoDataSection" columnWidth="572" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isFloatColumnFooter="true" uuid="b29c3ba6-1020-4625-9bd3-1937355162ed">
 	<property name="net.sf.jasperreports.export.xls.exclude.origin.keep.first.band.1" value="columnHeader"/>
 	<property name="net.sf.jasperreports.export.xls.exclude.origin.band.1" value="pageHeader"/>
@@ -16,7 +17,7 @@
 	<property name="net.sf.jasperreports.export.xls.wrap.text" value="true"/>
 	<property name="net.sf.jasperreports.export.xls.column.width.ratio" value="1.60f"/>
 	<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
-    <property name="ireport.zoom" value="1.2078825000000015"/>
+	<property name="ireport.zoom" value="1.2078825000000015"/>
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
 	<parameter name="RANGE" class="java.lang.String"/>
@@ -60,35 +61,37 @@
 		<band splitType="Stretch"/>
 	</background>
 	<title>
-		<band height="96" splitType="Stretch">
+		<band height="70" splitType="Stretch">
 			<textField isBlankWhenNull="true">
-				<reportElement x="0" y="0" width="572" height="20" uuid="ae3d854d-6819-4ef4-9f26-69fb77969167">
+				<reportElement x="0" y="0" width="572" height="16" uuid="ae3d854d-6819-4ef4-9f26-69fb77969167">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="SansSerif" size="14" isBold="true"/>
+					<font fontName="SansSerif" size="12" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{COMP_NAME}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="0" y="20" width="572" height="16" uuid="8dc03b87-ce0f-42e3-84cc-ff569c6fde86"/>
+				<reportElement x="0" y="16" width="572" height="14" uuid="8dc03b87-ce0f-42e3-84cc-ff569c6fde86">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="SansSerif" size="10"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{COMP_ADDR}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement mode="Transparent" x="0" y="36" width="572" height="24" forecolor="#000000" backcolor="#FFFFFF" uuid="e23cada8-ed1e-4dbe-935b-f8857598e300">
+				<reportElement mode="Transparent" x="0" y="30" width="572" height="20" forecolor="#000000" backcolor="#FFFFFF" uuid="e23cada8-ed1e-4dbe-935b-f8857598e300">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" markup="none">
-					<font fontName="SansSerif" size="16" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<font fontName="SansSerif" size="14" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
 				<text><![CDATA[DEPRECIATION SUMMARY]]></text>
 			</staticText>
 			<textField isBlankWhenNull="true">
-				<reportElement x="0" y="60" width="572" height="20" uuid="6647e14c-fbc4-41eb-9a30-38c5f431e298">
+				<reportElement x="0" y="50" width="572" height="16" uuid="6647e14c-fbc4-41eb-9a30-38c5f431e298">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
@@ -97,29 +100,27 @@
 				<textFieldExpression><![CDATA[$P{RANGE}]]></textFieldExpression>
 			</textField>
 			<image scaleImage="RetainShape" hAlign="Left">
-				<reportElement x="0" y="0" width="80" height="80" uuid="a572ebb6-75d3-4cc5-adf8-83c0b47be5b6">
+				<reportElement x="0" y="0" width="66" height="66" uuid="a572ebb6-75d3-4cc5-adf8-83c0b47be5b6">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<imageExpression><![CDATA[$P{LOGO_PATH}]]></imageExpression>
 			</image>
 		</band>
 	</title>
-	<pageHeader>
-		<band height="5" splitType="Stretch"/>
-	</pageHeader>
 	<columnHeader>
 		<band height="31">
 			<staticText>
 				<reportElement x="48" y="15" width="122" height="15" uuid="55d991c5-5056-4a7f-9220-d501cbed67ce"/>
 				<textElement textAlignment="Left" verticalAlignment="Bottom">
-					<font fontName="Monospaced" isBold="true"/>
+					<font fontName="SansSerif" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Description]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="0" y="15" width="48" height="15" uuid="1beae4c8-dbc3-407d-8766-98c60f7d5f38"/>
 				<textElement textAlignment="Left" verticalAlignment="Bottom">
-					<font fontName="Monospaced" isBold="true"/>
+					<font fontName="SansSerif" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Code]]></text>
 			</staticText>
@@ -129,14 +130,14 @@
 			<staticText>
 				<reportElement x="170" y="15" width="84" height="15" uuid="5d6accb6-928c-4ab0-ad0f-fe67d1337eef"/>
 				<textElement textAlignment="Right" verticalAlignment="Bottom">
-					<font fontName="Monospaced" isBold="true"/>
+					<font fontName="SansSerif" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Asset Value]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="254" y="0" width="83" height="31" uuid="6dc6ae86-117c-491a-ade7-83f31326c91f"/>
 				<textElement textAlignment="Right" verticalAlignment="Bottom">
-					<font fontName="Monospaced" isBold="true"/>
+					<font fontName="SansSerif" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Depreciation
 Amount]]></text>
@@ -144,7 +145,7 @@ Amount]]></text>
 			<staticText>
 				<reportElement mode="Transparent" x="337" y="0" width="117" height="30" forecolor="#000000" backcolor="#FFFFFF" uuid="24525cfb-c371-45f4-8e12-eb7f60d63750"/>
 				<textElement textAlignment="Left" verticalAlignment="Bottom" rotation="None" markup="none">
-					<font fontName="Monospaced" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<font fontName="SansSerif" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
 				<text><![CDATA[Expense Account]]></text>
@@ -152,7 +153,7 @@ Amount]]></text>
 			<staticText>
 				<reportElement mode="Transparent" x="454" y="0" width="117" height="30" forecolor="#000000" backcolor="#FFFFFF" uuid="b0e38c86-b551-4da6-ba62-deed3f6f06af"/>
 				<textElement textAlignment="Left" verticalAlignment="Bottom" rotation="None" markup="none">
-					<font fontName="Monospaced" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<font fontName="SansSerif" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
 				<text><![CDATA[Accumulated
@@ -165,42 +166,42 @@ Depr Account]]></text>
 			<textField>
 				<reportElement x="0" y="0" width="48" height="11" uuid="4a0578fb-0f9d-4bbd-ba6d-b1c08b4192fc"/>
 				<textElement>
-					<font size="8"/>
+					<font fontName="SansSerif" size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{code}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement x="48" y="0" width="122" height="11" isPrintWhenDetailOverflows="true" uuid="6d6ccdd4-e26a-4953-b19c-633825a32ff8"/>
 				<textElement>
-					<font size="8"/>
+					<font fontName="SansSerif" size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{description}]]></textFieldExpression>
 			</textField>
 			<textField pattern="#,##0.00" isBlankWhenNull="true">
 				<reportElement x="170" y="0" width="84" height="11" uuid="2b4dce1b-44f3-48b4-a214-775f09dd3ffe"/>
 				<textElement textAlignment="Right">
-					<font size="8"/>
+					<font fontName="SansSerif" size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{value}]]></textFieldExpression>
 			</textField>
 			<textField pattern="#,##0.00" isBlankWhenNull="true">
 				<reportElement x="254" y="0" width="83" height="11" uuid="da936167-d706-4539-8762-39851644d653"/>
 				<textElement textAlignment="Right">
-					<font size="8"/>
+					<font fontName="SansSerif" size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{depreciationAmount}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement x="454" y="0" width="117" height="11" isPrintWhenDetailOverflows="true" uuid="a3d69d89-5dde-46ba-ba24-cfd267b3d9b6"/>
 				<textElement>
-					<font size="8"/>
+					<font fontName="SansSerif" size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{accumDepAccount}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement x="337" y="0" width="117" height="11" isPrintWhenDetailOverflows="true" uuid="64db6687-bfdd-43fa-98d0-0cf732be33e5"/>
 				<textElement>
-					<font size="8"/>
+					<font fontName="SansSerif" size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{expenseAccount}]]></textFieldExpression>
 			</textField>
@@ -240,7 +241,7 @@ Depr Account]]></text>
 		</band>
 	</lastPageFooter>
 	<summary>
-		<band height="134">
+		<band height="112">
 			<staticText>
 				<reportElement positionType="Float" x="394" y="48" width="122" height="20" isRemoveLineWhenBlank="true" uuid="16b9a0a4-5133-4412-a7a8-1eaeac76638f"/>
 				<textElement textAlignment="Left">

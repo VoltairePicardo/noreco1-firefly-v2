@@ -52,25 +52,25 @@
 			<textField>
 				<reportElement x="0" y="0" width="572" height="20" uuid="fa2af9e9-2969-4be0-a910-c31380712ce3"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="12" isBold="false"/>
+					<font fontName="SansSerif" size="12" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{COMP_NAME}]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="0" y="19" width="572" height="15" uuid="f152ec1b-5410-4cad-91c0-0254fbae313c"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="10" isBold="false"/>
+					<font fontName="SansSerif" size="10" isBold="false"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{COMP_ADDR}]]></textFieldExpression>
 			</textField>
 			<image isLazy="true" onErrorType="Icon">
-				<reportElement x="32" y="0" width="60" height="52" uuid="78298b21-ab4c-431f-902c-7f2c8e651596"/>
+				<reportElement x="0" y="0" width="58" height="58" uuid="78298b21-ab4c-431f-902c-7f2c8e651596"/>
 				<imageExpression><![CDATA[$P{LOGO_PATH}]]></imageExpression>
 			</image>
 			<textField>
 				<reportElement x="0" y="45" width="572" height="20" uuid="e8daaeff-7d4a-457f-bbd2-fb9c3fff47a8"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="10" isBold="true"/>
+					<font fontName="SansSerif" size="11" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{TITLE}]]></textFieldExpression>
 			</textField>
@@ -938,7 +938,7 @@
 				<staticText>
 					<reportElement positionType="Float" x="0" y="0" width="180" height="14" uuid="9b837da8-61a7-42ee-991b-a431cd8f252b"/>
 					<textElement verticalAlignment="Middle">
-						<font fontName="Calibri" size="9"/>
+						<font fontName="SansSerif" size="9"/>
 					</textElement>
 					<text><![CDATA[Tested by:]]></text>
 				</staticText>
@@ -948,21 +948,21 @@
 						<bottomPen lineWidth="0.75"/>
 					</box>
 					<textElement textAlignment="Center" verticalAlignment="Bottom">
-						<font fontName="Calibri" size="10" isBold="true"/>
+						<font fontName="SansSerif" size="10" isBold="true"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$P{TESTED_BY}]]></textFieldExpression>
 				</textField>
 				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 					<reportElement positionType="Float" x="0" y="44" width="180" height="14" uuid="3302de69-2f49-4919-b576-083a3b67ed4e"/>
 					<textElement textAlignment="Center" verticalAlignment="Top">
-						<font fontName="Calibri" size="9"/>
+						<font fontName="SansSerif" size="9"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$P{TESTED_BY_POS}]]></textFieldExpression>
 				</textField>
 				<staticText>
 					<reportElement positionType="Float" x="196" y="0" width="180" height="14" uuid="868f5e35-303f-4367-8aaa-53cf0fbc3691"/>
 					<textElement verticalAlignment="Middle">
-						<font fontName="Calibri" size="9"/>
+						<font fontName="SansSerif" size="9"/>
 					</textElement>
 					<text><![CDATA[Recommending Approval:]]></text>
 				</staticText>
@@ -972,21 +972,21 @@
 						<bottomPen lineWidth="0.75"/>
 					</box>
 					<textElement textAlignment="Center" verticalAlignment="Bottom">
-						<font fontName="Calibri" size="10" isBold="true"/>
+						<font fontName="SansSerif" size="10" isBold="true"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$P{RECOMMENDING_APPROVAL}]]></textFieldExpression>
 				</textField>
 				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 					<reportElement positionType="Float" x="196" y="44" width="180" height="14" uuid="34e2a92c-960b-4677-9860-942b9d4c7864"/>
 					<textElement textAlignment="Center" verticalAlignment="Top">
-						<font fontName="Calibri" size="9"/>
+						<font fontName="SansSerif" size="9"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$P{RECOMMENDING_APPROVAL_POS}]]></textFieldExpression>
 				</textField>
 				<staticText>
 					<reportElement positionType="Float" x="392" y="0" width="180" height="14" uuid="9731dfbd-e166-44d3-a19f-b08246adc6c9"/>
 					<textElement verticalAlignment="Middle">
-						<font fontName="Calibri" size="9"/>
+						<font fontName="SansSerif" size="9"/>
 					</textElement>
 					<text><![CDATA[Approved by:]]></text>
 				</staticText>
@@ -996,14 +996,14 @@
 						<bottomPen lineWidth="0.75"/>
 					</box>
 					<textElement textAlignment="Center" verticalAlignment="Bottom">
-						<font fontName="Calibri" size="10" isBold="true"/>
+						<font fontName="SansSerif" size="10" isBold="true"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$P{APPROVED_BY}]]></textFieldExpression>
 				</textField>
 				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 					<reportElement positionType="Float" x="392" y="44" width="180" height="14" uuid="9f8f911c-d9f1-45f4-b1cb-92181b955b86"/>
 					<textElement textAlignment="Center" verticalAlignment="Top">
-						<font fontName="Calibri" size="9"/>
+						<font fontName="SansSerif" size="9"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$P{APPROVED_BY_POS}]]></textFieldExpression>
 				</textField>

@@ -49,7 +49,7 @@
 			<textField isBlankWhenNull="true">
 				<reportElement x="1" y="19" width="570" height="14" uuid="ea76a653-b5ae-445a-a088-0deedaaa1630"/>
 				<textElement textAlignment="Center">
-					<font fontName="Calibri Light" size="10"/>
+					<font fontName="SansSerif" size="10"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{COMP_ADDR}]]></textFieldExpression>
 			</textField>
@@ -64,7 +64,7 @@
 			<staticText>
 				<reportElement mode="Transparent" x="0" y="90" width="571" height="24" forecolor="#000000" backcolor="#FFFFFF" uuid="336be2f6-fdcb-4f68-92bb-ed7bfbed9d96"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" markup="none">
-					<font fontName="SansSerif" size="15" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<font fontName="SansSerif" size="11" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
 				<text><![CDATA[RETURN MEMORANDUM RECEIPT FOR TOOLS & EQUIPMENT]]></text>
@@ -93,7 +93,7 @@
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 				<reportElement x="1" y="3" width="570" height="16" isPrintWhenDetailOverflows="true" uuid="775916d1-2967-4550-b497-da68791059ce"/>
 				<textElement textAlignment="Center" markup="html">
-					<font fontName="Calibri" size="12" isBold="true"/>
+					<font fontName="SansSerif" size="12" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{COMP_NAME}]]></textFieldExpression>
 			</textField>
@@ -106,7 +106,7 @@
 				<text><![CDATA[Code:]]></text>
 			</staticText>
 			<image isLazy="true" onErrorType="Icon">
-				<reportElement x="47" y="3" width="80" height="70" uuid="b0d782df-bc2e-4cd6-abf2-d7614a2cf072"/>
+				<reportElement x="0" y="0" width="58" height="58" uuid="b0d782df-bc2e-4cd6-abf2-d7614a2cf072"/>
 				<imageExpression><![CDATA[$P{LOGO_PATH}]]></imageExpression>
 			</image>
 			<staticText>
@@ -195,7 +195,7 @@
 					<rightPen lineWidth="0.0"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="Times New Roman" size="9"/>
+					<font fontName="SansSerif" size="9"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$V{UNIT}]]></textFieldExpression>
 			</textField>
@@ -207,7 +207,7 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="Times New Roman" size="9"/>
+					<font fontName="SansSerif" size="9"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{stockWithdrawalDetail.item.description}]]></textFieldExpression>
 			</textField>
@@ -219,7 +219,7 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="Times New Roman" size="9"/>
+					<font fontName="SansSerif" size="9"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{usable} ? "YES" : "NO"]]></textFieldExpression>
 			</textField>
@@ -233,7 +233,7 @@
 					<topPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Top">
-					<font fontName="Times New Roman" size="12" isBold="true"/>
+					<font fontName="SansSerif" size="12" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{EMPLOYEE}]]></textFieldExpression>
 			</textField>

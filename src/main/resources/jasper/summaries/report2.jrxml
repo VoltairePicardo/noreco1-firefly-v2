@@ -65,7 +65,7 @@
 			<textField isBlankWhenNull="true">
 				<reportElement mode="Transparent" x="0" y="0" width="572" height="20" forecolor="#000000" backcolor="#FFFFFF" uuid="fb4e3f72-0ccb-4f1a-b3e6-10050e2e09a9"/>
 				<textElement textAlignment="Left" verticalAlignment="Top" rotation="None" markup="none">
-					<font fontName="Calibri Light" size="11" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<font fontName="SansSerif" size="11" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{code} + "Oh yeah!!!" + System.getProperty("user.dir")]]></textFieldExpression>

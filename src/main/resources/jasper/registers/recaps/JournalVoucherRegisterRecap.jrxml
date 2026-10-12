@@ -77,14 +77,14 @@
 					<rightPen lineStyle="Double"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="Arial" size="10" isBold="true"/>
+					<font fontName="SansSerif" size="10" isBold="true"/>
 				</textElement>
 				<text><![CDATA[General Ledger]]></text>
 			</staticText>
 			<textField>
 				<reportElement x="0" y="35" width="860" height="20" uuid="9a0dcdff-8ead-4b09-aa7f-be2db5dab8f9"/>
 				<textElement verticalAlignment="Middle">
-					<font fontName="Arial" size="10"/>
+					<font fontName="SansSerif" size="10"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{RANGE}]]></textFieldExpression>
 			</textField>
@@ -94,14 +94,14 @@
 					<bottomPen lineWidth="0.75"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="Arial" size="10" isBold="true"/>
+					<font fontName="SansSerif" size="10" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Subsidiary Ledger]]></text>
 			</staticText>
 			<staticText>
 				<reportElement mode="Transparent" x="0" y="15" width="860" height="20" forecolor="#000000" backcolor="#FFFFFF" uuid="378d2f2a-1208-4489-80f8-9b45f21f3161"/>
 				<textElement textAlignment="Left" verticalAlignment="Top" rotation="None" markup="none">
-					<font fontName="Calibri" size="14" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<font fontName="SansSerif" size="14" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
 				<text><![CDATA[ Journal Voucher Recap Entries]]></text>
@@ -109,7 +109,7 @@
 			<staticText>
 				<reportElement mode="Transparent" x="0" y="0" width="860" height="15" forecolor="#000000" backcolor="#FFFFFF" uuid="dcae6362-29b4-440d-8c02-f52fe87ead84"/>
 				<textElement textAlignment="Left" verticalAlignment="Top" rotation="None" markup="none">
-					<font fontName="Calibri" size="14" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<font fontName="SansSerif" size="14" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
 				<text><![CDATA[]]></text>
@@ -121,56 +121,56 @@
 			<staticText>
 				<reportElement x="0" y="0" width="198" height="20" uuid="91b96dc6-2106-412e-bbc2-cbae0ca0d0bf"/>
 				<textElement verticalAlignment="Middle">
-					<font fontName="Arial" size="8" isBold="true"/>
+					<font fontName="SansSerif" size="8" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Account Title]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="198" y="0" width="96" height="20" uuid="91b96dc6-2106-412e-bbc2-cbae0ca0d0bf"/>
 				<textElement verticalAlignment="Middle">
-					<font fontName="Arial" size="8" isBold="true"/>
+					<font fontName="SansSerif" size="8" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Account Code]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="294" y="0" width="90" height="20" uuid="91b96dc6-2106-412e-bbc2-cbae0ca0d0bf"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font fontName="Arial" size="8" isBold="true"/>
+					<font fontName="SansSerif" size="8" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Debit]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="384" y="0" width="90" height="20" uuid="91b96dc6-2106-412e-bbc2-cbae0ca0d0bf"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font fontName="Arial" size="8" isBold="true"/>
+					<font fontName="SansSerif" size="8" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Credit]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="778" y="0" width="82" height="20" uuid="91b96dc6-2106-412e-bbc2-cbae0ca0d0bf"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font fontName="Arial" size="8" isBold="true"/>
+					<font fontName="SansSerif" size="8" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Credit]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="696" y="0" width="82" height="20" uuid="91b96dc6-2106-412e-bbc2-cbae0ca0d0bf"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font fontName="Arial" size="8" isBold="true"/>
+					<font fontName="SansSerif" size="8" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Debit]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="619" y="0" width="77" height="20" uuid="91b96dc6-2106-412e-bbc2-cbae0ca0d0bf"/>
 				<textElement verticalAlignment="Middle">
-					<font fontName="Arial" size="8" isBold="true"/>
+					<font fontName="SansSerif" size="8" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Account Code]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="480" y="0" width="139" height="20" uuid="91b96dc6-2106-412e-bbc2-cbae0ca0d0bf"/>
 				<textElement verticalAlignment="Middle">
-					<font fontName="Arial" size="8" isBold="true"/>
+					<font fontName="SansSerif" size="8" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Account Title]]></text>
 			</staticText>
@@ -181,14 +181,14 @@
 			<textField isStretchWithOverflow="true" pattern=" #,##0.00" isBlankWhenNull="true">
 				<reportElement x="778" y="0" width="82" height="12" uuid="c7054397-9e39-4305-8d4b-dc0c3706f257"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font fontName="Arial" size="8" isBold="false"/>
+					<font fontName="SansSerif" size="8" isBold="false"/>
 				</textElement>
 				<textFieldExpression><![CDATA[($F{slCredit}.compareTo(new java.math.BigDecimal(0)) ==0 ? null:$F{slCredit})]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" pattern=" #,##0.00" isBlankWhenNull="true">
 				<reportElement x="696" y="0" width="82" height="12" uuid="f1102ced-e4ca-43d9-be19-327e4addd63f"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font fontName="Arial" size="8" isBold="false"/>
+					<font fontName="SansSerif" size="8" isBold="false"/>
 				</textElement>
 				<textFieldExpression><![CDATA[($F{slDebit}.compareTo(new java.math.BigDecimal(0)) ==0 ? null:$F{slDebit})]]></textFieldExpression>
 			</textField>
@@ -196,21 +196,21 @@
 				<reportElement x="0" y="0" width="198" height="12" uuid="d434d724-954e-4c6b-a17a-89e72039366b"/>
 				<box leftPadding="5"/>
 				<textElement verticalAlignment="Middle">
-					<font fontName="Arial" size="8" isBold="true" isItalic="false"/>
+					<font fontName="SansSerif" size="8" isBold="true" isItalic="false"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{glAccountTitle}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" pattern=" #,##0.00" isBlankWhenNull="true">
 				<reportElement x="294" y="0" width="90" height="12" uuid="f1102ced-e4ca-43d9-be19-327e4addd63f"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font fontName="Arial" size="8" isBold="false"/>
+					<font fontName="SansSerif" size="8" isBold="false"/>
 				</textElement>
 				<textFieldExpression><![CDATA[($F{glDebit}.compareTo(new java.math.BigDecimal(0)) ==0 ? null:$F{glDebit})]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" pattern=" #,##0.00" isBlankWhenNull="true">
 				<reportElement x="384" y="0" width="90" height="12" uuid="c7054397-9e39-4305-8d4b-dc0c3706f257"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font fontName="Arial" size="8" isBold="false"/>
+					<font fontName="SansSerif" size="8" isBold="false"/>
 				</textElement>
 				<textFieldExpression><![CDATA[($F{glCredit}.compareTo(new java.math.BigDecimal(0)) ==0 ? null:$F{glCredit})]]></textFieldExpression>
 			</textField>
@@ -218,7 +218,7 @@
 				<reportElement x="198" y="0" width="96" height="12" uuid="d434d724-954e-4c6b-a17a-89e72039366b"/>
 				<box leftPadding="5"/>
 				<textElement verticalAlignment="Middle">
-					<font fontName="Arial" size="8" isBold="true" isItalic="false"/>
+					<font fontName="SansSerif" size="8" isBold="true" isItalic="false"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{glAccountCode}]]></textFieldExpression>
 			</textField>
@@ -226,7 +226,7 @@
 				<reportElement x="619" y="0" width="77" height="12" uuid="06f54e51-e8f4-4911-8ff3-0f82175d32f9"/>
 				<box leftPadding="5"/>
 				<textElement verticalAlignment="Middle">
-					<font fontName="Arial" size="8" isBold="true" isItalic="false"/>
+					<font fontName="SansSerif" size="8" isBold="true" isItalic="false"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{slAccountCode}]]></textFieldExpression>
 			</textField>
@@ -234,7 +234,7 @@
 				<reportElement x="480" y="0" width="139" height="12" uuid="06f54e51-e8f4-4911-8ff3-0f82175d32f9"/>
 				<box leftPadding="15"/>
 				<textElement verticalAlignment="Middle">
-					<font fontName="Arial" size="8" isBold="true" isItalic="false"/>
+					<font fontName="SansSerif" size="8" isBold="true" isItalic="false"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{slAccountTitle}]]></textFieldExpression>
 			</textField>
@@ -281,14 +281,14 @@
 			<textField isStretchWithOverflow="true" pattern="#,##0.00;(#,##0.00)" isBlankWhenNull="true">
 				<reportElement x="778" y="2" width="82" height="17" uuid="da76c9c9-434b-4f5a-994c-b8ad00fec739"/>
 				<textElement textAlignment="Right" verticalAlignment="Bottom">
-					<font fontName="Arial" size="10" isBold="true"/>
+					<font fontName="SansSerif" size="10" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$V{slCredit_Sum}]]></textFieldExpression>
 			</textField>
 			<textField pattern="#,##0.00;(#,##0.00)" isBlankWhenNull="true">
 				<reportElement mode="Transparent" x="619" y="2" width="159" height="17" forecolor="#000000" backcolor="#FFFFFF" uuid="7b0d9307-f9de-4991-b84c-7d0acc816fd9"/>
 				<textElement textAlignment="Right" verticalAlignment="Bottom" rotation="None" markup="none">
-					<font fontName="Arial" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<font fontName="SansSerif" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$V{slDebit_Sum}]]></textFieldExpression>
@@ -296,7 +296,7 @@
 			<textField pattern="#,##0.00;(#,##0.00)" isBlankWhenNull="true">
 				<reportElement mode="Transparent" x="384" y="0" width="90" height="19" forecolor="#000000" backcolor="#FFFFFF" uuid="f9036849-01b6-4346-bc4a-4417bb6bdf24"/>
 				<textElement textAlignment="Right" verticalAlignment="Bottom" rotation="None" markup="none">
-					<font fontName="Arial" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<font fontName="SansSerif" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$V{glCredit_Sum}]]></textFieldExpression>
@@ -304,7 +304,7 @@
 			<textField pattern="#,##0.00;(#,##0.00)" isBlankWhenNull="true">
 				<reportElement mode="Transparent" x="198" y="1" width="186" height="18" forecolor="#000000" backcolor="#FFFFFF" uuid="ef346614-fdc2-4126-850e-aa553f1bef86"/>
 				<textElement textAlignment="Right" verticalAlignment="Bottom" rotation="None" markup="none">
-					<font fontName="Arial" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<font fontName="SansSerif" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$V{glDebit_Sum}]]></textFieldExpression>

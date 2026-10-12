@@ -51,7 +51,7 @@
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="SansSerif" size="14" isBold="true"/>
+					<font fontName="SansSerif" size="12" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{COMP_NAME}]]></textFieldExpression>
 			</textField>
@@ -67,7 +67,7 @@
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" markup="none">
-					<font fontName="SansSerif" size="16" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<font fontName="SansSerif" size="11" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
 				<text><![CDATA[List of Pending Vouchers]]></text>
@@ -82,7 +82,7 @@
 				<textFieldExpression><![CDATA[$P{SUBTITLE}]]></textFieldExpression>
 			</textField>
 			<image scaleImage="RetainShape" hAlign="Left">
-				<reportElement x="0" y="0" width="80" height="80" uuid="a572ebb6-75d3-4cc5-adf8-83c0b47be5b6">
+				<reportElement x="0" y="0" width="58" height="58" uuid="a572ebb6-75d3-4cc5-adf8-83c0b47be5b6">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<imageExpression><![CDATA[$P{LOGO_PATH}]]></imageExpression>

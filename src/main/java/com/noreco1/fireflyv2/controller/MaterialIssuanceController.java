@@ -58,6 +58,16 @@ public class MaterialIssuanceController {
         return mirService.findByDateRangeAndStatusId(from, to, status);
     }
 
+    @GetMapping("/list/{from}/{to}/type/{docType}")
+    public List<?> listByDateAndDocType(@PathVariable String from, @PathVariable String to, @PathVariable String docType) {
+        return mirService.findByDateRangeAndDocType(from, to, docType);
+    }
+
+    @GetMapping("/list/{from}/{to}/{status}/type/{docType}")
+    public List<?> listByDateStatusAndDocType(@PathVariable String from, @PathVariable String to, @PathVariable Integer status, @PathVariable String docType) {
+        return mirService.findByDateRangeAndStatusIdAndDocType(from, to, status, docType);
+    }
+
     @GetMapping("/{id}")
     public Object getById(@PathVariable Integer id) {
         return mirService.findById(id);
@@ -81,6 +91,12 @@ public class MaterialIssuanceController {
             mirService.logNewValue(response.getLogId());
         }
         return response;
+    }
+
+    @PostMapping("/update-entries")
+    public PostResponse updateEntries(@RequestBody MaterialIssueRegister mir) {
+        BindingResult bindingResult = new BeanPropertyBindingResult(mir, "materialIssueRegister");
+        return mirService.updateEntries(mir, bindingResult, messageSource);
     }
 
     @PostMapping("/process")

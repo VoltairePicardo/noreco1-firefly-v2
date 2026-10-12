@@ -50,7 +50,7 @@
 					<bottomPen lineWidth="1.0"/>
 				</box>
 				<textElement verticalAlignment="Middle">
-					<font fontName="Times New Roman" size="10" isBold="false"/>
+					<font fontName="SansSerif" size="10" isBold="false"/>
 				</textElement>
 				<text><![CDATA[Requisitioner:]]></text>
 			</staticText>
@@ -72,7 +72,7 @@
 			<textField pattern="" isBlankWhenNull="false">
 				<reportElement uuid="96c9cb90-d4f3-4c3b-ae42-634871d1178d" mode="Transparent" x="4" y="119" width="295" height="15" forecolor="#000000" backcolor="#FFFFFF"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle" rotation="None" markup="none">
-					<font fontName="Times New Roman" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<font fontName="SansSerif" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{POSITION}]]></textFieldExpression>
@@ -88,7 +88,7 @@
 			<textField pattern="" isBlankWhenNull="false">
 				<reportElement uuid="0c80067d-83e0-4e5d-ae03-63b40ccb5676" mode="Transparent" x="3" y="197" width="295" height="15" forecolor="#000000" backcolor="#FFFFFF"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle" rotation="None" markup="none">
-					<font fontName="Times New Roman" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<font fontName="SansSerif" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{APPROVEDBY_POS}]]></textFieldExpression>
@@ -99,7 +99,7 @@
 					<topPen lineWidth="1.0"/>
 				</box>
 				<textElement verticalAlignment="Middle">
-					<font fontName="Times New Roman" size="10" isBold="false"/>
+					<font fontName="SansSerif" size="10" isBold="false"/>
 				</textElement>
 				<text><![CDATA[Approved By:]]></text>
 			</staticText>
@@ -116,42 +116,42 @@
 			<staticText>
 				<reportElement uuid="daebf440-8238-4211-b7f0-52dd18c1f47e" positionType="Float" x="23" y="244" width="126" height="15" isRemoveLineWhenBlank="true"/>
 				<textElement>
-					<font fontName="Times New Roman" size="10" isBold="false"/>
+					<font fontName="SansSerif" size="10" isBold="false"/>
 				</textElement>
 				<text><![CDATA[Open Canvass/Shopping]]></text>
 			</staticText>
 			<staticText>
 				<reportElement uuid="d267cfe8-5bd5-43d4-8393-40e0b80d293a" positionType="Float" x="23" y="261" width="109" height="15" isRemoveLineWhenBlank="true"/>
 				<textElement>
-					<font fontName="Times New Roman" size="10" isBold="false"/>
+					<font fontName="SansSerif" size="10" isBold="false"/>
 				</textElement>
 				<text><![CDATA[Emergency Purchase]]></text>
 			</staticText>
 			<staticText>
 				<reportElement uuid="000c782a-bda7-42cc-acb4-0bc4354d0748" positionType="Float" x="23" y="278" width="109" height="15" isRemoveLineWhenBlank="true"/>
 				<textElement>
-					<font fontName="Times New Roman" size="10" isBold="false"/>
+					<font fontName="SansSerif" size="10" isBold="false"/>
 				</textElement>
 				<text><![CDATA[Repeat Order]]></text>
 			</staticText>
 			<staticText>
 				<reportElement uuid="8b0c4017-fa09-4ff7-b9d7-aa722499c888" positionType="Float" x="171" y="244" width="109" height="15" isRemoveLineWhenBlank="true"/>
 				<textElement>
-					<font fontName="Times New Roman" size="10" isBold="false"/>
+					<font fontName="SansSerif" size="10" isBold="false"/>
 				</textElement>
 				<text><![CDATA[Revolving Fund]]></text>
 			</staticText>
 			<staticText>
 				<reportElement uuid="39b15611-e563-4cf9-b4c9-6dd756394367" positionType="Float" x="171" y="261" width="109" height="15" isRemoveLineWhenBlank="true"/>
 				<textElement>
-					<font fontName="Times New Roman" size="10" isBold="false"/>
+					<font fontName="SansSerif" size="10" isBold="false"/>
 				</textElement>
 				<text><![CDATA[Simplified Bidding]]></text>
 			</staticText>
 			<staticText>
 				<reportElement uuid="5985b859-c30f-4f5f-a0ad-b1a066ce69a4" positionType="Float" x="3" y="313" width="111" height="15" isRemoveLineWhenBlank="true"/>
 				<textElement verticalAlignment="Middle">
-					<font fontName="Times New Roman" size="10" isBold="false"/>
+					<font fontName="SansSerif" size="10" isBold="false"/>
 				</textElement>
 				<text><![CDATA[BAC Representative:]]></text>
 			</staticText>
@@ -161,7 +161,7 @@
 					<bottomPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Bottom" rotation="None" markup="none">
-					<font fontName="Times New Roman" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<font fontName="SansSerif" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{BAC_REPRESENTATIVE}]]></textFieldExpression>
@@ -169,7 +169,7 @@
 			<staticText>
 				<reportElement uuid="32298bc5-6b57-46e4-8a72-d324df93aa0c" positionType="Float" x="229" y="313" width="29" height="15" isRemoveLineWhenBlank="true"/>
 				<textElement verticalAlignment="Middle">
-					<font fontName="Times New Roman" size="10" isBold="false"/>
+					<font fontName="SansSerif" size="10" isBold="false"/>
 				</textElement>
 				<text><![CDATA[Date:]]></text>
 			</staticText>
@@ -179,7 +179,7 @@
 					<bottomPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" markup="none">
-					<font fontName="Times New Roman" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<font fontName="SansSerif" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{BAC_DATE}]]></textFieldExpression>
@@ -190,7 +190,7 @@
 					<bottomPen lineWidth="1.0"/>
 				</box>
 				<textElement verticalAlignment="Middle">
-					<font fontName="Times New Roman" size="10" isBold="false"/>
+					<font fontName="SansSerif" size="10" isBold="false"/>
 				</textElement>
 				<text><![CDATA[Budget Provision:]]></text>
 			</staticText>
@@ -200,14 +200,14 @@
 					<topPen lineWidth="1.0"/>
 				</box>
 				<textElement verticalAlignment="Middle">
-					<font fontName="Times New Roman" size="10" isBold="false"/>
+					<font fontName="SansSerif" size="10" isBold="false"/>
 				</textElement>
 				<text><![CDATA[Budget Officer:]]></text>
 			</staticText>
 			<textField pattern="" isBlankWhenNull="false">
 				<reportElement uuid="73cd5490-6116-468a-a1f1-da4951fe3162" mode="Transparent" x="310" y="313" width="259" height="15" forecolor="#000000" backcolor="#FFFFFF"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" markup="none">
-					<font fontName="Times New Roman" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<font fontName="SansSerif" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{BUDGET_OFFICER}]]></textFieldExpression>
@@ -304,7 +304,7 @@
 			<staticText>
 				<reportElement uuid="cd873b19-409c-4fc8-bb31-0cc4093a2d22" positionType="Float" x="171" y="278" width="109" height="15" isRemoveLineWhenBlank="true"/>
 				<textElement>
-					<font fontName="Times New Roman" size="10" isBold="false"/>
+					<font fontName="SansSerif" size="10" isBold="false"/>
 				</textElement>
 				<text><![CDATA[Bidding]]></text>
 			</staticText>

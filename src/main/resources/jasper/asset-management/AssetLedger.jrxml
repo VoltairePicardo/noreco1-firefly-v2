@@ -47,7 +47,7 @@
 			<textField>
 				<reportElement mode="Transparent" x="0" y="44" width="902" height="33" forecolor="#000000" backcolor="#FFFFFF" uuid="7904d661-4044-452a-af33-e8283e40480e"/>
 				<textElement textAlignment="Center" verticalAlignment="Top" rotation="None" markup="none">
-					<font fontName="Calibri" size="16" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<font fontName="SansSerif" size="11" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{TITLE}]]></textFieldExpression>
@@ -55,32 +55,32 @@
 			<textField isBlankWhenNull="true">
 				<reportElement x="0" y="0" width="902" height="24" uuid="920120c3-a867-41ee-ba7a-7c9c23e67e42"/>
 				<textElement textAlignment="Center">
-					<font fontName="Calibri" size="12" isBold="true"/>
+					<font fontName="SansSerif" size="12" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{COMP_NAME}]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="0" y="101" width="902" height="24" uuid="05047fe9-fbde-4a46-8d0e-e11671f70151"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="Calibri" size="12" isBold="true"/>
+					<font fontName="SansSerif" size="12" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{TYPE}]]></textFieldExpression>
 			</textField>
 			<image isLazy="true" onErrorType="Icon">
-				<reportElement x="150" y="24" width="80" height="72" uuid="14158898-1d4c-40ee-80b0-ef94a2fb09cd"/>
+				<reportElement x="0" y="0" width="58" height="58" uuid="14158898-1d4c-40ee-80b0-ef94a2fb09cd"/>
 				<imageExpression><![CDATA[$P{LOGO_PATH}]]></imageExpression>
 			</image>
 			<textField>
 				<reportElement x="0" y="77" width="902" height="24" uuid="5486af4d-c733-4775-a457-416803132800"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="Calibri" size="12" isBold="true"/>
+					<font fontName="SansSerif" size="12" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{DATE_RANGE}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
 				<reportElement x="0" y="24" width="902" height="20" uuid="58e5946d-4846-405f-82e0-869a73d24df8"/>
 				<textElement textAlignment="Center">
-					<font fontName="Calibri Light" size="10"/>
+					<font fontName="SansSerif" size="10"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{COMP_ADDR}]]></textFieldExpression>
 			</textField>

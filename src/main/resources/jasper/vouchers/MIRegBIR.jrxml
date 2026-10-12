@@ -245,7 +245,7 @@
 			<textField>
 				<reportElement mode="Transparent" x="0" y="0" width="968" height="20" forecolor="#000000" backcolor="#FFFFFF" uuid="0b025c6c-dc74-47d2-8058-0e626bd9a769"/>
 				<textElement textAlignment="Center" verticalAlignment="Top" rotation="None" markup="none">
-					<font fontName="Tahoma" size="14" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<font fontName="SansSerif" size="14" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{ORG_NAME}]]></textFieldExpression>
@@ -253,7 +253,7 @@
 			<textField>
 				<reportElement mode="Transparent" x="0" y="20" width="968" height="20" forecolor="#000000" backcolor="#FFFFFF" uuid="dffe473f-93fd-4c50-851a-e3d999e047e9"/>
 				<textElement textAlignment="Center" verticalAlignment="Top" rotation="None" markup="none">
-					<font fontName="Tahoma" size="14" isBold="false" isItalic="true" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<font fontName="SansSerif" size="14" isBold="false" isItalic="true" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{ORG_ADDR}]]></textFieldExpression>
@@ -261,7 +261,7 @@
 			<textField>
 				<reportElement mode="Transparent" x="0" y="40" width="968" height="20" forecolor="#000000" backcolor="#FFFFFF" uuid="c92af7d4-c988-418d-8561-62aea974bf22"/>
 				<textElement textAlignment="Center" verticalAlignment="Top" rotation="None" markup="none">
-					<font fontName="Tahoma" size="14" isBold="false" isItalic="true" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<font fontName="SansSerif" size="14" isBold="false" isItalic="true" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{ORG_SITE}]]></textFieldExpression>
@@ -269,7 +269,7 @@
 			<textField>
 				<reportElement mode="Transparent" x="0" y="60" width="968" height="20" forecolor="#000000" backcolor="#FFFFFF" uuid="22362ab7-0244-4a5b-847c-01080b41465f"/>
 				<textElement textAlignment="Center" verticalAlignment="Top" rotation="None" markup="none">
-					<font fontName="Tahoma" size="10" isBold="false" isItalic="true" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<font fontName="SansSerif" size="10" isBold="false" isItalic="true" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{ORG_CONTACT}]]></textFieldExpression>
@@ -277,7 +277,7 @@
 			<staticText>
 				<reportElement mode="Transparent" x="0" y="80" width="968" height="20" forecolor="#000000" backcolor="#FFFFFF" uuid="d186d46c-a59d-4933-8fcc-1f4a889f8958"/>
 				<textElement textAlignment="Center" verticalAlignment="Top" rotation="None" markup="none">
-					<font fontName="Tahoma" size="14" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<font fontName="SansSerif" size="14" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
 				<text><![CDATA[Material Issue Register]]></text>
@@ -297,7 +297,7 @@
 			<textField>
 				<reportElement mode="Transparent" x="0" y="100" width="968" height="14" forecolor="#000000" backcolor="#FFFFFF" uuid="077fa9f1-2e03-4178-bee2-b18a1fb7e49e"/>
 				<textElement textAlignment="Center" verticalAlignment="Top" rotation="None" markup="none">
-					<font fontName="Tahoma" size="10" isBold="false" isItalic="true" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<font fontName="SansSerif" size="10" isBold="false" isItalic="true" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{recap}]]></textFieldExpression>

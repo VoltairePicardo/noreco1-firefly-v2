@@ -52,13 +52,13 @@
 	<title>
 		<band height="118" splitType="Stretch">
 			<image isLazy="true" onErrorType="Icon">
-				<reportElement uuid="a572ebb6-75d3-4cc5-adf8-83c0b47be5b6" x="113" y="3" width="60" height="52"/>
+				<reportElement uuid="a572ebb6-75d3-4cc5-adf8-83c0b47be5b6" x="0" y="0" width="58" height="58"/>
 				<imageExpression><![CDATA[$P{LOGO_PATH}]]></imageExpression>
 			</image>
 			<staticText>
 				<reportElement uuid="596ab2ed-60d4-4509-91f9-086bb1b65c9c" mode="Transparent" x="0" y="43" width="762" height="20" forecolor="#000000" backcolor="#FFFFFF"/>
 				<textElement textAlignment="Center" verticalAlignment="Top" rotation="None" markup="none">
-					<font fontName="Calibri" size="16" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<font fontName="SansSerif" size="11" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
 				<text><![CDATA[BIR FORM 1601E - SCHEDULE I]]></text>
@@ -66,21 +66,21 @@
 			<textField isBlankWhenNull="true">
 				<reportElement uuid="8dc03b87-ce0f-42e3-84cc-ff569c6fde86" x="0" y="19" width="762" height="14"/>
 				<textElement textAlignment="Center">
-					<font fontName="Calibri Light" size="10"/>
+					<font fontName="SansSerif" size="10"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{COMP_ADDR}]]></textFieldExpression>
 			</textField>
 			<textField pattern="MM/dd/yyyy hh:mm a">
 				<reportElement uuid="f50810b0-83ee-4d20-9622-690449fae3c6" x="676" y="0" width="86" height="14"/>
 				<textElement>
-					<font fontName="Calibri Light" size="9"/>
+					<font fontName="SansSerif" size="9"/>
 				</textElement>
 				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
 				<reportElement uuid="ae3d854d-6819-4ef4-9f26-69fb77969167" x="0" y="0" width="762" height="20"/>
 				<textElement textAlignment="Center">
-					<font fontName="Calibri" size="12" isBold="true"/>
+					<font fontName="SansSerif" size="12" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{COMP_NAME}]]></textFieldExpression>
 			</textField>
@@ -98,7 +98,7 @@
 			<staticText>
 				<reportElement uuid="ed39624e-2085-4fd8-9207-9fd4d1a8270a" mode="Transparent" x="0" y="63" width="762" height="17" forecolor="#000000" backcolor="#FFFFFF"/>
 				<textElement textAlignment="Center" verticalAlignment="Top" rotation="None" markup="none">
-					<font fontName="Calibri" size="12" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<font fontName="SansSerif" size="11" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
 				<text><![CDATA[ALPHABETICAL LIST OF PAYEES FROM WHOM TAXES WERE WITHHELD ]]></text>

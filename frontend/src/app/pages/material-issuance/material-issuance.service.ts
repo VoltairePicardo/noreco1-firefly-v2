@@ -71,6 +71,14 @@ export class MaterialIssuanceService {
         return this.http.get<any[]>(`${BASE_API}/material-issuance/inventory-doc-items/${docId}`);
     }
 
+    getMirGlEntries(transId: number, isMST: boolean): Observable<any[]> {
+        return this.http.get<any[]>(`${BASE_API}/ledger/mir/${transId}/${isMST}`);
+    }
+
+    updateEntries(payload: any): Observable<any> {
+        return this.http.post(`${BASE_API}/material-issuance/update-entries`, payload, httpOptions);
+    }
+
     approveAll(ids: number[]): Observable<any> {
         const payloads = ids.map(id => ({ documentId: id, remarks: '', documentType: 'MR' }));
         return this.http.post<any>(`${BASE_API}/approve-vouchers/process-all`, payloads, httpOptions);
