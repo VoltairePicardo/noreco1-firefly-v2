@@ -28,12 +28,27 @@ export class AlertService {
     }
 
     httpError(module: string, action: string, err: any): void {
+        const validation = err?.error?.validationErrors
+            ? Object.values(err.error.validationErrors).join('\n')
+            : '';
         const msg = err?.error?.failureMessage
-                 || (Array.isArray(err?.error?.messages) ? err.error.messages.join(', ') : '')
+                 || (Array.isArray(err?.error?.messages) ? err.error.messages.join('\n') : '')
+                 || validation
                  || err?.error?.message
                  || err?.message
                  || '';
-        this.error(module, action, msg);
+        this.errorHtml(module, action, this.escapeHtml(msg));
+    }
+
+    /** Shows the failureMessage and any field messages of an unsuccessful PostResponse. */
+    postError(module: string, action: string, res: any): void {
+        const parts = [res?.failureMessage, ...(Array.isArray(res?.messages) ? res.messages : [])]
+            .filter((m: string) => !!m);
+        this.errorHtml(module, action, this.escapeHtml(parts.join('\n')));
+    }
+
+    private escapeHtml(text: string): string {
+        return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     }
 
     error(module: string, action: string, message: string) {
