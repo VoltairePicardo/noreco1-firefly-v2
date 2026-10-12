@@ -6,6 +6,7 @@ import com.noreco1.fireflyv2.common.helpers.*;
 import com.noreco1.fireflyv2.dtoers.DocumentDtoer;
 import com.noreco1.fireflyv2.dtoers.LedgerDtoerImpl;
 import com.noreco1.fireflyv2.dtoers.WorkflowDtoer;
+import com.noreco1.fireflyv2.exception.BusinessException;
 import com.noreco1.fireflyv2.model.*;
 import com.noreco1.fireflyv2.model.DocumentStatus;
 import com.noreco1.fireflyv2.model.DocumentType;
@@ -22,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.data.domain.*;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -161,11 +163,11 @@ public class ApvServiceImpl implements ApvService, PrintableVoucher {
             User approvingOfficer = userRepo.findOneByAccountNo(apv.getApprovingOfficer().getAccountNo());
             User checker = userRepo.findOneByAccountNo(apv.getChecker().getAccountNo());
 
-            Boolean insertMode = apv.getId() == null;
-            Boolean withPaymentRequestId = apv.getPaymentRequestId() != null && apv.getPaymentRequestId() > 0;
+            boolean insertMode = apv.getId() == null;
+            boolean withPaymentRequestId = apv.getPaymentRequestId() != null && apv.getPaymentRequestId() > 0;
             Boolean withRRId = apv.getReceivingReportId() != null && apv.getReceivingReportId() > 0;
-            Boolean withJobOrderAcceptanceId = apv.getJoAcceptanceId() != null && apv.getJoAcceptanceId() > 0;
-            Boolean withReceivingReports = apv.getReceivingReports() != null && !apv.getReceivingReports().isEmpty();
+            boolean withJobOrderAcceptanceId = apv.getJoAcceptanceId() != null && apv.getJoAcceptanceId() > 0;
+            boolean withReceivingReports = apv.getReceivingReports() != null && !apv.getReceivingReports().isEmpty();
 
             if (insertMode) { // insert mode
 
@@ -185,7 +187,8 @@ public class ApvServiceImpl implements ApvService, PrintableVoucher {
                 existingApv = apv;
 
             } else {
-                existingApv = apvRepo.findById(apv.getId()).orElse(null);
+                existingApv = apvRepo.findById(apv.getId())
+                        .orElseThrow(() -> new BusinessException("Accounts Payable Voucher with id: "+apv.getId()+" not found.", HttpStatus.NOT_FOUND));
 
                 List<Integer> statusAllowed = new ArrayList();
                 statusAllowed.add(com.noreco1.fireflyv2.model.enums.DocumentStatus.DOCUMENT_CREATED.getId());
@@ -1180,6 +1183,7 @@ public class ApvServiceImpl implements ApvService, PrintableVoucher {
     }
 
     @Override
+    @Transactional
     public PostResponse processUpdate(Document v, BindingResult bindingResult, MessageSource messageSource,
                                       HttpServletRequest request, List<Map> fileToRemove) {
         PostResponse response = this.processUpdate(v, bindingResult, messageSource);
@@ -1187,10 +1191,9 @@ public class ApvServiceImpl implements ApvService, PrintableVoucher {
         if (request instanceof MultipartHttpServletRequest) {
             MultipartHttpServletRequest mRequest = (MultipartHttpServletRequest) request;
             if (this.model != null) {
-                if (mRequest.getFileMap() != null) {
-                    fileFacade.removeDocumentAttachment(fileToRemove, this.model.getTransaction().getId());
-                    fileFacade.saveDocumentAttachment(mRequest.getFileMap(), this.model.getTransaction().getId());
-                }
+                mRequest.getFileMap();
+                fileFacade.removeDocumentAttachment(fileToRemove, this.model.getTransaction().getId());
+                fileFacade.saveDocumentAttachment(FileFacadeImpl.flattenFileMap(mRequest), this.model.getTransaction().getId());
             }
         }
 
@@ -1198,15 +1201,15 @@ public class ApvServiceImpl implements ApvService, PrintableVoucher {
     }
 
     @Override
+    @Transactional
     public PostResponse processCreate(Document v, BindingResult bindingResult, MessageSource messageSource, HttpServletRequest request) {
         PostResponse response = this.processCreate(v, bindingResult, messageSource);
 
         if (request instanceof MultipartHttpServletRequest) {
             MultipartHttpServletRequest mRequest = (MultipartHttpServletRequest) request;
             if (this.model != null) {
-                if (mRequest.getFileMap() != null) {
-                    fileFacade.saveDocumentAttachment(mRequest.getFileMap(), this.model.getTransaction().getId());
-                }
+                mRequest.getFileMap();
+                fileFacade.saveDocumentAttachment(FileFacadeImpl.flattenFileMap(mRequest), this.model.getTransaction().getId());
             }
         }
 

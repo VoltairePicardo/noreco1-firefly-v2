@@ -5,6 +5,7 @@ import { environment } from '@/environments/environment';
 import { DownloadService } from '@/app/core/services/download.service';
 
 const BASE_API = environment.get('baseApiUrl');
+const BASE_URL = environment.get('baseUrl');
 const httpOptions = { headers: new HttpHeaders({ 'Content-Type': 'application/json' }) };
 
 @Injectable({ providedIn: 'root' })
@@ -26,14 +27,14 @@ export class AccountsPayableVoucherService {
     create(payload: any, files: File[] = []): Observable<any> {
         const formData = new FormData();
         formData.append('model', new Blob([JSON.stringify(payload)], { type: 'application/json' }));
-        files.forEach(f => formData.append('files', f, f.name));
+        files.forEach(f => formData.append('file_', f, f.name));
         return this.http.post<any>(`${BASE_API}/apv/create`, formData);
     }
 
     update(payload: any, files: File[] = [], filesToRemove: any[] = []): Observable<any> {
         const formData = new FormData();
         formData.append('model', new Blob([JSON.stringify(payload)], { type: 'application/json' }));
-        files.forEach(f => formData.append('files', f, f.name));
+        files.forEach(f => formData.append('file_', f, f.name));
         if (filesToRemove.length > 0) {
             formData.append('filesToRemove', new Blob([JSON.stringify(filesToRemove)], { type: 'application/json' }));
         }
@@ -51,6 +52,14 @@ export class AccountsPayableVoucherService {
 
     getJournalEntries(transId: number): Observable<any[]> {
         return this.http.get<any[]>(`${BASE_API}/ledger/gl/${transId}`);
+    }
+
+    getFiles(transId: number): Observable<any[]> {
+        return this.http.get<any[]>(`${BASE_URL}/file/attachments/${transId}`);
+    }
+
+    fileUrl(fileId: number): string {
+        return this.downloadService.printUrl(`${BASE_URL}/file/${fileId}`);
     }
 
     getDocumentStatuses(): Observable<any[]> {

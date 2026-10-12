@@ -195,7 +195,7 @@
                 <a href="javascript:void(0)" class="d-inline-flex align-items-center fs-xs fw-semibold text-decoration-none gap-1"
                    (click)="toggleLogs()">
                     <ng-icon [name]="showLogs ? 'tablerEyeOff' : 'tablerEye'" class="ps-0 pe-2 fw-bold fs-md"></ng-icon>
-                    {{ showLogs ? 'hide' : 'show' }} logs
+                    {{ showLogs ? 'Hide' : 'Show' }} Logs
                 </a>
                 <div [class.d-none]="!showLogs" class="mt-2">
                     <app-document-logs [transactionId]="data.transId"/>

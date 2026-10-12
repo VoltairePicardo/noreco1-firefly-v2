@@ -6,17 +6,21 @@ import {
     COMMON_MAIN_PAGE_IMPORTS,
     SHARED_PROVIDERS
 } from '@/app/shared/providers/shared-providers';
+import { DocumentLogsComponent } from '@/app/shared/components/document-logs/document-logs.component';
+import { AttachmentsComponent } from '@/app/shared/components/attachments/attachments.component';
 import { AccountsPayableVoucherService } from '../accounts-payable-voucher.service';
 import { provideIcons } from '@ng-icons/core';
-import { tablerCheck, tablerHistory, tablerEdit, tablerPrinter, tablerArrowLeft } from '@ng-icons/tabler-icons';
+import { tablerCheck, tablerEdit, tablerEye, tablerEyeOff, tablerPrinter, tablerArrowLeft } from '@ng-icons/tabler-icons';
 
 @Component({
     selector: 'app-accounts-payable-voucher-detail',
     imports: [
         ...COMMON_ALL_PAGE_IMPORTS,
-        ...COMMON_MAIN_PAGE_IMPORTS
+        ...COMMON_MAIN_PAGE_IMPORTS,
+        DocumentLogsComponent,
+        AttachmentsComponent
     ],
-    providers: [...SHARED_PROVIDERS, provideIcons({ tablerCheck, tablerHistory, tablerEdit, tablerPrinter, tablerArrowLeft })],
+    providers: [...SHARED_PROVIDERS, provideIcons({ tablerCheck, tablerEdit, tablerEye, tablerEyeOff, tablerPrinter, tablerArrowLeft })],
     templateUrl: './accounts-payable-voucher-detail.component.html'
 })
 export class AccountsPayableVoucherDetailComponent {
@@ -28,18 +32,15 @@ export class AccountsPayableVoucherDetailComponent {
     receivingReports: any[] = [];
     journalEntries: any[]   = [];
     iemopBillings: any[]    = [];
+    attachments: any[]      = [];
     isLoading = signal(false);
+    showLogs  = false;
 
     // Workflow
     workflowActions: any[] = [];
     selectedAction: any    = null;
     remarks                = '';
     processingWorkflow     = false;
-
-    // Document logs
-    logs: any[]  = [];
-    showLogs     = false;
-    logsLoading  = false;
 
     private service      = inject(AccountsPayableVoucherService);
     private route        = inject(ActivatedRoute);
@@ -66,15 +67,18 @@ export class AccountsPayableVoucherDetailComponent {
                     this.receivingReports = data.receivingReports || [];
                     this.iemopBillings    = data.iemopBillings    || [];
                     this.loadWorkflowActions();
-                    if (data.transId) { this.loadJournalEntries(data.transId); }
+                    if (data.transId) {
+                        this.loadJournalEntries(data.transId);
+                        this.loadAttachments(data.transId);
+                    }
                 } else {
                     this.alertService.error(this.module, 'Record not found.', '');
                     this.router.navigate(['/' + this.menuLink]);
                 }
             },
-            error: () => {
+            error: (err) => {
                 this.isLoading.set(false);
-                this.alertService.error(this.module, 'Failed to load record.', '');
+                this.alertService.httpError(this.module, 'Failed to load record.', err);
                 this.router.navigate(['/' + this.menuLink]);
             }
         });
@@ -84,6 +88,13 @@ export class AccountsPayableVoucherDetailComponent {
         this.service.getJournalEntries(transId).subscribe({
             next: (data) => { this.journalEntries = data || []; },
             error: ()    => { this.journalEntries = []; }
+        });
+    }
+
+    loadAttachments(transId: number): void {
+        this.service.getFiles(transId).subscribe({
+            next: (files) => { this.attachments = files || []; },
+            error: ()     => { this.attachments = []; }
         });
     }
 
@@ -103,7 +114,7 @@ export class AccountsPayableVoucherDetailComponent {
 
     get totalAmount(): number {
         return this.receivingReports.reduce(
-            (sum: number, rr: any) => sum + (Number(rr.netAmount) || Number(rr['netAmount']) || 0),
+            (sum: number, rr: any) => sum + (Number(rr.netAmount) || 0),
             0
         );
     }
@@ -144,39 +155,24 @@ export class AccountsPayableVoucherDetailComponent {
                     this.remarks = '';
                     this.loadData();
                 } else {
-                    this.alertService.error(this.module, 'Processing failed.', res?.failureMessage || '');
+                    this.alertService.postError(this.module, 'Processing failed.', res);
                 }
             },
-            error: () => {
+            error: (err) => {
                 this.processingWorkflow = false;
-                this.alertService.error(this.module, 'An error occurred while processing.', '');
+                this.alertService.httpError(this.module, 'Processing failed.', err);
             }
         });
     }
 
     toggleLogs(): void {
         this.showLogs = !this.showLogs;
-        if (this.showLogs && this.logs.length === 0) {
-            this.loadLogs();
-        }
     }
 
-    loadLogs(): void {
-        if (!this.data?.transId) return;
-        this.logsLoading = true;
-        this.service.getDocumentLogs(this.data.transId).subscribe({
-            next: (data) => {
-                this.logs        = data || [];
-                this.logsLoading = false;
-            },
-            error: () => {
-                this.logsLoading = false;
-            }
-        });
-    }
+    // ── Attachments (display only; managed in add-edit) ──────────────────────
+    fileUrl = (fileId: number): string => this.service.fileUrl(fileId);
 
     print(): void {
         this.service.print(this.id);
     }
-
 }

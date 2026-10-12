@@ -64,8 +64,8 @@ export class AccountsPayableVoucherMainComponent {
                 this.items.set((data || []).map((d: any) => ({ ...d, selected: false })));
                 this.isLoading.set(false);
             },
-            error: () => {
-                this.alertService.error(this.module, 'Load', '');
+            error: (err) => {
+                this.alertService.httpError(this.module, 'Load', err);
                 this.isLoading.set(false);
             }
         });
@@ -117,12 +117,12 @@ export class AccountsPayableVoucherMainComponent {
                     this.alertService.success(this.module, 'Approved', '');
                     this.load();
                 } else {
-                    this.alertService.error(this.module, 'Approve All', res?.failureMessage || '');
+                    this.alertService.postError(this.module, 'Approve All', res);
                 }
             },
-            error: () => {
+            error: (err) => {
                 this.processingAll = false;
-                this.alertService.error(this.module, 'Approve All', '');
+                this.alertService.httpError(this.module, 'Approve All', err);
             }
         });
     }
