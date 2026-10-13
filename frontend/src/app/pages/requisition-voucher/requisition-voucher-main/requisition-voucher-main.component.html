@@ -3,8 +3,7 @@
 
     <div class="card">
         <div class="card-header d-block">
-            <!-- Filters -->
-            <div class="row align-items-end g-2">
+            <div class="row align-items-end g-2 mb-2">
                 <div class="col-md-2">
                     <label class="form-label fw-bold mb-1 fs-xs text-uppercase">From</label>
                     <input type="text" mwlFlatpickr [options]="flatpickrOptions"
@@ -33,7 +32,7 @@
                     </button>
                 </div>
             </div>
-            <div class="row align-items-end g-2 mt-1">
+            <div class="row align-items-end g-2">
                 <div class="col-md-4">
                     <input type="search" class="form-control" [(ngModel)]="searchText"
                            placeholder="Search by code..." (ngModelChange)="page = 1"/>
@@ -106,7 +105,7 @@
         </div>
 
         @if (filteredRecords.length > pageSize) {
-            <div class="card-footer d-flex justify-content-center border-0">
+            <div class="card-footer d-flex justify-content-center border-top-0">
                 <div class="pagination-boxed align-items-center mt-2 mb-0">
                     <ngb-pagination
                         [collectionSize]="filteredRecords.length"

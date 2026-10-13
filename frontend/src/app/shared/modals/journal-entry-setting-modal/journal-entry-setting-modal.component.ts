@@ -56,8 +56,14 @@ export class JournalEntrySettingModalComponent implements OnInit {
     vatAmount: number | null = null;
 
     ngOnInit(): void {
-        this.baseDebit  = this.entry._grossDebit  ?? this.entry.debit  ?? 0;
-        this.baseCredit = this.entry._grossCredit ?? this.entry.credit ?? 0;
+        const debit  = Number(this.entry.debit)  || 0;
+        const credit = Number(this.entry.credit) || 0;
+        const untouched = this.entry._grossDebit != null && this.entry._grossCredit != null
+            && debit  === (Number(this.entry._netDebit)  || 0)
+            && credit === (Number(this.entry._netCredit) || 0);
+
+        this.baseDebit  = untouched ? this.entry._grossDebit!  : debit;
+        this.baseCredit = untouched ? this.entry._grossCredit! : credit;
 
         this.applyAllocation = this.entry.applyAllocation || false;
         this.allocationPct   = this.entry.allocationPct   ?? null;
@@ -82,7 +88,7 @@ export class JournalEntrySettingModalComponent implements OnInit {
                 next: (data) => {
                     this.vatAccount    = data || null;
                     this.vatPercentage = data?.value != null ? Number(data.value) : null;
-                    this.computeVatAmount();
+                    this.computeVatAmount(!!this.entry.wht);
                 },
                 error: () => { this.vatAccount = null; this.vatPercentage = null; }
             });
@@ -100,6 +106,12 @@ export class JournalEntrySettingModalComponent implements OnInit {
         return this.baseDebit || this.baseCredit || 0;
     }
 
+    /** Withholding tax base — the gross amount net of the extracted VAT, as in legacy `wtaxPercentageChanged()`. */
+    get whtBase(): number {
+        const vat = this.applyVat && this.isVatable ? (this.vatAmount || 0) : 0;
+        return Math.max(+(this.taxBase - vat).toFixed(2), 0);
+    }
+
     onAtcChange(): void {
         if (!this.selectedAtc) {
             this.whtNature = '';
@@ -112,18 +124,27 @@ export class JournalEntrySettingModalComponent implements OnInit {
         this.computeWhtAmount();
     }
 
+    onWhtToggle(): void {
+        if (this.applyWht && this.whtAmount == null) this.computeWhtAmount();
+    }
+
     computeWhtAmount(): void {
-        this.whtAmount = this.whtRate != null
-            ? +(this.taxBase * this.whtRate / 100).toFixed(2)
+        const rate = Number(this.whtRate);
+        this.whtAmount = this.whtRate != null && !isNaN(rate)
+            ? +(this.whtBase * rate / 100).toFixed(2)
             : null;
     }
 
     /** VAT-inclusive extraction, mirrors legacy `calculateVat()`/`hasVatChanged()`:
      *  the gross amount already includes VAT, so back out the VAT portion. */
-    computeVatAmount(): void {
-        if (this.vatPercentage == null) { this.vatAmount = null; return; }
-        const net = this.taxBase / ((100 + this.vatPercentage) / 100);
-        this.vatAmount = +(this.taxBase - net).toFixed(2);
+    computeVatAmount(keepSavedWht = false): void {
+        if (this.vatPercentage == null) {
+            this.vatAmount = null;
+        } else {
+            const net = this.taxBase / ((100 + this.vatPercentage) / 100);
+            this.vatAmount = +(this.taxBase - net).toFixed(2);
+        }
+        if (!keepSavedWht) this.computeWhtAmount();
     }
 
     save(): void {
@@ -154,7 +175,7 @@ export class JournalEntrySettingModalComponent implements OnInit {
                     atc: this.selectedAtc,
                     nature: this.whtNature,
                     percentage: this.whtRate,
-                    baseAmount: this.taxBase,
+                    baseAmount: this.whtBase,
                     amount: this.whtAmount
                 }
             });
@@ -183,6 +204,8 @@ export class JournalEntrySettingModalComponent implements OnInit {
                 credit: netCredit || null,
                 _grossDebit:  this.baseDebit,
                 _grossCredit: this.baseCredit,
+                _netDebit:    netDebit  || null,
+                _netCredit:   netCredit || null,
                 applyAllocation: this.applyAllocation,
                 allocationPct:   this.applyAllocation ? this.allocationPct : null,
                 applyWht:        this.applyWht,

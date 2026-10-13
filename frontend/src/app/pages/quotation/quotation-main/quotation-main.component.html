@@ -1,62 +1,62 @@
 <div class="container-fluid">
     <app-page-title [title]="module" [subTitle]="''" [menuLink]="menuLink"/>
-</div>
 
-<div class="card">
-    <div class="card-body">
-
-        <div class="row mb-2 align-items-end">
-            <div class="col-md-2 mt-2">
-                <label class="form-label fw-bold mb-1 fs-xs text-uppercase">From</label>
-                <input type="text" class="form-control" mwlFlatpickr
-                       [options]="flatpickrOptionsFrom"
-                       [(ngModel)]="dateFrom"
-                       [ngModelOptions]="{ standalone: true }"
-                       placeholder="Date From"/>
+    <div class="card">
+        <div class="card-header d-block">
+            <div class="row align-items-end g-2 mb-2">
+                <div class="col-md-2">
+                    <label class="form-label fw-bold mb-1 fs-xs text-uppercase">From</label>
+                    <input type="text" class="form-control" mwlFlatpickr
+                           [options]="flatpickrOptionsFrom"
+                           [(ngModel)]="dateFrom"
+                           [ngModelOptions]="{ standalone: true }"
+                           placeholder="Date From"/>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label fw-bold mb-1 fs-xs text-uppercase">To</label>
+                    <input type="text" class="form-control" mwlFlatpickr
+                           [options]="flatpickrOptionsTo"
+                           [(ngModel)]="dateTo"
+                           [ngModelOptions]="{ standalone: true }"
+                           placeholder="Date To"/>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label fw-bold mb-1 fs-xs text-uppercase">Status</label>
+                    <select class="form-select"
+                            [(ngModel)]="selectedStatusId"
+                            [ngModelOptions]="{ standalone: true }">
+                        <option [ngValue]="null">— All Statuses —</option>
+                        @for (s of statuses(); track s.id) {
+                            <option [ngValue]="s.id">{{ s.status }}</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-auto ms-auto">
+                    <button type="button" class="btn btn-primary fw-bold d-flex align-items-center gap-2"
+                            [routerLink]="['/' + menuLink + '/create']">
+                        <ng-icon name="tablerPlus" class="fw-bold"></ng-icon>
+                        Create {{ module }}
+                    </button>
+                </div>
             </div>
-            <div class="col-md-2 mt-2">
-                <label class="form-label fw-bold mb-1 fs-xs text-uppercase">To</label>
-                <input type="text" class="form-control" mwlFlatpickr
-                       [options]="flatpickrOptionsTo"
-                       [(ngModel)]="dateTo"
-                       [ngModelOptions]="{ standalone: true }"
-                       placeholder="Date To"/>
-            </div>
-            <div class="col-md-2 mt-2">
-                <label class="form-label fw-bold mb-1 fs-xs text-uppercase">Status</label>
-                <select class="form-select"
-                        [(ngModel)]="selectedStatusId"
-                        [ngModelOptions]="{ standalone: true }">
-                    <option [ngValue]="null">— All Statuses —</option>
-                    @for (s of statuses(); track s.id) {
-                        <option [ngValue]="s.id">{{ s.status }}</option>
-                    }
-                </select>
-            </div>
-            <div class="col-md-2 mt-2">
-                <label class="form-label fw-bold mb-1 fs-xs text-uppercase">Search</label>
-                <input type="search" class="form-control" [(ngModel)]="searchText"
-                       [ngModelOptions]="{ standalone: true }"
-                       placeholder="Search by code..." (ngModelChange)="page = 1"/>
-            </div>
-            <div class="col-md-auto mt-2 d-flex gap-2">
-                <button type="button" class="btn btn-success fw-bold" (click)="load()">
-                    <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Search
-                </button>
-                <button type="button" class="btn btn-danger fw-bold" (click)="reset()">
-                    <ng-icon name="tablerRefresh" class="ps-0 pe-3 fw-bold"></ng-icon>Reset
-                </button>
-            </div>
-            <div class="col-md-auto ms-auto mt-2">
-                <button type="button" class="btn btn-primary fw-bold d-flex align-items-center gap-2"
-                        [routerLink]="['/' + menuLink + '/create']">
-                    <ng-icon name="tablerPlus" class="fw-bold"></ng-icon>
-                    Create {{ module }}
-                </button>
+            <div class="row align-items-end g-2">
+                <div class="col-md-4">
+                    <input type="search" class="form-control" [(ngModel)]="searchText"
+                           [ngModelOptions]="{ standalone: true }"
+                           placeholder="Search by code..." (ngModelChange)="page = 1"/>
+                </div>
+                <div class="col-auto d-flex gap-2">
+                    <button type="button" class="btn btn-success fw-bold" (click)="load()">
+                        <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Search
+                    </button>
+                    <button type="button" class="btn btn-danger fw-bold" (click)="reset()">
+                        <ng-icon name="tablerRefresh" class="ps-0 pe-3 fw-bold"></ng-icon>Reset
+                    </button>
+                </div>
             </div>
         </div>
 
-        <div class="table-responsive mt-2">
+        <div class="table-responsive">
             <table class="table table-custom table-centered table-select table-hover w-100 mb-0">
                 <thead class="bg-light align-middle bg-opacity-25 thead-sm">
                     <tr class="text-uppercase fs-xxs">
@@ -110,5 +110,24 @@
             </table>
         </div>
 
+        @if (filteredRecords.length > pageSize) {
+            <div class="card-footer d-flex justify-content-center border-top-0">
+                <div class="pagination-boxed align-items-center mt-2 mb-0">
+                    <ngb-pagination
+                        [collectionSize]="filteredRecords.length"
+                        [(page)]="page"
+                        [pageSize]="pageSize"
+                        [maxSize]="5"
+                        [rotate]="true">
+                        <ng-template ngbPaginationPrevious>
+                            <ng-icon name="tablerChevronLeft"/>
+                        </ng-template>
+                        <ng-template ngbPaginationNext>
+                            <ng-icon name="tablerChevronRight"/>
+                        </ng-template>
+                    </ngb-pagination>
+                </div>
+            </div>
+        }
     </div>
 </div>

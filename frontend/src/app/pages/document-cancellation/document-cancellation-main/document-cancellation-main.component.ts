@@ -6,12 +6,12 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { DocumentCancellationService } from '../document-cancellation.service';
 import { monthStart, monthEnd } from '@/app/shared/utils/date.utils';
 import { provideIcons } from '@ng-icons/core';
-import { tablerSearch, tablerRefresh, tablerBan, tablerInfoCircle, tablerRotateClockwise, tablerX } from '@ng-icons/tabler-icons';
+import { tablerSearch, tablerRefresh, tablerBan, tablerInfoCircle, tablerRotateClockwise, tablerX, tablerChevronLeft, tablerChevronRight } from '@ng-icons/tabler-icons';
 
 @Component({
     selector: 'app-document-cancellation-main',
     imports: [...COMMON_ALL_PAGE_IMPORTS, ...COMMON_MAIN_PAGE_IMPORTS, FlatpickrModule],
-    providers: [...SHARED_PROVIDERS, FlatpickrDefaults, provideIcons({ tablerSearch, tablerRefresh, tablerBan, tablerInfoCircle, tablerRotateClockwise, tablerX })],
+    providers: [...SHARED_PROVIDERS, FlatpickrDefaults, provideIcons({ tablerSearch, tablerRefresh, tablerBan, tablerInfoCircle, tablerRotateClockwise, tablerX, tablerChevronLeft, tablerChevronRight })],
     templateUrl: './document-cancellation-main.component.html'
 })
 export class DocumentCancellationMainComponent {

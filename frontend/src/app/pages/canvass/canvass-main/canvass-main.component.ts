@@ -4,13 +4,13 @@ import { COMMON_ALL_PAGE_IMPORTS, COMMON_MAIN_PAGE_IMPORTS } from '@/app/shared/
 import { FormsModule } from '@angular/forms';
 import { FlatpickrDefaults, FlatpickrModule } from 'angularx-flatpickr';
 import { provideIcons } from '@ng-icons/core';
-import { tablerSearch, tablerRefresh, tablerPlus, tablerEye, tablerEdit } from '@ng-icons/tabler-icons';
+import { tablerSearch, tablerRefresh, tablerPlus, tablerEye, tablerEdit, tablerChevronLeft, tablerChevronRight } from '@ng-icons/tabler-icons';
 import { CanvassService } from '../canvass.service';
 
 @Component({
     selector: 'app-canvass-main',
     imports: [...COMMON_ALL_PAGE_IMPORTS, ...COMMON_MAIN_PAGE_IMPORTS, FormsModule, FlatpickrModule, RouterLink],
-    providers: [FlatpickrDefaults, provideIcons({ tablerSearch, tablerRefresh, tablerPlus, tablerEye, tablerEdit })],
+    providers: [FlatpickrDefaults, provideIcons({ tablerSearch, tablerRefresh, tablerPlus, tablerEye, tablerEdit, tablerChevronLeft, tablerChevronRight })],
     templateUrl: './canvass-main.component.html'
 })
 export class CanvassMainComponent {

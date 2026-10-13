@@ -2,17 +2,70 @@ import { ChangeDetectionStrategy, Component, computed, effect, inject, input, si
 import { DatePipe } from '@angular/common';
 import {AnyJSONService, DocumentLog} from '@/app/shared/services/any-json.service';
 
+/** Log keys whose timestamps are shown with the time of day. */
+const DATETIME_LOG_KEYS = new Set(['createdAt', 'updatedAt']);
+
 /** Log keys that are not shown in the history. */
-const HIDDEN_LOG_KEYS = new Set(['files']);
+const HIDDEN_LOG_KEYS = new Set<string>();
+
+interface LedgerColumn {
+    header: string;
+    field: string;
+    numeric?: boolean;
+}
+
+/** Log keys shown as their own table under a section heading, instead of as a plain log value. */
+const LEDGER_TABLES: Record<string, { section: string; title: string; columns: LedgerColumn[] }> = {
+    generalLedgerLines: {
+        section: 'Ledger Entries',
+        title: 'General Entries',
+        columns: [
+            { header: 'Code', field: 'code' },
+            { header: 'Title', field: 'description' },
+            { header: 'Debit', field: 'debit', numeric: true },
+            { header: 'Credit', field: 'credit', numeric: true },
+        ],
+    },
+    subLedgerLines: {
+        section: 'Ledger Entries',
+        title: 'Sub Entries',
+        columns: [
+            { header: 'Account', field: 'accountNo' },
+            { header: 'Name', field: 'name' },
+            { header: 'Amount', field: 'amount', numeric: true },
+        ],
+    },
+    files: {
+        section: 'Files',
+        title: '',
+        columns: [
+            { header: 'File Name', field: 'originalFilename' },
+            { header: 'Type', field: 'mimeType' },
+            { header: 'Uploaded', field: 'updatedAt' },
+        ],
+    },
+};
 
 interface LogEntry {
     label: string;
     value: string;
 }
 
+interface LedgerTable {
+    title: string;
+    columns: LedgerColumn[];
+    rows: string[][];
+}
+
+interface LedgerSection {
+    heading: string;
+    tables: LedgerTable[];
+}
+
 interface LogRow {
     id: number;
     entries: LogEntry[];
+    sections: LedgerSection[];
     userName: string;
     createdAt: string;
 }
@@ -34,7 +87,7 @@ interface LogRow {
             <p class="text-muted mb-0">No history yet.</p>
         } @else {
             <div class="table-responsive">
-                <table class="table table-sm align-middle mb-0">
+                <table class="table table-sm table-striped align-top mb-0">
                     <thead class="bg-light align-middle bg-opacity-25 thead-sm">
                     <tr class="text-uppercase fs-xxs">
                         <th scope="col">Log</th>
@@ -52,6 +105,37 @@ interface LogRow {
                                             <dd class="col-8 col-sm-8 fs-xs mb-0 fw-semibold">{{ entry.value }}</dd>
                                         }
                                     </dl>
+                                    @for (s of row.sections; track s.heading; let lastSection = $last; let firstSection = $first) {
+                                        <div class="fs-xs text-uppercase fw-semibold mb-1" [class.mt-3]="firstSection" [class.mt-0]="!firstSection">{{ s.heading }}</div>
+                                        @for (t of s.tables; track t.title; let lastTable = $last) {
+                                            @if (t.title) {
+                                                <div class="fs-xs fw-semibold mb-1 ps-3">{{ t.title }}</div>
+                                            }
+                                            <div class="table-responsive ps-3">
+                                                <table class="table table-sm table-borderless fs-xs mb-2">
+                                                    <thead class="bg-light bg-opacity-25">
+                                                    <tr class="text-uppercase fs-xxs">
+                                                        @for (c of t.columns; track c.header) {
+                                                            <th [class.text-end]="c.numeric">{{ c.header }}</th>
+                                                        }
+                                                    </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        @for (r of t.rows; track $index) {
+                                                            <tr>
+                                                                @for (cell of r; track $index; let ci = $index) {
+                                                                    <td [class.text-end]="t.columns[ci].numeric">{{ cell }}</td>
+                                                                }
+                                                            </tr>
+                                                        }
+                                                    </tbody>
+                                                </table>
+                                                @if (!(lastSection && lastTable)) {
+                                                    <hr class="mt-0"/>
+                                                }
+                                            </div>
+                                        }
+                                    }
                                 </td>
                                 <td class="text-nowrap fs-xs">{{ row.userName }}</td>
                                 <td class="text-nowrap fs-xs">{{ row.createdAt | date:'MMM dd, yyyy hh:mm:ss a' }}</td>
@@ -67,7 +151,6 @@ export class DocumentLogsComponent {
     private anyJsonService = inject(AnyJSONService);
     private datePipe = inject(DatePipe);
 
-    /** The document's workflow transaction id (e.g. `loan.transaction.id`). */
     transactionId = input<number | null | undefined>(null);
 
     private logs = signal<DocumentLog[]>([]);
@@ -89,16 +172,33 @@ export class DocumentLogsComponent {
 
     private buildRow(log: DocumentLog): LogRow {
         let entries: LogEntry[] = [];
+        const sections: LedgerSection[] = [];
 
         if (log.newValue) {
             try {
                 const parsed = JSON.parse(log.newValue) as Record<string, unknown>;
                 entries = Object.entries(parsed)
-                    .filter(([key]) => !HIDDEN_LOG_KEYS.has(key))
+                    .filter(([key]) => !HIDDEN_LOG_KEYS.has(key) && !(key in LEDGER_TABLES))
                     .map(([key, value]) => ({
                         label: this.humanizeKey(key),
-                        value: this.formatValue(value),
+                        value: this.formatValue(value, key),
                     }));
+
+                for (const [key, spec] of Object.entries(LEDGER_TABLES)) {
+                    const lines = parsed[key];
+                    if (!Array.isArray(lines) || lines.length === 0) continue;
+                    let section = sections.find((s) => s.heading === spec.section);
+                    if (!section) {
+                        section = { heading: spec.section, tables: [] };
+                        sections.push(section);
+                    }
+                    section.tables.push({
+                        title: spec.title,
+                        columns: spec.columns,
+                        rows: lines.map((line: Record<string, unknown>) =>
+                            spec.columns.map((c) => c.numeric ? this.formatAmount(line?.[c.field]) : this.formatValue(line?.[c.field], c.field))),
+                    });
+                }
             } catch {
                 entries = [{ label: 'Value', value: log.newValue }];
             }
@@ -107,9 +207,16 @@ export class DocumentLogsComponent {
         return {
             id: log.id,
             entries,
+            sections,
             userName: log.loggedBy?.fullName || log.loggedBy?.username || 'System',
             createdAt: log.createdAt,
         };
+    }
+
+    private formatAmount(value: unknown): string {
+        const n = Number(value);
+        if (value === null || value === undefined || value === '' || Number.isNaN(n)) return '—';
+        return n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     }
 
     private humanizeKey(key: string): string {
@@ -117,12 +224,15 @@ export class DocumentLogsComponent {
         return spaced.charAt(0).toUpperCase() + spaced.slice(1);
     }
 
-    private formatValue(value: unknown): string {
+    private formatValue(value: unknown, key?: string): string {
         if (value === null || value === undefined || value === '') return '—';
         if (typeof value === 'boolean') return value ? 'Yes' : 'No';
         if (typeof value === 'number') {
             // 13-digit numbers are epoch-millisecond timestamps in this API.
-            if (value > 1e12) return this.datePipe.transform(value, 'MMM dd, yyyy') ?? String(value);
+            if (value > 1e12) {
+                const format = key && DATETIME_LOG_KEYS.has(key) ? 'MMM dd, yyyy hh:mm a' : 'MMM dd, yyyy';
+                return this.datePipe.transform(value, format) ?? String(value);
+            }
             return String(value);
         }
         if (typeof value === 'string') return value;

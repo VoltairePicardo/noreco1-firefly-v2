@@ -10,7 +10,8 @@ import com.noreco1.fireflyv2.model.enums.DocumentType;
 import com.noreco1.fireflyv2.repo.EmployeeRepo;
 import com.noreco1.fireflyv2.repo.SettingRepo;
 import com.noreco1.fireflyv2.repo.SlEntityRepo;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
@@ -23,6 +24,8 @@ import java.util.Map;
  */
 
 @Component
+@RequiredArgsConstructor
+@Slf4j
 public class DefaultSignatoryFacadeImpl implements SignatoryFacade {
 
     private final String APV_SIGNATORIES = "APV_SIGNATORIES";
@@ -145,20 +148,12 @@ public class DefaultSignatoryFacadeImpl implements SignatoryFacade {
     private final String CREDIT_CARD_PURCHASE_REQUEST_SIGNATORIES = "CREDIT_CARD_PURCHASE_REQUEST_SIGNATORIES";
     private final String CREDIT_CARD_PURCHASE_REQUEST_SIGNATORIES_DESC = "Default signatories for credit card purchase request";
 
-    @Autowired
-    private SettingFacade settingFacade;
 
-    @Autowired
-    private SettingRepo settingRepo;
-
-    @Autowired
-    private SlEntityRepo slEntityRepo;
-
-    @Autowired
-    private EmployeeRepo employeeRepo;
-
-    @Autowired
-    private AuthenticationFacade authenticationFacade;
+    private final SettingFacade settingFacade;
+    private final SettingRepo settingRepo;
+    private final SlEntityRepo slEntityRepo;
+    private final EmployeeRepo employeeRepo;
+    private final AuthenticationFacade authenticationFacade;
 
     @Override
     public void apv(AccountsPayableVoucher apv) {
@@ -187,7 +182,7 @@ public class DefaultSignatoryFacadeImpl implements SignatoryFacade {
                 settingRepo.save(setting);
             }
         }catch (Exception ex) {
-            ex.printStackTrace();
+            log.error("Error in apv: {}", ex.getMessage(), ex);
         }
     }
 
@@ -223,7 +218,7 @@ public class DefaultSignatoryFacadeImpl implements SignatoryFacade {
                 settingRepo.save(setting);
             }
         }catch (Exception ex) {
-            ex.printStackTrace();
+            log.error("Error in cv: {}", ex.getMessage(), ex);
         }
     }
 
@@ -257,7 +252,7 @@ public class DefaultSignatoryFacadeImpl implements SignatoryFacade {
                 settingRepo.save(setting);
             }
         }catch (Exception ex) {
-            ex.printStackTrace();
+            log.error("Error in jv: {}", ex.getMessage(), ex);
         }
     }
 
@@ -304,7 +299,7 @@ public class DefaultSignatoryFacadeImpl implements SignatoryFacade {
                 settingRepo.save(setting);
             }
         }catch (Exception ex) {
-            ex.printStackTrace();
+            log.error("Error in rv: {}", ex.getMessage(), ex);
         }
     }
 
@@ -336,7 +331,7 @@ public class DefaultSignatoryFacadeImpl implements SignatoryFacade {
                 settingRepo.save(setting);
             }
         }catch (Exception ex) {
-            ex.printStackTrace();
+            log.error("Error in po: {}", ex.getMessage(), ex);
         }
     }
 
@@ -372,7 +367,7 @@ public class DefaultSignatoryFacadeImpl implements SignatoryFacade {
                 settingRepo.save(setting);
             }
         }catch (Exception ex) {
-            ex.printStackTrace();
+            log.error("Error in quotation: {}", ex.getMessage(), ex);
         }
     }
 
@@ -435,7 +430,7 @@ public class DefaultSignatoryFacadeImpl implements SignatoryFacade {
                 settingRepo.save(setting);
             }
         }catch (Exception ex) {
-            ex.printStackTrace();
+            log.error("Error in aj: {}", ex.getMessage(), ex);
         }
     }
 
@@ -467,7 +462,7 @@ public class DefaultSignatoryFacadeImpl implements SignatoryFacade {
                 settingRepo.save(setting);
             }
         }catch (Exception ex) {
-            ex.printStackTrace();
+            log.error("Error in jo: {}", ex.getMessage(), ex);
         }
     }
 
@@ -497,7 +492,7 @@ public class DefaultSignatoryFacadeImpl implements SignatoryFacade {
                 settingRepo.save(setting);
             }
         }catch (Exception ex) {
-            ex.printStackTrace();
+            log.error("Error in joAcceptance: {}", ex.getMessage(), ex);
         }
     }
 
@@ -1197,7 +1192,7 @@ public class DefaultSignatoryFacadeImpl implements SignatoryFacade {
                 settingRepo.save(setting);
             }
         }catch (Exception ex) {
-            ex.printStackTrace();
+            log.error("Error in miv: {}", ex.getMessage(), ex);
         }
     }
 
@@ -1244,7 +1239,7 @@ public class DefaultSignatoryFacadeImpl implements SignatoryFacade {
                 settingRepo.save(setting);
             }
         }catch (Exception ex) {
-            ex.printStackTrace();
+            log.error("Error in pcvSummary: {}", ex.getMessage(), ex);
         }
     }
 
@@ -1285,7 +1280,7 @@ public class DefaultSignatoryFacadeImpl implements SignatoryFacade {
                 settingRepo.save(setting);
             }
         }catch (Exception ex) {
-            ex.printStackTrace();
+            log.error("Error in pcv: {}", ex.getMessage(), ex);
         }
     }
 
@@ -1324,7 +1319,7 @@ public class DefaultSignatoryFacadeImpl implements SignatoryFacade {
                 settingRepo.save(setting);
             }
         }catch (Exception ex) {
-            ex.printStackTrace();
+            log.error("Error in pettyCashLiquidation: {}", ex.getMessage(), ex);
         }
     }
 
@@ -1354,7 +1349,7 @@ public class DefaultSignatoryFacadeImpl implements SignatoryFacade {
                 settingRepo.save(setting);
             }
         }catch (Exception ex) {
-            ex.printStackTrace();
+            log.error("Error in budget: {}", ex.getMessage(), ex);
         }
     }
 
@@ -1386,7 +1381,7 @@ public class DefaultSignatoryFacadeImpl implements SignatoryFacade {
                 settingRepo.save(setting);
             }
         }catch (Exception ex) {
-            ex.printStackTrace();
+            log.error("Error in bad: {}", ex.getMessage(), ex);
         }
     }*/
 
@@ -1417,7 +1412,7 @@ public class DefaultSignatoryFacadeImpl implements SignatoryFacade {
                 settingRepo.save(setting);
             }
         }catch (Exception ex) {
-            ex.printStackTrace();
+            log.error("Error in sv: {}", ex.getMessage(), ex);
         }
     }
 
@@ -1447,7 +1442,7 @@ public class DefaultSignatoryFacadeImpl implements SignatoryFacade {
                 settingRepo.save(setting);
             }
         }catch (Exception ex) {
-            ex.printStackTrace();
+            log.error("Error in crv: {}", ex.getMessage(), ex);
         }
     }
 
@@ -1479,7 +1474,7 @@ public class DefaultSignatoryFacadeImpl implements SignatoryFacade {
                 settingRepo.save(setting);
             }
         }catch (Exception ex) {
-            ex.printStackTrace();
+            log.error("Error in ca: {}", ex.getMessage(), ex);
         }
     }
 
@@ -1510,7 +1505,7 @@ public class DefaultSignatoryFacadeImpl implements SignatoryFacade {
                 settingRepo.save(setting);
             }
         }catch (Exception ex) {
-            ex.printStackTrace();
+            log.error("Error in cal: {}", ex.getMessage(), ex);
         }
     }
 
@@ -1542,7 +1537,7 @@ public class DefaultSignatoryFacadeImpl implements SignatoryFacade {
                 settingRepo.save(setting);
             }
         }catch (Exception ex) {
-            ex.printStackTrace();
+            log.error("Error in pr: {}", ex.getMessage(), ex);
         }
     }
 
@@ -1573,7 +1568,7 @@ public class DefaultSignatoryFacadeImpl implements SignatoryFacade {
                 settingRepo.save(setting);
             }
         }catch (Exception ex) {
-            ex.printStackTrace();
+            log.error("Error in cashflowStatement: {}", ex.getMessage(), ex);
         }
     }
 
@@ -1612,7 +1607,7 @@ public class DefaultSignatoryFacadeImpl implements SignatoryFacade {
                 settingRepo.save(setting);
             }
         }catch (Exception ex) {
-            ex.printStackTrace();
+            log.error("Error in birForm1601E: {}", ex.getMessage(), ex);
         }
     }
 
@@ -1644,7 +1639,7 @@ public class DefaultSignatoryFacadeImpl implements SignatoryFacade {
                 settingRepo.save(setting);
             }
         }catch (Exception ex) {
-            ex.printStackTrace();
+            log.error("Error in rr: {}", ex.getMessage(), ex);
         }
     }
 
@@ -1674,7 +1669,7 @@ public class DefaultSignatoryFacadeImpl implements SignatoryFacade {
                 settingRepo.save(setting);
             }
         }catch (Exception ex) {
-            ex.printStackTrace();
+            log.error("Error in glInquirySummary: {}", ex.getMessage(), ex);
         }
     }
 
@@ -1710,7 +1705,7 @@ public class DefaultSignatoryFacadeImpl implements SignatoryFacade {
                 settingRepo.save(setting);
             }
         }catch (Exception ex) {
-            ex.printStackTrace();
+            log.error("Error in sw: {}", ex.getMessage(), ex);
         }
     }
 
@@ -1751,7 +1746,7 @@ public class DefaultSignatoryFacadeImpl implements SignatoryFacade {
                 settingRepo.save(setting);
             }
         }catch (Exception ex) {
-            ex.printStackTrace();
+            log.error("Error in sr: {}", ex.getMessage(), ex);
         }
     }
 
@@ -1785,7 +1780,7 @@ public class DefaultSignatoryFacadeImpl implements SignatoryFacade {
                 settingRepo.save(setting);
             }
         }catch (Exception ex) {
-            ex.printStackTrace();
+            log.error("Error in mct: {}", ex.getMessage(), ex);
         }
     }
 
@@ -1819,7 +1814,7 @@ public class DefaultSignatoryFacadeImpl implements SignatoryFacade {
                 settingRepo.save(setting);
             }
         }catch (Exception ex) {
-            ex.printStackTrace();
+            log.error("Error in sa: {}", ex.getMessage(), ex);
         }
     }
 
@@ -1852,7 +1847,7 @@ public class DefaultSignatoryFacadeImpl implements SignatoryFacade {
                 settingRepo.save(setting);
             }
         }catch (Exception ex) {
-            ex.printStackTrace();
+            log.error("Error in mst: {}", ex.getMessage(), ex);
         }
     }
 
@@ -1884,7 +1879,7 @@ public class DefaultSignatoryFacadeImpl implements SignatoryFacade {
                 settingRepo.save(setting);
             }
         }catch (Exception ex) {
-            ex.printStackTrace();
+            log.error("Error in st: {}", ex.getMessage(), ex);
         }
     }
 
@@ -1917,7 +1912,7 @@ public class DefaultSignatoryFacadeImpl implements SignatoryFacade {
                 settingRepo.save(setting);
             }
         }catch (Exception ex) {
-            ex.printStackTrace();
+            log.error("Error in src: {}", ex.getMessage(), ex);
         }
     }
 
@@ -1948,7 +1943,7 @@ public class DefaultSignatoryFacadeImpl implements SignatoryFacade {
                 settingRepo.save(setting);
             }
         }catch (Exception ex) {
-            ex.printStackTrace();
+            log.error("Error in summaryOfQuotation: {}", ex.getMessage(), ex);
         }
     }
 
@@ -1980,7 +1975,7 @@ public class DefaultSignatoryFacadeImpl implements SignatoryFacade {
                 settingRepo.save(setting);
             }
         }catch (Exception ex) {
-            ex.printStackTrace();
+            log.error("Error in siteInspectionReport: {}", ex.getMessage(), ex);
         }
     }
 
@@ -2014,7 +2009,7 @@ public class DefaultSignatoryFacadeImpl implements SignatoryFacade {
                 settingRepo.save(setting);
             }
         }catch (Exception ex) {
-            ex.printStackTrace();
+            log.error("Error in ce: {}", ex.getMessage(), ex);
         }
     }
 
@@ -2048,7 +2043,7 @@ public class DefaultSignatoryFacadeImpl implements SignatoryFacade {
                 settingRepo.save(setting);
             }
         }catch (Exception ex) {
-            ex.printStackTrace();
+            log.error("Error in bom: {}", ex.getMessage(), ex);
         }
     }
 
@@ -2083,7 +2078,7 @@ public class DefaultSignatoryFacadeImpl implements SignatoryFacade {
                 settingRepo.save(setting);
             }
         }catch (Exception ex) {
-            ex.printStackTrace();
+            log.error("Error in projectAcceptanceReport: {}", ex.getMessage(), ex);
         }
     }
 
@@ -2114,7 +2109,7 @@ public class DefaultSignatoryFacadeImpl implements SignatoryFacade {
                 settingRepo.save(setting);
             }
         }catch (Exception ex) {
-            ex.printStackTrace();
+            log.error("Error in projectAcceptanceCertification: {}", ex.getMessage(), ex);
         }
     }
 
@@ -2157,7 +2152,7 @@ public class DefaultSignatoryFacadeImpl implements SignatoryFacade {
             }
 
         }catch (Exception ex) {
-            ex.printStackTrace();
+            log.error("Error in budgetLineItem: {}", ex.getMessage(), ex);
         }
 
     }
@@ -2193,7 +2188,7 @@ public class DefaultSignatoryFacadeImpl implements SignatoryFacade {
             }
 
         } catch (Exception ex){
-            ex.printStackTrace();
+            log.error("Error in memorandumReceipt: {}", ex.getMessage(), ex);
         }
 
     }
@@ -2233,7 +2228,7 @@ public class DefaultSignatoryFacadeImpl implements SignatoryFacade {
             }
 
         } catch (Exception ex){
-            ex.printStackTrace();
+            log.error("Error in creditCardPurchaseRequest: {}", ex.getMessage(), ex);
         }
 
     }

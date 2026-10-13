@@ -6,14 +6,14 @@ import { PaymentRequestService } from '../payment-request.service';
 import { FlatpickrDirective, provideFlatpickrDefaults } from 'angularx-flatpickr';
 import { FormsModule } from '@angular/forms';
 import { provideIcons } from '@ng-icons/core';
-import { tablerSearch, tablerRefresh, tablerPlus, tablerEye, tablerEdit } from '@ng-icons/tabler-icons';
+import { tablerSearch, tablerRefresh, tablerPlus, tablerEye, tablerEdit, tablerChevronLeft, tablerChevronRight } from '@ng-icons/tabler-icons';
 import { monthStart, monthEnd } from '@/app/shared/utils/date.utils';
 
 @Component({
     selector: 'app-payment-request-main',
     imports: [...COMMON_ALL_PAGE_IMPORTS, ...COMMON_MAIN_PAGE_IMPORTS, FlatpickrDirective, FormsModule, RouterLink],
     providers: [provideFlatpickrDefaults(), ...SHARED_PROVIDERS,
-        provideIcons({ tablerSearch, tablerRefresh, tablerPlus, tablerEye, tablerEdit })],
+        provideIcons({ tablerSearch, tablerRefresh, tablerPlus, tablerEye, tablerEdit, tablerChevronLeft, tablerChevronRight })],
     templateUrl: './payment-request-main.component.html'
 })
 export class PaymentRequestMainComponent {
