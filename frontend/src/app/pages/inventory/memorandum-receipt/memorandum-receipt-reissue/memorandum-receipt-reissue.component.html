@@ -19,7 +19,7 @@
                                     <input type="text" class="form-control"
                                            [value]="employee()?.name || employee()?.fullName || ''" readonly
                                            placeholder="Browse employee..."/>
-                                    <button type="button" class="btn btn-primary fw-bold gap-1" (click)="openEmployeeBrowse()">
+                                    <button type="button" class="btn btn-success fw-bold gap-1" (click)="openEmployeeBrowse()">
                                         <ng-icon name="tablerSearch" class="fs-lg fw-bold"></ng-icon>Browse
                                     </button>
                                 </div>
@@ -29,7 +29,7 @@
                                 <div class="input-group">
                                     <input type="text" class="form-control" [value]="selectedReturnedMrCode()" readonly
                                            placeholder="Browse returned MR..."/>
-                                    <button type="button" class="btn btn-primary fw-bold gap-1"
+                                    <button type="button" class="btn btn-success fw-bold gap-1"
                                             [disabled]="!employee()?.accountNo" (click)="openReturnedMrBrowse()">
                                         <ng-icon name="tablerSearch" class="fs-lg fw-bold"></ng-icon>Browse
                                     </button>
@@ -122,7 +122,7 @@
                                     <input type="text" class="form-control"
                                            [value]="approvingOfficer()?.fullName || approvingOfficer()?.name || ''" readonly
                                            placeholder="Browse approving officer..."/>
-                                    <button type="button" class="btn btn-primary fw-bold gap-1" (click)="openApprovingOfficerBrowse()">
+                                    <button type="button" class="btn btn-success fw-bold gap-1" (click)="openApprovingOfficerBrowse()">
                                         <ng-icon name="tablerSearch" class="fs-lg fw-bold"></ng-icon>Browse
                                     </button>
                                 </div>

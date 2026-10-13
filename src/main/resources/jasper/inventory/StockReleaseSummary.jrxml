@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.21.5.final using JasperReports Library version 6.21.5-74d586df47b25dbd05bd0957999819196e59934a  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="WithdrawalSummary" pageWidth="1008" pageHeight="612" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="968" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isFloatColumnFooter="true" uuid="b29c3ba6-1020-4625-9bd3-1937355162ed">
 	<property name="ireport.zoom" value="0.9982500000000011"/>
 	<property name="ireport.x" value="234"/>
@@ -34,53 +35,76 @@
 		<band splitType="Stretch"/>
 	</background>
 	<title>
-		<band height="163" splitType="Stretch">
+		<band height="120" splitType="Stretch">
 			<image isLazy="true" onErrorType="Icon">
-				<reportElement x="0" y="0" width="58" height="58" uuid="a572ebb6-75d3-4cc5-adf8-83c0b47be5b6"/>
+				<reportElement x="0" y="0" width="50" height="50" uuid="a572ebb6-75d3-4cc5-adf8-83c0b47be5b6">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
 				<imageExpression><![CDATA[$P{LOGO_PATH}]]></imageExpression>
 			</image>
 			<textField>
-				<reportElement mode="Transparent" x="1" y="43" width="967" height="24" forecolor="#000000" backcolor="#FFFFFF" uuid="a3b0e4f2-46ac-46a1-b650-63312ce0eb21"/>
-				<textElement textAlignment="Center" verticalAlignment="Top" rotation="None" markup="none">
-					<font fontName="SansSerif" size="11" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				<reportElement mode="Transparent" x="1" y="30" width="967" height="20" forecolor="#000000" backcolor="#FFFFFF" uuid="a3b0e4f2-46ac-46a1-b650-63312ce0eb21">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="SansSerif" size="14" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{REPORT_TITLE}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="1" y="14" width="967" height="20" uuid="8dc03b87-ce0f-42e3-84cc-ff569c6fde86"/>
-				<textElement textAlignment="Center">
+				<reportElement x="1" y="16" width="967" height="14" uuid="8dc03b87-ce0f-42e3-84cc-ff569c6fde86">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="SansSerif" size="10"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{COMP_ADDR}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="1" y="0" width="966" height="20" uuid="ae3d854d-6819-4ef4-9f26-69fb77969167"/>
-				<textElement textAlignment="Center">
+				<reportElement x="1" y="0" width="966" height="16" uuid="ae3d854d-6819-4ef4-9f26-69fb77969167">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="SansSerif" size="12" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{COMP_NAME}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="0" y="67" width="968" height="14" uuid="3ae1aa15-ff4f-4986-8516-b17c621d9df3"/>
-				<textElement textAlignment="Center">
+				<reportElement x="-1" y="50" width="968" height="14" uuid="3ae1aa15-ff4f-4986-8516-b17c621d9df3">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="SansSerif" size="10"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{RANGE}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="0" y="113" width="968" height="17" uuid="e02040f8-86fe-4cf6-9cdb-72acdcd11913"/>
-				<textElement textAlignment="Center"/>
+				<reportElement x="-1" y="92" width="968" height="14" uuid="e02040f8-86fe-4cf6-9cdb-72acdcd11913">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif"/>
+				</textElement>
 				<textFieldExpression><![CDATA[$P{STATUS}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="1" y="81" width="966" height="17" uuid="6261f0cd-ad35-44cb-ac91-f02bc0663269"/>
-				<textElement textAlignment="Center"/>
+				<reportElement x="-1" y="64" width="968" height="14" uuid="6261f0cd-ad35-44cb-ac91-f02bc0663269">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif"/>
+				</textElement>
 				<textFieldExpression><![CDATA[$P{TYPE}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="0" y="97" width="968" height="17" uuid="c58048e3-8b00-4a92-acb8-a692fe111871"/>
-				<textElement textAlignment="Center"/>
+				<reportElement x="-1" y="78" width="968" height="14" uuid="c58048e3-8b00-4a92-acb8-a692fe111871">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif"/>
+				</textElement>
 				<textFieldExpression><![CDATA[$P{INVENTORY_LOCATION}]]></textFieldExpression>
 			</textField>
 		</band>
@@ -184,43 +208,66 @@
 	</columnHeader>
 	<detail>
 		<band height="18" splitType="Stretch">
-			<textField isStretchWithOverflow="true" pattern="MMM d, yyyy" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" pattern="MMM d, yyyy" isBlankWhenNull="true">
 				<reportElement x="1" y="0" width="82" height="17" isPrintWhenDetailOverflows="true" uuid="16489928-e18b-4038-8a2d-b95c8a4725fd"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="SansSerif"/>
+				</textElement>
 				<textFieldExpression><![CDATA[$F{voucherDate}]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement x="83" y="0" width="140" height="17" isPrintWhenDetailOverflows="true" uuid="2c214ad4-43f1-4c16-b765-0b8b1f16a3cc"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="SansSerif"/>
+				</textElement>
 				<textFieldExpression><![CDATA[$F{code}]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement x="230" y="0" width="323" height="17" isPrintWhenDetailOverflows="true" uuid="252b3afb-8b17-4ef3-87bd-a70ed9731b56"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="SansSerif"/>
+				</textElement>
 				<textFieldExpression><![CDATA[$F{description}]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement x="553" y="0" width="85" height="17" isPrintWhenDetailOverflows="true" uuid="b206d2e1-8152-4f59-aace-9fe5d91df190"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="SansSerif"/>
+				</textElement>
 				<textFieldExpression><![CDATA[$F{status}]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement x="638" y="0" width="74" height="17" isPrintWhenDetailOverflows="true" uuid="0ea39b25-960d-4e8c-a7c6-bd378284ee89"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="SansSerif"/>
+				</textElement>
 				<textFieldExpression><![CDATA[$F{itemId}]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement x="688" y="0" width="80" height="17" isPrintWhenDetailOverflows="true" uuid="27e7ecf3-6857-49c2-9d20-cf20c6beef9c"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="SansSerif"/>
+				</textElement>
 				<textFieldExpression><![CDATA[$F{itemCode}]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" pattern="#,##0.00;(#,##0.00)" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" pattern="#,##0.00;(#,##0.00)" isBlankWhenNull="true">
 				<reportElement x="767" y="0" width="64" height="17" isPrintWhenDetailOverflows="true" uuid="efc20484-6eff-4a63-9e0c-1cd152c89144"/>
-				<textElement textAlignment="Right"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="SansSerif"/>
+				</textElement>
 				<textFieldExpression><![CDATA[$F{quantity}]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement x="834" y="0" width="60" height="17" isPrintWhenDetailOverflows="true" uuid="33b4cddd-df17-43e1-916a-f3ad52bfcbcc"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="SansSerif"/>
+				</textElement>
 				<textFieldExpression><![CDATA[$F{unit}]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" pattern="#,##0.00;(#,##0.00)" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" pattern="#,##0.00;(#,##0.00)" isBlankWhenNull="true">
 				<reportElement x="894" y="0" width="73" height="17" isPrintWhenDetailOverflows="true" uuid="1b3dcb36-02ca-4e47-94da-c8db743231a0"/>
-				<textElement textAlignment="Right">
-					<font isStrikeThrough="false"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="SansSerif" isStrikeThrough="false"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{quantityReleased}]]></textFieldExpression>
 			</textField>
@@ -236,24 +283,24 @@
 	<pageFooter>
 		<band height="20">
 			<textField>
-				<reportElement x="1" y="0" width="505" height="20" uuid="1d041190-5677-4495-9449-2614496158d6"/>
-				<textElement textAlignment="Right">
-					<font size="9"/>
+				<reportElement x="1" y="0" width="48" height="20" uuid="1d041190-5677-4495-9449-2614496158d6"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="9"/>
 				</textElement>
 				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of "]]></textFieldExpression>
 			</textField>
 			<textField evaluationTime="Report">
-				<reportElement x="506" y="0" width="100" height="20" uuid="be5e0bbf-4aff-4e52-a741-bfb9439cf235"/>
+				<reportElement x="50" y="0" width="110" height="20" uuid="be5e0bbf-4aff-4e52-a741-bfb9439cf235"/>
 				<box leftPadding="5"/>
-				<textElement>
-					<font size="9"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="SansSerif" size="9"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
 			</textField>
 			<textField pattern="MM/dd/yyyy hh:mm a" isBlankWhenNull="true">
 				<reportElement x="670" y="0" width="297" height="20" uuid="e93051fa-585c-4d2e-b985-bf3f49afe41c"/>
-				<textElement textAlignment="Right">
-					<font size="9"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="9"/>
 				</textElement>
 				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
 			</textField>
@@ -262,16 +309,16 @@
 	<lastPageFooter>
 		<band height="20">
 			<textField>
-				<reportElement x="0" y="0" width="967" height="20" uuid="16b40e6f-6aac-44b6-9c6d-225e9e02f71d"/>
-				<textElement textAlignment="Center">
-					<font size="9"/>
+				<reportElement x="0" y="0" width="159" height="20" uuid="16b40e6f-6aac-44b6-9c6d-225e9e02f71d"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="9"/>
 				</textElement>
 				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of " + $V{PAGE_NUMBER}]]></textFieldExpression>
 			</textField>
 			<textField pattern="MM/dd/yyyy hh:mm a" isBlankWhenNull="true">
 				<reportElement x="670" y="0" width="297" height="20" uuid="fb725bcf-3046-4661-8c73-6969637ff1d2"/>
-				<textElement textAlignment="Right">
-					<font size="9"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="9"/>
 				</textElement>
 				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
 			</textField>
@@ -284,14 +331,14 @@
 			</line>
 			<staticText>
 				<reportElement x="1" y="5" width="194" height="20" uuid="0590108c-d4e6-4549-bebb-7cbdf75ceda5"/>
-				<textElement markup="none">
-					<font size="12" isBold="true"/>
+				<textElement verticalAlignment="Middle" markup="none">
+					<font fontName="SansSerif" size="12" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Number of Stock Releases: ]]></text>
 			</staticText>
-			<textField isStretchWithOverflow="true" pattern="#,##0;(-#,##0)" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" pattern="#,##0;(-#,##0)" isBlankWhenNull="true">
 				<reportElement mode="Transparent" x="195" y="5" width="195" height="20" forecolor="#000000" backcolor="#FFFFFF" uuid="3597297c-7633-4ddd-8279-2b7bfc797e81"/>
-				<textElement textAlignment="Left" verticalAlignment="Top" rotation="None" markup="none">
+				<textElement textAlignment="Left" verticalAlignment="Middle" rotation="None" markup="none">
 					<font fontName="SansSerif" size="12" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>

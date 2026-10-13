@@ -19,7 +19,7 @@
                     <div class="d-flex align-items-center justify-content-between mb-2">
                         <span class="fs-sm fw-semibold">Temp GL/SL</span>
                         <div class="d-flex gap-2">
-                            <button type="button" class="btn btn-primary fw-bold" (click)="openTempGLBrowse()">
+                            <button type="button" class="btn btn-success fw-bold" (click)="openTempGLBrowse()">
                                 <ng-icon name="tablerSearch" class="me-1 fs-lg fw-bold"></ng-icon>Browse Temp GL/SL
                             </button>
                             @if (tempBatch) {
@@ -45,7 +45,7 @@
                     <div class="d-flex align-items-center justify-content-between mb-2">
                         <span class="fs-sm fw-semibold">Source Document</span>
                         <div class="d-flex gap-2">
-                            <button type="button" class="btn btn-primary fw-bold" (click)="openSourceVoucherBrowse()">
+                            <button type="button" class="btn btn-success fw-bold" (click)="openSourceVoucherBrowse()">
                                 <ng-icon name="tablerLink" class="me-1 fs-lg fw-bold"></ng-icon>Browse Document
                             </button>
                             @if (selectedSourceVoucher) {
@@ -257,7 +257,7 @@
                         <span class="fs-sm fw-semibold">Job Order / Purchase Order</span>
                         <div class="d-flex gap-2">
                             @if (!purchaseOrder) {
-                                <button type="button" class="btn btn-primary fw-bold" (click)="openJobOrderBrowse()">
+                                <button type="button" class="btn btn-success fw-bold" (click)="openJobOrderBrowse()">
                                     <ng-icon name="tablerSearch" class="me-1 fs-lg fw-bold"></ng-icon>Browse Job Order
                                 </button>
                             }
@@ -267,7 +267,7 @@
                                 </button>
                             }
                             @if (!jobOrder) {
-                                <button type="button" class="btn btn-primary fw-bold" (click)="openPurchaseOrderBrowse()">
+                                <button type="button" class="btn btn-success fw-bold" (click)="openPurchaseOrderBrowse()">
                                     <ng-icon name="tablerSearch" class="me-1 fs-lg fw-bold"></ng-icon>Browse Purchase Order
                                 </button>
                             }

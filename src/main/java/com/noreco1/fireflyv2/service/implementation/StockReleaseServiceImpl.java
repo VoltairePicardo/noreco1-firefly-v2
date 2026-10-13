@@ -135,8 +135,8 @@ public class StockReleaseServiceImpl implements StockReleaseService, PrintableVo
                     ItemTransactionDetailDto dto = new ItemTransactionDetailDto();
                     dto.setItemId(d.getItemStock().getItem().getId());
                     dto.setItemCode(d.getItemStock().getItem().getCode());
-                    dto.setUnitId(d.getItemStock().getItem().getUnit().getId());
-                    dto.setUnitCode(d.getItemStock().getItem().getUnit().getCode());
+                    dto.setUnitId(d.getItemStock().getItem().getUnit() != null ? d.getItemStock().getItem().getUnit().getId() : null);
+                    dto.setUnitCode(d.getItemStock().getItem().getUnit() != null ? d.getItemStock().getItem().getUnit().getCode() : "");
                     dto.setItemDescription(d.getItemStock().getItem().getDescription());
                     for (StockWithdrawalDetail swd : widDetails) {
                         if (d.getItemStock().getItem().getId().equals(swd.getItem().getId())) {
@@ -181,8 +181,8 @@ public class StockReleaseServiceImpl implements StockReleaseService, PrintableVo
                     ItemTransactionDetailDto dto = new ItemTransactionDetailDto();
                     dto.setItemId(d.getItemStock().getItem().getId());
                     dto.setItemCode(d.getItemStock().getItem().getCode());
-                    dto.setUnitId(d.getItemStock().getItem().getUnit().getId());
-                    dto.setUnitCode(d.getItemStock().getItem().getUnit().getCode());
+                    dto.setUnitId(d.getItemStock().getItem().getUnit() != null ? d.getItemStock().getItem().getUnit().getId() : null);
+                    dto.setUnitCode(d.getItemStock().getItem().getUnit() != null ? d.getItemStock().getItem().getUnit().getCode() : "");
                     dto.setItemDescription(d.getItemStock().getItem().getDescription());
 
                     for (ItemTransactionDetail swd : transDetails) {
@@ -269,8 +269,8 @@ public class StockReleaseServiceImpl implements StockReleaseService, PrintableVo
                     detailMap.put("code", detail.getItemStock().getItem().getCode());
                     detailMap.put("description", detail.getItemStock().getItem().getDescription());
                     detailMap.put("quantity", detail.getQuantity());
-                    detailMap.put("unitCode", detail.getItemStock().getItem().getUnit().getCode());
-                    detailMap.put("unitId", detail.getItemStock().getItem().getUnit().getId());
+                    detailMap.put("unitCode", detail.getItemStock().getItem().getUnit() != null ? detail.getItemStock().getItem().getUnit().getCode() : "");
+                    detailMap.put("unitId", detail.getItemStock().getItem().getUnit() != null ? detail.getItemStock().getItem().getUnit().getId() : null);
                     detailMap.put("unitCost", detail.getUnitCost());
                     detailMap.put("totalCost", detail.getTotalCost());
                     detailMap.put("stockTransactionDetailId", detail.getId());
@@ -832,7 +832,7 @@ public class StockReleaseServiceImpl implements StockReleaseService, PrintableVo
                 StockWithdrawalDetailDto detailDto = new StockWithdrawalDetailDto();
 
                 detailDto.setItemId(detail.getItem().getId());
-                detailDto.setUnitCode(detail.getItem().getUnit().getCode());
+                detailDto.setUnitCode(detail.getItem().getUnit() != null ? detail.getItem().getUnit().getCode() : "");
                 detailDto.setItemCode(detail.getItem().getCode());
                 detailDto.setItemDescription(detail.getItem().getDescription());
                 detailDto.setQuantity(detail.getQuantity());
@@ -1098,7 +1098,7 @@ public class StockReleaseServiceImpl implements StockReleaseService, PrintableVo
             Integer invLoc = 0;
             if(stockRelease.getType() != StockReleaseType.STRL.getId()){
                 StockWithdrawal stockWithdrawal = stockWithdrawalRepo.findOneByTransactionId(stockRelease.getDocumentTransaction().getId());
-                department = stockWithdrawal.getDepartment().getName();
+                department = stockWithdrawal.getDepartment() != null ? stockWithdrawal.getDepartment().getName() : "";
                 location = stockRelease.getInventoryLocation().getDescription();
                 docTransNo = stockWithdrawal.getCode();
                 woNo = stockWithdrawal.getWorkOrder() != null ? stockWithdrawal.getWorkOrder().getCode() : "";

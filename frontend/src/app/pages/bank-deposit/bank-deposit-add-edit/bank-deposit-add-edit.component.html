@@ -33,9 +33,9 @@
                                 @if (uploading) {
                                     <span class="spinner-border spinner-border-sm me-1" role="status"></span>
                                 } @else if (uploadFile) {
-                                    <ng-icon name="tablerUpload" class="ps-0 pe-2 fw-bold"></ng-icon>
+                                    <ng-icon name="tablerUpload" class="ps-0 pe-3 fw-bold"></ng-icon>
                                 } @else {
-                                    <ng-icon name="tablerPaperclip" class="ps-0 pe-2 fw-bold"></ng-icon>
+                                    <ng-icon name="tablerPaperclip" class="ps-0 pe-3 fw-bold"></ng-icon>
                                 }
                                 {{ uploading ? 'Uploading...' : (uploadFile ? 'Upload' : 'Choose') }}
                             </button>
@@ -85,7 +85,7 @@
                                        readonly placeholder="Select bank account..."/>
                                 <button type="button" class="btn btn-success fw-bold"
                                         (click)="openBankBrowse()">
-                                    <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
+                                    <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
                                 </button>
                             </div>
                             @if (bankAccount?.accountNumber) {
@@ -136,7 +136,7 @@
                                 <h6 class="fw-semibold text-uppercase fs-xs mb-0">Attachments</h6>
                                 <button type="button" class="btn btn-success fw-bold btn-sm"
                                         [disabled]="uploadingFiles" (click)="openFilePicker()">
-                                    <ng-icon name="tablerPaperclip" class="ps-0 pe-2 fw-bold"></ng-icon>Attach Files
+                                    <ng-icon name="tablerPaperclip" class="ps-0 pe-3 fw-bold"></ng-icon>Attach Files
                                 </button>
                                 <small class="text-muted">JPG, PNG, PDF only</small>
                             </div>

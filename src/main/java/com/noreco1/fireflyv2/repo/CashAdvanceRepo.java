@@ -179,7 +179,7 @@ public interface CashAdvanceRepo extends JpaRepository<CashAdvance, Integer> {
             nativeQuery = true)
     Page<CashAdvance> findAllForLiquidationByQuery(@Param("query") String query, Pageable pageable);
 
-    @Query(value = "SELECT * FROM CashAdvance ca " +
+    @Query(value = "SELECT ca.* FROM CashAdvance ca " +
             "left JOIN CashAdvanceLiquidation cal ON ca.id = cal.FK_cashAdvanceId " +
             "LEFT JOIN JournalVoucher jv ON cal.id = jv.FK_cashAdvanceLiquidationId " +
             "WHERE (cal.id IS NULL OR jv.id IS NULL OR jv.FK_documentStatusId != 7) " +
@@ -187,7 +187,7 @@ public interface CashAdvanceRepo extends JpaRepository<CashAdvance, Integer> {
             nativeQuery = true)
     List<CashAdvance> findAllUnliquidated();
 
-    @Query(value = "SELECT * FROM CashAdvance ca " +
+    @Query(value = "SELECT ca.* FROM CashAdvance ca " +
             "left JOIN CashAdvanceLiquidation cal ON ca.id = cal.FK_cashAdvanceId " +
             "LEFT JOIN JournalVoucher jv ON cal.id = jv.FK_cashAdvanceLiquidationId " +
             "WHERE (cal.id IS NULL OR jv.id IS NULL OR jv.FK_documentStatusId != 7) " +
@@ -196,7 +196,7 @@ public interface CashAdvanceRepo extends JpaRepository<CashAdvance, Integer> {
             nativeQuery = true)
     List<CashAdvance> findAllUnliquidatedOverdue();
 
-    @Query(value = "SELECT * FROM CashAdvance ca " +
+    @Query(value = "SELECT ca.* FROM CashAdvance ca " +
             "left JOIN CashAdvanceLiquidation cal ON ca.id = cal.FK_cashAdvanceId " +
             "LEFT JOIN JournalVoucher jv ON cal.id = jv.FK_cashAdvanceLiquidationId " +
             "WHERE (cal.id IS NULL OR jv.id IS NULL OR jv.FK_documentStatusId != 7) " +

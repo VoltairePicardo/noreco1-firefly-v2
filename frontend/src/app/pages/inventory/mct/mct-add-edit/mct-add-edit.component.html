@@ -26,7 +26,7 @@
                                 <span class="fs-sm fw-semibold">Material Charge Ticket Details</span>
                                 @if (!editMode) {
                                     <div class="d-flex gap-2">
-                                        <button type="button" class="btn btn-primary fw-bold"
+                                        <button type="button" class="btn btn-success fw-bold"
                                                 (click)="openStockReleaseBrowse()">
                                             <ng-icon name="tablerPlus" class="me-1 fs-lg fw-bold"></ng-icon>Browse Material Charge Ticket
                                         </button>
@@ -144,7 +144,7 @@
                                         <input type="text" class="form-control"
                                                [value]="approvingOfficer() ? (approvingOfficer().fullName || approvingOfficer().name || '') : ''"
                                                readonly placeholder="Browse receiving officer..."/>
-                                        <button type="button" class="btn btn-primary fw-bold"
+                                        <button type="button" class="btn btn-success fw-bold"
                                                 (click)="openApprovingOfficerBrowse()">
                                             <ng-icon name="tablerSearch" class="me-1 fs-lg fw-bold"></ng-icon>Browse
                                         </button>

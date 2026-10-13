@@ -42,7 +42,7 @@
                                    [value]="vendor ? (vendor.name || vendor.accountName || '') : ''"
                                    readonly placeholder="Select vendor..."/>
                             <button type="button" class="btn btn-success fw-bold" (click)="openVendorBrowse()">
-                                <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
+                                <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
                             </button>
                             @if (vendor) {
                                 <button type="button" class="btn btn-light fw-bold" (click)="clearVendor()">
@@ -58,7 +58,7 @@
                 <div class="d-flex align-items-center justify-content-between mb-2">
                     <div class="fs-xs text-uppercase fw-semibold text-muted">Payment Details</div>
                     <button type="button" class="btn btn-success fw-bold btn-sm" (click)="addLineItem()">
-                        <ng-icon name="tablerPlus" class="ps-0 pe-2 fw-bold"></ng-icon>Add Item
+                        <ng-icon name="tablerPlus" class="ps-0 pe-3 fw-bold"></ng-icon>Add Item
                     </button>
                 </div>
                 <div class="table-responsive">
@@ -117,7 +117,7 @@
                 <div class="d-flex align-items-center justify-content-between mb-2">
                     <div class="fs-xs text-uppercase fw-semibold text-muted">Budget Line Item <span class="text-danger">*</span></div>
                     <button type="button" class="btn btn-success fw-bold btn-sm" (click)="openBudgetLineItemBrowse()">
-                        <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
+                        <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
                     </button>
                 </div>
                 <div class="table-responsive">
@@ -162,7 +162,7 @@
                 <div class="d-flex align-items-center justify-content-between mb-2">
                     <div class="fs-xs text-uppercase fw-semibold text-muted">Budget Sub Item</div>
                     <button type="button" class="btn btn-success fw-bold btn-sm" (click)="addBudgetSubItem()">
-                        <ng-icon name="tablerPlus" class="ps-0 pe-2 fw-bold"></ng-icon>Add Sub Item
+                        <ng-icon name="tablerPlus" class="ps-0 pe-3 fw-bold"></ng-icon>Add Sub Item
                     </button>
                 </div>
                 <div class="table-responsive">
@@ -231,7 +231,7 @@
                     <div class="fs-xs text-uppercase fw-semibold text-muted">Attachments</div>
                     <button type="button" class="btn btn-success fw-bold btn-sm gap-1"
                             [disabled]="uploadingFiles" (click)="openFilePicker()">
-                        <ng-icon name="tablerPaperclip" class="ps-0 pe-2 fw-bold fs-md"></ng-icon>Attach Files
+                        <ng-icon name="tablerPaperclip" class="ps-0 pe-3 fw-bold fs-md"></ng-icon>Attach Files
                     </button>
                     <small class="text-muted">JPG, PNG, PDF only</small>
                 </div>

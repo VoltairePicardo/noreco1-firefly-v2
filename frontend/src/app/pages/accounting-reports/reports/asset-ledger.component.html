@@ -23,56 +23,39 @@
                         }
                     </select>
                 </div>
-
                 <div class="col-md-3">
                     <label class="form-label fw-bold mb-1">Account</label>
                     <div class="input-group">
                         <input type="text" class="form-control" readonly
-                               [value]="selectedAccount ? (selectedAccount.code + ' — ' + selectedAccount.description) : ''"
+                               [value]="selectedAccount ? (selectedAccount.accountCode + ' — ' + selectedAccount.accountTitle) : ''"
                                placeholder="Browse account..."/>
                         <button type="button" class="btn btn-success fw-bold" (click)="browseAccount()">
-                            <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
+                            <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
                         </button>
                     </div>
                 </div>
-
                 <div class="col-md-3">
-                    <div class="d-flex gap-2 justify-content-end">
-                        <button type="button" class="btn btn-success fw-bold" (click)="export('pdf')">
-                            <ng-icon name="tablerFileTypePdf" class="fw-bold me-1"></ng-icon>Export PDF
-                        </button>
-                        <button type="button" class="btn btn-success fw-bold" (click)="export('xls')">
-                            <ng-icon name="tablerFileTypeXls" class="fw-bold me-1"></ng-icon>Export Excel
-                        </button>
-                    </div>
-                </div>
-            </div>
-            <div class="row g-2 align-items-end mb-3">
-                <div class="col-md-4">
-                    <label class="form-label fw-bold mb-1">Account</label>
-                    <div class="input-group">
-                        <input type="text" class="form-control" readonly
-                               [value]="selectedAccount ? (selectedAccount.code + ' — ' + selectedAccount.description) : ''"
-                               placeholder="Browse account..."/>
-                        <button type="button" class="btn btn-success fw-bold" (click)="browseAccount()">
-                            <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
-                        </button>
-                    </div>
-                </div>
-                <div class="col-md-4">
                     <label class="form-label fw-bold mb-1">Asset (CPR)</label>
                     <div class="input-group">
                         <input type="text" class="form-control" readonly
                                [value]="selectedAsset?.description ?? ''"
                                placeholder="Browse asset (optional)..."/>
                         <button type="button" class="btn btn-success fw-bold" (click)="browseAsset()">
-                            <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
+                            <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
                         </button>
                     </div>
                 </div>
-                <div class="col-md-2">
+            </div>
+            <div class="row g-2 align-items-end mb-3">
+                <div class="col-md-auto ms-auto d-flex gap-2">
                     <button type="button" class="btn btn-success fw-bold" (click)="search()">
                         <ng-icon name="tablerSearch" class="fw-bold me-1"></ng-icon>Search
+                    </button>
+                    <button type="button" class="btn btn-success fw-bold" (click)="export('pdf')">
+                        <ng-icon name="tablerFileTypePdf" class="fw-bold me-1"></ng-icon>Export PDF
+                    </button>
+                    <button type="button" class="btn btn-success fw-bold" (click)="export('xls')">
+                        <ng-icon name="tablerFileTypeXls" class="fw-bold me-1"></ng-icon>Export Excel
                     </button>
                 </div>
             </div>

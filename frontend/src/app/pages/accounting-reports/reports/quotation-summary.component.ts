@@ -33,36 +33,36 @@ export class QuotationSummaryComponent {
 
     browseValidator(): void {
         const ref = this.modalService.open(BrowseEntityModalComponent, { size: 'lg', centered: true });
-        ref.componentInstance.types = ['ENTITY_EMPLOYEE'];
+        ref.componentInstance.entityTypes = [1];
         ref.result.then((result) => {
-            if (result) { this.validator = result; this.validatorError = ''; }
+            if (result?.action === 'select' && result?.data) { this.validator = result.data; this.validatorError = ''; }
         }, () => {});
     }
 
     browseApprovedBy(): void {
         const ref = this.modalService.open(BrowseEntityModalComponent, { size: 'lg', centered: true });
-        ref.componentInstance.types = ['ENTITY_EMPLOYEE'];
+        ref.componentInstance.entityTypes = [1];
         ref.result.then((result) => {
-            if (result) { this.approvedBy = result; this.approvedByError = ''; }
+            if (result?.action === 'select' && result?.data) { this.approvedBy = result.data; this.approvedByError = ''; }
         }, () => {});
     }
 
     search(): void {
-        if (!this.rivId || isNaN(Number(this.rivId))) {
-            this.alertService.error(this.module, 'Validation', 'Please enter a valid RV ID.');
+        if (!this.rivId || !this.rivId.trim()) {
+            this.alertService.error(this.module, 'Validation', 'Please enter a valid RV No.');
             return;
         }
         this.isLoading.set(true);
         this.items.set([]);
-        this.service.getQuotationSummaryItems(Number(this.rivId)).subscribe({
+        this.service.getQuotationSummaryItems(this.rivId.trim()).subscribe({
             next: (data) => { this.items.set(data ?? []); this.isLoading.set(false); },
             error: () => { this.isLoading.set(false); }
         });
     }
 
     export(type: 'pdf' | 'xls'): void {
-        if (!this.rivId || isNaN(Number(this.rivId))) {
-            this.alertService.error(this.module, 'Validation', 'Please enter a valid RV ID.');
+        if (!this.rivId || !this.rivId.trim()) {
+            this.alertService.error(this.module, 'Validation', 'Please enter a valid RV No.');
             return;
         }
         this.validatorError  = '';

@@ -26,7 +26,7 @@
                                 <span class="fs-sm fw-semibold">Document Details</span>
                                 @if (!editMode) {
                                     <div class="d-flex gap-2">
-                                        <button type="button" class="btn btn-primary fw-bold"
+                                        <button type="button" class="btn btn-success fw-bold"
                                                 (click)="openWithdrawalBrowse()">
                                             <ng-icon name="tablerPlus" class="me-1 fs-lg fw-bold"></ng-icon>Browse Releasing Document
                                         </button>
@@ -119,7 +119,7 @@
                                         <input type="text" class="form-control"
                                                [value]="receivedBy() ? (receivedBy().fullName || receivedBy().name || '') : ''"
                                                readonly placeholder="Browse receiving officer..."/>
-                                        <button type="button" class="btn btn-primary fw-bold"
+                                        <button type="button" class="btn btn-success fw-bold"
                                                 (click)="openReceivedByBrowse()">
                                             <ng-icon name="tablerSearch" class="fs-lg me-1 fw-bold"></ng-icon>Browse
                                         </button>

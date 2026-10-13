@@ -245,6 +245,15 @@ export class MaterialIssuanceAddEditComponent {
                 debit:       Number(e.debit)         || 0,
                 credit:      Number(e.credit)        || 0
             })),
+            subLedgerLines: this.journalEntries
+                .filter(e => (e.slentries || []).length > 0)
+                .flatMap(e => (e.slentries || []).map(sl => ({
+                    accountId: e.account?.id || null,
+                    accountNo: sl.accountNo,
+                    name:      sl.name,
+                    debit:     Number(sl.debit)  || 0,
+                    credit:    Number(sl.credit) || 0
+                }))),
             checker:             sigRef('checker'),
             recommendingOfficer: sigRef('recommendingApproval'),
             approvingOfficer:    sigRef('approvingOfficer')

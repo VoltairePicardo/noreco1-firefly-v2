@@ -165,7 +165,7 @@
 					<textFieldExpression><![CDATA[$F{vDate}]]></textFieldExpression>
 				</textField>
 				<staticText>
-					<reportElement x="0" y="0" width="968" height="14" uuid="f364cb05-4e27-49e0-a384-def0eca8b894"/>
+					<reportElement x="0" y="0" width="968" height="14" isRemoveLineWhenBlank="true" uuid="f364cb05-4e27-49e0-a384-def0eca8b894"/>
 					<box>
 						<topPen lineWidth="0.0"/>
 						<leftPen lineWidth="0.0"/>
@@ -193,7 +193,7 @@
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" markup="none">
-					<font fontName="SansSerif" size="11" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<font fontName="SansSerif" size="14" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{REPORT_TITLE}]]></textFieldExpression>
@@ -231,8 +231,9 @@
 				<textFieldExpression><![CDATA[$P{OFFICE}]]></textFieldExpression>
 			</textField>
 			<image scaleImage="RetainShape" hAlign="Left">
-				<reportElement x="0" y="0" width="58" height="58" uuid="ec68d453-6d3a-42f1-949c-1e3ecf5512b6">
+				<reportElement x="0" y="0" width="60" height="60" uuid="ec68d453-6d3a-42f1-949c-1e3ecf5512b6">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<imageExpression><![CDATA[$P{LOGO_PATH}]]></imageExpression>
 			</image>

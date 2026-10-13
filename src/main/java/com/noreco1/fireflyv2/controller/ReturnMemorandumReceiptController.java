@@ -1,5 +1,6 @@
 package com.noreco1.fireflyv2.controller;
 
+import com.noreco1.fireflyv2.common.GlobalConstant;
 import com.noreco1.fireflyv2.common.helpers.Checker;
 import com.noreco1.fireflyv2.controller.response.PostResponse;
 import com.noreco1.fireflyv2.controller.response.ProcessDocumentDto;
@@ -8,9 +9,14 @@ import com.noreco1.fireflyv2.model.ReturnMemorandumReceipt;
 import com.noreco1.fireflyv2.model.ReturnMemorandumReceiptDetail;
 import com.noreco1.fireflyv2.repo.MemorandumReceiptDetailRepo;
 import com.noreco1.fireflyv2.repo.ReturnMemorandumReceiptDetailRepo;
+import com.noreco1.fireflyv2.service.DownloadService;
+import com.noreco1.fireflyv2.service.PrintableVoucher;
 import com.noreco1.fireflyv2.service.ReturnMemorandumReceiptService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import net.sf.jasperreports.engine.JRDataSource;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -30,12 +36,16 @@ public class ReturnMemorandumReceiptController {
     private final ReturnMemorandumReceiptService returnMemorandumReceiptService;
     private final MemorandumReceiptDetailRepo memorandumReceiptDetailRepo;
     private final ReturnMemorandumReceiptDetailRepo returnMemorandumReceiptDetailRepo;
+    private final PrintableVoucher printableVoucher;
+    private final DownloadService downloadService;
 
-    public ReturnMemorandumReceiptController(MessageSource messageSource, ReturnMemorandumReceiptService returnMemorandumReceiptService, MemorandumReceiptDetailRepo memorandumReceiptDetailRepo, ReturnMemorandumReceiptDetailRepo returnMemorandumReceiptDetailRepo) {
+    public ReturnMemorandumReceiptController(MessageSource messageSource, ReturnMemorandumReceiptService returnMemorandumReceiptService, MemorandumReceiptDetailRepo memorandumReceiptDetailRepo, ReturnMemorandumReceiptDetailRepo returnMemorandumReceiptDetailRepo, @Qualifier("returnMemorandumReceiptServiceImpl") PrintableVoucher printableVoucher, DownloadService downloadService) {
         this.messageSource = messageSource;
         this.returnMemorandumReceiptService = returnMemorandumReceiptService;
         this.memorandumReceiptDetailRepo = memorandumReceiptDetailRepo;
         this.returnMemorandumReceiptDetailRepo = returnMemorandumReceiptDetailRepo;
+        this.printableVoucher = printableVoucher;
+        this.downloadService = downloadService;
     }
 
     @GetMapping(value = "/{id}")
@@ -119,6 +129,17 @@ public class ReturnMemorandumReceiptController {
 
             return dto;
         });
+    }
+
+    @RequestMapping(value = "/export/{id}")
+    public void exportToPdf(@PathVariable Integer id,
+                            @RequestParam(value = "type") String type,
+                            @RequestParam(value = "token") String token,
+                            HttpServletResponse response, HttpServletRequest request) {
+        HashMap params = printableVoucher.reportParameters(id, request);
+        JRDataSource dataSource = printableVoucher.datasource(id);
+        String template = GlobalConstant.JASPER_BASE_PATH + "/support-modules/ReturnMemorandumReceipt.jrxml";
+        downloadService.download(type, token, response, params, template, dataSource);
     }
 
     @GetMapping(value = "/return-memorandum-receipt-detail-for-mst")

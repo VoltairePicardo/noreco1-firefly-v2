@@ -19,11 +19,11 @@
                     <div class="d-flex gap-2">
                         @if (specialEquipmentId()) {
                             <button type="button" class="btn btn-light fw-bold" (click)="clearSelectedSpecialEquipment()">
-                                <ng-icon name="tablerX" class="ps-0 pe-2 fw-bold fs-lg"></ng-icon>Clear
+                                <ng-icon name="tablerX" class="ps-0 pe-3 fw-bold fs-lg"></ng-icon>Clear
                             </button>
                         }
-                        <button type="button" class="btn btn-primary fw-bold gap-1" (click)="openSpecialEquipmentBrowse()">
-                            <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold fs-lg"></ng-icon>Browse Special Equipment
+                        <button type="button" class="btn btn-success fw-bold gap-1" (click)="openSpecialEquipmentBrowse()">
+                            <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold fs-lg"></ng-icon>Browse Special Equipment
                         </button>
                     </div>
                 </div>
@@ -97,8 +97,8 @@
                         <div class="input-group">
                             <input type="text" class="form-control" [value]="verifiedByName()" readonly
                                    placeholder="Browse a user"/>
-                            <button type="button" class="btn btn-primary fw-bold" (click)="openUserBrowse('verifiedBy')">
-                                <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold fs-lg"></ng-icon>Browse
+                            <button type="button" class="btn btn-success fw-bold" (click)="openUserBrowse('verifiedBy')">
+                                <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold fs-lg"></ng-icon>Browse
                             </button>
                         </div>
                     </div>
@@ -107,8 +107,8 @@
                         <div class="input-group">
                             <input type="text" class="form-control" [value]="checkedByName()" readonly
                                    placeholder="Browse a user"/>
-                            <button type="button" class="btn btn-primary fw-bold" (click)="openUserBrowse('checkedBy')">
-                                <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold fs-lg"></ng-icon>Browse
+                            <button type="button" class="btn btn-success fw-bold" (click)="openUserBrowse('checkedBy')">
+                                <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold fs-lg"></ng-icon>Browse
                             </button>
                         </div>
                     </div>
@@ -117,8 +117,8 @@
                         <div class="input-group">
                             <input type="text" class="form-control" [value]="approvedByName()" readonly
                                    placeholder="Browse a user"/>
-                            <button type="button" class="btn btn-primary fw-bold" (click)="openUserBrowse('approvedBy')">
-                                <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold fs-lg"></ng-icon>Browse
+                            <button type="button" class="btn btn-success fw-bold" (click)="openUserBrowse('approvedBy')">
+                                <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold fs-lg"></ng-icon>Browse
                             </button>
                         </div>
                     </div>

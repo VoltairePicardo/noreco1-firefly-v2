@@ -48,7 +48,7 @@ public class MaterialSalvageTicketController {
     private final DownloadService downloadService;
     private final PrintableVoucher printableVoucher;
 
-    public MaterialSalvageTicketController(MessageSource messageSource, MaterialSalvageTicketService materialSalvageTicketService, DownloadService downloadService, @Qualifier("stockAdjustmentServiceImpl") PrintableVoucher printableVoucher) {
+    public MaterialSalvageTicketController(MessageSource messageSource, MaterialSalvageTicketService materialSalvageTicketService, DownloadService downloadService, @Qualifier("materialSalvageTicketServiceImpl") PrintableVoucher printableVoucher) {
         this.messageSource = messageSource;
         this.materialSalvageTicketService = materialSalvageTicketService;
         this.downloadService = downloadService;

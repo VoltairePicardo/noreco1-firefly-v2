@@ -204,7 +204,7 @@
                                     <h6 class="fw-semibold text-uppercase fs-xs mb-0">Account Detail</h6>
                                     @if (isEditable) {
                                         <button type="button" class="btn btn-success fw-bold" (click)="addRow()">
-                                            <ng-icon name="tablerPlus" class="ps-0 pe-2 fw-bold"></ng-icon>Add Row
+                                            <ng-icon name="tablerPlus" class="ps-0 pe-3 fw-bold"></ng-icon>Add Row
                                         </button>
                                     }
                                 </div>
@@ -374,12 +374,12 @@
                     <!-- Footer actions -->
                     <div class="d-flex gap-2 justify-content-end align-items-center mt-2">
                         <button type="button" class="btn btn-light fw-bold" (click)="goBack()">
-                            <ng-icon name="tablerArrowLeft" class="ps-0 pe-2 fw-bold"></ng-icon>Back
+                            <ng-icon name="tablerArrowLeft" class="ps-0 pe-3 fw-bold"></ng-icon>Back
                         </button>
                         <button type="button" class="btn btn-primary fw-bold"
                                 [disabled]="formSubmit || !selectedVoucher" (click)="save()">
                             <span *ngIf="formSubmit" class="spinner-border spinner-border-sm me-2" role="status"></span>
-                            <ng-icon *ngIf="!formSubmit" name="tablerCheck" class="ps-0 pe-2 fw-bold"></ng-icon>
+                            <ng-icon *ngIf="!formSubmit" name="tablerCheck" class="ps-0 pe-3 fw-bold"></ng-icon>
                             {{ formSubmit ? 'Saving...' : 'Save' }}
                         </button>
                     </div>

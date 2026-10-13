@@ -461,7 +461,7 @@ public class SiteInspectionReportServiceImpl implements SiteInspectionReportServ
             Employee approvedBy = employeeRepo.findOneByAccountNumber(report.getApprovedBy().getAccountNo());
 
             params.put("CODE", report.getCode());
-            params.put("WO_NUMBER", report.getWorkOrder().getCode());
+            params.put("WO_NUMBER", report.getWorkOrder() != null ? report.getWorkOrder().getCode() : "");
             params.put("PROJECT", report.getProject().getName());
             params.put("ADDRESS", report.getProject().getLocation());
             params.put("DATE_OF_INSPECTION", report.getDate());

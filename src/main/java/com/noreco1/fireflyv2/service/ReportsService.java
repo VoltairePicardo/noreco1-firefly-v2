@@ -227,7 +227,7 @@ public interface ReportsService extends Printable {
     List<Map> dataForStockCard(String from, String to, Integer itemStockId);
 
     @Transactional(readOnly = true)
-    HashMap reportParametersForInventoryBalance(HttpServletRequest request);
+    HashMap reportParametersForInventoryBalance(Integer inventoryLocationId, Integer inventoryCategoryId, HttpServletRequest request);
 
     @Transactional(readOnly = true)
     JRDataSource datasourceForInventoryBalance(Integer inventoryLocationId, Integer inventoryCategoryId);
@@ -281,7 +281,7 @@ public interface ReportsService extends Printable {
     JRDataSource datasourceForMaterialIssuanceSummary(String from, String to, Integer inventoryCategoryId, Integer inventoryLocationId);
 
     @Transactional(readOnly = true)
-    HashMap reportParametersForIdealQuantityReorderPoint(Integer reportTypeId, HttpServletRequest request);
+    HashMap reportParametersForIdealQuantityReorderPoint(Integer reportTypeId, Integer inventoryLocationId, HttpServletRequest request);
 
     @Transactional(readOnly = true)
     JRDataSource datasourceForIdealQuantityReorderPoint(Integer inventoryLocationId, Integer reportTypeId, Integer inventoryCategoryId);

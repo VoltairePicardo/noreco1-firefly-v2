@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.21.5.final using JasperReports Library version 6.21.5-74d586df47b25dbd05bd0957999819196e59934a  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="MeterTesting" language="groovy" pageWidth="612" pageHeight="396" whenNoDataType="AllSectionsNoDetail" columnWidth="572" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="bf884d65-bf64-4648-946b-cd8826a8bdc9">
 	<property name="ireport.zoom" value="1.7715610000000153"/>
 	<property name="ireport.x" value="0"/>
@@ -48,7 +49,9 @@
 				<textFieldExpression><![CDATA[$P{COMP_NAME}]]></textFieldExpression>
 			</textField>
 			<image isLazy="true" onErrorType="Icon">
-				<reportElement x="0" y="0" width="58" height="58" uuid="b6b4473c-8cae-4e57-9947-563c23bd41f1"/>
+				<reportElement x="0" y="0" width="29" height="29" uuid="b6b4473c-8cae-4e57-9947-563c23bd41f1">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
 				<imageExpression><![CDATA[$P{LOGO_PATH}]]></imageExpression>
 			</image>
 			<textField>
@@ -86,7 +89,7 @@
 				</textElement>
 				<text><![CDATA[Reason for testing:]]></text>
 			</staticText>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement x="56" y="42" width="311" height="13" uuid="06cd4268-ba3a-4211-98c7-01d9f7986089"/>
 				<box leftPadding="3">
 					<topPen lineWidth="0.5"/>
@@ -99,7 +102,7 @@
 				</textElement>
 				<textFieldExpression><![CDATA[$P{BILLING_NAME}]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement x="56" y="55" width="311" height="13" uuid="9703819a-65f3-4601-9085-0280b32c5154"/>
 				<box leftPadding="3">
 					<topPen lineWidth="0.5"/>
@@ -112,7 +115,7 @@
 				</textElement>
 				<textFieldExpression><![CDATA[$P{ADDRESS}]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement x="56" y="68" width="131" height="13" uuid="d3c3e92e-21f7-44ce-b93e-cc2410f3a4be"/>
 				<box leftPadding="3">
 					<topPen lineWidth="0.5"/>
@@ -138,7 +141,7 @@
 				</textElement>
 				<text><![CDATA[Serial No. | Class:]]></text>
 			</staticText>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement x="261" y="68" width="106" height="13" uuid="679d42df-f71d-4bf6-bef5-c138ae4ee155"/>
 				<box leftPadding="3" rightPadding="3"/>
 				<textElement verticalAlignment="Middle">
@@ -226,7 +229,7 @@
 				</textElement>
 				<text><![CDATA[:]]></text>
 			</staticText>
-			<textField isStretchWithOverflow="true" pattern="MMMMM dd, yyyy" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" pattern="MMMMM dd, yyyy" isBlankWhenNull="true">
 				<reportElement x="416" y="42" width="156" height="13" uuid="e16959f9-276e-447a-8b44-923f71976497"/>
 				<box leftPadding="2" rightPadding="2">
 					<topPen lineWidth="0.5"/>
@@ -239,7 +242,7 @@
 				</textElement>
 				<textFieldExpression><![CDATA[$P{DATE}]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" pattern="###0" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" pattern="###0" isBlankWhenNull="true">
 				<reportElement x="416" y="55" width="156" height="13" uuid="52d1b3dd-5c44-4991-a880-8ad4e7896d86"/>
 				<box leftPadding="2" rightPadding="2">
 					<topPen lineWidth="0.5"/>
@@ -252,7 +255,7 @@
 				</textElement>
 				<textFieldExpression><![CDATA[$P{READING}]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement x="416" y="68" width="156" height="13" uuid="a0aecb9b-afa8-431f-a75a-035f5791eb48"/>
 				<box leftPadding="2" rightPadding="2">
 					<topPen lineWidth="0.5"/>
@@ -265,7 +268,7 @@
 				</textElement>
 				<textFieldExpression><![CDATA[$P{METER}]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement x="19" y="321" width="230" height="14" uuid="da463d37-beb8-4908-93a2-8dbc1c4e5697"/>
 				<box>
 					<bottomPen lineWidth="0.75"/>
@@ -282,7 +285,7 @@
 				</textElement>
 				<text><![CDATA[Consumer / Representative]]></text>
 			</staticText>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement x="321" y="321" width="230" height="14" uuid="daa0e6c0-e6a0-4ec1-b13e-b40d27af5609"/>
 				<box>
 					<bottomPen lineWidth="0.75"/>
@@ -467,7 +470,7 @@
 				</textElement>
 				<text><![CDATA[]]></text>
 			</staticText>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement x="416" y="119" width="156" height="11" isPrintWhenDetailOverflows="true" forecolor="#FF6666" uuid="a57369d2-d645-4cca-a1f7-90055fbc737d"/>
 				<box leftPadding="3" rightPadding="3">
 					<pen lineColor="#000000"/>
@@ -551,7 +554,7 @@
 				</textElement>
 				<text><![CDATA[Others:]]></text>
 			</staticText>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement x="127" y="188" width="445" height="12" isPrintWhenDetailOverflows="true" forecolor="#FF6666" uuid="a00f462c-549f-401c-af00-aa9964c984e5"/>
 				<box leftPadding="3" rightPadding="3">
 					<pen lineColor="#000000"/>
@@ -677,7 +680,7 @@
 				</textElement>
 				<text><![CDATA[Ready for Re-installation]]></text>
 			</staticText>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement x="91" y="268" width="481" height="12" isPrintWhenDetailOverflows="true" forecolor="#FF6666" uuid="f5acf699-9e28-4bb9-bf18-65320371e434"/>
 				<box leftPadding="3" rightPadding="3">
 					<pen lineColor="#000000"/>

@@ -66,8 +66,9 @@
 				<textFieldExpression><![CDATA[$P{STATUS_ID} == 0 ? "" : $P{STATUS_ID} == -1 ? "PENDING" : $P{STATUS_ID} == 7 ? "APPROVED" : $F{status}.toUpperCase()]]></textFieldExpression>
 			</textField>
 			<image scaleImage="RetainShape" hAlign="Left">
-				<reportElement x="0" y="0" width="58" height="58" uuid="d74edc9e-1b20-4378-b5b5-00955244fb4e">
+				<reportElement x="0" y="0" width="60" height="60" uuid="d74edc9e-1b20-4378-b5b5-00955244fb4e">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<imageExpression><![CDATA[$P{LOGO_PATH}]]></imageExpression>
 			</image>
@@ -92,7 +93,7 @@
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" markup="none">
-					<font fontName="SansSerif" size="11" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<font fontName="SansSerif" size="14" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{REPORT_TITLE}]]></textFieldExpression>

@@ -785,8 +785,8 @@ public class MaterialSalvageTicketServiceImpl implements MaterialSalvageTicketSe
                     detailMap.put("code", detail.getItem().getCode());
                     detailMap.put("description", detail.getItem().getDescription());
                     detailMap.put("quantity", detail.getQuantity());
-                    detailMap.put("unitCode", detail.getItem().getUnit().getCode());
-                    detailMap.put("unitId", detail.getItem().getUnit().getId());
+                    detailMap.put("unitCode", detail.getItem().getUnit() != null ? detail.getItem().getUnit().getCode() : "");
+                    detailMap.put("unitId", detail.getItem().getUnit() != null ? detail.getItem().getUnit().getId() : null);
                     detailMap.put("unitCost", detail.getUnitCost());
                     detailMap.put("totalCost", detail.getTotalCost());
                     detailMap.put("mrte", detail.getMemorandumReceiptDetail() != null ? detail.getMemorandumReceiptDetail().getMemorandumReceipt().getCode() : "");

@@ -43,8 +43,8 @@ export class BirForm1601EComponent {
 
     browseAuthorizedRep(): void {
         const ref = this.modalService.open(BrowseEntityModalComponent, { size: 'lg', centered: true });
-        ref.componentInstance.types = ['ENTITY_EMPLOYEE'];
-        ref.result.then((entity) => { if (entity) this.authorizedRep = entity; }, () => {});
+        ref.componentInstance.entityTypes = [1];
+        ref.result.then((result) => { if (result?.action === 'select' && result?.data) this.authorizedRep = result.data; }, () => {});
     }
 
     search(): void {

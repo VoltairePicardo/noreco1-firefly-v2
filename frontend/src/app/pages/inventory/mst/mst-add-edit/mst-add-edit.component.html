@@ -59,7 +59,7 @@
                         <hr class="border-dashed mx-n3 mt-3"/>
                         <div class="d-flex justify-content-between align-items-center mb-2">
                             <div class="fs-sm fw-semibold mb-2">Items</div>
-                            <button type="button" class="btn btn-primary fw-bold btn-sm"
+                            <button type="button" class="btn btn-success fw-bold btn-sm"
                                     (click)="openItemStockBrowse()">
                                 <ng-icon name="tablerPlus" class="me-1 fs-lg fw-bold"></ng-icon>Add Item
                             </button>
@@ -146,7 +146,7 @@
                                     <input type="text" class="form-control"
                                            [value]="returnedBy() ? (returnedBy().fullName || returnedBy().name || '') : ''"
                                            readonly placeholder="Browse returned by..."/>
-                                    <button type="button" class="btn btn-primary fw-bold"
+                                    <button type="button" class="btn btn-success fw-bold"
                                             (click)="openReturnedByBrowse()">
                                         <ng-icon name="tablerSearch" class="me-1 fs-lg fw-bold"></ng-icon>Browse
                                     </button>
@@ -158,7 +158,7 @@
                                     <input type="text" class="form-control"
                                            [value]="receivedBy() ? (receivedBy().fullName || receivedBy().name || '') : ''"
                                            readonly placeholder="Browse received by..."/>
-                                    <button type="button" class="btn btn-primary fw-bold"
+                                    <button type="button" class="btn btn-success fw-bold"
                                             (click)="openReceivedByBrowse()">
                                         <ng-icon name="tablerSearch" class="me-1 fs-lg fw-bold"></ng-icon>Browse
                                     </button>

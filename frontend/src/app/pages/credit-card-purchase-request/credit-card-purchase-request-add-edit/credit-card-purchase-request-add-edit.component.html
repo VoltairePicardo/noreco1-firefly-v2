@@ -97,7 +97,7 @@
                                [value]="selectedPO ? (selectedPO.localCode || selectedPO.code || '') : ''"
                                readonly placeholder="Browse purchase order..."/>
                         <button type="button" class="btn btn-success fw-bold" (click)="openPoBrowse()">
-                            <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
+                            <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
                         </button>
                     </div>
                 </div>
@@ -112,7 +112,7 @@
                                [value]="selectedJO ? (selectedJO.localCode || selectedJO.code || '') : ''"
                                readonly placeholder="Browse job order..."/>
                         <button type="button" class="btn btn-success fw-bold" (click)="openJoBrowse()">
-                            <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
+                            <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
                         </button>
                     </div>
                 </div>
@@ -179,7 +179,7 @@
                            [value]="recommendedBy?.name || ''" readonly
                            placeholder="Select recommending officer..."/>
                     <button type="button" class="btn btn-success fw-bold" (click)="openEntityBrowse('recommendedBy')">
-                        <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
+                        <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
                     </button>
                 </div>
             </div>
@@ -192,7 +192,7 @@
                            [value]="approvedBy?.name || ''" readonly
                            placeholder="Select approving officer..."/>
                     <button type="button" class="btn btn-success fw-bold" (click)="openEntityBrowse('approvedBy')">
-                        <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
+                        <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
                     </button>
                 </div>
             </div>

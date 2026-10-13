@@ -787,11 +787,11 @@ public class AccountingReportDtoerImpl implements AccountingReportDtoer {
                 //map cash and cash equivalents account on settings table to supply param acctId
                 // and add results to achieve all cashBalances
                 Map account = settingFacade.getByCode("CASH_ACCOUNT");
-                BigDecimal cashBalanceToDate = voucherCashflowDetailRepo.findCashBalances(Integer.parseInt(account.get("id")+""), DocumentStatus.APPROVED.getId(), jan1, to);
-                BigDecimal cashBalanceThisMonth = voucherCashflowDetailRepo.findCashBalances(Integer.parseInt(account.get("id")+""), DocumentStatus.APPROVED.getId(), from, to);
+                BigDecimal cashBalanceToDate = Objects.requireNonNullElse(voucherCashflowDetailRepo.findCashBalances(Integer.parseInt(account.get("id")+""), DocumentStatus.APPROVED.getId(), jan1, to), BigDecimal.ZERO);
+                BigDecimal cashBalanceThisMonth = Objects.requireNonNullElse(voucherCashflowDetailRepo.findCashBalances(Integer.parseInt(account.get("id")+""), DocumentStatus.APPROVED.getId(), from, to), BigDecimal.ZERO);
                 account = settingFacade.getByCode("CASH_EQUIVALENTS_ACCOUNT");
-                cashBalanceToDate = cashBalanceToDate.add(voucherCashflowDetailRepo.findCashBalances(Integer.parseInt(account.get("id")+""), DocumentStatus.APPROVED.getId(), jan1, to));
-                cashBalanceThisMonth = cashBalanceThisMonth.add(voucherCashflowDetailRepo.findCashBalances(Integer.parseInt(account.get("id")+""), DocumentStatus.APPROVED.getId(), from, to));
+                cashBalanceToDate = cashBalanceToDate.add(Objects.requireNonNullElse(voucherCashflowDetailRepo.findCashBalances(Integer.parseInt(account.get("id")+""), DocumentStatus.APPROVED.getId(), jan1, to), BigDecimal.ZERO));
+                cashBalanceThisMonth = cashBalanceThisMonth.add(Objects.requireNonNullElse(voucherCashflowDetailRepo.findCashBalances(Integer.parseInt(account.get("id")+""), DocumentStatus.APPROVED.getId(), from, to), BigDecimal.ZERO));
 
                 beginningBalance.setToDate(cashBalanceToDate);
                 beginningBalance.setActualThisMonth(cashBalanceThisMonth);

@@ -162,14 +162,14 @@
     </div>
     <div class="modal-footer d-flex justify-content-between">
         <button type="button" class="btn btn-light fw-bold" (click)="modal.dismiss()">
-            <ng-icon name="tablerX" class="ps-0 pe-2 fw-bold"></ng-icon>Cancel
+            <ng-icon name="tablerX" class="ps-0 pe-3 fw-bold"></ng-icon>Cancel
         </button>
         <button type="button" class="btn btn-danger fw-bold" [disabled]="formSubmit || !cancelRemarks.trim()"
                 (click)="confirmCancel(modal)">
             @if (formSubmit) {
                 <span class="spinner-border spinner-border-sm me-2" role="status"></span>
             } @else {
-                <ng-icon name="tablerBan" class="ps-0 pe-2 fw-bold"></ng-icon>
+                <ng-icon name="tablerBan" class="ps-0 pe-3 fw-bold"></ng-icon>
             }
             {{ formSubmit ? 'Cancelling...' : 'Confirm Cancel' }}
         </button>
@@ -204,14 +204,14 @@
     </div>
     <div class="modal-footer d-flex justify-content-between">
         <button type="button" class="btn btn-light fw-bold" (click)="modal.dismiss()">
-            <ng-icon name="tablerX" class="ps-0 pe-2 fw-bold"></ng-icon>Cancel
+            <ng-icon name="tablerX" class="ps-0 pe-3 fw-bold"></ng-icon>Cancel
         </button>
         <button type="button" class="btn btn-primary fw-bold" [disabled]="formSubmit"
                 (click)="confirmRestore(modal)">
             @if (formSubmit) {
                 <span class="spinner-border spinner-border-sm me-2" role="status"></span>
             } @else {
-                <ng-icon name="tablerRotateClockwise" class="ps-0 pe-2 fw-bold"></ng-icon>
+                <ng-icon name="tablerRotateClockwise" class="ps-0 pe-3 fw-bold"></ng-icon>
             }
             {{ formSubmit ? 'Restoring...' : 'Confirm Restore' }}
         </button>
@@ -251,7 +251,7 @@
     </div>
     <div class="modal-footer">
         <button type="button" class="btn btn-light fw-bold" (click)="modal.dismiss()">
-            <ng-icon name="tablerX" class="ps-0 pe-2 fw-bold"></ng-icon>Close
+            <ng-icon name="tablerX" class="ps-0 pe-3 fw-bold"></ng-icon>Close
         </button>
     </div>
 </ng-template>

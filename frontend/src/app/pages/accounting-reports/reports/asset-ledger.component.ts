@@ -44,9 +44,9 @@ export class AssetLedgerComponent implements OnInit {
     }
 
     setDefaultDates(): void {
-        const now = new Date(), first = new Date(now.getFullYear(), now.getMonth(), 1);
+        const now = new Date(), first = new Date(now.getFullYear(), now.getMonth(), 1), last = new Date(now.getFullYear(), now.getMonth() + 1, 0);
         this.fromDate = first.toISOString().substring(0, 10);
-        this.toDate   = now.toISOString().substring(0, 10);
+        this.toDate   = last.toISOString().substring(0, 10);
     }
 
     browseAccount(): void {

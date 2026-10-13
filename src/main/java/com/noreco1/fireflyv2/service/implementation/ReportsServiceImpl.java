@@ -489,14 +489,14 @@ public class ReportsServiceImpl implements ReportsService, Bir1601E {
             case "MCRT":
                 this.inventoryLocationId = request.getParameter("location");
                 params.put("REPORT_TITLE", "Material Credit Ticket Summary");
-                params.put("INVENTORY_LOCATION", "Inventory Location: " + request.getParameter("locationDesc"));
+                params.put("INVENTORY_LOCATION", "Inventory Location: " + resolveInventoryLocationDesc(request.getParameter("location")));
                 String status = StringFormatter.statusIdToStr(this.statusId);
                 params.put("STATUS", "Status: " + (status == null ? "All":status));
                 break;
             case "MST":
                 this.inventoryLocationId = request.getParameter("location");
                 params.put("REPORT_TITLE", "Material Salvage Ticket Summary");
-                params.put("INVENTORY_LOCATION", "Inventory Location: " + request.getParameter("locationDesc"));
+                params.put("INVENTORY_LOCATION", "Inventory Location: " + resolveInventoryLocationDesc(request.getParameter("location")));
                 status = StringFormatter.statusIdToStr(this.statusId);
                 params.put("STATUS", "Status: " + (status == null ? "All":status));
                 break;
@@ -504,8 +504,8 @@ public class ReportsServiceImpl implements ReportsService, Bir1601E {
                 this.inventoryLocationId = request.getParameter("location");
                 this.documentTypeId = request.getParameter("docType");
                 params.put("REPORT_TITLE", "Stock Withdrawal Summary");
-                params.put("INVENTORY_LOCATION", "Inventory Location: " + request.getParameter("locationDesc"));
-                params.put("TYPE", "Document Type: " + request.getParameter("docTypeDesc"));
+                params.put("INVENTORY_LOCATION", "Inventory Location: " + resolveInventoryLocationDesc(request.getParameter("location")));
+                params.put("TYPE", "Document Type: " + resolveReleasingDocTypeDesc(request.getParameter("docType")));
                 status = StringFormatter.statusIdToStr(this.statusId);
                 params.put("STATUS", "Status: " + (status == null ? "All":status));
                 break;
@@ -513,29 +513,29 @@ public class ReportsServiceImpl implements ReportsService, Bir1601E {
                 this.inventoryLocationId = request.getParameter("location");
                 this.documentTypeId = request.getParameter("docType");
                 params.put("REPORT_TITLE", "Stock Release Summary");
-                params.put("INVENTORY_LOCATION", "Inventory Location: " + request.getParameter("locationDesc"));
-                params.put("TYPE", "Document Type: " + request.getParameter("docTypeDesc"));
+                params.put("INVENTORY_LOCATION", "Inventory Location: " + resolveInventoryLocationDesc(request.getParameter("location")));
+                params.put("TYPE", "Document Type: " + resolveReleasingDocTypeDesc(request.getParameter("docType")));
                 status = StringFormatter.statusIdToStr(this.statusId);
                 params.put("STATUS", "Status: " + (status == null ? "All":status));
                 break;
             case "SA":
                 this.inventoryLocationId = request.getParameter("location");
                 params.put("REPORT_TITLE", "Stock Adjustment Summary");
-                params.put("INVENTORY_LOCATION", "Inventory Location: " + request.getParameter("locationDesc"));
+                params.put("INVENTORY_LOCATION", "Inventory Location: " + resolveInventoryLocationDesc(request.getParameter("location")));
                 status = StringFormatter.statusIdToStr(this.statusId);
                 params.put("STATUS", "Status: " + (status == null ? "All":status));
                 break;
             case "ST":
                 this.inventoryLocationId = request.getParameter("location");
                 params.put("REPORT_TITLE", "Stock Transfer Summary");
-                params.put("INVENTORY_LOCATION", "Inventory Location: " + request.getParameter("locationDesc"));
+                params.put("INVENTORY_LOCATION", "Inventory Location: " + resolveInventoryLocationDesc(request.getParameter("location")));
                 status = StringFormatter.statusIdToStr(this.statusId);
                 params.put("STATUS", "Status: " + (status == null ? "All":status));
                 break;
             case "SR":
                 this.inventoryLocationId = request.getParameter("location");
                 params.put("REPORT_TITLE", "Summary of Received Stock Transfers");
-                params.put("INVENTORY_LOCATION", "Inventory Location: " + request.getParameter("locationDesc"));
+                params.put("INVENTORY_LOCATION", "Inventory Location: " + resolveInventoryLocationDesc(request.getParameter("location")));
                 status = StringFormatter.statusIdToStr(this.statusId);
                 params.put("STATUS", "Status: " + (status == null ? "All":status));
                 break;
@@ -880,15 +880,17 @@ public class ReportsServiceImpl implements ReportsService, Bir1601E {
 
                     // calculate map for new totals row
                     // TODO: ditch duplicate
-                    if(account.getAccountType().getId() == AccountType.ASSET.getId()) {
-                        totalAssetsMap = this.calculatePerAccountTypeTotal(totalAssetsMap, businessSegments, data, AccountType.ASSET.getId());
-                        totalAssetsMap.put("title", "Total Assets");
-                    } else if (account.getAccountType().getId() == AccountType.LIABILITY.getId()) {
-                        totalLiabMap = this.calculatePerAccountTypeTotal(totalLiabMap, businessSegments, data, AccountType.LIABILITY.getId());
-                        totalLiabMap.put("title", "Total Liability");
-                    } else if (account.getAccountType().getId() == AccountType.EQUITY.getId()) {
-                        totalEquityMap = this.calculatePerAccountTypeTotal(totalEquityMap, businessSegments, data, AccountType.EQUITY.getId());
-                        totalEquityMap.put("title", "Total Equity");
+                    if (account.getAccountType() != null) {
+                        if(account.getAccountType().getId() == AccountType.ASSET.getId()) {
+                            totalAssetsMap = this.calculatePerAccountTypeTotal(totalAssetsMap, businessSegments, data, AccountType.ASSET.getId());
+                            totalAssetsMap.put("title", "Total Assets");
+                        } else if (account.getAccountType().getId() == AccountType.LIABILITY.getId()) {
+                            totalLiabMap = this.calculatePerAccountTypeTotal(totalLiabMap, businessSegments, data, AccountType.LIABILITY.getId());
+                            totalLiabMap.put("title", "Total Liability");
+                        } else if (account.getAccountType().getId() == AccountType.EQUITY.getId()) {
+                            totalEquityMap = this.calculatePerAccountTypeTotal(totalEquityMap, businessSegments, data, AccountType.EQUITY.getId());
+                            totalEquityMap.put("title", "Total Equity");
+                        }
                     }
                 }
                 prevCode = String.valueOf(account.getCode());
@@ -1006,21 +1008,23 @@ public class ReportsServiceImpl implements ReportsService, Bir1601E {
                         data = findDescendantsTb(businessSegments, data, account.getId(), INDENTION, AccountClassification.BSUP.getId());
 
                         // calculate map for new totals row
-                        if(account.getAccountType().getId() == AccountType.ASSET.getId()) {
-                            totalAssetsMap = this.calculatePerAccountTypeTotal(totalAssetsMap, businessSegments, data, AccountType.ASSET.getId());
-                            totalAssetsMap.put("title", "Total Assets");
-                        } else if (account.getAccountType().getId() == AccountType.LIABILITY.getId()) {
-                            totalLiabMap = this.calculatePerAccountTypeTotal(totalLiabMap, businessSegments, data, AccountType.LIABILITY.getId());
-                            totalLiabMap.put("title", "Total Liability");
-                        } else if (account.getAccountType().getId() == AccountType.EQUITY.getId()) {
-                            totalEquityMap = this.calculatePerAccountTypeTotal(totalEquityMap, businessSegments, data, AccountType.EQUITY.getId());
-                            totalEquityMap.put("title", "Total Equity");
-                        } else if (account.getAccountType().getId() == AccountType.REVENUE.getId()) {
-                            totalIncomeMap = this.calculatePerAccountTypeTotal(totalIncomeMap, businessSegments, data, AccountType.REVENUE.getId());
-                            totalIncomeMap.put("title", "Total Income");
-                        } else if (account.getAccountType().getId() == AccountType.EXPENSE.getId()) {
-                            totalExpensesMap = this.calculatePerAccountTypeTotal(totalExpensesMap, businessSegments, data, AccountType.EXPENSE.getId());
-                            totalExpensesMap.put("title", "Total Expenses");
+                        if (account.getAccountType() != null) {
+                            if(account.getAccountType().getId() == AccountType.ASSET.getId()) {
+                                totalAssetsMap = this.calculatePerAccountTypeTotal(totalAssetsMap, businessSegments, data, AccountType.ASSET.getId());
+                                totalAssetsMap.put("title", "Total Assets");
+                            } else if (account.getAccountType().getId() == AccountType.LIABILITY.getId()) {
+                                totalLiabMap = this.calculatePerAccountTypeTotal(totalLiabMap, businessSegments, data, AccountType.LIABILITY.getId());
+                                totalLiabMap.put("title", "Total Liability");
+                            } else if (account.getAccountType().getId() == AccountType.EQUITY.getId()) {
+                                totalEquityMap = this.calculatePerAccountTypeTotal(totalEquityMap, businessSegments, data, AccountType.EQUITY.getId());
+                                totalEquityMap.put("title", "Total Equity");
+                            } else if (account.getAccountType().getId() == AccountType.REVENUE.getId()) {
+                                totalIncomeMap = this.calculatePerAccountTypeTotal(totalIncomeMap, businessSegments, data, AccountType.REVENUE.getId());
+                                totalIncomeMap.put("title", "Total Income");
+                            } else if (account.getAccountType().getId() == AccountType.EXPENSE.getId()) {
+                                totalExpensesMap = this.calculatePerAccountTypeTotal(totalExpensesMap, businessSegments, data, AccountType.EXPENSE.getId());
+                                totalExpensesMap.put("title", "Total Expenses");
+                            }
                         }
                     }
                     prevCode = String.valueOf(account.getCode());
@@ -1509,7 +1513,7 @@ public class ReportsServiceImpl implements ReportsService, Bir1601E {
                     BalanceSheetAccountBSUP accountBSUP = balanceSheetAccountBSUPRepo.findByBalanceSheetSettingbsupId(settingBSUP.getId());
                     if (totalLiabEquityMap.get(code) != null) {
                         BigDecimal amount = new BigDecimal(String.valueOf(totalLiabEquityMap.get(code)));
-                        if(accountBSUP != null) {
+                        if(accountBSUP != null && accountBSUP.getAccount().getAccountType() != null) {
                             if (accountBSUP.getAccount().getAccountType().getId() != AccountType.ASSET.getId()) {
                                 amount = amount.add(pAmt);
                             }
@@ -1521,7 +1525,7 @@ public class ReportsServiceImpl implements ReportsService, Bir1601E {
                             genActSubtotal = genActSubtotal.add(amount);
                         }
                     } else {
-                        if(accountBSUP != null) {
+                        if(accountBSUP != null && accountBSUP.getAccount().getAccountType() != null) {
                             if (accountBSUP.getAccount().getAccountType().getId() != AccountType.ASSET.getId()) {
                                 totalLiabEquityMap.put(code, pAmt);
                             }
@@ -1730,7 +1734,7 @@ public class ReportsServiceImpl implements ReportsService, Bir1601E {
                         BalanceSheetAccountBSUP accountBSUP = balanceSheetAccountBSUPRepo.findByBalanceSheetSettingbsupId(settingBSUP.getId());
                         if (totalLiabEquityMap.get(code) != null) {
                             BigDecimal amount = new BigDecimal(String.valueOf(totalLiabEquityMap.get(code)));
-                            if(accountBSUP != null) {
+                            if(accountBSUP != null && accountBSUP.getAccount().getAccountType() != null) {
                                 if (accountBSUP.getAccount().getAccountType().getId() != AccountType.ASSET.getId()) {
                                     amount = amount.add(pAmt);
                                 }
@@ -1742,7 +1746,7 @@ public class ReportsServiceImpl implements ReportsService, Bir1601E {
                                 genActSubtotal = genActSubtotal.add(amount);
                             }
                         } else {
-                            if(accountBSUP != null) {
+                            if(accountBSUP != null && accountBSUP.getAccount().getAccountType() != null) {
                                 if (accountBSUP.getAccount().getAccountType().getId() != AccountType.ASSET.getId()) {
                                     totalLiabEquityMap.put(code, pAmt);
                                 }
@@ -2790,7 +2794,8 @@ public class ReportsServiceImpl implements ReportsService, Bir1601E {
             if(!docType.equals("null")){
                 subtitle = docType;
                 if(!status.equals("null")){
-                    subtitle+="<br/>"+status.toUpperCase();
+                    /*subtitle+="<br/>"+status.toUpperCase();*/
+                    subtitle+=" " + status.toUpperCase();
                 }
             } else if(!status.equals("null")){
                 subtitle = status.toUpperCase();
@@ -2987,11 +2992,6 @@ public class ReportsServiceImpl implements ReportsService, Bir1601E {
     public HashMap reportParametersForBinCard(String from, String to, Integer itemStockId, HttpServletRequest request) {
         HashMap<String, Object> params = ReportUtil.setupSharedReportHeaders(request);
         ItemStock itemStock = itemStockRepo.findById(itemStockId).orElse(null);
-        DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-        long s = Long.parseLong(from);
-        from = formatter.format(new java.sql.Date(s));
-        s = Long.parseLong(to);
-        to = formatter.format(new java.sql.Date(s));
         try {
             params.put("RANGE", this.formatDateRange(from, to));
             params.put("ITEM_CODE", itemStock.getItem().getCode());
@@ -3014,21 +3014,16 @@ public class ReportsServiceImpl implements ReportsService, Bir1601E {
     @Override
     public List<Map> dataForBinCard(String from, String to, Integer itemStockId) {
         List<Map> data = new ArrayList<>();
-        DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-        long s = Long.parseLong(from);
-        from = formatter.format(new java.sql.Date(s));
         try {
-            this.yesterday = DateHelper.yesterday(new java.sql.Date(s));
+            this.yesterday = DateHelper.yesterday(parseSqlDate(from));
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        s = Long.parseLong(to);
-        to = formatter.format(new java.sql.Date(s));
         try {
             List<Object[]> v = itemStockRepo.findForBinCard(from, to, itemStockId);
 
             //beginning balance
-            List<Object[]> bb = itemStockRepo.findForBinCard(formatter.format(new java.sql.Date(0)), formatter.format(this.yesterday), itemStockId);
+            List<Object[]> bb = itemStockRepo.findForBinCard(new java.sql.Date(0).toString(), this.yesterday.toString(), itemStockId);
             Map bbMap = new HashMap();
 
             bbMap.put("purpose", "Beginning Balance");
@@ -3067,11 +3062,6 @@ public class ReportsServiceImpl implements ReportsService, Bir1601E {
     public HashMap reportParametersForStockCard(String from, String to, Integer itemStockId, HttpServletRequest request) {
         HashMap<String, Object> params = ReportUtil.setupSharedReportHeaders(request);
         ItemStock itemStock = itemStockRepo.findById(itemStockId).orElse(null);
-        DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-        long s = Long.parseLong(from);
-        from = formatter.format(new java.sql.Date(s));
-        s = Long.parseLong(to);
-        to = formatter.format(new java.sql.Date(s));
         try {
             params.put("RANGE", this.formatDateRange(from, to));
             params.put("ITEM_CODE", itemStock.getItem().getCode());
@@ -3094,21 +3084,16 @@ public class ReportsServiceImpl implements ReportsService, Bir1601E {
     @Override
     public List<Map> dataForStockCard(String from, String to, Integer itemStockId) {
         List<Map> data = new ArrayList<>();
-        DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-        long s = Long.parseLong(from);
-        from = formatter.format(new java.sql.Date(s));
         try {
-            this.yesterday = DateHelper.yesterday(new java.sql.Date(s));
+            this.yesterday = DateHelper.yesterday(parseSqlDate(from));
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        s = Long.parseLong(to);
-        to = formatter.format(new java.sql.Date(s));
         try {
             List<Object[]> v = itemStockRepo.findForStockCard(from, to, itemStockId);
 
             //beginning balance
-            List<Object[]> bb = itemStockRepo.findForStockCard(formatter.format(new java.sql.Date(0)), formatter.format(this.yesterday), itemStockId);
+            List<Object[]> bb = itemStockRepo.findForStockCard(new java.sql.Date(0).toString(), this.yesterday.toString(), itemStockId);
             Map bbMap = new HashMap();
 
             bbMap.put("purpose", "Beginning Balance");
@@ -3149,11 +3134,16 @@ public class ReportsServiceImpl implements ReportsService, Bir1601E {
     }
 
     @Override
-    public HashMap reportParametersForInventoryBalance(HttpServletRequest request) {
+    public HashMap reportParametersForInventoryBalance(Integer inventoryLocationId, Integer inventoryCategoryId, HttpServletRequest request) {
         HashMap<String, Object> params = ReportUtil.setupSharedReportHeaders(request);
         try {
+            InventoryLocation location = inventoryLocationId != null && inventoryLocationId > 0
+                    ? inventoryLocationRepo.findById(inventoryLocationId).orElse(null) : null;
+            InventoryCategory category = inventoryCategoryId != null && inventoryCategoryId > 0
+                    ? inventoryCategoryRepo.findById(inventoryCategoryId).orElse(null) : null;
             params.put("REPORT_TITLE", "Inventory Balance");
-            params.put("INVENTORY_LOCATION", "Inventory Location: " + request.getParameter("locationDesc"));
+            params.put("INVENTORY_LOCATION", "Inventory Location: " + (location != null ? location.getDescription() : "All"));
+            params.put("INVENTORY_CATEGORY", "Category: " + (category != null ? category.getDescription() : "All"));
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -3187,7 +3177,7 @@ public class ReportsServiceImpl implements ReportsService, Bir1601E {
                     ap.put("itemCode", row.getItem().getCode());
                     ap.put("quantity", row.getQuantity());
                     ap.put("description", row.getItem().getDescription());
-                    ap.put("unitCode", row.getItem().getUnit().getCode());
+                    ap.put("unitCode", row.getItem().getUnit() != null ? row.getItem().getUnit().getCode() : "");
                     ap.put("unitCost", row.getUnitCost());
                     ap.put("totalCost", row.getUnitCost().multiply(row.getQuantity()));
                     ap.put("invCat", row.getItem().getInventoryCategory().getId());
@@ -3490,7 +3480,7 @@ public class ReportsServiceImpl implements ReportsService, Bir1601E {
                     Date voucherDate = (Date) voucher[0];
                     String description = (String) voucher[1];
                     String voucherCode = (String) voucher[2];
-                    Integer linkType = ((BigInteger) voucher[3]).intValue();
+                    Integer linkType = ((Number) voucher[3]).intValue();
                     BigDecimal totalCost = (BigDecimal) voucher[4];
                     String adjustmentType = (String) voucher[5];
 
@@ -3722,8 +3712,8 @@ public class ReportsServiceImpl implements ReportsService, Bir1601E {
 
         try {
 
-            InventoryCategory inventoryCategory = inventoryCategoryRepo.findById(inventoryCategoryId).orElse(null);
-            InventoryLocation inventoryLocation = inventoryLocationRepo.findById(inventoryLocationId).orElse(null);
+            InventoryCategory inventoryCategory = inventoryCategoryId != null ? inventoryCategoryRepo.findById(inventoryCategoryId).orElse(null) : null;
+            InventoryLocation inventoryLocation = inventoryLocationId != null ? inventoryLocationRepo.findById(inventoryLocationId).orElse(null) : null;
 
             String subTitle = (inventoryCategory != null ? inventoryCategory.getDescription() : "")
                     + (inventoryCategory != null && inventoryLocation != null ? " - " : "")
@@ -3765,11 +3755,14 @@ public class ReportsServiceImpl implements ReportsService, Bir1601E {
     }
 
         @Override
-    public HashMap reportParametersForIdealQuantityReorderPoint(Integer reportTypeId, HttpServletRequest request) {
+    public HashMap reportParametersForIdealQuantityReorderPoint(Integer reportTypeId, Integer inventoryLocationId, HttpServletRequest request) {
         HashMap<String, Object> params = ReportUtil.setupSharedReportHeaders(request);
         try {
             params.put("REPORT_TITLE", reportTypeId == 0 ? "Items for Reorder" : "Items Below Ideal Quantity");
-            params.put("INVENTORY_LOCATION", "Inventory Location: " + request.getParameter("locationDesc"));
+            String locDesc = (inventoryLocationId != null && inventoryLocationId > 0)
+                    ? inventoryLocationRepo.findById(inventoryLocationId).map(l -> l.getDescription()).orElse("All")
+                    : "All";
+            params.put("INVENTORY_LOCATION", "Inventory Location: " + locDesc);
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -3880,7 +3873,7 @@ public class ReportsServiceImpl implements ReportsService, Bir1601E {
                     String itemCode = (String) object[6];
                     String itemDescription = (String) object[7];
                     BigDecimal unitPrice = (BigDecimal) object[8];
-                    BigInteger quantityAssigned = (BigInteger) object[9];
+                    Number quantityAssigned = (Number) object[9];
                     BigDecimal quantityReturned = (BigDecimal) object[10];
                     BigDecimal balance = (BigDecimal) object[11];
 
@@ -4420,9 +4413,10 @@ public class ReportsServiceImpl implements ReportsService, Bir1601E {
 
         try {
 
-            SpecialEquipmentType specialEquipmentType = specialEquipmentTypeRepo.findById(typeId).orElse(null);
+            SpecialEquipmentType specialEquipmentType = (typeId != null && typeId > 0)
+                    ? specialEquipmentTypeRepo.findById(typeId).orElse(null) : null;
 
-            String subTitle = (specialEquipmentType != null ? specialEquipmentType.getDescription() : "");
+            String subTitle = (specialEquipmentType != null ? specialEquipmentType.getDescription() : "All Types");
 
             params.put("TITLE", "SPECIAL EQUIPMENT RELEASE SUMMARY");
             params.put("SUB_TITLE", subTitle);
@@ -4515,9 +4509,10 @@ public class ReportsServiceImpl implements ReportsService, Bir1601E {
 
         try {
 
-            SpecialEquipmentType specialEquipmentType = specialEquipmentTypeRepo.findById(typeId).orElse(null);
+            SpecialEquipmentType specialEquipmentType = (typeId != null && typeId > 0)
+                    ? specialEquipmentTypeRepo.findById(typeId).orElse(null) : null;
 
-            String subTitle = (specialEquipmentType != null ? specialEquipmentType.getDescription() : "");
+            String subTitle = (specialEquipmentType != null ? specialEquipmentType.getDescription() : "All Types");
 
             params.put("TITLE", "SPECIAL EQUIPMENT PENDING INSTALLATION/ASSIGNMENT SUMMARY");
             params.put("DATE_RANGE", "AS OF DATE " + new SimpleDateFormat("MMMM dd, yyyy").format(new Date()));
@@ -4934,10 +4929,8 @@ public class ReportsServiceImpl implements ReportsService, Bir1601E {
     public List<Map> dataForTrialBalanceNEANotClosedMonths(String begCutOff, String endCutOff) {
 
         boolean startDateIsNotNull = begCutOff != null && !Objects.equals(begCutOff, "null");
-        long l1 = startDateIsNotNull ? Long.parseLong(begCutOff) : Long.MIN_VALUE;
-        long l2 = Long.parseLong(endCutOff);
-        Date startDate = new java.sql.Date(l1);
-        Date endDate = new java.sql.Date(l2);
+        Date startDate = startDateIsNotNull ? parseSqlDate(begCutOff) : new java.sql.Date(0);
+        Date endDate = parseSqlDate(endCutOff);
 
         List<Object[]> monthlyCycles = monthlyCycleRepo.findOpenByDateRange(startDateIsNotNull ? DateHelper.dateToSQL(startDate) : "1980-01-01", DateHelper.dateToSQL(endDate));
 
@@ -6902,6 +6895,8 @@ public class ReportsServiceImpl implements ReportsService, Bir1601E {
 
     private List<Map> findBalanceSheetAccountsBSUP(List<BusinessSegment> businessSegments, List<Map> data, BalanceSheetAccountBSUP balanceSheetAccountBSUP, String indention, Map map1) {
 
+        if (balanceSheetAccountBSUP.getAccount() == null) return data;
+
         // ex.: Total Net Non - Current Assets
         List<Object[]> list1 = generalLedgerRepo.findByAccountIdForBalanceSheet(balanceSheetAccountBSUP.getAccount().getId(), DocumentStatus.APPROVED.getId(), this.asOfDateSql);
 
@@ -7731,16 +7726,23 @@ public class ReportsServiceImpl implements ReportsService, Bir1601E {
         return BigDecimal.ZERO;
     }
 
+    /** Accepts epoch-millis strings (legacy) or ISO date strings (yyyy-MM-dd). */
+    private java.sql.Date parseSqlDate(String dateStr) {
+        try {
+            return new java.sql.Date(Long.parseLong(dateStr));
+        } catch (NumberFormatException nfe) {
+            return java.sql.Date.valueOf(dateStr);
+        }
+    }
+
     private void setDateParams(String begCutOff, String endCutOff) {
 
         this.begCutOffDateSql = new java.sql.Date(new Date().getTime());
         this.endCutOffDateSql = new java.sql.Date(new Date().getTime());
 
         try {
-            long l1 = Long.parseLong(begCutOff);
-            long l2 = Long.parseLong(endCutOff);
-            this.begCutOffDateSql = new java.sql.Date(l1);
-            this.endCutOffDateSql = new java.sql.Date(l2);
+            this.begCutOffDateSql = parseSqlDate(begCutOff);
+            this.endCutOffDateSql = parseSqlDate(endCutOff);
 
             Calendar c = Calendar.getInstance();
             c.setTime(this.endCutOffDateSql);
@@ -8316,15 +8318,10 @@ public class ReportsServiceImpl implements ReportsService, Bir1601E {
     }
 
     private String formatDateRange(String from, String to) {
-        DateFormat formatter = new SimpleDateFormat("yy-MM-dd");
         DateFormat humanFormat = new SimpleDateFormat("MMMM dd, yyyy");
         try {
-            Date dateFrom = formatter.parse(from);
-            Date dateTo = formatter.parse(to);
-
-            return humanFormat.format(dateFrom) + " to " + humanFormat.format(dateTo);
-
-        } catch (ParseException e) {
+            return humanFormat.format(parseSqlDate(from)) + " to " + humanFormat.format(parseSqlDate(to));
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return "";
@@ -8338,13 +8335,9 @@ public class ReportsServiceImpl implements ReportsService, Bir1601E {
 
     private String formatAsOfDate(String asOf) {
         DateFormat humanFormat = new SimpleDateFormat("MMMM dd, yyyy");
-
         try {
-            long l = Long.parseLong(asOf);
-            Date d = new Date(l);
-            return humanFormat.format(d);
+            return humanFormat.format(parseSqlDate(asOf));
         } catch (Exception e) { }
-
         return "";
     }
 
@@ -8578,6 +8571,30 @@ public class ReportsServiceImpl implements ReportsService, Bir1601E {
             returnDocuments.add(docInqListDto);
         }
         return returnDocuments;
+    }
+
+    private String resolveInventoryLocationDesc(String locIdStr) {
+        if (locIdStr == null) return "All";
+        try {
+            int locId = Integer.parseInt(locIdStr);
+            if (locId <= 0) return "All";
+            return inventoryLocationRepo.findById(locId)
+                    .map(l -> l.getDescription())
+                    .orElse("All");
+        } catch (NumberFormatException e) {
+            return "All";
+        }
+    }
+
+    private String resolveReleasingDocTypeDesc(String docTypeIdStr) {
+        if (docTypeIdStr == null) return "All";
+        switch (docTypeIdStr) {
+            case "1": return "Material Charge Ticket";
+            case "2": return "Office Furniture and Equipment Acquired or Issued";
+            case "3": return "Office Supplies or Spare Parts Issuance Slip";
+            case "4": return "Stock Transfer Release";
+            default:  return "All";
+        }
     }
 
 }

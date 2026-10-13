@@ -52,7 +52,7 @@
                             <hr class="border-dashed mx-n3 mt-3"/>
                             <div class="d-flex justify-content-between align-items-center mb-2">
                                 <div class="fs-sm fw-semibold mb-2">Items</div>
-                                <button type="button" class="btn btn-primary fw-bold btn-sm"
+                                <button type="button" class="btn btn-success fw-bold btn-sm"
                                         (click)="openItemStockBrowse()">
                                     <ng-icon name="tablerPlus" class="fs-lg me-1 fw-bold"></ng-icon>Add Item
                                 </button>
@@ -124,7 +124,7 @@
                                                [value]="signatoryNames['checkerAccountNo'] || ''"
                                                [class]="submit && form.get('checkerAccountNo')?.errors ? 'is-invalid' : submit && form.get('checkerAccountNo')?.value ? 'is-valid' : ''"
                                                readonly placeholder="Browse checker..."/>
-                                        <button type="button" class="btn btn-primary fw-bold"
+                                        <button type="button" class="btn btn-success fw-bold"
                                                 (click)="openCheckerBrowse()">
                                             <ng-icon name="tablerSearch" class="fs-lg me-1 fw-bold"></ng-icon>Browse
                                         </button>
@@ -140,7 +140,7 @@
                                                [value]="signatoryNames['approvedByAccountNo'] || ''"
                                                [class]="submit && form.get('approvedByAccountNo')?.errors ? 'is-invalid' : submit && form.get('approvedByAccountNo')?.value ? 'is-valid' : ''"
                                                readonly placeholder="Browse approving officer..."/>
-                                        <button type="button" class="btn btn-primary fw-bold"
+                                        <button type="button" class="btn btn-success fw-bold"
                                                 (click)="openApprovedByBrowse()">
                                             <ng-icon name="tablerSearch" class="fs-lg me-1 fw-bold"></ng-icon>Browse
                                         </button>

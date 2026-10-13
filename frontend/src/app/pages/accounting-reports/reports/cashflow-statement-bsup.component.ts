@@ -37,21 +37,21 @@ export class CashflowStatementBsupComponent {
     ngOnInit(): void { this.setDefaultDates(); }
 
     setDefaultDates(): void {
-        const now = new Date(), first = new Date(now.getFullYear(), now.getMonth(), 1);
+        const now = new Date(), first = new Date(now.getFullYear(), now.getMonth(), 1), last = new Date(now.getFullYear(), now.getMonth() + 1, 0);
         this.fromDate = first.toISOString().substring(0, 10);
-        this.toDate   = now.toISOString().substring(0, 10);
+        this.toDate   = last.toISOString().substring(0, 10);
     }
 
     browseCheckedBy(): void {
         const ref = this.modalService.open(BrowseEntityModalComponent, { size: 'lg', centered: true });
-        ref.componentInstance.types = ['ENTITY_EMPLOYEE'];
-        ref.result.then((entity) => { if (entity) this.checkedBy = entity; }, () => {});
+        ref.componentInstance.entityTypes = [1];
+        ref.result.then((result) => { if (result?.action === 'select' && result?.data) this.checkedBy = result.data; }, () => {});
     }
 
     browseNotedBy(): void {
         const ref = this.modalService.open(BrowseEntityModalComponent, { size: 'lg', centered: true });
-        ref.componentInstance.types = ['ENTITY_EMPLOYEE'];
-        ref.result.then((entity) => { if (entity) this.notedBy = entity; }, () => {});
+        ref.componentInstance.entityTypes = [1];
+        ref.result.then((result) => { if (result?.action === 'select' && result?.data) this.notedBy = result.data; }, () => {});
     }
 
     private sameYearValid(): boolean {

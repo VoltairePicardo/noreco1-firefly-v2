@@ -32,9 +32,11 @@ export class TrialBalanceNeaComponent {
     ngOnInit(): void { this.setDefaultDates(); }
 
     setDefaultDates(): void {
-        const now = new Date(), first = new Date(now.getFullYear(), now.getMonth(), 1);
+        const now = new Date();
+        const first = new Date(now.getFullYear(), now.getMonth(), 1);
+        const last  = new Date(now.getFullYear(), now.getMonth() + 1, 0);
         this.fromDate = first.toISOString().substring(0, 10);
-        this.toDate   = now.toISOString().substring(0, 10);
+        this.toDate   = last.toISOString().substring(0, 10);
     }
 
     search(): void {

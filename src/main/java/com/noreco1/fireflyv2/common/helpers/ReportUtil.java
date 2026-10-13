@@ -17,8 +17,8 @@ public class ReportUtil {
         HashMap<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("COMP_NAME", "NEGROS ORIENTAL I ELECTRIC COOPERATIVE, INC");
         parameters.put("COMP_ADDR", "Tinaogan, Bindoy, Negros Oriental, Philippines");
-        parameters.put("COMP_CONTACT", "");
-        parameters.put("PURCHASING_CONTACT", "0900-000-0000");
+        parameters.put("COMP_CONTACT", "0947-2037059 | (035) 402-5149 | 0909-91656011");
+        parameters.put("PURCHASING_CONTACT", "0947-2037059 | (035) 402-5149 | 0909-91656011");
         java.net.URL logoUrl = ReportUtil.class.getResource("/images/NORECO1_LOGO_NO_BG.png");
         parameters.put("LOGO_PATH", logoUrl != null ? logoUrl.toString() : "");
         java.net.URL subreportUrl = ReportUtil.class.getResource("/jasper/vouchers/sub_reports/");

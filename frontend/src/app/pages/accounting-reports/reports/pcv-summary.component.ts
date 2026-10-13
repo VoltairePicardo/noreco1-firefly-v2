@@ -70,14 +70,14 @@ export class PcvSummaryComponent implements OnInit {
 
     browseCheckedBy(): void {
         const ref = this.modalService.open(BrowseEntityModalComponent, { size: 'lg', centered: true });
-        ref.componentInstance.types = ['ENTITY_EMPLOYEE'];
-        ref.result.then((entity) => { if (entity) this.checkedBy = entity; }, () => {});
+        ref.componentInstance.entityTypes = [1];
+        ref.result.then((result) => { if (result?.action === 'select' && result?.data) this.checkedBy = result.data; }, () => {});
     }
 
     browseReplenishedBy(): void {
         const ref = this.modalService.open(BrowseEntityModalComponent, { size: 'lg', centered: true });
-        ref.componentInstance.types = ['ENTITY_EMPLOYEE'];
-        ref.result.then((entity) => { if (entity) this.replenishedBy = entity; }, () => {});
+        ref.componentInstance.entityTypes = [1];
+        ref.result.then((result) => { if (result?.action === 'select' && result?.data) this.replenishedBy = result.data; }, () => {});
     }
 
     export(type: 'pdf' | 'xls'): void {

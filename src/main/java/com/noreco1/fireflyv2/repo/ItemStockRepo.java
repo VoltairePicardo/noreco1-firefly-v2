@@ -69,7 +69,7 @@ public interface ItemStockRepo extends JpaRepository<ItemStock, Integer> {
             "IF(vouchers.docNo IN (3, 6), std.quantity, NULL) AS outs, " +
             "std.itemStockBalance FROM StockTransactionDetail std " +
             "INNER JOIN (SELECT st.id AS stockTransId, doc.code, doc.deliveryDate AS voucherDate, " +
-            "doc.invoiceDescription AS purpose, doc.FK_transactionId, 1 AS docNo FROM ReceivingReport doc " +
+            "doc.remarks AS purpose, doc.FK_transactionId, 1 AS docNo FROM ReceivingReport doc " +
             "INNER JOIN StockTransaction st ON st.FK_transactionId = doc.FK_transactionId " +
             "WHERE doc.deliveryDate BETWEEN :from AND :to " +
             "UNION " +
@@ -116,7 +116,7 @@ public interface ItemStockRepo extends JpaRepository<ItemStock, Integer> {
             "IF(vouchers.docNo IN (3, 6), std.totalCost, NULL) AS outsAmt, " +
             "std.itemStockBalance, std.itemStockAmountBalance FROM StockTransactionDetail std " +
             "INNER JOIN (SELECT st.id AS stockTransId, doc.code, doc.deliveryDate AS voucherDate, " +
-            "doc.invoiceDescription AS purpose, doc.FK_transactionId, 1 AS docNo FROM ReceivingReport doc " +
+            "doc.remarks AS purpose, doc.FK_transactionId, 1 AS docNo FROM ReceivingReport doc " +
             "INNER JOIN StockTransaction st ON st.FK_transactionId = doc.FK_transactionId " +
             "WHERE doc.deliveryDate BETWEEN :from AND :to " +
             "UNION " +
@@ -285,7 +285,7 @@ public interface ItemStockRepo extends JpaRepository<ItemStock, Integer> {
                                               @Param("invLocId") Integer invLocId,
                                               @Param("invLocId2") Integer invLocId2);
 
-    @Query(value = "SELECT * FROM ItemStock " +
+    @Query(value = "SELECT ItemStock.* FROM ItemStock " +
             "INNER JOIN Item ON Item.id = ItemStock.FK_itemId " +
             "INNER JOIN InventoryCategory ON InventoryCategory.id = Item.FK_inventoryCategoryId " +
             "WHERE (ItemStock.FK_inventoryLocationId = :inventoryLocationId) " +
@@ -295,7 +295,7 @@ public interface ItemStockRepo extends JpaRepository<ItemStock, Integer> {
             nativeQuery = true)
     List<ItemStock> findAllByInventoryLocationIdAndItemStockQuantityIsLessThanEqualItemReorderPointAndItemInventoryCategoryIdOrderByItemInventoryCategoryIdAscItemDescriptionAsc(@Param("inventoryLocationId")Integer inventoryLocationId, @Param("inventoryCategoryId")Integer inventoryCategoryId);
 
-    @Query(value = "SELECT * FROM ItemStock " +
+    @Query(value = "SELECT ItemStock.* FROM ItemStock " +
             "INNER JOIN Item ON Item.id = ItemStock.FK_itemId " +
             "INNER JOIN InventoryCategory ON InventoryCategory.id = Item.FK_inventoryCategoryId " +
             "WHERE (ItemStock.FK_inventoryLocationId = :inventoryLocationId) " +

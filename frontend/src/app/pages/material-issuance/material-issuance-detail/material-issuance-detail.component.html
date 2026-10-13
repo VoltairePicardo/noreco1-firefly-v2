@@ -138,7 +138,7 @@
 
         @if (isForChecking()) {
             <!-- Editable journal entries for checker -->
-            <app-journal-entries-form [(entries)]="editableJournalEntries"/>
+            <app-journal-entries-form [entries]="editableJournalEntries"/>
             <div class="d-flex justify-content-end mt-3">
                 <button type="button" class="btn btn-primary fw-bold" (click)="updateEntries()"
                         [disabled]="savingEntries || !isBalanced">

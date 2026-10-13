@@ -50,7 +50,7 @@ export class MemorandumReceiptService {
     }
 
     print(id: number): void {
-        this.downloadService.print(`${BASE_URL}/memorandum-receipt/export/${id}`, { type: 'pdf' });
+        this.downloadService.print(`${BASE_API}/memorandum-receipt/export/${id}`, { type: 'pdf' });
     }
 
     getDefaultSignatories(): Observable<{ approvedBy?: SlEntity; approvingOfficer?: SlEntity }> {

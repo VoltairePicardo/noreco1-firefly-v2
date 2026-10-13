@@ -1,6 +1,8 @@
 package com.noreco1.fireflyv2.controller;
 
 import com.noreco1.fireflyv2.common.GlobalConstant;
+import com.noreco1.fireflyv2.model.PurchaseRequest;
+import com.noreco1.fireflyv2.repo.PurchaseRequestRepo;
 import com.noreco1.fireflyv2.common.facade.SignatoryFacade;
 import com.noreco1.fireflyv2.common.helpers.StringFormatter;
 import com.noreco1.fireflyv2.dtoers.AccountingReportDtoer;
@@ -72,6 +74,9 @@ public class ReportsController {
     @Autowired
     @Qualifier("reportsServiceImpl")
     Bir1601E bir1601E;
+
+    @Autowired
+    PurchaseRequestRepo purchaseRequestRepo;
 
     // accounting reports view providers
 
@@ -572,7 +577,7 @@ public class ReportsController {
         HashMap params = reportsService.reportParametersBirAlphalist(year, month, request);
         JRDataSource dataSource = reportsService.datasourceBirAlphalist(year, month);
 
-        String template = GlobalConstant.JASPER_BASE_PATH + "/bir/BirAlphalist.jrxml";
+            String template = GlobalConstant.JASPER_BASE_PATH + "/bir/BirAlphalist.jrxml";
         downloadService.download(type, token, response, params, template, dataSource);
     }// end: BIR Alphalist
 
@@ -763,12 +768,7 @@ public class ReportsController {
 
         String template = GlobalConstant.JASPER_BASE_PATH + "/financial-statements/BalanceSheetNEA.jrxml";
 
-        if (type.equals(ExporterService.EXTENSION_TYPE_EXCEL.toString())) {
-            downloadService.download(type, token, response, params, template, dataSource);
-        } else {
-            String newPdfFilename = env.getProperty("path.attachments") + "BalanceSheetNEA-" + token + ".pdf";
-            downloadService.savePdf(newPdfFilename, params, template, dataSource);
-        }
+        downloadService.download(type, token, response, params, template, dataSource);
 
     }
 
@@ -891,18 +891,22 @@ public class ReportsController {
     }// end: pending-voucher-list
 
     // Summary of Quotations
-    @GetMapping(value = "/data/quotation-summary/{rivId}")
-    
-    public List<QuotationDetail> quotationSummaryData(@PathVariable int rivId) {
-        return accountingReportDtoer.getForQuotationSummary(rivId);
+    @GetMapping(value = "/data/quotation-summary/{rvCode}")
+    public List<QuotationDetail> quotationSummaryData(@PathVariable String rvCode) {
+        PurchaseRequest pr = purchaseRequestRepo.findPurchaseRequestByCode(rvCode);
+        if (pr == null) return List.of();
+        return accountingReportDtoer.getForQuotationSummary(pr.getId());
     }
 
-    @RequestMapping(value = "/export/quotation-summary/{rivId}/{validatedByAcctNo}/{approvedByAcctNo}")
-    public void exportQuotationSummary(@PathVariable int rivId, @PathVariable int validatedByAcctNo, @PathVariable int approvedByAcctNo,
+    @RequestMapping(value = "/export/quotation-summary/{rvCode}/{validatedByAcctNo}/{approvedByAcctNo}")
+    public void exportQuotationSummary(@PathVariable String rvCode, @PathVariable int validatedByAcctNo, @PathVariable int approvedByAcctNo,
                                 @RequestParam(value = "type") String type,
                                 @RequestParam(value = "token") String token,
                                 HttpServletResponse response, HttpServletRequest request) {
 
+        PurchaseRequest pr = purchaseRequestRepo.findPurchaseRequestByCode(rvCode);
+        if (pr == null) return;
+        int rivId = pr.getId();
         HashMap params = reportsService.reportParametersForQuotationSummary(request, rivId, validatedByAcctNo, approvedByAcctNo);
         JRDataSource dataSource = reportsService.datasourceForQuotationSummary(rivId);
 
@@ -1078,7 +1082,7 @@ public class ReportsController {
                                 @RequestParam(value = "token") String token,
                                 HttpServletResponse response, HttpServletRequest request) {
 
-        HashMap params = reportsService.reportParametersForInventoryBalance(request);
+        HashMap params = reportsService.reportParametersForInventoryBalance(inventoryLocationId, inventoryCategoryId, request);
         JRDataSource dataSource = reportsService.datasourceForInventoryBalance(inventoryLocationId, inventoryCategoryId);
 
         String template = GlobalConstant.JASPER_BASE_PATH + "/inventory/InventoryBalance.jrxml";
@@ -1130,7 +1134,6 @@ public class ReportsController {
     // start: Petty Cash Fund Ledger
 
     @GetMapping(value = "/accounting/petty-cash-fund-ledger/{from}/{to}/{docStatId}/{pcfId}")
-    
     public List<Map> getPettyCashFundLedger(@PathVariable String from, @PathVariable String to, @PathVariable Integer pcfId, @PathVariable Integer docStatId) {
         return reportsService.dataForPettyCashFundLedger(from, to, pcfId, docStatId);
     }
@@ -1215,7 +1218,6 @@ public class ReportsController {
     //start: Ideal Quantity, Reorder Point
 
     @GetMapping(value = "/data/ideal-quantity-reorder-point")
-    
     public List<Map> idealQuantityReorderPointData(@RequestParam(value = "inventoryLocationId", required = false) Integer inventoryLocationId,
                                                    @RequestParam(value = "reportTypeId", required = false) Integer reportTypeId,
                                                    @RequestParam(value = "inventoryCategoryId", required = false) Integer inventoryCategoryId) {
@@ -1228,7 +1230,7 @@ public class ReportsController {
                                                 @RequestParam(value = "token") String token,
                                                 HttpServletResponse response, HttpServletRequest request) {
 
-        HashMap params = reportsService.reportParametersForIdealQuantityReorderPoint(reportTypeId, request);
+        HashMap params = reportsService.reportParametersForIdealQuantityReorderPoint(reportTypeId, inventoryLocationId, request);
         JRDataSource dataSource = reportsService.datasourceForIdealQuantityReorderPoint(inventoryLocationId, reportTypeId, inventoryCategoryId);
 
         String template = GlobalConstant.JASPER_BASE_PATH + "/inventory/IdealQuantityReorderPoint.jrxml";
@@ -1239,7 +1241,6 @@ public class ReportsController {
     // end: PCV Summary
 
     // MST Summary
-
     @GetMapping(value = "/accounting/mrte-ledger")
     public List<Map> getMrteLedgerData(@RequestParam(value = "acctNo") Integer acctNo) {
         return reportsService.dataForMRTELedger(acctNo);
@@ -1281,7 +1282,6 @@ public class ReportsController {
     } // end: Maintenance Record Summary
 
     // Asset Monitoring Sheet
-
     @RequestMapping(value = "/export/asset-monitoring-sheet/{maintenanceRecordId}")
     public void exportAssetMonitoringSheet(@PathVariable Integer maintenanceRecordId,
                                           @RequestParam(value = "type") String type,
@@ -1296,9 +1296,7 @@ public class ReportsController {
     } // end: Asset Monitoring Sheet
 
     // start: Check List
-
     @GetMapping(value = "/accounting/check-list/{from}/{to}")
-    
     public List<Map> getCheckList(@PathVariable String from, @PathVariable String to) {
         return reportsService.dataForCheckList(from, to);
     }
@@ -1344,26 +1342,32 @@ public class ReportsController {
     // start: Pending PR
 
     @GetMapping(value = "/accounting/pending-purchase-requests/{from}/{to}/{status}")
-    
-    public List<Map> getPendingPurchaseRequests(@PathVariable String from, @PathVariable String to, @PathVariable Integer status) {
-        return reportsService.dataForPendingPurchaseRequests(from, to, status);
+
+    public List<Map> getPendingPurchaseRequests(@PathVariable String from, @PathVariable String to, @PathVariable String status) {
+        return reportsService.dataForPendingPurchaseRequests(from, to, parsePrStatus(status));
     }
 
     @RequestMapping(value = "/export/pending-purchase-requests")
     public void exportCheckList(@RequestParam(value = "from") String from,
                                 @RequestParam(value = "to") String to,
-                                @RequestParam(value = "status") Integer status,
+                                @RequestParam(value = "status") String status,
                                 @RequestParam(value = "token") String token,
                                 @RequestParam(value = "type") String type,
                                 HttpServletResponse response, HttpServletRequest request) {
 
-        HashMap params = reportsService.reportParametersForPendingPurchaseRequests(from, to, status, request);
-        JRDataSource dataSource = reportsService.datasourceForPendingPurchaseRequests(from, to, status);
+        Integer statusId = parsePrStatus(status);
+        HashMap params = reportsService.reportParametersForPendingPurchaseRequests(from, to, statusId, request);
+        JRDataSource dataSource = reportsService.datasourceForPendingPurchaseRequests(from, to, statusId);
 
         String template = GlobalConstant.JASPER_BASE_PATH + "/summaries/PendingPurchaseRequest.jrxml";
         downloadService.download(type, token, response, params, template, dataSource);
     }
     // end: Pending PR
+
+    private Integer parsePrStatus(String status) {
+        if ("Approved".equalsIgnoreCase(status)) return com.noreco1.fireflyv2.model.enums.DocumentStatus.APPROVED.getId();
+        return 0; // Pending / All → service filters out APPROVED/DENIED/CANCELLED
+    }
 
 //    @GetMapping(value = "/accounting/sl-account-inquiry/{accountId}/{accountNo}/{from}/{to}")
 //    

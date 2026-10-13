@@ -6,7 +6,7 @@ import { environment } from '@/environments/environment';
 const BASE     = environment.get('baseApiUrl');  // http://localhost:8080/api
 const BASE_URL = environment.get('baseUrl');      // http://localhost:8080 (for non-/api controllers)
 
-// Print base URL map — from old Firefly voucherUtil.setBaseUrlForPrint()
+// Print base URL map — paths relative to baseApiUrl (/api)
 export const PRINT_BASE_MAP: Record<string, string> = {
     'Accounts Payable':         'accounts-payable',
     'Journal Voucher':          'journal-voucher',
@@ -18,18 +18,18 @@ export const PRINT_BASE_MAP: Record<string, string> = {
     'JO Acceptance':            'jo-acceptance',
     'Payment Request':          'payment-request',
     'Summary of Quotation':     'quotation',
-    'Sales Voucher':            'sales-voucher-mgt',
-    'Cash Receipts':            'cash-receipts-mgt',
-    'Receiving Report':         'receiving-report-mgt',
-    'Stock Withdrawal':         'inventory/withdrawal',
-    'Stock Release':            'inventory/releasing',
-    'Stock Adjustment':         'inventory/stock-adjustment-mgt',
-    'Stock Transfer':           'inventory/stock-transfer-mgt',
-    'Stock Receive':            'inventory/receiving-mgt',
+    'Sales Voucher':            'sales-voucher',
+    'Cash Receipts':            'cash-receipts',
+    'Receiving Report':         'rr',
+    'Stock Withdrawal':         'withdrawal',
+    'Stock Release':            'stock-release',
+    'Stock Adjustment':         'stock-adjustment',
+    'Stock Transfer':           'stock-transfer',
+    'Stock Receive':            'stock-receive',
     'Material Credit Ticket':   'inventory/mct-mgt',
-    'Material Salvage Ticket':  'inventory/mst-mgt',
+    'Material Salvage Ticket':  'mst',
     'Site Inspection Report':   'site-inspection-report',
-    'Cost Estimate':            'cost-estimate-mgt',
+    'Cost Estimate':            'cost-estimate',
 };
 
 // RV print type constants — from old Firefly firefly.js

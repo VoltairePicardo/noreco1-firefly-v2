@@ -18,7 +18,7 @@
                                 <div class="input-group">
                                     <input type="text" class="form-control" [value]="selectedSWCode()" readonly
                                            placeholder="No stock withdrawal selected"/>
-                                    <button type="button" class="btn btn-primary fw-bold gap-1" (click)="openStockWithdrawalBrowse()">
+                                    <button type="button" class="btn btn-success fw-bold gap-1" (click)="openStockWithdrawalBrowse()">
                                         <ng-icon name="tablerSearch" class="fs-lg fw-bold"></ng-icon>Browse
                                     </button>
                                 </div>
@@ -29,7 +29,7 @@
                                     <input type="text" class="form-control"
                                            [value]="approvingOfficer()?.fullName || approvingOfficer()?.name || ''" readonly
                                            placeholder="Browse approving officer"/>
-                                    <button type="button" class="btn btn-primary fw-bold gap-1" (click)="openApprovingOfficerBrowse()">
+                                    <button type="button" class="btn btn-success fw-bold gap-1" (click)="openApprovingOfficerBrowse()">
                                         <ng-icon name="tablerSearch" class="fs-lg fw-bold"></ng-icon>Browse
                                     </button>
                                 </div>

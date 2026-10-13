@@ -256,8 +256,8 @@ export class AccountingReportsService {
         return this.http.get<any[]>(`${BASE_API}/reports/accounting/pe-summary/${month}/${year}`);
     }
 
-    getQuotationSummaryItems(rivId: number): Observable<any[]> {
-        return this.http.get<any[]>(`${BASE_API}/reports/data/quotation-summary/${rivId}`);
+    getQuotationSummaryItems(rvCode: string): Observable<any[]> {
+        return this.http.get<any[]>(`${BASE_API}/reports/data/quotation-summary/${rvCode}`);
     }
 
     getPendingVoucherList(docTypeId: number, tableName: string, pt: string, statusId: number): Observable<any[]> {

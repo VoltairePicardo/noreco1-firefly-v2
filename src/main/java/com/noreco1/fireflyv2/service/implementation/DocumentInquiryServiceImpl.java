@@ -120,7 +120,7 @@ public class DocumentInquiryServiceImpl implements DocumentInquiryService {
             String amount = docTypeId == DocumentType.RV.getId() || docTypeId == DocumentType.CF.getId() ? "" : ", doc.amount ";
             String rvTypeId = docTypeId == DocumentType.RV.getId() ? ", doc.rvType " : "";
             String fkId = docTypeId != DocumentType.PR.getId() ? "" : ", joa.id AS fkId ";
-            String forPr = docTypeId != DocumentType.PR.getId() ? "INNER JOIN Supplier supp ON supp.FK_accountNo = doc.FK_vendorAccountNo " : "INNER JOIN JobOrderAcceptance joa ON joa.id = doc.FK_joAcceptanceId INNER JOIN Supplier supp ON supp.FK_accountNo = joa.FK_vendorAccountNo";
+            String forPr = docTypeId != DocumentType.PR.getId() ? "INNER JOIN Supplier supp ON supp.FK_accountNo = doc.FK_vendorAccountNo " : "INNER JOIN JobOrderAcceptance joa ON joa.id = doc.FK_joAcceptanceId INNER JOIN Supplier supp ON supp.FK_accountNo = joa.FK_vendorAccountNo ";
 
             String allVouchersJoinQuery = " JOIN generalledger gl ON doc.FK_transactionId = gl.FK_transactionId " +
                     "LEFT JOIN SegmentAccount sa ON gl.FK_segmentAccountId = sa.id " +
@@ -590,7 +590,7 @@ public class DocumentInquiryServiceImpl implements DocumentInquiryService {
             String amount = docTypeId == DocumentType.RV.getId() || docTypeId == DocumentType.CF.getId() ? "" : ", doc.amount ";
             String rvTypeId = docTypeId == DocumentType.RV.getId() ? ", doc.rvType " : "";
             String fkId = docTypeId != DocumentType.PR.getId() ? "" : ", joa.id AS fkId ";
-            String forPr = docTypeId != DocumentType.PR.getId() ? "INNER JOIN Supplier supp ON supp.FK_accountNo = doc.FK_vendorAccountNo " : "INNER JOIN JobOrderAcceptance joa ON joa.id = doc.FK_joAcceptanceId INNER JOIN Supplier supp ON supp.FK_accountNo = joa.FK_vendorAccountNo";
+            String forPr = docTypeId != DocumentType.PR.getId() ? "INNER JOIN Supplier supp ON supp.FK_accountNo = doc.FK_vendorAccountNo " : "INNER JOIN JobOrderAcceptance joa ON joa.id = doc.FK_joAcceptanceId INNER JOIN Supplier supp ON supp.FK_accountNo = joa.FK_vendorAccountNo ";
             String sql = "SELECT " +
                     "DISTINCT " +
                     "doc.id, " +

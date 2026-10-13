@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.21.5.final using JasperReports Library version 6.21.5-74d586df47b25dbd05bd0957999819196e59934a  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ItemTestingAcknowledgement" language="groovy" pageWidth="612" pageHeight="792" whenNoDataType="AllSectionsNoDetail" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="e574cc27-45ae-4c41-aeb3-7c3d71c10e2a">
 	<property name="ireport.zoom" value="1.1000000000000023"/>
 	<property name="ireport.x" value="0"/>
@@ -36,9 +37,9 @@
 		<band splitType="Stretch"/>
 	</background>
 	<title>
-		<band height="190" splitType="Stretch">
+		<band height="164" splitType="Stretch">
 			<staticText>
-				<reportElement mode="Transparent" x="1" y="107" width="360" height="20" forecolor="#000000" backcolor="#FFFFFF" uuid="0154fbc7-66ca-45b2-af9f-95a088aea508"/>
+				<reportElement mode="Transparent" x="1" y="88" width="360" height="20" forecolor="#000000" backcolor="#FFFFFF" uuid="0154fbc7-66ca-45b2-af9f-95a088aea508"/>
 				<box>
 					<topPen lineWidth="1.0"/>
 				</box>
@@ -55,7 +56,7 @@
 				</textElement>
 				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement x="1" y="2" width="571" height="16" isPrintWhenDetailOverflows="true" uuid="f5fef8db-17ae-4b79-b96e-9d7684fa116c"/>
 				<textElement textAlignment="Center" markup="html">
 					<font fontName="SansSerif" size="12" isBold="true"/>
@@ -70,7 +71,7 @@
 				<textFieldExpression><![CDATA[$P{COMP_ADDR}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement mode="Transparent" x="1" y="87" width="360" height="20" forecolor="#000000" backcolor="#FFFFFF" uuid="31c4d41e-9ac4-406b-a3d0-8102e2431636"/>
+				<reportElement mode="Transparent" x="1" y="68" width="360" height="20" forecolor="#000000" backcolor="#FFFFFF" uuid="31c4d41e-9ac4-406b-a3d0-8102e2431636"/>
 				<textElement textAlignment="Center" verticalAlignment="Top" rotation="None" markup="none">
 					<font fontName="SansSerif" size="11" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
@@ -82,15 +83,17 @@
 				<imageExpression><![CDATA[$P{LOGO_PATH}]]></imageExpression>
 			</image>
 			<textField>
-				<reportElement mode="Transparent" x="1" y="37" width="571" height="24" forecolor="#000000" backcolor="#FFFFFF" uuid="e9a92f6b-f395-43b5-973e-f9ea984a8439"/>
+				<reportElement mode="Transparent" x="1" y="32" width="571" height="20" forecolor="#000000" backcolor="#FFFFFF" uuid="e9a92f6b-f395-43b5-973e-f9ea984a8439">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Top" rotation="None" markup="none">
-					<font fontName="SansSerif" size="11" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<font fontName="SansSerif" size="14" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{TITLE}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement mode="Transparent" x="1" y="155" width="360" height="20" forecolor="#000000" backcolor="#FFFFFF" uuid="0c619c00-448e-4097-8fa4-590e38b0354d"/>
+				<reportElement mode="Transparent" x="1" y="136" width="360" height="20" forecolor="#000000" backcolor="#FFFFFF" uuid="0c619c00-448e-4097-8fa4-590e38b0354d"/>
 				<box>
 					<topPen lineWidth="1.0"/>
 				</box>
@@ -101,7 +104,7 @@
 				<text><![CDATA[INVENTORY LOCATION]]></text>
 			</staticText>
 			<textField isBlankWhenNull="true">
-				<reportElement mode="Transparent" x="1" y="135" width="360" height="20" forecolor="#000000" backcolor="#FFFFFF" uuid="d198dd8a-c517-4d09-9dd5-92413a8dd2cd"/>
+				<reportElement mode="Transparent" x="1" y="116" width="360" height="20" forecolor="#000000" backcolor="#FFFFFF" uuid="d198dd8a-c517-4d09-9dd5-92413a8dd2cd"/>
 				<textElement textAlignment="Center" verticalAlignment="Top" rotation="None" markup="none">
 					<font fontName="SansSerif" size="11" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
@@ -109,7 +112,7 @@
 				<textFieldExpression><![CDATA[$P{INV_LOCATION}]]></textFieldExpression>
 			</textField>
 			<textField pattern="" isBlankWhenNull="true">
-				<reportElement x="433" y="135" width="139" height="20" uuid="bd35dcde-cf1c-4a14-ad6c-429ebb9906cd"/>
+				<reportElement x="433" y="116" width="139" height="20" uuid="bd35dcde-cf1c-4a14-ad6c-429ebb9906cd"/>
 				<box>
 					<bottomPen lineWidth="1.0"/>
 				</box>
@@ -119,7 +122,7 @@
 				<textFieldExpression><![CDATA[$P{PO_NO}]]></textFieldExpression>
 			</textField>
 			<textField pattern="MMMM dd, yyyy" isBlankWhenNull="true">
-				<reportElement x="433" y="89" width="139" height="20" uuid="b2d9771a-9341-44ae-ae16-19e77cf5bc2c"/>
+				<reportElement x="433" y="70" width="139" height="20" uuid="b2d9771a-9341-44ae-ae16-19e77cf5bc2c"/>
 				<box>
 					<bottomPen lineWidth="1.0"/>
 				</box>
@@ -129,7 +132,7 @@
 				<textFieldExpression><![CDATA[$P{ITEM_TESTING_DATE}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement mode="Transparent" x="388" y="135" width="43" height="20" forecolor="#000000" backcolor="#FFFFFF" uuid="dafb4c48-db8e-4992-a198-0487e739464e"/>
+				<reportElement mode="Transparent" x="388" y="116" width="43" height="20" forecolor="#000000" backcolor="#FFFFFF" uuid="dafb4c48-db8e-4992-a198-0487e739464e"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None" markup="none">
 					<font fontName="SansSerif" size="11" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
@@ -137,7 +140,7 @@
 				<text><![CDATA[PO No.:]]></text>
 			</staticText>
 			<staticText>
-				<reportElement mode="Transparent" x="388" y="89" width="43" height="20" forecolor="#000000" backcolor="#FFFFFF" uuid="a2d3dc63-d8df-4a2e-87dc-71e4bcbd033a"/>
+				<reportElement mode="Transparent" x="388" y="70" width="43" height="20" forecolor="#000000" backcolor="#FFFFFF" uuid="a2d3dc63-d8df-4a2e-87dc-71e4bcbd033a"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None" markup="none">
 					<font fontName="SansSerif" size="11" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
@@ -242,7 +245,7 @@
 	</columnHeader>
 	<detail>
 		<band height="13" splitType="Stretch">
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement stretchType="RelativeToBandHeight" x="59" y="0" width="230" height="13" isPrintWhenDetailOverflows="true" uuid="a6f7b580-181f-4dde-88a5-ff45ad72b903"/>
 				<box leftPadding="5" bottomPadding="3">
 					<bottomPen lineWidth="1.0"/>
@@ -253,7 +256,7 @@
 				</textElement>
 				<textFieldExpression><![CDATA[$F{description}]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement stretchType="RelativeToBandHeight" x="0" y="0" width="59" height="13" isPrintWhenDetailOverflows="true" uuid="d1465a8b-31fe-42f1-91e9-d7d96ee411bb"/>
 				<box>
 					<topPen lineWidth="1.0"/>
@@ -266,7 +269,7 @@
 				</textElement>
 				<textFieldExpression><![CDATA[$F{code}]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" pattern="###0" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" pattern="###0" isBlankWhenNull="true">
 				<reportElement stretchType="RelativeToBandHeight" x="289" y="0" width="60" height="13" isPrintWhenDetailOverflows="true" uuid="59a3a927-eb4d-414c-8795-dd705b34d423"/>
 				<box>
 					<pen lineWidth="1.0"/>
@@ -278,7 +281,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{unitReceivedQuantity}]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" pattern="###0" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" pattern="###0" isBlankWhenNull="true">
 				<reportElement stretchType="RelativeToBandHeight" x="349" y="0" width="60" height="13" isPrintWhenDetailOverflows="true" uuid="40fbf875-1d01-463b-aa9a-c687bd5e25a6"/>
 				<box>
 					<pen lineWidth="1.0"/>
@@ -290,7 +293,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{unitRejectedQuantity}]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement stretchType="RelativeToBandHeight" x="409" y="0" width="163" height="13" isPrintWhenDetailOverflows="true" uuid="3f39fbbc-39a3-4173-b906-b60386656d0a"/>
 				<box leftPadding="2">
 					<pen lineWidth="1.0"/>
@@ -318,9 +321,9 @@
 		</band>
 	</pageFooter>
 	<summary>
-		<band height="144" splitType="Stretch">
+		<band height="110" splitType="Stretch">
 			<textField isBlankWhenNull="true">
-				<reportElement positionType="Float" x="11" y="86" width="200" height="20" isRemoveLineWhenBlank="true" uuid="03743418-61bc-4d6b-8b08-c7b991106f03"/>
+				<reportElement positionType="Float" x="11" y="70" width="200" height="20" isRemoveLineWhenBlank="true" uuid="03743418-61bc-4d6b-8b08-c7b991106f03"/>
 				<box>
 					<bottomPen lineWidth="1.0"/>
 				</box>
@@ -330,7 +333,7 @@
 				<textFieldExpression><![CDATA[$P{PREPARAR}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement positionType="Float" x="11" y="106" width="200" height="20" isRemoveLineWhenBlank="true" uuid="536e92c8-c90f-4bfd-b580-afaf692eb9b2"/>
+				<reportElement positionType="Float" x="11" y="90" width="200" height="20" isRemoveLineWhenBlank="true" uuid="536e92c8-c90f-4bfd-b580-afaf692eb9b2"/>
 				<box>
 					<topPen lineWidth="0.0"/>
 				</box>
@@ -361,7 +364,7 @@
 				</textElement>
 				<text><![CDATA[TOTAL]]></text>
 			</staticText>
-			<textField isStretchWithOverflow="true" pattern="###0" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" pattern="###0" isBlankWhenNull="true">
 				<reportElement stretchType="RelativeToBandHeight" x="289" y="0" width="60" height="18" isPrintWhenDetailOverflows="true" uuid="40b6beaf-944c-4b90-b5f2-8322e8dd5616"/>
 				<box>
 					<pen lineWidth="1.0"/>
@@ -373,7 +376,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$V{TOTAL_RECEIVED}]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" pattern="###0" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" pattern="###0" isBlankWhenNull="true">
 				<reportElement stretchType="RelativeToBandHeight" x="349" y="0" width="60" height="18" isPrintWhenDetailOverflows="true" uuid="8a9359b9-1798-4825-b169-7ebb430d3776"/>
 				<box>
 					<pen lineWidth="1.0"/>

@@ -43,7 +43,7 @@
                                    [value]="asset ? ((asset.refNo || asset.localCode || asset.code || '') + ' — ' + (asset.description || '')) : ''"
                                    placeholder="No asset selected"/>
                             <button type="button" class="btn btn-success fw-bold" (click)="browseAsset()">
-                                <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
+                                <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
                             </button>
                         </div>
                         @if (asset) {
@@ -73,7 +73,7 @@
                                    [value]="voucherTransaction ? (voucherTransaction.code || voucherTransaction.transactionId || '') : ''"
                                    placeholder="No voucher linked"/>
                             <button type="button" class="btn btn-success fw-bold" (click)="browseVoucher()" [disabled]="!asset">
-                                <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
+                                <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
                             </button>
                         </div>
                     </div>
@@ -85,7 +85,7 @@
                 <div class="d-flex align-items-center justify-content-between mb-2">
                     <div class="fs-xs text-uppercase fw-semibold text-muted">Labor / Works Needed</div>
                     <button type="button" class="btn btn-success fw-bold" (click)="addWorkItem()">
-                        <ng-icon name="tablerPlus" class="ps-0 pe-2 fw-bold"></ng-icon>Add Row
+                        <ng-icon name="tablerPlus" class="ps-0 pe-3 fw-bold"></ng-icon>Add Row
                     </button>
                 </div>
                 <div class="table-responsive">
@@ -140,7 +140,7 @@
                 <div class="d-flex align-items-center justify-content-between mb-2">
                     <div class="fs-xs text-uppercase fw-semibold text-muted">Materials (Stock Releases)</div>
                     <button type="button" class="btn btn-success fw-bold" (click)="browseStockRelease()">
-                        <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse Stock Release
+                        <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse Stock Release
                     </button>
                 </div>
                 @if (stockReleases.length > 0) {
@@ -210,7 +210,7 @@
                 <div class="d-flex align-items-center justify-content-between mb-2">
                     <div class="fs-xs text-uppercase fw-semibold text-muted">Other Items</div>
                     <button type="button" class="btn btn-success fw-bold" (click)="addOtherItem()">
-                        <ng-icon name="tablerPlus" class="ps-0 pe-2 fw-bold"></ng-icon>Add Row
+                        <ng-icon name="tablerPlus" class="ps-0 pe-3 fw-bold"></ng-icon>Add Row
                     </button>
                 </div>
                 <div class="table-responsive">

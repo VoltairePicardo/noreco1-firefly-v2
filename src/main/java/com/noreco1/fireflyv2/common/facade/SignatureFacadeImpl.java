@@ -960,7 +960,8 @@ public class SignatureFacadeImpl implements SignatureFacade {
 
 //                        Employee approvar = employeeRepo.findOneByAccountNumber(voucher.getApprovingOfficer().getAccountNo());
                         Employee preparar = employeeRepo.findOneByAccountNumber(voucher.getCreatedBy().getAccountNo());
-                        Employee receiver = employeeRepo.findOneByAccountNumber(voucher.getReceivedBy().getAccountNo());
+                        Employee receiver = voucher.getReceivedBy() != null
+                                ? employeeRepo.findOneByAccountNumber(voucher.getReceivedBy().getAccountNo()) : null;
 
                         if (receiver != null) {
                             params.put("RECEIVED_BY", receiver.getName());
@@ -1013,7 +1014,8 @@ public class SignatureFacadeImpl implements SignatureFacade {
                         }
 
                         Employee preparar = employeeRepo.findOneByAccountNumber(voucher.getCreatedBy().getAccountNo());
-                        Employee receiver = employeeRepo.findOneByAccountNumber(voucher.getReceivedBy().getAccountNo());
+                        Employee receiver = voucher.getReceivedBy() != null
+                                ? employeeRepo.findOneByAccountNumber(voucher.getReceivedBy().getAccountNo()) : null;
 
                         if (receiver != null) {
                             params.put("RECEIVED_BY", receiver.getName());
@@ -1183,8 +1185,10 @@ public class SignatureFacadeImpl implements SignatureFacade {
                     case MST: {
                         MaterialSalvageTicket voucher = (MaterialSalvageTicket) document;
 
-                        Employee receivedBy = employeeRepo.findOneByAccountNumber(voucher.getReceivedBy().getAccountNo());
-                        Employee returnedBy = employeeRepo.findOneByAccountNumber(voucher.getReturnedBy().getAccountNo());
+                        Employee receivedBy = voucher.getReceivedBy() != null
+                                ? employeeRepo.findOneByAccountNumber(voucher.getReceivedBy().getAccountNo()) : null;
+                        Employee returnedBy = voucher.getReturnedBy() != null
+                                ? employeeRepo.findOneByAccountNumber(voucher.getReturnedBy().getAccountNo()) : null;
                         Employee preparar = employeeRepo.findOneByAccountNumber(voucher.getCreatedBy().getAccountNo());
 
                         if (receivedBy != null) {

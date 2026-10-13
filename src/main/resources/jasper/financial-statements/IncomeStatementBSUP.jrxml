@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.21.5.final using JasperReports Library version 6.21.5-74d586df47b25dbd05bd0957999819196e59934a  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="TrialBalance" pageWidth="1684" pageHeight="1190" orientation="Landscape" whenNoDataType="NoDataSection" columnWidth="1644" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isFloatColumnFooter="true" uuid="b29c3ba6-1020-4625-9bd3-1937355162ed">
 	<property name="net.sf.jasperreports.export.xls.exclude.origin.band.1" value="pageHeader"/>
 	<property name="net.sf.jasperreports.export.xls.exclude.origin.band.2" value="pageFooter"/>
@@ -18,8 +19,8 @@
 	<property name="ireport.zoom" value="0.6818181818181824"/>
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
-	<style name="titleStyle" hAlign="Center" vAlign="Top" fontName="SansSerif" fontSize="14" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
-	<style name="detailStyle" hAlign="Left" vAlign="Middle" markup="html" fontSize="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false">
+	<style name="titleStyle" hTextAlign="Center" hImageAlign="Center" vTextAlign="Top" vImageAlign="Top" fontName="SansSerif" fontSize="14" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+	<style name="detailStyle" hTextAlign="Left" hImageAlign="Left" vTextAlign="Middle" vImageAlign="Middle" markup="html" fontSize="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false">
 		<box leftPadding="5">
 			<topPen lineWidth="1.0"/>
 			<leftPen lineWidth="1.0"/>
@@ -27,10 +28,10 @@
 			<rightPen lineWidth="1.0"/>
 		</box>
 	</style>
-	<style name="amountStyle" style="detailStyle" hAlign="Right" vAlign="Middle" pattern="#,##0.00;(#,##0.00)" fontSize="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false">
+	<style name="amountStyle" style="detailStyle" hTextAlign="Right" hImageAlign="Right" vTextAlign="Middle" vImageAlign="Middle" pattern="#,##0.00;(#,##0.00)" fontSize="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false">
 		<box leftPadding="5" rightPadding="2"/>
 	</style>
-	<style name="columnHeaderStyle" hAlign="Center" vAlign="Middle" fontSize="9" isItalic="false" isUnderline="false" isStrikeThrough="false">
+	<style name="columnHeaderStyle" hTextAlign="Center" hImageAlign="Center" vTextAlign="Middle" vImageAlign="Middle" fontSize="9" isItalic="false" isUnderline="false" isStrikeThrough="false">
 		<box>
 			<topPen lineWidth="1.0"/>
 			<leftPen lineWidth="1.0"/>
@@ -39,7 +40,7 @@
 		</box>
 	</style>
 	<style name="subTitleStyle" style="titleStyle" fontSize="10" isBold="false"/>
-	<style name="totalAmountStyle" style="detailStyle" hAlign="Right" vAlign="Middle" markup="none" pattern="#,##0.00;(#,##0.00)" isBlankWhenNull="true" fontSize="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false">
+	<style name="totalAmountStyle" style="detailStyle" hTextAlign="Right" hImageAlign="Right" vTextAlign="Middle" vImageAlign="Middle" markup="none" pattern="#,##0.00;(#,##0.00)" isBlankWhenNull="true" fontSize="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false">
 		<box rightPadding="2"/>
 	</style>
 	<parameter name="COMP_ADDR" class="java.lang.String"/>
@@ -58,41 +59,50 @@
 	<title>
 		<band height="112" splitType="Stretch">
 			<image isLazy="true" onErrorType="Icon">
-				<reportElement uuid="a572ebb6-75d3-4cc5-adf8-83c0b47be5b6" x="0" y="0" width="58" height="58"/>
+				<reportElement x="0" y="0" width="50" height="50" uuid="a572ebb6-75d3-4cc5-adf8-83c0b47be5b6">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
 				<imageExpression><![CDATA[$P{LOGO_PATH}]]></imageExpression>
 			</image>
 			<staticText>
-				<reportElement uuid="97a850ee-d8e0-445e-89de-0f623269d28a" mode="Transparent" x="1" y="43" width="1643" height="24" forecolor="#000000" backcolor="#FFFFFF"/>
-				<textElement textAlignment="Center" verticalAlignment="Top" rotation="None" markup="none">
-					<font fontName="SansSerif" size="11" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				<reportElement mode="Transparent" x="0" y="30" width="1643" height="24" forecolor="#000000" backcolor="#FFFFFF" uuid="97a850ee-d8e0-445e-89de-0f623269d28a"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="SansSerif" size="14" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
 				<text><![CDATA[Statement of Income]]></text>
 			</staticText>
 			<textField isBlankWhenNull="true">
-				<reportElement uuid="8dc03b87-ce0f-42e3-84cc-ff569c6fde86" x="1" y="17" width="1643" height="12"/>
-				<textElement textAlignment="Center">
+				<reportElement x="1" y="16" width="1643" height="14" uuid="8dc03b87-ce0f-42e3-84cc-ff569c6fde86">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="SansSerif" size="10"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{COMP_ADDR}]]></textFieldExpression>
 			</textField>
 			<textField pattern="MM/dd/yyyy hh:mm a">
-				<reportElement uuid="f50810b0-83ee-4d20-9622-690449fae3c6" x="1558" y="1" width="86" height="14"/>
-				<textElement>
+				<reportElement x="1510" y="1" width="134" height="14" uuid="f50810b0-83ee-4d20-9622-690449fae3c6"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font fontName="SansSerif" size="9"/>
 				</textElement>
 				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement uuid="ae3d854d-6819-4ef4-9f26-69fb77969167" x="1" y="0" width="1643" height="15"/>
-				<textElement textAlignment="Center">
+				<reportElement x="1" y="0" width="1643" height="16" uuid="ae3d854d-6819-4ef4-9f26-69fb77969167">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="SansSerif" size="12" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{COMP_NAME}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement uuid="3ae1aa15-ff4f-4986-8516-b17c621d9df3" x="1" y="66" width="1643" height="36"/>
-				<textElement textAlignment="Center">
+				<reportElement x="1" y="54" width="1643" height="14" uuid="3ae1aa15-ff4f-4986-8516-b17c621d9df3">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="SansSerif" size="10"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{RANGE}]]></textFieldExpression>
@@ -111,7 +121,7 @@
 	<columnFooter>
 		<band height="17" splitType="Stretch">
 			<line>
-				<reportElement uuid="999b0e37-e3e3-4f9c-ab8b-d0ef54b39868" x="0" y="0" width="1644" height="1"/>
+				<reportElement x="0" y="0" width="1644" height="1" uuid="999b0e37-e3e3-4f9c-ab8b-d0ef54b39868"/>
 			</line>
 		</band>
 	</columnFooter>
