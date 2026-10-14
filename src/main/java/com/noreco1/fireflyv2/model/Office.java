@@ -5,6 +5,8 @@ import lombok.*;
 import jakarta.validation.constraints.NotBlank;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 import java.util.Date;
 
 @Getter
@@ -43,6 +45,7 @@ public class Office {
     @Column(nullable = false)
     private Date updatedAt;
 
+    @NotFound(action = NotFoundAction.IGNORE)
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "FK_inventoryLocationId")
     private InventoryLocation inventoryLocation;

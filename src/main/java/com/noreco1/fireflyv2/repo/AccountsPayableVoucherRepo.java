@@ -227,6 +227,7 @@ public interface AccountsPayableVoucherRepo extends JpaRepository<AccountsPayabl
             "      ) " +
             "  )) " +
             ") " +
+            "ORDER BY apv.id DESC " +
             "\n#pageable\n",
             countQuery = "SELECT COUNT(*) FROM AccountsPayableVoucher apv " +
                     "WHERE apv.FK_documentStatusId = :documentStatusId " +
@@ -252,8 +253,9 @@ public interface AccountsPayableVoucherRepo extends JpaRepository<AccountsPayabl
                                                               Pageable pageable);
 
     @Query(value = "SELECT apv.* FROM AccountsPayableVoucher apv " +
+            "LEFT JOIN slentity ON apv.FK_vendorAccountNo = slentity.accountNo " +
             "WHERE apv.FK_documentStatusId = :documentStatusId " +
-            "AND apv.code LIKE :query " +
+            "AND (UPPER(apv.code) LIKE :query OR UPPER(apv.particulars) LIKE :query OR UPPER(slentity.name) LIKE :query) " +
             "AND ( " +
             "  (COALESCE(apv.forInstallment, 0) = 0 AND apv.id NOT IN ( " +
             "      SELECT cva.FK_accountsPayableVoucherId " +
@@ -271,10 +273,12 @@ public interface AccountsPayableVoucherRepo extends JpaRepository<AccountsPayabl
             "      ) " +
             "  )) " +
             ") " +
+            "ORDER BY apv.id DESC " +
             "\n#pageable\n",
             countQuery = "SELECT COUNT(*) FROM AccountsPayableVoucher apv " +
+                    "LEFT JOIN slentity ON apv.FK_vendorAccountNo = slentity.accountNo " +
                     "WHERE apv.FK_documentStatusId = :documentStatusId " +
-                    "AND apv.code LIKE :query " +
+                    "AND (UPPER(apv.code) LIKE :query OR UPPER(apv.particulars) LIKE :query OR UPPER(slentity.name) LIKE :query) " +
                     "AND ( " +
                     "  (COALESCE(apv.forInstallment, 0) = 0 AND apv.id NOT IN ( " +
                     "      SELECT cva.FK_accountsPayableVoucherId " +

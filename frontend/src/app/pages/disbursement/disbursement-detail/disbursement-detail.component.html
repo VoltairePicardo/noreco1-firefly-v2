@@ -19,7 +19,7 @@
             <button type="button" class="btn btn-success fw-bold" (click)="print()">
                 <ng-icon name="tablerPrinter" class="ps-0 pe-3 fw-bold fs-lg"></ng-icon>Print
             </button>
-            <button type="button" class="btn btn-primary fw-bold" (click)="print2307()">
+            <button type="button" class="btn btn-primary fw-bold" (click)="print2307()" [disabled]="!hasWtax">
                 <ng-icon name="tablerFile" class="ps-0 pe-3 fw-bold fs-lg"></ng-icon>2307
             </button>
             @if (isEditable()) {
@@ -140,6 +140,7 @@
                             <th>Bank Account</th>
                             <th>Check Number</th>
                             <th>Status</th>
+                            <th class="text-center">Print Count</th>
                             <th style="width:60px"></th>
                         </tr>
                     </thead>
@@ -159,18 +160,17 @@
                                         <span class="badge bg-warning bg-opacity-25 text-warning border">Pending</span>
                                     }
                                 </td>
+                                <td class="text-center">{{ row.printCount || 0 }}</td>
                                 <td class="text-center">
-                                    @if (row.forCheckWriting) {
-                                        <button type="button" class="btn btn-info btn-icon btn rounded-circle"
-                                                [disabled]="printingCheckRows.has(row)"
-                                                (click)="printCheck(row)" ngbTooltip="Print">
-                                            @if (printingCheckRows.has(row)) {
-                                                <span class="spinner-border spinner-border-sm"></span>
-                                            } @else {
-                                                <ng-icon name="tablerPrinter" class="fs-sm"></ng-icon>
-                                            }
-                                        </button>
-                                    }
+                                    <button type="button" class="btn btn-info btn-icon btn rounded-circle"
+                                            [disabled]="printingCheckRows.has(row)"
+                                            (click)="printCheck(row)" ngbTooltip="Print">
+                                        @if (printingCheckRows.has(row)) {
+                                            <span class="spinner-border spinner-border-sm"></span>
+                                        } @else {
+                                            <ng-icon name="tablerPrinter" class="fs-sm"></ng-icon>
+                                        }
+                                    </button>
                                 </td>
                             </tr>
                         }
@@ -280,8 +280,8 @@
                                             <ng-icon [name]="isSlExpanded(i) ? 'tablerChevronDown' : 'tablerChevronRight'" class="fs-sm ms-1"/>
                                         </button>
                                     }
-                                    <strong>{{ entry.code || entry.account?.accountCode || '—' }}</strong><br/>
-                                    {{ entry.description || entry.account?.accountTitle || entry.account?.accountDescription || '—' }}
+                                    <strong>{{ entry.code || '—' }}</strong><br/>
+                                    {{ entry.description || '—' }}
                                     @if (entry.slentries?.length && isSlExpanded(i)) {
                                         <div class="table-responsive mt-1">
                                             <table class="table table-sm table-bordered mb-0 fs-xs">

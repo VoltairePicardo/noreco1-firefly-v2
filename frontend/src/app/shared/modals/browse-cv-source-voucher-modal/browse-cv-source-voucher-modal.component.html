@@ -41,7 +41,7 @@
                 </tr>
             </thead>
             <tbody>
-                @if (loading()) {
+                @if (loading) {
                     <tr>
                         <td colspan="5" class="text-center py-4">
                             <div class="d-flex justify-content-center align-items-center gap-2 py-2 text-muted">
@@ -50,8 +50,8 @@
                             </div>
                         </td>
                     </tr>
-                } @else if (hasResults()) {
-                    @for (voucher of vouchers(); track voucher.id) {
+                } @else if (hasResults) {
+                    @for (voucher of vouchers; track voucher.id) {
                         <tr style="cursor: pointer" (click)="select(voucher)">
                             <td class="fw-bold">{{ voucher.localCode || '—' }}</td>
                             <td class="text-end">{{ voucher.amount != null ? (voucher.amount | number:'1.2-2') : '—' }}</td>
@@ -69,10 +69,10 @@
         </table>
     </div>
 
-    @if (hasResults()) {
+    @if (hasResults) {
         <div class="d-flex justify-content-center pagination-boxed align-items-center mt-3">
-            <ngb-pagination [collectionSize]="total()" [page]="page()" (pageChange)="onPageChange($event)"
-                            [pageSize]="pageSize()" [maxSize]="5" [rotate]="true">
+            <ngb-pagination [collectionSize]="total" [(page)]="page" (pageChange)="loadData()"
+                            [pageSize]="pageSize" [maxSize]="5" [rotate]="true">
                 <ng-template ngbPaginationPrevious><ng-icon name="tablerChevronLeft"/></ng-template>
                 <ng-template ngbPaginationNext><ng-icon name="tablerChevronRight"/></ng-template>
             </ngb-pagination>

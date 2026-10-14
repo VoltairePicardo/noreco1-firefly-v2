@@ -104,6 +104,10 @@ export class DisbursementService {
         return this.approvedForCvPaged('jo-acceptance', q, page, size);
     }
 
+    getApprovedRfpForCv(q: string = '', page = 0, size = 10): Observable<any> {
+        return this.approvedForCvPaged('payment-request', q, page, size);
+    }
+
     getNextCheckNumber(bankAccountId: number): Observable<{ checkNumber?: string }> {
         return this.http.get<{ checkNumber?: string }>(`${BASE_API}/disbursement/next-check-number/${bankAccountId}`);
     }

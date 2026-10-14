@@ -48,4 +48,7 @@ public class CheckVoucherCheque implements Serializable {
     @Column
     private Boolean printed;
 
+    @Column
+    private Integer printCount = 0;
+
 }

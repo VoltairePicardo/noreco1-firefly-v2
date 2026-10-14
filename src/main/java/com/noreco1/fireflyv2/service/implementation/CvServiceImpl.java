@@ -480,8 +480,11 @@ public class CvServiceImpl implements CvService, PrintableVoucher, PrintableCheq
                     map.put("released", checkVoucherCheque.getReleased());
                     map.put("cleared", checkVoucherCheque.getCleared());
                     map.put("printed", checkVoucherCheque.getPrinted());
+                    map.put("printCount", checkVoucherCheque.getPrintCount() != null ? checkVoucherCheque.getPrintCount() : 0);
                     map.put("transId", checkVoucherCheque.getTransaction().getId());
-                    map.put("forCheckWriting", authenticationFacade.getLoggedIn().getAccountNo().equals(checkVoucher.getCheckPrinter().getAccountNo()) && checkVoucher.getDocumentStatus().getId().equals(com.noreco1.fireflyv2.model.enums.DocumentStatus.FOR_CHECK_WRITING.getId()));
+                    map.put("forCheckWriting", checkVoucher.getCheckPrinter() != null
+                        && authenticationFacade.getLoggedIn().getAccountNo().equals(checkVoucher.getCheckPrinter().getAccountNo())
+                        && checkVoucher.getDocumentStatus().getId().equals(com.noreco1.fireflyv2.model.enums.DocumentStatus.FOR_CHECK_WRITING.getId()));
 
                     bankAccountDetailsMap.add(map);
 
@@ -495,13 +498,13 @@ public class CvServiceImpl implements CvService, PrintableVoucher, PrintableCheq
                 cvDto.setLocalCode(checkVoucher.getCode());
                 cvDto.setTransId(checkVoucher.getTransaction().getId());
 
-                SlEntity preparedBy = slEntityRepo.findById(checkVoucher.getCreatedBy().getAccountNo()).orElse(null);
-                SlEntity checkPrinter = slEntityRepo.findById(checkVoucher.getCheckPrinter().getAccountNo()).orElse(null);
-                SlEntity approvingOfficer = slEntityRepo.findById(checkVoucher.getApprovingOfficer().getAccountNo()).orElse(null);
-                SlEntity budgetOfficer = slEntityRepo.findById(checkVoucher.getBudgetOfficer().getAccountNo()).orElse(null);
-                SlEntity checker = slEntityRepo.findById(checkVoucher.getChecker().getAccountNo()).orElse(null);
-                SlEntity rao = slEntityRepo.findById(checkVoucher.getRecommendingOfficer().getAccountNo()).orElse(null);
-                SlEntity auditor = slEntityRepo.findById(checkVoucher.getAuditingOfficer().getAccountNo()).orElse(null);
+                SlEntity preparedBy = checkVoucher.getCreatedBy() != null ? slEntityRepo.findById(checkVoucher.getCreatedBy().getAccountNo()).orElse(null) : null;
+                SlEntity checkPrinter = checkVoucher.getCheckPrinter() != null ? slEntityRepo.findById(checkVoucher.getCheckPrinter().getAccountNo()).orElse(null) : null;
+                SlEntity approvingOfficer = checkVoucher.getApprovingOfficer() != null ? slEntityRepo.findById(checkVoucher.getApprovingOfficer().getAccountNo()).orElse(null) : null;
+                SlEntity budgetOfficer = checkVoucher.getBudgetOfficer() != null ? slEntityRepo.findById(checkVoucher.getBudgetOfficer().getAccountNo()).orElse(null) : null;
+                SlEntity checker = checkVoucher.getChecker() != null ? slEntityRepo.findById(checkVoucher.getChecker().getAccountNo()).orElse(null) : null;
+                SlEntity rao = checkVoucher.getRecommendingOfficer() != null ? slEntityRepo.findById(checkVoucher.getRecommendingOfficer().getAccountNo()).orElse(null) : null;
+                SlEntity auditor = checkVoucher.getAuditingOfficer() != null ? slEntityRepo.findById(checkVoucher.getAuditingOfficer().getAccountNo()).orElse(null) : null;
                 if (checkVoucher.getSecondCheckSign() != null) {
                     SlEntity secondCheckSign = slEntityRepo.findById(checkVoucher.getSecondCheckSign().getAccountNo()).orElse(null);
                     cvDto.setSecondCheckSign(secondCheckSign);
@@ -587,6 +590,9 @@ public class CvServiceImpl implements CvService, PrintableVoucher, PrintableCheq
 
                 cvDto.setForAddingBudgetDetail(authenticationFacade.getLoggedIn().getAccountNo().equals(checkVoucher.getBudgetOfficer().getAccountNo()) && checkVoucher.getDocumentStatus().getId().equals(com.noreco1.fireflyv2.model.enums.DocumentStatus.FOR_BUDGET_OFFICER.getId()));
 
+                List<CheckVoucherIncomePayment> incomePayments = incomePaymentRepo.findByTransactionId(checkVoucher.getTransaction().getId());
+                cvDto.setHasTax(!incomePayments.isEmpty());
+
             }
 
         } catch (Exception ex){
@@ -606,12 +612,16 @@ public class CvServiceImpl implements CvService, PrintableVoucher, PrintableCheq
     public PostResponse updateCheckNumber(CheckVoucherCheque cheque, BindingResult bindingResult, MessageSource messageSource) {
         PostResponse response = new PostResponse();
 
+        CheckVoucherCheque existing = chequeRepo.findOneByBankAccountIdAndTransactionId(cheque.getBankAccount().getId(), cheque.getTransaction().getId());
+        int previousPrintCount = (existing != null && existing.getPrintCount() != null) ? existing.getPrintCount() : 0;
+
         chequeRepo.deleteByBankAccountIdAndTransactionId(cheque.getBankAccount().getId(), cheque.getTransaction().getId());
 
         if (cheque.getCheckNumber() != null && cheque.getCheckNumber().trim().length() > 0) {
             cheque.setReleased(false);
             cheque.setCleared(false);
             cheque.setPrinted(true);
+            cheque.setPrintCount(previousPrintCount + 1);
             CheckVoucherCheque newCh = chequeRepo.save(cheque);
             if (newCh != null) {
                 response.setSuccess(true);
@@ -628,7 +638,7 @@ public class CvServiceImpl implements CvService, PrintableVoucher, PrintableCheq
     public CheckDto findForPrintCheckDetails(Integer transId, Integer bankAccountId) {
         CheckVoucher checkVoucher = cvRepo.findOneByTransactionId(transId);
 
-        if (checkVoucher != null && checkVoucher.getDocumentStatus().getId().equals(com.noreco1.fireflyv2.model.enums.DocumentStatus.APPROVED.getId())) {
+        if (checkVoucher != null && checkVoucher.getDocumentStatus().getId().equals(com.noreco1.fireflyv2.model.enums.DocumentStatus.FOR_CHECK_WRITING.getId())) {
 
             Map oldJvMap = this.forLogMapMain(checkVoucher);    // for logging
 
@@ -821,6 +831,8 @@ public class CvServiceImpl implements CvService, PrintableVoucher, PrintableCheq
     public HashMap reportParameters(Integer transId, Integer bankAccountId) {
         HashMap<String, Object> par = new HashMap<String, Object>();
         CheckVoucher checkVoucher = cvRepo.findOneByTransactionId(transId);
+        if (checkVoucher == null) return par;
+
         CheckVoucherCheque ch = chequeRepo.findOneByBankAccountIdAndTransactionId(bankAccountId, transId);
         CheckConfig config = checkConfigRepo.findOneByBankAccountId(bankAccountId);
 
@@ -828,9 +840,9 @@ public class CvServiceImpl implements CvService, PrintableVoucher, PrintableCheq
         par.put("PAYEE", checkVoucher.getPayee().getName() + "***");
         par.put("AMOUNT", new DecimalFormat("#,##0.00").format(checkVoucher.getCheckAmount()) + "***");
         par.put("AMOUNT_IN_WORDS", CurrencyIntoWords.convert(checkVoucher.getCheckAmount()).toUpperCase() + "***");
-        par.put("CHECK_NO", ch.getCheckNumber());
+        par.put("CHECK_NO", ch != null ? ch.getCheckNumber() : "");
 
-        if (config.getWithSigner().equals(1)) {
+        if (config != null && Integer.valueOf(1).equals(config.getWithSigner()) && checkVoucher.getApprovingOfficer() != null) {
             String s1 = "<b>" + checkVoucher.getApprovingOfficer().getFullName().toUpperCase() + "</b>";
             par.put("SIGN1", s1);
         }

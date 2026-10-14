@@ -22,6 +22,7 @@ import {
 import { BrowseJobOrderModalComponent } from '@/app/shared/modals/browse-job-order-modal/browse-job-order-modal.component';
 import { BrowsePurchaseOrderModalComponent } from '@/app/shared/modals/browse-purchase-order-modal/browse-purchase-order-modal.component';
 import { SelectBankAccountsModalComponent } from '@/app/shared/modals/select-bank-accounts-modal/select-bank-accounts-modal.component';
+import { SL_ENTITY_CLASSIFICATION } from '@/app/shared/utils/sl_entity-classification';
 import { JournalEntriesFormComponent, JournalEntry } from '@/app/shared/forms/journal-entries-form/journal-entries-form.component';
 import { provideIcons } from '@ng-icons/core';
 import {
@@ -40,7 +41,8 @@ const VOUCHER_TYPE_LABELS: Record<CvSourceVoucherType, string> = {
     CA:  'Cash Advance',
     JV:  'Journal Voucher',
     RR:  'Receiving Report',
-    JOA: 'JO Acceptance'
+    JOA: 'JO Acceptance',
+    RFP: 'Request for Payment'
 };
 
 @Component({
@@ -77,7 +79,7 @@ export class DisbursementAddEditComponent {
 
     flatpickrOptions = { dateFormat: 'Y-m-d', altInput: true, altFormat: 'F j, Y' };
 
-    voucherDate          = '';
+    voucherDate          = new Date().toISOString().substring(0, 10);
     particulars          = '';
     additionalPayeeInfo  = '';
     checkAmount: number | null = null;
@@ -322,7 +324,11 @@ export class DisbursementAddEditComponent {
 
     async openPayeeBrowse(): Promise<void> {
         try {
-            const result = await this.modalService.openModal(BrowseEntityModalComponent, {}, { size: 'lg', centered: true });
+            const result = await this.modalService.openModal(
+                BrowseEntityModalComponent,
+                { defaultClassificationId: SL_ENTITY_CLASSIFICATION.PAYEE },
+                { size: 'lg', centered: true }
+            );
             if (result?.action === 'select' && result?.data) {
                 this.payee = result.data;
             }
@@ -334,7 +340,7 @@ export class DisbursementAddEditComponent {
     // Source document linking (APV / CA / JV / RR / JOA) — mirrors legacy cv2.js setSelectedVoucher()
     async openSourceVoucherBrowse(): Promise<void> {
         try {
-            const result = await this.modalService.openModal(BrowseCvSourceVoucherModalComponent, {}, { size: 'lg', centered: true });
+            const result = await this.modalService.openModal(BrowseCvSourceVoucherModalComponent, {}, { size: 'xl', centered: true });
             if (result?.action !== 'select' || !result?.data) return;
 
             const voucherType: CvSourceVoucherType = result.voucherType;
@@ -359,8 +365,11 @@ export class DisbursementAddEditComponent {
                 if (voucher.forInstallment) {
                     // Amount is derived from selected installments, not the full APV amount.
                     this.checkAmount = null;
-                } else {
+                } else if (voucher.hasTax) {
+                    // APV has withheld tax — load entries without WHT so the CV can re-apply it
                     this.fetchSourceGLEntries(this.service.getGLEntriesWithoutWithholdingTax(voucher.transId!));
+                } else {
+                    this.fetchSourceGLEntries(this.service.getGLEntries(voucher.transId!));
                 }
             } else if (voucherType === 'JV') {
                 this.fetchSourceGLEntries(this.service.getGLEntries(voucher.transId!));

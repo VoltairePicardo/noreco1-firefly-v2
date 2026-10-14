@@ -412,6 +412,11 @@ public class LedgerFacadeImpl implements LedgerFacade {
                 incomePayment.setBaseAmount(new BigDecimal(ledgerLine.getWTaxEntry().get("baseAmount").toString()));
                 incomePayment.setPercentage(new BigDecimal(ledgerLine.getWTaxEntry().get("percentage").toString()));
                 incomePayment.setTaxCode(taxCode);
+                if (ledgerLine.getAccountId() != null) {
+                    Account account = new Account();
+                    account.setId(ledgerLine.getAccountId());
+                    incomePayment.setAccount(account);
+                }
 
                 incomePaymentRepo.save(incomePayment);
             }

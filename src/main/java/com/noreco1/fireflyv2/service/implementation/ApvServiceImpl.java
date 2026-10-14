@@ -566,7 +566,7 @@ public class ApvServiceImpl implements ApvService, PrintableVoucher {
         org.springframework.data.domain.Page<AccountsPayableVoucher> accountsPayableVouchers;
 
         if(query != null){
-            accountsPayableVouchers = apvRepo.findAllByQueryAndDocumentStatusForCv("%"+query+"%", com.noreco1.fireflyv2.model.enums.DocumentStatus.APPROVED.getId(), pageable);
+            accountsPayableVouchers = apvRepo.findAllByQueryAndDocumentStatusForCv("%" + query.toUpperCase() + "%", com.noreco1.fireflyv2.model.enums.DocumentStatus.APPROVED.getId(), pageable);
         } else {
             accountsPayableVouchers = apvRepo.findAllByDocumentStatusForCv(com.noreco1.fireflyv2.model.enums.DocumentStatus.APPROVED.getId(), pageable);
         }
@@ -577,11 +577,11 @@ public class ApvServiceImpl implements ApvService, PrintableVoucher {
                 dto.setVoucherDate(entity.getVoucherDate());
                 dto.setLocalCode(entity.getCode());
                 dto.setId(entity.getId());
-                dto.setPreparedBy(entity.getCreatedBy().getFullName());
+                dto.setPreparedBy(entity.getCreatedBy() != null ? entity.getCreatedBy().getFullName() : null);
                 dto.setAmount(entity.getAmount());
                 dto.setParticulars(entity.getParticulars());
-                dto.setSlentityAccountNo(entity.getVendor().getAccountNo());
-                dto.setSlentityName(entity.getVendor().getName());
+                dto.setSlentityAccountNo(entity.getVendor() != null ? entity.getVendor().getAccountNo() : null);
+                dto.setSlentityName(entity.getVendor() != null ? entity.getVendor().getName() : null);
                 dto.setInvoiceDate(entity.getInvoiceDate());
                 dto.setDueDate(entity.getDueDate());
                 dto.setTransId(entity.getTransaction().getId());

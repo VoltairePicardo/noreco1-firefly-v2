@@ -610,6 +610,30 @@ public class PaymentRequestServiceImpl implements PaymentRequestService, Printab
         return null;
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public org.springframework.data.domain.Page<com.noreco1.fireflyv2.controller.response.CvVoucherDto> findAllApprovedForCvPaged(String query, Pageable pageable) {
+        org.springframework.data.domain.Page<PaymentRequest> paymentRequests;
+        if (query != null) {
+            paymentRequests = payReqRepo.findAllByQueryForCv("%" + query + "%", com.noreco1.fireflyv2.model.enums.DocumentStatus.APPROVED.getId(), pageable);
+        } else {
+            paymentRequests = payReqRepo.findAllForCv(com.noreco1.fireflyv2.model.enums.DocumentStatus.APPROVED.getId(), pageable);
+        }
+        return paymentRequests.map(entity -> {
+            com.noreco1.fireflyv2.controller.response.CvVoucherDto dto = new com.noreco1.fireflyv2.controller.response.CvVoucherDto();
+            dto.setId(entity.getId());
+            dto.setLocalCode(entity.getCode());
+            dto.setAmount(entity.getAmount());
+            dto.setParticulars(entity.getCode() + " - " + entity.getVendor().getName());
+            dto.setVoucherDate(entity.getVoucherDate());
+            dto.setPreparedBy(entity.getCreatedBy().getFullName());
+            dto.setSlentityAccountNo(entity.getVendor().getAccountNo());
+            dto.setSlentityName(entity.getVendor().getName());
+            if (entity.getTransaction() != null) dto.setTransId(entity.getTransaction().getId());
+            return dto;
+        });
+    }
+
     @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Map findByApvId(Integer apvId) {

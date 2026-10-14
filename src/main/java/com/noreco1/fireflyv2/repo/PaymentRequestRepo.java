@@ -174,4 +174,26 @@ public interface PaymentRequestRepo extends JpaRepository<PaymentRequest, Intege
                     ") GROUP BY PaymentRequest.id ",
             nativeQuery = true)
     Page<PaymentRequest> findAllForApv(@Param("documentStatusId") Integer documentStatusId, @Param("docTypeId") Integer docTypeId, Pageable pageable);
+
+    @Query(value = "SELECT pr.* FROM PaymentRequest pr " +
+            "JOIN slentity ON pr.FK_vendorAccountNo = slentity.accountNo " +
+            "WHERE pr.FK_documentStatusId = :documentStatusId " +
+            "AND (UPPER(pr.code) LIKE :query OR UPPER(slentity.name) LIKE :query) " +
+            "GROUP BY pr.id ORDER BY pr.id DESC " +
+            "\n#pageable\n",
+            countQuery = "SELECT COUNT(*) FROM PaymentRequest pr " +
+                    "JOIN slentity ON pr.FK_vendorAccountNo = slentity.accountNo " +
+                    "WHERE pr.FK_documentStatusId = :documentStatusId " +
+                    "AND (UPPER(pr.code) LIKE :query OR UPPER(slentity.name) LIKE :query)",
+            nativeQuery = true)
+    Page<PaymentRequest> findAllByQueryForCv(@Param("query") String query, @Param("documentStatusId") Integer documentStatusId, Pageable pageable);
+
+    @Query(value = "SELECT pr.* FROM PaymentRequest pr " +
+            "WHERE pr.FK_documentStatusId = :documentStatusId " +
+            "ORDER BY pr.id DESC " +
+            "\n#pageable\n",
+            countQuery = "SELECT COUNT(*) FROM PaymentRequest pr " +
+                    "WHERE pr.FK_documentStatusId = :documentStatusId",
+            nativeQuery = true)
+    Page<PaymentRequest> findAllForCv(@Param("documentStatusId") Integer documentStatusId, Pageable pageable);
 }

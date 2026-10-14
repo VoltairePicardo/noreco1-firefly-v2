@@ -57,6 +57,7 @@ public class CvDto {
     private List<GeneralLedgerLineDto2> generalLedgerLines = new ArrayList<>();
 
     private boolean isForAddingBudgetDetail = false;
+    private boolean hasTax = false;
 
     public CvDto() {}
 
@@ -410,5 +411,13 @@ public class CvDto {
 
     public void setForAddingBudgetDetail(boolean forAddingBudgetDetail) {
         isForAddingBudgetDetail = forAddingBudgetDetail;
+    }
+
+    public boolean isHasTax() {
+        return hasTax;
+    }
+
+    public void setHasTax(boolean hasTax) {
+        this.hasTax = hasTax;
     }
 }

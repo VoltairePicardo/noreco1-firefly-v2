@@ -1,6 +1,7 @@
 import { Component, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AlertService } from '@/app/shared/services/alert.service';
+import Swal from 'sweetalert2';
 import { COMMON_ALL_PAGE_IMPORTS, COMMON_MAIN_PAGE_IMPORTS, SHARED_PROVIDERS } from '@/app/shared/providers/shared-providers';
 import { DisbursementService } from '../disbursement.service';
 import { provideIcons } from '@ng-icons/core';
@@ -59,6 +60,7 @@ export class DisbursementDetailComponent {
         this.service.getData(this.id).subscribe({
             next: (data) => {
                 this.isLoading.set(false);
+                this.processingWorkflow = false;
                 if (data?.id) {
                     this.data = data;
                     this.journalEntries = data.generalLedgerLines || [];
@@ -73,6 +75,7 @@ export class DisbursementDetailComponent {
             },
             error: () => {
                 this.isLoading.set(false);
+                this.processingWorkflow = false;
                 this.alertService.error(this.module, 'Error', '');
                 this.router.navigate(['/' + this.menuLink]);
             }
@@ -81,6 +84,7 @@ export class DisbursementDetailComponent {
 
     loadWorkflowActions(): void {
         if (!this.data?.transId) return;
+        this.workflowActions = [];
         this.service.getWorkflowActions(this.data.transId).subscribe({
             next: (actions) => { this.workflowActions = actions || []; this.selectedAction = null; this.remarks = ''; },
             error: () => { this.workflowActions = []; }
@@ -98,11 +102,13 @@ export class DisbursementDetailComponent {
         };
         this.service.process(payload).subscribe({
             next: (res) => {
-                this.processingWorkflow = false;
                 if (res.success) {
                     this.alertService.success(this.module, 'Processed', '');
+                    this.logs = [];
                     this.loadData();
+                    if (this.showLogs) this.loadLogs();
                 } else {
+                    this.processingWorkflow = false;
                     this.alertService.error(this.module, 'Process', res.failureMessage || '');
                 }
             },
@@ -159,6 +165,10 @@ export class DisbursementDetailComponent {
         return this.data.bankAccountDetailsMap || [];
     }
 
+    get hasWtax(): boolean {
+        return !!this.data.hasTax;
+    }
+
     loadAttachments(): void {
         if (!this.data?.transId) return;
         this.service.getFiles(this.data.transId).subscribe({
@@ -201,9 +211,21 @@ export class DisbursementDetailComponent {
         this.service.print2307SubSuppliers(this.data.transId);
     }
 
-    printCheck(row: any): void {
+    async printCheck(row: any): Promise<void> {
         const checkNumber = (row.checkNumber || '').trim();
         if (!checkNumber || this.printingCheckRows.has(row)) return;
+
+        if (row.printed) {
+            const result = await Swal.fire({
+                title: 'Reprint Check?',
+                text: 'This check has already been printed. Are you sure you want to reprint?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, reprint',
+                cancelButtonText: 'Cancel'
+            });
+            if (!result.isConfirmed) return;
+        }
 
         this.service.printCheck(row.transId, row.bankAccount.id);
 

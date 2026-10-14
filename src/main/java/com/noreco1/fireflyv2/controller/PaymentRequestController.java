@@ -1,6 +1,7 @@
 package com.noreco1.fireflyv2.controller;
 
 import com.noreco1.fireflyv2.common.GlobalConstant;
+import com.noreco1.fireflyv2.controller.response.CvVoucherDto;
 import com.noreco1.fireflyv2.controller.response.PayReqDto;
 import com.noreco1.fireflyv2.controller.response.PostResponse;
 import com.noreco1.fireflyv2.controller.response.ProcessDocumentDto;
@@ -27,6 +28,8 @@ import org.springframework.core.env.Environment;
 import org.springframework.http.MediaType;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -120,6 +123,14 @@ public class PaymentRequestController {
     public PostResponse process(@RequestBody ProcessDocumentDto dto) {
         BindingResult bindingResult = new BeanPropertyBindingResult(dto, "processDocumentDto");
         return service.process(dto, bindingResult, messageSource);
+    }
+
+    @GetMapping("/approved-for-cv-paged")
+    public Page<CvVoucherDto> approvedForCvPaged(
+            @RequestParam(value = "q", required = false, defaultValue = "") String q,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size) {
+        return service.findAllApprovedForCvPaged(q.isEmpty() ? null : q, PageRequest.of(page, size));
     }
 
     @GetMapping("/{id}/budget-details")

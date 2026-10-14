@@ -4,6 +4,7 @@ import com.noreco1.fireflyv2.model.DocumentNoApproval;
 import com.noreco1.fireflyv2.model.PaymentRequest;
 import com.noreco1.fireflyv2.model.PaymentRequestBudgetDetail;
 import com.noreco1.fireflyv2.controller.response.ApvPurchasingDocumentDto;
+import com.noreco1.fireflyv2.controller.response.CvVoucherDto;
 import com.noreco1.fireflyv2.controller.response.PayReqDto;
 import com.noreco1.fireflyv2.controller.response.PayReqListDto;
 import com.noreco1.fireflyv2.controller.response.PostResponse;
@@ -42,6 +43,8 @@ public interface PaymentRequestService extends VoucherService {
     List<Map> findByDateRangePending(String from, String to);
 
     Page<ApvPurchasingDocumentDto> findAllApprovedForApvPaged(String query, Pageable pageable);
+
+    Page<CvVoucherDto> findAllApprovedForCvPaged(String query, Pageable pageable);
 
     @Transactional
     PostResponse processUpdate(DocumentNoApproval v, BindingResult bindingResult, MessageSource messageSource);

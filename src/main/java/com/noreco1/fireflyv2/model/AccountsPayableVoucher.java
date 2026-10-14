@@ -33,7 +33,7 @@ public class AccountsPayableVoucher extends Voucher {
 
     @NotNull(message = "Please select vendor.")
     @NotFound(action = NotFoundAction.IGNORE)
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "FK_vendorAccountNo")
     private SlEntity vendor;
 

@@ -29,6 +29,7 @@ public class Document implements Serializable {
     @Column
     private String code;
 
+    @NotFound(action = NotFoundAction.IGNORE)
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "FK_transactionId")
     private Transaction transaction;
