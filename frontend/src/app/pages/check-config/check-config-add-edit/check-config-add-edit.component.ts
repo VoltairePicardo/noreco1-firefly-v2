@@ -116,6 +116,15 @@ export class CheckConfigAddEditComponent {
 
         const v = this.form.value;
         const { bankAccountId, ...rest } = v;
+        const numFields = [
+            'dateX','dateY','payeeX','payeeY','payeeW',
+            'numericAmountX','numericAmountY',
+            'alphaAmountX','alphaAmountY','alphaAmountW',
+            'sig1X','sig1Y','sig2X','sig2Y',
+            'checkNoX','checkNoY',
+            'dateLineSpacing','amountNoOfCharToAdjust','nameNoOfCharToAdjust',
+        ];
+        numFields.forEach(f => { if (rest[f] == null) rest[f] = 0; });
         const frm = {
             id: this.editMode ? this.id : null,
             ...rest,

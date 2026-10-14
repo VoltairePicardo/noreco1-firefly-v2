@@ -50,7 +50,54 @@ public class CheckConfigServiceImpl implements CheckConfigService {
     @Override
     @Transactional
     public PostResponse processUpdate(CheckConfig config, BindingResult bindingResult, MessageSource messageSource) {
-        return processCreate(config, bindingResult, messageSource);
+        PostResponse response = new PostRoleResponse();
+
+        CheckConfig existing = checkConfigRepo.findById(config.getId()).orElse(null);
+        if (existing == null) { response.setFailureMessage("Check config not found."); return response; }
+
+        MessageFormatter messageFormatter = new MessageFormatter(bindingResult, messageSource, response);
+        CheckConfigValidator validator = new CheckConfigValidator();
+        validator.setService(this);
+        validator.validate(config, bindingResult);
+
+        if (bindingResult.hasErrors()) {
+            messageFormatter.buildErrorMessages();
+            response = messageFormatter.getResponse();
+            response.setSuccess(false);
+        } else {
+            existing.setCode(config.getCode());
+            existing.setBankAccount(config.getBankAccount());
+            existing.setDateFormat(config.getDateFormat());
+            existing.setCheckNoPrefix(config.getCheckNoPrefix());
+            existing.setDateX(config.getDateX());
+            existing.setDateY(config.getDateY());
+            existing.setPayeeX(config.getPayeeX());
+            existing.setPayeeY(config.getPayeeY());
+            existing.setPayeeW(config.getPayeeW());
+            existing.setNumericAmountX(config.getNumericAmountX());
+            existing.setNumericAmountY(config.getNumericAmountY());
+            existing.setAlphaAmountX(config.getAlphaAmountX());
+            existing.setAlphaAmountY(config.getAlphaAmountY());
+            existing.setAlphaAmountW(config.getAlphaAmountW());
+            existing.setSig1X(config.getSig1X());
+            existing.setSig1Y(config.getSig1Y());
+            existing.setSig2X(config.getSig2X());
+            existing.setSig2Y(config.getSig2Y());
+            existing.setCheckNoX(config.getCheckNoX());
+            existing.setCheckNoY(config.getCheckNoY());
+            existing.setDateLineSpacing(config.getDateLineSpacing());
+            existing.setAmountNoOfCharToAdjust(config.getAmountNoOfCharToAdjust());
+            existing.setNameNoOfCharToAdjust(config.getNameNoOfCharToAdjust());
+            existing.setWithSigner(config.getWithSigner());
+            existing.setShowDesignation(config.getShowDesignation());
+            existing.setUpdatedAt(new Date());
+
+            CheckConfig saved = checkConfigRepo.save(existing);
+            response.setModelId(saved.getId());
+            response.setSuccessMessage("Check config successfully updated!");
+            response.setSuccess(true);
+        }
+        return response;
     }
 
     @Override

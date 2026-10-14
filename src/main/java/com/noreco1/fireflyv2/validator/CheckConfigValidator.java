@@ -34,7 +34,7 @@ public class CheckConfigValidator implements Validator {
             }
         } else {
             // update role
-            if (i != null && i.getId() != checkConfig.getId()) { // diff check
+            if (i != null && !i.getId().equals(checkConfig.getId())) { // diff check
                 errors.rejectValue("code", "check.code.taken");
             }
         }

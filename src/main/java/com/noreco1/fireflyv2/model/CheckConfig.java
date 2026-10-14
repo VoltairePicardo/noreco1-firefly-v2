@@ -96,7 +96,7 @@ public class CheckConfig {
     Integer nameNoOfCharToAdjust;
 
     @NotFound(action = NotFoundAction.IGNORE)
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name="FK_accountId")
     private Account account;
 
@@ -105,7 +105,7 @@ public class CheckConfig {
     private Date updatedAt;
 
     @NotFound(action = NotFoundAction.IGNORE)
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name="FK_bankAccountId")
     private BankAccount bankAccount;
 
