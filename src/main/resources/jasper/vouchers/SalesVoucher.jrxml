@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.21.5.final using JasperReports Library version 6.21.5-74d586df47b25dbd05bd0957999819196e59934a  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="SalesVoucher" pageWidth="612" pageHeight="792" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isFloatColumnFooter="true" uuid="b29c3ba6-1020-4625-9bd3-1937355162ed">
 	<property name="ireport.zoom" value="1.771561000000001"/>
 	<property name="ireport.x" value="0"/>
@@ -22,6 +23,9 @@
 	<parameter name="APPROVAR_POS" class="java.lang.String"/>
 	<parameter name="CHECKER_POS" class="java.lang.String"/>
 	<parameter name="PREPARAR_POS" class="java.lang.String"/>
+	<parameter name="COMP_ACRONYM" class="java.lang.String"/>
+	<parameter name="COMP_TIN" class="java.lang.String"/>
+	<parameter name="SOA_HEADER_PATH" class="java.lang.String"/>
 	<queryString>
 		<![CDATA[]]>
 	</queryString>
@@ -76,63 +80,90 @@
 		<band splitType="Stretch"/>
 	</background>
 	<title>
-		<band height="172" splitType="Stretch">
-			<textField isBlankWhenNull="true">
-				<reportElement x="1" y="16" width="572" height="14" uuid="a6715665-534c-47cf-b145-1cc845d4a9b0"/>
-				<textElement textAlignment="Center">
-					<font fontName="SansSerif" size="10"/>
+		<band height="86" splitType="Stretch">
+			<image isLazy="true" onErrorType="Icon">
+				<reportElement mode="Transparent" x="-20" y="-20" width="612" height="106" uuid="77e47488-fd81-40ea-8a31-0b855fcc4113"/>
+				<imageExpression><![CDATA[$P{SOA_HEADER_PATH}]]></imageExpression>
+			</image>
+			<textField>
+				<reportElement x="36" y="0" width="212" height="12" uuid="3f3b56d0-7ce4-46d8-a739-d1bb6e93e07d">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<box leftPadding="5"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="SansSerif" size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{COMP_NAME}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="36" y="12" width="212" height="12" uuid="492bf302-865f-4d75-a878-285313ab84ae">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<box leftPadding="5"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="SansSerif" size="8" isBold="false"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{COMP_ADDR}]]></textFieldExpression>
 			</textField>
+			<textField>
+				<reportElement x="36" y="24" width="212" height="12" uuid="f2eb0fda-f633-4dc6-b0f5-892425062259">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<box leftPadding="5"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="SansSerif" size="8" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{COMP_TIN}]]></textFieldExpression>
+			</textField>
+			<image isLazy="true" onErrorType="Icon">
+				<reportElement x="0" y="0" width="36" height="36" uuid="f8d4b2eb-254a-433e-a915-a4c1173f5f96">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<imageExpression><![CDATA[$P{LOGO_PATH}]]></imageExpression>
+			</image>
+			<textField>
+				<reportElement x="0" y="36" width="36" height="10" forecolor="#000000" uuid="0ac09604-5b2c-4855-af96-a63283d06828">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<box leftPadding="0"/>
+				<textElement textAlignment="Center" verticalAlignment="Top">
+					<font fontName="SansSerif" size="7" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{COMP_ACRONYM}]]></textFieldExpression>
+			</textField>
 			<staticText>
-				<reportElement mode="Transparent" x="1" y="43" width="572" height="24" forecolor="#000000" backcolor="#FFFFFF" uuid="18489830-c25c-4921-a2a4-085af68bd22c"/>
-				<textElement textAlignment="Center" verticalAlignment="Top" rotation="None" markup="none">
-					<font fontName="SansSerif" size="11" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				<reportElement mode="Transparent" x="0" y="36" width="572" height="14" forecolor="#000000" backcolor="#FFFFFF" uuid="31b8eace-3ab3-4252-9eef-83fbe6d8916f">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="SansSerif" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
 				<text><![CDATA[SALES VOUCHER]]></text>
 			</staticText>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement x="1" y="0" width="572" height="16" isPrintWhenDetailOverflows="true" uuid="413e6e16-0f96-4cb0-a01c-7e1af0e4756c"/>
-				<textElement textAlignment="Center" markup="html">
-					<font fontName="SansSerif" size="12" isBold="true"/>
+			<textField>
+				<reportElement x="380" y="50" width="192" height="14" uuid="ea021b46-07b3-4fae-9389-d208bfe36691">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="10" isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$P{COMP_NAME}]]></textFieldExpression>
+				<textFieldExpression><![CDATA["Voucher No: " + $P{VOUCHER_NO}]]></textFieldExpression>
 			</textField>
-			<image isLazy="true" onErrorType="Icon">
-				<reportElement x="0" y="0" width="58" height="58" uuid="a4b7b6df-bc3f-4709-bee7-efcd3bd28727"/>
-				<imageExpression><![CDATA[$P{LOGO_PATH} + "/report-logo.jpg"]]></imageExpression>
-			</image>
-			<textField pattern="MM/dd/yyyy hh:mm a">
-				<reportElement x="487" y="0" width="86" height="14" uuid="b1986d7c-0148-4d69-be84-53461f44b64c"/>
-				<textElement>
-					<font fontName="SansSerif" size="9"/>
-				</textElement>
-				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
-			</textField>
-			<staticText>
-				<reportElement mode="Transparent" x="409" y="78" width="33" height="20" forecolor="#000000" backcolor="#FFFFFF" uuid="be8bb49a-9994-415f-a379-df9e2a096d67"/>
-				<textElement textAlignment="Right" verticalAlignment="Top" rotation="None" markup="none">
-					<font fontName="SansSerif" size="11" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
-					<paragraph lineSpacing="Single"/>
-				</textElement>
-				<text><![CDATA[Date]]></text>
-			</staticText>
 			<textField pattern="MMMM dd, yyyy" isBlankWhenNull="true">
-				<reportElement x="444" y="78" width="127" height="20" uuid="81f7878c-e33c-447a-9752-2a0586b640e3"/>
+				<reportElement x="380" y="65" width="192" height="14" uuid="53159721-d937-46c6-88ee-401e94da66da">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
 				<box>
-					<bottomPen lineWidth="1.0"/>
+					<bottomPen lineWidth="0.0"/>
 				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="SansSerif"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="SansSerif" isBold="false"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$P{V_DATE}]]></textFieldExpression>
+				<textFieldExpression><![CDATA["Date: " + $P{V_DATE}]]></textFieldExpression>
 			</textField>
 		</band>
 	</title>
-	<pageHeader>
-		<band height="4" splitType="Stretch"/>
-	</pageHeader>
 	<columnHeader>
 		<band height="31">
 			<line>
@@ -238,6 +269,24 @@ No. Charged]]></text>
 			</line>
 		</band>
 	</columnFooter>
+	<pageFooter>
+		<band height="12">
+			<textField>
+				<reportElement x="0" y="0" width="203" height="12" uuid="853873c1-178d-42cd-99c4-86594adaa509"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField pattern="MMMM dd, yyyy hh:mm a">
+				<reportElement x="446" y="0" width="126" height="12" uuid="8c8e5d51-501f-4ba2-8fa8-98486a9f3cd3"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
 	<summary>
 		<band height="103">
 			<line>
@@ -258,19 +307,6 @@ No. Charged]]></text>
 					<font fontName="SansSerif" size="10" isBold="false"/>
 				</textElement>
 				<text><![CDATA[Checked by:]]></text>
-			</staticText>
-			<staticText>
-				<reportElement positionType="Float" x="427" y="27" width="144" height="75" uuid="92fedb1e-932f-4a7d-aa87-0b16c0984835"/>
-				<box>
-					<topPen lineWidth="1.0"/>
-					<leftPen lineWidth="0.0"/>
-					<bottomPen lineWidth="1.0"/>
-					<rightPen lineWidth="0.0"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="SansSerif" isBold="true"/>
-				</textElement>
-				<text><![CDATA[]]></text>
 			</staticText>
 			<staticText>
 				<reportElement positionType="Float" x="287" y="31" width="109" height="20" isRemoveLineWhenBlank="true" uuid="cbbac354-6223-4d61-9d78-7a92c6da6b7a"/>
@@ -332,24 +368,6 @@ No. Charged]]></text>
 				<textFieldExpression><![CDATA[$P{APPROVAR_POS}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement positionType="Float" mode="Transparent" x="436" y="35" width="125" height="25" forecolor="#000000" backcolor="#FFFFFF" uuid="62590a81-744a-40b7-bdb2-c441b3fa2913"/>
-				<textElement textAlignment="Left" verticalAlignment="Top" rotation="None" markup="none">
-					<font fontName="SansSerif" size="11" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
-					<paragraph lineSpacing="Single"/>
-				</textElement>
-				<text><![CDATA[Voucher No.]]></text>
-			</staticText>
-			<textField isBlankWhenNull="true">
-				<reportElement positionType="Float" x="436" y="62" width="125" height="20" uuid="9b671310-3309-4141-beee-a3fd00d789ba"/>
-				<box>
-					<bottomPen lineWidth="1.0"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="SansSerif" size="11"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$P{VOUCHER_NO}]]></textFieldExpression>
-			</textField>
-			<staticText>
 				<reportElement mode="Transparent" x="0" y="3" width="61" height="20" forecolor="#000000" backcolor="#FFFFFF" uuid="c226df38-82fe-433d-9275-f82cdc9868ef"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None" markup="none">
 					<font fontName="SansSerif" size="12" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
@@ -357,7 +375,7 @@ No. Charged]]></text>
 				</textElement>
 				<text><![CDATA[Remarks:]]></text>
 			</staticText>
-			<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" pattern="" isBlankWhenNull="true">
 				<reportElement mode="Transparent" x="63" y="3" width="507" height="20" isRemoveLineWhenBlank="true" isPrintInFirstWholeBand="true" isPrintWhenDetailOverflows="true" forecolor="#000000" backcolor="#FFFFFF" uuid="77927ac8-1a50-4bfc-acae-5e50b90616ac"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle" rotation="None" markup="none">
 					<font fontName="SansSerif" size="10" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
@@ -366,10 +384,10 @@ No. Charged]]></text>
 				<textFieldExpression><![CDATA[$P{REMARKS}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement positionType="Float" x="0" y="27" width="428" height="75" uuid="94bbbd82-145b-41e2-8f28-00912eb52b82"/>
+				<reportElement positionType="Float" x="0" y="27" width="572" height="75" uuid="94bbbd82-145b-41e2-8f28-00912eb52b82"/>
 				<box>
 					<topPen lineWidth="1.0"/>
-					<leftPen lineWidth="0.0"/>
+					<leftPen lineWidth="1.0"/>
 					<bottomPen lineWidth="1.0"/>
 					<rightPen lineWidth="1.0"/>
 				</box>

@@ -16,12 +16,18 @@ public class ReportUtil {
 
         HashMap<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("COMP_NAME", "NEGROS ORIENTAL I ELECTRIC COOPERATIVE, INC");
-        parameters.put("COMP_ADDR", "Tinaogan, Bindoy, Negros Oriental, Philippines");
+        parameters.put("COMP_ACRONYM", "NORECO I");
+        parameters.put("COMP_TIN", "VAT REGISTERED TIN: 000-613-539-00000");
+        parameters.put("COMP_ADDR", "BRGY. TINAOGAN, BINDOY, NEGROS ORIENTAL");
         parameters.put("COMP_CONTACT", "0947-2037059 | (035) 402-5149 | 0909-91656011");
         parameters.put("PURCHASING_CONTACT", "0947-2037059 | (035) 402-5149 | 0909-91656011");
         java.net.URL logoUrl = ReportUtil.class.getResource("/images/NORECO1_LOGO_NO_BG.png");
         parameters.put("LOGO_PATH", logoUrl != null ? logoUrl.toString() : "");
         java.net.URL subreportUrl = ReportUtil.class.getResource("/jasper/vouchers/sub_reports/");
+        java.net.URL soaHeader = ReportUtil.class.getResource("/images/SOA_HEADER.png");
+        java.net.URL soaHeader2 = ReportUtil.class.getResource("/images/SOA_HEADER2.png");
+        parameters.put("SOA_HEADER_PATH", soaHeader != null ? soaHeader.toString() : "");
+        parameters.put("SOA_HEADER_PATH2", soaHeader2 != null ? soaHeader2.toString() : "");
         parameters.put("SUBREPORT_DIR", subreportUrl != null ? subreportUrl.toString() + "/" : "jasper/vouchers/sub_reports/");
         return parameters;
     }
