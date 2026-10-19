@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.21.5.final using JasperReports Library version 6.21.5-74d586df47b25dbd05bd0957999819196e59934a  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="InventoryBalance" pageWidth="612" pageHeight="792" whenNoDataType="AllSectionsNoDetail" columnWidth="572" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isFloatColumnFooter="true" uuid="b29c3ba6-1020-4625-9bd3-1937355162ed">
 	<property name="ireport.zoom" value="0.9982500000000019"/>
@@ -262,7 +262,7 @@
 	<pageFooter>
 		<band height="14">
 			<textField>
-				<reportElement x="0" y="0" width="51" height="14" uuid="16b40e6f-6aac-44b6-9c6d-225e9e02f71d"/>
+				<reportElement x="0" y="0" width="50" height="14" uuid="16b40e6f-6aac-44b6-9c6d-225e9e02f71d"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font fontName="SansSerif" size="9"/>
 				</textElement>
@@ -276,7 +276,7 @@
 				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
 			</textField>
 			<textField evaluationTime="Report">
-				<reportElement x="52" y="0" width="100" height="14" uuid="ecb7129c-b1d7-4273-b3f1-c4fbf05204e0"/>
+				<reportElement x="50" y="0" width="30" height="14" uuid="ecb7129c-b1d7-4273-b3f1-c4fbf05204e0"/>
 				<box leftPadding="5"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="SansSerif" size="9"/>
@@ -288,7 +288,7 @@
 	<lastPageFooter>
 		<band height="14">
 			<textField evaluationTime="Report">
-				<reportElement x="0" y="0" width="51" height="14" uuid="62cf1210-e7a6-4770-862d-d0411c19b1ba"/>
+				<reportElement x="0" y="0" width="50" height="14" uuid="62cf1210-e7a6-4770-862d-d0411c19b1ba"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font fontName="SansSerif" size="9"/>
 				</textElement>
@@ -302,7 +302,7 @@
 				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
 			</textField>
 			<textField evaluationTime="Report">
-				<reportElement x="52" y="0" width="100" height="14" uuid="9d12b121-ff2a-48a0-970a-118adeb6af35"/>
+				<reportElement x="50" y="0" width="30" height="14" uuid="9d12b121-ff2a-48a0-970a-118adeb6af35"/>
 				<box leftPadding="5"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="SansSerif" size="9"/>

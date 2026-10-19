@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.21.5.final using JasperReports Library version 6.21.5-74d586df47b25dbd05bd0957999819196e59934a  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="DepreciationSchedule" pageWidth="1008" pageHeight="612" orientation="Landscape" whenNoDataType="NoDataSection" columnWidth="972" leftMargin="18" rightMargin="18" topMargin="20" bottomMargin="20" isFloatColumnFooter="true" uuid="e4394313-b9ac-4414-b768-c128af3e0ffe">
 	<property name="net.sf.jasperreports.export.xls.exclude.origin.keep.first.band.1" value="columnHeader"/>
@@ -447,7 +447,7 @@
 				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of "]]></textFieldExpression>
 			</textField>
 			<textField evaluationTime="Report">
-				<reportElement x="50" y="1" width="41" height="12" uuid="4a4de711-ef0a-49f6-aca8-0ad5aa665580">
+				<reportElement x="50" y="1" width="30" height="12" uuid="4a4de711-ef0a-49f6-aca8-0ad5aa665580">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<box leftPadding="3"/>

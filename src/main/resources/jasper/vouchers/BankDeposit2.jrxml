@@ -128,7 +128,7 @@
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font fontName="SansSerif" isBold="false"/>
 				</textElement>
-				<textFieldExpression><![CDATA["Date: " + $P{V_DATE}]]></textFieldExpression>
+				<textFieldExpression><![CDATA["Date: " + new java.text.SimpleDateFormat("MMMM dd, yyyy").format($P{V_DATE})]]></textFieldExpression>
 			</textField>
 		</band>
 	</title>
@@ -318,11 +318,18 @@ Code]]></text>
 				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="0" y="0" width="203" height="12" uuid="eece39bd-c32f-455e-bc61-bf306a7c954e"/>
+				<reportElement x="0" y="0" width="50" height="12" uuid="eece39bd-c32f-455e-bc61-bf306a7c954e"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font size="8"/>
 				</textElement>
-				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of " + $V{PAGE_NUMBER}]]></textFieldExpression>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of "]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement x="50" y="0" width="30" height="12" uuid="bd0bf69c-b419-40d3-a4f3-3369e3bef85b"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
 			</textField>
 		</band>
 	</pageFooter>

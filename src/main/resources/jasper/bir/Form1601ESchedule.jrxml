@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.21.5.final using JasperReports Library version 6.21.5-74d586df47b25dbd05bd0957999819196e59934a  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Form1601ESchedule" pageWidth="792" pageHeight="612" orientation="Landscape" whenNoDataType="NoDataSection" columnWidth="762" leftMargin="15" rightMargin="15" topMargin="36" bottomMargin="36" isFloatColumnFooter="true" uuid="b29c3ba6-1020-4625-9bd3-1937355162ed">
 	<property name="ireport.zoom" value="1.0980750000000006"/>
@@ -274,7 +274,7 @@ TAX WITHHELD]]></text>
 				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of "]]></textFieldExpression>
 			</textField>
 			<textField evaluationTime="Report">
-				<reportElement x="50" y="2" width="40" height="12" uuid="534c182f-9921-4aa5-a232-d1212ba5f1ff"/>
+				<reportElement x="50" y="2" width="30" height="12" uuid="534c182f-9921-4aa5-a232-d1212ba5f1ff"/>
 				<textElement textAlignment="Left">
 					<font fontName="SansSerif" size="8"/>
 				</textElement>

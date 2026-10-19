@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.21.5.final using JasperReports Library version 6.21.5-74d586df47b25dbd05bd0957999819196e59934a  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="StockTransfer" pageWidth="612" pageHeight="792" whenNoDataType="AllSectionsNoDetail" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isFloatColumnFooter="true" uuid="b29c3ba6-1020-4625-9bd3-1937355162ed">
 	<property name="ireport.zoom" value="2.143588810000002"/>
@@ -217,7 +217,7 @@
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font fontName="SansSerif" isBold="false"/>
 				</textElement>
-				<textFieldExpression><![CDATA["Date: " + $P{V_DATE}]]></textFieldExpression>
+				<textFieldExpression><![CDATA["Date: " + new java.text.SimpleDateFormat("MMMM dd, yyyy").format($P{V_DATE})]]></textFieldExpression>
 			</textField>
 			<line>
 				<reportElement x="0" y="0" width="572" height="1" uuid="482cbde2-df0f-4555-a35c-388501cf8777"/>

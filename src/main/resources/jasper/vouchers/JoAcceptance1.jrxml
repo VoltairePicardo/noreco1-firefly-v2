@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.21.5.final using JasperReports Library version 6.21.5-74d586df47b25dbd05bd0957999819196e59934a  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="JOAcceptance" pageWidth="612" pageHeight="792" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isFloatColumnFooter="true" uuid="b29c3ba6-1020-4625-9bd3-1937355162ed">
 	<property name="ireport.zoom" value="2.593742460100003"/>
@@ -170,7 +170,7 @@
 				<textElement verticalAlignment="Middle">
 					<font fontName="SansSerif" size="11"/>
 				</textElement>
-				<textFieldExpression><![CDATA["Invoice Date: " + $P{INVOICE_DATE}]]></textFieldExpression>
+				<textFieldExpression><![CDATA["Invoice Date: " + new java.text.SimpleDateFormat("MMMM dd, yyyy").format($P{INVOICE_DATE})]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
 				<reportElement positionType="Float" x="0" y="213" width="235" height="18" uuid="5d5798ef-9296-4c28-b0d8-9100712c22c2"/>
@@ -273,7 +273,7 @@
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font fontName="SansSerif" isBold="false"/>
 				</textElement>
-				<textFieldExpression><![CDATA["Date: " + $P{V_DATE}]]></textFieldExpression>
+				<textFieldExpression><![CDATA["Date: " + new java.text.SimpleDateFormat("MMMM dd, yyyy").format($P{V_DATE})]]></textFieldExpression>
 			</textField>
 		</band>
 	</title>
@@ -354,11 +354,18 @@
 	<pageFooter>
 		<band height="12">
 			<textField>
-				<reportElement x="0" y="0" width="203" height="12" uuid="b4e8c4b1-65aa-45dd-bd27-688a613c1fbd"/>
+				<reportElement x="0" y="0" width="50" height="12" uuid="b4e8c4b1-65aa-45dd-bd27-688a613c1fbd"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font size="8"/>
 				</textElement>
-				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of " + $V{PAGE_NUMBER}]]></textFieldExpression>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of "]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement x="50" y="0" width="30" height="12" uuid="d7031ec7-a5fe-400e-814d-1614ec48ea41"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
 			</textField>
 			<textField pattern="MMMM dd, yyyy hh:mm a">
 				<reportElement x="446" y="0" width="126" height="12" uuid="ddd13a18-3252-4ab9-9f8a-a8aa323bd853"/>

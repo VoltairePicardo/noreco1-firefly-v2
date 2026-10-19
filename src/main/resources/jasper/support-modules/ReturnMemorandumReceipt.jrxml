@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.21.5.final using JasperReports Library version 6.21.5-74d586df47b25dbd05bd0957999819196e59934a  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReturnMemorandumReceipt" language="groovy" pageWidth="612" pageHeight="792" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="bb13ee52-28f0-4cf6-8b01-154e9ab84021">
 	<property name="ireport.zoom" value="1.6105100000000012"/>
@@ -195,7 +195,7 @@
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font fontName="SansSerif" isBold="false"/>
 				</textElement>
-				<textFieldExpression><![CDATA["Date Returned: " + $P{DATE}]]></textFieldExpression>
+				<textFieldExpression><![CDATA["Date Returned: " + new java.text.SimpleDateFormat("MMMM dd, yyyy").format($P{DATE})]]></textFieldExpression>
 			</textField>
 		</band>
 	</title>

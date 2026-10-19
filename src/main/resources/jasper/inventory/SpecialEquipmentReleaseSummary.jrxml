@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.21.5.final using JasperReports Library version 6.21.5-74d586df47b25dbd05bd0957999819196e59934a  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="SpecialEquipmentReleaseSummary" pageWidth="612" pageHeight="792" whenNoDataType="AllSectionsNoDetail" columnWidth="572" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isFloatColumnFooter="true" uuid="53e32c74-95cb-40e1-a21c-af822419a17c">
 	<property name="ireport.zoom" value="1.1000000000000012"/>
@@ -277,7 +277,7 @@
 	<pageFooter>
 		<band height="12">
 			<textField>
-				<reportElement x="1" y="0" width="49" height="12" uuid="cb7d52b2-3a09-414c-820d-a98b43e08120">
+				<reportElement x="1" y="0" width="50" height="12" uuid="cb7d52b2-3a09-414c-820d-a98b43e08120">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
@@ -286,7 +286,7 @@
 				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of "]]></textFieldExpression>
 			</textField>
 			<textField evaluationTime="Report">
-				<reportElement x="50" y="0" width="108" height="12" uuid="300197ec-d422-44cf-ad5f-06f9beab27d5">
+				<reportElement x="51" y="0" width="30" height="12" uuid="300197ec-d422-44cf-ad5f-06f9beab27d5">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement textAlignment="Left" verticalAlignment="Middle">

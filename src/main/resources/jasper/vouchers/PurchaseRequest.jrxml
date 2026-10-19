@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.21.5.final using JasperReports Library version 6.21.5-74d586df47b25dbd05bd0957999819196e59934a  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="RequisitionVoucher" pageWidth="612" pageHeight="792" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isFloatColumnFooter="true" uuid="b29c3ba6-1020-4625-9bd3-1937355162ed">
 	<property name="ireport.zoom" value="1.1566298682885952"/>
@@ -260,7 +260,7 @@
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font fontName="SansSerif" isBold="false"/>
 				</textElement>
-				<textFieldExpression><![CDATA["Date: " + $P{V_DATE}]]></textFieldExpression>
+				<textFieldExpression><![CDATA["Date: " + new java.text.SimpleDateFormat("MMMM dd, yyyy").format($P{V_DATE})]]></textFieldExpression>
 			</textField>
 		</band>
 	</title>
@@ -418,11 +418,18 @@
 	<pageFooter>
 		<band height="14">
 			<textField>
-				<reportElement x="0" y="0" width="190" height="14" uuid="8a2fabf4-458b-41e8-b556-8f290cd8ec52"/>
+				<reportElement x="0" y="0" width="50" height="14" uuid="8a2fabf4-458b-41e8-b556-8f290cd8ec52"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font fontName="SansSerif" size="9"/>
 				</textElement>
-				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of " + $V{PAGE_NUMBER}]]></textFieldExpression>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of "]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement x="50" y="0" width="30" height="14" uuid="56fd7c5d-cc03-4de4-8bd9-569e6e2a9a6f"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
 			</textField>
 			<textField pattern="MMMM dd, yyyy hh:mm a">
 				<reportElement x="410" y="0" width="162" height="14" uuid="b1986d7c-0148-4d69-be84-53461f44b64c"/>
