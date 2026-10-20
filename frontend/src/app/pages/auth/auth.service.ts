@@ -23,7 +23,7 @@ export class AuthService {
             .pipe(
                 tap(res => {
                     localStorage.setItem('token', res.token);
-                    localStorage.setItem('user', JSON.stringify(res));
+                    localStorage.setItem('user', JSON.stringify(res.user));
                 }),
                 catchError(this.handleError)
             );

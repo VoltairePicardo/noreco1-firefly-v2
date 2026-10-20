@@ -34,7 +34,7 @@
                         @for (rec of pagedRecords; track $index) {
                             <tr>
                                 <td class="fw-bold">
-                                    <a [href]="detailLink(rec)">{{ rec.code || rec.localCode }}</a>
+                                    <a [routerLink]="detailLink(rec)">{{ rec.code || rec.localCode }}</a>
                                 </td>
                                 <td>{{ rec.particulars || rec.explanation || rec.remarks || '—' }}</td>
                                 <td class="text-end">{{ rec.amount ?? rec.totalDebit | number:'1.2-2' }}</td>

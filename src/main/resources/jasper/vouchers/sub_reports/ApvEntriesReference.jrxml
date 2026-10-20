@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.21.5.final using JasperReports Library version 6.21.5-74d586df47b25dbd05bd0957999819196e59934a  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ApvEntriesReference" pageWidth="612" pageHeight="792" whenNoDataType="AllSectionsNoDetail" columnWidth="592" leftMargin="0" rightMargin="20" topMargin="0" bottomMargin="0" isFloatColumnFooter="true" isIgnorePagination="true" uuid="9b05243c-a772-49c3-89bd-ea00365f0a0a">
 	<property name="net.sf.jasperreports.export.xls.exclude.origin.keep.first.band.1" value="columnHeader"/>
 	<property name="net.sf.jasperreports.export.xls.exclude.origin.band.1" value="pageHeader"/>
@@ -50,14 +51,11 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement verticalAlignment="Middle" rotation="None" markup="none">
-					<font fontName="Serif" size="11" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<font fontName="SansSerif" size="11" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
 				<text><![CDATA[Reference]]></text>
 			</staticText>
-			<line>
-				<reportElement x="0" y="15" width="572" height="1" uuid="eea78ae7-8e25-4267-aeb6-10ef3654c8a6"/>
-			</line>
 		</band>
 	</columnHeader>
 	<detail>
@@ -70,8 +68,8 @@
 					<leftPen lineWidth="1.0"/>
 					<rightPen lineWidth="1.0"/>
 				</box>
-				<textElement textAlignment="Left" verticalAlignment="Top" rotation="None" markup="html">
-					<font fontName="Serif" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle" rotation="None" markup="html">
+					<font fontName="SansSerif" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{invoiceNumber}+" "+$F{particulars}]]></textFieldExpression>
