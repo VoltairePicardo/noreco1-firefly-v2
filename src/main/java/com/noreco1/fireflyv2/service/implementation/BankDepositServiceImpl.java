@@ -11,6 +11,7 @@ import com.noreco1.fireflyv2.model.*;
 import com.noreco1.fireflyv2.model.DocumentType;
 import com.noreco1.fireflyv2.repo.*;
 import com.noreco1.fireflyv2.controller.response.*;
+import com.noreco1.fireflyv2.controller.response.reports.CommonLedgerDetail;
 import com.noreco1.fireflyv2.service.BankDepositService;
 import com.noreco1.fireflyv2.service.PrintableVoucher;
 
@@ -357,7 +358,7 @@ public class BankDepositServiceImpl implements BankDepositService, PrintableVouc
             params.put("TRANS_ID", bankDeposit.getTransaction().getId());
             params.put("VOUCHER_NO", bankDeposit.getCode());
             params.put("V_DATE", bankDeposit.getDepositDate());
-            params.put("EXPLANATION", "");
+            params.put("EXPLANATION", bankDeposit.getReferenceNumber() != null ? bankDeposit.getReferenceNumber() : "");
 
             User preparedBy = bankDeposit.getCreatedBy();
             if (preparedBy != null) {
@@ -383,9 +384,29 @@ public class BankDepositServiceImpl implements BankDepositService, PrintableVouc
     public JRDataSource datasource(Integer vid) {
         BankDeposit bankDeposit = bankDepositRepo.findById(vid).orElse(null);
         if (bankDeposit != null) {
-            return new JRBeanCollectionDataSource(
-                ledgerDtoers.getVoucherLedgerLines(bankDeposit.getTransaction().getId())
-            );
+            Integer transId = bankDeposit.getTransaction().getId();
+            List<CommonLedgerDetail> details = ledgerDtoers.getVoucherLedgerLines(transId);
+
+            // Permanent GL is empty (not yet posted) — fall back to TemporaryGeneralLedger
+            boolean hasData = details != null && details.stream()
+                .anyMatch(d -> d.getGlDebitAmount() != null && d.getGlDebitAmount().compareTo(BigDecimal.ZERO) != 0);
+
+            if (!hasData) {
+                TemporaryBatch batch = temporaryBatchRepo.findFirstByTransactionId(transId);
+                if (batch != null) {
+                    details = new ArrayList<>();
+                    for (GeneralLedgerLineDto2 gl : ledgerDtoers.getGLAccountEntriesDtoTempBatchId(batch.getId())) {
+                        CommonLedgerDetail d = new CommonLedgerDetail();
+                        d.setAccountCode(gl.getCode());
+                        d.setAccountTitle(gl.getDescription());
+                        d.setGlDebitAmount(gl.getDebit());
+                        d.setGlCreditAmount(gl.getCredit());
+                        details.add(d);
+                    }
+                }
+            }
+
+            return new JRBeanCollectionDataSource(details != null ? details : Collections.emptyList());
         }
         return new JRBeanCollectionDataSource(Collections.emptyList());
     }

@@ -166,28 +166,38 @@ export class BankDepositAddEditComponent {
             this.alertService.warning(this.module, 'Validation', 'Please select a file to upload.');
             return;
         }
-        this.uploading = true;
-        this.uploadMessage = '';
-        const formData = new FormData();
-        formData.append('file', this.uploadFile, this.uploadFile.name);
-        this.service.uploadDeposits(formData).subscribe({
-            next: (res) => {
-                this.uploading = false;
-                if (res?.success) {
-                    this.uploadSuccess = true;
-                    this.uploadMessage = res?.message || 'Upload successful.';
-                    this.uploadFile = null;
-                } else {
+        if (!this.bankAccount) {
+            this.alertService.warning(this.module, 'Validation', 'Please select a bank account before uploading.');
+            return;
+        }
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const lines = (e.target?.result as string)
+                .split(/\r?\n/)
+                .map(l => l.trim())
+                .filter(l => l.length > 0);
+            this.uploading = true;
+            this.uploadMessage = '';
+            this.service.uploadDeposits({ bankDepositLines: lines, bankAccount: { id: this.bankAccount.id } }).subscribe({
+                next: (res) => {
+                    this.uploading = false;
+                    if (res?.success) {
+                        this.uploadSuccess = true;
+                        this.uploadMessage = res?.successMessage || res?.message || 'Upload successful.';
+                        this.uploadFile = null;
+                    } else {
+                        this.uploadSuccess = false;
+                        this.uploadMessage = res?.failureMessage || 'Upload failed.';
+                    }
+                },
+                error: () => {
+                    this.uploading = false;
                     this.uploadSuccess = false;
-                    this.uploadMessage = res?.failureMessage || 'Upload failed.';
+                    this.uploadMessage = 'An error occurred during upload.';
                 }
-            },
-            error: () => {
-                this.uploading = false;
-                this.uploadSuccess = false;
-                this.uploadMessage = 'An error occurred during upload.';
-            }
-        });
+            });
+        };
+        reader.readAsText(this.uploadFile);
     }
 
     private uploadAndNavigate(savedId: number): void {

@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.21.5.final using JasperReports Library version 6.21.5-74d586df47b25dbd05bd0957999819196e59934a  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="CashReceipts" pageWidth="612" pageHeight="792" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isFloatColumnFooter="true" uuid="b29c3ba6-1020-4625-9bd3-1937355162ed">
 	<property name="ireport.zoom" value="1.771561000000001"/>
@@ -38,10 +38,10 @@
 	</field>
 	<field name="accountTitle" class="java.lang.String"/>
 	<variable name="total_credit" class="java.math.BigDecimal" resetType="Group" resetGroup="report-group" calculation="Sum">
-		<variableExpression><![CDATA[$F{glCreditAmount}]]></variableExpression>
+		<variableExpression><![CDATA["TOTAL".equals($F{accountTitle}) ? null : $F{glCreditAmount}]]></variableExpression>
 	</variable>
 	<variable name="total_debit" class="java.math.BigDecimal" resetType="Group" resetGroup="report-group" calculation="Sum">
-		<variableExpression><![CDATA[$F{glDebitAmount}]]></variableExpression>
+		<variableExpression><![CDATA["TOTAL".equals($F{accountTitle}) ? null : $F{glDebitAmount}]]></variableExpression>
 	</variable>
 	<group name="report-group">
 		<groupFooter>
@@ -352,11 +352,6 @@ No. Charged]]></text>
 	</pageFooter>
 	<summary>
 		<band height="112">
-			<line>
-				<reportElement key="line-1" x="154" y="0" width="334" height="1" uuid="dbc9135f-3282-461e-843d-855eb2720e7e">
-					<printWhenExpression><![CDATA[new Boolean($P{REPORT_PARAMETERS_MAP}.put("LastPageNumber",$V{PAGE_NUMBER}).equals("dummyPrintWhen"))]]></printWhenExpression>
-				</reportElement>
-			</line>
 			<staticText>
 				<reportElement positionType="Float" x="0" y="31" width="170" height="20" isRemoveLineWhenBlank="true" uuid="b93262da-d9eb-469a-98f2-e1052ca7d23d"/>
 				<textElement verticalAlignment="Middle">

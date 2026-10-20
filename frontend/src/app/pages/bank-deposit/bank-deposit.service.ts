@@ -45,8 +45,8 @@ export class BankDepositService {
         return `${BASE_API}/bank-deposit/file/${fileId}`;
     }
 
-    uploadDeposits(formData: FormData): Observable<any> {
-        return this.http.post(`${BASE_API}/bank-deposit/upload-deposits`, formData);
+    uploadDeposits(payload: { bankDepositLines: string[]; bankAccount: { id: number } }): Observable<any> {
+        return this.http.post(`${BASE_API}/bank-deposit/upload-deposits`, payload, httpOptions);
     }
 
     print(id: number): void {

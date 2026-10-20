@@ -2,6 +2,7 @@ package com.noreco1.fireflyv2.controller;
 
 import com.noreco1.fireflyv2.common.GlobalConstant;
 import com.noreco1.fireflyv2.controller.response.PostResponse;
+import com.noreco1.fireflyv2.controller.response.UploadBankDepositDto;
 import com.noreco1.fireflyv2.model.BankDeposit;
 import com.noreco1.fireflyv2.service.BankDepositService;
 import com.noreco1.fireflyv2.service.DownloadService;
@@ -57,6 +58,12 @@ public class BankDepositController {
     public PostResponse update(@RequestBody BankDeposit entity) {
         BindingResult bindingResult = new BeanPropertyBindingResult(entity, "bankDeposit");
         return service.processUpdate(entity, bindingResult, messageSource);
+    }
+
+    @PostMapping("/upload-deposits")
+    public PostResponse uploadDeposits(@RequestBody UploadBankDepositDto uploadBankDepositDto) {
+        BindingResult bindingResult = new BeanPropertyBindingResult(uploadBankDepositDto, "uploadBankDepositDto");
+        return service.uploadDeposits(uploadBankDepositDto, bindingResult, messageSource);
     }
 
     @GetMapping("/export/{id}")

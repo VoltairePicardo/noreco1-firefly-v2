@@ -38,10 +38,10 @@
 	</field>
 	<field name="accountTitle" class="java.lang.String"/>
 	<variable name="total_credit" class="java.math.BigDecimal" resetType="Group" resetGroup="report-group" calculation="Sum">
-		<variableExpression><![CDATA[$F{glCreditAmount}]]></variableExpression>
+		<variableExpression><![CDATA["TOTAL".equals($F{accountTitle}) ? null : $F{glCreditAmount}]]></variableExpression>
 	</variable>
 	<variable name="total_debit" class="java.math.BigDecimal" resetType="Group" resetGroup="report-group" calculation="Sum">
-		<variableExpression><![CDATA[$F{glDebitAmount}]]></variableExpression>
+		<variableExpression><![CDATA["TOTAL".equals($F{accountTitle}) ? null : $F{glDebitAmount}]]></variableExpression>
 	</variable>
 	<group name="report-group">
 		<groupFooter>

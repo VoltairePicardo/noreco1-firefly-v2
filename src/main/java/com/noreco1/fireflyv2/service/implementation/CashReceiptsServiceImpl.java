@@ -407,7 +407,7 @@ public class CashReceiptsServiceImpl implements CashReceiptsService, PrintableVo
             params.put("AMOUNT_IN_WORDS", CurrencyIntoWords.convert(cashReceipts.getAmount()));
             params.put("TOTAL", cashReceipts.getAmount());
             params.put("EXPLANATION", cashReceipts.getParticulars());
-            params.put("REMARKS","");
+            params.put("REMARKS", cashReceipts.getParticulars());
 
             params = signatureFacade.getDocumentSignature(params, com.noreco1.fireflyv2.model.enums.DocumentType.CRV, cashReceipts);
         }

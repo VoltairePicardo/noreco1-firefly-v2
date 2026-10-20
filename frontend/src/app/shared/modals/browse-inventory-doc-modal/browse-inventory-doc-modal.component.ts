@@ -31,8 +31,8 @@ export class BrowseInventoryDocModalComponent implements OnInit {
         this.loading = true;
         this.service.searchInventoryDocs(this.searchText, this.page - 1, this.pageSize).subscribe({
             next: (res) => {
-                this.items = res.content ?? res ?? [];
-                this.total = res.totalElements ?? res.page?.totalElements ?? this.items.length;
+                this.items = res?.content ?? (Array.isArray(res) ? res : []);
+                this.total = res?.totalElements ?? res?.page?.totalElements ?? this.items.length;
                 this.loading = false;
                 this.cdr.markForCheck();
             },

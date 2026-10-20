@@ -390,7 +390,7 @@ Code]]></text>
 			<staticText>
 				<reportElement positionType="Float" x="0" y="43" width="572" height="83" uuid="22ad3df2-9e28-409d-ba21-fdaee08097c3"/>
 				<box>
-					<topPen lineWidth="0.0"/>
+					<topPen lineWidth="1.0"/>
 					<leftPen lineWidth="1.0"/>
 					<bottomPen lineWidth="1.0"/>
 					<rightPen lineWidth="1.0"/>
@@ -431,7 +431,7 @@ Code]]></text>
 				<textFieldExpression><![CDATA[$P{APPROVAR}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" pattern="" isBlankWhenNull="true">
-				<reportElement positionType="Float" mode="Transparent" x="0" y="0" width="572" height="42" isRemoveLineWhenBlank="true" isPrintWhenDetailOverflows="true" forecolor="#000000" backcolor="#FFFFFF" uuid="8f40ebd2-c3d0-417c-a2a6-304772db1e6b"/>
+				<reportElement positionType="Float" mode="Transparent" x="0" y="0" width="572" height="43" isRemoveLineWhenBlank="true" isPrintWhenDetailOverflows="true" forecolor="#000000" backcolor="#FFFFFF" uuid="8f40ebd2-c3d0-417c-a2a6-304772db1e6b"/>
 				<box topPadding="20" leftPadding="70" bottomPadding="5" rightPadding="70">
 					<leftPen lineWidth="1.0"/>
 					<bottomPen lineWidth="1.0"/>

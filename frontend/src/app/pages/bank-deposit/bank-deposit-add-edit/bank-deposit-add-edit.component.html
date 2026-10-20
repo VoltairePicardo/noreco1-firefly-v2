@@ -81,7 +81,7 @@
                             <label class="form-label fw-bold">Bank Account <span class="text-danger">*</span></label>
                             <div class="input-group">
                                 <input type="text" class="form-control"
-                                       [value]="bankAccount ? (bankAccount.accountName || bankAccount.name || '') : ''"
+                                       [value]="bankAccount ? (bankAccount.description || bankAccount.accountName || bankAccount.name || '') : ''"
                                        readonly placeholder="Select bank account..."/>
                                 <button type="button" class="btn btn-success fw-bold"
                                         (click)="openBankBrowse()">

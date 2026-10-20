@@ -17,7 +17,7 @@
                 <div class="col-md-2">
                     <label class="form-label fw-bold mb-1 fs-xs text-uppercase">Status</label>
                     <select class="form-select" [(ngModel)]="selectedStatusId">
-                        <option [ngValue]="0">All</option>
+                        <option [ngValue]="0">Pending</option>
                         @for (s of statuses(); track s.id) {
                             <option [ngValue]="s.id">{{ s.status || s.description }}</option>
                         }

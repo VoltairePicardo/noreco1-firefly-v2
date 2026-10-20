@@ -97,10 +97,10 @@
 		<fieldDescription><![CDATA[slDebitAmount]]></fieldDescription>
 	</field>
 	<variable name="debit_1" class="java.math.BigDecimal" calculation="Sum">
-		<variableExpression><![CDATA[$F{glDebitAmount}]]></variableExpression>
+		<variableExpression><![CDATA["TOTAL".equals($F{accountTitle}) ? null : $F{glDebitAmount}]]></variableExpression>
 	</variable>
 	<variable name="credit_1" class="java.math.BigDecimal" calculation="Sum">
-		<variableExpression><![CDATA[$F{glCreditAmount}]]></variableExpression>
+		<variableExpression><![CDATA["TOTAL".equals($F{accountTitle}) ? null : $F{glCreditAmount}]]></variableExpression>
 	</variable>
 	<background>
 		<band splitType="Stretch"/>

@@ -59,7 +59,7 @@
                     @if (pagedRecords.length > 0) {
                         @for (rec of pagedRecords; track rec.id) {
                             <tr>
-                                <td class="fw-bold">{{ rec.code }}</td>
+                                <td class="fw-bold">{{ rec.localCode }}</td>
                                 <td>{{ rec.depositDate | date:'MM/dd/yyyy' }}</td>
                                 <td>{{ rec.referenceNumber || '—' }}</td>
                                 <td>{{ rec.bankAccount?.bank?.name || rec.bankName || rec.bankAccountName || rec.bankAccount?.accountName || '—' }}</td>
