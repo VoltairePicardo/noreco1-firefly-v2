@@ -68,6 +68,10 @@ export class CanvassService {
         return this.http.get<any[]>(`${BASE_API}/rv-detail/rvd/type/canvass`);
     }
 
+    getPurchaseRequestsForCanvass(): Observable<any[]> {
+        return this.http.get<any[]>(`${BASE_API}/rv-detail/purchase-request/for-canvass`);
+    }
+
     getPrDetailsForCanvass(prId: number): Observable<any[]> {
         return this.http.get<any[]>(`${BASE_API}/rv-detail/prd-for-canvass/${prId}`);
     }

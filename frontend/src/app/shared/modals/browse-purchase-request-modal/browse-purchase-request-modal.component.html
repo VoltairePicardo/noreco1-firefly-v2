@@ -16,14 +16,16 @@
                     <th>PR No.</th>
                     <th>Date</th>
                     <th>Purpose</th>
-                    <th>Delivery Date</th>
+                    @if (type !== 'canvass') {
+                        <th>Delivery Date</th>
+                    }
                     <th>Prepared By</th>
                 </tr>
             </thead>
             <tbody>
                 @if (loading) {
                     <tr>
-                        <td colspan="5" class="text-center py-4">
+                        <td [colSpan]="type === 'canvass' ? 4 : 5" class="text-center py-4">
                             <div class="d-flex justify-content-center align-items-center gap-2 text-muted">
                                 <span class="spinner-border spinner-border-sm"></span>
                                 <span>Loading...</span>
@@ -32,7 +34,7 @@
                     </tr>
                 } @else if (filtered.length === 0) {
                     <tr>
-                        <td colspan="5" class="text-center text-muted py-3">No records found.</td>
+                        <td [colSpan]="type === 'canvass' ? 4 : 5" class="text-center text-muted py-3">No records found.</td>
                     </tr>
                 } @else {
                     @for (pr of filtered; track pr.id) {
@@ -40,7 +42,9 @@
                             <td class="fw-bold text-nowrap">{{ pr.code }}</td>
                             <td class="text-nowrap">{{ pr.voucherDate | date:'MMM dd, yyyy' }}</td>
                             <td>{{ pr.purpose }}</td>
-                            <td class="text-nowrap">{{ pr.deliveryDate | date:'MMM dd, yyyy' }}</td>
+                            @if (type !== 'canvass') {
+                                <td class="text-nowrap">{{ pr.deliveryDate | date:'MMM dd, yyyy' }}</td>
+                            }
                             <td>{{ pr.preparedBy }}</td>
                         </tr>
                     }

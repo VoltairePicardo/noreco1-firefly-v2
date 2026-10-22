@@ -363,6 +363,27 @@ public class PurchaseRequestDetailServiceImpl implements PurchaseRequestDetailSe
 
     @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
+    public List<Map<String, Object>> getPurchaseRequestsForCanvass() {
+        List<Integer> types = List.of(RvType.FOR_PO.getId(), RvType.FOR_IT.getId(), RvType.FOR_LAB.getId(), RvType.FOR_REP.getId());
+        List<Object[]> rows = purchaseRequestDetailRepo.findPurchaseRequestsForCanvass(
+                types, DocumentStatus.REVIEWED_AND_ACCEPTED.getId(), DocumentStatus.CANCELLED.getId());
+        List<Map<String, Object>> result = new ArrayList<>();
+        if (rows != null) {
+            for (Object[] row : rows) {
+                Map<String, Object> map = new HashMap<>();
+                map.put("id",          row[0]);
+                map.put("code",        row[1]);
+                map.put("voucherDate", row[2]);
+                map.put("purpose",     row[3]);
+                map.put("preparedBy",  row[4]);
+                result.add(map);
+            }
+        }
+        return result;
+    }
+
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
+    @Override
     public List<RvDetailDto> getRvDetailsForJo() {
         List<Integer> types = List.of(RvType.FOR_REP.getId(), RvType.FOR_LAB.getId());
         List<Object[]> rows = purchaseRequestDetailRepo.findPurchaseRequestDetailsForJo(types);
@@ -502,6 +523,61 @@ public class PurchaseRequestDetailServiceImpl implements PurchaseRequestDetailSe
                         dto.setRvPurpose((String) row[13]);
                     }
                     // post-load parentItemId via item lookup (avoids changing query indices)
+                    if (dto.getItemId() != null && dto.getItemId() > 0) {
+                        Item item = itemRepo.findById(dto.getItemId()).orElse(null);
+                        dto.setParentItemId(item != null && item.getParentItem() != null
+                                ? item.getParentItem().getId() : null);
+                    }
+                    rvDetailDtos.add(dto);
+                }
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return rvDetailDtos;
+    }
+
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
+    @Override
+    public List<Map<String, Object>> getPurchaseRequestsForQuotation() {
+        List<Integer> types = List.of(RvType.FOR_PO.getId(), RvType.FOR_IT.getId(), RvType.FOR_LAB.getId(), RvType.FOR_REP.getId());
+        List<Object[]> rows = purchaseRequestDetailRepo.findPurchaseRequestsForQuotation(
+                types, DocumentStatus.REVIEWED_AND_ACCEPTED.getId(), DocumentStatus.CANCELLED.getId());
+        List<Map<String, Object>> result = new ArrayList<>();
+        if (rows != null) {
+            for (Object[] row : rows) {
+                Map<String, Object> map = new HashMap<>();
+                map.put("id",          row[0]);
+                map.put("code",        row[1]);
+                map.put("voucherDate", row[2]);
+                map.put("purpose",     row[3]);
+                map.put("preparedBy",  row[4]);
+                result.add(map);
+            }
+        }
+        return result;
+    }
+
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
+    @Override
+    public List<RvDetailDto> getPrDetailsForQuotation(Integer prId) {
+        List<RvDetailDto> rvDetailDtos = new ArrayList<>();
+        try {
+            List types = new ArrayList();
+            types.add(RvType.FOR_PO.getId());
+            types.add(RvType.FOR_IT.getId());
+            types.add(RvType.FOR_LAB.getId());
+            types.add(RvType.FOR_REP.getId());
+
+            List<Object[]> rows = purchaseRequestDetailRepo.findPrdForQuotation(
+                    types, DocumentStatus.REVIEWED_AND_ACCEPTED.getId(), DocumentStatus.CANCELLED.getId(), prId);
+
+            if (rows != null) {
+                for (Object[] row : rows) {
+                    RvDetailDto dto = mapCanvassRow(row);
+                    if (row.length > 13 && row[13] != null) {
+                        dto.setRvPurpose((String) row[13]);
+                    }
                     if (dto.getItemId() != null && dto.getItemId() > 0) {
                         Item item = itemRepo.findById(dto.getItemId()).orElse(null);
                         dto.setParentItemId(item != null && item.getParentItem() != null

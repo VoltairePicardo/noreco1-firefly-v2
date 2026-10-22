@@ -151,6 +151,42 @@ public interface PurchaseRequestDetailRepo extends JpaRepository<PurchaseRequest
     @Query("SELECT rvd.id, rvd.quantity, rvd.poQuantity, rvd.joDescription, " +
             "rvd.item.id, rvd.item.code, rvd.item.description, " +
             "rvd.unitMeasure.id, rvd.unitMeasure.code, " +
+            "rvd.purchaseRequest.id, rvd.purchaseRequest.code, rvd.purchaseRequest.voucherDate, " +
+            "rvd.purchaseRequest.createdBy.fullName, rvd.purchaseRequest.purpose " +
+            "FROM PurchaseRequestDetail rvd " +
+            "WHERE rvd.purchaseRequest.rvType IN (:rvTypes) " +
+            "AND rvd.purchaseRequest.documentStatus.id = :approvedStatusId " +
+            "AND rvd.purchaseRequest.id = :prId " +
+            "AND EXISTS (" +
+                "SELECT cd FROM CanvassDetail cd " +
+                "WHERE cd.purchaseRequestDetail = rvd " +
+                "AND cd.canvass.documentStatus.id <> :cancelledStatusId" +
+            ")")
+    List<Object[]> findPrdForQuotation(@Param("rvTypes") List rvTypes,
+                                        @Param("approvedStatusId") Integer approvedStatusId,
+                                        @Param("cancelledStatusId") Integer cancelledStatusId,
+                                        @Param("prId") Integer prId);
+
+    @Query(value = "SELECT DISTINCT e.id, e.code, e.voucherDate, e.purpose, u.fullName " +
+            "FROM PurchaseRequestDetail rvd " +
+            "JOIN PurchaseRequest e ON rvd.FK_PurchaseRequestId = e.id " +
+            "LEFT JOIN `User` u ON e.FK_createdByUserId = u.id " +
+            "WHERE e.rvType IN (:rvTypes) " +
+            "AND e.FK_documentStatusId = :approvedStatusId " +
+            "AND EXISTS (" +
+                "SELECT cd.id FROM CanvassDetail cd " +
+                "JOIN Canvass c ON cd.FK_canvassId = c.id " +
+                "WHERE cd.FK_purchaseRequestDetailId = rvd.id " +
+                "AND c.FK_documentStatusId <> :cancelledStatusId" +
+            ") " +
+            "ORDER BY e.code", nativeQuery = true)
+    List<Object[]> findPurchaseRequestsForQuotation(@Param("rvTypes") List<Integer> rvTypes,
+                                                     @Param("approvedStatusId") Integer approvedStatusId,
+                                                     @Param("cancelledStatusId") Integer cancelledStatusId);
+
+    @Query("SELECT rvd.id, rvd.quantity, rvd.poQuantity, rvd.joDescription, " +
+            "rvd.item.id, rvd.item.code, rvd.item.description, " +
+            "rvd.unitMeasure.id, rvd.unitMeasure.code, " +
             "rvd.purchaseRequest.id, rvd.purchaseRequest.code, rvd.purchaseRequest.voucherDate, rvd.purchaseRequest.purpose " +
             "FROM PurchaseRequestDetail rvd " +
             "WHERE rvd.purchaseRequest.rvType IN (:rvTypes) " +
@@ -167,6 +203,25 @@ public interface PurchaseRequestDetailRepo extends JpaRepository<PurchaseRequest
             "AND e.FK_documentStatusId = 55 " +
             "ORDER BY e.code", nativeQuery = true)
     List<Object[]> findPurchaseRequestsForJo(@Param("rvTypes") List<Integer> rvTypes);
+
+    @Query(value = "SELECT DISTINCT e.id, e.code, e.voucherDate, e.purpose, u.fullName " +
+            "FROM PurchaseRequestDetail rvd " +
+            "JOIN PurchaseRequest e ON rvd.FK_PurchaseRequestId = e.id " +
+            "LEFT JOIN `User` u ON e.FK_createdByUserId = u.id " +
+            "WHERE e.rvType IN (:rvTypes) " +
+            "AND (rvd.quantity - rvd.poQuantity) > 0 " +
+            "AND e.FK_documentStatusId = :approvedStatusId " +
+            "AND (e.emergencyPurchase = false OR e.emergencyPurchase IS NULL) " +
+            "AND NOT EXISTS (" +
+                "SELECT cd.id FROM CanvassDetail cd " +
+                "JOIN Canvass c ON cd.FK_canvassId = c.id " +
+                "WHERE cd.FK_purchaseRequestDetailId = rvd.id " +
+                "AND c.FK_documentStatusId <> :cancelledStatusId" +
+            ") " +
+            "ORDER BY e.code", nativeQuery = true)
+    List<Object[]> findPurchaseRequestsForCanvass(@Param("rvTypes") List<Integer> rvTypes,
+                                                   @Param("approvedStatusId") Integer approvedStatusId,
+                                                   @Param("cancelledStatusId") Integer cancelledStatusId);
 
     @Query(value = "SELECT DISTINCT e.id, e.code, e.voucherDate, e.purpose, e.deliveryDate, u.fullName, " +
             "blid.id AS budgetLineItemDetailId, blid.title AS budgetLineItemDetailTitle, blid.code AS budgetLineItemDetailCode " +

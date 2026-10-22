@@ -4,6 +4,8 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { FormsModule } from '@angular/forms';
 import { JobOrderService } from '@/app/pages/job-order/job-order.service';
 import { PurchaseOrderService } from '@/app/pages/purchase-order/purchase-order.service';
+import { CanvassService } from '@/app/pages/canvass/canvass.service';
+import { QuotationService } from '@/app/pages/quotation/quotation.service';
 
 @Component({
     selector: 'app-browse-purchase-request-modal',
@@ -12,13 +14,15 @@ import { PurchaseOrderService } from '@/app/pages/purchase-order/purchase-order.
     templateUrl: './browse-purchase-request-modal.component.html'
 })
 export class BrowsePurchaseRequestModalComponent implements OnInit {
-    activeModal  = inject(NgbActiveModal);
-    private joSvc = inject(JobOrderService);
-    private poSvc = inject(PurchaseOrderService);
-    private cdr   = inject(ChangeDetectorRef);
+    activeModal        = inject(NgbActiveModal);
+    private joSvc      = inject(JobOrderService);
+    private poSvc      = inject(PurchaseOrderService);
+    private canvassSvc = inject(CanvassService);
+    private quotSvc    = inject(QuotationService);
+    private cdr        = inject(ChangeDetectorRef);
 
-    /** 'jo' loads FOR_REP/FOR_LAB PRs; 'po' loads FOR_PO/FOR_IT PRs */
-    @Input() type: 'jo' | 'po' = 'jo';
+    /** 'jo' | 'po' | 'canvass' | 'quotation' */
+    @Input() type: 'jo' | 'po' | 'canvass' | 'quotation' = 'jo';
     @Input() title = 'Browse Purchase Request';
 
     items: any[]   = [];
@@ -39,7 +43,11 @@ export class BrowsePurchaseRequestModalComponent implements OnInit {
         this.loading = true;
         const loader$ = this.type === 'po'
             ? this.poSvc.getPurchaseRequestsForPo()
-            : this.joSvc.getPurchaseRequestsForJo();
+            : this.type === 'canvass'
+                ? this.canvassSvc.getPurchaseRequestsForCanvass()
+                : this.type === 'quotation'
+                    ? this.quotSvc.getPurchaseRequestsForQuotation()
+                    : this.joSvc.getPurchaseRequestsForJo();
 
         loader$.subscribe({
             next: (data) => {

@@ -104,4 +104,19 @@ public class PurchaseRequestDetailController {
     public List<Map<String, Object>> getPurchaseRequestsForPo() {
         return purchaseRequestDetailService.getPurchaseRequestsForPo();
     }
+
+    @GetMapping(value = "/purchase-request/for-canvass")
+    public List<Map<String, Object>> getPurchaseRequestsForCanvass() {
+        return purchaseRequestDetailService.getPurchaseRequestsForCanvass();
+    }
+
+    @GetMapping(value = "/purchase-request/for-quotation")
+    public List<Map<String, Object>> getPurchaseRequestsForQuotation() {
+        return purchaseRequestDetailService.getPurchaseRequestsForQuotation();
+    }
+
+    @GetMapping(value = "/prd-for-quotation/{prId}")
+    public List<RvDetailDto> getPrDetailsForQuotation(@PathVariable Integer prId) {
+        return purchaseRequestDetailService.getPrDetailsForQuotation(prId);
+    }
 }

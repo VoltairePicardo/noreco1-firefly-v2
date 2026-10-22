@@ -9,7 +9,7 @@ import { LaddaModule } from 'angular2-ladda';
 import { forkJoin } from 'rxjs';
 import { CanvassService } from '../canvass.service';
 import { ModalService } from '@/app/shared/modals/modal-service';
-import { BrowseRvItemsModalComponent } from '@/app/shared/modals/browse-rv-items-modal/browse-rv-items-modal.component';
+import { BrowsePurchaseRequestModalComponent } from '@/app/shared/modals/browse-purchase-request-modal/browse-purchase-request-modal.component';
 
 @Component({
     selector: 'app-canvass-add-edit',
@@ -90,18 +90,26 @@ export class CanvassAddEditComponent {
 
     async openRvBrowse(): Promise<void> {
         try {
-            const result = await this.modalService.openModal(BrowseRvItemsModalComponent, {}, { size: 'xl', centered: true });
-            if (result?.action === 'select' && result?.data?.length) {
-                const existing = new Set(this.lineItems.map((li: any) => li.rvDetailId));
-                result.data.filter((item: any) => !existing.has(item.id)).forEach((item: any) => {
-                    this.lineItems.push({
-                        rvDetailId:      item.id,
-                        rvNumber:        item.rvNumber || '',
-                        itemCode:        item.itemCode || '',
-                        itemDescription: item.itemDescription || '',
-                        unitCode:        item.unitCode || '',
-                        quantity:        item.quantity || 0,
-                    });
+            const result = await this.modalService.openModal(
+                BrowsePurchaseRequestModalComponent,
+                { type: 'canvass', title: 'Browse Purchase Request' },
+                { size: 'xl', centered: true }
+            );
+            if (result?.action === 'select' && result?.data?.id) {
+                this.service.getPrDetailsForCanvass(result.data.id).subscribe({
+                    next: (items) => {
+                        const existing = new Set(this.lineItems.map((li: any) => li.rvDetailId));
+                        (items || []).filter((item: any) => !existing.has(item.id)).forEach((item: any) => {
+                            this.lineItems.push({
+                                rvDetailId:      item.id,
+                                rvNumber:        item.rvNumber || '',
+                                itemCode:        item.itemCode || '',
+                                itemDescription: item.itemDescription || item.joDescription || '',
+                                unitCode:        item.unitCode || '',
+                                quantity:        item.quantity || 0,
+                            });
+                        });
+                    }
                 });
             }
         } catch { }

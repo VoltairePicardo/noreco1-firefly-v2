@@ -27,4 +27,7 @@ public interface PurchaseRequestDetailService {
     List<RvDetailDto> getPrDetailsForCanvass(Integer prId);
     List<Map<String, Object>> getPurchaseRequestsForJo();
     List<Map<String, Object>> getPurchaseRequestsForPo();
+    List<Map<String, Object>> getPurchaseRequestsForCanvass();
+    List<Map<String, Object>> getPurchaseRequestsForQuotation();
+    List<RvDetailDto> getPrDetailsForQuotation(Integer prId);
 }

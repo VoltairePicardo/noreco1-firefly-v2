@@ -84,4 +84,12 @@ export class QuotationService {
             .set('size', size);
         return this.http.get<any>(`${BASE_API}/item/list`, { params });
     }
+
+    getPurchaseRequestsForQuotation(): Observable<any[]> {
+        return this.http.get<any[]>(`${BASE_API}/rv-detail/purchase-request/for-quotation`);
+    }
+
+    getPrDetailsForQuotation(prId: number): Observable<any[]> {
+        return this.http.get<any[]>(`${BASE_API}/rv-detail/prd-for-quotation/${prId}`);
+    }
 }

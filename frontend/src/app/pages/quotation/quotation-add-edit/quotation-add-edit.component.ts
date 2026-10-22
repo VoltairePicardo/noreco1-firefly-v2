@@ -11,7 +11,7 @@ import { LaddaModule } from 'angular2-ladda';
 import { QuotationService } from '../quotation.service';
 import { FlatpickrDirective, provideFlatpickrDefaults } from 'angularx-flatpickr';
 import { ModalService } from '@/app/shared/modals/modal-service';
-import { BrowseRvItemsModalComponent } from '@/app/shared/modals/browse-rv-items-modal/browse-rv-items-modal.component';
+import { BrowsePurchaseRequestModalComponent } from '@/app/shared/modals/browse-purchase-request-modal/browse-purchase-request-modal.component';
 import { BrowseSupplierModalComponent } from '@/app/shared/modals/browse-supplier-modal/browse-supplier-modal.component';
 import { BrowseEntityModalComponent } from '@/app/shared/modals/browse-entity-modal/browse-entity-modal.component';
 import { provideIcons } from '@ng-icons/core';
@@ -163,50 +163,44 @@ export class QuotationAddEditComponent {
     async openPrBrowse(): Promise<void> {
         try {
             const result = await this.modalService.openModal(
-                BrowseRvItemsModalComponent,
-                { type: 'quotation' },
+                BrowsePurchaseRequestModalComponent,
+                { type: 'quotation', title: 'Browse Purchase Request' },
                 { size: 'xl', centered: true }
             );
-            if (result?.action === 'select' && result?.data?.length) {
-                const existing = new Set(this.lineItems.map((li: any) => li.rvDetailId));
-                const newItems = result.data.filter((item: any) => !existing.has(item.id));
-                newItems.forEach((item: any) => {
-                    this.lineItems.push({
-                        rvDetailId:         item.id,
-                        rvNumber:           item.rvNumber || '',
-                        itemDescription:    item.itemDescription || '',
-                        unitCode:           item.unitCode || '',
-                        quantity:           item.quantity || 0,
-                        available:          true,
-                        originalItemId:     item.itemId ?? null,
-                        isChildItem:        item.parentItemId != null,
-                        isApprovedItem:     false,
-                        newItemId:          null,
-                        newItemDescription: null,
-                        details: [
-                            { brand: null, price: 0, awarded: false },
-                            { brand: null, price: 0, awarded: false },
-                            { brand: null, price: 0, awarded: false },
-                        ]
-                    });
-                });
+            if (result?.action === 'select' && result?.data?.id) {
+                this.service.getPrDetailsForQuotation(result.data.id).subscribe({
+                    next: (items) => {
+                        const existing = new Set(this.lineItems.map((li: any) => li.rvDetailId));
+                        const newItems = (items || []).filter((item: any) => !existing.has(item.id));
+                        newItems.forEach((item: any) => {
+                            this.lineItems.push({
+                                rvDetailId:         item.id,
+                                rvNumber:           item.rvNumber || '',
+                                itemDescription:    item.itemDescription || '',
+                                unitCode:           item.unitCode || '',
+                                quantity:           item.quantity || 0,
+                                available:          true,
+                                originalItemId:     item.itemId ?? null,
+                                isChildItem:        item.parentItemId != null,
+                                isApprovedItem:     false,
+                                newItemId:          null,
+                                newItemDescription: null,
+                                details: [
+                                    { brand: null, price: 0, awarded: false },
+                                    { brand: null, price: 0, awarded: false },
+                                    { brand: null, price: 0, awarded: false },
+                                ]
+                            });
+                        });
 
-                // Auto-copy PR particulars: collect unique purposes for newly added PRs only
-                const existingRvNumbers = new Set<string>(
-                    this.lineItems.slice(0, this.lineItems.length - newItems.length).map((li: any) => li.rvNumber)
-                );
-                const purposeByRv = new Map<string, string>(); // rvNumber → purpose
-                newItems.forEach((item: any) => {
-                    if (item.rvPurpose && item.rvNumber && !existingRvNumbers.has(item.rvNumber) && !purposeByRv.has(item.rvNumber)) {
-                        purposeByRv.set(item.rvNumber, item.rvPurpose);
+                        // Auto-copy PR purpose to particular field
+                        if (result.data.purpose && newItems.length > 0) {
+                            this.particular = this.particular.trim()
+                                ? `${this.particular.trim()}; ${result.data.purpose}`
+                                : result.data.purpose;
+                        }
                     }
                 });
-                if (purposeByRv.size > 0) {
-                    const newPurposes = Array.from(purposeByRv.values()).join('; ');
-                    this.particular = this.particular.trim()
-                        ? `${this.particular.trim()}; ${newPurposes}`
-                        : newPurposes;
-                }
             }
         } catch { }
     }
