@@ -228,6 +228,11 @@ export class QuotationAddEditComponent {
                 { size: 'xl', centered: true }
             );
             if (result?.id) {
+                const alreadyUsed = this.lineItems.some((li, i) => i !== rowIndex && li.newItemId === result.id);
+                if (alreadyUsed) {
+                    this.alertService.warning(this.module, 'This child item is already assigned to another row.', '');
+                    return;
+                }
                 this.lineItems[rowIndex].newItemId          = result.id;
                 this.lineItems[rowIndex].newItemDescription = result.description;
                 this.lineItems[rowIndex].isChildItem        = true;
@@ -241,6 +246,11 @@ export class QuotationAddEditComponent {
         try {
             const result = await this.modalService.openModal(BrowseSupplierModalComponent, {}, { size: 'lg', centered: true });
             if (result?.action === 'select' && result?.data) {
+                const duplicate = this.suppliers.some((s, i) => i !== index && s?.id === result.data.id);
+                if (duplicate) {
+                    this.alertService.warning(this.module, 'This supplier is already selected in another column.', '');
+                    return;
+                }
                 this.suppliers[index] = result.data;
             }
         } catch { }

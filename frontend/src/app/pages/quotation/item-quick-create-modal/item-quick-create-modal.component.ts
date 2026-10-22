@@ -1,7 +1,7 @@
 import { Component, ElementRef, inject, Input, OnInit, signal, ViewChild } from '@angular/core';
 import { FormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { Subject } from 'rxjs';
+import { firstValueFrom, Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
 import Swal from 'sweetalert2';
 import { COMMON_ADD_EDIT_PAGE_IMPORTS, COMMON_ALL_PAGE_IMPORTS } from '@/app/shared/providers/shared-providers';
@@ -114,6 +114,19 @@ export class ItemQuickCreateModalComponent implements OnInit {
     clearParentItem(): void {
         this.selectedParentItem = null;
         this.refreshDescription();
+    }
+
+    async selectDuplicate(dup: any): Promise<void> {
+        try {
+            const item = await firstValueFrom(this.service.getData(dup.id));
+            if (!item?.parentItem?.id) {
+                Swal.fire({ title: 'Invalid Selection', text: 'The selected item is not a child item. Only items with a parent item can be used here.', icon: 'warning' });
+                return;
+            }
+            this.activeModal.close({ id: item.id, description: item.description, isApproved: item.documentStatus?.id === 7 });
+        } catch {
+            Swal.fire({ title: 'Error', text: 'Could not verify item. Please try again.', icon: 'error' });
+        }
     }
 
     save(): void {

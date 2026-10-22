@@ -119,6 +119,7 @@
                             <th>Code</th>
                             <th>Description</th>
                             <th>Status</th>
+                            <th></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -131,6 +132,12 @@
                                     @else if (dup.documentStatus?.id === 5) { <span class="badge bg-warning text-dark">For Approval</span> }
                                     @else if (dup.documentStatus?.id === 1) { <span class="badge bg-secondary">Draft</span> }
                                     @else { <span class="badge bg-success">Approved</span> }
+                                </td>
+                                <td>
+                                    <button type="button" class="btn btn-success btn-sm fw-bold"
+                                            (click)="selectDuplicate(dup)">
+                                        <ng-icon name="tablerCheck" class="ps-0 pe-3 fw-bold"></ng-icon> Select
+                                    </button>
                                 </td>
                             </tr>
                         }
