@@ -94,6 +94,7 @@ public class LedgerFacadeImpl implements LedgerFacade {
 
             if(distribution.isEmpty()) {
 
+                boolean glSavedForLine = false;
                 java.sql.Date sqlDate = new java.sql.Date(voucherDate.getTime());
 
                 List<DateRange> dateRanges = dateRangeRepo.findByEndGreaterThanEqualAndStartLessThanEqual(sqlDate, sqlDate);
@@ -182,6 +183,7 @@ public class LedgerFacadeImpl implements LedgerFacade {
                                     generalLedger.setSegmentAccount(segmentAccount);
 
                                     GeneralLedger newGl = generalLedgerRepo.save(generalLedger);
+                                    glSavedForLine = true;
 
                                     count += newGl == null ? 0 : 1;
 
@@ -198,7 +200,7 @@ public class LedgerFacadeImpl implements LedgerFacade {
 
                                     for(SubLedgerDto subLedgerLine: subLedgerLines) {
 
-                                        if (subLedgerLine.getAccountId().equals(ledgerLine.getAccountId())) {
+                                        if (subLedgerLine.getAccountId() != null && subLedgerLine.getAccountId().equals(ledgerLine.getAccountId())) {
                                             SubLedger subLedger = new SubLedger();
                                             subLedger.setTransaction(transaction);
                                             subLedger.setSegmentAccount(segmentAccount);
@@ -280,6 +282,45 @@ public class LedgerFacadeImpl implements LedgerFacade {
                                 break;
                             }
 
+                        }
+                    }
+                }
+                // fallback: if allocation path saved nothing, save GL and SL using first segment account
+                if (!glSavedForLine) {
+                    List<SegmentAccount> segmentAccounts = segmentAccountRepo.findByAccountId(ledgerLine.getAccountId());
+                    SegmentAccount fallbackSegment = Checker.collectionIsNotEmpty(segmentAccounts) ? segmentAccounts.get(0) : null;
+
+                    GeneralLedger generalLedger = new GeneralLedger();
+                    generalLedger.setTransaction(transaction);
+                    generalLedger.setDebit(glAmountDebit);
+                    generalLedger.setCredit(glAmountCredit);
+                    generalLedger.setSegmentAccount(fallbackSegment);
+                    GeneralLedger newGl = generalLedgerRepo.save(generalLedger);
+                    count += newGl == null ? 0 : 1;
+
+                    cashFlowAccountEntryFacade.setCashFlowAccountEntries(newGl, ledgerLine, voucherDate);
+
+                    if (Checker.collectionIsNotEmpty(subLedgerLines)) {
+                        for (SubLedgerDto subLedgerLine : subLedgerLines) {
+                            if (subLedgerLine.getAccountId() != null && subLedgerLine.getAccountId().equals(ledgerLine.getAccountId())) {
+                                boolean noDebit = subLedgerLine.getDebit() == null || subLedgerLine.getDebit().compareTo(BigDecimal.ZERO) == 0;
+                                boolean noCredit = subLedgerLine.getCredit() == null || subLedgerLine.getCredit().compareTo(BigDecimal.ZERO) == 0;
+                                if (noDebit && noCredit) continue;
+
+                                SubLedger subLedger = new SubLedger();
+                                subLedger.setTransaction(newGl.getTransaction());
+                                subLedger.setGeneralLedger(newGl);
+                                subLedger.setSegmentAccount(fallbackSegment);
+
+                                SlEntity slEntity = new SlEntity();
+                                slEntity.setAccountNo(subLedgerLine.getAccountNo());
+                                subLedger.setSlEntity(slEntity);
+
+                                subLedger.setDebit(subLedgerLine.getDebit() != null ? subLedgerLine.getDebit() : BigDecimal.ZERO);
+                                subLedger.setCredit(subLedgerLine.getCredit() != null ? subLedgerLine.getCredit() : BigDecimal.ZERO);
+
+                                subLedgerRepo.save(subLedger);
+                            }
                         }
                     }
                 }

@@ -80,14 +80,22 @@ export class CashReceiptsAddEditComponent {
                         account: {
                             id:           e.accountId,
                             accountCode:  e.code,
-                            accountTitle: e.description
+                            accountTitle: e.description,
+                            hasSL:        e.hasSL || false
                         },
                         debit:           Number(e.debit)  || null,
                         credit:          Number(e.credit) || null,
                         applyAllocation: e.applyAllocation || false,
                         allocationPct:   e.allocationPct   ?? null,
                         applyWht:        e.applyWht        || false,
-                        wht:             e.wht             || null
+                        wht:             e.wht             || null,
+                        slentries:       (e.slentries || []).map((sl: any) => ({
+                            entity:    null,
+                            accountNo: sl.accountNo,
+                            name:      sl.name,
+                            debit:     Number(sl.debit)  || null,
+                            credit:    Number(sl.credit) || null
+                        }))
                     }));
                 } else {
                     this.alertService.error(this.module, 'Record not found.', '');
@@ -181,13 +189,15 @@ export class CashReceiptsAddEditComponent {
             voucherDate: this.voucherDate,
             particulars: this.particulars,
             amount:      this.totalDebit,
-            generalLedgerLines: this.journalEntries.map(e => ({
-                code:        e.account?.accountCode || '',
-                description: e.account?.accountTitle || '',
-                accountId:   e.account?.id || null,
-                debit:       Number(e.debit)  || 0,
-                credit:      Number(e.credit) || 0
-            })),
+            generalLedgerLines: this.journalEntries
+                .filter(e => e.account?.id)
+                .map(e => ({
+                    code:        e.account?.accountCode || '',
+                    description: e.account?.accountTitle || '',
+                    accountId:   e.account!.id,
+                    debit:       Number(e.debit)  || 0,
+                    credit:      Number(e.credit) || 0
+                })),
             subLedgerLines: this.journalEntries
                 .filter(e => (e.slentries || []).length > 0)
                 .flatMap(e => (e.slentries || []).map(sl => ({

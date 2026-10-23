@@ -490,6 +490,7 @@ export class AccountsPayableVoucherAddEditComponent {
                 (e.slentries || []).map(sl => ({
                     accountId: e.account?.id ?? null,
                     accountNo: sl.accountNo,
+                    name:      sl.name,
                     debit:     Number(sl.debit)  || 0,
                     credit:    Number(sl.credit) || 0
                 }))

@@ -91,13 +91,22 @@ export class OtherAccountReceivableAddEditComponent {
                     this.voucherDate = data.voucherDate ? new Date(data.voucherDate).toISOString().substring(0, 10) : '';
                     this.particulars = data.particulars || data.remarks || '';
                     this.journalEntries = (data.journalEntries || data.details || []).map((e: any): JournalEntry => ({
-                        account:         e.account || (e.code ? { accountCode: e.code, accountTitle: e.description, id: e.accountId } : null),
+                        account:         e.account
+                            ? { ...e.account, hasSL: e.account.hasSL || e.hasSL || false }
+                            : (e.code ? { accountCode: e.code, accountTitle: e.description, id: e.accountId, hasSL: e.hasSL || false } : null),
                         debit:           Number(e.debit ?? e.debitAmount) || null,
                         credit:          Number(e.credit ?? e.creditAmount) || null,
                         applyAllocation: e.applyAllocation || false,
                         allocationPct:   e.allocationPct   ?? null,
                         applyWht:        e.applyWht        || false,
-                        wht:             e.wht             || null
+                        wht:             e.wht             || null,
+                        slentries:       (e.slentries || []).map((sl: any) => ({
+                            entity:    null,
+                            accountNo: sl.accountNo,
+                            name:      sl.name,
+                            debit:     Number(sl.debit)  || null,
+                            credit:    Number(sl.credit) || null
+                        }))
                     }));
                     if (this.journalEntries.length === 0) {
                         this.journalEntries = [{ account: null, debit: null, credit: null }];
@@ -180,17 +189,19 @@ export class OtherAccountReceivableAddEditComponent {
             id:          this.editMode ? this.id : null,
             voucherDate: this.voucherDate,
             particulars: this.particulars,
-            generalLedgerLines: this.journalEntries.map(e => ({
-                code:        e.account?.accountCode  || '',
-                description: e.account?.accountTitle || e.account?.accountDescription || '',
-                accountId:   e.account?.id           || null,
-                debit:       Number(e.debit)         || 0,
-                credit:      Number(e.credit)        || 0,
-                applyAllocation: e.applyAllocation || false,
-                allocationPct:   e.allocationPct   ?? null,
-                applyWht:        e.applyWht        || false,
-                wht:             e.wht             || null
-            })),
+            generalLedgerLines: this.journalEntries
+                .filter(e => e.account?.id)
+                .map(e => ({
+                    code:        e.account?.accountCode  || '',
+                    description: e.account?.accountTitle || e.account?.accountDescription || '',
+                    accountId:   e.account!.id,
+                    debit:       Number(e.debit)         || 0,
+                    credit:      Number(e.credit)        || 0,
+                    applyAllocation: e.applyAllocation || false,
+                    allocationPct:   e.allocationPct   ?? null,
+                    applyWht:        e.applyWht        || false,
+                    wht:             e.wht             || null
+                })),
             subLedgerLines: this.journalEntries
                 .filter(e => (e.slentries || []).length > 0)
                 .flatMap(e => (e.slentries || []).map(sl => ({

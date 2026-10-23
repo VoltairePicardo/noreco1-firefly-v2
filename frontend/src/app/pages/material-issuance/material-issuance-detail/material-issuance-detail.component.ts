@@ -59,9 +59,16 @@ export class MaterialIssuanceDetailComponent {
                     const rawEntries = data.journalEntries || data.details || [];
                     this.journalEntries = rawEntries.filter((e: any) => e.accountCode);
                     this.editableJournalEntries = this.journalEntries.map((e: any): JournalEntry => ({
-                        account: { id: e.accountId, accountCode: e.accountCode, accountTitle: e.accountTitle || e.account?.accountTitle || e.description },
+                        account: { id: e.accountId, accountCode: e.accountCode, accountTitle: e.accountTitle || e.account?.accountTitle || e.description, hasSL: e.hasSL || e.account?.hasSL || false },
                         debit:   Number(e.glDebitAmount ?? e.debitAmount ?? e.debit) || null,
-                        credit:  Number(e.glCreditAmount ?? e.creditAmount ?? e.credit) || null
+                        credit:  Number(e.glCreditAmount ?? e.creditAmount ?? e.credit) || null,
+                        slentries: (e.slentries || []).map((sl: any) => ({
+                            entity:    null,
+                            accountNo: sl.accountNo,
+                            name:      sl.name,
+                            debit:     Number(sl.debit)  || null,
+                            credit:    Number(sl.credit) || null
+                        }))
                     }));
                     if (this.editableJournalEntries.length === 0) {
                         this.editableJournalEntries = [{ account: null, debit: null, credit: null }];

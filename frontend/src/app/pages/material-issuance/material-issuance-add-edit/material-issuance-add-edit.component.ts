@@ -173,9 +173,16 @@ export class MaterialIssuanceAddEditComponent {
                     this.service.getMirGlEntries(doc.transId, isMST).subscribe({
                         next: (entries) => {
                             this.journalEntries = (entries || []).map((e: any): JournalEntry => ({
-                                account: { id: e.accountId, accountCode: e.code, accountTitle: e.description },
+                                account: { id: e.accountId, accountCode: e.code, accountTitle: e.description, hasSL: e.hasSL || false },
                                 debit:   Number(e.debit)  || null,
-                                credit:  Number(e.credit) || null
+                                credit:  Number(e.credit) || null,
+                                slentries: (e.slentries || []).map((sl: any) => ({
+                                    entity:    null,
+                                    accountNo: sl.accountNo,
+                                    name:      sl.name,
+                                    debit:     Number(sl.debit)  || null,
+                                    credit:    Number(sl.credit) || null
+                                }))
                             }));
                             if (this.journalEntries.length === 0) {
                                 this.journalEntries = [{ account: null, debit: null, credit: null }];
