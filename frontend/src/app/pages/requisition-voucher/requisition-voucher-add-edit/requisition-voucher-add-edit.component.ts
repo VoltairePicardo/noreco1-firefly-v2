@@ -15,16 +15,9 @@ import { BrowseUserModalComponent } from '@/app/shared/modals/browse-user-modal/
 import { BrowseBudgetLineItemModalComponent } from '@/app/shared/modals/browse-budget-line-item-modal/browse-budget-line-item-modal.component';
 import { forkJoin } from 'rxjs';
 
-/*const RV_TYPES = [
-    { id: 1, label: 'For PO (Purchase Request)' },
-    { id: 2, label: 'For IT (Internal Transfer)' },
-    { id: 3, label: 'For REP (Repair)' },
-    { id: 4, label: 'For Labor' },
-];*/
-
 const RV_TYPES = [
-    { id: 1, label: 'For PO (Purchase Request)' },
-    { id: 3, label: 'For REP (Repair/JO)' },
+    { id: 1, label: 'Items or Materials' },
+    { id: 3, label: 'Labor and Materials' },
     { id: 4, label: 'For Labor' },
 ];
 
@@ -349,6 +342,7 @@ export class RequisitionVoucherAddEditComponent {
                         next: (details) => {
                             this.lineItems = (details || []).map((d: any) => ({
                                 // itemId=0 means no item linked — description stored in joDescription
+                                rowType:         d.itemId    ? 'item' : 'labor',
                                 itemId:          d.itemId    || 0,
                                 itemCode:        d.itemId    ? (d.itemCode    || '') : '',
                                 itemDescription: d.itemId    ? (d.itemDescription || '') : (d.joDescription || ''),
@@ -375,8 +369,9 @@ export class RequisitionVoucherAddEditComponent {
         });
     }
 
+    /** Adds a standard inventory item row (used by PO, IT, REP, and REP's items section). */
     addLineItem(): void {
-        // For LAB: block adding a new row if the last row has no description
+        // For LAB: block adding a new row if the last labor row has no description
         if (this.isForLab() && this.lineItems.length > 0) {
             const last = this.lineItems[this.lineItems.length - 1];
             if (!last.joDescription?.trim()) {
@@ -384,9 +379,25 @@ export class RequisitionVoucherAddEditComponent {
                 return;
             }
         }
-        this.lineItems.push({ itemId: 0, itemCode: '', itemDescription: '', quantity: 1, unitId: null, joDescription: '', itemGroup: null });
+        this.lineItems.push({ rowType: 'item', itemId: 0, itemCode: '', itemDescription: '', quantity: 1, unitId: null, joDescription: '', itemGroup: null });
         this.checkInventoryRequired();
     }
+
+    /** Adds a labor/service-charge row for the Labor and Materials (REP) type. */
+    addLaborRow(): void {
+        const laborRows = this.lineItems.filter(li => li.rowType === 'labor');
+        if (laborRows.length > 0) {
+            const last = laborRows[laborRows.length - 1];
+            if (!last.joDescription?.trim()) {
+                this.alertService.error(this.module, 'Validation', 'Please fill in the description of the current labor row before adding another.');
+                return;
+            }
+        }
+        this.lineItems.push({ rowType: 'labor', itemId: 0, itemCode: '', itemDescription: '', quantity: 1, unitId: null, joDescription: '', itemGroup: null });
+    }
+
+    get repItemRows():  any[] { return this.lineItems.filter(li => li.rowType === 'item'); }
+    get repLaborRows(): any[] { return this.lineItems.filter(li => li.rowType === 'labor'); }
 
     /**
      * Opens the item browse modal for PO/IT line items.

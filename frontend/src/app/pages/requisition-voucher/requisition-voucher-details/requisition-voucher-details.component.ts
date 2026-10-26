@@ -168,6 +168,10 @@ export class RequisitionVoucherDetailsComponent {
         });
     }
 
+    isForRep(): boolean { return this.data?.rvTypeId === 3; }
+    get repItemLines():  any[] { return this.lineItems.filter(li => li.itemId); }
+    get repLaborLines(): any[] { return this.lineItems.filter(li => !li.itemId); }
+
     isEditable(): boolean {
         const status = this.data?.documentStatus?.status || '';
         return status === 'Document Created' || status === 'Returned to Creator';
@@ -194,6 +198,6 @@ export class RequisitionVoucherDetailsComponent {
     }
 
     print(): void {
-        this.service.print(this.id, this.data?.rvType || '');
+        this.service.print(this.id, this.data?.rvTypeId || 0);
     }
 }

@@ -95,20 +95,19 @@ export class CanvassAddEditComponent {
                 { type: 'canvass', title: 'Browse Purchase Request' },
                 { size: 'xl', centered: true }
             );
-            if (result?.action === 'select' && result?.data?.id) {
-                this.service.getPrDetailsForCanvass(result.data.id).subscribe({
+            if (result?.action === 'select' && result?.data) {
+                const prId = result.data.id;
+                if (!prId) return;
+                this.service.getPrDetailsForCanvass(prId).subscribe({
                     next: (items) => {
-                        const existing = new Set(this.lineItems.map((li: any) => li.rvDetailId));
-                        (items || []).filter((item: any) => !existing.has(item.id)).forEach((item: any) => {
-                            this.lineItems.push({
-                                rvDetailId:      item.id,
-                                rvNumber:        item.rvNumber || '',
-                                itemCode:        item.itemCode || '',
-                                itemDescription: item.itemDescription || item.joDescription || '',
-                                unitCode:        item.unitCode || '',
-                                quantity:        item.quantity || 0,
-                            });
-                        });
+                        this.lineItems = (items || []).map((item: any) => ({
+                            rvDetailId:      item.id,
+                            rvNumber:        item.rvNumber || '',
+                            itemCode:        item.itemCode || '',
+                            itemDescription: item.itemDescription || item.joDescription || '',
+                            unitCode:        item.unitCode || '',
+                            quantity:        item.quantity || 0,
+                        }));
                     }
                 });
             }

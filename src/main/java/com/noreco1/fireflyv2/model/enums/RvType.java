@@ -5,9 +5,9 @@ import lombok.*;
 @Getter
 public enum RvType {
 
-    FOR_PO(1, "For PO"),
+    FOR_PO(1, "Items or Materials"),
     FOR_IT(2, "For IT"),
-    FOR_REP(3, "For REP"),
+    FOR_REP(3, "Labor and Materials"),
     FOR_LAB(4, "For Labor");
 
     private int id;

@@ -194,10 +194,12 @@ public interface PurchaseRequestDetailRepo extends JpaRepository<PurchaseRequest
             "AND rvd.purchaseRequest.documentStatus.id = 55")
     List<Object[]> findPurchaseRequestDetailsForJo(@Param("rvTypes") List<Integer> rvTypes);
 
-    @Query(value = "SELECT DISTINCT e.id, e.code, e.voucherDate, e.purpose, e.deliveryDate, u.fullName " +
+    @Query(value = "SELECT DISTINCT e.id, e.code, e.voucherDate, e.purpose, e.deliveryDate, u.fullName, " +
+            "blid.id AS budgetLineItemDetailId, blid.title AS budgetLineItemDetailTitle, blid.code AS budgetLineItemDetailCode " +
             "FROM PurchaseRequestDetail rvd " +
             "JOIN PurchaseRequest e ON rvd.FK_PurchaseRequestId = e.id " +
             "LEFT JOIN `User` u ON e.FK_createdByUserId = u.id " +
+            "LEFT JOIN BudgetLineItemDetail blid ON blid.id = e.FK_budgetLineItemDetailId " +
             "WHERE e.rvType IN (:rvTypes) " +
             "AND (rvd.quantity - rvd.poQuantity) > 0 " +
             "AND e.FK_documentStatusId = 55 " +

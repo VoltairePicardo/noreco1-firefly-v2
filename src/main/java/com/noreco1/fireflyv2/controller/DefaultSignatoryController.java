@@ -20,4 +20,9 @@ public class DefaultSignatoryController {
     public Map getForRv() {
         return signatoryFacade.defaultSignatories(DocumentType.RV);
     }
+
+    @GetMapping("/jo")
+    public Map getForJo() {
+        return signatoryFacade.defaultSignatories(DocumentType.JO);
+    }
 }

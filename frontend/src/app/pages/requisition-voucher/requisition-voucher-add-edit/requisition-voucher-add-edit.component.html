@@ -95,8 +95,8 @@
                                 </div>
                                 <div class="col-md-3 mt-2">
                                     <label for="estimatedAmount" class="form-label fw-bold">Estimated Amount <span class="text-danger">*</span></label>
-                                    <input id="estimatedAmount" type="number" class="form-control"
-                                           formControlName="estimatedAmount" placeholder="0.00" min="0" step="0.01"
+                                    <input id="estimatedAmount" type="text" appNumericFormat class="form-control"
+                                           formControlName="estimatedAmount" placeholder="0.00"
                                            [class]="submit && form.get('estimatedAmount')?.errors ? 'is-invalid' : submit && !form.get('estimatedAmount')?.errors ? 'is-valid' : ''"/>
                                     <div class="invalid-feedback">Please provide an estimated amount.</div>
                                 </div>
@@ -226,8 +226,8 @@
                             <div class="row">
                                 <div class="col-md-3 mt-2">
                                     <label for="estimatedAmountRep" class="form-label fw-bold">Estimated Amount <span class="text-danger">*</span></label>
-                                    <input id="estimatedAmountRep" type="number" class="form-control"
-                                           formControlName="estimatedAmount" placeholder="0.00" min="0" step="0.01"
+                                    <input id="estimatedAmountRep" type="text" appNumericFormat class="form-control"
+                                           formControlName="estimatedAmount" placeholder="0.00"
                                            [class]="submit && form.get('estimatedAmount')?.errors ? 'is-invalid' : submit && !form.get('estimatedAmount')?.errors ? 'is-valid' : ''"/>
                                     <div class="invalid-feedback">Please provide an estimated amount.</div>
                                 </div>
@@ -308,8 +308,8 @@
                                 </div>
                                 <div class="col-md-3 mt-2">
                                     <label for="estimatedAmountLab" class="form-label fw-bold">Estimated Amount <span class="text-danger">*</span></label>
-                                    <input id="estimatedAmountLab" type="number" class="form-control"
-                                           formControlName="estimatedAmount" placeholder="0.00" min="0" step="0.01"
+                                    <input id="estimatedAmountLab" type="text" appNumericFormat class="form-control"
+                                           formControlName="estimatedAmount" placeholder="0.00"
                                            [class]="submit && form.get('estimatedAmount')?.errors ? 'is-invalid' : submit && !form.get('estimatedAmount')?.errors ? 'is-valid' : ''"/>
                                     <div class="invalid-feedback">Please provide an estimated amount.</div>
                                 </div>
@@ -437,128 +437,270 @@
                         }
 
                         <hr class="mt-3 mb-1"/>
-                        <h6 class="fw-bold text-muted text-uppercase fs-xxs mb-0">{{ isForLab() ? 'Labor Charges' : 'Items to be Requested' }}</h6>
 
-                        <!-- Items Table -->
-                        <div class="row">
-                            <div class="col-12">
-                                <div class="table-responsive">
-                                    <table class="table table-sm table-bordered align-middle">
-                                        <thead class="bg-light thead-sm text-uppercase fs-xxs">
-                                            <tr>
-                                                @if (isForLab()) {
-                                                    <th style="width:18%">Unit</th>
-                                                    <th style="width:62%">Description</th>
-                                                    <th style="width:12%">Quantity</th>
-                                                } @else {
+                        @if (isForRep()) {
+                            <!-- ===== LABOR AND MATERIALS: Items table ===== -->
+                            <h6 class="fw-bold text-muted text-uppercase fs-xxs mb-0">Items</h6>
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="table-responsive">
+                                        <table class="table table-sm table-bordered align-middle">
+                                            <thead class="bg-light thead-sm text-uppercase fs-xxs">
+                                                <tr>
                                                     <th style="width:10%">Item No.</th>
-                                                    <th style="width:28%">Description</th>
+                                                    <th style="width:38%">Description</th>
                                                     <th style="width:20%">Specification</th>
                                                     <th style="width:10%">Quantity</th>
                                                     <th style="width:12%">Unit</th>
-                                                    @if (isForIt()) {
-                                                        <th style="width:12%">JO Description</th>
+                                                    <th style="width:10%" class="text-end">
+                                                        <button type="button" class="btn btn-primary fw-bold" (click)="addLineItem()">
+                                                            <ng-icon name="tablerPlus" class="ps-0 pe-3 fw-bold"></ng-icon>Add Item
+                                                        </button>
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @for (li of lineItems; track trackByIndex($index); let i = $index) {
+                                                    @if (li.rowType === 'item') {
+                                                        <tr>
+                                                            <td class="text-muted small">{{ li.itemCode || '—' }}</td>
+                                                            <td>
+                                                                <div class="input-group input-group-sm">
+                                                                    <input type="text" class="form-control form-control-sm"
+                                                                           [value]="li.itemDescription" readonly
+                                                                           placeholder="Browse item..."
+                                                                           style="cursor:pointer; background:#fff;"
+                                                                           (click)="openItemBrowse(i)"/>
+                                                                    <button type="button" class="btn btn-success fw-bold" (click)="openItemBrowse(i)">
+                                                                        <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
+                                                                    </button>
+                                                                </div>
+                                                            </td>
+                                                            <td>
+                                                                <textarea class="form-control form-control-sm"
+                                                                          [(ngModel)]="li.joDescription"
+                                                                          [ngModelOptions]="{standalone: true}"
+                                                                          placeholder="Specification" rows="1"></textarea>
+                                                            </td>
+                                                            <td>
+                                                                <input type="text" appNumericFormat class="form-control form-control-sm"
+                                                                       [(ngModel)]="li.quantity"
+                                                                       [ngModelOptions]="{standalone: true}"
+                                                                       placeholder="0"/>
+                                                            </td>
+                                                            <td>
+                                                                <select class="form-select form-select-sm"
+                                                                        [(ngModel)]="li.unitId"
+                                                                        [ngModelOptions]="{standalone: true}">
+                                                                    <option [ngValue]="null">— Select —</option>
+                                                                    @for (u of units(); track u.id) {
+                                                                        <option [ngValue]="u.id">{{ u.code }}</option>
+                                                                    }
+                                                                </select>
+                                                            </td>
+                                                            <td class="text-center">
+                                                                <button type="button" class="btn btn-light btn-icon rounded-circle"
+                                                                        (click)="removeLineItem(i)">
+                                                                    <ng-icon name="tablerTrash" class="text-danger"></ng-icon>
+                                                                </button>
+                                                            </td>
+                                                        </tr>
                                                     }
                                                 }
-                                                <th style="width:8%" class="text-end">
-                                                    <button type="button" class="btn btn-primary fw-bold"
-                                                            (click)="addLineItem()">
-                                                        <ng-icon name="tablerPlus" class="ps-0 pe-3 fw-bold"></ng-icon>Add
-                                                    </button>
-                                                </th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @for (li of lineItems; track trackByIndex($index); let i = $index) {
+                                                @if (repItemRows.length === 0) {
+                                                    <tr><td colspan="6" class="text-center text-muted py-2">No items added.</td></tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- ===== LABOR AND MATERIALS: Labor / Service Charges table ===== -->
+                            <hr class="mt-3 mb-1"/>
+                            <h6 class="fw-bold text-muted text-uppercase fs-xxs mb-0">Labor / Service Charges</h6>
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="table-responsive">
+                                        <table class="table table-sm table-bordered align-middle">
+                                            <thead class="bg-light thead-sm text-uppercase fs-xxs">
                                                 <tr>
-                                                    @if (isForLab()) {
-                                                        <!-- LAB: Unit | Description | Quantity -->
-                                                        <td>
-                                                            <select class="form-select form-select-sm"
-                                                                    [(ngModel)]="li.unitId"
-                                                                    [ngModelOptions]="{standalone: true}">
-                                                                <option [ngValue]="null">— Select —</option>
-                                                                @for (u of units(); track u.id) {
-                                                                    <option [ngValue]="u.id">{{ u.code }}</option>
-                                                                }
-                                                            </select>
-                                                        </td>
-                                                        <td>
-                                                            <input type="text" class="form-control form-control-sm"
-                                                                   [(ngModel)]="li.joDescription"
-                                                                   [ngModelOptions]="{standalone: true}"
-                                                                   placeholder="Description"/>
-                                                        </td>
-                                                        <td>
-                                                            <input type="number" class="form-control form-control-sm"
-                                                                   [(ngModel)]="li.quantity"
-                                                                   [ngModelOptions]="{standalone: true}"
-                                                                   min="1" placeholder="0"/>
-                                                        </td>
-                                                    } @else {
-                                                        <!-- PO/IT/REP: Item No. | Description | Specification | Quantity | Unit | [JO Desc for IT] -->
-                                                        <td class="text-muted small">{{ li.itemCode || '—' }}</td>
-                                                        <td>
-                                                            <div class="input-group input-group-sm">
-                                                                <input type="text" class="form-control form-control-sm"
-                                                                       [value]="li.itemDescription"
-                                                                       readonly
-                                                                       placeholder="Browse item..."
-                                                                       style="cursor:pointer; background:#fff;"
-                                                                       (click)="openItemBrowse(i)"/>
-                                                                <button type="button" class="btn btn-success fw-bold"
-                                                                        (click)="openItemBrowse(i)">
-                                                                    <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
-                                                                </button>
-                                                            </div>
-                                                        </td>
-                                                        <td>
-                                                            <textarea class="form-control form-control-sm"
-                                                                      [(ngModel)]="li.joDescription"
-                                                                      [ngModelOptions]="{standalone: true}"
-                                                                      placeholder="Specification"
-                                                                      rows="1"></textarea>
-                                                        </td>
-                                                        <td>
-                                                            <input type="number" class="form-control form-control-sm"
-                                                                   [(ngModel)]="li.quantity"
-                                                                   [ngModelOptions]="{standalone: true}"
-                                                                   min="1" placeholder="0"/>
-                                                        </td>
-                                                        <td>
-                                                            <select class="form-select form-select-sm"
-                                                                    [(ngModel)]="li.unitId"
-                                                                    [ngModelOptions]="{standalone: true}">
-                                                                <option [ngValue]="null">— Select —</option>
-                                                                @for (u of units(); track u.id) {
-                                                                    <option [ngValue]="u.id">{{ u.code }}</option>
-                                                                }
-                                                            </select>
-                                                        </td>
-                                                        @if (isForIt()) {
+                                                    <th style="width:18%">Unit</th>
+                                                    <th style="width:58%">Description</th>
+                                                    <th style="width:12%">Quantity</th>
+                                                    <th style="width:12%" class="text-end">
+                                                        <button type="button" class="btn btn-primary fw-bold" (click)="addLaborRow()">
+                                                            <ng-icon name="tablerPlus" class="ps-0 pe-3 fw-bold"></ng-icon>Add Labor
+                                                        </button>
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @for (li of lineItems; track trackByIndex($index); let i = $index) {
+                                                    @if (li.rowType === 'labor') {
+                                                        <tr>
+                                                            <td>
+                                                                <select class="form-select form-select-sm"
+                                                                        [(ngModel)]="li.unitId"
+                                                                        [ngModelOptions]="{standalone: true}">
+                                                                    <option [ngValue]="null">— Select —</option>
+                                                                    @for (u of units(); track u.id) {
+                                                                        <option [ngValue]="u.id">{{ u.code }}</option>
+                                                                    }
+                                                                </select>
+                                                            </td>
                                                             <td>
                                                                 <input type="text" class="form-control form-control-sm"
                                                                        [(ngModel)]="li.joDescription"
                                                                        [ngModelOptions]="{standalone: true}"
-                                                                       placeholder="JO description"/>
+                                                                       placeholder="Description"/>
                                                             </td>
-                                                        }
+                                                            <td>
+                                                                <input type="text" appNumericFormat class="form-control form-control-sm"
+                                                                       [(ngModel)]="li.quantity"
+                                                                       [ngModelOptions]="{standalone: true}"
+                                                                       placeholder="0"/>
+                                                            </td>
+                                                            <td class="text-center">
+                                                                <button type="button" class="btn btn-light btn-icon rounded-circle"
+                                                                        (click)="removeLineItem(i)">
+                                                                    <ng-icon name="tablerTrash" class="text-danger"></ng-icon>
+                                                                </button>
+                                                            </td>
+                                                        </tr>
                                                     }
-                                                    <td class="text-center">
-                                                        @if (lineItems.length > 1) {
-                                                            <button type="button" class="btn btn-light btn-icon rounded-circle"
-                                                                    (click)="removeLineItem(i)">
-                                                                <ng-icon name="tablerTrash" class="text-danger"></ng-icon>
-                                                            </button>
-                                                        }
-                                                    </td>
-                                                </tr>
-                                            }
-                                        </tbody>
-                                    </table>
+                                                }
+                                                @if (repLaborRows.length === 0) {
+                                                    <tr><td colspan="4" class="text-center text-muted py-2">No labor charges added.</td></tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        } @else {
+                            <!-- ===== PO / IT / LAB: Single section ===== -->
+                            <h6 class="fw-bold text-muted text-uppercase fs-xxs mb-0">{{ isForLab() ? 'Labor Charges' : 'Items to be Requested' }}</h6>
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="table-responsive">
+                                        <table class="table table-sm table-bordered align-middle">
+                                            <thead class="bg-light thead-sm text-uppercase fs-xxs">
+                                                <tr>
+                                                    @if (isForLab()) {
+                                                        <th style="width:18%">Unit</th>
+                                                        <th style="width:62%">Description</th>
+                                                        <th style="width:12%">Quantity</th>
+                                                    } @else {
+                                                        <th style="width:10%">Item No.</th>
+                                                        <th style="width:28%">Description</th>
+                                                        <th style="width:20%">Specification</th>
+                                                        <th style="width:10%">Quantity</th>
+                                                        <th style="width:12%">Unit</th>
+                                                        @if (isForIt()) {
+                                                            <th style="width:12%">JO Description</th>
+                                                        }
+                                                    }
+                                                    <th style="width:8%" class="text-end">
+                                                        <button type="button" class="btn btn-primary fw-bold"
+                                                                (click)="addLineItem()">
+                                                            <ng-icon name="tablerPlus" class="ps-0 pe-3 fw-bold"></ng-icon>Add
+                                                        </button>
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @for (li of lineItems; track trackByIndex($index); let i = $index) {
+                                                    <tr>
+                                                        @if (isForLab()) {
+                                                            <!-- LAB: Unit | Description | Quantity -->
+                                                            <td>
+                                                                <select class="form-select form-select-sm"
+                                                                        [(ngModel)]="li.unitId"
+                                                                        [ngModelOptions]="{standalone: true}">
+                                                                    <option [ngValue]="null">— Select —</option>
+                                                                    @for (u of units(); track u.id) {
+                                                                        <option [ngValue]="u.id">{{ u.code }}</option>
+                                                                    }
+                                                                </select>
+                                                            </td>
+                                                            <td>
+                                                                <input type="text" class="form-control form-control-sm"
+                                                                       [(ngModel)]="li.joDescription"
+                                                                       [ngModelOptions]="{standalone: true}"
+                                                                       placeholder="Description"/>
+                                                            </td>
+                                                            <td>
+                                                                <input type="text" appNumericFormat class="form-control form-control-sm"
+                                                                       [(ngModel)]="li.quantity"
+                                                                       [ngModelOptions]="{standalone: true}"
+                                                                       placeholder="0"/>
+                                                            </td>
+                                                        } @else {
+                                                            <!-- PO/IT: Item No. | Description | Specification | Quantity | Unit | [JO Desc for IT] -->
+                                                            <td class="text-muted small">{{ li.itemCode || '—' }}</td>
+                                                            <td>
+                                                                <div class="input-group input-group-sm">
+                                                                    <input type="text" class="form-control form-control-sm"
+                                                                           [value]="li.itemDescription"
+                                                                           readonly
+                                                                           placeholder="Browse item..."
+                                                                           style="cursor:pointer; background:#fff;"
+                                                                           (click)="openItemBrowse(i)"/>
+                                                                    <button type="button" class="btn btn-success fw-bold"
+                                                                            (click)="openItemBrowse(i)">
+                                                                        <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
+                                                                    </button>
+                                                                </div>
+                                                            </td>
+                                                            <td>
+                                                                <textarea class="form-control form-control-sm"
+                                                                          [(ngModel)]="li.joDescription"
+                                                                          [ngModelOptions]="{standalone: true}"
+                                                                          placeholder="Specification"
+                                                                          rows="1"></textarea>
+                                                            </td>
+                                                            <td>
+                                                                <input type="text" appNumericFormat class="form-control form-control-sm"
+                                                                       [(ngModel)]="li.quantity"
+                                                                       [ngModelOptions]="{standalone: true}"
+                                                                       placeholder="0"/>
+                                                            </td>
+                                                            <td>
+                                                                <select class="form-select form-select-sm"
+                                                                        [(ngModel)]="li.unitId"
+                                                                        [ngModelOptions]="{standalone: true}">
+                                                                    <option [ngValue]="null">— Select —</option>
+                                                                    @for (u of units(); track u.id) {
+                                                                        <option [ngValue]="u.id">{{ u.code }}</option>
+                                                                    }
+                                                                </select>
+                                                            </td>
+                                                            @if (isForIt()) {
+                                                                <td>
+                                                                    <input type="text" class="form-control form-control-sm"
+                                                                           [(ngModel)]="li.joDescription"
+                                                                           [ngModelOptions]="{standalone: true}"
+                                                                           placeholder="JO description"/>
+                                                                </td>
+                                                            }
+                                                        }
+                                                        <td class="text-center">
+                                                            @if (lineItems.length > 1) {
+                                                                <button type="button" class="btn btn-light btn-icon rounded-circle"
+                                                                        (click)="removeLineItem(i)">
+                                                                    <ng-icon name="tablerTrash" class="text-danger"></ng-icon>
+                                                                </button>
+                                                            }
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        }
 
                         <!-- Signatories -->
                         <hr class="mt-3 mb-1"/>

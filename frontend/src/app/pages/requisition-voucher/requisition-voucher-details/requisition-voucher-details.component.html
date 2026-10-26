@@ -263,39 +263,103 @@
 
         <!-- Items -->
         <hr class="my-3"/>
-        <div class="fs-xs text-uppercase fw-semibold text-muted mb-2">Items to be Requested</div>
-        <div class="table-responsive">
-            <table class="table table-custom table-centered table-hover w-100 mb-0">
-                <thead class="bg-light align-middle bg-opacity-25 thead-sm">
-                    <tr class="text-uppercase fs-xxs">
-                        <th>#</th>
-                        <th>Item No.</th>
-                        <th>Description</th>
-                        <th>Specification</th>
-                        <th class="text-center">Qty</th>
-                        <th>Unit</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @if (lineItems.length > 0) {
-                        @for (li of lineItems; track li.id; let i = $index) {
+        <div class="fs-xs text-uppercase fw-semibold text-muted mb-2">
+            {{ isForRep() ? 'Items and Labor Charges' : 'Items to be Requested' }}
+        </div>
+
+        @if (isForRep()) {
+            <!-- REP: Items sub-table -->
+            <div class="fs-xs fw-semibold text-muted mb-1 mt-2">Items / Materials</div>
+            <div class="table-responsive mb-3">
+                <table class="table table-custom table-centered table-hover w-100 mb-0">
+                    <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                        <tr class="text-uppercase fs-xxs">
+                            <th>#</th>
+                            <th>Item No.</th>
+                            <th>Description</th>
+                            <th class="text-center">Qty</th>
+                            <th>Unit</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (li of repItemLines; track li.id; let i = $index) {
                             <tr>
                                 <td class="text-muted">{{ i + 1 }}</td>
                                 <td class="fw-bold">{{ li.itemCode || '—' }}</td>
-                                <td>{{ li.itemDescription || li.joDescription || '—' }}</td>
+                                <td>{{ li.itemDescription || '—' }}</td>
+                                <td class="text-center fw-bold">{{ li.quantity }}</td>
+                                <td>{{ li.unitCode || '—' }}</td>
+                            </tr>
+                        }
+                        @if (repItemLines.length === 0) {
+                            <tr><td colspan="5" class="text-center text-muted py-3">No items added.</td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- REP: Labor sub-table -->
+            <div class="fs-xs fw-semibold text-muted mb-1">Labor / Service Charges</div>
+            <div class="table-responsive">
+                <table class="table table-custom table-centered table-hover w-100 mb-0">
+                    <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                        <tr class="text-uppercase fs-xxs">
+                            <th>#</th>
+                            <th>Description</th>
+                            <th class="text-center">Qty</th>
+                            <th>Unit</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (li of repLaborLines; track li.id; let i = $index) {
+                            <tr>
+                                <td class="text-muted">{{ i + 1 }}</td>
                                 <td>{{ li.joDescription || '—' }}</td>
                                 <td class="text-center fw-bold">{{ li.quantity }}</td>
                                 <td>{{ li.unitCode || '—' }}</td>
                             </tr>
                         }
-                    } @else {
-                        <tr>
-                            <td colspan="6" class="text-center text-muted py-3">No line items.</td>
+                        @if (repLaborLines.length === 0) {
+                            <tr><td colspan="4" class="text-center text-muted py-3">No labor charges added.</td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        } @else {
+            <!-- Standard single table for PO / IT / LAB -->
+            <div class="table-responsive">
+                <table class="table table-custom table-centered table-hover w-100 mb-0">
+                    <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                        <tr class="text-uppercase fs-xxs">
+                            <th>#</th>
+                            <th>Item No.</th>
+                            <th>Description</th>
+                            <th>Specification</th>
+                            <th class="text-center">Qty</th>
+                            <th>Unit</th>
                         </tr>
-                    }
-                </tbody>
-            </table>
-        </div>
+                    </thead>
+                    <tbody>
+                        @if (lineItems.length > 0) {
+                            @for (li of lineItems; track li.id; let i = $index) {
+                                <tr>
+                                    <td class="text-muted">{{ i + 1 }}</td>
+                                    <td class="fw-bold">{{ li.itemCode || '—' }}</td>
+                                    <td>{{ li.itemDescription || li.joDescription || '—' }}</td>
+                                    <td>{{ li.joDescription || '—' }}</td>
+                                    <td class="text-center fw-bold">{{ li.quantity }}</td>
+                                    <td>{{ li.unitCode || '—' }}</td>
+                                </tr>
+                            }
+                        } @else {
+                            <tr>
+                                <td colspan="6" class="text-center text-muted py-3">No line items.</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
 
     </div>
 </div>

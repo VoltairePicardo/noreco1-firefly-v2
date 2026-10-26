@@ -43,6 +43,22 @@
                 <textarea class="form-control" [(ngModel)]="description" rows="2"
                           placeholder="Enter purpose or scope of work" maxlength="1024"></textarea>
             </div>
+            @if (purchaseRequest) {
+                <div class="col-md-6">
+                    <label class="form-label fw-bold">Linked Purchase Request</label>
+                    <input type="text" class="form-control" [value]="purchaseRequest.code || purchaseRequest.localCode || ''" readonly/>
+                    @if (budgetBalancePOJO != null || budgetBalanceCV != null) {
+                        <div class="d-flex gap-4 mt-1 small text-muted">
+                            @if (budgetBalancePOJO != null) {
+                                <span>Budget Balance (PO/JO): <strong class="text-dark">{{ budgetBalancePOJO | number:'1.2-2' }}</strong></span>
+                            }
+                            @if (budgetBalanceCV != null) {
+                                <span>Budget Balance (CV): <strong class="text-dark">{{ budgetBalanceCV | number:'1.2-2' }}</strong></span>
+                            }
+                        </div>
+                    }
+                </div>
+            }
         </div>
 
         <!-- Items For Labor -->
@@ -84,14 +100,14 @@
                                     </td>
                                     <td>{{ item.unitCode }}</td>
                                     <td>
-                                        <input type="number" class="form-control form-control-sm text-end"
+                                        <input type="text" appNumericFormat class="form-control form-control-sm text-end"
                                                style="min-width:80px"
-                                               [(ngModel)]="item.quantity" min="0" step="1"/>
+                                               [(ngModel)]="item.quantity"/>
                                     </td>
                                     <td>
-                                        <input type="number" class="form-control form-control-sm text-end"
+                                        <input type="text" appNumericFormat class="form-control form-control-sm text-end"
                                                style="min-width:110px"
-                                               [(ngModel)]="item.unitPrice" min="0" step="0.01"/>
+                                               [(ngModel)]="item.unitPrice"/>
                                     </td>
                                     <td>
                                         <input type="number" class="form-control form-control-sm text-end"

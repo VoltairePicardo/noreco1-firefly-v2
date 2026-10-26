@@ -37,7 +37,7 @@
                         <td [colSpan]="type === 'canvass' ? 4 : 5" class="text-center text-muted py-3">No records found.</td>
                     </tr>
                 } @else {
-                    @for (pr of filtered; track pr.id) {
+                    @for (pr of filtered; track $index) {
                         <tr style="cursor: pointer" (click)="select(pr)">
                             <td class="fw-bold text-nowrap">{{ pr.code }}</td>
                             <td class="text-nowrap">{{ pr.voucherDate | date:'MMM dd, yyyy' }}</td>

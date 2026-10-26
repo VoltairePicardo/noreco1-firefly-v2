@@ -17,6 +17,7 @@ import {DefaultTableComponent} from '@/app/shared/tables/default-table/default-t
 import {UiCardComponent} from '@app/components/ui-card.component';
 import {LaddaModule} from 'angular2-ladda';
 import {ChoiceSelectInputDirective} from '@core/directive/choices-select.directive';
+import {NumericFormatDirective} from '@/app/shared/directives/numeric-format.directive';
 import {SharedModule} from '@/app/shared/shared.module';
 import {SweetAlert2Module} from '@sweetalert2/ngx-sweetalert2';
 import {ReportFilterContainerComponent} from '@/app/shared/report-filters/components/report-filter-container.component';
@@ -44,6 +45,7 @@ export const COMMON_ADD_EDIT_PAGE_IMPORTS = [
     ReactiveFormsModule,
     LaddaModule,
     ChoiceSelectInputDirective,
+    NumericFormatDirective,
 ];
 export const COMMON_MAIN_PAGE_IMPORTS = [
     NgbdSortableHeader,

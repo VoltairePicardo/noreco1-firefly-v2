@@ -1047,8 +1047,6 @@ public class PurchaseRequestServiceImpl implements PurchaseRequestService, Print
             map.put("rvType", RvType.FOR_IT.getDescription());
         } else if (r.getRvType() == RvType.FOR_REP.getId()){
             map.put("rvType", RvType.FOR_REP.getDescription());
-        } else if (r.getRvType() == RvType.FOR_REP.getId()) {
-            map.put("rvType", RvType.FOR_REP.getDescription());
         } else if (r.getRvType() == RvType.FOR_LAB.getId()) {
             map.put("rvType", RvType.FOR_LAB.getDescription());
         }

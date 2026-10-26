@@ -2,6 +2,7 @@ package com.noreco1.fireflyv2.controller;
 
 import com.noreco1.fireflyv2.common.GlobalConstant;
 import com.noreco1.fireflyv2.common.helpers.Checker;
+import com.noreco1.fireflyv2.controller.response.CashFlowItemDto;
 import com.noreco1.fireflyv2.controller.response.JoDetailDto;
 import com.noreco1.fireflyv2.controller.response.JoDto;
 import com.noreco1.fireflyv2.controller.response.JoListDto;
@@ -9,10 +10,12 @@ import com.noreco1.fireflyv2.controller.response.PostResponse;
 import com.noreco1.fireflyv2.controller.response.ProcessDocumentDto;
 import com.noreco1.fireflyv2.model.DocumentStatus;
 import com.noreco1.fireflyv2.model.JobOrder;
+import com.noreco1.fireflyv2.model.JobOrderBudgetDetail;
 import com.noreco1.fireflyv2.service.DownloadService;
 import com.noreco1.fireflyv2.service.JoDetailService;
 import com.noreco1.fireflyv2.service.JobOrderService;
 import com.noreco1.fireflyv2.service.PrintableVoucher;
+import jakarta.validation.Valid;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import net.sf.jasperreports.engine.JRDataSource;
@@ -112,6 +115,21 @@ public class JobOrderController {
     @GetMapping("/{id}")
     public JoDto getById(@PathVariable Integer id) {
         return jobOrderService.findById(id);
+    }
+
+    @GetMapping("/is-document-for-cash-flow-item-assignment/{transactionId}")
+    public boolean isDocumentForCashFlowItemAssignment(@PathVariable Integer transactionId) {
+        return jobOrderService.isDocumentForCashFlowItemAssignment(transactionId);
+    }
+
+    @PostMapping("/saveCashFlowItem")
+    public PostResponse saveCashFlowItem(@Valid @RequestBody CashFlowItemDto dto, BindingResult bindingResult) {
+        return jobOrderService.saveCashFlowItem(dto, bindingResult, messageSource);
+    }
+
+    @GetMapping("/budget-details/{joId}")
+    public List<JobOrderBudgetDetail> getBudgetDetails(@PathVariable Integer joId) {
+        return jobOrderService.getJobOrderBudgetDetail(joId);
     }
 
     @Autowired

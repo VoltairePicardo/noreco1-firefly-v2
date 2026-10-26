@@ -37,6 +37,11 @@ export class JobOrderAddEditComponent {
     paymentTerm: number | null = null;
     paymentTermInWords = '';
 
+    // PR link + budget balance (display only)
+    purchaseRequest: any      = null;
+    budgetBalancePOJO: number | null = null;
+    budgetBalanceCV:   number | null = null;
+
     // Signatories
     budgetCheckedBy: any = null;
     checkedBy: any       = null;
@@ -62,7 +67,19 @@ export class JobOrderAddEditComponent {
             } else {
                 const today = new Date();
                 this.voucherDate = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+                this.loadDefaultSignatories();
             }
+        });
+    }
+
+    private loadDefaultSignatories(): void {
+        this.service.getDefaultSignatories().subscribe({
+            next: (sig) => {
+                if (sig?.budgetCheckedBy) this.budgetCheckedBy = sig.budgetCheckedBy;
+                if (sig?.checkedBy)       this.checkedBy       = sig.checkedBy;
+                if (sig?.approvedBy)      this.approvedBy      = sig.approvedBy;
+            },
+            error: () => {}
         });
     }
 
@@ -84,6 +101,9 @@ export class JobOrderAddEditComponent {
                     this.budgetCheckedBy    = header.budgetCheckedBy || null;
                     this.checkedBy          = header.checkedBy || null;
                     this.approvedBy         = header.approvedBy || header.approvingOfficer || null;
+                    this.purchaseRequest    = header.purchaseRequest || null;
+                    this.budgetBalancePOJO  = header.budgetLineItemBalancePOJORFP ?? null;
+                    this.budgetBalanceCV    = header.budgetLineItemBalanceCV ?? null;
 
                     this.lineItems = (details || []).map((d: any) => ({
                         rvDetailId:      d.rvDetailId,
@@ -140,11 +160,27 @@ export class JobOrderAddEditComponent {
             );
             if (result?.action === 'select' && result?.data) {
                 const pr = result.data;
+                // Link PR to header + auto-fill description + load budget balance
+                this.purchaseRequest = pr;
+                if (!this.description && pr.purpose) {
+                    this.description = pr.purpose;
+                }
+                if (pr.budgetLineItemDetail?.id) {
+                    this.service.getPrBudgetBalance(pr.budgetLineItemDetail.id).subscribe({
+                        next: (bal) => {
+                            this.budgetBalancePOJO = bal?.amountBalancePOJO ?? null;
+                            this.budgetBalanceCV   = bal?.amountBalanceCV   ?? null;
+                        },
+                        error: () => {}
+                    });
+                }
+                // Load items
                 this.service.getPurchaseRequestItems(pr.id).subscribe({
                     next: (items) => {
                         const existing = new Set(this.lineItems.map((li: any) => li.rvDetailId));
+                        const newItems: any[] = [];
                         (items || []).filter((item: any) => !existing.has(item.id)).forEach((item: any) => {
-                            this.lineItems.push({
+                            newItems.push({
                                 rvDetailId:      item.id,
                                 itemCode:        item.itemCode || '',
                                 itemDescription: item.itemDescription || '',
@@ -155,7 +191,17 @@ export class JobOrderAddEditComponent {
                                 vat:             0,
                                 discount:        0,
                             });
+                            this.lineItems.push(newItems[newItems.length - 1]);
                         });
+                        // Auto-fetch quotation prices if vendor is already selected
+                        if (this.vendor?.accountNo && newItems.length > 0) {
+                            newItems.forEach(li => {
+                                this.service.getQuotationPrice(this.vendor.accountNo, li.rvDetailId).subscribe({
+                                    next: (price) => { if (price != null) li.unitPrice = price; },
+                                    error: () => {}
+                                });
+                            });
+                        }
                     },
                     error: () => this.alertService.error(this.module, 'Failed to load PR items.', '')
                 });
@@ -227,12 +273,14 @@ export class JobOrderAddEditComponent {
         this.formSubmit = true;
 
         const payload: any = {
-            voucherDate:        this.voucherDate,
-            vendor:             { accountNo: this.vendor.accountNo },
-            description:        this.description || null,
-            paymentTerm:        this.paymentTerm || null,
-            paymentTermInWords: this.paymentTermInWords || null,
-            amount:             this.totalAmount,
+            voucherDate:                  this.voucherDate,
+            vendor:                       { accountNo: this.vendor.accountNo },
+            description:                  this.description || null,
+            paymentTerm:                  this.paymentTerm || null,
+            paymentTermInWords:           this.paymentTermInWords || null,
+            amount:                       this.totalAmount,
+            budgetLineItemBalancePOJORFP: this.budgetBalancePOJO,
+            budgetLineItemBalanceCV:      this.budgetBalanceCV,
             budgetCheckedBy:    this.budgetCheckedBy?.accountNo ? { accountNo: this.budgetCheckedBy.accountNo } : null,
             checkedBy:          this.checkedBy?.accountNo       ? { accountNo: this.checkedBy.accountNo }       : null,
             approvingOfficer:   this.approvedBy?.accountNo      ? { accountNo: this.approvedBy.accountNo }      : null,

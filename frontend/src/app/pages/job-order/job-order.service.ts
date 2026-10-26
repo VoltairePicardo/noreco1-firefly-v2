@@ -82,6 +82,34 @@ export class JobOrderService {
         return this.http.get<any[]>(`${BASE_API}/json/document-logs/${transId}`);
     }
 
+    getDefaultSignatories(): Observable<any> {
+        return this.http.get(`${BASE_API}/default-signatory/jo`);
+    }
+
+    getQuotationPrice(vendorAccountNo: number, rvDetailId: number): Observable<any> {
+        return this.http.get(`${BASE_API}/quotation-detail/quotation-price/${vendorAccountNo}/${rvDetailId}`);
+    }
+
+    getPrBudgetBalance(budgetLineItemDetailId: number): Observable<any> {
+        return this.http.get(`${BASE_API}/json/budget-line-item-balance/${budgetLineItemDetailId}`);
+    }
+
+    isDocumentForCashFlowItemAssignment(transId: number): Observable<boolean> {
+        return this.http.get<boolean>(`${BASE_API}/job-order/is-document-for-cash-flow-item-assignment/${transId}`);
+    }
+
+    saveCashFlowItem(payload: any): Observable<any> {
+        return this.http.post(`${BASE_API}/job-order/saveCashFlowItem`, payload, httpOptions);
+    }
+
+    getBudgetDetails(joId: number): Observable<any[]> {
+        return this.http.get<any[]>(`${BASE_API}/job-order/budget-details/${joId}`);
+    }
+
+    getBudgetSubItems(budgetLineItemDetailId: number): Observable<any[]> {
+        return this.http.get<any[]>(`${BASE_API}/json/budget-sub-items/${budgetLineItemDetailId}`);
+    }
+
     print(id: number): void {
         this.downloadService.print(`${BASE_API}/job-order/export/${id}`, { type: 'pdf' });
     }

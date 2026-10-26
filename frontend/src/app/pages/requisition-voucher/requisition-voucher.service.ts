@@ -112,14 +112,17 @@ export class RequisitionVoucherService {
     }
 
     /**
-     * Opens the RV export in a new tab. The export endpoint is determined by
-     * RV type: For PO → /export, For IT → /export1, For REP → /export2, For LAB → /export3.
+     * Opens the RV export in a new tab. Routing is by rvTypeId (numeric):
+     *   1 = Items or Materials → /export
+     *   2 = For IT             → /export1
+     *   3 = Labor and Materials → /export2
+     *   4 = For Labor          → /export3
      */
-    print(id: number, rvType: string): void {
+    print(id: number, rvTypeId: number): void {
         let path = '/purchase-request/export';
-        if      (rvType.includes('REP')) path = '/purchase-request/export2';
-        else if (rvType.includes('LAB')) path = '/purchase-request/export3';
-        else if (rvType.includes('IT'))  path = '/purchase-request/export1';
+        if      (rvTypeId === 3) path = '/purchase-request/export2';
+        else if (rvTypeId === 4) path = '/purchase-request/export3';
+        else if (rvTypeId === 2) path = '/purchase-request/export1';
         this.downloadService.print(`${BASE_API}${path}/${id}`, { type: 'pdf' });
     }
 }

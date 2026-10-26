@@ -191,6 +191,75 @@
             </table>
         </div>
 
+        <!-- Budget Sub-Item Assignment -->
+        @if (isForCashFlowAssignment) {
+            <hr class="my-3"/>
+            <div class="fs-xs text-uppercase fw-semibold text-muted mb-2">Budget Sub-Item Assignment</div>
+            @if (availableSubItems.length > 0) {
+                <div class="d-flex gap-2 mb-3">
+                    <select class="form-select" style="max-width:360px" [(ngModel)]="selectedSubItemId">
+                        <option [ngValue]="null">— Select Sub-Item —</option>
+                        @for (s of availableSubItems; track s.id) {
+                            <option [ngValue]="s.id">{{ s.description }}</option>
+                        }
+                    </select>
+                    <button type="button" class="btn btn-success fw-bold" (click)="addSubItem()" [disabled]="!selectedSubItemId">
+                        <ng-icon name="tablerPlus" class="ps-0 pe-3 fw-bold"></ng-icon>Add
+                    </button>
+                </div>
+            }
+            <div class="table-responsive">
+                <table class="table table-custom table-centered table-hover w-100 mb-0">
+                    <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                        <tr class="text-uppercase fs-xxs">
+                            <th>Budget Sub-Item</th>
+                            <th class="text-end">Bal. (PO/JO)</th>
+                            <th class="text-end">Bal. (CV)</th>
+                            <th class="text-end" style="width:150px">Amount</th>
+                            <th style="width:50px"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (budgetDetails.length > 0) {
+                            @for (d of budgetDetails; track $index) {
+                                <tr>
+                                    <td>{{ d.budgetSubItem?.description || '—' }}</td>
+                                    <td class="text-end">{{ (d.budgetSubItemAmountBalancePOJO ?? d.budgetSubItem?.balancePOJO) | number:'1.2-2' }}</td>
+                                    <td class="text-end">{{ (d.budgetSubItemAmountBalanceCV ?? d.budgetSubItem?.balanceCV) | number:'1.2-2' }}</td>
+                                    <td class="text-end">
+                                        <input type="text" appNumericFormat class="form-control form-control-sm text-end"
+                                               [(ngModel)]="d.amount" style="width:120px;margin-left:auto"/>
+                                    </td>
+                                    <td class="text-center">
+                                        <button type="button" class="btn btn-light btn-icon btn-sm rounded-circle"
+                                                (click)="removeSubItem($index)">
+                                            <ng-icon name="tablerTrash" class="fs-lg"></ng-icon>
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                            <tr class="fw-bold">
+                                <td colspan="3" class="text-end text-uppercase fs-xs">Total</td>
+                                <td class="text-end">{{ budgetTotal | number:'1.2-2' }}</td>
+                                <td></td>
+                            </tr>
+                        } @else {
+                            <tr><td colspan="5" class="text-center text-muted py-3">No budget sub-items assigned.</td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="d-flex justify-content-end mt-3">
+                <button type="button" class="btn btn-primary fw-bold" [disabled]="formSubmit" (click)="saveCashFlowItems()">
+                    @if (formSubmit) {
+                        <span class="spinner-border spinner-border-sm me-2" role="status"></span>Saving...
+                    } @else {
+                        <ng-icon name="tablerCheck" class="ps-0 pe-3 fw-bold"></ng-icon>Save Budget Sub-Items
+                    }
+                </button>
+            </div>
+        }
+
     </div>
 </div>
 
