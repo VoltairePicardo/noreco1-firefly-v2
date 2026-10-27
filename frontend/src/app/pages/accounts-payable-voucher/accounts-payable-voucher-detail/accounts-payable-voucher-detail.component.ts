@@ -10,7 +10,7 @@ import { DocumentLogsComponent } from '@/app/shared/components/document-logs/doc
 import { AttachmentsComponent } from '@/app/shared/components/attachments/attachments.component';
 import { AccountsPayableVoucherService } from '../accounts-payable-voucher.service';
 import { provideIcons } from '@ng-icons/core';
-import { tablerCheck, tablerEdit, tablerEye, tablerEyeOff, tablerPrinter, tablerArrowLeft } from '@ng-icons/tabler-icons';
+import { tablerCheck, tablerEdit, tablerEye, tablerEyeOff, tablerPrinter, tablerArrowLeft, tablerX, tablerChevronDown, tablerChevronRight } from '@ng-icons/tabler-icons';
 
 @Component({
     selector: 'app-accounts-payable-voucher-detail',
@@ -20,7 +20,7 @@ import { tablerCheck, tablerEdit, tablerEye, tablerEyeOff, tablerPrinter, tabler
         DocumentLogsComponent,
         AttachmentsComponent
     ],
-    providers: [...SHARED_PROVIDERS, provideIcons({ tablerCheck, tablerEdit, tablerEye, tablerEyeOff, tablerPrinter, tablerArrowLeft })],
+    providers: [...SHARED_PROVIDERS, provideIcons({ tablerCheck, tablerEdit, tablerEye, tablerEyeOff, tablerPrinter, tablerArrowLeft, tablerX, tablerChevronDown, tablerChevronRight })],
     templateUrl: './accounts-payable-voucher-detail.component.html'
 })
 export class AccountsPayableVoucherDetailComponent {
@@ -29,12 +29,21 @@ export class AccountsPayableVoucherDetailComponent {
 
     id: any   = null;
     data: any = {};
-    receivingReports: any[] = [];
-    journalEntries: any[]   = [];
-    iemopBillings: any[]    = [];
-    attachments: any[]      = [];
+    receivingReports: any[]   = [];
+    linkedPr: any             = null;
+    linkedJoa: any            = null;
+    journalEntries: any[]     = [];
+    iemopBillings: any[]      = [];
+    attachments: any[]        = [];
+    expandedSl = new Set<number>();
+    installmentDetails: any[] = [];
     isLoading = signal(false);
     showLogs  = false;
+
+    // Unpaid Remarks
+    unpaidRemark        = '';
+    editingUnpaidRemark = false;
+    savingUnpaidRemark  = false;
 
     // Workflow
     workflowActions: any[] = [];
@@ -63,9 +72,13 @@ export class AccountsPayableVoucherDetailComponent {
             next: (data) => {
                 this.isLoading.set(false);
                 if (data?.id) {
-                    this.data             = data;
-                    this.receivingReports = data.receivingReports || [];
-                    this.iemopBillings    = data.iemopBillings    || [];
+                    this.data               = data;
+                    this.receivingReports   = data.receivingReports   || [];
+                    this.linkedPr           = data.linkedPr            || null;
+                    this.linkedJoa          = data.linkedJoa           || null;
+                    this.iemopBillings      = data.iemopBillings      || [];
+                    this.installmentDetails = data.installmentDetails  || [];
+                    this.unpaidRemark       = data.unpaidRemark        || '';
                     this.loadWorkflowActions();
                     if (data.transId) {
                         this.loadJournalEntries(data.transId);
@@ -163,6 +176,43 @@ export class AccountsPayableVoucherDetailComponent {
                 this.alertService.httpError(this.module, 'Processing failed.', err);
             }
         });
+    }
+
+    editUnpaidRemark(): void {
+        this.editingUnpaidRemark = true;
+    }
+
+    cancelUnpaidRemark(): void {
+        this.unpaidRemark       = this.data.unpaidRemark || '';
+        this.editingUnpaidRemark = false;
+    }
+
+    saveUnpaidRemark(): void {
+        this.savingUnpaidRemark = true;
+        this.service.saveUnpaidRemarks(this.id, this.unpaidRemark).subscribe({
+            next: () => {
+                this.savingUnpaidRemark  = false;
+                this.editingUnpaidRemark = false;
+                this.data.unpaidRemark   = this.unpaidRemark;
+                this.alertService.success(this.module, 'Unpaid remarks saved.', '');
+            },
+            error: (err) => {
+                this.savingUnpaidRemark = false;
+                this.alertService.httpError(this.module, 'Failed to save remarks.', err);
+            }
+        });
+    }
+
+    isSlExpanded(index: number): boolean {
+        return this.expandedSl.has(index);
+    }
+
+    toggleSl(index: number): void {
+        if (this.expandedSl.has(index)) {
+            this.expandedSl.delete(index);
+        } else {
+            this.expandedSl.add(index);
+        }
     }
 
     toggleLogs(): void {

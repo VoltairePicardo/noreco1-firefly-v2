@@ -3,6 +3,7 @@ package com.noreco1.fireflyv2.controller;
 import com.noreco1.fireflyv2.common.GlobalConstant;
 import com.noreco1.fireflyv2.common.helpers.Checker;
 import com.noreco1.fireflyv2.controller.response.CvVoucherDto;
+import com.noreco1.fireflyv2.controller.response.JournalVoucherAdditionalBudgetLineItemDetailDto;
 import com.noreco1.fireflyv2.controller.response.PostResponse;
 import com.noreco1.fireflyv2.controller.response.ProcessDocumentDto;
 import com.noreco1.fireflyv2.model.DocumentStatus;
@@ -92,6 +93,23 @@ public class GeneralJournalController {
         }
 
         return response;
+    }
+
+    @PostMapping("/update-entries")
+    @ResponseBody
+    public PostResponse updateEntries(@RequestBody @Valid JournalVoucher jv, BindingResult bindingResult) {
+        return jvService.updateEntries(jv, bindingResult, messageSource);
+    }
+
+    @GetMapping("/cashflow-budget-details")
+    public List<Map<String, Object>> cashflowBudgetDetails() {
+        return jvService.getCashflowBudgetDetailsForJv();
+    }
+
+    @PostMapping("/additional-budget-line-item-detail")
+    public PostResponse additionalBudgetLineItemDetail(@RequestBody JournalVoucherAdditionalBudgetLineItemDetailDto dto) {
+        BindingResult bindingResult = new org.springframework.validation.BeanPropertyBindingResult(dto, "dto");
+        return jvService.additionalBudgetLineItemDetail(dto, bindingResult, messageSource);
     }
 
     @PostMapping("/process")

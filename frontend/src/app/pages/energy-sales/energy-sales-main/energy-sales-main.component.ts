@@ -4,6 +4,7 @@ import { AlertService } from '@/app/shared/services/alert.service';
 import { FlatpickrDefaults, FlatpickrModule } from 'angularx-flatpickr';
 import { EnergySalesService } from '../energy-sales.service';
 import { monthStart, monthEnd } from '@/app/shared/utils/date.utils';
+import Swal from 'sweetalert2';
 
 @Component({
     selector: 'app-energy-sales-main',
@@ -82,14 +83,24 @@ export class EnergySalesMainComponent {
         this.load();
     }
 
-    approveAll(): void {
+    async approveAll(): Promise<void> {
         const ids = this.selectedIds;
         if (ids.length === 0) {
             this.alertService.warning(this.module, 'Approve All', 'Please select at least one record.');
             return;
         }
+        const { isConfirmed, value: remarks } = await Swal.fire({
+            title:            'Approve All',
+            text:             `Approve ${ids.length} selected record(s)?`,
+            input:            'text',
+            inputLabel:       'Remarks (optional)',
+            inputPlaceholder: 'Enter remarks...',
+            showCancelButton: true,
+            confirmButtonText: 'Approve',
+        });
+        if (!isConfirmed) return;
         this.processingAll = true;
-        this.service.approveAll(ids).subscribe({
+        this.service.approveAll(ids, remarks || '').subscribe({
             next: (res) => {
                 this.processingAll = false;
                 if (res?.success) {

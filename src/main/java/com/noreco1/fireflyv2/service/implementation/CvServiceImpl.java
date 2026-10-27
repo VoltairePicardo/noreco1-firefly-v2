@@ -188,6 +188,7 @@ public class CvServiceImpl implements CvService, PrintableVoucher, PrintableCheq
             existingCv.setYear(voucherYear);
             existingCv.setAmount(cv.getAmount());
             existingCv.setCheckAmount(cv.getCheckAmount());
+            existingCv.setRemarks(cv.getRemarks());
             existingCv.setRrNumber(cv.getRrNumber());
             existingCv.setAdditionalPayeeInfo(cv.getAdditionalPayeeInfo());
             if (cv.getBank() != null) {
@@ -198,7 +199,7 @@ public class CvServiceImpl implements CvService, PrintableVoucher, PrintableCheq
                     existingCv.setBank(resolvedBankAccount.getBank());
                 }
             }
-//            existingCv.setBudgetLineItemDetail(cv.getBudgetLineItemDetail());
+            existingCv.setBudgetLineItemDetail(cv.getBudgetLineItemDetail());
             existingCv.setPurchaseOrder(cv.getPurchaseOrder());
             existingCv.setJobOrder(cv.getJobOrder());
 
@@ -495,6 +496,7 @@ public class CvServiceImpl implements CvService, PrintableVoucher, PrintableCheq
             if (checkVoucher != null) {
                 cvDto.setId(checkVoucher.getId());
                 cvDto.setParticulars(checkVoucher.getParticulars());
+                cvDto.setRemarks(checkVoucher.getRemarks());
                 cvDto.setLocalCode(checkVoucher.getCode());
                 cvDto.setTransId(checkVoucher.getTransaction().getId());
 

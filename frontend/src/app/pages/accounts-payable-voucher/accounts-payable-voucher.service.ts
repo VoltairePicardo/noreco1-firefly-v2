@@ -45,9 +45,13 @@ export class AccountsPayableVoucherService {
         return this.http.post<any>(`${BASE_API}/apv/process`, dto);
     }
 
-    approveAll(ids: number[]): Observable<any> {
-        const payloads = ids.map(id => ({ documentId: id, remarks: '', documentType: 'APV' }));
+    approveAll(ids: number[], remarks: string = ''): Observable<any> {
+        const payloads = ids.map(id => ({ documentId: id, remarks, documentType: 'APV' }));
         return this.http.post<any>(`${BASE_API}/approve-vouchers/process-all`, payloads, httpOptions);
+    }
+
+    saveUnpaidRemarks(id: number, unpaidRemark: string): Observable<any> {
+        return this.http.post<any>(`${BASE_API}/apv/update-unpaid-remarks`, { id, unpaidRemark }, httpOptions);
     }
 
     getJournalEntries(transId: number): Observable<any[]> {
@@ -79,11 +83,18 @@ export class AccountsPayableVoucherService {
     }
 
     searchRvs(q: string = '', page: number = 0, size: number = 10): Observable<any> {
-        const params = new HttpParams()
-            .set('q', q)
-            .set('page', page)
-            .set('size', size);
+        const params = new HttpParams().set('q', q).set('page', page).set('size', size);
         return this.http.get<any>(`${BASE_API}/apv/rr-approved-paged`, { params });
+    }
+
+    searchPrs(q: string = '', page: number = 0, size: number = 10): Observable<any> {
+        const params = new HttpParams().set('q', q).set('page', page).set('size', size);
+        return this.http.get<any>(`${BASE_API}/payment-request/apv-approved-paged`, { params });
+    }
+
+    searchJoas(q: string = '', page: number = 0, size: number = 10): Observable<any> {
+        const params = new HttpParams().set('q', q).set('page', page).set('size', size);
+        return this.http.get<any>(`${BASE_API}/jo-acceptance/apv-approved-paged`, { params });
     }
 
     getWorkflowActions(transId: number): Observable<any[]> {

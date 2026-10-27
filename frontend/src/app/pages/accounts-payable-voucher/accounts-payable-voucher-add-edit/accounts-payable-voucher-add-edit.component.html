@@ -46,7 +46,7 @@
                                    [value]="vendor ? vendor.name : ''"
                                    readonly placeholder="Select vendor..."/>
                             <button type="button" class="btn btn-success fw-bold" (click)="openVendorBrowse()">
-                                <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
+                                <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
                             </button>
                             @if (vendor) {
                                 <button type="button" class="btn btn-light fw-bold" (click)="clearVendor()">
@@ -120,6 +120,84 @@
                     </div>
                 }
 
+                <!-- Linked Purchasing Document -->
+                <hr class="border-dashed mx-n3 mt-3"/>
+                <div class="fs-xs text-uppercase fw-semibold text-muted mb-2">Linked Purchasing Document</div>
+                <div class="row g-3 mb-3">
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold">Document Type</label>
+                        <select class="form-select" [(ngModel)]="docType" [ngModelOptions]="{ standalone: true }"
+                                (ngModelChange)="onDocTypeChange()">
+                            <option [ngValue]="null">— Select Type —</option>
+                            <option value="pr">Payment Request</option>
+                            <option value="rr">Receiving Report</option>
+                            <option value="joa">JO Acceptance</option>
+                        </select>
+                    </div>
+                    @if (docType) {
+                        <div class="col-md-auto d-flex align-items-end">
+                            <button type="button" class="btn btn-success fw-bold" (click)="openDocumentBrowse()">
+                                <ng-icon name="tablerPlus" class="ps-0 pe-3 fw-bold"></ng-icon>Browse {{ docTypeLabel }}
+                            </button>
+                        </div>
+                    }
+                </div>
+
+                @if (docType === 'rr') {
+                    <div class="table-responsive">
+                        <table class="table table-custom table-centered table-hover w-100 mb-0">
+                            <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                            <tr class="text-uppercase fs-xxs">
+                                <th style="width:50px">#</th>
+                                <th>RR Code</th>
+                                <th>Supplier</th>
+                                <th class="text-end">Amount</th>
+                                <th>Date</th>
+                                <th>Particulars</th>
+                                <th style="width:50px"></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                                @for (rr of linkedRrs; track rr.id; let i = $index) {
+                                    <tr>
+                                        <td class="text-center">{{ i + 1 }}</td>
+                                        <td class="fw-bold">{{ rr.localCode || '—' }}</td>
+                                        <td>{{ rr.slentityName || '—' }}</td>
+                                        <td class="text-end">{{ (rr.netAmount || 0) | number:'1.2-2' }}</td>
+                                        <td>{{ rr.voucherDate | date:'MMM d, yyyy' }}</td>
+                                        <td>{{ rr.particulars || '—' }}</td>
+                                        <td class="text-center">
+                                            <button type="button" class="btn btn-light btn-icon rounded-circle" (click)="removeRr(i)">
+                                                <ng-icon name="tablerTrash" class="fs-lg"></ng-icon>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                }
+                                @if (linkedRrs.length === 0) {
+                                    <tr><td colspan="7" class="text-center text-muted py-3">No receiving reports linked. Click "Browse Receiving Report" to add.</td></tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+
+                @if (docType === 'pr' || docType === 'joa') {
+                    @if (linkedDocument) {
+                        <div class="d-flex align-items-center gap-3 p-2 border rounded">
+                            <div class="flex-grow-1">
+                                <span class="fw-bold me-2">{{ linkedDocument.localCode }}</span>
+                                <span class="text-muted me-2">{{ linkedDocument.slentityName }}</span>
+                                <span class="fw-bold">{{ (linkedDocument.netAmount || 0) | number:'1.2-2' }}</span>
+                            </div>
+                            <button type="button" class="btn btn-light btn-icon btn-sm rounded-circle" (click)="clearLinkedDocument()">
+                                <ng-icon name="tablerTrash" class="fs-lg"></ng-icon>
+                            </button>
+                        </div>
+                    } @else {
+                        <p class="text-muted fst-italic mb-0">No {{ docTypeLabel }} linked. Click "Browse {{ docTypeLabel }}" above.</p>
+                    }
+                }
+
                 <!-- Journal Entries -->
                 <hr class="border-dashed mx-n3 mt-3"/>
                 <!--                <div class="fs-xs text-uppercase fw-semibold text-muted mb-2">Journal Entries</div>-->
@@ -131,8 +209,8 @@
                 <hr class="border-dashed mx-n3 mt-3"/>
                 <div class="d-flex align-items-center justify-content-between mb-2">
                     <div class="fs-xs text-uppercase fw-semibold text-muted">IEMOP Billings</div>
-                    <button type="button" class="btn btn-success fw-bold btn-sm" (click)="openIemopBrowse()">
-                        <ng-icon name="tablerPlus" class="ps-0 pe-2 fw-bold"></ng-icon>Browse IEMOP
+                    <button type="button" class="btn btn-success fw-bold " (click)="openIemopBrowse()">
+                        <ng-icon name="tablerPlus" class="ps-0 pe-3 fw-bold"></ng-icon>Browse IEMOP
                     </button>
                 </div>
                 <div class="table-responsive">
@@ -159,7 +237,7 @@
                                     <td class="text-end">{{ (bill.ewtPurchases || 0) | number:'1.2-2' }}</td>
                                     <td class="text-center">
                                         <button type="button"
-                                                class="btn btn-light btn-icon btn-sm rounded-circle"
+                                                class="btn btn-light btn-icon  rounded-circle"
                                                 (click)="removeIemop(i)">
                                             <ng-icon name="tablerTrash" class="fs-lg"></ng-icon>
                                         </button>
@@ -186,7 +264,7 @@
                                    [value]="checker ? (checker.name || checker.fullName || '') : ''"
                                    readonly placeholder="Select checker..."/>
                             <button type="button" class="btn btn-success fw-bold" (click)="openSignatoryBrowse('checker')">
-                                <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
+                                <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
                             </button>
                             @if (checker) {
                                 <button type="button" class="btn btn-light fw-bold" (click)="clearSignatory('checker')">
@@ -202,7 +280,7 @@
                                    [value]="approvingOfficer ? (approvingOfficer.name || approvingOfficer.fullName || '') : ''"
                                    readonly placeholder="Select approving officer..."/>
                             <button type="button" class="btn btn-success fw-bold" (click)="openSignatoryBrowse('approvingOfficer')">
-                                <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
+                                <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
                             </button>
                             @if (approvingOfficer) {
                                 <button type="button" class="btn btn-light fw-bold" (click)="clearSignatory('approvingOfficer')">
@@ -217,8 +295,8 @@
                 <hr class="border-dashed mx-n3 mt-3"/>
                 <div class="d-flex align-items-center gap-3 mb-2">
                     <div class="fs-xs text-uppercase fw-semibold text-muted">Attachments</div>
-                    <button type="button" class="btn btn-success fw-bold btn-sm gap-1" (click)="openFilePicker()">
-                        <ng-icon name="tablerPaperclip" class="ps-0 pe-2 fw-bold fs-md"></ng-icon>Attach Files
+                    <button type="button" class="btn btn-success fw-bold  gap-1" (click)="openFilePicker()">
+                        <ng-icon name="tablerPaperclip" class="ps-0 pe-3 fw-bold fs-md"></ng-icon>Attach Files
                     </button>
                     <small class="text-muted">JPG, PNG, PDF only</small>
                 </div>

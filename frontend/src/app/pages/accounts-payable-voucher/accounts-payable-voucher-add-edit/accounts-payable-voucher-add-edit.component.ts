@@ -13,6 +13,7 @@ import { AccountsPayableVoucherService } from '../accounts-payable-voucher.servi
 import { ModalService } from '@/app/shared/modals/modal-service';
 import { BrowseEntityModalComponent } from '@/app/shared/modals/browse-entity-modal/browse-entity-modal.component';
 import { BrowseIemopBillingModalComponent } from '@/app/shared/modals/browse-iemop-billing-modal/browse-iemop-billing-modal.component';
+import { BrowseReceivingReportModalComponent } from '@/app/shared/modals/browse-receiving-report-modal/browse-receiving-report-modal.component';
 import { JournalEntriesFormComponent, JournalEntry } from '@/app/shared/forms/journal-entries-form/journal-entries-form.component';
 import { AttachmentFile, AttachmentsComponent } from '@/app/shared/components/attachments/attachments.component';
 import { provideIcons } from '@ng-icons/core';
@@ -68,6 +69,19 @@ export class AccountsPayableVoucherAddEditComponent {
     // Signatories
     checker: any          = null;
     approvingOfficer: any = null;
+
+    // Linked purchasing document
+    docType: 'rr' | 'pr' | 'joa' | null = null;
+    linkedRrs: any[] = [];
+    linkedDocument: any = null;
+    private autoFilled = false;
+
+    get docTypeLabel(): string {
+        return this.docType === 'pr'  ? 'Payment Request'
+             : this.docType === 'rr'  ? 'Receiving Report'
+             : this.docType === 'joa' ? 'JO Acceptance'
+             : '';
+    }
 
     // IEMOP Billings
     iemopBillings: any[] = [];
@@ -255,6 +269,16 @@ export class AccountsPayableVoucherAddEditComponent {
                     this.vendor         = data.vendor        || null;
                     this.checker        = data.checker       || null;
                     this.approvingOfficer = data.approvingOfficer || null;
+                    this.linkedRrs     = data.receivingReports || [];
+                    if (this.linkedRrs.length > 0) {
+                        this.docType = 'rr';
+                    } else if (data.linkedPr) {
+                        this.docType        = 'pr';
+                        this.linkedDocument = data.linkedPr;
+                    } else if (data.linkedJoa) {
+                        this.docType        = 'joa';
+                        this.linkedDocument = data.linkedJoa;
+                    }
                     this.iemopBillings = data.iemopBillings || [];
                     this.transId       = data.transId ?? null;
                     this.installmentDetails = (data.installmentDetails || []).map((d: any) => ({
@@ -322,6 +346,75 @@ export class AccountsPayableVoucherAddEditComponent {
 
     clearVendor(): void {
         this.vendor = null;
+        this.clearAutoFilled();
+    }
+
+    onDocTypeChange(): void {
+        this.linkedRrs = [];
+        this.linkedDocument = null;
+        this.clearAutoFilled();
+    }
+
+    private clearAutoFilled(): void {
+        if (this.autoFilled) {
+            this.vendor      = null;
+            this.invoiceDate = '';
+            this.particulars = '';
+            this.autoFilled  = false;
+        }
+    }
+
+    private autoFillFromDoc(doc: any): void {
+        if (!this.vendor && doc.slentityAccountNo) {
+            this.vendor     = { accountNo: doc.slentityAccountNo, name: doc.slentityName };
+            this.autoFilled = true;
+        }
+        if (!this.invoiceDate && doc.invoiceDate) {
+            this.invoiceDate = new Date(doc.invoiceDate).toISOString().substring(0, 10);
+            this.autoFilled  = true;
+        }
+        if (!this.particulars && doc.particulars) {
+            this.particulars = doc.particulars;
+            this.autoFilled  = true;
+        }
+        if (!this.paymentTerm && doc.paymentTerm) {
+            this.paymentTerm = doc.paymentTerm;
+            this.calculateDueDate();
+        }
+    }
+
+    async openDocumentBrowse(): Promise<void> {
+        if (!this.docType) return;
+        try {
+            const result = await this.modalService.openModal(
+                BrowseReceivingReportModalComponent,
+                { docType: this.docType },
+                { size: 'xl', centered: true });
+            if (result?.action === 'select' && result?.data) {
+                const doc = result.data;
+                if (this.docType === 'rr') {
+                    if (this.linkedRrs.some(r => r.id === doc.id)) {
+                        this.alertService.warning(this.module, 'Already Added', 'This RR is already linked.');
+                        return;
+                    }
+                    this.linkedRrs.push(doc);
+                    if (this.linkedRrs.length === 1) this.autoFillFromDoc(doc);
+                } else {
+                    this.linkedDocument = doc;
+                    this.autoFillFromDoc(doc);
+                }
+            }
+        } catch { }
+    }
+
+    removeRr(index: number): void {
+        this.linkedRrs.splice(index, 1);
+        if (this.linkedRrs.length === 0) this.clearAutoFilled();
+    }
+
+    clearLinkedDocument(): void {
+        this.linkedDocument = null;
+        this.clearAutoFilled();
     }
 
     async openIemopBrowse(): Promise<void> {
@@ -475,6 +568,10 @@ export class AccountsPayableVoucherAddEditComponent {
             vendor:           { accountNo: this.vendor.accountNo },
             checker:          { accountNo: this.checker.accountNo },
             approvingOfficer: { accountNo: this.approvingOfficer.accountNo },
+            paymentRequestId: this.docType === 'pr'  ? (this.linkedDocument?.id ?? 0) : 0,
+            receivingReportId: 0,
+            joAcceptanceId:   this.docType === 'joa' ? (this.linkedDocument?.id ?? 0) : 0,
+            receivingReports: this.docType === 'rr'  ? this.linkedRrs.map(r => ({ id: r.id })) : [],
             iemopBillings:    this.iemopBillings.map(b => ({ id: b.id })),
             generalLedgerLines: lines.map(e => ({
                 code:        e.account?.accountCode  || '',

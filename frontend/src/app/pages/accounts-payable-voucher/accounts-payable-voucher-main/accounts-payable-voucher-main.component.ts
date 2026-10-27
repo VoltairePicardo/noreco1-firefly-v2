@@ -12,6 +12,7 @@ import { FlatpickrDirective, provideFlatpickrDefaults } from 'angularx-flatpickr
 import { monthStart, monthEnd } from '@/app/shared/utils/date.utils';
 import { provideIcons } from '@ng-icons/core';
 import { tablerSearch, tablerRefresh, tablerPlus, tablerEye, tablerEdit, tablerThumbUp, tablerChevronLeft, tablerChevronRight } from '@ng-icons/tabler-icons';
+import Swal from 'sweetalert2';
 
 @Component({
     selector: 'app-accounts-payable-voucher-main',
@@ -109,21 +110,33 @@ export class AccountsPayableVoucherMainComponent {
             this.alertService.warning(this.module, 'Approve All', 'Please select at least one record.');
             return;
         }
-        this.processingAll = true;
-        this.service.approveAll(ids).subscribe({
-            next: (res) => {
-                this.processingAll = false;
-                if (res?.success) {
-                    this.alertService.success(this.module, 'Approved', '');
-                    this.load();
-                } else {
-                    this.alertService.postError(this.module, 'Approve All', res);
+        Swal.fire({
+            title: 'Approve All',
+            text: `Approving ${ids.length} document(s).`,
+            input: 'text',
+            inputLabel: 'Remarks (optional)',
+            inputPlaceholder: 'Enter remarks...',
+            showCancelButton: true,
+            confirmButtonText: 'Approve',
+            confirmButtonColor: '#0d6efd'
+        }).then(result => {
+            if (!result.isConfirmed) return;
+            this.processingAll = true;
+            this.service.approveAll(ids, result.value || '').subscribe({
+                next: (res) => {
+                    this.processingAll = false;
+                    if (res?.success) {
+                        this.alertService.success(this.module, 'Approved', '');
+                        this.load();
+                    } else {
+                        this.alertService.postError(this.module, 'Approve All', res);
+                    }
+                },
+                error: (err) => {
+                    this.processingAll = false;
+                    this.alertService.httpError(this.module, 'Approve All', err);
                 }
-            },
-            error: (err) => {
-                this.processingAll = false;
-                this.alertService.httpError(this.module, 'Approve All', err);
-            }
+            });
         });
     }
 }

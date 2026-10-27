@@ -189,6 +189,7 @@ export class EnergySalesAddEditComponent {
             voucherDate: this.voucherDate,
             particulars: this.particulars,
             amount:      this.totalDebit,
+            tempBatchId: this.tempBatch ? this.tempBatch.tempBatchId : 0,
             generalLedgerLines: this.journalEntries
                 .filter(e => e.account?.id)
                 .map(e => ({

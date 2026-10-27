@@ -132,6 +132,14 @@ export class DisbursementService {
         return this.http.get<any[]>(`${BASE_API}/json/document-logs/${transId}`);
     }
 
+    assignBudget(payload: { transactionId: number; budgetDetailId?: number | null; budgetLineItemDetailId?: number | null }): Observable<any> {
+        return this.http.post(`${BASE_API}/disbursement/assign-budget`, payload, httpOptions);
+    }
+
+    getBudgetLineItems(): Observable<any[]> {
+        return this.http.get<any[]>(`${BASE_API}/json/budget-line-items`);
+    }
+
     approveAll(ids: number[]): Observable<any> {
         const payloads = ids.map(id => ({ documentId: id, remarks: '', documentType: 'CV' }));
         return this.http.post<any>(`${BASE_API}/approve-vouchers/process-all`, payloads, httpOptions);

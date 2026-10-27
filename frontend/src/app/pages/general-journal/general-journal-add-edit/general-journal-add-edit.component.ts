@@ -1,4 +1,5 @@
 import { Component, inject, signal, ViewChild, ElementRef } from '@angular/core';
+import Swal from 'sweetalert2';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AlertService } from '@/app/shared/services/alert.service';
 import {
@@ -52,6 +53,7 @@ interface SourceDocument {
     voucherDate?: string;
     particulars?: string;
     remarks?: string;
+    extensionUrl?: string;
 }
 
 interface SignatoryRef {
@@ -141,6 +143,7 @@ export class GeneralJournalAddEditComponent {
 
     selectedDocument: SourceDocument | null = null;
     selectedIsCal: boolean      = false;
+    selectedIsRr: boolean       = false;
     loadingDocEntries           = false;
 
     stagedFiles  : File[] = [];
@@ -229,6 +232,9 @@ export class GeneralJournalAddEditComponent {
                     if (data.cashAdvanceLiquidation) {
                         this.selectedDocument = data.cashAdvanceLiquidation;
                         this.selectedIsCal    = true;
+                    } else if (data.document) {
+                        this.selectedDocument = data.document;
+                        this.selectedIsRr     = data.document.extensionUrl === 'receiving-report';
                     }
                     this.signatories = {
                         checker:              data.checker              || data.checkedBy         || null,
@@ -374,10 +380,14 @@ export class GeneralJournalAddEditComponent {
             if (result?.action === 'select' && result?.data) {
                 this.selectedDocument = result.data;
                 this.selectedIsCal    = result.documentType === 'CAL';
+                this.selectedIsRr     = result.documentType === 'RR';
 
                 if (this.selectedIsCal) {
                     this.explanation = result.data.remarks || this.explanation;
-                } else if (result.data.transactionId) {
+                } else {
+                    this.explanation = result.data.particulars || this.explanation;
+                }
+                if (!this.selectedIsCal && result.data.transactionId) {
                     this.loadingDocEntries = true;
                     this.service.getAccountSettingEntries(result.data.transactionId).subscribe({
                         next: (entries) => {
@@ -398,6 +408,7 @@ export class GeneralJournalAddEditComponent {
     clearSelectedDocument(): void {
         this.selectedDocument = null;
         this.selectedIsCal    = false;
+        this.selectedIsRr     = false;
     }
 
     async openEntityBrowse(key: string): Promise<void> {
@@ -450,6 +461,26 @@ export class GeneralJournalAddEditComponent {
             return;
         }
 
+        if (this.selectedIsRr && !this.payable) {
+            Swal.fire({
+                title: 'Payable is not checked',
+                text: 'RR Amount is greater than Advance Payment or CA Liquidation amount. Do you want to continue?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Confirm',
+                cancelButtonText: 'Cancel'
+            }).then(result => {
+                if (result.isConfirmed) {
+                    this.submitSave();
+                }
+            });
+            return;
+        }
+
+        this.submitSave();
+    }
+
+    private submitSave(): void {
         this.formSubmit = true;
 
         const sigRef = (key: string): SignatoryRef | null => this.signatories[key]?.accountNo

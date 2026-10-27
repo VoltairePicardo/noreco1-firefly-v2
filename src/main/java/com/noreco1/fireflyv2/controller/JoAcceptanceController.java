@@ -3,6 +3,7 @@ package com.noreco1.fireflyv2.controller;
 import com.noreco1.fireflyv2.common.GlobalConstant;
 import com.noreco1.fireflyv2.common.helpers.Checker;
 import com.noreco1.fireflyv2.common.facade.FileFacadeImpl;
+import com.noreco1.fireflyv2.controller.response.ApvPurchasingDocumentDto;
 import com.noreco1.fireflyv2.controller.response.CvVoucherDto;
 import com.noreco1.fireflyv2.controller.response.JoAcceptanceDetailDto;
 import com.noreco1.fireflyv2.controller.response.JoAcceptanceDto;
@@ -110,6 +111,14 @@ public class JoAcceptanceController {
     @GetMapping("/{id}")
     public JoAcceptanceDto getById(@PathVariable Integer id) {
         return joAcceptanceService.findById(id);
+    }
+
+    @GetMapping("/apv-approved-paged")
+    public Page<ApvPurchasingDocumentDto> apvApprovedPaged(
+            @RequestParam(value = "q", required = false, defaultValue = "") String q,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size) {
+        return joAcceptanceService.findAllApprovedForApvPaged(q.isEmpty() ? null : q, PageRequest.of(page, size));
     }
 
     @GetMapping("/approved-for-cv-paged")

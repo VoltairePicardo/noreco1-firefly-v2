@@ -1,4 +1,5 @@
 import { Component, inject, signal, ViewChild, ElementRef } from '@angular/core';
+import Swal from 'sweetalert2';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AlertService } from '@/app/shared/services/alert.service';
 import {
@@ -81,6 +82,7 @@ export class DisbursementAddEditComponent {
 
     voucherDate          = new Date().toISOString().substring(0, 10);
     particulars          = '';
+    remarks              = '';
     additionalPayeeInfo  = '';
     checkAmount: number | null = null;
 
@@ -93,6 +95,7 @@ export class DisbursementAddEditComponent {
 
     purchaseOrder: any = null;
     jobOrder: any = null;
+    budgetLineItemDetail: any = null;
 
     readonly voucherTypeLabels = VOUCHER_TYPE_LABELS;
     selectedVoucherType: CvSourceVoucherType | null = null;
@@ -174,13 +177,15 @@ export class DisbursementAddEditComponent {
                     this.transId             = data.transId ?? data.transaction?.id ?? null;
                     this.voucherDate         = data.voucherDate         ? new Date(data.voucherDate).toISOString().substring(0, 10) : '';
                     this.particulars         = data.particulars         || '';
+                    this.remarks             = data.remarks             || '';
                     this.additionalPayeeInfo = data.additionalPayeeInfo || '';
                     this.checkAmount         = data.checkAmount         ?? null;
                     this.payee               = data.payee               || null;
                     this.selectedBank        = data.bank                || null;
-                    this.purchaseOrder       = data.purchaseOrder       || null;
-                    this.jobOrder            = data.jobOrder            || null;
-                    this.cashAdvances        = data.cashAdvances        || [];
+                    this.purchaseOrder        = data.purchaseOrder        || null;
+                    this.jobOrder             = data.jobOrder             || null;
+                    this.budgetLineItemDetail = data.budgetLineItemDetail  || null;
+                    this.cashAdvances         = data.cashAdvances          || [];
 
                     if (data.accountsPayableVoucher?.id) {
                         this.selectedVoucherType   = 'APV';
@@ -194,6 +199,9 @@ export class DisbursementAddEditComponent {
                     } else if (data.joAcceptance?.id) {
                         this.selectedVoucherType   = 'JOA';
                         this.selectedSourceVoucher = data.joAcceptance;
+                    } else if (data.rfpDto?.id) {
+                        this.selectedVoucherType   = 'RFP';
+                        this.selectedSourceVoucher = data.rfpDto;
                     }
 
                     this.journalEntries = (data.generalLedgerLines || []).map((line: any) => {
@@ -393,7 +401,18 @@ export class DisbursementAddEditComponent {
         });
     }
 
-    clearSourceVoucher(): void {
+    async clearSourceVoucher(): Promise<void> {
+        if (this.editMode) {
+            const result = await Swal.fire({
+                title: 'Remove linked document?',
+                text: 'This will unlink the source document from this voucher.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, remove',
+                cancelButtonText: 'Cancel'
+            });
+            if (!result.isConfirmed) return;
+        }
         this.selectedVoucherType    = null;
         this.selectedSourceVoucher  = null;
         this.selectedInstallmentIds = [];
@@ -706,6 +725,7 @@ export class DisbursementAddEditComponent {
             checkAmount:         this.checkAmount        ?? null,
             amount:              this.totalDebit,
             particulars:         this.particulars         || null,
+            remarks:             this.remarks             || null,
             additionalPayeeInfo: this.additionalPayeeInfo || null,
             payee:               { accountNo: this.payee.accountNo },
             bank:                this.selectedBank ? { id: this.selectedBank.id } : null,
@@ -749,6 +769,7 @@ export class DisbursementAddEditComponent {
                 ? { id: this.selectedSourceVoucher.id } : null,
             joAcceptance: this.selectedVoucherType === 'JOA' && this.selectedSourceVoucher
                 ? { id: this.selectedSourceVoucher.id } : null,
+            budgetLineItemDetail: this.budgetLineItemDetail ? { id: this.budgetLineItemDetail.id } : null,
             cashAdvances: this.cashAdvances.map(ca => ({ id: ca.id })),
             selectedInstallmentDetails: this.selectedInstallmentIds.map(id => ({ id })),
             iemopBillings: this.iemopBillings.map(b => ({ id: b.id }))

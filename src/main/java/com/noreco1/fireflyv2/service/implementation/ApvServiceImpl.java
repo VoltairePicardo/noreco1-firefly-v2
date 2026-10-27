@@ -432,6 +432,36 @@ public class ApvServiceImpl implements ApvService, PrintableVoucher {
                 apvDto.setInstallmentDetails(installmentDetails);
             }
 
+            // PR link
+            List<Object[]> prRows = paymentRequestRepo.findByApvId(accountsPayableVoucher.getId(), com.noreco1.fireflyv2.model.enums.DocumentType.PR.getId());
+            if (!Checker.collectionIsEmpty(prRows)) {
+                Object[] row = prRows.get(0);
+                Map prMap = new HashMap();
+                prMap.put("id",              row[0]);
+                prMap.put("localCode",       row[1]);
+                prMap.put("netAmount",       row[2]);
+                prMap.put("particulars",     row[3]);
+                prMap.put("voucherDate",     row[4]);
+                prMap.put("preparedBy",      row[5]);
+                prMap.put("slentityName",    row[6]);
+                apvDto.setLinkedPr(prMap);
+            }
+
+            // JOA link
+            List<Object[]> joaRows = joAcceptanceRepo.findByApvId(accountsPayableVoucher.getId(), com.noreco1.fireflyv2.model.enums.DocumentType.JOA.getId());
+            if (!Checker.collectionIsEmpty(joaRows)) {
+                Object[] row = joaRows.get(0);
+                Map joaMap = new HashMap();
+                joaMap.put("id",              row[0]);
+                joaMap.put("localCode",       row[1]);
+                joaMap.put("netAmount",       row[2]);
+                joaMap.put("particulars",     row[3]);
+                joaMap.put("voucherDate",     row[4]);
+                joaMap.put("preparedBy",      row[5]);
+                joaMap.put("slentityName",    row[6]);
+                apvDto.setLinkedJoa(joaMap);
+            }
+
             List<AccountsPayableVoucherLink> apvLinks = apvLinkRepo.findByAccountsPayableVoucherIdAndDocumentTypeId(accountsPayableVoucher.getId(), com.noreco1.fireflyv2.model.enums.DocumentType.RR.getId());
             List<Map> receivingReports = new ArrayList<>();
             if(!apvLinks.isEmpty()){

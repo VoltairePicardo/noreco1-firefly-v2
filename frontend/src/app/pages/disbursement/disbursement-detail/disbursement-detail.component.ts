@@ -4,18 +4,22 @@ import { AlertService } from '@/app/shared/services/alert.service';
 import Swal from 'sweetalert2';
 import { COMMON_ALL_PAGE_IMPORTS, COMMON_MAIN_PAGE_IMPORTS, SHARED_PROVIDERS } from '@/app/shared/providers/shared-providers';
 import { DisbursementService } from '../disbursement.service';
+import { ModalService } from '@/app/shared/modals/modal-service';
+import { BrowseBudgetLineItemModalComponent } from '@/app/shared/modals/browse-budget-line-item-modal/browse-budget-line-item-modal.component';
+import { DocumentLogsComponent } from '@/app/shared/components/document-logs/document-logs.component';
+import { AttachmentsComponent } from '@/app/shared/components/attachments/attachments.component';
 import { provideIcons } from '@ng-icons/core';
 import {
     tablerArrowLeft, tablerPrinter, tablerEdit, tablerCheck, tablerEye, tablerEyeOff,
-    tablerChevronDown, tablerChevronRight, tablerFile
+    tablerChevronDown, tablerChevronRight, tablerFile, tablerSearch, tablerX
 } from '@ng-icons/tabler-icons';
 
 @Component({
     selector: 'app-disbursement-detail',
-    imports: [...COMMON_ALL_PAGE_IMPORTS, ...COMMON_MAIN_PAGE_IMPORTS],
+    imports: [...COMMON_ALL_PAGE_IMPORTS, ...COMMON_MAIN_PAGE_IMPORTS, DocumentLogsComponent, AttachmentsComponent],
     providers: [...SHARED_PROVIDERS, provideIcons({
         tablerArrowLeft, tablerPrinter, tablerEdit, tablerCheck, tablerEye, tablerEyeOff,
-        tablerChevronDown, tablerChevronRight, tablerFile
+        tablerChevronDown, tablerChevronRight, tablerFile, tablerSearch, tablerX
     })],
     templateUrl: './disbursement-detail.component.html'
 })
@@ -37,11 +41,16 @@ export class DisbursementDetailComponent {
     selectedAction: any    = null;
     remarks = '';
 
-    logs        : any[] = [];
-    showLogs    = false;
-    logsLoading = false;
+    showLogs = false;
+
+    // Budget assignment (forAddingBudgetDetail workflow step)
+    budgetLineItems     : any[] = [];
+    budgetLineItemsLoaded = false;
+    selectedBudgetLineItem: any = null;
+    savingBudget = false;
 
     private service      = inject(DisbursementService);
+    private modalService = inject(ModalService);
     private route        = inject(ActivatedRoute);
     private router       = inject(Router);
     private alertService = inject(AlertService);
@@ -66,8 +75,15 @@ export class DisbursementDetailComponent {
                     this.journalEntries = data.generalLedgerLines || [];
                     this.iemopBillings  = data.iemopBillings  || [];
                     this.expandedSl.clear();
+                    this.selectedBudgetLineItem = null;
                     this.loadWorkflowActions();
                     this.loadAttachments();
+                    if (data.forAddingBudgetDetail && !this.budgetLineItemsLoaded) {
+                        this.service.getBudgetLineItems().subscribe({
+                            next: (items) => { this.budgetLineItems = items || []; this.budgetLineItemsLoaded = true; },
+                            error: () => {}
+                        });
+                    }
                 } else {
                     this.alertService.error(this.module, 'Not Found', '');
                     this.router.navigate(['/' + this.menuLink]);
@@ -104,9 +120,7 @@ export class DisbursementDetailComponent {
             next: (res) => {
                 if (res.success) {
                     this.alertService.success(this.module, 'Processed', '');
-                    this.logs = [];
                     this.loadData();
-                    if (this.showLogs) this.loadLogs();
                 } else {
                     this.processingWorkflow = false;
                     this.alertService.error(this.module, 'Process', res.failureMessage || '');
@@ -177,23 +191,60 @@ export class DisbursementDetailComponent {
         });
     }
 
-    fileUrl(fileId: number): string {
-        return this.service.fileUrl(fileId);
-    }
+    fileUrl = (fileId: number): string => this.service.fileUrl(fileId);
 
     toggleLogs(): void {
         this.showLogs = !this.showLogs;
-        if (this.showLogs && this.logs.length === 0 && !this.logsLoading) {
-            this.loadLogs();
-        }
     }
 
-    loadLogs(): void {
-        if (!this.data?.transId || this.logsLoading) return;
-        this.logsLoading = true;
-        this.service.getDocumentLogs(this.data.transId).subscribe({
-            next: (logs) => { this.logs = logs || []; this.logsLoading = false; },
-            error: () => { this.logsLoading = false; }
+    async openBudgetLineItemBrowse(): Promise<void> {
+        if (!this.budgetLineItemsLoaded) {
+            this.service.getBudgetLineItems().subscribe({
+                next: (items) => {
+                    this.budgetLineItems = items || [];
+                    this.budgetLineItemsLoaded = true;
+                    this.openBudgetLineItemBrowse();
+                },
+                error: () => {}
+            });
+            return;
+        }
+        try {
+            const result = await this.modalService.openModal(
+                BrowseBudgetLineItemModalComponent,
+                { items: this.budgetLineItems },
+                { size: 'lg', centered: true }
+            );
+            if (result?.action === 'select' && result?.data) {
+                this.selectedBudgetLineItem = result.data;
+            }
+        } catch { }
+    }
+
+    saveBudgetAssignment(): void {
+        if (!this.selectedBudgetLineItem && !this.data?.budgetDetail?.id) {
+            this.alertService.warning(this.module, 'Validation', 'Please select a Budget Line Item.');
+            return;
+        }
+        this.savingBudget = true;
+        this.service.assignBudget({
+            transactionId:          this.data.transId,
+            budgetLineItemDetailId: this.selectedBudgetLineItem?.id ?? null,
+            budgetDetailId:         this.data.budgetDetail?.id ?? null
+        }).subscribe({
+            next: (res) => {
+                this.savingBudget = false;
+                if (res?.success) {
+                    this.alertService.success(this.module, 'Budget assigned.', '');
+                    this.loadData();
+                } else {
+                    this.alertService.error(this.module, 'Save failed.', res?.failureMessage || '');
+                }
+            },
+            error: () => {
+                this.savingBudget = false;
+                this.alertService.error(this.module, 'An error occurred.', '');
+            }
         });
     }
 
