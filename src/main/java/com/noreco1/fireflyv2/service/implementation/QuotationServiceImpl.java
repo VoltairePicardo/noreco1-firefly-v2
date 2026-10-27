@@ -742,7 +742,6 @@ public class QuotationServiceImpl implements QuotationService, PrintableVoucher 
     }
 
     @Override
-    @Transactional
     public PostResponse process(ProcessDocumentDto postData, BindingResult bindingResult, MessageSource messageSource) {
         PostResponse response = new PostResponse();
 
@@ -806,13 +805,11 @@ public class QuotationServiceImpl implements QuotationService, PrintableVoucher 
             Map newMap = this.forLogMapMain(quotation);
             newMap.put("remarks", postData.getRemarks());
 
-            if (quotation != null) {
-                documentProcessingFacade.processAction(quotation.getTransaction(), actionMap, null, processedBy);
-                documentLoggerFacade.log(quotation.getTransaction(), authenticationFacade.getLoggedIn(), oldMap, newMap);
+            documentProcessingFacade.processAction(quotation.getTransaction(), actionMap, null, processedBy);
+            documentLoggerFacade.log(quotation.getTransaction(), authenticationFacade.getLoggedIn(), oldMap, newMap);
 
-                response.setSuccessMessage("Document successfully processed");
-                response.setSuccess(true);
-            }
+            response.setSuccessMessage("Document successfully processed");
+            response.setSuccess(true);
 
         }
         return response;
@@ -854,7 +851,7 @@ public class QuotationServiceImpl implements QuotationService, PrintableVoucher 
             Boolean insertMode = quotation.getId() == null || quotation.getId() == 0;
             if (insertMode) { // insert mode
                 Object latestCanvassCode = quotationRepo.findLatestQuotationCodeByYear(quotationYear);
-                quotation.setCode(generatorFacade.voucherCodeNoOffice("SOQ", (latestCanvassCode == null ? "" : String.valueOf(latestCanvassCode)), quotation.getDate(), GlobalConstant.COUNTER_PAD_4));
+                quotation.setCode(generatorFacade.voucherCodeNoOffice("AOQ", (latestCanvassCode == null ? "" : String.valueOf(latestCanvassCode)), quotation.getDate(), GlobalConstant.COUNTER_PAD_4));
 
                 DocumentStatus documentStatus = new DocumentStatus();
                 documentStatus.setId(com.noreco1.fireflyv2.model.enums.DocumentStatus.DOCUMENT_CREATED.getId());
@@ -1048,7 +1045,7 @@ public class QuotationServiceImpl implements QuotationService, PrintableVoucher 
 
         if(quotation != null) {
 
-            params.put("REPORT_TITLE", "SUMMARY OF QUOTATIONS");
+            params.put("REPORT_TITLE", "ABSTRACT OF QUOTATIONS");
 
             // Compile awards subreport at runtime to avoid .jasper version mismatch
             try {

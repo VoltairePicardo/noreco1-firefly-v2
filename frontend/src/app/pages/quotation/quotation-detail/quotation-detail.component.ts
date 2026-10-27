@@ -6,6 +6,9 @@ import { SharedModule } from '@/app/shared/shared.module';
 import { provideIcons } from '@ng-icons/core';
 import { tablerArrowLeft, tablerPrinter, tablerEdit, tablerCheck, tablerEye, tablerEyeOff, tablerAlertTriangle } from '@ng-icons/tabler-icons';
 import { QuotationService } from '../quotation.service';
+import { documentStatusBadgeClass } from '@/app/shared/workflow/document-status-badge.util';
+import { isDocumentEditable } from '@/app/shared/workflow/document-editability.util';
+import { DocumentLogsComponent } from '@/app/shared/components/document-logs/document-logs.component';
 import { forkJoin } from 'rxjs';
 
 const TERMINAL_STATUSES = ['Approved', 'Denied', 'Cancelled'];
@@ -15,15 +18,18 @@ const TERMINAL_STATUSES = ['Approved', 'Denied', 'Cancelled'];
     imports: [
         ...COMMON_ALL_PAGE_IMPORTS,
         ...COMMON_MAIN_PAGE_IMPORTS,
-        SharedModule
+        SharedModule,
+        DocumentLogsComponent
     ],
     providers: [...SHARED_PROVIDERS, provideIcons({ tablerArrowLeft, tablerPrinter, tablerEdit, tablerCheck, tablerEye, tablerEyeOff, tablerAlertTriangle })],
     templateUrl: './quotation-detail.component.html'
 })
 export class QuotationDetailComponent {
-    module    = 'Quotation';
+    module    = 'Abstract of Quotation';
     subModule = 'Detail';
     menuLink  = 'quotation';
+    readonly statusBadgeClass = documentStatusBadgeClass;
+    readonly isEditable = isDocumentEditable;
     id: any   = 0;
 
     data: any        = {};
@@ -35,9 +41,7 @@ export class QuotationDetailComponent {
     remarks            = '';
     processingWorkflow = false;
 
-    logs:       any[] = [];
-    showLogs    = false;
-    logsLoading = false;
+    showLogs = false;
 
     readonly supplierSlots = [0, 1, 2];
 
@@ -68,7 +72,6 @@ export class QuotationDetailComponent {
                 if (header?.id) {
                     this.data      = header;
                     this.lineItems = details || [];
-                    this.logs      = [];
                     this.showLogs  = false;
                     this.loadWorkflowActions();
                 } else {
@@ -100,10 +103,6 @@ export class QuotationDetailComponent {
         return TERMINAL_STATUSES.includes(this.data?.documentStatus || '');
     }
 
-    isEditable(): boolean {
-        const s = this.data?.documentStatus || '';
-        return s === 'Document Created' || s === 'For Revision';
-    }
 
     processWorkflow(): void {
         if (!this.selectedAction) return;
@@ -137,34 +136,6 @@ export class QuotationDetailComponent {
 
     toggleLogs(): void {
         this.showLogs = !this.showLogs;
-        if (this.showLogs && this.logs.length === 0) {
-            this.logsLoading = true;
-            this.service.getDocumentLogs(this.data.transId).subscribe({
-                next: (logs) => {
-                    this.logs = (logs || []).map((log: any) => ({
-                        ...log,
-                        parsed: this.parseLog(log)
-                    }));
-                    this.logsLoading = false;
-                },
-                error: () => { this.logsLoading = false; }
-            });
-        }
-    }
-
-    parseLog(log: any): any {
-        try {
-            const raw = log.newValue || log.oldValue;
-            if (!raw) return null;
-            return JSON.parse(raw);
-        } catch { return null; }
-    }
-
-    logSupplierNames(parsed: any): string[] {
-        const items: any[] = parsed?.quotationItems || [];
-        if (!items.length) return [];
-        const details: any[] = items[0]?.details || [];
-        return details.map((d: any) => d?.supplier?.name || '').filter((n: string) => n);
     }
 
     print(): void {
@@ -203,7 +174,7 @@ export class QuotationDetailComponent {
                     total += amount;
                     items.push({
                         no:          idx + 1,
-                        description: item.itemDescription || '—',
+                        description: (item.isChildItem ? item.newItemDescription : item.itemDescription) || '—',
                         unitCode:    item.unitCode || '—',
                         quantity:    Number(item.quantity || 0),
                         price:       Number(detail.price || 0),
