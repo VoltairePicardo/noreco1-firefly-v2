@@ -1,7 +1,3 @@
-/**
- * Maps a document status label to a bootstrap "-subtle" badge variant
- * (mirrors the legacy documentStatusUtil.classType() color coding).
- */
 export function documentStatusBadgeVariant(status: string | null | undefined): string {
     const normalized = (status ?? '').toLowerCase();
 

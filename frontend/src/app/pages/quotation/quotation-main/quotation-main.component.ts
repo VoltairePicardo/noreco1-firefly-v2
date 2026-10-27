@@ -3,6 +3,8 @@ import { Router } from '@angular/router';
 import { COMMON_ALL_PAGE_IMPORTS, COMMON_MAIN_PAGE_IMPORTS, SHARED_PROVIDERS } from '@/app/shared/providers/shared-providers';
 import { AlertService } from '@/app/shared/services/alert.service';
 import { QuotationService } from '../quotation.service';
+import { documentStatusBadgeClass } from '@/app/shared/workflow/document-status-badge.util';
+import { isDocumentEditable } from '@/app/shared/workflow/document-editability.util';
 import { FlatpickrDirective, provideFlatpickrDefaults } from 'angularx-flatpickr';
 import { provideIcons } from '@ng-icons/core';
 import { tablerSearch, tablerRefresh, tablerPlus, tablerEye, tablerEdit, tablerChevronLeft, tablerChevronRight } from '@ng-icons/tabler-icons';
@@ -14,8 +16,10 @@ import { tablerSearch, tablerRefresh, tablerPlus, tablerEye, tablerEdit, tablerC
     templateUrl: './quotation-main.component.html'
 })
 export class QuotationMainComponent {
-    module   = 'Quotation';
+    module   = 'Abstract of Quotation';
     menuLink = 'quotation';
+    readonly statusBadgeClass = documentStatusBadgeClass;
+    readonly isEditable = isDocumentEditable;
 
     flatpickrOptionsFrom: any = { dateFormat: 'Y-m-d', altInput: true, altFormat: 'F j, Y' };
     flatpickrOptionsTo:   any = { dateFormat: 'Y-m-d', altInput: true, altFormat: 'F j, Y' };
@@ -81,6 +85,7 @@ export class QuotationMainComponent {
             error: () => { this.alertService.error(this.module, 'Load', ''); this.isLoading.set(false); }
         });
     }
+
 
     reset(): void {
         const now     = new Date();

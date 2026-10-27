@@ -32,7 +32,7 @@ import { forkJoin } from 'rxjs';
     templateUrl: './quotation-add-edit.component.html'
 })
 export class QuotationAddEditComponent {
-    module    = 'Quotation';
+    module    = 'Abstract of Quotation';
     menuLink  = 'quotation';
     id: any   = 0;
     editMode  = false;

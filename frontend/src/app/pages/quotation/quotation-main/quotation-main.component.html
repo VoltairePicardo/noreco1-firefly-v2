@@ -77,7 +77,7 @@
                                 <td>{{ item.requisitionVoucherCode || '—' }}</td>
                                 <td>{{ item.preparedBy || '—' }}</td>
                                 <td>
-                                    <span class="badge bg-secondary bg-opacity-25 text-dark border">{{ item.documentStatus || '—' }}</span>
+                                    <span [class]="statusBadgeClass(item.documentStatus)">{{ item.documentStatus || '—' }}</span>
                                 </td>
                                 <td class="text-nowrap">
                                     <div class="d-flex justify-content-end gap-1">
@@ -86,11 +86,13 @@
                                            class="btn btn-light btn-icon btn-sm rounded-circle">
                                             <ng-icon name="tablerEye" class="fs-lg"></ng-icon>
                                         </a>
-                                        <a href="javascript:void(0)" ngbTooltip="Edit"
-                                           [routerLink]="['/' + menuLink, item.id, 'edit']"
-                                           class="btn btn-light btn-icon btn-sm rounded-circle">
-                                            <ng-icon name="tablerEdit" class="fs-lg"></ng-icon>
-                                        </a>
+                                        @if (isEditable(item)) {
+                                            <a href="javascript:void(0)" ngbTooltip="Edit"
+                                               [routerLink]="['/' + menuLink, item.id, 'edit']"
+                                               class="btn btn-light btn-icon btn-sm rounded-circle">
+                                                <ng-icon name="tablerEdit" class="fs-lg"></ng-icon>
+                                            </a>
+                                        }
                                     </div>
                                 </td>
                             </tr>
