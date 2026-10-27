@@ -9,6 +9,7 @@ import {
 import { DocumentLogsComponent } from '@/app/shared/components/document-logs/document-logs.component';
 import { AttachmentsComponent } from '@/app/shared/components/attachments/attachments.component';
 import { AccountsPayableVoucherService } from '../accounts-payable-voucher.service';
+import { documentStatusBadgeClass } from '@/app/shared/workflow/document-status-badge.util';
 import { provideIcons } from '@ng-icons/core';
 import { tablerCheck, tablerEdit, tablerEye, tablerEyeOff, tablerPrinter, tablerArrowLeft } from '@ng-icons/tabler-icons';
 
@@ -24,6 +25,8 @@ import { tablerCheck, tablerEdit, tablerEye, tablerEyeOff, tablerPrinter, tabler
     templateUrl: './accounts-payable-voucher-detail.component.html'
 })
 export class AccountsPayableVoucherDetailComponent {
+    readonly statusBadgeClass = documentStatusBadgeClass;
+
     module   = 'Accounts Payable Voucher';
     menuLink = 'accounts-payable-voucher';
 

@@ -8,6 +8,8 @@ const BASE_API = environment.get('baseApiUrl');
 const BASE_URL = environment.get('baseUrl');
 const httpOptions = { headers: new HttpHeaders({ 'Content-Type': 'application/json' }) };
 
+export type ApvDocumentType = 'PR' | 'RR' | 'JOA';
+
 @Injectable({ providedIn: 'root' })
 export class AccountsPayableVoucherService {
     private http            = inject(HttpClient);
@@ -78,12 +80,32 @@ export class AccountsPayableVoucherService {
         return this.http.get<any>(`${BASE_API}/json/entities`, { params });
     }
 
-    searchRvs(q: string = '', page: number = 0, size: number = 10): Observable<any> {
-        const params = new HttpParams()
+    searchPurchasingDocuments(type: ApvDocumentType, q: string = '', page: number = 0, size: number = 10, supplierAccountNo?: number | null): Observable<any> {
+        let params = new HttpParams()
             .set('q', q)
             .set('page', page)
             .set('size', size);
-        return this.http.get<any>(`${BASE_API}/apv/rr-approved-paged`, { params });
+        if (type === 'RR') {
+            params = params.set('s', supplierAccountNo as number);
+        }
+        const path = type === 'PR' ? 'pr-approved-paged' : type === 'JOA' ? 'joa-approved-paged' : 'rr-approved-with-account-setting-paged';
+        return this.http.get<any>(`${BASE_API}/apv/${path}`, { params });
+    }
+
+    getLinkedPaymentRequest(apvId: number): Observable<any> {
+        return this.http.get<any>(`${BASE_API}/apv/${apvId}/payment-request`);
+    }
+
+    getLinkedJoAcceptance(apvId: number): Observable<any> {
+        return this.http.get<any>(`${BASE_API}/apv/${apvId}/jo-acceptance`);
+    }
+
+    getReceivingReport(id: number): Observable<any> {
+        return this.http.get<any>(`${BASE_API}/rr/${id}`);
+    }
+
+    getSupplierAccount(): Observable<any> {
+        return this.http.get<any>(`${BASE_API}/accounting/accounts/supplier-account`);
     }
 
     getWorkflowActions(transId: number): Observable<any[]> {

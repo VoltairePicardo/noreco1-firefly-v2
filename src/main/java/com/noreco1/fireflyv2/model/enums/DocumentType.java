@@ -62,8 +62,8 @@ public enum DocumentType {
     ITEM(513, "ITEM", "Item", "INVENTORY", false);
 
     private int id;
-    private String description;
     private String code;
+    private String description;
     private String module;
     private boolean isCancellable;
 
