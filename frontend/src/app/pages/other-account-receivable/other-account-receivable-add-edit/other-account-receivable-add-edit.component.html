@@ -1,8 +1,6 @@
 <div class="container-fluid">
     <app-page-title [title]="module" [subTitle]="subModule" [menuLink]="menuLink"/>
-</div>
 
-<div class="container-fluid">
     <div class="row">
         <div class="col-xl-12">
             <app-ui-card [title]="module + ' Details'">
@@ -56,7 +54,7 @@
                                 <label class="form-label fw-bold">{{ signatoryLabels[key] }}</label>
                                 <div class="input-group">
                                     <input type="text" class="form-control"
-                                           [value]="signatories[key] ? signatories[key].name : ''"
+                                           [value]="signatories[key] ? (signatories[key].name || signatories[key].fullName || '') : ''"
                                            readonly placeholder="Select signatory..."/>
                                     <button type="button" class="btn btn-success fw-bold"
                                             (click)="openEntityBrowse(key)">

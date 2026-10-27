@@ -3,13 +3,14 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { AlertService } from '@/app/shared/services/alert.service';
 import { COMMON_ALL_PAGE_IMPORTS, COMMON_MAIN_PAGE_IMPORTS, SHARED_PROVIDERS } from '@/app/shared/providers/shared-providers';
 import { OtherAccountReceivableService } from '../other-account-receivable.service';
+import { AttachmentsComponent } from '@/app/shared/components/attachments/attachments.component';
 import { provideIcons } from '@ng-icons/core';
-import { tablerArrowLeft, tablerPrinter, tablerEdit, tablerHistory, tablerCheck } from '@ng-icons/tabler-icons';
+import { tablerArrowLeft, tablerPrinter, tablerEdit, tablerHistory, tablerCheck, tablerEye, tablerEyeOff, tablerChevronRight, tablerChevronDown } from '@ng-icons/tabler-icons';
 
 @Component({
     selector: 'app-other-account-receivable-detail',
-    imports: [...COMMON_ALL_PAGE_IMPORTS, ...COMMON_MAIN_PAGE_IMPORTS],
-    providers: [...SHARED_PROVIDERS, provideIcons({ tablerArrowLeft, tablerPrinter, tablerEdit, tablerHistory, tablerCheck })],
+    imports: [...COMMON_ALL_PAGE_IMPORTS, ...COMMON_MAIN_PAGE_IMPORTS, AttachmentsComponent],
+    providers: [...SHARED_PROVIDERS, provideIcons({ tablerArrowLeft, tablerPrinter, tablerEdit, tablerHistory, tablerCheck, tablerEye, tablerEyeOff, tablerChevronRight, tablerChevronDown })],
     templateUrl: './other-account-receivable-detail.component.html'
 })
 export class OtherAccountReceivableDetailComponent {
@@ -26,6 +27,8 @@ export class OtherAccountReceivableDetailComponent {
     workflowActions: any[] = [];
     selectedAction: any    = null;
     remarks = '';
+
+    expandedSl = new Set<number>();
 
     logs        : any[] = [];
     showLogs    = false;
@@ -49,10 +52,11 @@ export class OtherAccountReceivableDetailComponent {
             next: (data) => {
                 this.isLoading.set(false);
                 if (data?.id) {
-                    this.data          = data;
-                    this.journalEntries = data.journalEntries || data.details || [];
+                    this.data = data;
+                    this.expandedSl.clear();
                     this.loadWorkflowActions();
                     this.loadAttachments();
+                    if (data.transId) this.loadJournalEntries(data.transId);
                 } else {
                     this.alertService.error(this.module, 'Not Found', '');
                     this.router.navigate(['/' + this.menuLink]);
@@ -61,6 +65,23 @@ export class OtherAccountReceivableDetailComponent {
             error: () => { this.isLoading.set(false); this.alertService.error(this.module, 'Error', ''); this.router.navigate(['/' + this.menuLink]); }
         });
     }
+
+    loadJournalEntries(transId: number): void {
+        this.service.getGLEntries(transId).subscribe({
+            next: (entries) => { this.journalEntries = entries || []; },
+            error: () => { this.journalEntries = []; }
+        });
+    }
+
+    loadAttachments(): void {
+        if (!this.data?.transId) return;
+        this.service.getFiles(this.data.transId).subscribe({
+            next: (files) => { this.attachments = files || []; },
+            error: () => { this.attachments = []; }
+        });
+    }
+
+    fileUrl = (fileId: number): string => this.service.fileUrl(fileId);
 
     loadWorkflowActions(): void {
         if (!this.data?.transId) return;
@@ -102,15 +123,11 @@ export class OtherAccountReceivableDetailComponent {
         return this.journalEntries.reduce((sum, e) => sum + (Number(e.credit ?? e.creditAmount) || 0), 0);
     }
 
-    loadAttachments(): void {
-        this.service.getFiles(this.id).subscribe({
-            next: (files) => { this.attachments = files || []; },
-            error: () => { this.attachments = []; }
-        });
-    }
+    isSlExpanded(index: number): boolean { return this.expandedSl.has(index); }
 
-    fileUrl(fileId: number): string {
-        return this.service.fileUrl(fileId);
+    toggleSl(index: number): void {
+        if (this.expandedSl.has(index)) this.expandedSl.delete(index);
+        else this.expandedSl.add(index);
     }
 
     toggleLogs(): void {

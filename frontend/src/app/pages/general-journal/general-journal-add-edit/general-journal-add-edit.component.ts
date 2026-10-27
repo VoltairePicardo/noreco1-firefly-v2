@@ -19,7 +19,7 @@ import { provideIcons } from '@ng-icons/core';
 import {
     tablerSearch, tablerX, tablerArrowLeft, tablerCheck,
     tablerTrash, tablerPaperclip, tablerPhoto, tablerFile,
-    tablerDatabase, tablerLink
+    tablerDatabase, tablerLink, tablerFolder
 } from '@ng-icons/tabler-icons';
 
 interface Signatory {
@@ -109,7 +109,7 @@ interface GeneralJournalPayload {
         provideIcons({
             tablerSearch, tablerX, tablerArrowLeft, tablerCheck,
             tablerTrash, tablerPaperclip, tablerPhoto, tablerFile,
-            tablerDatabase, tablerLink
+            tablerDatabase, tablerLink, tablerFolder
         })
     ],
     templateUrl: './general-journal-add-edit.component.html'

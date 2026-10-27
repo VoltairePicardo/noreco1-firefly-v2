@@ -46,16 +46,16 @@ export class OtherAccountReceivableService {
     }
 
     getWorkflowActions(transId: number): Observable<any[]> {
-        return this.http.get<any[]>(`${BASE_URL}/json/workflow-actions/${transId}`);
+        return this.http.get<any[]>(`${BASE_API}/json/workflow-actions/${transId}`);
     }
 
     getDocumentLogs(transId: number): Observable<any[]> {
-        return this.http.get<any[]>(`${BASE_URL}/json/document-logs/${transId}`);
+        return this.http.get<any[]>(`${BASE_API}/json/document-logs/${transId}`);
     }
 
     getEntities(q: string = '', page = 0, size = 10): Observable<any> {
         const params = new HttpParams().set('q', q).set('page', page).set('size', size);
-        return this.http.get(`${BASE_URL}/json/entities/search`, { params });
+        return this.http.get(`${BASE_API}/json/entities/search`, { params });
     }
 
     searchAccounts(q: string = '', page = 0, size = 10): Observable<any> {
@@ -63,12 +63,16 @@ export class OtherAccountReceivableService {
         return this.http.get(`${BASE_API}/accounting/accounts/search`, { params });
     }
 
-    getFiles(id: number): Observable<any[]> {
-        return this.http.get<any[]>(`${BASE_API}/other-account-receivable/${id}/files`);
+    getGLEntries(transId: number): Observable<any[]> {
+        return this.http.get<any[]>(`${BASE_API}/ledger/gl/${transId}`);
+    }
+
+    getFiles(transId: number): Observable<any[]> {
+        return this.http.get<any[]>(`${BASE_URL}/file/attachments/${transId}`);
     }
 
     fileUrl(fileId: number): string {
-        return `${BASE_API}/other-account-receivable/file/${fileId}`;
+        return this.downloadService.printUrl(`${BASE_URL}/file/${fileId}`);
     }
 
     print(id: number): void {

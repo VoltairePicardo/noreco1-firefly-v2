@@ -115,6 +115,11 @@ export class CashReceiptsAddEditComponent {
             next: (data) => { if (data) this.approvingOfficer = data.approvingOfficer || null; },
             error: () => {}
         });
+        this.service.getDefaultDate().subscribe({
+            next: (data) => { if (data?.date) this.voucherDate = data.date.substring(0, 10); },
+            error: () => {}
+        });
+        if (!this.particulars) this.particulars = 'COLLECTION DEPOSITED';
     }
 
     get totalDebit(): number {
@@ -189,6 +194,7 @@ export class CashReceiptsAddEditComponent {
             voucherDate: this.voucherDate,
             particulars: this.particulars,
             amount:      this.totalDebit,
+            tempBatchId: this.tempBatch ? this.tempBatch.tempBatchId : 0,
             generalLedgerLines: this.journalEntries
                 .filter(e => e.account?.id)
                 .map(e => ({

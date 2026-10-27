@@ -1,4 +1,5 @@
 import { Component, inject, signal } from '@angular/core';
+import Swal from 'sweetalert2';
 import { COMMON_ALL_PAGE_IMPORTS, COMMON_MAIN_PAGE_IMPORTS, SHARED_PROVIDERS } from '@/app/shared/providers/shared-providers';
 import { AlertService } from '@/app/shared/services/alert.service';
 import { FlatpickrDefaults, FlatpickrModule } from 'angularx-flatpickr';
@@ -104,14 +105,22 @@ export class DisbursementMainComponent {
         return this.records().filter(r => r.selected).map(r => r.id);
     }
 
-    approveAll(): void {
+    async approveAll(): Promise<void> {
         const ids = this.selectedIds;
         if (ids.length === 0) {
             this.alertService.warning(this.module, 'Approve All', 'Please select at least one record.');
             return;
         }
+        const { isConfirmed, value: remarks } = await Swal.fire({
+            title: 'Approve All',
+            input: 'text',
+            inputLabel: 'Remarks (optional)',
+            showCancelButton: true,
+            confirmButtonText: 'Approve',
+        });
+        if (!isConfirmed) return;
         this.processingAll = true;
-        this.service.approveAll(ids).subscribe({
+        this.service.approveAll(ids, remarks || '').subscribe({
             next: (res) => {
                 this.processingAll = false;
                 if (res?.success) {

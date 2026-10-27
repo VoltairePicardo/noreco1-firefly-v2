@@ -80,7 +80,15 @@ export class BankDepositAddEditComponent {
                 this.loadForEdit();
             } else {
                 this.subModule = 'Create';
+                this.loadDefaultDate();
             }
+        });
+    }
+
+    loadDefaultDate(): void {
+        this.service.getDefaultDate().subscribe({
+            next: (data) => { if (data?.date) this.postingDate = data.date.substring(0, 10); },
+            error: () => {}
         });
     }
 
@@ -220,6 +228,10 @@ export class BankDepositAddEditComponent {
     save(): void {
         if (!this.depositDate) {
             this.alertService.warning(this.module, 'Validation', 'Please enter a deposit date.');
+            return;
+        }
+        if (!this.referenceNumber.trim()) {
+            this.alertService.warning(this.module, 'Validation', 'Please enter a reference number.');
             return;
         }
         if (!this.bankAccount) {

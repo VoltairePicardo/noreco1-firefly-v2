@@ -13,6 +13,8 @@ import { ModalService } from '@/app/shared/modals/modal-service';
 import { BrowseEntityModalComponent } from '@/app/shared/modals/browse-entity-modal/browse-entity-modal.component';
 import { BrowseInventoryDocModalComponent } from '@/app/shared/modals/browse-inventory-doc-modal/browse-inventory-doc-modal.component';
 import { JournalEntriesFormComponent, JournalEntry } from '@/app/shared/forms/journal-entries-form/journal-entries-form.component';
+import { provideIcons } from '@ng-icons/core';
+import { tablerSearch, tablerArrowLeft, tablerCheck } from '@ng-icons/tabler-icons';
 
 @Component({
     selector: 'app-material-issuance-add-edit',
@@ -23,7 +25,7 @@ import { JournalEntriesFormComponent, JournalEntry } from '@/app/shared/forms/jo
         FlatpickrDirective,
         JournalEntriesFormComponent
     ],
-    providers: [provideFlatpickrDefaults(), ...SHARED_PROVIDERS],
+    providers: [provideFlatpickrDefaults(), ...SHARED_PROVIDERS, provideIcons({ tablerSearch, tablerArrowLeft, tablerCheck })],
     templateUrl: './material-issuance-add-edit.component.html'
 })
 export class MaterialIssuanceAddEditComponent {

@@ -3,14 +3,15 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { AlertService } from '@/app/shared/services/alert.service';
 import { COMMON_ALL_PAGE_IMPORTS, COMMON_MAIN_PAGE_IMPORTS, SHARED_PROVIDERS } from '@/app/shared/providers/shared-providers';
 import { MaterialIssuanceService } from '../material-issuance.service';
+import { AttachmentsComponent } from '@/app/shared/components/attachments/attachments.component';
 import { provideIcons } from '@ng-icons/core';
-import { tablerArrowLeft, tablerPrinter, tablerEdit, tablerEye, tablerEyeOff, tablerCheck, tablerDeviceFloppy } from '@ng-icons/tabler-icons';
+import { tablerArrowLeft, tablerPrinter, tablerEdit, tablerEye, tablerEyeOff, tablerCheck, tablerDeviceFloppy, tablerChevronRight, tablerChevronDown } from '@ng-icons/tabler-icons';
 import { JournalEntriesFormComponent, JournalEntry } from '@/app/shared/forms/journal-entries-form/journal-entries-form.component';
 
 @Component({
     selector: 'app-material-issuance-detail',
-    imports: [...COMMON_ALL_PAGE_IMPORTS, ...COMMON_MAIN_PAGE_IMPORTS, JournalEntriesFormComponent],
-    providers: [...SHARED_PROVIDERS, provideIcons({ tablerArrowLeft, tablerPrinter, tablerEdit, tablerEye, tablerEyeOff, tablerCheck, tablerDeviceFloppy })],
+    imports: [...COMMON_ALL_PAGE_IMPORTS, ...COMMON_MAIN_PAGE_IMPORTS, JournalEntriesFormComponent, AttachmentsComponent],
+    providers: [...SHARED_PROVIDERS, provideIcons({ tablerArrowLeft, tablerPrinter, tablerEdit, tablerEye, tablerEyeOff, tablerCheck, tablerDeviceFloppy, tablerChevronRight, tablerChevronDown })],
     templateUrl: './material-issuance-detail.component.html'
 })
 export class MaterialIssuanceDetailComponent {
@@ -21,6 +22,7 @@ export class MaterialIssuanceDetailComponent {
     data: any = {};
     journalEntries: any[]    = [];
     inventoryDocItems: any[] = [];
+    attachments: any[]       = [];
     isLoading          = signal(false);
     processingWorkflow = false;
     savingEntries      = false;
@@ -30,6 +32,8 @@ export class MaterialIssuanceDetailComponent {
     workflowActions: any[] = [];
     selectedAction: any    = null;
     remarks = '';
+
+    expandedSl = new Set<number>();
 
     logs        : any[] = [];
     showLogs    = false;
@@ -56,25 +60,11 @@ export class MaterialIssuanceDetailComponent {
                 this.isLoading.set(false);
                 if (data?.id) {
                     this.data = data;
-                    const rawEntries = data.journalEntries || data.details || [];
-                    this.journalEntries = rawEntries.filter((e: any) => e.accountCode);
-                    this.editableJournalEntries = this.journalEntries.map((e: any): JournalEntry => ({
-                        account: { id: e.accountId, accountCode: e.accountCode, accountTitle: e.accountTitle || e.account?.accountTitle || e.description, hasSL: e.hasSL || e.account?.hasSL || false },
-                        debit:   Number(e.glDebitAmount ?? e.debitAmount ?? e.debit) || null,
-                        credit:  Number(e.glCreditAmount ?? e.creditAmount ?? e.credit) || null,
-                        slentries: (e.slentries || []).map((sl: any) => ({
-                            entity:    null,
-                            accountNo: sl.accountNo,
-                            name:      sl.name,
-                            debit:     Number(sl.debit)  || null,
-                            credit:    Number(sl.credit) || null
-                        }))
-                    }));
-                    if (this.editableJournalEntries.length === 0) {
-                        this.editableJournalEntries = [{ account: null, debit: null, credit: null }];
-                    }
+                    this.expandedSl.clear();
                     this.inventoryDocItems = data.inventoryDocItems || data.inventoryDocument?.details || data.items || [];
                     this.loadWorkflowActions();
+                    this.loadAttachments();
+                    if (data.transId) this.loadJournalEntries(data.transId);
                 } else {
                     this.alertService.error(this.module, 'Not Found', '');
                     this.router.navigate(['/' + this.menuLink]);
@@ -87,6 +77,40 @@ export class MaterialIssuanceDetailComponent {
             }
         });
     }
+
+    loadJournalEntries(transId: number): void {
+        this.service.getGLEntries(transId).subscribe({
+            next: (entries) => {
+                this.journalEntries = entries || [];
+                this.editableJournalEntries = this.journalEntries.map((e: any): JournalEntry => ({
+                    account: { id: e.accountId, accountCode: e.code, accountTitle: e.description, hasSL: e.hasSL || false },
+                    debit:   Number(e.debit ?? e.debitAmount) || null,
+                    credit:  Number(e.credit ?? e.creditAmount) || null,
+                    slentries: (e.slentries || []).map((sl: any) => ({
+                        entity:    null,
+                        accountNo: sl.accountNo,
+                        name:      sl.name,
+                        debit:     Number(sl.debit)  || null,
+                        credit:    Number(sl.credit) || null
+                    }))
+                }));
+                if (this.editableJournalEntries.length === 0) {
+                    this.editableJournalEntries = [{ account: null, debit: null, credit: null }];
+                }
+            },
+            error: () => { this.journalEntries = []; }
+        });
+    }
+
+    loadAttachments(): void {
+        if (!this.data?.transId) return;
+        this.service.getFiles(this.data.transId).subscribe({
+            next: (files) => { this.attachments = files || []; },
+            error: () => { this.attachments = []; }
+        });
+    }
+
+    fileUrl = (fileId: number): string => this.service.fileUrl(fileId);
 
     loadWorkflowActions(): void {
         if (!this.data?.transId) return;
@@ -127,6 +151,21 @@ export class MaterialIssuanceDetailComponent {
     isForChecking(): boolean {
         const s = this.data?.documentStatus?.status || this.data?.status || '';
         return s.toLowerCase().includes('checking');
+    }
+
+    isSlExpanded(index: number): boolean { return this.expandedSl.has(index); }
+
+    toggleSl(index: number): void {
+        if (this.expandedSl.has(index)) this.expandedSl.delete(index);
+        else this.expandedSl.add(index);
+    }
+
+    get totalDebit(): number {
+        return this.journalEntries.reduce((sum, e) => sum + (Number(e.debit ?? e.debitAmount) || 0), 0);
+    }
+
+    get totalCredit(): number {
+        return this.journalEntries.reduce((sum, e) => sum + (Number(e.credit ?? e.creditAmount) || 0), 0);
     }
 
     get totalDebitEditable(): number {
@@ -180,14 +219,6 @@ export class MaterialIssuanceDetailComponent {
             },
             error: () => { this.savingEntries = false; this.alertService.error(this.module, 'Update Entries', ''); }
         });
-    }
-
-    get totalDebit(): number {
-        return this.journalEntries.reduce((sum, e) => sum + (Number(e.glDebitAmount) || 0), 0);
-    }
-
-    get totalCredit(): number {
-        return this.journalEntries.reduce((sum, e) => sum + (Number(e.glCreditAmount) || 0), 0);
     }
 
     toggleLogs(): void {

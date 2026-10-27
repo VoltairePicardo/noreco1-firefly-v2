@@ -2,11 +2,13 @@ import { Component, inject, signal } from '@angular/core';
 import { COMMON_ALL_PAGE_IMPORTS, COMMON_MAIN_PAGE_IMPORTS, SHARED_PROVIDERS } from '@/app/shared/providers/shared-providers';
 import { AlertService } from '@/app/shared/services/alert.service';
 import { OtherAccountReceivableService } from '../other-account-receivable.service';
+import { provideIcons } from '@ng-icons/core';
+import { tablerPlus, tablerSearch, tablerRefresh, tablerEye, tablerEdit, tablerChevronLeft, tablerChevronRight } from '@ng-icons/tabler-icons';
 
 @Component({
     selector: 'app-other-account-receivable-main',
     imports: [...COMMON_ALL_PAGE_IMPORTS, ...COMMON_MAIN_PAGE_IMPORTS],
-    providers: [...SHARED_PROVIDERS],
+    providers: [...SHARED_PROVIDERS, provideIcons({ tablerPlus, tablerSearch, tablerRefresh, tablerEye, tablerEdit, tablerChevronLeft, tablerChevronRight })],
     templateUrl: './other-account-receivable-main.component.html'
 })
 export class OtherAccountReceivableMainComponent {
@@ -61,7 +63,7 @@ export class OtherAccountReceivableMainComponent {
     }
 
     isEditable(rec: any): boolean {
-        const s = rec?.status || '';
+        const s = rec?.documentStatus?.status || rec?.status || '';
         return s === 'Document Created' || s === 'Returned to Creator';
     }
 }

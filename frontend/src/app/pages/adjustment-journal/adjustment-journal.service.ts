@@ -5,6 +5,7 @@ import { environment } from '@/environments/environment';
 import { DownloadService } from '@/app/core/services/download.service';
 
 const BASE_API = environment.get('baseApiUrl');
+const BASE_URL = environment.get('baseUrl');
 const httpOptions = { headers: new HttpHeaders({ 'Content-Type': 'application/json' }) };
 
 @Injectable({ providedIn: 'root' })
@@ -51,6 +52,22 @@ export class AdjustmentJournalService {
         return this.http.get(`${BASE_API}/adjustment-journal/default-signatories`);
     }
 
+    defaultDate(): Observable<any> {
+        return this.http.get(`${BASE_API}/aj/default-date`);
+    }
+
+    closingDefaultEntries(date: string): Observable<any[]> {
+        return this.http.get<any[]>(`${BASE_API}/aj/closing-default-entries/${date}`);
+    }
+
+    reopeningDefaultEntries(year: string): Observable<any[]> {
+        return this.http.get<any[]>(`${BASE_API}/aj/reopening-default-entries/${year}`);
+    }
+
+    updateEntries(payload: any): Observable<any> {
+        return this.http.post(`${BASE_API}/aj/updateEntries`, payload, httpOptions);
+    }
+
     getEntities(q: string = '', page = 0, size = 10): Observable<any> {
         const params = new HttpParams().set('q', q).set('page', page).set('size', size);
         return this.http.get(`${BASE_API}/json/entities/search`, { params });
@@ -65,13 +82,25 @@ export class AdjustmentJournalService {
         return this.http.get<any[]>(`${BASE_API}/json/document-logs/${transId}`);
     }
 
-    approveAll(ids: number[]): Observable<any> {
-        const payloads = ids.map(id => ({ documentId: id, remarks: '', documentType: 'AJ' }));
+    getGLEntries(transId: number): Observable<any[]> {
+        return this.http.get<any[]>(`${BASE_API}/ledger/gl/${transId}`);
+    }
+
+    approveAll(ids: number[], remarks: string = ''): Observable<any> {
+        const payloads = ids.map(id => ({ documentId: id, remarks, documentType: 'AJ' }));
         return this.http.post<any>(`${BASE_API}/approve-vouchers/process-all`, payloads, httpOptions);
     }
 
     uploadFiles(id: number, formData: FormData): Observable<any> {
         return this.http.post(`${BASE_API}/adjustment-journal/${id}/upload`, formData);
+    }
+
+    getFiles(transId: number): Observable<any[]> {
+        return this.http.get<any[]>(`${BASE_URL}/file/attachments/${transId}`);
+    }
+
+    fileUrl(fileId: number): string {
+        return this.downloadService.printUrl(`${BASE_URL}/file/${fileId}`);
     }
 
     print(id: number): void {

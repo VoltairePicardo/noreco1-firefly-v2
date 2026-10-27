@@ -1,12 +1,8 @@
 <div class="container-fluid">
     <app-page-title [title]="module" [subTitle]="subModule" [menuLink]="menuLink"/>
-</div>
 
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-xl-12">
-            <app-ui-card [title]="module + ' Form'">
-                <div class="col-xl-12 p-3" card-body>
+    <app-ui-card [title]="module + ' Form'">
+        <div card-body>
 
                     @if (isLoading()) {
                         <div class="d-flex align-items-center gap-2 text-muted py-2">
@@ -56,8 +52,6 @@
                     </div>
 
                     }
-                </div>
-            </app-ui-card>
         </div>
-    </div>
+    </app-ui-card>
 </div>

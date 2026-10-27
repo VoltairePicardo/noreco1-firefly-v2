@@ -48,7 +48,11 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @if (pagedRecords.length > 0) {
+                    @if (isLoading()) {
+                        <tr><td colspan="5" class="text-center py-3">
+                            <span class="spinner-border spinner-border-sm me-2" role="status"></span>Loading...
+                        </td></tr>
+                    } @else if (pagedRecords.length > 0) {
                         @for (rec of pagedRecords; track rec.id) {
                             <tr>
                                 <td class="fw-bold">{{ rec.code }}</td>
@@ -75,11 +79,7 @@
                         }
                     } @else {
                         <tr class="no-results">
-                            <td colspan="5" class="text-center text-muted py-3">
-                                @if (isLoading()) {
-                                    <span class="spinner-border spinner-border-sm me-2" role="status"></span>Loading...
-                                } @else { Nothing found. }
-                            </td>
+                            <td colspan="5" class="text-center text-muted py-3">No records found.</td>
                         </tr>
                     }
                 </tbody>

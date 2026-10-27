@@ -10,6 +10,8 @@ import {
 import { FlatpickrDirective, provideFlatpickrDefaults } from 'angularx-flatpickr';
 import { EnergySalesService } from '../energy-sales.service';
 import { ModalService } from '@/app/shared/modals/modal-service';
+import { provideIcons } from '@ng-icons/core';
+import { tablerSearch, tablerX, tablerArrowLeft, tablerCheck } from '@ng-icons/tabler-icons';
 import { BrowseEntityModalComponent } from '@/app/shared/modals/browse-entity-modal/browse-entity-modal.component';
 import { BrowseTempGLModalComponent } from '@/app/shared/modals/browse-temp-gl-modal/browse-temp-gl-modal.component';
 import { JournalEntriesFormComponent, JournalEntry } from '@/app/shared/forms/journal-entries-form/journal-entries-form.component';
@@ -23,7 +25,7 @@ import { JournalEntriesFormComponent, JournalEntry } from '@/app/shared/forms/jo
         FlatpickrDirective,
         JournalEntriesFormComponent
     ],
-    providers: [provideFlatpickrDefaults(), ...SHARED_PROVIDERS],
+    providers: [provideFlatpickrDefaults(), ...SHARED_PROVIDERS, provideIcons({ tablerSearch, tablerX, tablerArrowLeft, tablerCheck })],
     templateUrl: './energy-sales-add-edit.component.html'
 })
 export class EnergySalesAddEditComponent {
@@ -113,6 +115,10 @@ export class EnergySalesAddEditComponent {
     loadDefaultSignatories(): void {
         this.service.getDefaultSignatories().subscribe({
             next: (data) => { if (data) this.approvingOfficer = data.approvingOfficer || null; },
+            error: () => {}
+        });
+        this.service.getDefaultDate().subscribe({
+            next: (data) => { if (data?.date) this.voucherDate = data.date.substring(0, 10); },
             error: () => {}
         });
     }

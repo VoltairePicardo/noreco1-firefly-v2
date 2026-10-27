@@ -140,8 +140,8 @@ export class DisbursementService {
         return this.http.get<any[]>(`${BASE_API}/json/budget-line-items`);
     }
 
-    approveAll(ids: number[]): Observable<any> {
-        const payloads = ids.map(id => ({ documentId: id, remarks: '', documentType: 'CV' }));
+    approveAll(ids: number[], remarks = ''): Observable<any> {
+        const payloads = ids.map(id => ({ documentId: id, remarks, documentType: 'CV' }));
         return this.http.post<any>(`${BASE_API}/approve-vouchers/process-all`, payloads, httpOptions);
     }
 

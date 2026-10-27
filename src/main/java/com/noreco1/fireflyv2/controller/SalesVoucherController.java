@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -106,6 +107,13 @@ public class SalesVoucherController {
     @GetMapping("/default-signatories")
     public Map defaultSignatories() {
         return service.defaultSignatories();
+    }
+
+    @GetMapping("/default-date")
+    public Map<String, String> defaultDate() {
+        Map<String, String> map = new HashMap<>();
+        map.put("date", LocalDate.now().toString());
+        return map;
     }
 
     @GetMapping("/export/{id}")

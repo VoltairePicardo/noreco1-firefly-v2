@@ -15,12 +15,24 @@
                 <p class="mb-0">{{ voucher.documentType || '—' }}</p>
             </div>
             <div class="col-6">
-                <label class="form-label fw-bold fs-xs text-uppercase">Amount</label>
-                <p class="mb-0">{{ voucher.amount ?? voucher.totalDebit | number:'1.2-2' }}</p>
+                <label class="form-label fw-bold fs-xs text-uppercase">Status</label>
+                <p class="mb-0">{{ voucher.status || '—' }}</p>
             </div>
             <div class="col-6">
                 <label class="form-label fw-bold fs-xs text-uppercase">Voucher Date</label>
                 <p class="mb-0">{{ voucher.voucherDate | date:'MM/dd/yyyy' }}</p>
+            </div>
+            <div class="col-6">
+                <label class="form-label fw-bold fs-xs text-uppercase">Amount</label>
+                <p class="mb-0">{{ voucher.amount ?? voucher.totalDebit | number:'1.2-2' }}</p>
+            </div>
+            <div class="col-6">
+                <label class="form-label fw-bold fs-xs text-uppercase">Created By</label>
+                <p class="mb-0">{{ voucher.createBy || voucher.createdBy || voucher.preparedBy || '—' }}</p>
+            </div>
+            <div class="col-12">
+                <label class="form-label fw-bold fs-xs text-uppercase">Particulars</label>
+                <p class="mb-0">{{ voucher.particulars || voucher.explanation || '—' }}</p>
             </div>
         </div>
 

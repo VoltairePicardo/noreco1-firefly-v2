@@ -52,6 +52,10 @@ export class EnergySalesService {
         return this.http.get(`${BASE_API}/sales-voucher/default-signatories`);
     }
 
+    getDefaultDate(): Observable<any> {
+        return this.http.get(`${BASE_API}/sales-voucher/default-date`);
+    }
+
     getWorkflowActions(transId: number): Observable<any[]> {
         return this.http.get<any[]>(`${BASE_API}/json/workflow-actions/${transId}`);
     }
@@ -63,6 +67,10 @@ export class EnergySalesService {
     searchAccounts(q: string = '', page = 0, size = 10): Observable<any> {
         const params = new HttpParams().set('q', q).set('page', page).set('size', size);
         return this.http.get(`${BASE_API}/accounting/accounts/search`, { params });
+    }
+
+    getJournalEntries(transId: number): Observable<any[]> {
+        return this.http.get<any[]>(`${BASE_API}/ledger/gl/${transId}`);
     }
 
     updateEntries(payload: any): Observable<any> {

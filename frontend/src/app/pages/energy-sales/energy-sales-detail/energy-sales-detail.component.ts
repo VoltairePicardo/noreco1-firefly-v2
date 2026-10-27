@@ -63,17 +63,18 @@ export class EnergySalesDetailComponent {
                 this.isLoading.set(false);
                 if (data?.id) {
                     this.data = data;
-                    const rawEntries = data.journalEntries || data.details || [];
-                    this.journalEntries = rawEntries.filter((e: any) => e.accountCode);
-                    this.editableEntries = this.journalEntries.map((e: any): JournalEntry => ({
+                    const glLines: any[] = data.generalLedgerLines || [];
+
+                    // Editable entries use generalLedgerLines directly (has accountId, hasSL, slentries)
+                    this.editableEntries = glLines.map((e: any): JournalEntry => ({
                         account: {
                             id:           e.accountId,
-                            accountCode:  e.accountCode || e.code,
-                            accountTitle: e.accountTitle || e.description,
+                            accountCode:  e.code,
+                            accountTitle: e.description,
                             hasSL:        e.hasSL || false
                         },
-                        debit:  Number(e.glDebitAmount  ?? e.debit)  || null,
-                        credit: Number(e.glCreditAmount ?? e.credit) || null,
+                        debit:     Number(e.debit)  || null,
+                        credit:    Number(e.credit) || null,
                         slentries: (e.slentries || []).map((sl: any) => ({
                             entity: null, accountNo: sl.accountNo, name: sl.name,
                             debit: Number(sl.debit) || null, credit: Number(sl.credit) || null
@@ -82,12 +83,20 @@ export class EnergySalesDetailComponent {
                     this.expandedSl.clear();
                     this.loadWorkflowActions();
                     this.loadAttachments();
+                    if (data.transId) { this.loadJournalEntries(data.transId); }
                 } else {
                     this.alertService.error(this.module, 'Not Found', '');
                     this.router.navigate(['/' + this.menuLink]);
                 }
             },
             error: () => { this.isLoading.set(false); this.alertService.error(this.module, 'Error', ''); this.router.navigate(['/' + this.menuLink]); }
+        });
+    }
+
+    loadJournalEntries(transId: number): void {
+        this.service.getJournalEntries(transId).subscribe({
+            next: (data) => { this.journalEntries = data || []; },
+            error: ()    => { this.journalEntries = []; }
         });
     }
 
@@ -137,11 +146,11 @@ export class EnergySalesDetailComponent {
     }
 
     get totalDebit(): number {
-        return this.journalEntries.reduce((sum, e) => sum + (Number(e.glDebitAmount ?? e.debit) || 0), 0);
+        return this.journalEntries.reduce((sum, e) => sum + (Number(e.debit) || 0), 0);
     }
 
     get totalCredit(): number {
-        return this.journalEntries.reduce((sum, e) => sum + (Number(e.glCreditAmount ?? e.credit) || 0), 0);
+        return this.journalEntries.reduce((sum, e) => sum + (Number(e.credit) || 0), 0);
     }
 
     get editableDebit(): number {

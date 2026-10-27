@@ -163,6 +163,42 @@ export class AdjustmentJournalAddEditComponent {
             },
             error: () => {}
         });
+        this.service.defaultDate().subscribe({
+            next: (data) => { if (data?.date) this.voucherDate = data.date.substring(0, 10); },
+            error: () => {}
+        });
+    }
+
+    onTransactionTypeChange(): void {
+        if (!this.voucherDate) return;
+        if (this.transactionType === 'Closing') {
+            this.service.closingDefaultEntries(this.voucherDate).subscribe({
+                next: (entries) => {
+                    if (entries?.length) {
+                        this.journalEntries = entries.map((e: any) => ({
+                            account: { id: e.accountId, accountCode: e.code, accountTitle: e.description, hasSL: e.hasSL || false },
+                            debit:   Number(e.debit)  || null,
+                            credit:  Number(e.credit) || null
+                        }));
+                    }
+                },
+                error: () => {}
+            });
+        } else if (this.transactionType === 'Reopening') {
+            const year = this.voucherDate.substring(0, 4);
+            this.service.reopeningDefaultEntries(year).subscribe({
+                next: (entries) => {
+                    if (entries?.length) {
+                        this.journalEntries = entries.map((e: any) => ({
+                            account: { id: e.accountId, accountCode: e.code, accountTitle: e.description, hasSL: e.hasSL || false },
+                            debit:   Number(e.debit)  || null,
+                            credit:  Number(e.credit) || null
+                        }));
+                    }
+                },
+                error: () => {}
+            });
+        }
     }
 
     get totalDebit(): number {

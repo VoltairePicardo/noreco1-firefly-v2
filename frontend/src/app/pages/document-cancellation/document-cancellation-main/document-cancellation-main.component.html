@@ -152,6 +152,10 @@
                     <label class="form-label fw-bold fs-xs text-uppercase">Amount</label>
                     <p class="mb-0">{{ cancelTarget.amount ?? cancelTarget.totalDebit | number:'1.2-2' }}</p>
                 </div>
+                <div class="col-12">
+                    <label class="form-label fw-bold fs-xs text-uppercase">Created By</label>
+                    <p class="mb-0">{{ cancelTarget.createBy || cancelTarget.createdBy || cancelTarget.preparedBy || '—' }}</p>
+                </div>
             </div>
             <div class="mb-2">
                 <label class="form-label fw-bold">Cancellation Remarks <span class="text-danger">*</span></label>
@@ -192,12 +196,20 @@
                     <p class="mb-0 fw-bold">{{ restoreTarget.code || restoreTarget.localCode }}</p>
                 </div>
                 <div class="col-6">
+                    <label class="form-label fw-bold fs-xs text-uppercase">Status</label>
+                    <p class="mb-0">{{ restoreTarget.status }}</p>
+                </div>
+                <div class="col-6">
                     <label class="form-label fw-bold fs-xs text-uppercase">Date</label>
                     <p class="mb-0">{{ restoreTarget.voucherDate || restoreTarget.date | date:'MM/dd/yyyy' }}</p>
                 </div>
                 <div class="col-6">
                     <label class="form-label fw-bold fs-xs text-uppercase">Amount</label>
                     <p class="mb-0">{{ restoreTarget.amount ?? restoreTarget.totalDebit | number:'1.2-2' }}</p>
+                </div>
+                <div class="col-12">
+                    <label class="form-label fw-bold fs-xs text-uppercase">Created By</label>
+                    <p class="mb-0">{{ restoreTarget.createBy || restoreTarget.createdBy || restoreTarget.preparedBy || '—' }}</p>
                 </div>
             </div>
         }

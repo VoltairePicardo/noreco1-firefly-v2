@@ -5,11 +5,13 @@ import { FlatpickrDefaults, FlatpickrModule } from 'angularx-flatpickr';
 import { EnergySalesService } from '../energy-sales.service';
 import { monthStart, monthEnd } from '@/app/shared/utils/date.utils';
 import Swal from 'sweetalert2';
+import { provideIcons } from '@ng-icons/core';
+import { tablerSearch, tablerRefresh, tablerPlus, tablerEye, tablerEdit, tablerChevronLeft, tablerChevronRight, tablerThumbUp } from '@ng-icons/tabler-icons';
 
 @Component({
     selector: 'app-energy-sales-main',
     imports: [...COMMON_ALL_PAGE_IMPORTS, ...COMMON_MAIN_PAGE_IMPORTS, FlatpickrModule],
-    providers: [...SHARED_PROVIDERS, FlatpickrDefaults],
+    providers: [...SHARED_PROVIDERS, FlatpickrDefaults, provideIcons({ tablerSearch, tablerRefresh, tablerPlus, tablerEye, tablerEdit, tablerChevronLeft, tablerChevronRight, tablerThumbUp })],
     templateUrl: './energy-sales-main.component.html'
 })
 export class EnergySalesMainComponent {
@@ -118,7 +120,7 @@ export class EnergySalesMainComponent {
     }
 
     isEditable(rec: any): boolean {
-        const s = rec?.status || '';
+        const s = rec?.documentStatus?.status || rec?.status || '';
         return s === 'Document Created' || s === 'Returned to Creator';
     }
 }

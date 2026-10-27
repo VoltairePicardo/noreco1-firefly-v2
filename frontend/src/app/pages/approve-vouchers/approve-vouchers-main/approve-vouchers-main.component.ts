@@ -4,11 +4,13 @@ import { AlertService } from '@/app/shared/services/alert.service';
 import { ModalService } from '@/app/shared/modals/modal-service';
 import { ApproveVouchersService } from '../approve-vouchers.service';
 import { ApproveVoucherModalComponent } from '@/app/shared/modals/approve-voucher-modal/approve-voucher-modal.component';
+import { provideIcons } from '@ng-icons/core';
+import { tablerRefresh, tablerCheck, tablerChevronLeft, tablerChevronRight } from '@ng-icons/tabler-icons';
 
 @Component({
     selector: 'app-approve-vouchers-main',
     imports: [...COMMON_ALL_PAGE_IMPORTS, ...COMMON_MAIN_PAGE_IMPORTS],
-    providers: [...SHARED_PROVIDERS],
+    providers: [...SHARED_PROVIDERS, provideIcons({ tablerRefresh, tablerCheck, tablerChevronLeft, tablerChevronRight })],
     templateUrl: './approve-vouchers-main.component.html'
 })
 export class ApproveVouchersMainComponent {

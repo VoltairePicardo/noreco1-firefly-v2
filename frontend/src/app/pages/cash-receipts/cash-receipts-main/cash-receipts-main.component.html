@@ -75,7 +75,7 @@
                                     }
                                 </td>
                                 <td class="fw-bold">{{ rec.localCode }}</td>
-                                <td>{{ rec.voucherDate | date:'MM/dd/yyyy' }}</td>
+                                <td>{{ rec.date | date:'MM/dd/yyyy' }}</td>
                                 <td>{{ rec.particulars || '—' }}</td>
                                 <td class="text-end fw-bold">{{ rec.amount | number:'1.2-2' }}</td>
                                 <td><span class="badge bg-secondary bg-opacity-25 text-dark border">{{ rec.status }}</span></td>
@@ -104,8 +104,7 @@
             </table>
         </div>
 
-        <!-- Approve All -->
-        <div class="card-footer border-top-0">
+        <div class="card-footer position-relative d-flex align-items-center">
             <button type="button" class="btn btn-primary fw-bold"
                     [disabled]="processingAll || selectedIds.length === 0"
                     (click)="approveAll()">
@@ -115,26 +114,25 @@
                     <ng-icon name="tablerThumbUp" class="ps-0 pe-3 fw-bold"></ng-icon>Approve All
                 }
             </button>
-        </div>
-
-        @if (filteredRecords.length > pageSize) {
-            <div class="card-footer d-flex justify-content-center border-top-0">
-                <div class="pagination-boxed align-items-center mt-2 mb-0">
-                    <ngb-pagination
-                        [collectionSize]="filteredRecords.length"
-                        [(page)]="page"
-                        [pageSize]="pageSize"
-                        [maxSize]="5"
-                        [rotate]="true">
-                        <ng-template ngbPaginationPrevious>
-                            <ng-icon name="tablerChevronLeft"/>
-                        </ng-template>
-                        <ng-template ngbPaginationNext>
-                            <ng-icon name="tablerChevronRight"/>
-                        </ng-template>
-                    </ngb-pagination>
+            @if (filteredRecords.length > pageSize) {
+                <div class="position-absolute start-50 translate-middle-x">
+                    <div class="pagination-boxed align-items-center mb-0">
+                        <ngb-pagination
+                            [collectionSize]="filteredRecords.length"
+                            [(page)]="page"
+                            [pageSize]="pageSize"
+                            [maxSize]="5"
+                            [rotate]="true">
+                            <ng-template ngbPaginationPrevious>
+                                <ng-icon name="tablerChevronLeft"/>
+                            </ng-template>
+                            <ng-template ngbPaginationNext>
+                                <ng-icon name="tablerChevronRight"/>
+                            </ng-template>
+                        </ngb-pagination>
+                    </div>
                 </div>
-            </div>
-        }
+            }
+        </div>
     </div>
 </div>

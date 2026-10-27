@@ -3,13 +3,18 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { AlertService } from '@/app/shared/services/alert.service';
 import { COMMON_ALL_PAGE_IMPORTS, COMMON_MAIN_PAGE_IMPORTS, SHARED_PROVIDERS } from '@/app/shared/providers/shared-providers';
 import { BankDepositService } from '../bank-deposit.service';
+import { DocumentLogsComponent } from '@/app/shared/components/document-logs/document-logs.component';
+import { AttachmentsComponent } from '@/app/shared/components/attachments/attachments.component';
 import { provideIcons } from '@ng-icons/core';
-import { tablerArrowLeft, tablerPrinter, tablerEdit } from '@ng-icons/tabler-icons';
+import { tablerArrowLeft, tablerPrinter, tablerEdit, tablerEye, tablerEyeOff } from '@ng-icons/tabler-icons';
 
 @Component({
     selector: 'app-bank-deposit-detail',
-    imports: [...COMMON_ALL_PAGE_IMPORTS, ...COMMON_MAIN_PAGE_IMPORTS],
-    providers: [...SHARED_PROVIDERS, provideIcons({ tablerArrowLeft, tablerPrinter, tablerEdit })],
+    imports: [
+        ...COMMON_ALL_PAGE_IMPORTS, ...COMMON_MAIN_PAGE_IMPORTS,
+        DocumentLogsComponent, AttachmentsComponent
+    ],
+    providers: [...SHARED_PROVIDERS, provideIcons({ tablerArrowLeft, tablerPrinter, tablerEdit, tablerEye, tablerEyeOff })],
     templateUrl: './bank-deposit-detail.component.html'
 })
 export class BankDepositDetailComponent {
@@ -19,6 +24,7 @@ export class BankDepositDetailComponent {
     id: any   = 0;
     data: any = {};
     attachments: any[] = [];
+    showLogs  = false;
     isLoading = signal(false);
 
     private service      = inject(BankDepositService);
@@ -40,7 +46,7 @@ export class BankDepositDetailComponent {
                 this.isLoading.set(false);
                 if (data?.id) {
                     this.data = data;
-                    this.loadAttachments();
+                    if (data.transId) { this.loadAttachments(data.transId); }
                 } else {
                     this.alertService.error(this.module, 'Not Found', '');
                     this.router.navigate(['/' + this.menuLink]);
@@ -54,22 +60,20 @@ export class BankDepositDetailComponent {
         });
     }
 
-    loadAttachments(): void {
-        this.service.getFiles(this.id).subscribe({
+    loadAttachments(transId: number): void {
+        this.service.getFiles(transId).subscribe({
             next: (files) => { this.attachments = files || []; },
             error: () => { this.attachments = []; }
         });
-    }
-
-    fileUrl(fileId: number): string {
-        return this.service.fileUrl(fileId);
     }
 
     get totalAmount(): number {
         return (Number(this.data.cashAmount) || 0) + (Number(this.data.checkAmount) || 0);
     }
 
-    print(): void {
-        this.service.print(this.id);
-    }
+    fileUrl = (fileId: number): string => this.service.fileUrl(fileId);
+
+    toggleLogs(): void { this.showLogs = !this.showLogs; }
+
+    print(): void { this.service.print(this.id); }
 }

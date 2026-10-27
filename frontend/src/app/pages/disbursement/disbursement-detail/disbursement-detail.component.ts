@@ -72,12 +72,12 @@ export class DisbursementDetailComponent {
                 this.processingWorkflow = false;
                 if (data?.id) {
                     this.data = data;
-                    this.journalEntries = data.generalLedgerLines || [];
                     this.iemopBillings  = data.iemopBillings  || [];
                     this.expandedSl.clear();
                     this.selectedBudgetLineItem = null;
                     this.loadWorkflowActions();
                     this.loadAttachments();
+                    if (data.transId) { this.loadJournalEntries(data.transId); }
                     if (data.forAddingBudgetDetail && !this.budgetLineItemsLoaded) {
                         this.service.getBudgetLineItems().subscribe({
                             next: (items) => { this.budgetLineItems = items || []; this.budgetLineItemsLoaded = true; },
@@ -95,6 +95,13 @@ export class DisbursementDetailComponent {
                 this.alertService.error(this.module, 'Error', '');
                 this.router.navigate(['/' + this.menuLink]);
             }
+        });
+    }
+
+    loadJournalEntries(transId: number): void {
+        this.service.getGLEntries(transId).subscribe({
+            next: (entries) => { this.journalEntries = entries || []; },
+            error: () => { this.journalEntries = []; }
         });
     }
 
