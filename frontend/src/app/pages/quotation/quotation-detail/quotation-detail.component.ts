@@ -9,7 +9,6 @@ import { QuotationService } from '../quotation.service';
 import { documentStatusBadgeClass } from '@/app/shared/workflow/document-status-badge.util';
 import { isDocumentEditable } from '@/app/shared/workflow/document-editability.util';
 import { DocumentLogsComponent } from '@/app/shared/components/document-logs/document-logs.component';
-import { NgbTooltip } from '@ng-bootstrap/ng-bootstrap';
 import { forkJoin } from 'rxjs';
 
 const TERMINAL_STATUSES = ['Approved', 'Denied', 'Cancelled'];
@@ -20,8 +19,7 @@ const TERMINAL_STATUSES = ['Approved', 'Denied', 'Cancelled'];
         ...COMMON_ALL_PAGE_IMPORTS,
         ...COMMON_MAIN_PAGE_IMPORTS,
         SharedModule,
-        DocumentLogsComponent,
-        NgbTooltip
+        DocumentLogsComponent
     ],
     providers: [...SHARED_PROVIDERS, provideIcons({ tablerArrowLeft, tablerPrinter, tablerEdit, tablerCheck, tablerEye, tablerEyeOff, tablerAlertTriangle })],
     templateUrl: './quotation-detail.component.html'
