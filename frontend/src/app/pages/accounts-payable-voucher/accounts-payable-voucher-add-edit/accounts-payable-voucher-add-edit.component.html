@@ -10,11 +10,45 @@
         <div class="card">
             <div class="card-body">
 
+                <!-- Select Document -->
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                    <div class="fs-xs text-uppercase fw-semibold text-muted">
+                        @if(documentRows.length > 0) {
+                            Document Details
+                        }
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-primary fw-bold" (click)="openDocumentBrowse()">
+                            <ng-icon name="tablerFolderOpen" class="me-1 fw-bold fs-md"></ng-icon>Browse Documents
+                        </button>
+                        @if (documentRows.length > 0) {
+                            <button type="button" class="btn btn-danger fw-bold" (click)="clearDocuments()">
+                                <ng-icon name="tablerTrash" class="me-1 fw-bold fs-md"></ng-icon>Clear
+                            </button>
+                        }
+                    </div>
+                </div>
+                @for (doc of documentRows; track doc.id; let i = $index; let last = $last) {
+                    <div class="d-flex align-items-start gap-3" [class.border-bottom]="!last" [class.pb-3]="!last" [class.mb-3]="!last">
+                        <div class="row g-1 flex-grow-1">
+                            <div class="col-12 d-flex"><span style="width:110px">Document Type:</span> <span class="fw-bold">{{ documentTypeLabel }}</span></div>
+                            <div class="col-12 d-flex"><span style="width:110px">Code:</span> <span class="fw-bold">{{ doc.localCode || '—' }}</span></div>
+                            <div class="col-12 d-flex"><span style="width:110px">Date:</span> <span class="fw-bold">{{ doc.voucherDate ? (doc.voucherDate | date:'MMM dd, yyyy') : '—' }}</span></div>
+                            <div class="col-12 d-flex"><span style="width:110px">Amount:</span> <span class="fw-bold">{{ (doc.netAmount || 0) | number:'1.2-2' }}</span></div>
+                            <div class="col-12 d-flex"><span style="width:110px">Particulars:</span> <span class="fw-bold">{{ doc.particulars || '—' }}</span></div>
+                        </div>
+                    </div>
+                } @empty {
+<!--                    <div class="text-center text-muted py-3">No document selected. Click "Browse" to add.</div>-->
+                }
+
                 <!-- Header -->
+                <hr class="border-dashed mx-n3 mt-3"/>
                 <div class="row g-3">
                     <div class="col-md-3">
                         <label class="form-label fw-bold">Voucher Date <span class="text-danger">*</span></label>
                         <input type="text" class="form-control" mwlFlatpickr
+                               [disabled]="editMode"
                                [options]="flatpickrOptions"
                                [ngModel]="voucherDate"
                                (ngModelChange)="voucherDate = $event; calculateDueDate()"
@@ -33,7 +67,7 @@
                                [ngModelOptions]="{ standalone: true }" placeholder="Select date"/>
                     </div>
                     <div class="col-md-3">
-                        <label class="form-label fw-bold">Payment Term (days)</label>
+                        <label class="form-label fw-bold">Payment Term (days) <span class="text-danger">*</span></label>
                         <input type="number" class="form-control"
                                [ngModel]="paymentTerm"
                                (ngModelChange)="paymentTerm = $event; calculateDueDate()"
@@ -45,8 +79,8 @@
                             <input type="text" class="form-control"
                                    [value]="vendor ? vendor.name : ''"
                                    readonly placeholder="Select vendor..."/>
-                            <button type="button" class="btn btn-success fw-bold" (click)="openVendorBrowse()">
-                                <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
+                            <button type="button" class="btn btn-primary fw-bold" (click)="openVendorBrowse()">
+                                <ng-icon name="tablerSearch" class="me-1 fw-bold fs-md"></ng-icon>Browse
                             </button>
                             @if (vendor) {
                                 <button type="button" class="btn btn-light fw-bold" (click)="clearVendor()">
@@ -131,8 +165,8 @@
                 <hr class="border-dashed mx-n3 mt-3"/>
                 <div class="d-flex align-items-center justify-content-between mb-2">
                     <div class="fs-xs text-uppercase fw-semibold text-muted">IEMOP Billings</div>
-                    <button type="button" class="btn btn-success fw-bold btn-sm" (click)="openIemopBrowse()">
-                        <ng-icon name="tablerPlus" class="ps-0 pe-2 fw-bold"></ng-icon>Browse IEMOP
+                    <button type="button" class="btn btn-primary fw-bold btn-sm" (click)="openIemopBrowse()">
+                        <ng-icon name="tablerPlus" class="me-1 fw-bold fs-md"></ng-icon>Browse IEMOP
                     </button>
                 </div>
                 <div class="table-responsive">
@@ -185,8 +219,8 @@
                             <input type="text" class="form-control"
                                    [value]="checker ? (checker.name || checker.fullName || '') : ''"
                                    readonly placeholder="Select checker..."/>
-                            <button type="button" class="btn btn-success fw-bold" (click)="openSignatoryBrowse('checker')">
-                                <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
+                            <button type="button" class="btn btn-primary fw-bold" (click)="openSignatoryBrowse('checker')">
+                                <ng-icon name="tablerSearch" class="me-1 fw-bold fs-md"></ng-icon>Browse
                             </button>
                             @if (checker) {
                                 <button type="button" class="btn btn-light fw-bold" (click)="clearSignatory('checker')">
@@ -201,8 +235,8 @@
                             <input type="text" class="form-control"
                                    [value]="approvingOfficer ? (approvingOfficer.name || approvingOfficer.fullName || '') : ''"
                                    readonly placeholder="Select approving officer..."/>
-                            <button type="button" class="btn btn-success fw-bold" (click)="openSignatoryBrowse('approvingOfficer')">
-                                <ng-icon name="tablerSearch" class="ps-0 pe-2 fw-bold"></ng-icon>Browse
+                            <button type="button" class="btn btn-primary fw-bold" (click)="openSignatoryBrowse('approvingOfficer')">
+                                <ng-icon name="tablerSearch" class="me-1 fw-bold fs-md"></ng-icon>Browse
                             </button>
                             @if (approvingOfficer) {
                                 <button type="button" class="btn btn-light fw-bold" (click)="clearSignatory('approvingOfficer')">
@@ -217,7 +251,7 @@
                 <hr class="border-dashed mx-n3 mt-3"/>
                 <div class="d-flex align-items-center gap-3 mb-2">
                     <div class="fs-xs text-uppercase fw-semibold text-muted">Attachments</div>
-                    <button type="button" class="btn btn-success fw-bold btn-sm gap-1" (click)="openFilePicker()">
+                    <button type="button" class="btn btn-primary fw-bold btn-sm gap-1" (click)="openFilePicker()">
                         <ng-icon name="tablerPaperclip" class="ps-0 pe-2 fw-bold fs-md"></ng-icon>Attach Files
                     </button>
                     <small class="text-muted">JPG, PNG, PDF only</small>
