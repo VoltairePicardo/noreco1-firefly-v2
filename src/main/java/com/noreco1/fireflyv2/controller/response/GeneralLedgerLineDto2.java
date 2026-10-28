@@ -1,5 +1,6 @@
 package com.noreco1.fireflyv2.controller.response;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -27,7 +28,9 @@ public class GeneralLedgerLineDto2 {
     private String checkNumber;
     private List<Map> distribution = new ArrayList<>();
     private List<Map> cashFlowAccounts = new ArrayList<>();
-    private Map wTaxEntry;
+    @Getter(onMethod_ = @JsonProperty("wTaxEntry"))
+    @Setter(onMethod_ = @JsonProperty("wTaxEntry"))
+    private WTaxEntry wTaxEntry;
     private Map vatEntry;
     private List<SubLedgerDto> slentries = new ArrayList<>();
 

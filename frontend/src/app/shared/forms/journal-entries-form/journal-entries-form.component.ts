@@ -26,7 +26,7 @@ export interface JournalEntry {
     wht?: { atc: any; nature: string; rate: number | null; amount: number | null } | null;
     slentries?: SlEntry[];
     generated?: boolean;
-    wTaxEntry?: any | null;
+    wTaxEntry?: WTaxEntry | null;
     vatEntry?: any | null;
     _id?: number;
     _parentId?: number;
@@ -34,6 +34,23 @@ export interface JournalEntry {
     _grossCredit?: number;
     _netDebit?: number | null;
     _netCredit?: number | null;
+}
+
+export interface WTaxEntry {
+    percentage: number | null;
+    amount: number | null;
+    baseAmount: number | null;
+    nature?: string;
+    atc: TaxCode;
+}
+
+export interface TaxCode {
+    id: number;
+    code: string;
+    description: string;
+    rate: number;
+    payeeType: string;
+    account?: any;
 }
 
 @Component({

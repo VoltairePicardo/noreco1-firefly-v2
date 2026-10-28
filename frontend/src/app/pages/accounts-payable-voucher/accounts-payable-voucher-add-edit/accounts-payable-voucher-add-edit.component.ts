@@ -313,25 +313,30 @@ export class AccountsPayableVoucherAddEditComponent {
     loadJournalEntries(transId: number): void {
         this.service.getJournalEntries(transId).subscribe({
             next: (data) => {
-                this.journalEntries = (data || []).map((e: any): JournalEntry => ({
-                    account: {
-                        accountCode:  e.code || e.accountCode,
-                        accountTitle: e.description || e.accountTitle,
-                        id:           e.accountId,
-                        hasSL:        e.hasSL || false
-                    },
-                    debit:     Number(e.debit)  || null,
-                    credit:    Number(e.credit) || null,
-                    wTaxEntry: e.wTaxEntry || null,
-                    vatEntry:  e.vatEntry  || null,
-                    slentries: (e.slentries || []).map((sl: any) => ({
-                        entity:    null,
-                        accountNo: sl.accountNo,
-                        name:      sl.name,
-                        debit:     Number(sl.debit)  || null,
-                        credit:    Number(sl.credit) || null
-                    }))
-                }));
+                this.journalEntries = (data || []).map((e: any): JournalEntry => {
+                    const whtAccountId = e.wTaxEntry?.atc?.account?.id;
+                    const isWhtRow     = whtAccountId != null && whtAccountId === e.accountId;
+                    return {
+                        account: {
+                            accountCode:  e.code || e.accountCode,
+                            accountTitle: e.description || e.accountTitle,
+                            id:           e.accountId,
+                            hasSL:        e.hasSL || false
+                        },
+                        debit:     Number(e.debit)  || null,
+                        credit:    Number(e.credit) || null,
+                        generated: isWhtRow,
+                        wTaxEntry: isWhtRow ? e.wTaxEntry : null,
+                        vatEntry:  e.vatEntry  || null,
+                        slentries: (e.slentries || []).map((sl: any) => ({
+                            entity:    null,
+                            accountNo: sl.accountNo,
+                            name:      sl.name,
+                            debit:     Number(sl.debit)  || null,
+                            credit:    Number(sl.credit) || null
+                        }))
+                    };
+                });
             },
             error: () => { this.journalEntries = []; }
         });
@@ -685,6 +690,12 @@ export class AccountsPayableVoucherAddEditComponent {
             )
         };
 
+        // TEMP DEBUG: log payload only, backend call disabled. Revert by deleting these 3 lines and uncommenting the block below.
+        // console.log('APV payload', JSON.stringify(payload, null, 2));
+        // this.formSubmit = false;
+        // return;
+
+
         const req$ = this.editMode
             ? this.service.update(payload, this.newFiles, this.filesToRemove)
             : this.service.create(payload, this.newFiles);
@@ -704,5 +715,6 @@ export class AccountsPayableVoucherAddEditComponent {
                 this.alertService.httpError(this.module, 'Save failed.', err);
             }
         });
+
     }
 }
