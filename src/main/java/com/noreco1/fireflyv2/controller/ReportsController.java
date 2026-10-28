@@ -581,6 +581,24 @@ public class ReportsController {
         downloadService.download(type, token, response, params, template, dataSource);
     }// end: BIR Alphalist
 
+    // start: Summary of Taxes Withheld
+
+    @RequestMapping(value = "/export/summary-of-taxes-withheld/{year}/{month}/{notedByAcctNo}/{approvedByAcctNo}")
+    public void exportSummaryOfTaxesWithheld(@PathVariable Integer year,
+                                             @PathVariable Integer month,
+                                             @PathVariable Integer notedByAcctNo,
+                                             @PathVariable Integer approvedByAcctNo,
+                                             @RequestParam(value = "type") String type,
+                                             @RequestParam(value = "token") String token,
+                                             HttpServletResponse response, HttpServletRequest request) {
+
+        HashMap params = reportsService.reportParametersSummaryOfTaxesWithheld(year, month, notedByAcctNo, approvedByAcctNo, request);
+        JRDataSource dataSource = reportsService.datasourceSummaryOfTaxesWithheld(year, month);
+
+        String template = GlobalConstant.JASPER_BASE_PATH + "/bir/SummaryOfTaxesWithheld.jrxml";
+        downloadService.download(type, token, response, params, template, dataSource);
+    }// end: Summary of Taxes Withheld
+
     // start: GL Account Inquiry
 
     @GetMapping(value = "/accounting/gl-account-inquiry/{accountId}/{from}/{to}/{statusId}")

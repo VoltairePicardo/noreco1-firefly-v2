@@ -1,0 +1,332 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.21.5.final using JasperReports Library version 6.21.5  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="SummaryOfTaxesWithheld" pageWidth="612" pageHeight="792" whenNoDataType="AllSectionsNoDetail" columnWidth="552" leftMargin="30" rightMargin="30" topMargin="30" bottomMargin="30" isSummaryWithPageHeaderAndFooter="true" uuid="20a61f8a-c7b2-4836-a203-dfc01444f66e">
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.topMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.bottomMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.leftMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.rightMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
+	<parameter name="COMP_NAME" class="java.lang.String"/>
+	<parameter name="COMP_ADDR" class="java.lang.String"/>
+	<parameter name="MONTH" class="java.lang.String"/>
+	<parameter name="YEAR" class="java.lang.Integer"/>
+	<parameter name="PREPARED_BY" class="java.lang.String"/>
+	<parameter name="PREPARED_BY_POS" class="java.lang.String"/>
+	<parameter name="NOTED_BY" class="java.lang.String"/>
+	<parameter name="NOTED_BY_POS" class="java.lang.String"/>
+	<parameter name="APPROVED_BY" class="java.lang.String"/>
+	<parameter name="APPROVED_BY_POS" class="java.lang.String"/>
+	<parameter name="LOGO_PATH" class="java.lang.String"/>
+	<parameter name="PREPARED_BY_SIGN" class="java.awt.Image"/>
+	<parameter name="NOTED_BY_SIGN" class="java.awt.Image"/>
+	<parameter name="APPROVED_BY_SIGN" class="java.awt.Image"/>
+	<parameter name="TAX_CODE_SUBREPORT" class="net.sf.jasperreports.engine.JasperReport"/>
+	<parameter name="TAX_CODE_DS" class="net.sf.jasperreports.engine.JRDataSource"/>
+	<field name="description" class="java.lang.String"/>
+	<field name="code" class="java.lang.String"/>
+	<field name="baseAmount" class="java.math.BigDecimal"/>
+	<field name="taxRate" class="java.math.BigDecimal"/>
+	<field name="taxDue" class="java.math.BigDecimal"/>
+	<variable name="totalTaxDue" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{taxDue}]]></variableExpression>
+	</variable>
+	<title>
+		<band height="110" splitType="Stretch">
+			<image hAlign="Left" vAlign="Top" isLazy="true" onErrorType="Blank">
+				<reportElement x="40" y="0" width="55" height="55" uuid="64307314-ab09-492d-bdba-d1957aa5aa89"/>
+				<imageExpression><![CDATA[$P{LOGO_PATH}]]></imageExpression>
+			</image>
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="0" width="552" height="16" uuid="cc469327-df39-403b-88b9-f29525e17d7f"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="11" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{COMP_NAME}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="16" width="552" height="14" uuid="8e9ee1a7-7c49-4918-bbc9-ce21086c2e03"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{COMP_ADDR}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="50" width="552" height="16" uuid="5babb7a7-92e3-45f2-9fde-292e006b5b3f"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="11"/>
+				</textElement>
+				<text><![CDATA[SUMMARY OF TAXES WITHHELD]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="0" y="66" width="552" height="16" uuid="f8e4cc81-89d3-4e86-a66e-ea3317f54b8a"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="11" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["For the month of " + $P{MONTH} + " " + $P{YEAR}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<columnHeader>
+		<band height="35" splitType="Stretch">
+			<staticText>
+				<reportElement x="220" y="0" width="50" height="30" uuid="fa787a03-8ba3-4729-b4ee-8efe0361f152"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[ATC NO.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="278" y="0" width="104" height="30" uuid="2c382361-85d6-439a-8e92-8e8160ff9c1a"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" isBold="true"/>
+				</textElement>
+				<text><![CDATA[TAX BASE
+AMOUNT]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="390" y="0" width="55" height="30" uuid="717ed2f7-66fc-4176-bc50-e20211a7bf54"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" isBold="true"/>
+				</textElement>
+				<text><![CDATA[TAX
+RATE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="450" y="0" width="102" height="30" uuid="ea6acc72-ba80-47be-ad46-07da80c5897d"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" isBold="true"/>
+				</textElement>
+				<text><![CDATA[TAX DUE]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="28" splitType="Stretch">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="210" height="24" uuid="7a575ab7-708c-4e14-a93d-96f95a8a5a62"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{description}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToTallestObject" x="220" y="0" width="50" height="24" uuid="55993e99-fb90-44d1-b6fc-f052f161e75d"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="10" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{code}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToTallestObject" x="278" y="0" width="104" height="24" uuid="102431fa-1580-492b-a82e-b7eb8f1850e4"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{baseAmount}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.##%" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToTallestObject" x="390" y="0" width="55" height="24" uuid="e49351f8-ef3c-4c46-a1b8-b8b4e09ff4c8"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{taxRate}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToTallestObject" x="450" y="0" width="102" height="24" uuid="f2664a5d-1144-4bf0-b9ce-4becbf273f37"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{taxDue}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="13">
+			<textField>
+				<reportElement x="450" y="1" width="102" height="12" uuid="9decad5d-4ef6-404f-983d-d140e69f5ed2"/>
+				<textElement textAlignment="Right">
+					<font fontName="SansSerif" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Page " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField pattern="MMMM d, yyyy hh:mm a">
+				<reportElement x="0" y="1" width="102" height="12" uuid="6d951cbf-0417-49c1-ba24-c48dad6767a5"/>
+				<textElement textAlignment="Left">
+					<font fontName="SansSerif" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="206" splitType="Stretch">
+			<image hAlign="Left" vAlign="Middle" onErrorType="Blank">
+				<reportElement x="368" y="73" width="170" height="48" uuid="120174b3-eb36-401e-a816-145149101150"/>
+				<imageExpression><![CDATA[$P{APPROVED_BY_SIGN}]]></imageExpression>
+			</image>
+			<image hAlign="Left" vAlign="Middle" onErrorType="Blank">
+				<reportElement x="184" y="73" width="170" height="48" uuid="38a88c1b-0430-4947-ae10-f67c60ec8196"/>
+				<imageExpression><![CDATA[$P{NOTED_BY_SIGN}]]></imageExpression>
+			</image>
+			<image hAlign="Left" vAlign="Middle" onErrorType="Blank">
+				<reportElement x="0" y="73" width="170" height="48" uuid="ea45e264-518e-4555-8803-f3f8a71aeb12"/>
+				<imageExpression><![CDATA[$P{PREPARED_BY_SIGN}]]></imageExpression>
+			</image>
+			<staticText>
+				<reportElement x="0" y="8" width="220" height="24" uuid="3c5f421a-348d-40b7-a7f3-0519741be534"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[TOTAL]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="220" y="8" width="230" height="24" uuid="4bb692a6-6ba2-47e5-82ab-9be30b5de273"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<textField pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement x="450" y="8" width="102" height="24" uuid="16fd9608-c240-474c-8edd-ab09ed686658"/>
+				<box rightPadding="4">
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="10" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{totalTaxDue}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="60" width="100" height="14" uuid="ce643a62-57b3-4aa3-8524-55a22bbd4c4a"/>
+				<textElement>
+					<font fontName="SansSerif" size="9"/>
+				</textElement>
+				<text><![CDATA[Prepared by:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="184" y="60" width="100" height="14" uuid="32bd7d14-bffd-4fd6-84a9-b4fe2e269fc4"/>
+				<textElement>
+					<font fontName="SansSerif" size="9"/>
+				</textElement>
+				<text><![CDATA[Noted by:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="368" y="60" width="100" height="14" uuid="bd101878-a853-43a4-85ea-e0b435b7f613"/>
+				<textElement>
+					<font fontName="SansSerif" size="9"/>
+				</textElement>
+				<text><![CDATA[Approved by:]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="121" width="170" height="14" uuid="f648e6f7-ea2e-46da-9b0f-734c9de7ce8a"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="SansSerif" size="9" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{PREPARED_BY}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="135" width="170" height="14" uuid="0cc460d1-e7ca-445c-a540-03b58ad653d2"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="SansSerif" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{PREPARED_BY_POS}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="184" y="121" width="170" height="14" uuid="6fb0ef2e-8cac-4739-8d17-f06898ac8d65"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="SansSerif" size="9" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{NOTED_BY}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="184" y="135" width="170" height="14" uuid="d867590e-af7d-443d-92bb-1f7ba36106f8"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="SansSerif" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{NOTED_BY_POS}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="368" y="121" width="170" height="14" uuid="3992fc3b-2c57-422e-8112-95bc94f1ab16"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="SansSerif" size="9" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{APPROVED_BY}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="368" y="135" width="170" height="14" uuid="4db2ba27-5abe-4060-8bcd-00b2105a1cbc"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="SansSerif" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{APPROVED_BY_POS}]]></textFieldExpression>
+			</textField>
+			<break>
+				<reportElement x="0" y="176" width="550" height="1" uuid="d0c2571d-f7b8-4218-ac5e-b127761c7452"/>
+			</break>
+			<subreport>
+				<reportElement positionType="Float" x="0" y="186" width="552" height="20" uuid="fac6bbcd-e746-420b-bd6e-aea6cf7a0735"/>
+				<subreportParameter name="LOGO_PATH">
+					<subreportParameterExpression><![CDATA[$P{LOGO_PATH}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="PREPARED_BY_SIGN">
+					<subreportParameterExpression><![CDATA[$P{PREPARED_BY_SIGN}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="NOTED_BY_SIGN">
+					<subreportParameterExpression><![CDATA[$P{NOTED_BY_SIGN}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="APPROVED_BY_SIGN">
+					<subreportParameterExpression><![CDATA[$P{APPROVED_BY_SIGN}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="COMP_NAME">
+					<subreportParameterExpression><![CDATA[$P{COMP_NAME}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="COMP_ADDR">
+					<subreportParameterExpression><![CDATA[$P{COMP_ADDR}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="MONTH">
+					<subreportParameterExpression><![CDATA[$P{MONTH}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="YEAR">
+					<subreportParameterExpression><![CDATA[$P{YEAR}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="PREPARED_BY">
+					<subreportParameterExpression><![CDATA[$P{PREPARED_BY}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="PREPARED_BY_POS">
+					<subreportParameterExpression><![CDATA[$P{PREPARED_BY_POS}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="NOTED_BY">
+					<subreportParameterExpression><![CDATA[$P{NOTED_BY}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="NOTED_BY_POS">
+					<subreportParameterExpression><![CDATA[$P{NOTED_BY_POS}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="APPROVED_BY">
+					<subreportParameterExpression><![CDATA[$P{APPROVED_BY}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="APPROVED_BY_POS">
+					<subreportParameterExpression><![CDATA[$P{APPROVED_BY_POS}]]></subreportParameterExpression>
+				</subreportParameter>
+				<dataSourceExpression><![CDATA[$P{TAX_CODE_DS}]]></dataSourceExpression>
+				<subreportExpression><![CDATA[$P{TAX_CODE_SUBREPORT}]]></subreportExpression>
+			</subreport>
+		</band>
+	</summary>
+</jasperReport>

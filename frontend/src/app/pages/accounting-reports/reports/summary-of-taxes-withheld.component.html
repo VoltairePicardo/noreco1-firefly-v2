@@ -1,0 +1,65 @@
+<div class="container-fluid">
+    <app-page-title [title]="'Accounting Reports'" [subTitle]="module" [menuLink]="menuLink" [useSubtitleAsTitle]="true"/>
+</div>
+<div class="container-fluid">
+    <div class="card">
+        <div class="card-body">
+            <div class="row g-2 align-items-end">
+                <div class="col-md-2">
+                    <label class="form-label fw-bold mb-1">Year</label>
+                    <select class="form-select" [ngModel]="selectedYear()"
+                            (ngModelChange)="selectedYear.set($event)">
+                        @for (y of years; track y) {
+                            <option [ngValue]="y">{{ y }}</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label fw-bold mb-1">Month</label>
+                    <select class="form-select" [ngModel]="selectedMonth()"
+                            (ngModelChange)="selectedMonth.set($event)">
+                        @for (m of months; track m.id) {
+                            <option [ngValue]="m.id">{{ m.name }}</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-bold mb-1">Noted By</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control" [value]="notedBy?.name || ''" readonly placeholder="Browse officer..."/>
+                        <button type="button" class="btn btn-primary fw-bold" (click)="browseNotedBy()">
+                            <ng-icon name="tablerSearch" class="fw-bold me-1 fs-md"></ng-icon>Browse
+                        </button>
+                    </div>
+                    @if (notedByError) {
+                        <div class="text-danger small mt-1">{{ notedByError }}</div>
+                    }
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-bold mb-1">Approved By</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control" [value]="approvedBy?.name || ''" readonly placeholder="Browse officer..."/>
+                        <button type="button" class="btn btn-primary fw-bold" (click)="browseApprovedBy()">
+                            <ng-icon name="tablerSearch" class="fw-bold me-1 fs-md"></ng-icon>Browse
+                        </button>
+                    </div>
+                    @if (approvedByError) {
+                        <div class="text-danger small mt-1">{{ approvedByError }}</div>
+                    }
+                </div>
+            </div>
+            <div class="row g-2 mt-1">
+                <div class="col-12">
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-primary fw-bold" (click)="export('pdf')">
+                            <ng-icon name="tablerFileTypePdf" class="fw-bold me-1 fs-md"></ng-icon>Export PDF
+                        </button>
+                        <button type="button" class="btn btn-primary fw-bold" (click)="export('xls')">
+                            <ng-icon name="tablerFileTypeXls" class="fw-bold me-1 fs-md"></ng-icon>Export Excel
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

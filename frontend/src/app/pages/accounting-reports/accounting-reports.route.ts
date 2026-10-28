@@ -207,6 +207,11 @@ export const ACCOUNTING_REPORTS_ROUTES: Routes = [
         data: { title: 'BIR Alphalist' }
     },
     {
+        path: 'summary-of-taxes-withheld',
+        loadComponent: () => import('./reports/summary-of-taxes-withheld.component').then(m => m.SummaryOfTaxesWithheldComponent),
+        data: { title: 'Summary of Taxes Withheld' }
+    },
+    {
         path: 'bir-form-1601e',
         loadComponent: () => import('./reports/bir-form-1601e.component').then(m => m.BirForm1601EComponent),
         data: { title: 'BIR Form 1601E' }
