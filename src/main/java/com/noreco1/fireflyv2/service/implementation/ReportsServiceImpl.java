@@ -5513,8 +5513,8 @@ public class ReportsServiceImpl implements ReportsService, Bir1601E {
             if (is == null) {
                 return null;
             }
-            java.awt.Image image = javax.imageio.ImageIO.read(is);
-            return image;
+
+            return javax.imageio.ImageIO.read(is);
         } catch (Exception e) {
             return null;
         }
