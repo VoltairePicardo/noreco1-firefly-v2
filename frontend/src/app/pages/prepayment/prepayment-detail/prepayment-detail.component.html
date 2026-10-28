@@ -158,13 +158,22 @@
                     </div>
                     @if (voucherResult.totalElements > 10) {
                         <div class="d-flex justify-content-center mb-3">
-                            <ngb-pagination
-                                [collectionSize]="voucherResult.totalElements"
-                                [page]="voucherPage + 1"
-                                [pageSize]="10"
-                                [maxSize]="5"
-                                (pageChange)="voucherPageChange($event)">
-                            </ngb-pagination>
+                            <div class="pagination-boxed align-items-center mb-0">
+                                <ngb-pagination
+                                    [collectionSize]="voucherResult.totalElements"
+                                    [page]="voucherPage + 1"
+                                    [pageSize]="10"
+                                    [maxSize]="5"
+                                    [rotate]="true"
+                                    (pageChange)="voucherPageChange($event)">
+                                    <ng-template ngbPaginationPrevious>
+                                        <ng-icon name="tablerChevronLeft"/>
+                                    </ng-template>
+                                    <ng-template ngbPaginationNext>
+                                        <ng-icon name="tablerChevronRight"/>
+                                    </ng-template>
+                                </ngb-pagination>
+                            </div>
                         </div>
                     }
                 } @else if (voucherResult !== null) {

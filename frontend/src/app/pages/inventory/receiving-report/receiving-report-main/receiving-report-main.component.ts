@@ -4,11 +4,13 @@ import { AlertService } from '@/app/shared/services/alert.service';
 import { FlatpickrDirective, provideFlatpickrDefaults } from 'angularx-flatpickr';
 import { ReceivingReportService } from '../receiving-report.service';
 import { monthStart, monthEnd } from '@/app/shared/utils/date.utils';
+import { provideIcons } from '@ng-icons/core';
+import { tablerChevronLeft, tablerChevronRight } from '@ng-icons/tabler-icons';
 
 @Component({
     selector: 'app-receiving-report-main',
     imports: [...COMMON_ALL_PAGE_IMPORTS, ...COMMON_MAIN_PAGE_IMPORTS, FlatpickrDirective],
-    providers: [...SHARED_PROVIDERS, provideFlatpickrDefaults()],
+    providers: [...SHARED_PROVIDERS, provideFlatpickrDefaults(), provideIcons({ tablerChevronLeft, tablerChevronRight })],
     templateUrl: './receiving-report-main.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush
 })

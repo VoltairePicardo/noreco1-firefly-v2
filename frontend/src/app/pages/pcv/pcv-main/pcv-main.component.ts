@@ -5,11 +5,13 @@ import { ModalService } from '@/app/shared/modals/modal-service';
 import { ReplenishCvModalComponent } from '@/app/shared/modals/replenish-cv-modal/replenish-cv-modal.component';
 import { PcvService } from '../pcv.service';
 import Swal from 'sweetalert2';
+import { provideIcons } from '@ng-icons/core';
+import { tablerChevronLeft, tablerChevronRight } from '@ng-icons/tabler-icons';
 
 @Component({
     selector: 'app-pcv-main',
     imports: [...COMMON_ALL_PAGE_IMPORTS, ...COMMON_MAIN_PAGE_IMPORTS],
-    providers: [...SHARED_PROVIDERS],
+    providers: [...SHARED_PROVIDERS, provideIcons({ tablerChevronLeft, tablerChevronRight })],
     templateUrl: './pcv-main.component.html'
 })
 export class PcvMainComponent {

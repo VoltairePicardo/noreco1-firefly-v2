@@ -5,11 +5,13 @@ import { BudgetLineItemService } from '../budget-line-item.service';
 import Swal from 'sweetalert2';
 import { AuthService } from '../../auth/auth.service';
 import { Router } from '@angular/router';
+import { provideIcons } from '@ng-icons/core';
+import { tablerChevronLeft, tablerChevronRight } from '@ng-icons/tabler-icons';
 
 @Component({
     selector: 'app-budget-line-item-main',
     imports: [...COMMON_ALL_PAGE_IMPORTS, ...COMMON_MAIN_PAGE_IMPORTS],
-    providers: [...SHARED_PROVIDERS],
+    providers: [...SHARED_PROVIDERS, provideIcons({ tablerChevronLeft, tablerChevronRight })],
     templateUrl: './budget-line-item-main.component.html'
 })
 export class BudgetLineItemMainComponent {

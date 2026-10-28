@@ -6,11 +6,13 @@ import { ModalService } from '@/app/shared/modals/modal-service';
 import { BrowseCOAModalComponent } from '@/app/shared/modals/browse-coa-modal/browse-coa-modal.component';
 import { AuthService } from '@/app/pages/auth/auth.service';
 import Swal from 'sweetalert2';
+import { provideIcons } from '@ng-icons/core';
+import { tablerChevronLeft, tablerChevronRight } from '@ng-icons/tabler-icons';
 
 @Component({
     selector: 'app-item-main',
     imports: [...COMMON_ALL_PAGE_IMPORTS, ...COMMON_MAIN_PAGE_IMPORTS],
-    providers: [...SHARED_PROVIDERS],
+    providers: [...SHARED_PROVIDERS, provideIcons({ tablerChevronLeft, tablerChevronRight })],
     templateUrl: './item-main.component.html'
 })
 export class ItemMainComponent {

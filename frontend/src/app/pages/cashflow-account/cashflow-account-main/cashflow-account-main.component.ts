@@ -2,11 +2,13 @@ import { Component, inject, signal, computed } from '@angular/core';
 import { COMMON_ALL_PAGE_IMPORTS, COMMON_MAIN_PAGE_IMPORTS, SHARED_PROVIDERS } from '@/app/shared/providers/shared-providers';
 import { AlertService } from '@/app/shared/services/alert.service';
 import { CashflowAccountService } from '../cashflow-account.service';
+import { provideIcons } from '@ng-icons/core';
+import { tablerChevronLeft, tablerChevronRight } from '@ng-icons/tabler-icons';
 
 @Component({
     selector: 'app-cashflow-account-main',
     imports: [...COMMON_ALL_PAGE_IMPORTS, ...COMMON_MAIN_PAGE_IMPORTS],
-    providers: [...SHARED_PROVIDERS],
+    providers: [...SHARED_PROVIDERS, provideIcons({ tablerChevronLeft, tablerChevronRight })],
     templateUrl: './cashflow-account-main.component.html'
 })
 export class CashflowAccountMainComponent {

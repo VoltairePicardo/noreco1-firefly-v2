@@ -4,11 +4,13 @@ import { FlatpickrDefaults, FlatpickrModule } from 'angularx-flatpickr';
 import { AlertService } from '@/app/shared/services/alert.service';
 import { ProjectAcceptanceCertificationService } from '../project-acceptance-certification.service';
 import { monthStart, monthEnd } from '@/app/shared/utils/date.utils';
+import { provideIcons } from '@ng-icons/core';
+import { tablerChevronLeft, tablerChevronRight } from '@ng-icons/tabler-icons';
 
 @Component({
     selector: 'app-project-acceptance-certification-main',
     imports: [...COMMON_ALL_PAGE_IMPORTS, ...COMMON_MAIN_PAGE_IMPORTS, FlatpickrModule],
-    providers: [...SHARED_PROVIDERS, FlatpickrDefaults],
+    providers: [...SHARED_PROVIDERS, FlatpickrDefaults, provideIcons({ tablerChevronLeft, tablerChevronRight })],
     templateUrl: './project-acceptance-certification-main.component.html'
 })
 export class ProjectAcceptanceCertificationMainComponent {

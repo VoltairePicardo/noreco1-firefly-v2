@@ -6,11 +6,13 @@ import { ModalService } from '@/app/shared/modals/modal-service';
 import { BrowseCOAModalComponent } from '@/app/shared/modals/browse-coa-modal/browse-coa-modal.component';
 import { FlatpickrDirective, provideFlatpickrDefaults } from 'angularx-flatpickr';
 import Swal from 'sweetalert2';
+import { provideIcons } from '@ng-icons/core';
+import { tablerChevronLeft, tablerChevronRight } from '@ng-icons/tabler-icons';
 
 @Component({
     selector: 'app-bank-reconciliation-main',
     imports: [...COMMON_ALL_PAGE_IMPORTS, ...COMMON_MAIN_PAGE_IMPORTS, FlatpickrDirective],
-    providers: [...SHARED_PROVIDERS, provideFlatpickrDefaults()],
+    providers: [...SHARED_PROVIDERS, provideFlatpickrDefaults(), provideIcons({ tablerChevronLeft, tablerChevronRight })],
     templateUrl: './bank-reconciliation-main.component.html'
 })
 export class BankReconciliationMainComponent {
