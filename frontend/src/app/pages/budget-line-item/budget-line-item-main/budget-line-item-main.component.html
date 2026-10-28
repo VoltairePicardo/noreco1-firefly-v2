@@ -119,6 +119,10 @@
                                                             <th>Budget Title</th>
                                                             <th>Specification</th>
                                                             <th class="text-end">Project Cost</th>
+                                                            @if (rec.documentStatus?.status === 'Approved') {
+                                                                <th class="text-end">NEA Approved Budget</th>
+                                                                <th class="text-end">Supplemental Budget</th>
+                                                            }
                                                         </tr>
                                                     </thead>
                                                     <tbody>
@@ -127,6 +131,22 @@
                                                                 <td>{{ d.title }}</td>
                                                                 <td>{{ d.item?.description ? (d.item.description + (d.specification ? ' - ' + d.specification : '')) : (d.specification || '') }}</td>
                                                                 <td class="text-end">{{ d.totalPrice | number:'1.2-2' }}</td>
+                                                                @if (rec.documentStatus?.status === 'Approved') {
+                                                                    <td class="text-end text-nowrap">
+                                                                        {{ (d.nEAApprovedAmount || 0) | number:'1.2-2' }}
+                                                                        <button type="button" class="btn btn-light btn-icon btn-sm rounded-circle ms-1"
+                                                                                (click)="updateNeaAmount(d)">
+                                                                            <ng-icon name="tablerEdit"></ng-icon>
+                                                                        </button>
+                                                                    </td>
+                                                                    <td class="text-end text-nowrap">
+                                                                        {{ (d.supplementalAmount || 0) | number:'1.2-2' }}
+                                                                        <button type="button" class="btn btn-light btn-icon btn-sm rounded-circle ms-1"
+                                                                                (click)="updateSupplementalAmt(d)">
+                                                                            <ng-icon name="tablerEdit"></ng-icon>
+                                                                        </button>
+                                                                    </td>
+                                                                }
                                                             </tr>
                                                         }
 

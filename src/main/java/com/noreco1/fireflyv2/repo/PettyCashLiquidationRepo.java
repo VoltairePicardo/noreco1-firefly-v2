@@ -14,7 +14,6 @@ public interface PettyCashLiquidationRepo extends JpaRepository<PettyCashLiquida
     @Query(value = "select " +
             "la.* " +
             "from PettyCashLiquidation la  " +
-            "LEFT JOIN `User` approveUser on la.FK_approvedByUserId = approveUser.id " +
             "LEFT JOIN `User` createUser on la.FK_createdByUserId = createUser.id  " +
             "LEFT JOIN `User` receiveUser on la.FK_receivedByUserId = receiveUser.id " +
             "WHERE approveUser.id = :userId OR createUser.id = :userId  " +

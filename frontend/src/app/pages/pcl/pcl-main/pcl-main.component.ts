@@ -29,9 +29,9 @@ export class PclMainComponent {
         return this.records().filter(r =>
             !q ||
             (r.code || '').toLowerCase().includes(q) ||
-            (r.pcvCode || r.pettyCashTransCode || '').toLowerCase().includes(q) ||
-            (r.payee || '').toLowerCase().includes(q) ||
-            (r.status || r.documentStatus || '').toLowerCase().includes(q)
+            (r.pettyCashTrans?.code || '').toLowerCase().includes(q) ||
+            (r.pettyCashTrans?.payee || '').toLowerCase().includes(q) ||
+            (r.documentStatus?.status || '').toLowerCase().includes(q)
         );
     }
 
@@ -63,7 +63,7 @@ export class PclMainComponent {
     }
 
     isEditable(rec: any): boolean {
-        const s = (rec?.status || rec?.documentStatus || '').toString();
-        return s === 'Document Created' || s === 'Returned to Creator' || s === '1' || s === '11';
+        const s = (rec?.documentStatus?.status || '').toString();
+        return s === 'Document Created' || s === 'Returned to Creator';
     }
 }

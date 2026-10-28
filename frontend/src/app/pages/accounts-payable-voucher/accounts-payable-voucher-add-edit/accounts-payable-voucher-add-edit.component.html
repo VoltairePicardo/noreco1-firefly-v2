@@ -18,7 +18,9 @@
                                [options]="flatpickrOptions"
                                [ngModel]="voucherDate"
                                (ngModelChange)="voucherDate = $event; calculateDueDate()"
-                               [ngModelOptions]="{ standalone: true }" placeholder="Select date"/>
+                               [ngModelOptions]="{ standalone: true }"
+                               [disabled]="editMode"
+                               placeholder="Select date"/>
                     </div>
                     <div class="col-md-3">
                         <label class="form-label fw-bold">Invoice Date</label>
@@ -61,6 +63,7 @@
                                   cdkTextareaAutosize cdkAutosizeMinRows="1" cdkAutosizeMaxRows="10"
                                   [(ngModel)]="particulars"
                                   [ngModelOptions]="{ standalone: true }"
+                                  maxlength="1024"
                                   placeholder="Enter particulars..."></textarea>
                     </div>
                     <div class="col-md-4 d-flex align-items-end">

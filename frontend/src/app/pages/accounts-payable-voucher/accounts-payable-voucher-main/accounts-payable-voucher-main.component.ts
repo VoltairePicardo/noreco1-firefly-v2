@@ -87,7 +87,11 @@ export class AccountsPayableVoucherMainComponent {
     get filteredItems(): any[] {
         if (!this.searchText.trim()) return this.items();
         const q = this.searchText.toLowerCase();
-        return this.items().filter((r: any) => (r.localCode || r.code || '').toLowerCase().includes(q));
+        return this.items().filter((r: any) =>
+            (r.localCode || r.code || '').toLowerCase().includes(q) ||
+            (r.supplier || r.vendor || '').toLowerCase().includes(q) ||
+            (r.particulars || '').toLowerCase().includes(q)
+        );
     }
 
     get pagedItems(): any[] {
@@ -97,7 +101,7 @@ export class AccountsPayableVoucherMainComponent {
 
     isEditable(item: any): boolean {
         const s = item?.status || '';
-        return s === 'Document Created' || s === 'For Revision';
+        return s === 'Document Created' || s === 'For Revision' || s === 'Returned to Creator';
     }
 
     get selectedIds(): number[] {

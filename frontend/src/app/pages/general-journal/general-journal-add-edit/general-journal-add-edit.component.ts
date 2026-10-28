@@ -452,12 +452,22 @@ export class GeneralJournalAddEditComponent {
             this.alertService.warning(this.module, 'Validation', 'Please enter a voucher date.');
             return;
         }
+        if (!this.explanation?.trim()) {
+            this.alertService.warning(this.module, 'Validation', 'Please enter an explanation or remarks.');
+            return;
+        }
         if (this.journalEntries.length === 0) {
             this.alertService.warning(this.module, 'Validation', 'Please add at least one journal entry.');
             return;
         }
         if (!this.isBalanced) {
             this.alertService.warning(this.module, 'Validation', 'Debit and credit totals must be equal.');
+            return;
+        }
+
+        const missingSignatory = this.signatoryKeys.find(key => !this.signatories[key]);
+        if (missingSignatory) {
+            this.alertService.warning(this.module, 'Validation', `Please select ${this.signatoryLabels[missingSignatory]}.`);
             return;
         }
 

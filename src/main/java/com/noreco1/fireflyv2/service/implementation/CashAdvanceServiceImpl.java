@@ -833,6 +833,7 @@ public class CashAdvanceServiceImpl implements CashAdvanceService, PrintableVouc
             hm.put("createdAt", cashAdvance.getCreatedAt());
             hm.put("updatedAt", cashAdvance.getUpdatedAt());
             hm.put("transaction", transaction);
+            hm.put("transId", cashAdvance.getTransaction().getId());
 
             boolean isChecked = cashAdvance.getBudgetOfficer() != null;
             boolean allowCheck = false;

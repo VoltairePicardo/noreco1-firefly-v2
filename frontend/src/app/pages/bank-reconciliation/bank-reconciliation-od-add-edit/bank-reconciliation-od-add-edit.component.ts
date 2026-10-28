@@ -93,7 +93,7 @@ export class BankReconciliationOdAddEditComponent {
     }
 
     isValid(): boolean {
-        return !!(this.voucherDate && this.particulars?.trim() && this.account);
+        return !!(this.voucherDate && this.particulars?.trim() && this.account && Number(this.amount) > 0);
     }
 
     save(): void {
@@ -105,7 +105,7 @@ export class BankReconciliationOdAddEditComponent {
             id:          this.editMode ? this.id : null,
             voucherDate: this.voucherDate,
             particulars: this.particulars.trim(),
-            amount:      Number(this.amount) || 0,
+            amount:      Number(this.amount),
             account:     { id: this.account.id },
             checkNumber: ''
         };
@@ -116,7 +116,8 @@ export class BankReconciliationOdAddEditComponent {
                 this.formSubmit = false;
                 if (res?.success) {
                     this.alertService.success(this.module, 'Saved', '');
-                    this.router.navigate(['/' + this.menuLink]);
+                    const detailId = this.editMode ? this.id : res.modelId;
+                    this.router.navigate(['/' + this.menuLink, 'od', detailId, 'detail']);
                 } else {
                     this.alertService.error(this.module, 'Save Failed', res?.failureMessage || '');
                 }

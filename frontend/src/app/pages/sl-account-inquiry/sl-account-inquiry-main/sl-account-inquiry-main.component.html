@@ -34,8 +34,9 @@
                 <div class="col">
                     <label class="form-label fw-bold mb-1">Account</label>
                     <div class="input-group">
-                        <input type="text" class="form-control" [value]="selectedAccount?.title || ''" readonly
-                               placeholder="Browse an account..."/>
+                        <input type="text" class="form-control"
+                               [value]="selectedAccount ? (selectedAccount.accountCode + ' — ' + selectedAccount.accountTitle) : ''"
+                               readonly placeholder="Browse an account..."/>
                         <button type="button" class="btn btn-success fw-bold" (click)="browseAccount()">
                             <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
                         </button>

@@ -3,13 +3,16 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { environment } from '@/environments/environment';
+import { DownloadService } from '@/app/core/services/download.service';
 
 const BASE_API = environment.get('baseApiUrl');
+const BASE_URL = environment.get('baseUrl');
 const httpOptions = { headers: new HttpHeaders({ 'Content-Type': 'application/json' }) };
 
 @Injectable({ providedIn: 'root' })
 export class PcvService {
-    private http = inject(HttpClient);
+    private http            = inject(HttpClient);
+    private downloadService = inject(DownloadService);
 
     list(): Observable<any[]> {
         return this.http.get<any[]>(`${BASE_API}/pcv/list`);
@@ -60,6 +63,14 @@ export class PcvService {
         return this.http.get<any[]>(`${BASE_API}/json/document-logs/${transId}`);
     }
 
+    getFiles(transId: number): Observable<any[]> {
+        return this.http.get<any[]>(`${BASE_URL}/file/attachments/${transId}`);
+    }
+
+    fileUrl(fileId: number): string {
+        return this.downloadService.printUrl(`${BASE_URL}/file/${fileId}`);
+    }
+
     getBatches(): Observable<any[]> {
         return this.http.get<any[]>(`${BASE_API}/pcv/batches`);
     }
@@ -85,7 +96,7 @@ export class PcvService {
     }
 
     getCashFlowItems(): Observable<any[]> {
-        return this.http.get<any[]>(`${BASE_API}/json/cashflow-items`);
+        return this.http.get<any[]>(`${BASE_API}/cashflow-item/list`);
     }
 
     getCashFlowBalances(budgetLineItemDetailId: number): Observable<any> {
@@ -105,7 +116,7 @@ export class PcvService {
     }
 
     print(id: number): void {
-        window.open(`${BASE_API}/pcv/print/${id}`, '_blank');
+        this.downloadService.print(`${BASE_API}/petty-cash-voucher/export/${id}`, { type: 'pdf' });
     }
 
     getOffices(): Observable<any[]> {
@@ -121,11 +132,18 @@ export class PcvService {
     }
 
     getCloseoutVouchers(params: any): Observable<any[]> {
-        return this.http.get<any[]>(`${BASE_API}/pcv/closeout-vouchers`, { params });
+        const p: any = {};
+        if (params.from)             p['from']             = params.from;
+        if (params.to)               p['to']               = params.to;
+        if (params.officeId)         p['officeId']         = params.officeId;
+        if (params.documentStatusId) p['documentStatusId'] = params.documentStatusId;
+        return this.http.get<any[]>(`${BASE_API}/pcv/closeout-vouchers`, { params: p });
     }
 
-    printCloseout(params: any): void {
-        const query = new URLSearchParams(params).toString();
-        window.open(`${BASE_API}/pcv/print-summary?${query}`, '_blank');
+    printCloseout(checkedByAcctNo: number, replenishedByAcctNo: number, params: Record<string, any>): void {
+        this.downloadService.print(
+            `${BASE_API}/petty-cash-voucher/print/${checkedByAcctNo}/${replenishedByAcctNo}`,
+            { type: 'pdf', ...params }
+        );
     }
 }

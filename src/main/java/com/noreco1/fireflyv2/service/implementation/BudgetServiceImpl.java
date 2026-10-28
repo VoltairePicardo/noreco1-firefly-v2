@@ -109,10 +109,10 @@ public class BudgetServiceImpl implements BudgetService, PrintableVoucher, Print
 //            params.put("V_DATE", budget.getVoucherDate());
             params.put("AMOUNT_IN_WORDS", CurrencyIntoWords.convert(budget.getAmount()));
             params.put("TOTAL", budget.getAmount());
+            params.put("YEAR", budget.getYear());
 //            params.put("APPROVAR", budget.getApprovingOfficer().getFullName());
 //            params.put("CHECKER", budget.getChecker().getFullName());
 //            params.put("PREPARAR", budget.getCreatedBy().getFullName());
-//            params.put("YEAR", budget.getYear());
 //            params.put("DEPARTMENT_ID", budget.getDepartment().getId());
 //            params.put("DEPARTMENT_NAME", budget.getDepartment().getName());
 
@@ -335,12 +335,14 @@ public class BudgetServiceImpl implements BudgetService, PrintableVoucher, Print
 //                d.setVoucherDate(dto.getBudget().getVoucherDate());
                 d.setCashflowChildName(dto.getCashflowItem().getName());
                 d.setCashflowParentName(dto.getCashflowItem().getParentCashflowItem().getName());
-                d.setAmtOgm(dto.getAmtOgm());
-                d.setAmtAod(dto.getAmtAod());
-                d.setAmtIsd(dto.getAmtIsd());
-                d.setAmtFsd(dto.getAmtFsd());
-                d.setAmtTsd(dto.getAmtTsd());
-                d.setAmtBod(dto.getAmtBod());
+                // v2 has no departments; route full amount through amtOgm so the
+                // JRXML's totalBudgetAmt variable (sum of all dept cols) equals bd.amount
+                d.setAmtOgm(dto.getAmount());
+                d.setAmtAod(BigDecimal.ZERO);
+                d.setAmtIsd(BigDecimal.ZERO);
+                d.setAmtFsd(BigDecimal.ZERO);
+                d.setAmtTsd(BigDecimal.ZERO);
+                d.setAmtBod(BigDecimal.ZERO);
                 d.setTotalYearBudget(dto.getTotalYearBudget());
 
                 details.add(d);

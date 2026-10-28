@@ -73,6 +73,13 @@ export class VoucherCashflowMainComponent {
     }
 
     goToSetup(rec: any): void {
-        this.router.navigate(['/' + this.menuLink, rec.documentTypeCode, rec.voucherId, 'setup']);
+        const typeCodeMap: Record<string, string> = {
+            'Check Voucher': 'CV',
+            'Cash Receipt Voucher': 'CRV',
+            'Journal Voucher': 'JV',
+            'Accounts Payable': 'APV'
+        };
+        const typeCode = typeCodeMap[rec.documentType] ?? rec.documentType;
+        this.router.navigate(['/' + this.menuLink, typeCode, rec.id, 'setup']);
     }
 }

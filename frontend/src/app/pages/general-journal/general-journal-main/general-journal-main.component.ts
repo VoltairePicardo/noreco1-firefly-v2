@@ -97,7 +97,7 @@ export class GeneralJournalMainComponent {
     }
 
     isEditable(rec: any): boolean {
-        const s = rec?.status || '';
+        const s = rec?.documentStatus?.status || '';
         return s === 'Document Created' || s === 'Returned to Creator';
     }
 

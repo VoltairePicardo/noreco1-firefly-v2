@@ -32,6 +32,11 @@ public class MonthlyCycleController {
         return service.findById(id);
     }
 
+    @GetMapping("/{year}/{month}")
+    public Map getByYearAndMonth(@PathVariable Integer year, @PathVariable Integer month) {
+        return service.findByYearAndMonth(year, month);
+    }
+
     @GetMapping("/{id}/logs")
     public List<Map> getLogs(@PathVariable Integer id) {
         return service.findLogs(id);

@@ -319,6 +319,11 @@
                                         (click)="openPayeeBrowse()">
                                     <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
                                 </button>
+                                @if (payee) {
+                                    <button type="button" class="btn btn-light fw-bold" (click)="clearPayee()" ngbTooltip="Clear">
+                                        <ng-icon name="tablerX" class="fs-sm"></ng-icon>
+                                    </button>
+                                }
                             </div>
                         </div>
                     </div>
@@ -329,12 +334,14 @@
                             <label class="form-label fw-bold">Additional Payee Information</label>
                             <textarea class="form-control" rows="2"
                                       [(ngModel)]="additionalPayeeInfo" [ngModelOptions]="{ standalone: true }"
+                                      maxlength="1024"
                                       placeholder="Enter additional payee info..."></textarea>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-bold">Particulars</label>
+                            <label class="form-label fw-bold">Particulars <span class="text-danger">*</span></label>
                             <textarea class="form-control" rows="2"
                                       [(ngModel)]="particulars" [ngModelOptions]="{ standalone: true }"
+                                      maxlength="1024"
                                       placeholder="Enter particulars..."></textarea>
                         </div>
                         <div class="col-md-12">
@@ -484,6 +491,11 @@
                                             (click)="openEntityBrowse(key)">
                                         <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
                                     </button>
+                                    @if (signatories[key]) {
+                                        <button type="button" class="btn btn-light fw-bold" (click)="clearSignatory(key)" ngbTooltip="Clear">
+                                            <ng-icon name="tablerX" class="fs-sm"></ng-icon>
+                                        </button>
+                                    }
                                 </div>
                                 @if (signatories[key]?.position) {
                                     <small class="text-muted">{{ signatories[key]?.position }}</small>
@@ -581,8 +593,13 @@
                         </a>
                         <button type="button" class="btn btn-primary fw-bold"
                                 [disabled]="formSubmit" (click)="save()">
-                            <ng-icon name="tablerCheck" class="ps-0 pe-3 fw-bold"></ng-icon>
-                            {{ editMode ? 'Update' : 'Save ' + module }}
+                            @if (formSubmit) {
+                                <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                                {{ editMode ? 'Updating...' : 'Saving...' }}
+                            } @else {
+                                <ng-icon name="tablerCheck" class="ps-0 pe-3 fw-bold"></ng-icon>
+                                {{ editMode ? 'Update' : 'Save ' + module }}
+                            }
                         </button>
                     </div>
 

@@ -326,4 +326,52 @@ export class BudgetLineItemMainComponent {
             this.selectedDivision = null;
         }
     }
+
+    async updateNeaAmount(detail: any): Promise<void> {
+        const { value, isConfirmed } = await Swal.fire({
+            title: 'NEA Approved Budget',
+            input: 'number',
+            inputValue: detail.nEAApprovedAmount ?? 0,
+            inputAttributes: { min: '0', step: '0.01' },
+            showCancelButton: true,
+            confirmButtonText: 'Save',
+            confirmButtonColor: '#0d6efd'
+        });
+        if (!isConfirmed || value === undefined || value === '') return;
+        this.service.updateNeaApprovedAmount({ id: detail.id, nEAApprovedAmount: Number(value) }).subscribe({
+            next: (res) => {
+                if (res?.success) {
+                    detail.nEAApprovedAmount = Number(value);
+                    this.alertService.success(this.module, 'NEA Approved Amount updated.', '');
+                } else {
+                    this.alertService.error(this.module, res?.failureMessage || 'Update failed.', '');
+                }
+            },
+            error: () => this.alertService.error(this.module, 'An error occurred.', '')
+        });
+    }
+
+    async updateSupplementalAmt(detail: any): Promise<void> {
+        const { value, isConfirmed } = await Swal.fire({
+            title: 'Supplemental Budget',
+            input: 'number',
+            inputValue: detail.supplementalAmount ?? 0,
+            inputAttributes: { min: '0', step: '0.01' },
+            showCancelButton: true,
+            confirmButtonText: 'Save',
+            confirmButtonColor: '#0d6efd'
+        });
+        if (!isConfirmed || value === undefined || value === '') return;
+        this.service.updateSupplementalAmount({ id: detail.id, supplementalAmount: Number(value) }).subscribe({
+            next: (res) => {
+                if (res?.success) {
+                    detail.supplementalAmount = Number(value);
+                    this.alertService.success(this.module, 'Supplemental Amount updated.', '');
+                } else {
+                    this.alertService.error(this.module, res?.failureMessage || 'Update failed.', '');
+                }
+            },
+            error: () => this.alertService.error(this.module, 'An error occurred.', '')
+        });
+    }
 }

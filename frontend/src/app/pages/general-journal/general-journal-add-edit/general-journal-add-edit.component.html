@@ -119,6 +119,7 @@
                             <label class="form-label fw-bold">Voucher Date <span class="text-danger">*</span></label>
                             <input type="text" class="form-control" mwlFlatpickr [options]="flatpickrOptions"
                                    [(ngModel)]="voucherDate" [ngModelOptions]="{ standalone: true }"
+                                   [disabled]="editMode"
                                    placeholder="Select date"/>
                         </div>
                         <div class="col-md-2">
@@ -130,10 +131,11 @@
                             </div>
                         </div>
                         <div class="col-md-8">
-                            <label class="form-label fw-bold">Explanation / Remarks</label>
+                            <label class="form-label fw-bold">Explanation / Remarks <span class="text-danger">*</span></label>
                             <textarea class="form-control" rows="3"
                                    [(ngModel)]="explanation" [ngModelOptions]="{ standalone: true }"
-                                   placeholder="Enter explanation or remarks..."></textarea>
+                                   placeholder="Enter explanation or remarks..."
+                                   maxlength="1024"></textarea>
                         </div>
                     </div>
 
@@ -169,6 +171,11 @@
                                             (click)="openEntityBrowse(key)">
                                         <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
                                     </button>
+                                    @if (signatories[key]) {
+                                        <button type="button" class="btn btn-light fw-bold" (click)="clearSignatory(key)" ngbTooltip="Clear">
+                                            <ng-icon name="tablerX" class="fs-sm"></ng-icon>
+                                        </button>
+                                    }
                                 </div>
                                 @if (signatories[key]?.position) {
                                     <small class="text-muted">{{ signatories[key]?.position }}</small>
@@ -237,8 +244,13 @@
                         </a>
                         <button type="button" class="btn btn-primary fw-bold"
                                 [disabled]="formSubmit" (click)="save()">
-                            <ng-icon name="tablerCheck" class="ps-0 pe-3 fw-bold"></ng-icon>
-                            {{ editMode ? 'Update' : 'Save ' + module }}
+                            @if (formSubmit) {
+                                <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                                {{ editMode ? 'Updating...' : 'Saving...' }}
+                            } @else {
+                                <ng-icon name="tablerCheck" class="ps-0 pe-3 fw-bold"></ng-icon>
+                                {{ editMode ? 'Update' : 'Save ' + module }}
+                            }
                         </button>
                     </div>
 

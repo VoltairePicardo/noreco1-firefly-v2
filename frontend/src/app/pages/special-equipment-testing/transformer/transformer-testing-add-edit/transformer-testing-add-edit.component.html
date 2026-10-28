@@ -17,14 +17,14 @@
                         <span class="fs-xs text-uppercase fw-semibold text-muted">New transformer</span>
                     }
                     <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-success fw-bold gap-1" (click)="openTransformerBrowse()">
+                            <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold fs-lg fs-lg"></ng-icon>Browse Existing Transformer
+                        </button>
                         @if (transformerId()) {
                             <button type="button" class="btn btn-light fw-bold" (click)="clearSelectedTransformer()">
                                 <ng-icon name="tablerX" class="ps-0 pe-3 fw-bold fs-lg"></ng-icon>Clear
                             </button>
                         }
-                        <button type="button" class="btn btn-success fw-bold gap-1" (click)="openTransformerBrowse()">
-                            <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold fs-lg fs-lg"></ng-icon>Browse Existing Transformer
-                        </button>
                     </div>
                 </div>
 

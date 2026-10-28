@@ -874,6 +874,16 @@ public class PettyCashTransServiceImpl implements PettyCashTransService, Printab
         return list;
     }
 
+    @Override
+    public List<PettyCashTrans> findForCloseout(String from, String to, Integer officeId, Integer documentStatusId) {
+        return pettyCashTransRepo.findForCloseout(
+                (from != null && !from.isEmpty()) ? from : null,
+                (to   != null && !to.isEmpty())   ? to   : null,
+                (officeId != null && officeId > 0) ? officeId : null,
+                (documentStatusId != null && documentStatusId > 0) ? documentStatusId : null
+        );
+    }
+
     private HashMap composeHashMap(PettyCashTrans pettyCashTrans) {
         HashMap<String, Object> hm = new HashMap<>();
         HashMap<String, Object> documentStatus;
@@ -939,21 +949,39 @@ public class PettyCashTransServiceImpl implements PettyCashTransService, Printab
             hm.put("code", pettyCashTrans.getCode());
             hm.put("documentStatus", documentStatus);
             hm.put("transaction", transaction);
+            hm.put("transId", pettyCashTrans.getTransaction().getId());
             hm.put("pettyCashFund", pettyCashFund);
             hm.put("pettyCashDate", pettyCashTrans.getPettyCashDate());
             hm.put("payee", pettyCashTrans.getPayee());
             hm.put("request", pettyCashTrans.getRequest());
             hm.put("amount", pettyCashTrans.getAmount());
+            hm.put("budgetAmountBalance", pettyCashTrans.getBudgetAmountBalancePCL());
             hm.put("createdByUser", createdBy);
             hm.put("approvedByUser", approvedBy);
             hm.put("checkedByUser", checkedBy);
             hm.put("releasedByUser", releasedBy);
             hm.put("createdAt", pettyCashTrans.getCreatedAt());
             hm.put("updatedAt", pettyCashTrans.getUpdatedAt());
-            hm.put("office", pettyCashTrans.getOffice() == null ? "":pettyCashTrans.getOffice().getName());
-            hm.put("officeId", pettyCashTrans.getOffice() == null ? "":pettyCashTrans.getOffice().getId());
+            if (pettyCashTrans.getOffice() != null) {
+                HashMap<String, Object> office = new HashMap<>();
+                office.put("id",   pettyCashTrans.getOffice().getId());
+                office.put("name", pettyCashTrans.getOffice().getName());
+                hm.put("office",   office);
+                hm.put("officeId", pettyCashTrans.getOffice().getId());
+            } else {
+                hm.put("office",   null);
+                hm.put("officeId", null);
+            }
             hm.put("documentStatusId", pettyCashTrans.getDocumentStatus() == null ? "":pettyCashTrans.getDocumentStatus().getId());
             hm.put("budgetLineItemDetail", pettyCashTrans.getBudgetLineItemDetail() == null ? "":pettyCashTrans.getBudgetLineItemDetail());
+
+            if (pettyCashTrans.getPettyCashBatch() != null) {
+                HashMap<String, Object> batch = new HashMap<>();
+                batch.put("id",     pettyCashTrans.getPettyCashBatch().getId());
+                batch.put("status", pettyCashTrans.getPettyCashBatch().getStatus() ? "Active" : "Closed");
+                hm.put("pettyCashBatch", batch);
+            }
+
             List<HashMap<String, Object>> detailList = new ArrayList<>();
             for (PettyCashTransDetail d : pettyCashTransDetailRepo.findByPCVId(pettyCashTrans.getId())) {
                 HashMap<String, Object> dm = new HashMap<>();

@@ -31,6 +31,6 @@ export class VoucherCashflowService {
     }
 
     getMonthlyCycle(year: number, month: number): Observable<any> {
-        return this.http.get<any>(`${BASE_API}/monthly-cycle/${year}/${month}`);
+        return this.http.get<any>(`${BASE_API}/monthly-closing/${year}/${month}`);
     }
 }

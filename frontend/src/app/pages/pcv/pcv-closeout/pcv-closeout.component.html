@@ -110,10 +110,10 @@
                                 } @else if (records().length > 0) {
                                     @for (rec of records(); track rec.id) {
                                         <tr>
-                                            <td>{{ rec.date || rec.pettyCashDate | date:'MMM dd, yyyy' }}</td>
+                                            <td>{{ rec.pettyCashDate | date:'MMM dd, yyyy' }}</td>
                                             <td class="fw-bold">{{ rec.code }}</td>
                                             <td>{{ rec.payee }}</td>
-                                            <td>{{ rec.purpose || rec.natureOfPayment || '—' }}</td>
+                                            <td>{{ rec.request || '—' }}</td>
                                             <td>{{ rec.glAccountCode || '—' }}</td>
                                             <td class="text-end fw-bold">{{ rec.amount | number:'1.2-2' }}</td>
                                             <td>

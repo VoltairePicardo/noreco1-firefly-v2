@@ -187,6 +187,10 @@ export class EnergySalesAddEditComponent {
             this.alertService.warning(this.module, 'Validation', 'Debit and credit totals must be equal.');
             return;
         }
+        if (!this.approvingOfficer) {
+            this.alertService.warning(this.module, 'Validation', 'Please select an Approving Officer.');
+            return;
+        }
 
         this.formSubmit = true;
 

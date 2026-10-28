@@ -8,18 +8,19 @@ import { ModalService } from '@/app/shared/modals/modal-service';
 import { BrowseBudgetLineItemModalComponent } from '@/app/shared/modals/browse-budget-line-item-modal/browse-budget-line-item-modal.component';
 import { DocumentLogsComponent } from '@/app/shared/components/document-logs/document-logs.component';
 import { AttachmentsComponent } from '@/app/shared/components/attachments/attachments.component';
+import { JournalEntriesFormComponent, JournalEntry } from '@/app/shared/forms/journal-entries-form/journal-entries-form.component';
 import { provideIcons } from '@ng-icons/core';
 import {
     tablerArrowLeft, tablerPrinter, tablerEdit, tablerCheck, tablerEye, tablerEyeOff,
-    tablerChevronDown, tablerChevronRight, tablerFile, tablerSearch, tablerX
+    tablerChevronDown, tablerChevronRight, tablerFile, tablerSearch, tablerX, tablerDeviceFloppy
 } from '@ng-icons/tabler-icons';
 
 @Component({
     selector: 'app-disbursement-detail',
-    imports: [...COMMON_ALL_PAGE_IMPORTS, ...COMMON_MAIN_PAGE_IMPORTS, DocumentLogsComponent, AttachmentsComponent],
+    imports: [...COMMON_ALL_PAGE_IMPORTS, ...COMMON_MAIN_PAGE_IMPORTS, DocumentLogsComponent, AttachmentsComponent, JournalEntriesFormComponent],
     providers: [...SHARED_PROVIDERS, provideIcons({
         tablerArrowLeft, tablerPrinter, tablerEdit, tablerCheck, tablerEye, tablerEyeOff,
-        tablerChevronDown, tablerChevronRight, tablerFile, tablerSearch, tablerX
+        tablerChevronDown, tablerChevronRight, tablerFile, tablerSearch, tablerX, tablerDeviceFloppy
     })],
     templateUrl: './disbursement-detail.component.html'
 })
@@ -29,7 +30,9 @@ export class DisbursementDetailComponent {
     menuLink  = 'disbursement';
     id: any   = 0;
     data: any = {};
-    journalEntries: any[] = [];
+    journalEntries  : any[] = [];
+    editableEntries : JournalEntry[] = [];
+    savingEntries     = false;
     iemopBillings : any[] = [];
     attachments   : any[] = [];
     expandedSl    = new Set<number>();
@@ -100,8 +103,63 @@ export class DisbursementDetailComponent {
 
     loadJournalEntries(transId: number): void {
         this.service.getGLEntries(transId).subscribe({
-            next: (entries) => { this.journalEntries = entries || []; },
-            error: () => { this.journalEntries = []; }
+            next: (entries) => {
+                this.journalEntries = entries || [];
+                this.editableEntries = (entries || []).map((e: any): JournalEntry => ({
+                    account: { id: e.accountId, accountCode: e.code, accountTitle: e.description, hasSL: e.hasSL || false },
+                    debit:   Number(e.debit)  || null,
+                    credit:  Number(e.credit) || null,
+                    slentries: (e.slentries || []).map((sl: any) => ({
+                        entity: null, accountNo: sl.accountNo, name: sl.name,
+                        debit: Number(sl.debit) || null, credit: Number(sl.credit) || null
+                    }))
+                }));
+            },
+            error: () => { this.journalEntries = []; this.editableEntries = []; }
+        });
+    }
+
+    isForCheckingOrReviewing(): boolean {
+        const s = this.data?.documentStatus?.status || '';
+        return s === 'For Checking' || s === 'For Reviewing';
+    }
+
+    saveEntries(): void {
+        if (this.savingEntries) return;
+        this.savingEntries = true;
+        const payload = {
+            id: this.data.id,
+            generalLedgerLines: this.editableEntries.map(e => ({
+                code:        e.account?.accountCode  || '',
+                description: e.account?.accountTitle || '',
+                accountId:   e.account?.id           || null,
+                debit:       Number(e.debit)         || 0,
+                credit:      Number(e.credit)        || 0
+            })),
+            subLedgerLines: this.editableEntries
+                .filter(e => (e.slentries || []).length > 0)
+                .flatMap(e => (e.slentries || []).map((sl: any) => ({
+                    accountId: e.account?.id || null,
+                    accountNo: sl.accountNo,
+                    name:      sl.name,
+                    debit:     Number(sl.debit)  || 0,
+                    credit:    Number(sl.credit) || 0
+                })))
+        };
+        this.service.updateEntries(payload).subscribe({
+            next: (res) => {
+                this.savingEntries = false;
+                if (res?.success) {
+                    this.alertService.success(this.module, 'Entries saved successfully.', '');
+                    this.loadData();
+                } else {
+                    this.alertService.error(this.module, 'Save failed.', res?.failureMessage || '');
+                }
+            },
+            error: () => {
+                this.savingEntries = false;
+                this.alertService.error(this.module, 'An error occurred while saving entries.', '');
+            }
         });
     }
 
@@ -175,11 +233,12 @@ export class DisbursementDetailComponent {
         if (this.data.jvDto)  return 'Journal Voucher';
         if (this.data.rrDto)  return 'Receiving Report';
         if (this.data.joaDto) return 'JO Acceptance';
+        if (this.data.rfpDto) return 'Request for Payment';
         return null;
     }
 
     get sourceVoucher(): any {
-        return this.data.apvDto || this.data.jvDto || this.data.rrDto || this.data.joaDto || null;
+        return this.data.apvDto || this.data.jvDto || this.data.rrDto || this.data.joaDto || this.data.rfpDto || null;
     }
 
     get checkNumberRows(): any[] {

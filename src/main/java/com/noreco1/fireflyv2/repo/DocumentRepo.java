@@ -622,6 +622,18 @@ public interface DocumentRepo extends JpaRepository<Document, Integer> {
             "'Journal Voucher' as documentType " +
             "FROM JournalVoucher " +
             "WHERE JournalVoucher.voucherDate BETWEEN :from AND :to " +
+            " " +
+            "UNION " +
+            "SELECT " +
+            "AccountsPayableVoucher.id, " +
+            "AccountsPayableVoucher.FK_transactionId, " +
+            "AccountsPayableVoucher.amount, " +
+            "AccountsPayableVoucher.code, " +
+            "AccountsPayableVoucher.particulars, " +
+            "AccountsPayableVoucher.voucherDate, " +
+            "'Accounts Payable' as documentType " +
+            "FROM AccountsPayableVoucher " +
+            "WHERE AccountsPayableVoucher.voucherDate BETWEEN :from AND :to " +
             ") as vouchers " +
             "ORDER BY vouchers.voucherDate ASC, vouchers.documentType ASC " +
             " ", nativeQuery = true)

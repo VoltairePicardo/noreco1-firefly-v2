@@ -3,13 +3,16 @@ package com.noreco1.fireflyv2.controller;
 import com.noreco1.fireflyv2.common.facade.SignatoryFacade;
 import com.noreco1.fireflyv2.common.helpers.Checker;
 import com.noreco1.fireflyv2.common.helpers.ServiceUtil;
+import com.noreco1.fireflyv2.model.BudgetLineItemDetail;
 import com.noreco1.fireflyv2.model.PettyCashBatch;
 import com.noreco1.fireflyv2.model.PettyCashTrans;
 import com.noreco1.fireflyv2.model.PettyCashTransBudgetDetail;
 import com.noreco1.fireflyv2.model.PettyCashTransDetail;
 import com.noreco1.fireflyv2.model.enums.DocumentStatus;
 import com.noreco1.fireflyv2.model.enums.DocumentType;
+import com.noreco1.fireflyv2.repo.BudgetLineItemDetailRepo;
 import com.noreco1.fireflyv2.repo.PettyCashTransDetailRepo;
+import com.noreco1.fireflyv2.repo.PurchaseOrderBudgetDetailRepo;
 import com.noreco1.fireflyv2.controller.response.*;
 import com.noreco1.fireflyv2.service.PettyCashTransService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +20,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -25,6 +29,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import java.math.BigDecimal;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -40,6 +45,12 @@ public class PettyCashTransController {
 
     @Autowired
     PettyCashTransDetailRepo pettyCashTransDetailRepo;
+
+    @Autowired
+    BudgetLineItemDetailRepo budgetLineItemDetailRepo;
+
+    @Autowired
+    PurchaseOrderBudgetDetailRepo purchaseOrderBudgetDetailRepo;
 
     @Autowired
     SignatoryFacade signatoryFacade;
@@ -162,6 +173,30 @@ public class PettyCashTransController {
         return pettyCashTransService.findByStatusAndFilter(documentStatusId, filter, pageable);
     }
 
+    @GetMapping(value = "/closeout-vouchers")
+    public List<Map> getCloseoutVouchers(
+            @RequestParam(required = false) String from,
+            @RequestParam(required = false) String to,
+            @RequestParam(required = false) Integer officeId,
+            @RequestParam(required = false) Integer documentStatusId) {
+        return pettyCashTransService.findForCloseout(from, to, officeId, documentStatusId)
+                .stream()
+                .map(pcv -> {
+                    Map<String, Object> dto = new HashMap<>();
+                    dto.put("id",            pcv.getId());
+                    dto.put("code",          pcv.getCode());
+                    dto.put("payee",         pcv.getPayee());
+                    dto.put("pettyCashDate", pcv.getPettyCashDate());
+                    dto.put("amount",        pcv.getAmount());
+                    dto.put("request",       pcv.getRequest());
+                    Map<String, Object> status = new HashMap<>();
+                    status.put("status", pcv.getDocumentStatus().getStatus());
+                    dto.put("documentStatus", status);
+                    return (Map) dto;
+                })
+                .collect(java.util.stream.Collectors.toList());
+    }
+
     @GetMapping(value = "/is-document-for-cash-flow-item-assignment/{transactionId}")
     
     public boolean isDocumentForCashFlowItemAssignment(@PathVariable Integer transactionId) {
@@ -175,9 +210,37 @@ public class PettyCashTransController {
     }
 
     @GetMapping(value = "/cash-flow/{pcvId}")
-    
+
     public List<PettyCashTransBudgetDetail> getPettyCashTransBudgetDetails(@PathVariable Integer pcvId, HttpServletRequest request) {
         return pettyCashTransService.getPettyCashTransBudgetDetail(pcvId);
+    }
+
+    @Transactional(readOnly = true)
+    @GetMapping(value = "/budget-balances/{budgetLineItemDetailId}")
+    public Map<String, Object> getBudgetBalances(@PathVariable Integer budgetLineItemDetailId) {
+        int cancelled = DocumentStatus.CANCELLED.getId();
+        Map<String, Object> m = new LinkedHashMap<>();
+        m.put("budgetAmountBalancePCL",       budgetLineItemDetailRepo.getBudgetLineItemDetailAmountBalancePCL(cancelled, budgetLineItemDetailId));
+        m.put("budgetLineItemBalancePOJORFP", budgetLineItemDetailRepo.getBudgetLineItemDetailAmountBalancePOJO(cancelled, budgetLineItemDetailId));
+        m.put("budgetLineItemBalanceCV",      budgetLineItemDetailRepo.getBudgetLineItemDetailAmountBalanceCV(cancelled, budgetLineItemDetailId));
+        return m;
+    }
+
+    @Transactional(readOnly = true)
+    @GetMapping(value = "/cashflow-balances/{budgetLineItemDetailId}")
+    public Map<String, Object> getCashFlowBalances(@PathVariable Integer budgetLineItemDetailId) {
+        int cancelled = DocumentStatus.CANCELLED.getId();
+        BudgetLineItemDetail blid = budgetLineItemDetailRepo.findById(budgetLineItemDetailId).orElse(null);
+        Map<String, Object> m = new LinkedHashMap<>();
+        if (blid == null || blid.getCashflowItem() == null) {
+            m.put("cashFlowAmountBalancePOJO", BigDecimal.ZERO);
+            m.put("cashFlowAmountBalanceCV",   BigDecimal.ZERO);
+            return m;
+        }
+        Integer cashFlowItemId = blid.getCashflowItem().getId();
+        m.put("cashFlowAmountBalancePOJO", purchaseOrderBudgetDetailRepo.getCashFlowItemDetailAmountBalancePOJORFPCA(cancelled, cashFlowItemId));
+        m.put("cashFlowAmountBalanceCV",   purchaseOrderBudgetDetailRepo.getCashFlowItemDetailAmountBalanceCV(cancelled, cashFlowItemId));
+        return m;
     }
 
 }

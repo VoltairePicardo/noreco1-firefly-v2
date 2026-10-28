@@ -1,14 +1,13 @@
 <div class="container-fluid">
     <app-page-title [title]="module" [subTitle]="subModule" [menuLink]="menuLink"/>
-</div>
 
-@if (isLoading()) {
-    <div class="card"><div class="card-body text-center py-4">
-        <span class="spinner-border spinner-border-sm me-2" role="status"></span>Loading...
-    </div></div>
-} @else {
+    @if (isLoading()) {
+        <div class="card"><div class="card-body text-center py-4">
+            <span class="spinner-border spinner-border-sm me-2" role="status"></span>Loading...
+        </div></div>
+    } @else {
 
-<div class="card mb-3">
+    <div class="card mb-3">
     <div class="card-body">
 
         <!-- Actions -->
@@ -33,7 +32,7 @@
             <div class="row g-3 align-items-end">
                 <div class="col-md-4">
                     <label class="form-label fw-bold">Action</label>
-                    <select class="form-select" [(ngModel)]="selectedAction">
+                    <select class="form-select" [(ngModel)]="selectedAction" [ngModelOptions]="{ standalone: true }">
                         <option [ngValue]="null">— Select Action —</option>
                         @for (a of workflowActions; track a.actionMapId) {
                             <option [ngValue]="a">{{ a.action }}</option>
@@ -42,7 +41,7 @@
                 </div>
                 <div class="col-md-6">
                     <label class="form-label fw-bold">Remarks <span class="text-muted fw-normal">(optional)</span></label>
-                    <input type="text" class="form-control" [(ngModel)]="remarks" placeholder="Optional remarks"/>
+                    <input type="text" class="form-control" [(ngModel)]="remarks" [ngModelOptions]="{ standalone: true }" placeholder="Optional remarks"/>
                 </div>
                 <div class="col-md-2">
                     <button type="button" class="btn btn-primary fw-bold"
@@ -215,4 +214,6 @@
     </div>
 </div>
 
-} <!-- end !isLoading -->
+    } <!-- end !isLoading -->
+
+</div>

@@ -99,6 +99,12 @@ export class BankReconciliationMainComponent {
         this.page = 1;
     }
 
+    onTypeChange(): void {
+        // Mirror old behavior: selecting a type defaults status filter to "Not Cleared"
+        this.clearedFilter = this.typeFilter ? 'not-cleared' : '';
+        this.page = 1;
+    }
+
     reset(): void {
         this.searchQuery      = '';
         this.clearedFilter    = '';
@@ -124,19 +130,26 @@ export class BankReconciliationMainComponent {
         this.page = 1;
     }
 
+    /** Type-aware status label: OD uses Reflected/Not Reflected; RC+DT use Cleared/Not Cleared */
+    statusLabel(rec: any, cleared: boolean): string {
+        return rec.type === 'OD'
+            ? (cleared ? 'Reflected'    : 'Not Reflected')
+            : (cleared ? 'Cleared'      : 'Not Cleared');
+    }
+
     toggleCleared(rec: any): void {
-        const willClear = !this.isCleared(rec);
-        const title = willClear ? 'Mark as Cleared?' : 'Mark as Not Cleared?';
-        const text  = willClear
-            ? 'This will mark the record as cleared on the bank statement.'
-            : 'This will remove the cleared status.';
+        const willClear    = !this.isCleared(rec);
+        const actionLabel  = this.statusLabel(rec, willClear);
+        const currentLabel = this.statusLabel(rec, !willClear);
 
         Swal.fire({
-            title,
-            text,
+            title: `Mark as ${actionLabel}?`,
+            text:  willClear
+                ? `This will mark the record as ${actionLabel.toLowerCase()}.`
+                : `This will remove the ${currentLabel.toLowerCase()} status.`,
             icon: 'question',
             showCancelButton: true,
-            confirmButtonText: willClear ? 'Clear' : 'UnClear',
+            confirmButtonText: actionLabel,
             cancelButtonText: 'Cancel',
             buttonsStyling: false,
             customClass: {
@@ -145,22 +158,24 @@ export class BankReconciliationMainComponent {
             }
         }).then(result => {
             if (!result.isConfirmed) return;
+
             const req$ = rec.type === 'RC'
                 ? this.service.processRc(rec.documentId, willClear)
-                : this.service.processOd(rec.documentId, willClear);
+                : rec.type === 'DT'
+                    ? this.service.processDt(rec.documentId, willClear)
+                    : this.service.processOd(rec.documentId, willClear);
 
             req$.subscribe({
                 next: (res) => {
                     if (res?.success) {
-                        const action = willClear ? 'Cleared' : 'Uncleared';
-                        this.alertService.success(this.module, action, '');
+                        this.alertService.success(this.module, actionLabel, '');
                         this.load();
                     } else {
-                        this.alertService.error(this.module, willClear ? 'Clear' : 'UnClear', res?.failureMessage || '');
+                        this.alertService.error(this.module, actionLabel, res?.failureMessage || '');
                     }
                 },
                 error: () => {
-                    this.alertService.error(this.module, willClear ? 'Clear' : 'UnClear', '');
+                    this.alertService.error(this.module, actionLabel, '');
                 }
             });
         });

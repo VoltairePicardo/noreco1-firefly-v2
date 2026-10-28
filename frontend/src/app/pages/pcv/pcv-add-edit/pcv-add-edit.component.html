@@ -94,7 +94,9 @@
 
                         <!-- 7. Budget Line Item -->
                         <div class="col-md-6">
-                            <label class="form-label fw-bold">Budget Line Item</label>
+                            <label class="form-label fw-bold">
+                                Budget Line Item <span class="text-danger">*</span>
+                            </label>
                             <div class="d-flex align-items-center gap-2">
                                 <div class="input-group">
                                     <input type="text" class="form-control"
@@ -107,6 +109,9 @@
                                     </button>
                                 </div>
                             </div>
+                            @if (submit && !budgetLineItemDetail) {
+                                <div class="text-danger fs-xs mt-1">Please select a budget line item.</div>
+                            }
                         </div>
 
                         <!-- Budget balance info (shown when BLI selected) -->
@@ -180,7 +185,15 @@
                                         }
                                         <tr class="fw-bold">
                                             <td></td>
-                                            <td class="text-end">{{ totalAmount | number:'1.2-2' }}</td>
+                                            <td class="text-end">
+                                                {{ totalAmount | number:'1.2-2' }}
+                                                @if (submit && totalAmount > 1000) {
+                                                    <div class="text-danger fw-normal fs-xs">Total must not exceed ₱1,000.00.</div>
+                                                }
+                                                @if (submit && pettyCashFund?.balance != null && totalAmount > pettyCashFund.balance) {
+                                                    <div class="text-danger fw-normal fs-xs">Total exceeds PCF balance ({{ pettyCashFund.balance | number:'1.2-2' }}).</div>
+                                                }
+                                            </td>
                                             <td></td>
                                         </tr>
                                     </tbody>
@@ -189,33 +202,18 @@
                         </div>
 
                         <hr class="border-dashed mx-n3 mt-3"/>
-                        <div class="col-12 fs-xs text-uppercase fw-semibold text-muted">Attachments</div>
-
-                        <!-- 9. Attachments -->
-                        <div class="col-md-12">
-                            <div class="d-flex flex-wrap gap-2 mb-2">
-                                @for (att of attachments; track att.name; let i = $index) {
-                                    <div class="d-flex align-items-center gap-1 border rounded px-2 py-1 bg-light">
-                                        @if (isImage(att)) {
-                                            <ng-icon name="tablerPhoto" class="text-primary"></ng-icon>
-                                        } @else {
-                                            <ng-icon name="tablerFile" class="text-muted"></ng-icon>
-                                        }
-                                        <span class="fs-xs text-truncate" style="max-width:180px"
-                                              [ngbTooltip]="att.name">{{ att.name }}</span>
-                                        <button type="button" class="btn btn-link p-0 text-danger ms-1"
-                                                (click)="removeAttachment(i)">
-                                            <ng-icon name="tablerX" class="fs-sm"></ng-icon>
-                                        </button>
-                                    </div>
-                                }
+                        <div class="col-12">
+                            <div class="d-flex align-items-center gap-3 mb-2">
+                                <div class="fs-xs text-uppercase fw-semibold text-muted">Attachments</div>
+                                <button type="button" class="btn btn-success fw-bold" (click)="openFilePicker()">
+                                    <ng-icon name="tablerPaperclip" class="ps-0 pe-3 fw-bold fs-md"></ng-icon>Attach Files
+                                </button>
+                                <small class="text-muted">JPG, PNG, PDF only</small>
                             </div>
-                            <button type="button" class="btn btn-success fw-bold" (click)="openFilePicker()">
-                                <ng-icon name="tablerPaperclip" class="ps-0 pe-3 fw-bold"></ng-icon>Attach Files
-                            </button>
-                            <small class="text-muted ms-2">JPG, PNG, PDF only</small>
                             <input #fileInput type="file" multiple accept=".jpg,.jpeg,.png,.pdf"
                                    style="display:none" (change)="onFileSelect($event)"/>
+                            <app-attachments [files]="attachmentItems" [fileUrl]="fileUrl" [editable]="true"
+                                             emptyText="No files attached." (remove)="onRemoveAttachment($event)"/>
                         </div>
 
                         <hr class="border-dashed mx-n3 mt-3"/>
@@ -243,7 +241,9 @@
 
                         <!-- 11. Checking Officer -->
                         <div class="col-md-4">
-                            <label class="form-label fw-bold">Checking Officer</label>
+                            <label class="form-label fw-bold">
+                                Checking Officer <span class="text-danger">*</span>
+                            </label>
                             <div class="input-group">
                                 <input type="text" class="form-control"
                                        [value]="checker ? (checker.name || checker.fullName || '') : ''"
@@ -254,11 +254,16 @@
                                     <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
                                 </button>
                             </div>
+                            @if (submit && !checker) {
+                                <div class="text-danger fs-xs mt-1">Please select a checking officer.</div>
+                            }
                         </div>
 
                         <!-- 12. Releasing Officer -->
                         <div class="col-md-4">
-                            <label class="form-label fw-bold">Releasing Officer</label>
+                            <label class="form-label fw-bold">
+                                Releasing Officer <span class="text-danger">*</span>
+                            </label>
                             <div class="input-group">
                                 <input type="text" class="form-control"
                                        [value]="releasingOfficer ? (releasingOfficer.name || releasingOfficer.fullName || '') : ''"
@@ -269,6 +274,9 @@
                                     <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
                                 </button>
                             </div>
+                            @if (submit && !releasingOfficer) {
+                                <div class="text-danger fs-xs mt-1">Please select a releasing officer.</div>
+                            }
                         </div>
 
                         <hr class="border-dashed mx-n3 mt-3"/>

@@ -31,7 +31,13 @@ export class BudgetSubItemMainComponent {
 
     ngOnInit(): void {
         this.loadDivisions();
-        this.load();
+        this.service.getUserDivisions().subscribe({
+            next: (data) => {
+                if ((data || []).length === 1) this.divisionFilter = data[0];
+                this.load();
+            },
+            error: () => this.load()
+        });
     }
 
     loadDivisions(): void {

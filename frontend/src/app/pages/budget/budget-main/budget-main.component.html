@@ -21,7 +21,10 @@
                             <ng-icon name="tablerRefresh" class="ps-0 pe-3 fw-bold"></ng-icon>Reset
                         </button>
                     </div>
-                    <div class="col-md-auto ms-auto">
+                    <div class="col-md-auto ms-auto d-flex gap-2">
+                        <a class="btn btn-success fw-bold" [routerLink]="['/' + menuLink + '/report']">
+                            <ng-icon name="tablerReport" class="ps-0 pe-3 fw-bold"></ng-icon>Report
+                        </a>
                         <a class="btn btn-primary fw-bold" [routerLink]="['/' + menuLink + '/create']">
                             <ng-icon name="tablerPlus" class="ps-0 pe-3 fw-bold"></ng-icon>Create {{module}}
                         </a>

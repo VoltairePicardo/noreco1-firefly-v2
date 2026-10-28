@@ -33,4 +33,8 @@ export class BudgetSubItemService {
     getDivisions(): Observable<any[]> {
         return this.http.get<any[]>(`${BASE_API}/json/divisions`);
     }
+
+    getUserDivisions(): Observable<any[]> {
+        return this.http.get<any[]>(`${BASE_API}/json/divisions-by-user`);
+    }
 }

@@ -65,8 +65,9 @@ export class PrepaymentDetailComponent {
     }
 
     getStatus(): string {
-        return (Number(this.data.balance) || 0) > 0 ? 'OPEN' : 'CLOSED';
+        return (Number(this.data.balance) || 0) > 0 ? 'OPEN' : 'CLOSED OUT';
     }
+
 
     isEditable(): boolean {
         return !this.data?.hasPpd;

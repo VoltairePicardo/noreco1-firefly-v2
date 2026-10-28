@@ -206,7 +206,12 @@ export class PclAddEditComponent {
                 this.formSubmit = false;
                 if (res?.success) {
                     this.alertService.success(this.module, 'Saved successfully.', '');
-                    this.router.navigate(['/' + this.menuLink]);
+                    const savedId = this.editMode ? this.id : res.modelId;
+                    if (savedId) {
+                        this.router.navigate(['/' + this.menuLink, savedId, 'detail']);
+                    } else {
+                        this.router.navigate(['/' + this.menuLink]);
+                    }
                 } else {
                     this.alertService.error(this.module, 'Save failed.', res?.failureMessage || '');
                 }

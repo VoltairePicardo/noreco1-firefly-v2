@@ -16,7 +16,7 @@
             <a [routerLink]="['/' + menuLink]" class="btn btn-light fw-bold">
                 <ng-icon name="tablerArrowLeft" class="ps-0 pe-3 fw-bold"></ng-icon>Back
             </a>
-            @if (isEditable()) {
+@if (isEditable()) {
                 <a class="btn btn-primary fw-bold" [routerLink]="['/' + menuLink, id, 'edit']">
                     <ng-icon name="tablerEdit" class="ps-0 pe-3 fw-bold"></ng-icon>Edit
                 </a>
@@ -45,7 +45,7 @@
                 @if (getStatus() === 'OPEN') {
                     <span class="badge bg-success bg-opacity-25 text-success border">OPEN</span>
                 } @else {
-                    <span class="badge bg-secondary bg-opacity-25 text-dark border">CLOSED</span>
+                    <span class="badge bg-secondary bg-opacity-25 text-dark border">CLOSED OUT</span>
                 }
             </div>
             <div class="col-md-12">

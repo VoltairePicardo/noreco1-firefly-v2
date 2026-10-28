@@ -52,6 +52,8 @@ export class CaAddEditComponent {
     particulars: CaParticular[] = [];
     signatoryNames: { [key: string]: string } = {};
     selectedBudgetLineItemText = '';
+    budgetBalancePOJO : number | null = null;
+    budgetBalanceCV   : number | null = null;
 
     validationForm!: UntypedFormGroup;
 
@@ -125,6 +127,7 @@ export class CaAddEditComponent {
             if (data.approvingOfficer?.name || data.approvingOfficer?.fullName) this.signatoryNames['approvingOfficerAccountNo'] = data.approvingOfficer.name || data.approvingOfficer.fullName;
             if (data.budgetLineItemDetail) {
                 this.selectedBudgetLineItemText = data.budgetLineItemDetail.code + ' — ' + data.budgetLineItemDetail.title;
+                this.loadBudgetBalance(data.budgetLineItemDetail.id);
             }
         }
     }
@@ -216,13 +219,26 @@ export class CaAddEditComponent {
             if (result?.action === 'select' && result?.data) {
                 this.form.get('budgetLineItemDetailId')?.setValue(result.data.id);
                 this.selectedBudgetLineItemText = result.data.code + ' — ' + result.data.title;
+                this.loadBudgetBalance(result.data.id);
             }
         } catch { }
+    }
+
+    loadBudgetBalance(id: number): void {
+        this.service.getBudgetLineItemBalance(id).subscribe({
+            next: (data) => {
+                this.budgetBalancePOJO = data?.amountBalancePOJO ?? null;
+                this.budgetBalanceCV   = data?.amountBalanceCV   ?? null;
+            },
+            error: () => {}
+        });
     }
 
     clearBudgetLineItem(): void {
         this.form.get('budgetLineItemDetailId')?.setValue(null);
         this.selectedBudgetLineItemText = '';
+        this.budgetBalancePOJO = null;
+        this.budgetBalanceCV   = null;
     }
 
     async openSignatoryBrowse(field: 'recommendedByAccountNo' | 'budgetOfficerAccountNo' | 'approvingOfficerAccountNo'): Promise<void> {
@@ -258,7 +274,9 @@ export class CaAddEditComponent {
             amount:           this.totalAmount,
             employee:         null,
             office:               v.officeId              ? (this.offices().find(o => o.id === v.officeId) || { id: v.officeId }) : null,
-            budgetLineItemDetail: v.budgetLineItemDetailId ? { id: v.budgetLineItemDetailId } : null,
+            budgetLineItemDetail:         v.budgetLineItemDetailId ? { id: v.budgetLineItemDetailId } : null,
+            budgetLineItemBalancePOJORFP: this.budgetBalancePOJO,
+            budgetLineItemBalanceCV:      this.budgetBalanceCV,
             recommendedBy:    v.recommendedByAccountNo    ? { accountNo: v.recommendedByAccountNo }    : null,
             budgetOfficer:    v.budgetOfficerAccountNo    ? { accountNo: v.budgetOfficerAccountNo }    : null,
             approvingOfficer: v.approvingOfficerAccountNo ? { accountNo: v.approvingOfficerAccountNo } : null,

@@ -14,6 +14,7 @@ import com.noreco1.fireflyv2.repo.*;
 import com.noreco1.fireflyv2.controller.response.PostResponse;
 import com.noreco1.fireflyv2.controller.response.ProcessDocumentDto;
 import com.noreco1.fireflyv2.controller.response.WorkflowActionsDto;
+import com.noreco1.fireflyv2.dtoers.DocumentDtoer;
 import com.noreco1.fireflyv2.service.PettyCashLiquidationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
@@ -76,6 +77,9 @@ public class PettyCashLiquidationServiceImpl implements PettyCashLiquidationServ
 
     @Autowired
     SignatureFacade signatureFacade;
+
+    @Autowired
+    DocumentDtoer documentDtoer;
 
     @Autowired
     UserRepo userRepo;
@@ -404,7 +408,7 @@ public class PettyCashLiquidationServiceImpl implements PettyCashLiquidationServ
 
     @Override
     public List<DocumentStatus> getDocumentsStatuses() {
-        return null;
+        return documentDtoer.getDocumentStatuses(com.noreco1.fireflyv2.model.enums.Workflow.PC_LIQUIDATION.getId());
     }
 
     private HashMap composeHashMap(PettyCashLiquidation pettyCashLiquidation) {

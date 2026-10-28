@@ -3,11 +3,13 @@ import { COMMON_ALL_PAGE_IMPORTS, COMMON_MAIN_PAGE_IMPORTS, SHARED_PROVIDERS } f
 import { AlertService } from '@/app/shared/services/alert.service';
 import { FlatpickrDirective, provideFlatpickrDefaults } from 'angularx-flatpickr';
 import { PrepaymentService } from '../prepayment.service';
+import { provideIcons } from '@ng-icons/core';
+import { tablerChevronLeft, tablerChevronRight } from '@ng-icons/tabler-icons';
 
 @Component({
     selector: 'app-prepayment-main',
     imports: [...COMMON_ALL_PAGE_IMPORTS, ...COMMON_MAIN_PAGE_IMPORTS, FlatpickrDirective],
-    providers: [provideFlatpickrDefaults(), ...SHARED_PROVIDERS],
+    providers: [provideFlatpickrDefaults(), ...SHARED_PROVIDERS, provideIcons({ tablerChevronLeft, tablerChevronRight })],
     templateUrl: './prepayment-main.component.html'
 })
 export class PrepaymentMainComponent {
@@ -22,7 +24,7 @@ export class PrepaymentMainComponent {
     pageSize = 10;
 
     searchText  = '';
-    statusFilter = '';   // '' = All, 'OPEN', 'CLOSED'
+    statusFilter = '';   // '' = All, 'OPEN', 'CLOSED OUT'
     fromDate     = '';
     toDate       = '';
 
@@ -83,7 +85,7 @@ export class PrepaymentMainComponent {
     }
 
     getStatus(rec: any): string {
-        return (Number(rec.balance) || 0) > 0 ? 'OPEN' : 'CLOSED';
+        return (Number(rec.balance) || 0) > 0 ? 'OPEN' : 'CLOSED OUT';
     }
 
     isEditable(rec: any): boolean {

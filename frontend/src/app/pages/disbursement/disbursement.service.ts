@@ -128,6 +128,10 @@ export class DisbursementService {
         return this.http.get<any[]>(`${BASE_API}/ledger/gl-for-ca/${caId}`);
     }
 
+    updateEntries(payload: any): Observable<any> {
+        return this.http.post(`${BASE_API}/disbursement/update-entries`, payload, httpOptions);
+    }
+
     getDocumentLogs(transId: number): Observable<any[]> {
         return this.http.get<any[]>(`${BASE_API}/json/document-logs/${transId}`);
     }

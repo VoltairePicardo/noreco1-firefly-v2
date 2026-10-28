@@ -8,9 +8,10 @@ import {
 } from '@/app/shared/providers/shared-providers';
 import { DocumentLogsComponent } from '@/app/shared/components/document-logs/document-logs.component';
 import { AttachmentsComponent } from '@/app/shared/components/attachments/attachments.component';
+import { JournalEntriesFormComponent, JournalEntry } from '@/app/shared/forms/journal-entries-form/journal-entries-form.component';
 import { AccountsPayableVoucherService } from '../accounts-payable-voucher.service';
 import { provideIcons } from '@ng-icons/core';
-import { tablerCheck, tablerEdit, tablerEye, tablerEyeOff, tablerPrinter, tablerArrowLeft, tablerX, tablerChevronDown, tablerChevronRight } from '@ng-icons/tabler-icons';
+import { tablerCheck, tablerEdit, tablerEye, tablerEyeOff, tablerPrinter, tablerArrowLeft, tablerX, tablerChevronDown, tablerChevronRight, tablerDeviceFloppy } from '@ng-icons/tabler-icons';
 
 @Component({
     selector: 'app-accounts-payable-voucher-detail',
@@ -18,9 +19,10 @@ import { tablerCheck, tablerEdit, tablerEye, tablerEyeOff, tablerPrinter, tabler
         ...COMMON_ALL_PAGE_IMPORTS,
         ...COMMON_MAIN_PAGE_IMPORTS,
         DocumentLogsComponent,
-        AttachmentsComponent
+        AttachmentsComponent,
+        JournalEntriesFormComponent
     ],
-    providers: [...SHARED_PROVIDERS, provideIcons({ tablerCheck, tablerEdit, tablerEye, tablerEyeOff, tablerPrinter, tablerArrowLeft, tablerX, tablerChevronDown, tablerChevronRight })],
+    providers: [...SHARED_PROVIDERS, provideIcons({ tablerCheck, tablerEdit, tablerEye, tablerEyeOff, tablerPrinter, tablerArrowLeft, tablerX, tablerChevronDown, tablerChevronRight, tablerDeviceFloppy })],
     templateUrl: './accounts-payable-voucher-detail.component.html'
 })
 export class AccountsPayableVoucherDetailComponent {
@@ -33,6 +35,8 @@ export class AccountsPayableVoucherDetailComponent {
     linkedPr: any             = null;
     linkedJoa: any            = null;
     journalEntries: any[]     = [];
+    editableEntries: JournalEntry[] = [];
+    savingEntries             = false;
     iemopBillings: any[]      = [];
     attachments: any[]        = [];
     expandedSl = new Set<number>();
@@ -99,8 +103,19 @@ export class AccountsPayableVoucherDetailComponent {
 
     loadJournalEntries(transId: number): void {
         this.service.getJournalEntries(transId).subscribe({
-            next: (data) => { this.journalEntries = data || []; },
-            error: ()    => { this.journalEntries = []; }
+            next: (data) => {
+                this.journalEntries = data || [];
+                this.editableEntries = (data || []).map((e: any): JournalEntry => ({
+                    account: { id: e.accountId, accountCode: e.code, accountTitle: e.description, hasSL: e.hasSL || false },
+                    debit:   Number(e.debit)  || null,
+                    credit:  Number(e.credit) || null,
+                    slentries: (e.slentries || []).map((sl: any) => ({
+                        entity: null, accountNo: sl.accountNo, name: sl.name,
+                        debit: Number(sl.debit) || null, credit: Number(sl.credit) || null
+                    }))
+                }));
+            },
+            error: () => { this.journalEntries = []; }
         });
     }
 
@@ -134,7 +149,51 @@ export class AccountsPayableVoucherDetailComponent {
 
     isEditable(): boolean {
         const status = this.data?.documentStatus?.status || '';
-        return status === 'Document Created' || status === 'For Revision';
+        return status === 'Document Created' || status === 'For Revision' || status === 'Returned to Creator';
+    }
+
+    isForCheckingOrReviewing(): boolean {
+        const status = this.data?.documentStatus?.status || '';
+        return status === 'For Checking' || status === 'For Reviewing';
+    }
+
+    saveEntries(): void {
+        if (this.savingEntries) return;
+        this.savingEntries = true;
+        const payload = {
+            id: this.data.id,
+            generalLedgerLines: this.editableEntries.map(e => ({
+                code:        e.account?.accountCode  || '',
+                description: e.account?.accountTitle || '',
+                accountId:   e.account?.id           || null,
+                debit:       Number(e.debit)         || 0,
+                credit:      Number(e.credit)        || 0
+            })),
+            subLedgerLines: this.editableEntries
+                .filter(e => (e.slentries || []).length > 0)
+                .flatMap(e => (e.slentries || []).map((sl: any) => ({
+                    accountId: e.account?.id || null,
+                    accountNo: sl.accountNo,
+                    name:      sl.name,
+                    debit:     Number(sl.debit)  || 0,
+                    credit:    Number(sl.credit) || 0
+                })))
+        };
+        this.service.updateEntries(payload).subscribe({
+            next: (res) => {
+                this.savingEntries = false;
+                if (res?.success) {
+                    this.alertService.success(this.module, 'Entries saved successfully.', '');
+                    this.loadData();
+                } else {
+                    this.alertService.error(this.module, 'Save failed.', res?.failureMessage || '');
+                }
+            },
+            error: () => {
+                this.savingEntries = false;
+                this.alertService.error(this.module, 'An error occurred while saving entries.', '');
+            }
+        });
     }
 
     get journalDebitTotal(): number {

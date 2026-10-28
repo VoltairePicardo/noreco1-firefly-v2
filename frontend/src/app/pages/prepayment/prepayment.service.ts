@@ -2,7 +2,6 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '@/environments/environment';
-
 const BASE_API = environment.get('baseApiUrl');
 const httpOptions = { headers: new HttpHeaders({ 'Content-Type': 'application/json' }) };
 
@@ -49,4 +48,5 @@ export class PrepaymentService {
     getVouchersForLinking(accountNo: number, query: string, page: number): Observable<any> {
         return this.http.get(`${BASE_API}/vouchers-for-prepayment-linking/${accountNo}?q=${encodeURIComponent(query)}&page=${page}&size=10`);
     }
+
 }

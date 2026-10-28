@@ -112,6 +112,12 @@ public class DisbursementController {
         return cvService.findCvChecks(transId);
     }
 
+    @PostMapping("/update-entries")
+    public PostResponse updateEntries(@RequestBody CheckVoucher cv) {
+        BindingResult bindingResult = new BeanPropertyBindingResult(cv, "cv");
+        return cvService.updateEntries(cv, bindingResult, messageSource);
+    }
+
     @PostMapping("/assign-budget")
     public PostResponse assignBudget(@RequestBody CheckVoucherAdditionalBudgetLineItemDetailDto dto) {
         BindingResult bindingResult = new BeanPropertyBindingResult(dto, "dto");

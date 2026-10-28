@@ -133,6 +133,20 @@ export class PrepaymentAddEditComponent {
         } catch { }
     }
 
+    reset(): void {
+        this.datePaid          = '';
+        this.description       = '';
+        this.startMonth        = 1;
+        this.startYear         = new Date().getFullYear();
+        this.totalCost         = 0;
+        this.noOfMonths        = 0;
+        this.monthlyCost       = 0;
+        this.appliedCost       = 0;
+        this.balance           = 0;
+        this.prepaymentAccount = null;
+        this.expenseAccount    = null;
+    }
+
     save(): void {
         if (!this.datePaid) {
             this.alertService.warning(this.module, 'Validation', 'Please enter a date paid.');

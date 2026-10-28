@@ -1,12 +1,13 @@
 import { Component, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { COMMON_ALL_PAGE_IMPORTS, COMMON_ADD_EDIT_PAGE_IMPORTS, SHARED_PROVIDERS } from '@/app/shared/providers/shared-providers';
+import { COMMON_ALL_PAGE_IMPORTS, COMMON_ADD_EDIT_PAGE_IMPORTS, COMMON_MAIN_PAGE_IMPORTS, SHARED_PROVIDERS } from '@/app/shared/providers/shared-providers';
 import { AlertService } from '@/app/shared/services/alert.service';
+import { DocumentLogsComponent } from '@/app/shared/components/document-logs/document-logs.component';
 import { BudgetLineItemService } from '../budget-line-item.service';
 
 @Component({
     selector: 'app-budget-line-item-detail',
-    imports: [...COMMON_ALL_PAGE_IMPORTS, ...COMMON_ADD_EDIT_PAGE_IMPORTS],
+    imports: [...COMMON_ALL_PAGE_IMPORTS, ...COMMON_ADD_EDIT_PAGE_IMPORTS, ...COMMON_MAIN_PAGE_IMPORTS, DocumentLogsComponent],
     providers: [...SHARED_PROVIDERS],
     templateUrl: './budget-line-item-detail.component.html'
 })
@@ -25,9 +26,13 @@ export class BudgetLineItemDetailComponent {
     remarks            = '';
     processingWorkflow = false;
 
-    logs        : any[] = [];
-    showLogs    = false;
-    logsLoading = false;
+    showLogs = false;
+
+    // Additional Details reference data
+    fundingSources      : any[] = [];
+    generalClassifications : any[] = [];
+    cashflowItems       : any[] = [];
+    savingAdditional    = false;
 
     readonly months = ['January','February','March','April','May','June',
                        'July','August','September','October','November','December'];
@@ -52,9 +57,11 @@ export class BudgetLineItemDetailComponent {
                 if (data?.id) {
                     this.data    = data;
                     this.details = data.budgetLineItemDetails || [];
-                    this.logs    = [];
                     this.showLogs = false;
                     this.loadWorkflowActions();
+                    if (data.forAddingAdditionalDetails) {
+                        this.loadAdditionalDetailRefs();
+                    }
                 } else {
                     this.alertService.error(this.module, 'Not Found', '');
                     this.router.navigate(['/' + this.menuLink]);
@@ -66,6 +73,12 @@ export class BudgetLineItemDetailComponent {
                 this.router.navigate(['/' + this.menuLink]);
             }
         });
+    }
+
+    loadAdditionalDetailRefs(): void {
+        this.service.getFundingSources().subscribe({ next: (d) => this.fundingSources = d || [], error: () => {} });
+        this.service.getGeneralClassifications().subscribe({ next: (d) => this.generalClassifications = d || [], error: () => {} });
+        this.service.getCashflowItems().subscribe({ next: (d) => this.cashflowItems = d || [], error: () => {} });
     }
 
     loadWorkflowActions(): void {
@@ -121,16 +134,6 @@ export class BudgetLineItemDetailComponent {
 
     toggleLogs(): void {
         this.showLogs = !this.showLogs;
-        if (this.showLogs && this.logs.length === 0) {
-            this.logsLoading = true;
-            const transId = this.data?.transaction?.id;
-            if (transId) {
-                this.service.getDocumentLogs(transId).subscribe({
-                    next: (logs) => { this.logs = logs || []; this.logsLoading = false; },
-                    error: () => { this.logsLoading = false; }
-                });
-            }
-        }
     }
 
     compareById(a: any, b: any): boolean {
@@ -140,5 +143,30 @@ export class BudgetLineItemDetailComponent {
     monthName(m: number | null): string {
         if (!m) return '—';
         return this.months[m - 1] || '—';
+    }
+
+    saveAdditionalDetails(): void {
+        this.savingAdditional = true;
+        const payload = {
+            id: this.data.id,
+            budgetLineItemDetails: this.details.map((d: any) => ({
+                id:                    d.id,
+                cashflowItem:          d.cashflowItem          ? { id: d.cashflowItem.id }          : null,
+                fundingSource:         d.fundingSource         ? { id: d.fundingSource.id }         : null,
+                generalClassification: d.generalClassification ? { id: d.generalClassification.id } : null
+            }))
+        };
+        this.service.saveAdditionalDetails(payload).subscribe({
+            next: (res) => {
+                this.savingAdditional = false;
+                if (res?.success) {
+                    this.alertService.success(this.module, res.successMessage || 'Saved.', '');
+                    this.loadData();
+                } else {
+                    this.alertService.error(this.module, res?.failureMessage || 'Save failed.', '');
+                }
+            },
+            error: () => { this.savingAdditional = false; this.alertService.error(this.module, 'Error.', ''); }
+        });
     }
 }

@@ -134,7 +134,7 @@ export class AdjustmentJournalAddEditComponent {
                     }
                     this.signatories = {
                         checker:              data.checker              || null,
-                        recommendingApproval: data.recommendingApproval || null,
+                        recommendingApproval: data.recommendingApproval || data.recommendingOfficer || null,
                         approvingOfficer:     data.approvingOfficer     || null
                     };
                 } else {
@@ -271,6 +271,10 @@ export class AdjustmentJournalAddEditComponent {
     save(): void {
         if (!this.voucherDate) {
             this.alertService.warning(this.module, 'Validation', 'Please enter a voucher date.');
+            return;
+        }
+        if (!this.explanation?.trim()) {
+            this.alertService.warning(this.module, 'Validation', 'Please enter an explanation or remarks.');
             return;
         }
         if (this.journalEntries.length === 0) {

@@ -94,4 +94,28 @@ export class BudgetLineItemService {
     approveAll(payload: any[]): Observable<any> {
         return this.http.post(`${BASE_API}/approve-vouchers/process-all-budget`, payload, httpOptions);
     }
+
+    getFundingSources(): Observable<any[]> {
+        return this.http.get<any[]>(`${BASE_API}/json/funding-sources`);
+    }
+
+    getGeneralClassifications(): Observable<any[]> {
+        return this.http.get<any[]>(`${BASE_API}/json/general-classification`);
+    }
+
+    getCashflowItems(): Observable<any[]> {
+        return this.http.get<any[]>(`${BASE_API}/cashflow-item/list`);
+    }
+
+    saveAdditionalDetails(payload: any): Observable<any> {
+        return this.http.post(`${BASE_API}/budget-line-item/additional-detail`, payload, httpOptions);
+    }
+
+    updateNeaApprovedAmount(payload: any): Observable<any> {
+        return this.http.post(`${BASE_API}/budget-line-item/detail/update-nea-approved-amount`, payload, httpOptions);
+    }
+
+    updateSupplementalAmount(payload: any): Observable<any> {
+        return this.http.post(`${BASE_API}/budget-line-item/detail/update-supplemental-amount`, payload, httpOptions);
+    }
 }

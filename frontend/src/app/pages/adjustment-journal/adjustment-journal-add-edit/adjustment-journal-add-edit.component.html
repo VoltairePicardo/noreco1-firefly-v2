@@ -34,10 +34,11 @@
                                    [options]="flatpickrOptions"
                                    [(ngModel)]="voucherDate"
                                    [ngModelOptions]="{ standalone: true }"
+                                   [disabled]="editMode"
                                    placeholder="Select date"/>
                         </div>
                         <div class="col-md-12">
-                            <label class="form-label fw-bold">Explanation / Remarks</label>
+                            <label class="form-label fw-bold">Explanation / Remarks <span class="text-danger">*</span></label>
                             <textarea class="form-control"
                                       [(ngModel)]="explanation"
                                       [ngModelOptions]="{ standalone: true }"
@@ -82,6 +83,11 @@
                                             (click)="openEntityBrowse(key)">
                                         <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
                                     </button>
+                                    @if (signatories[key]) {
+                                        <button type="button" class="btn btn-light fw-bold" (click)="clearSignatory(key)" ngbTooltip="Clear">
+                                            <ng-icon name="tablerX" class="fs-sm"></ng-icon>
+                                        </button>
+                                    }
                                 </div>
                                 @if (signatories[key]?.position) {
                                     <small class="text-muted">{{ signatories[key].position }}</small>

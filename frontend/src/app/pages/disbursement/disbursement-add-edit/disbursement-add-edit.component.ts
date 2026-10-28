@@ -196,9 +196,9 @@ export class DisbursementAddEditComponent {
                     } else if (data.receivingReport?.id) {
                         this.selectedVoucherType   = 'RR';
                         this.selectedSourceVoucher = data.receivingReport;
-                    } else if (data.joAcceptance?.id) {
+                    } else if (data.joaDto?.id) {
                         this.selectedVoucherType   = 'JOA';
-                        this.selectedSourceVoucher = data.joAcceptance;
+                        this.selectedSourceVoucher = data.joaDto;
                     } else if (data.rfpDto?.id) {
                         this.selectedVoucherType   = 'RFP';
                         this.selectedSourceVoucher = data.rfpDto;
@@ -767,7 +767,7 @@ export class DisbursementAddEditComponent {
                 ? { id: this.selectedSourceVoucher.id } : null,
             receivingReport: this.selectedVoucherType === 'RR' && this.selectedSourceVoucher
                 ? { id: this.selectedSourceVoucher.id } : null,
-            joAcceptance: this.selectedVoucherType === 'JOA' && this.selectedSourceVoucher
+            jobOrderAcceptance: this.selectedVoucherType === 'JOA' && this.selectedSourceVoucher
                 ? { id: this.selectedSourceVoucher.id } : null,
             budgetLineItemDetail: this.budgetLineItemDetail ? { id: this.budgetLineItemDetail.id } : null,
             cashAdvances: this.cashAdvances.map(ca => ({ id: ca.id })),

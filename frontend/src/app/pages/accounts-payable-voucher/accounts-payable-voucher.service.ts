@@ -54,6 +54,10 @@ export class AccountsPayableVoucherService {
         return this.http.post<any>(`${BASE_API}/apv/update-unpaid-remarks`, { id, unpaidRemark }, httpOptions);
     }
 
+    updateEntries(payload: any): Observable<any> {
+        return this.http.post<any>(`${BASE_API}/apv/update-entries`, payload, httpOptions);
+    }
+
     getJournalEntries(transId: number): Observable<any[]> {
         return this.http.get<any[]>(`${BASE_API}/ledger/gl/${transId}`);
     }
