@@ -441,9 +441,11 @@ public class LedgerFacadeImpl implements LedgerFacade {
 
             if (ledgerLine.getWTaxEntry() != null) {
 
+                LinkedHashMap atc = (LinkedHashMap)ledgerLine.getWTaxEntry().get("atc");
+                if (atc == null || atc.get("id") == null) continue;
+
                 CheckVoucherIncomePayment incomePayment = incomePaymentRepo.findOneByTransactionId(transaction.getId());
                 if (incomePayment == null) incomePayment = new CheckVoucherIncomePayment();
-                LinkedHashMap atc = (LinkedHashMap)ledgerLine.getWTaxEntry().get("atc");
 
                 TaxCode taxCode = new TaxCode();
                 taxCode.setId(Integer.parseInt(atc.get("id").toString()));

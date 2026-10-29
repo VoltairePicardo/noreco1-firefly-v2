@@ -1393,6 +1393,16 @@ public class CvServiceImpl implements CvService, PrintableVoucher, PrintableCheq
                     par.put("PAYEE_FOR_ADDRESS", employee.getAddress("F"));
                     par.put("PAYEE_FOR_ZIP", "");
 
+                } else {
+                    par.put("PAYEE_TIN1", "");
+                    par.put("PAYEE_TIN2", "");
+                    par.put("PAYEE_TIN3", "");
+                    par.put("PAYEE_TIN4", "");
+                    par.put("PAYEE_NAME", "");
+                    par.put("PAYEE_REG_ADDRESS", "");
+                    par.put("PAYEE_REG_ZIP", "");
+                    par.put("PAYEE_FOR_ADDRESS", "");
+                    par.put("PAYEE_FOR_ZIP", "");
                 }
             } else {
 

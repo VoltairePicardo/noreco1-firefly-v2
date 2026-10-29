@@ -319,11 +319,6 @@
                                         (click)="openPayeeBrowse()">
                                     <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
                                 </button>
-                                @if (payee) {
-                                    <button type="button" class="btn btn-light fw-bold" (click)="clearPayee()" ngbTooltip="Clear">
-                                        <ng-icon name="tablerX" class="fs-sm"></ng-icon>
-                                    </button>
-                                }
                             </div>
                         </div>
                     </div>
@@ -363,19 +358,9 @@
                                     <ng-icon name="tablerSearch" class="me-1 fs-lg fw-bold"></ng-icon>Browse Job Order
                                 </button>
                             }
-                            @if (jobOrder) {
-                                <button type="button" class="btn btn-danger fw-bold" (click)="clearJobOrder()" aria-label="Clear job order">
-                                    <ng-icon name="tablerTrash" class="fs-lg fw-bold"></ng-icon>
-                                </button>
-                            }
                             @if (!jobOrder) {
                                 <button type="button" class="btn btn-success fw-bold" (click)="openPurchaseOrderBrowse()">
                                     <ng-icon name="tablerSearch" class="me-1 fs-lg fw-bold"></ng-icon>Browse Purchase Order
-                                </button>
-                            }
-                            @if (purchaseOrder) {
-                                <button type="button" class="btn btn-danger fw-bold" (click)="clearPurchaseOrder()" aria-label="Clear purchase order">
-                                    <ng-icon name="tablerTrash" class="fs-lg fw-bold"></ng-icon>
                                 </button>
                             }
                         </div>
@@ -384,10 +369,16 @@
                     @if (jobOrder) {
                         <div class="row g-1">
                             <div class="col-12 d-flex"><span style="width:110px">Job Order:</span> <span class="fw-bold">{{ jobOrder.localCode || jobOrder.code || '—' }}</span></div>
+                            @if (budgetLineItemDetail) {
+                                <div class="col-12 d-flex"><span style="width:110px">Budget Item:</span> <span class="fw-bold">{{ budgetLineItemDetail.code }} - {{ budgetLineItemDetail.title }}</span></div>
+                            }
                         </div>
                     } @else if (purchaseOrder) {
                         <div class="row g-1">
                             <div class="col-12 d-flex"><span style="width:110px">Purchase Order:</span> <span class="fw-bold">{{ purchaseOrder.localCode || purchaseOrder.code || '—' }}</span></div>
+                            @if (budgetLineItemDetail) {
+                                <div class="col-12 d-flex"><span style="width:110px">Budget Item:</span> <span class="fw-bold">{{ budgetLineItemDetail.code }} - {{ budgetLineItemDetail.title }}</span></div>
+                            }
                         </div>
                     } @else {
                         <span class="text-muted fs-sm">Optionally link a Job Order or Purchase Order.</span>
@@ -491,11 +482,6 @@
                                             (click)="openEntityBrowse(key)">
                                         <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
                                     </button>
-                                    @if (signatories[key]) {
-                                        <button type="button" class="btn btn-light fw-bold" (click)="clearSignatory(key)" ngbTooltip="Clear">
-                                            <ng-icon name="tablerX" class="fs-sm"></ng-icon>
-                                        </button>
-                                    }
                                 </div>
                                 @if (signatories[key]?.position) {
                                     <small class="text-muted">{{ signatories[key]?.position }}</small>

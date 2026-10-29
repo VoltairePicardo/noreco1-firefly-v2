@@ -70,12 +70,6 @@
                                             (click)="openSupplierBrowse(i)">
                                         <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
                                     </button>
-                                    @if (suppliers[i]) {
-                                        <button type="button" class="btn btn-light btn-icon btn-sm rounded-circle"
-                                                (click)="clearSupplier(i)">
-                                            <ng-icon name="tablerX" class="fs-sm"></ng-icon>
-                                        </button>
-                                    }
                                 </div>
                             </th>
                         }

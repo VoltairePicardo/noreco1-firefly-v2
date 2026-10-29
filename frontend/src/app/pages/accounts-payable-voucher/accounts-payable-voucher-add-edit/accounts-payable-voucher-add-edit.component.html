@@ -50,11 +50,6 @@
                             <button type="button" class="btn btn-success fw-bold" (click)="openVendorBrowse()">
                                 <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
                             </button>
-                            @if (vendor) {
-                                <button type="button" class="btn btn-light fw-bold" (click)="clearVendor()">
-                                    <ng-icon name="tablerX" class="ps-0 fw-bold"></ng-icon>
-                                </button>
-                            }
                         </div>
                     </div>
                     <div class="col-md-6">
@@ -269,11 +264,6 @@
                             <button type="button" class="btn btn-success fw-bold" (click)="openSignatoryBrowse('checker')">
                                 <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
                             </button>
-                            @if (checker) {
-                                <button type="button" class="btn btn-light fw-bold" (click)="clearSignatory('checker')">
-                                    <ng-icon name="tablerX" class="ps-0 fw-bold"></ng-icon>
-                                </button>
-                            }
                         </div>
                     </div>
                     <div class="col-md-6">
@@ -285,11 +275,6 @@
                             <button type="button" class="btn btn-success fw-bold" (click)="openSignatoryBrowse('approvingOfficer')">
                                 <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
                             </button>
-                            @if (approvingOfficer) {
-                                <button type="button" class="btn btn-light fw-bold" (click)="clearSignatory('approvingOfficer')">
-                                    <ng-icon name="tablerX" class="ps-0 fw-bold"></ng-icon>
-                                </button>
-                            }
                         </div>
                     </div>
                 </div>

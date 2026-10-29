@@ -136,6 +136,8 @@ public class LedgerDtoerImpl implements LedgerDtoer {
 
         List<GeneralLedgerLineDto2> ledgerLineDtos = new ArrayList<>();
 
+        CheckVoucherIncomePayment incomePayment = incomePaymentRepo.findOneByTransactionId(transId);
+
         if (generalLedgerLines != null) {
             for (Object[] line : generalLedgerLines) {
                 GeneralLedgerLineDto2 lineDto = new GeneralLedgerLineDto2();
@@ -163,17 +165,9 @@ public class LedgerDtoerImpl implements LedgerDtoer {
                 List<Object[]> subLedgerLines = subLedgerRepo.findByTransactionIdAndAccountId(transId, accountId);
                 lineDto.setHasSL((subLedgerLines != null && subLedgerLines.size() > 0));
 
-                // withholding tax: atc
-//                Integer wtaxAccountId = 0;
-//                try {
-//                    Map wtaxAccount = settingFacade.getByCode(SettingCode.WTAX_ACCOUNT.toString());
-//                    wtaxAccountId = Integer.parseInt(wtaxAccount.get("id").toString());
-//                } finally {}
-//
-//                if (wtaxAccountId.equals(accountId)) {
-
-                CheckVoucherIncomePayment incomePayment = incomePaymentRepo.findOneByTransactionId(transId);
-                if (incomePayment != null) {
+                // withholding tax: only attach to the GL line that owns the income payment
+                if (incomePayment != null && incomePayment.getAccount() != null
+                        && incomePayment.getAccount().getId().equals(accountId)) {
                     Map account = new HashMap();
                     account.put("id", accountId);
                     account.put("title", title);
@@ -366,7 +360,7 @@ public class LedgerDtoerImpl implements LedgerDtoer {
         BigDecimal totalSLDebit = BigDecimal.ZERO;
         BigDecimal totalSLCredit= BigDecimal.ZERO;
 
-        List<GeneralLedgerLineDto2> ledgerLineDto2s = this.getGLAccountEntriesDtoByTrans(transId, true);
+        List<GeneralLedgerLineDto2> ledgerLineDto2s = this.getGLAccountEntriesDtoByTrans(transId, false);
 
         if (!Checker.collectionIsEmpty(ledgerLineDto2s)) {
             for(GeneralLedgerLineDto2 gl : ledgerLineDto2s) {

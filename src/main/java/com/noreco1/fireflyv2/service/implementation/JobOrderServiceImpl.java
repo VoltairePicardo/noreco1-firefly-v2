@@ -338,6 +338,7 @@ public class JobOrderServiceImpl implements JobOrderService, PrintableVoucher {
                 joListDto.setSupplier(jo.getVendor().getName());
                 joListDto.setAmount(jo.getAmount());
                 joListDto.setStatus(jo.getDocumentStatus().getStatus());
+                joListDto.setBudgetLineItemDetail(jo.getBudgetLineItemDetail());
 
                 SlEntity createdBy = slEntityRepo.findById(jo.getCreatedBy().getAccountNo()).orElse(null);
                 if (createdBy != null) joListDto.setPreparedBy(createdBy.getName());

@@ -145,12 +145,6 @@
                                         (click)="openSignatoryBrowse('checkedBy')">
                                     <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
                                 </button>
-                                @if (checkedBy) {
-                                    <button type="button" class="btn btn-danger fw-bold"
-                                            (click)="clearSignatory('checkedBy')">
-                                        <ng-icon name="tablerX" class="ps-0 pe-0 fw-bold"></ng-icon>
-                                    </button>
-                                }
                             </div>
                         </div>
                         <div class="col-md-4">
@@ -163,12 +157,6 @@
                                         (click)="openSignatoryBrowse('replenishedBy')">
                                     <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
                                 </button>
-                                @if (replenishedBy) {
-                                    <button type="button" class="btn btn-danger fw-bold"
-                                            (click)="clearSignatory('replenishedBy')">
-                                        <ng-icon name="tablerX" class="ps-0 pe-0 fw-bold"></ng-icon>
-                                    </button>
-                                }
                             </div>
                         </div>
                     </div>

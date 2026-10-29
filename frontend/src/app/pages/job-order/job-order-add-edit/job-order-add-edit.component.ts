@@ -39,6 +39,7 @@ export class JobOrderAddEditComponent {
 
     // PR link + budget balance (display only)
     purchaseRequest: any      = null;
+    budgetLineItemDetail: any = null;
     budgetBalancePOJO: number | null = null;
     budgetBalanceCV:   number | null = null;
 
@@ -101,9 +102,10 @@ export class JobOrderAddEditComponent {
                     this.budgetCheckedBy    = header.budgetCheckedBy || null;
                     this.checkedBy          = header.checkedBy || null;
                     this.approvedBy         = header.approvedBy || header.approvingOfficer || null;
-                    this.purchaseRequest    = header.purchaseRequest || null;
-                    this.budgetBalancePOJO  = header.budgetLineItemBalancePOJORFP ?? null;
-                    this.budgetBalanceCV    = header.budgetLineItemBalanceCV ?? null;
+                    this.purchaseRequest      = header.purchaseRequest     || null;
+                    this.budgetLineItemDetail = header.budgetLineItemDetail || null;
+                    this.budgetBalancePOJO    = header.budgetLineItemBalancePOJORFP ?? null;
+                    this.budgetBalanceCV      = header.budgetLineItemBalanceCV      ?? null;
 
                     this.lineItems = (details || []).map((d: any) => ({
                         rvDetailId:      d.rvDetailId,
@@ -161,7 +163,8 @@ export class JobOrderAddEditComponent {
             if (result?.action === 'select' && result?.data) {
                 const pr = result.data;
                 // Link PR to header + auto-fill description + load budget balance
-                this.purchaseRequest = pr;
+                this.purchaseRequest      = pr;
+                this.budgetLineItemDetail = pr.budgetLineItemDetail || null;
                 if (!this.description && pr.purpose) {
                     this.description = pr.purpose;
                 }
@@ -281,9 +284,10 @@ export class JobOrderAddEditComponent {
             amount:                       this.totalAmount,
             budgetLineItemBalancePOJORFP: this.budgetBalancePOJO,
             budgetLineItemBalanceCV:      this.budgetBalanceCV,
-            budgetCheckedBy:    this.budgetCheckedBy?.accountNo ? { accountNo: this.budgetCheckedBy.accountNo } : null,
-            checkedBy:          this.checkedBy?.accountNo       ? { accountNo: this.checkedBy.accountNo }       : null,
-            approvingOfficer:   this.approvedBy?.accountNo      ? { accountNo: this.approvedBy.accountNo }      : null,
+            budgetCheckedBy:      this.budgetCheckedBy?.accountNo    ? { accountNo: this.budgetCheckedBy.accountNo }    : null,
+            checkedBy:            this.checkedBy?.accountNo          ? { accountNo: this.checkedBy.accountNo }          : null,
+            approvingOfficer:     this.approvedBy?.accountNo         ? { accountNo: this.approvedBy.accountNo }         : null,
+            budgetLineItemDetail: this.budgetLineItemDetail?.id      ? { id: this.budgetLineItemDetail.id }             : null,
             joDetails: this.lineItems.map(li => ({
                 rvDetailId:    li.rvDetailId,
                 quantity:      li.quantity,

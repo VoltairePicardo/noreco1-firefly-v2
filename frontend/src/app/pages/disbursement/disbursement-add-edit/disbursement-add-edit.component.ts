@@ -493,6 +493,9 @@ export class DisbursementAddEditComponent {
             if (result?.action === 'select' && result?.data) {
                 this.jobOrder      = result.data;
                 this.purchaseOrder = null;
+                if (result.data.budgetLineItemDetail) {
+                    this.budgetLineItemDetail = result.data.budgetLineItemDetail;
+                }
             }
         } catch { }
     }
@@ -505,6 +508,9 @@ export class DisbursementAddEditComponent {
             if (result?.action === 'select' && result?.data) {
                 this.purchaseOrder = result.data;
                 this.jobOrder       = null;
+                if (result.data.budgetLineItemDetail) {
+                    this.budgetLineItemDetail = result.data.budgetLineItemDetail;
+                }
             }
         } catch { }
     }

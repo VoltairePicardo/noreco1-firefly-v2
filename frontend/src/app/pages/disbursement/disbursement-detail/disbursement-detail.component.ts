@@ -109,6 +109,7 @@ export class DisbursementDetailComponent {
                     account: { id: e.accountId, accountCode: e.code, accountTitle: e.description, hasSL: e.hasSL || false },
                     debit:   Number(e.debit)  || null,
                     credit:  Number(e.credit) || null,
+                    wTaxEntry: e.wTaxEntry || null,
                     slentries: (e.slentries || []).map((sl: any) => ({
                         entity: null, accountNo: sl.accountNo, name: sl.name,
                         debit: Number(sl.debit) || null, credit: Number(sl.credit) || null
@@ -134,7 +135,8 @@ export class DisbursementDetailComponent {
                 description: e.account?.accountTitle || '',
                 accountId:   e.account?.id           || null,
                 debit:       Number(e.debit)         || 0,
-                credit:      Number(e.credit)        || 0
+                credit:      Number(e.credit)        || 0,
+                wTaxEntry:   e.wTaxEntry             || null
             })),
             subLedgerLines: this.editableEntries
                 .filter(e => (e.slentries || []).length > 0)
@@ -357,8 +359,8 @@ export class DisbursementDetailComponent {
             next: (res) => {
                 this.printingCheckRows.delete(row);
                 if (res?.success) {
-                    row.printed = true;
                     this.alertService.success(this.module, 'Check Printed', '');
+                    this.loadData();
                 } else {
                     this.alertService.error(this.module, 'Error', res?.failureMessage || '');
                 }
