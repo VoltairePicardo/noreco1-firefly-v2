@@ -37,13 +37,21 @@ interface CheckNumberRow {
     loadingNextNumber?: boolean;
 }
 
+/*const VOUCHER_TYPE_LABELS: Record<CvSourceVoucherType, string> = {
+    APV: 'Account Payable Voucher',
+    CA:  'Cash Advance',
+    JV:  'Journal Voucher',
+    RR:  'Receiving Report',
+    JOA: 'JO Acceptance'
+    RFP: 'Request for Payment'
+};*/
+
 const VOUCHER_TYPE_LABELS: Record<CvSourceVoucherType, string> = {
     APV: 'Account Payable Voucher',
     CA:  'Cash Advance',
     JV:  'Journal Voucher',
     RR:  'Receiving Report',
     JOA: 'JO Acceptance',
-    RFP: 'Request for Payment'
 };
 
 @Component({
@@ -202,10 +210,10 @@ export class DisbursementAddEditComponent {
                     } else if (data.joaDto?.id) {
                         this.selectedVoucherType   = 'JOA';
                         this.selectedSourceVoucher = data.joaDto;
-                    } else if (data.rfpDto?.id) {
+                    } /*else if (data.rfpDto?.id) {
                         this.selectedVoucherType   = 'RFP';
                         this.selectedSourceVoucher = data.rfpDto;
-                    }
+                    }*/
 
                     this.journalEntries = (data.generalLedgerLines || []).map((line: any) => {
                         // The backend currently attaches the transaction's wTaxEntry to every

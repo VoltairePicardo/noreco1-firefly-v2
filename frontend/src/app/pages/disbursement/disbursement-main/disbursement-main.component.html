@@ -56,6 +56,7 @@
                         <th>Code</th>
                         <th>Voucher Date</th>
                         <th>Payee</th>
+                        <th>Particulars</th>
                         <th>Check No.</th>
                         <th class="text-end">Amount</th>
                         <th>Status</th>
@@ -64,7 +65,7 @@
                 </thead>
                 <tbody>
                     @if (isLoading()) {
-                        <tr><td colspan="8" class="text-center py-3">
+                        <tr><td colspan="9" class="text-center py-3">
                             <span class="spinner-border spinner-border-sm me-2"></span>Loading...
                         </td></tr>
                     } @else if (pagedRecords.length > 0) {
@@ -78,6 +79,7 @@
                                 <td class="fw-bold">{{ rec.code }}</td>
                                 <td>{{ rec.voucherDate | date:'MM/dd/yyyy' }}</td>
                                 <td>{{ rec.payee || '—' }}</td>
+                                <td>{{ rec.particulars || '—' }}</td>
                                 <td>{{ rec.checkNumber || '—' }}</td>
                                 <td class="text-end">{{ rec.checkAmount | number:'1.2-2' }}</td>
                                 <td><span class="badge border" [ngClass]="rec.status === 'Approved' ? 'bg-success bg-opacity-25 text-success' : 'bg-primary bg-opacity-25 text-primary'">{{ rec.status }}</span></td>
@@ -100,7 +102,7 @@
                             </tr>
                         }
                     } @else {
-                        <tr><td colspan="8" class="text-center text-muted py-3">No records found.</td></tr>
+                        <tr><td colspan="9" class="text-center text-muted py-3">No records found.</td></tr>
                     }
                 </tbody>
             </table>

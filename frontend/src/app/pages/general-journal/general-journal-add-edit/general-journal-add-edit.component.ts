@@ -274,6 +274,26 @@ export class GeneralJournalAddEditComponent {
         if (removed) this.filesToRemove.push(removed);
     }
 
+    async onVoucherDateChange(newDate: string): Promise<void> {
+        const hasEntries = this.journalEntries.some(e => e.account != null);
+        if (!hasEntries) {
+            this.voucherDate = newDate;
+            return;
+        }
+        const result = await Swal.fire({
+            title: 'Change Voucher Date?',
+            text: 'Journal entries are already loaded. Do you want to reset them?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, reset entries',
+            cancelButtonText: 'Keep entries'
+        });
+        if (result.isConfirmed) {
+            this.journalEntries = [{ account: null, debit: null, credit: null }];
+        }
+        this.voucherDate = newDate;
+    }
+
     loadDefaultSignatories(): void {
         this.service.getDefaultSignatories().subscribe({
             next: (data) => {

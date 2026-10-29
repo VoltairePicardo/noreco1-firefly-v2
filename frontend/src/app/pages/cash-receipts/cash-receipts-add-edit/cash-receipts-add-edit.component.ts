@@ -1,5 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import Swal from 'sweetalert2';
 import { AlertService } from '@/app/shared/services/alert.service';
 import {
     COMMON_ALL_PAGE_IMPORTS,
@@ -122,6 +123,27 @@ export class CashReceiptsAddEditComponent {
         if (!this.particulars) this.particulars = 'COLLECTION DEPOSITED';
     }
 
+    async onVoucherDateChange(newDate: string): Promise<void> {
+        const hasEntries = this.journalEntries.some(e => e.account != null);
+        if (!hasEntries) {
+            this.voucherDate = newDate;
+            return;
+        }
+        const result = await Swal.fire({
+            title: 'Change Voucher Date?',
+            text: 'Journal entries are already loaded. Do you want to reset them?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, reset entries',
+            cancelButtonText: 'Keep entries'
+        });
+        if (result.isConfirmed) {
+            this.journalEntries = [];
+            this.tempBatch      = null;
+        }
+        this.voucherDate = newDate;
+    }
+
     get totalDebit(): number {
         return this.journalEntries.reduce((sum, e) => sum + (Number(e.debit) || 0), 0);
     }
@@ -184,6 +206,10 @@ export class CashReceiptsAddEditComponent {
         }
         if (!this.isBalanced) {
             this.alertService.warning(this.module, 'Validation', 'Debit and credit totals must be equal.');
+            return;
+        }
+        if (!this.approvingOfficer) {
+            this.alertService.warning(this.module, 'Validation', 'Please select an Approving Officer.');
             return;
         }
 

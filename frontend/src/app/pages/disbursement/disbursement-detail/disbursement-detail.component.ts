@@ -6,6 +6,7 @@ import { COMMON_ALL_PAGE_IMPORTS, COMMON_MAIN_PAGE_IMPORTS, SHARED_PROVIDERS } f
 import { DisbursementService } from '../disbursement.service';
 import { ModalService } from '@/app/shared/modals/modal-service';
 import { BrowseBudgetLineItemModalComponent } from '@/app/shared/modals/browse-budget-line-item-modal/browse-budget-line-item-modal.component';
+import { BrowseCashflowItemModalComponent } from '@/app/shared/modals/browse-cashflow-item-modal/browse-cashflow-item-modal.component';
 import { DocumentLogsComponent } from '@/app/shared/components/document-logs/document-logs.component';
 import { AttachmentsComponent } from '@/app/shared/components/attachments/attachments.component';
 import { JournalEntriesFormComponent, JournalEntry } from '@/app/shared/forms/journal-entries-form/journal-entries-form.component';
@@ -47,9 +48,12 @@ export class DisbursementDetailComponent {
     showLogs = false;
 
     // Budget assignment (forAddingBudgetDetail workflow step)
-    budgetLineItems     : any[] = [];
+    budgetLineItems       : any[] = [];
     budgetLineItemsLoaded = false;
-    selectedBudgetLineItem: any = null;
+    selectedBudgetLineItem: any   = null;
+    cashflowItems         : any[] = [];
+    cashflowItemsLoaded   = false;
+    selectedBudgetDetail  : any   = null;
     savingBudget = false;
 
     private service      = inject(DisbursementService);
@@ -77,6 +81,7 @@ export class DisbursementDetailComponent {
                     this.iemopBillings  = data.iemopBillings  || [];
                     this.expandedSl.clear();
                     this.selectedBudgetLineItem = null;
+                    this.selectedBudgetDetail   = null;
                     this.loadAttachments();
                     if (data.transId) { this.loadJournalEntries(data.transId); }
                     if (data.forAddingBudgetDetail && !this.budgetLineItemsLoaded) {
@@ -293,20 +298,48 @@ export class DisbursementDetailComponent {
             );
             if (result?.action === 'select' && result?.data) {
                 this.selectedBudgetLineItem = result.data;
+                this.selectedBudgetDetail   = null; // mutually exclusive
+            }
+        } catch { }
+    }
+
+    async openCashflowItemBrowse(): Promise<void> {
+        if (!this.cashflowItemsLoaded) {
+            this.service.getCashflowBudgetDetails().subscribe({
+                next: (items) => {
+                    this.cashflowItems = items || [];
+                    this.cashflowItemsLoaded = true;
+                    this.openCashflowItemBrowse();
+                },
+                error: () => {}
+            });
+            return;
+        }
+        try {
+            const result = await this.modalService.openModal(
+                BrowseCashflowItemModalComponent,
+                { items: this.cashflowItems },
+                { size: 'lg', centered: true }
+            );
+            if (result?.action === 'select' && result?.data) {
+                this.selectedBudgetDetail   = result.data;
+                this.selectedBudgetLineItem = null; // mutually exclusive
             }
         } catch { }
     }
 
     saveBudgetAssignment(): void {
-        if (!this.selectedBudgetLineItem && !this.data?.budgetDetail?.id) {
-            this.alertService.warning(this.module, 'Validation', 'Please select a Budget Line Item.');
+        const hasBudgetLineItem = this.selectedBudgetLineItem || this.data?.budgetLineItemDetail?.id;
+        const hasBudgetDetail   = this.selectedBudgetDetail   || this.data?.budgetDetail?.id;
+        if (!hasBudgetLineItem && !hasBudgetDetail) {
+            this.alertService.warning(this.module, 'Validation', 'Please select a Budget Line Item or Cash Flow Item.');
             return;
         }
         this.savingBudget = true;
         this.service.assignBudget({
             transactionId:          this.data.transId,
-            budgetLineItemDetailId: this.selectedBudgetLineItem?.id ?? null,
-            budgetDetailId:         this.data.budgetDetail?.id ?? null
+            budgetLineItemDetailId: this.selectedBudgetLineItem?.id ?? this.data?.budgetLineItemDetail?.id ?? null,
+            budgetDetailId:         this.selectedBudgetDetail?.id   ?? this.data?.budgetDetail?.id        ?? null
         }).subscribe({
             next: (res) => {
                 this.savingBudget = false;

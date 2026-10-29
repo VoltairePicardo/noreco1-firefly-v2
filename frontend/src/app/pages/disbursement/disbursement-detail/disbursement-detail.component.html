@@ -193,12 +193,12 @@
             </div>
         }
 
-        <!-- Budget Assignment Workflow (Gap 3) — visible only when budget officer step -->
+        <!-- Budget Assignment Workflow — visible only when budget officer step -->
         @if (data.forAddingBudgetDetail) {
             <hr class="border-dashed mx-n3 mt-3"/>
-            <div class="fs-xs text-uppercase fw-semibold text-muted mb-2">Assign Budget Line Item</div>
+            <div class="fs-xs text-uppercase fw-semibold text-muted mb-2">Assign Budget</div>
             <div class="row g-3 align-items-end">
-                <div class="col-md-6">
+                <div class="col-md-5">
                     <label class="form-label fw-bold">Budget Line Item</label>
                     <div class="input-group">
                         <input type="text" class="form-control" readonly
@@ -209,9 +209,20 @@
                         </button>
                     </div>
                 </div>
+                <div class="col-md-5">
+                    <label class="form-label fw-bold">Cash Flow Item</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control" readonly
+                               [value]="selectedBudgetDetail?.name ?? data.budgetDetail?.cashflowItem?.name ?? ''"
+                               placeholder="Select cash flow item..."/>
+                        <button type="button" class="btn btn-success fw-bold" (click)="openCashflowItemBrowse()">
+                            <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
+                        </button>
+                    </div>
+                </div>
                 <div class="col-md-auto">
                     <button type="button" class="btn btn-primary fw-bold"
-                            [disabled]="savingBudget || (!selectedBudgetLineItem && !data.budgetLineItemDetail)"
+                            [disabled]="savingBudget || (!selectedBudgetLineItem && !data.budgetLineItemDetail && !selectedBudgetDetail && !data.budgetDetail)"
                             (click)="saveBudgetAssignment()">
                         @if (savingBudget) {
                             <span class="spinner-border spinner-border-sm me-2"></span>

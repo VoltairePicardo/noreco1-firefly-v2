@@ -301,6 +301,7 @@ export class PcvAddEditComponent {
         if (!this.checker)          return false;
         if (!this.releasingOfficer) return false;
         if (!this.budgetLineItemDetail) return false;
+        if (this.totalAmount <= 0)   return false;
         if (this.totalAmount > 1000) return false;
         if (this.pettyCashFund?.balance != null && this.totalAmount > this.pettyCashFund.balance) return false;
         if (this.details.filter(d => d.remarks?.trim()).length === 0) return false;
@@ -311,6 +312,10 @@ export class PcvAddEditComponent {
         this.submit = true;
         if (!this.isValid()) {
             // Provide specific error feedback
+            if (this.totalAmount <= 0) {
+                this.alertService.warning(this.module, 'Validation', 'Total amount must be greater than zero.');
+                return;
+            }
             if (this.totalAmount > 1000) {
                 this.alertService.error(this.module, 'Validation', 'Total amount must not exceed ₱1,000.00.');
                 return;

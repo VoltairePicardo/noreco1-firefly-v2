@@ -61,6 +61,10 @@ export class DisbursementService {
         return this.http.get(`${BASE_API}/disbursement/default-signatories`);
     }
 
+    getCashflowBudgetDetails(): Observable<any[]> {
+        return this.http.get<any[]>(`${BASE_API}/general-journal/cashflow-budget-details`);
+    }
+
     getEntities(q: string = '', page = 0, size = 10): Observable<any> {
         const params = new HttpParams().set('q', q).set('page', page).set('size', size);
         return this.http.get(`${BASE_API}/json/entities/search`, { params });

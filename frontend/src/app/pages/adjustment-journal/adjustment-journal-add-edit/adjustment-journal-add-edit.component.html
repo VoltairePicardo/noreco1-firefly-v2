@@ -32,7 +32,8 @@
                                    class="form-control"
                                    mwlFlatpickr
                                    [options]="flatpickrOptions"
-                                   [(ngModel)]="voucherDate"
+                                   [ngModel]="voucherDate"
+                                   (ngModelChange)="onVoucherDateChange($event)"
                                    [ngModelOptions]="{ standalone: true }"
                                    [disabled]="editMode"
                                    placeholder="Select date"/>

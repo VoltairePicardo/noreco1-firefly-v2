@@ -8,7 +8,8 @@ import { NG_ICON_DIRECTIVES, provideIcons } from '@ng-icons/core';
 import { tablerSearch } from '@ng-icons/tabler-icons';
 import { DisbursementService } from '@/app/pages/disbursement/disbursement.service';
 
-export type CvSourceVoucherType = 'APV' | 'CA' | 'JV' | 'RR' | 'JOA' | 'RFP';
+/*export type CvSourceVoucherType = 'APV' | 'CA' | 'JV' | 'RR' | 'JOA' | 'RFP';*/
+export type CvSourceVoucherType = 'APV' | 'CA' | 'JV' | 'RR' | 'JOA';
 
 export interface CvVoucherInstallmentDetail {
     id: number;
@@ -37,8 +38,8 @@ const VOUCHER_TYPE_OPTIONS: { value: CvSourceVoucherType; label: string }[] = [
     { value: 'CA', label: 'Cash Advance' },
     { value: 'JV', label: 'Journal Voucher' },
     { value: 'RR', label: 'Receiving Report' },
-    { value: 'JOA', label: 'JO Acceptance' },
-    { value: 'RFP', label: 'Request for Payment' },
+    { value: 'JOA', label: 'JO Acceptance' }
+    /*{ value: 'RFP', label: 'Request for Payment' },*/
 ];
 
 @Component({
@@ -110,7 +111,7 @@ export class BrowseCvSourceVoucherModalComponent implements OnInit {
             case 'JV':  return this.service.getApprovedJvForCv(q, page, size);
             case 'RR':  return this.service.getApprovedRrForCv(q, page, size);
             case 'JOA': return this.service.getApprovedJoaForCv(q, page, size);
-            case 'RFP': return this.service.getApprovedRfpForCv(q, page, size);
+           /* case 'RFP': return this.service.getApprovedRfpForCv(q, page, size);*/
         }
     }
 }

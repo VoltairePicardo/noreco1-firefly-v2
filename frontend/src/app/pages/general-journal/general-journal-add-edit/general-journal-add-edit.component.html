@@ -118,7 +118,8 @@
                         <div class="col-md-3">
                             <label class="form-label fw-bold">Voucher Date <span class="text-danger">*</span></label>
                             <input type="text" class="form-control" mwlFlatpickr [options]="flatpickrOptions"
-                                   [(ngModel)]="voucherDate" [ngModelOptions]="{ standalone: true }"
+                                   [ngModel]="voucherDate" (ngModelChange)="onVoucherDateChange($event)"
+                                   [ngModelOptions]="{ standalone: true }"
                                    [disabled]="editMode"
                                    placeholder="Select date"/>
                         </div>
