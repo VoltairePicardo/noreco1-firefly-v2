@@ -278,11 +278,10 @@
                                                     <!-- Value -->
                                                     <td>
                                                         @if (isEditable) {
-                                                            <input type="number" class="form-control form-control-sm text-end"
+                                                            <input type="text" appNumericFormat class="form-control form-control-sm text-end"
                                                                    [(ngModel)]="row.value"
                                                                    [ngModelOptions]="{ standalone: true }"
-                                                                   (ngModelChange)="onRowValueChange(row)"
-                                                                   min="0" step="0.01"/>
+                                                                   (ngModelChange)="onRowValueChange(row)"/>
                                                         } @else {
                                                             <span class="d-block text-end">{{ row.value | number:'1.2-2' }}</span>
                                                         }
@@ -290,11 +289,10 @@
                                                     <!-- Dep. Value -->
                                                     <td>
                                                         @if (isEditable) {
-                                                            <input type="number" class="form-control form-control-sm text-end"
+                                                            <input type="text" appNumericFormat class="form-control form-control-sm text-end"
                                                                    [(ngModel)]="row.depreciatedValue"
                                                                    [ngModelOptions]="{ standalone: true }"
-                                                                   (ngModelChange)="onRowDepChange(row)"
-                                                                   min="0" step="0.01"/>
+                                                                   (ngModelChange)="onRowDepChange(row)"/>
                                                         } @else {
                                                             <span class="d-block text-end">{{ row.depreciatedValue | number:'1.2-2' }}</span>
                                                         }

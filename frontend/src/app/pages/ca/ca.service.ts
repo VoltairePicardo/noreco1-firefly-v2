@@ -109,4 +109,14 @@ export class CaService {
     print(id: number): void {
         this.downloadService.print(`${BASE_API}/cash-advance/export/${id}`, { type: 'pdf' });
     }
+
+    updateAmounts(payload: any): Observable<any> {
+        const fd = new FormData();
+        fd.append('model', new Blob([JSON.stringify(payload)], { type: 'application/json' }));
+        return this.http.post(`${BASE_API}/cash-advance/update`, fd);
+    }
+
+    confirmBudgetLineItem(payload: any): Observable<any> {
+        return this.http.post(`${BASE_API}/cash-advance/check-budget-line-item`, payload, httpOptions);
+    }
 }

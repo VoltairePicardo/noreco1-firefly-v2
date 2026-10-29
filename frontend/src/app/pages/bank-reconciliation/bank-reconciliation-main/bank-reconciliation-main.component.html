@@ -46,8 +46,8 @@
                             <label class="form-label fw-bold mb-1 fs-xs text-uppercase">Status</label>
                             <select class="form-select" [(ngModel)]="clearedFilter" (ngModelChange)="page = 1">
                                 <option value="">All</option>
-                                <option value="cleared">{{ typeFilter === 'OD' ? 'Reflected' : 'Cleared' }}</option>
-                                <option value="not-cleared">{{ typeFilter === 'OD' ? 'Not Reflected' : 'Not Cleared' }}</option>
+                                <option value="cleared">{{ typeFilter === 'DT' ? 'Reflected' : 'Cleared' }}</option>
+                                <option value="not-cleared">{{ typeFilter === 'DT' ? 'Not Reflected' : 'Not Cleared' }}</option>
                             </select>
                         </div>
                         <div class="col-md-4">
@@ -59,6 +59,11 @@
                                 <button type="button" class="btn btn-success fw-bold" (click)="openAccBrowse()">
                                     <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
                                 </button>
+                                @if (selectedAccount) {
+                                    <button type="button" class="btn btn-danger fw-bold" (click)="clearAccount()">
+                                        <ng-icon name="tablerX" class="ps-0 pe-2 fw-bold"></ng-icon>Clear
+                                    </button>
+                                }
                             </div>
                         </div>
                         <div class="col-md-2">

@@ -117,10 +117,10 @@
                                                     </div>
                                                     <div class="col-md-3">
                                                         <label class="form-label fw-bold mb-1 fs-xs text-uppercase">Amount</label>
-                                                        <input type="number" class="form-control form-control-sm"
+                                                        <input type="text" appNumericFormat class="form-control form-control-sm"
                                                                [(ngModel)]="inlineAmount"
                                                                [ngModelOptions]="{ standalone: true }"
-                                                               placeholder="0.00" min="0" step="0.01"/>
+                                                               placeholder="0.00"/>
                                                     </div>
                                                     <div class="col-md-auto">
                                                         <button type="button" class="btn btn-primary fw-bold btn-sm"

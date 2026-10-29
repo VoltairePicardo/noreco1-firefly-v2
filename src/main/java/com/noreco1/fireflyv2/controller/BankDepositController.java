@@ -62,6 +62,11 @@ public class BankDepositController {
         return service.processUpdate(entity, bindingResult, messageSource);
     }
 
+    @PostMapping("/{id}/upload")
+    public PostResponse uploadFiles(@PathVariable Integer id, HttpServletRequest request) {
+        return service.uploadAttachments(id, request);
+    }
+
     @PostMapping("/upload-deposits")
     public PostResponse uploadDeposits(@RequestBody UploadBankDepositDto uploadBankDepositDto) {
         BindingResult bindingResult = new BeanPropertyBindingResult(uploadBankDepositDto, "uploadBankDepositDto");

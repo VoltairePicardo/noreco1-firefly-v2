@@ -31,7 +31,7 @@ public interface ReleasedCheckRepo extends JpaRepository<ReleasedCheque, Integer
             "GROUP BY cvrc.id, cv.code, cv.voucherDate, cvc.checkNumber, cvrc.dateReleased, cvrc.receivedBy, " +
             "cvc.released, cvrc.remarks, cvrc.orNumber, cvrc.idNumber, cvrc.depositSlip, cvrc.personImage, " +
             "cvrc.FK_transactionId, a.title, sle.name", nativeQuery = true)
-    Object[] findDetailById(@Param("id") Integer id);
+    List<Object[]> findDetailById(@Param("id") Integer id);
 
     @Query(value = "SELECT cvrc.id, cv.code, cv.voucherDate, cvc.checkNumber, " +
             "SUM(gl.credit) as checkAmount, " +

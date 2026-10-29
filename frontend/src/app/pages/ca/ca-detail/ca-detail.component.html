@@ -19,6 +19,16 @@
             <button type="button" class="btn btn-success fw-bold" (click)="print()">
                 <ng-icon name="tablerPrinter" class="ps-0 pe-3 fw-bold"></ng-icon>Print
             </button>
+            @if (data.isAllowedCheck && !data.isChecked) {
+                <button type="button" class="btn btn-warning fw-bold"
+                        (click)="confirmBudgetLineItem()" [disabled]="confirmingBli">
+                    @if (confirmingBli) {
+                        <span class="spinner-border spinner-border-sm me-2" role="status"></span>Confirming...
+                    } @else {
+                        <ng-icon name="tablerCheck" class="ps-0 pe-3 fw-bold"></ng-icon>Confirm Budget Line Item
+                    }
+                </button>
+            }
             @if (canBeSetAsLiquidated()) {
                 <button type="button" class="btn btn-warning fw-bold"
                         (click)="setAsLiquidated()" [disabled]="settingLiquidated">
@@ -185,7 +195,15 @@
                                 <td>{{ p.particular }}</td>
                                 <td class="text-end">{{ p.quantity }}</td>
                                 <td>{{ p.unit?.code || '—' }}</td>
-                                <td class="text-end">{{ p.amount | number:'1.2-2' }}</td>
+                                <td class="text-end">
+                                    @if (data.allowEditAmount) {
+                                        <input type="text" appNumericFormat class="form-control form-control-sm text-end"
+                                               [(ngModel)]="p.amount" [ngModelOptions]="{standalone: true}"
+                                               style="width:110px;margin-left:auto"/>
+                                    } @else {
+                                        {{ p.amount | number:'1.2-2' }}
+                                    }
+                                </td>
                                 <td class="text-end fw-bold">{{ rowTotal(p) | number:'1.2-2' }}</td>
                             </tr>
                         }
@@ -201,6 +219,18 @@
                 </tbody>
             </table>
         </div>
+
+        @if (data.allowEditAmount) {
+            <div class="d-flex justify-content-end mt-2">
+                <button type="button" class="btn btn-primary fw-bold" (click)="updateAmounts()" [disabled]="updatingAmounts">
+                    @if (updatingAmounts) {
+                        <span class="spinner-border spinner-border-sm me-2" role="status"></span>Updating...
+                    } @else {
+                        <ng-icon name="tablerCheck" class="ps-0 pe-3 fw-bold"></ng-icon>Update Amounts
+                    }
+                </button>
+            </div>
+        }
 
         <!-- Cash Flow Items -->
         <hr class="my-3"/>
@@ -228,9 +258,9 @@
                                     <td>{{ d.cashflowItem?.name || '—' }}</td>
                                     <td>{{ d.cashflowItem?.cashflowItemType?.name || '—' }}</td>
                                     <td class="text-end">
-                                        <input type="number" class="form-control form-control-sm text-end"
+                                        <input type="text" appNumericFormat class="form-control form-control-sm text-end"
                                                [(ngModel)]="d.amount" [ngModelOptions]="{standalone:true}"
-                                               min="0" step="0.01" style="width:120px;margin-left:auto"/>
+                                               style="width:120px;margin-left:auto"/>
                                     </td>
                                     <td class="text-center">
                                         <button type="button" class="btn btn-light btn-icon btn-sm rounded-circle"

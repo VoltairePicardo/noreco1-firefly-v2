@@ -74,7 +74,6 @@ export class AccountsPayableVoucherDetailComponent {
         this.isLoading.set(true);
         this.service.getById(this.id).subscribe({
             next: (data) => {
-                this.isLoading.set(false);
                 if (data?.id) {
                     this.data               = data;
                     this.receivingReports   = data.receivingReports   || [];
@@ -83,12 +82,13 @@ export class AccountsPayableVoucherDetailComponent {
                     this.iemopBillings      = data.iemopBillings      || [];
                     this.installmentDetails = data.installmentDetails  || [];
                     this.unpaidRemark       = data.unpaidRemark        || '';
-                    this.loadWorkflowActions();
                     if (data.transId) {
                         this.loadJournalEntries(data.transId);
                         this.loadAttachments(data.transId);
                     }
+                    this.loadWorkflowActions(); // sets isLoading(false) on completion
                 } else {
+                    this.isLoading.set(false);
                     this.alertService.error(this.module, 'Record not found.', '');
                     this.router.navigate(['/' + this.menuLink]);
                 }
@@ -128,13 +128,15 @@ export class AccountsPayableVoucherDetailComponent {
 
     loadWorkflowActions(): void {
         const transId = this.data?.transId || this.data?.transaction?.id;
-        if (!transId) return;
+        if (!transId) { this.isLoading.set(false); return; }
         this.service.getWorkflowActions(transId).subscribe({
             next: (actions) => {
+                this.isLoading.set(false);
                 this.workflowActions = actions || [];
                 this.selectedAction  = null;
             },
             error: () => {
+                this.isLoading.set(false);
                 this.workflowActions = [];
             }
         });
@@ -149,7 +151,7 @@ export class AccountsPayableVoucherDetailComponent {
 
     isEditable(): boolean {
         const status = this.data?.documentStatus?.status || '';
-        return status === 'Document Created' || status === 'For Revision' || status === 'Returned to Creator';
+        return status === 'Document Created' || status === 'Returned to Creator';
     }
 
     isForCheckingOrReviewing(): boolean {

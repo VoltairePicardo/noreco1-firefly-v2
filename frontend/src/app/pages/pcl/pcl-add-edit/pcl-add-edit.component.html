@@ -93,10 +93,10 @@
                                                         <td>{{ item.remarks }}</td>
                                                         <td class="text-end text-muted">{{ item.pcvAmount | number:'1.2-2' }}</td>
                                                         <td>
-                                                            <input type="number" class="form-control form-control-sm text-end"
+                                                            <input type="text" appNumericFormat class="form-control form-control-sm text-end"
                                                                    [(ngModel)]="item.amount"
                                                                    [name]="'amt_' + $index"
-                                                                   min="0" step="0.01" placeholder="0.00"/>
+                                                                   placeholder="0.00"/>
                                                         </td>
                                                         <td>
                                                             <input type="text" class="form-control form-control-sm"

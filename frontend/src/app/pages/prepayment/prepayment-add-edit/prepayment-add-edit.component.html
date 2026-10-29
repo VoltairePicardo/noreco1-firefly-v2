@@ -57,9 +57,9 @@
                         </div>
                         <div class="col-md-3">
                             <label class="form-label fw-bold">Total Cost <span class="text-danger">*</span></label>
-                            <input type="number" class="form-control text-end"
+                            <input type="text" appNumericFormat class="form-control text-end"
                                    [(ngModel)]="totalCost" [ngModelOptions]="{ standalone: true }"
-                                   min="0" step="0.01" placeholder="0.00"
+                                   placeholder="0.00"
                                    (ngModelChange)="onCostChange()" [disabled]="hasPpd"/>
                         </div>
                         <div class="col-md-3">
@@ -75,19 +75,19 @@
                     <div class="row g-3 mt-1">
                         <div class="col-md-3">
                             <label class="form-label fw-bold">Monthly Cost</label>
-                            <input type="number" class="form-control text-end" [value]="monthlyCost"
+                            <input type="text" appNumericFormat class="form-control text-end" [value]="monthlyCost"
                                    readonly placeholder="0.00"/>
                         </div>
                         <div class="col-md-3">
                             <label class="form-label fw-bold">Applied Cost</label>
-                            <input type="number" class="form-control text-end"
+                            <input type="text" appNumericFormat class="form-control text-end"
                                    [(ngModel)]="appliedCost" [ngModelOptions]="{ standalone: true }"
-                                   min="0" step="0.01" placeholder="0.00"
+                                   placeholder="0.00"
                                    (ngModelChange)="onCostChange()" [disabled]="hasPpd"/>
                         </div>
                         <div class="col-md-3">
                             <label class="form-label fw-bold">Balance</label>
-                            <input type="number" class="form-control text-end" [value]="balance"
+                            <input type="text" appNumericFormat class="form-control text-end" [value]="balance"
                                    readonly placeholder="0.00"/>
                         </div>
                     </div>

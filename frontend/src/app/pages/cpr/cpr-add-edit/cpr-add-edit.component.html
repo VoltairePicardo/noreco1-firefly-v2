@@ -157,21 +157,21 @@
                                                 </td>
                                                 <!-- Value -->
                                                 <td>
-                                                    <input type="number" class="form-control form-control-sm text-end"
+                                                    <input type="text" appNumericFormat class="form-control form-control-sm text-end"
                                                            [(ngModel)]="row.value"
                                                            [ngModelOptions]="{ standalone: true }"
                                                            (ngModelChange)="onRowValueChange(row)"
-                                                           min="0" step="0.01" placeholder="0.00"/>
+                                                           placeholder="0.00"/>
                                                 </td>
                                                 <!-- Monthly Dep (readonly) -->
                                                 <td class="text-end">{{ row.monthlyDepreciation | number:'1.2-2' }}</td>
                                                 <!-- Depreciated Value -->
                                                 <td>
-                                                    <input type="number" class="form-control form-control-sm text-end"
+                                                    <input type="text" appNumericFormat class="form-control form-control-sm text-end"
                                                            [(ngModel)]="row.depreciatedValue"
                                                            [ngModelOptions]="{ standalone: true }"
                                                            (ngModelChange)="onRowDepreciatedValueChange(row)"
-                                                           min="0" step="0.01" placeholder="0.00"/>
+                                                           placeholder="0.00"/>
                                                 </td>
                                                 <!-- Remaining Value (readonly) -->
                                                 <td class="text-end">{{ row.remainingValue | number:'1.2-2' }}</td>

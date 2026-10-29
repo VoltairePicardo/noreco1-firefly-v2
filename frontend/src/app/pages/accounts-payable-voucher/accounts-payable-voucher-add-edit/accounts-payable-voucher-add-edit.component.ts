@@ -19,6 +19,7 @@ import { AttachmentFile, AttachmentsComponent } from '@/app/shared/components/at
 import { provideIcons } from '@ng-icons/core';
 import { tablerCheck, tablerArrowLeft, tablerSearch, tablerPlus, tablerTrash, tablerX, tablerPaperclip } from '@ng-icons/tabler-icons';
 import {SL_ENTITY_CLASSIFICATION} from '@/app/shared/utils/sl_entity-classification';
+import Swal from 'sweetalert2';
 
 @Component({
     selector: 'app-accounts-payable-voucher-add-edit',
@@ -259,6 +260,11 @@ export class AccountsPayableVoucherAddEditComponent {
             next: (data) => {
                 this.isLoading.set(false);
                 if (data?.id) {
+                    const status = data.documentStatus?.status || '';
+                    if (status !== 'Document Created' && status !== 'Returned to Creator') {
+                        this.router.navigate(['/' + this.menuLink, this.id, 'detail']);
+                        return;
+                    }
                     this.voucherDate    = data.voucherDate   ? new Date(data.voucherDate).toISOString().substring(0, 10)   : '';
                     this.invoiceDate    = data.invoiceDate   ? new Date(data.invoiceDate).toISOString().substring(0, 10)   : '';
                     this.dueDate        = data.dueDate       ? new Date(data.dueDate).toISOString().substring(0, 10)       : '';
@@ -399,6 +405,7 @@ export class AccountsPayableVoucherAddEditComponent {
                     }
                     this.linkedRrs.push(doc);
                     if (this.linkedRrs.length === 1) this.autoFillFromDoc(doc);
+                    this.mergeRrGlEntries(doc);
                 } else {
                     this.linkedDocument = doc;
                     this.autoFillFromDoc(doc);
@@ -486,6 +493,55 @@ export class AccountsPayableVoucherAddEditComponent {
         this.refreshAttachments();
     }
 
+    onVoucherDateChange(newDate: string): void {
+        const oldDate = this.voucherDate;
+        this.voucherDate = newDate;
+        this.calculateDueDate();
+        if (this.journalEntries.length > 0 && newDate !== oldDate) {
+            Swal.fire({
+                title: 'Journal entries will be cleared',
+                text: 'Changing the voucher date clears the current journal entries. Proceed?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, proceed',
+                cancelButtonText: 'No, keep entries'
+            }).then(r => {
+                if (r.isConfirmed) {
+                    this.journalEntries = [];
+                } else {
+                    this.voucherDate = oldDate;
+                    this.calculateDueDate();
+                }
+            });
+        }
+    }
+
+    private mergeRrGlEntries(doc: any): void {
+        const transId = doc.transactionId;
+        if (!transId) return;
+        this.service.getJournalEntries(transId).subscribe({
+            next: (data) => {
+                (data || []).forEach((e: any) => {
+                    const existing = this.journalEntries.find(j => j.account?.id === e.accountId);
+                    if (existing) {
+                        existing.debit  = ((Number(existing.debit)  || 0) + (Number(e.debit)  || 0)) || null;
+                        existing.credit = ((Number(existing.credit) || 0) + (Number(e.credit) || 0)) || null;
+                    } else {
+                        this.journalEntries.push({
+                            account:   { id: e.accountId, accountCode: e.code, accountTitle: e.description, hasSL: e.hasSL || false },
+                            debit:     Number(e.debit)  || null,
+                            credit:    Number(e.credit) || null,
+                            wTaxEntry: e.wTaxEntry || null,
+                            vatEntry:  e.vatEntry  || null,
+                            slentries: []
+                        });
+                    }
+                });
+            },
+            error: () => {}
+        });
+    }
+
     save(): void {
         if (!this.voucherDate) {
             this.alertService.warning(this.module, 'Validation', 'Please enter a voucher date.');
@@ -493,6 +549,10 @@ export class AccountsPayableVoucherAddEditComponent {
         }
         if (!this.vendor) {
             this.alertService.warning(this.module, 'Validation', 'Please select a vendor/supplier.');
+            return;
+        }
+        if (!this.invoiceDate) {
+            this.alertService.warning(this.module, 'Validation', 'Please enter an invoice date.');
             return;
         }
         if (!this.particulars || !this.particulars.trim()) {
@@ -528,6 +588,11 @@ export class AccountsPayableVoucherAddEditComponent {
                     return;
                 }
             }
+            const installSum = this.installmentDetails.reduce((s, r) => s + (Number(r.amount) || 0), 0);
+            if (Math.round(installSum * 100) !== Math.round(this.totalDebit * 100)) {
+                this.alertService.warning(this.module, 'Validation', 'Sum of installment amounts must equal the journal entry total.');
+                return;
+            }
         }
 
         const lines = this.journalEntries.filter(e => e.account);
@@ -542,6 +607,13 @@ export class AccountsPayableVoucherAddEditComponent {
         if (this.totalDebit <= 0) {
             this.alertService.warning(this.module, 'Validation', 'Journal entries totals must be greater than zero.');
             return;
+        }
+        if ((this.docType === 'pr' || this.docType === 'joa') && this.linkedDocument?.netAmount != null) {
+            if (Math.round(this.totalDebit * 100) !== Math.round(this.linkedDocument.netAmount * 100)) {
+                this.alertService.warning(this.module, 'Validation',
+                    `Journal entry total must match the linked ${this.docTypeLabel} amount (${Number(this.linkedDocument.netAmount).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}).`);
+                return;
+            }
         }
         const missingSl = lines.find(e => !e.generated && e.account?.hasSL && !(e.slentries && e.slentries.length > 0));
         if (missingSl) {
@@ -565,11 +637,11 @@ export class AccountsPayableVoucherAddEditComponent {
             installmentDetails: this.forInstallment
                 ? this.installmentDetails.map(d => ({ dueDate: d.dueDate, amount: d.amount }))
                 : [],
-            vendor:           { accountNo: this.vendor.accountNo },
-            checker:          { accountNo: this.checker.accountNo },
-            approvingOfficer: { accountNo: this.approvingOfficer.accountNo },
+            vendor:           { id: this.vendor?.id, accountNo: this.vendor.accountNo },
+            checker:          { id: this.checker?.id, accountNo: this.checker.accountNo },
+            approvingOfficer: { id: this.approvingOfficer?.id, accountNo: this.approvingOfficer.accountNo },
             paymentRequestId: this.docType === 'pr'  ? (this.linkedDocument?.id ?? 0) : 0,
-            receivingReportId: 0,
+            receivingReportId: this.docType === 'rr' && this.linkedRrs.length === 1 ? this.linkedRrs[0].id : 0,
             joAcceptanceId:   this.docType === 'joa' ? (this.linkedDocument?.id ?? 0) : 0,
             receivingReports: this.docType === 'rr'  ? this.linkedRrs.map(r => ({ id: r.id })) : [],
             iemopBillings:    this.iemopBillings.map(b => ({ id: b.id })),

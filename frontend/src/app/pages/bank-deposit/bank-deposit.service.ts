@@ -46,6 +46,10 @@ export class BankDepositService {
         return this.http.post(`${BASE_API}/bank-deposit/${id}/upload`, formData);
     }
 
+    deleteFile(fileId: number): Observable<any> {
+        return this.http.delete(`${BASE_URL}/file/${fileId}`);
+    }
+
     fileUrl(fileId: number): string {
         return this.downloadService.printUrl(`${BASE_URL}/file/${fileId}`);
     }

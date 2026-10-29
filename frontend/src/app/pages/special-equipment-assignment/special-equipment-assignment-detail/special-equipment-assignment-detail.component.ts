@@ -35,9 +35,8 @@ export class SpecialEquipmentAssignmentDetailComponent {
         this.isLoading.set(true);
         this.service.getData(this.id).subscribe({
             next: (data) => {
-                this.isLoading.set(false);
                 if (data?.id) { this.data = data; this.loadWorkflowActions(); }
-                else { this.alertService.error(this.module, 'Not Found', ''); this.router.navigate(['/' + this.menuLink]); }
+                else { this.isLoading.set(false); this.alertService.error(this.module, 'Not Found', ''); this.router.navigate(['/' + this.menuLink]); }
             },
             error: () => { this.isLoading.set(false); this.alertService.error(this.module, 'Error.', ''); this.router.navigate(['/' + this.menuLink]); }
         });
@@ -47,9 +46,10 @@ export class SpecialEquipmentAssignmentDetailComponent {
         if (!this.data?.transId || this.isTerminal()) {
             this.workflowActions = [];
             this.selectedAction  = null;
+            this.isLoading.set(false);
             return;
         }
-        this.service.getWorkflowActions(this.data.transId).subscribe({ next: (a) => { this.workflowActions = a || []; this.selectedAction = null; this.remarks = ''; }, error: () => { this.workflowActions = []; } });
+        this.service.getWorkflowActions(this.data.transId).subscribe({ next: (a) => { this.isLoading.set(false); this.workflowActions = a || []; this.selectedAction = null; this.remarks = ''; }, error: () => { this.isLoading.set(false); this.workflowActions = []; } });
     }
 
     isTerminal(): boolean { return TERMINAL_STATUSES.includes(this.data?.documentStatus?.status || ''); }

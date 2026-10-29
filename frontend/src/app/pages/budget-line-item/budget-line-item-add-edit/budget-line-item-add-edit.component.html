@@ -182,10 +182,10 @@
                                                 </div>
                                                 <div class="col-md-6">
                                                     <label class="form-label fw-bold">Unit Price</label>
-                                                    <input type="number" class="form-control text-end"
+                                                    <input type="text" appNumericFormat class="form-control text-end"
                                                            [(ngModel)]="d.applicationAmount"
                                                            [name]="'amount_' + $index"
-                                                           min="0" step="0.01" placeholder="0.00"
+                                                           placeholder="0.00"
                                                            (ngModelChange)="calcTotal(d)"/>
                                                 </div>
                                                 <div class="col-md-6">

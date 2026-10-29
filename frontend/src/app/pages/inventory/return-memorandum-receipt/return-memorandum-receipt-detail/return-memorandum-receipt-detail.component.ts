@@ -60,9 +60,8 @@ export class ReturnMemorandumReceiptDetailComponent implements OnInit {
         this.isLoading.set(true);
         this.service.getData(this.id).subscribe({
             next: (data) => {
-                this.isLoading.set(false);
                 if (data?.id) { this.data.set(data); this.loadWorkflowActions(); }
-                else { this.alertService.error(this.module, 'Not Found', ''); this.router.navigate(['/' + this.menuLink]); }
+                else { this.isLoading.set(false); this.alertService.error(this.module, 'Not Found', ''); this.router.navigate(['/' + this.menuLink]); }
             },
             error: () => { this.isLoading.set(false); this.alertService.error(this.module, 'Error.', ''); this.router.navigate(['/' + this.menuLink]); }
         });
@@ -71,13 +70,14 @@ export class ReturnMemorandumReceiptDetailComponent implements OnInit {
     loadWorkflowActions(): void {
         const transactionId = this.transactionId();
         if (!transactionId || this.isTerminal()) {
+            this.isLoading.set(false);
             this.workflowActions.set([]);
             this.selectedAction  = null;
             return;
         }
         this.anyJSONService.getWorkflowActions(transactionId).subscribe({
-            next: (a) => { this.workflowActions.set(a || []); this.selectedAction = null; this.remarks = ''; },
-            error: () => { this.workflowActions.set([]); }
+            next: (a) => { this.isLoading.set(false); this.workflowActions.set(a || []); this.selectedAction = null; this.remarks = ''; },
+            error: () => { this.isLoading.set(false); this.workflowActions.set([]); }
         });
     }
 

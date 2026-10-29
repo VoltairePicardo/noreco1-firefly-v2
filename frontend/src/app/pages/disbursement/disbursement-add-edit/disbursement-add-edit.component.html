@@ -101,6 +101,18 @@
                                 <span class="text-muted fs-sm">Loading journal entries from document...</span>
                             </div>
                         }
+
+                        @if (selectedVoucherType === 'RR') {
+                            <div class="row g-3 mt-1">
+                                <div class="col-md-4">
+                                    <label class="form-label fw-bold">RR Number</label>
+                                    <input type="text" class="form-control"
+                                           [(ngModel)]="rrNumber"
+                                           [ngModelOptions]="{ standalone: true }"
+                                           placeholder="Enter RR number..."/>
+                                </div>
+                            </div>
+                        }
                     }
 
                     @if (cashAdvances.length > 0) {
@@ -289,9 +301,10 @@
                         </div>
                         <div class="col-md-3">
                             <label class="form-label fw-bold">Check Amount</label>
-                            <input type="number" class="form-control text-end"
-                                   [(ngModel)]="checkAmount" [ngModelOptions]="{ standalone: true }"
-                                   min="0" step="0.01" placeholder="0.00"/>
+                            <input type="text" class="form-control text-end"
+                                   [value]="(checkAmount || null) | number:'1.2-2'"
+                                   (blur)="onCheckAmountBlur($event)"
+                                   placeholder="0.00"/>
                         </div>
                     </div>
 

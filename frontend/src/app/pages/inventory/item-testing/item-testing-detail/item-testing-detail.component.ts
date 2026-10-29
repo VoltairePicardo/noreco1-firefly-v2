@@ -52,9 +52,8 @@ export class ItemTestingDetailComponent implements OnInit {
         this.isLoading.set(true);
         this.service.getData(Number(this.id)).subscribe({
             next: (data) => {
-                this.isLoading.set(false);
                 if (data?.id) { this.data.set(data); this.loadWorkflowActions(); }
-                else { this.alertService.error(this.module, 'Not Found', ''); this.router.navigate(['/' + this.menuLink]); }
+                else { this.isLoading.set(false); this.alertService.error(this.module, 'Not Found', ''); this.router.navigate(['/' + this.menuLink]); }
             },
             error: () => { this.isLoading.set(false); this.alertService.error(this.module, 'Error.', ''); this.router.navigate(['/' + this.menuLink]); }
         });
@@ -62,10 +61,10 @@ export class ItemTestingDetailComponent implements OnInit {
 
     loadWorkflowActions(): void {
         const transId = this.data()?.transId;
-        if (!transId || this.isTerminal()) return;
+        if (!transId || this.isTerminal()) { this.isLoading.set(false); return; }
         this.service.getWorkflowActions(transId).subscribe({
-            next: (a) => { this.workflowActions.set(a || []); },
-            error: () => { this.workflowActions.set([]); }
+            next: (a) => { this.isLoading.set(false); this.workflowActions.set(a || []); },
+            error: () => { this.isLoading.set(false); this.workflowActions.set([]); }
         });
     }
 

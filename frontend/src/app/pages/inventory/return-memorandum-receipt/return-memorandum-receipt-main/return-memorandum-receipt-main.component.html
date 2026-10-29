@@ -91,7 +91,7 @@
                                 <td>{{ rec.date | date:'MM/dd/yyyy' }}</td>
                                 <td class="text-start">{{ rec.office?.name || '—' }}</td>
                                 <td class="text-start">{{ rec.employee?.name || rec.employee?.fullName || '—' }}</td>
-                                <td><span class="badge bg-secondary bg-opacity-25 text-dark border">{{ rec.status || '—' }}</span></td>
+                                <td><span class="badge border" [ngClass]="(rec.status || '—') === 'Approved' ? 'bg-success bg-opacity-25 text-success' : 'bg-primary bg-opacity-25 text-primary'">{{ rec.status || '—' }}</span></td>
                                 <td>
                                     <div class="d-flex gap-1">
                                         <a [routerLink]="['/' + menuLink, rec.id, 'detail']"

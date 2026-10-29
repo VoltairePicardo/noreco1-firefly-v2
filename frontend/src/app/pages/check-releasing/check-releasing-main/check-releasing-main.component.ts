@@ -37,7 +37,8 @@ export class CheckReleasingMainComponent {
             (r.code         || '').toLowerCase().includes(q) ||
             (r.checkNumber  || '').toLowerCase().includes(q) ||
             (r.accountTitle || '').toLowerCase().includes(q) ||
-            (r.particulars  || '').toLowerCase().includes(q)
+            (r.particulars  || '').toLowerCase().includes(q) ||
+            (r.payee        || '').toLowerCase().includes(q)
         );
     }
 

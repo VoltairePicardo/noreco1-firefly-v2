@@ -29,16 +29,14 @@
                         </div>
                     </td>
                     <td>
-                        <input type="text" inputmode="decimal" class="form-control form-control-sm text-end"
-                               [value]="formatAmount(entries[i].debit)"
-                               (focus)="onAmountFocus($event)"
+                        <input type="text" class="form-control form-control-sm text-end"
+                               [value]="(entries[i].debit || null) | number:'1.2-2'"
                                (blur)="onAmountBlur($event, i, 'debit')"
                                placeholder="0.00"/>
                     </td>
                     <td>
-                        <input type="text" inputmode="decimal" class="form-control form-control-sm text-end"
-                               [value]="formatAmount(entries[i].credit)"
-                               (focus)="onAmountFocus($event)"
+                        <input type="text" class="form-control form-control-sm text-end"
+                               [value]="(entries[i].credit || null) | number:'1.2-2'"
                                (blur)="onAmountBlur($event, i, 'credit')"
                                placeholder="0.00"/>
                     </td>

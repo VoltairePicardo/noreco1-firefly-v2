@@ -223,6 +223,24 @@ public class BankDepositServiceImpl implements BankDepositService, PrintableVouc
     }
 
     @Override
+    @Transactional
+    public PostResponse uploadAttachments(Integer id, HttpServletRequest request) {
+        PostResponse response = new PostResponse();
+        BankDeposit bankDeposit = bankDepositRepo.findById(id).orElse(null);
+        if (bankDeposit == null) {
+            response.setSuccess(false);
+            response.setFailureMessage("Bank deposit not found.");
+            return response;
+        }
+        if (request instanceof MultipartHttpServletRequest mRequest) {
+            fileFacade.saveDocumentAttachment(FileFacadeImpl.flattenFileMap(mRequest), bankDeposit.getTransaction().getId());
+        }
+        response.setSuccess(true);
+        response.setSuccessMessage("Files uploaded successfully.");
+        return response;
+    }
+
+    @Override
     public PostResponse uploadDeposits(UploadBankDepositDto uploadBankDepositDto, BindingResult bindingResult, MessageSource messageSource) {
 
         PostResponse response = new PostResponse();

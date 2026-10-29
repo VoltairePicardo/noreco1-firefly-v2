@@ -1,6 +1,7 @@
 import { Component, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { COMMON_ALL_PAGE_IMPORTS, COMMON_MAIN_PAGE_IMPORTS } from '@/app/shared/providers/shared-providers';
+import { NumericFormatDirective } from '@/app/shared/directives/numeric-format.directive';
 import { AlertService } from '@/app/shared/services/alert.service';
 import { ModalService } from '@/app/shared/modals/modal-service';
 import { BrowseCashflowItemModalComponent } from '@/app/shared/modals/browse-cashflow-item-modal/browse-cashflow-item-modal.component';
@@ -10,7 +11,7 @@ import Swal from 'sweetalert2';
 
 @Component({
     selector: 'app-ca-detail',
-    imports: [...COMMON_ALL_PAGE_IMPORTS, ...COMMON_MAIN_PAGE_IMPORTS, DocumentLogsComponent],
+    imports: [...COMMON_ALL_PAGE_IMPORTS, ...COMMON_MAIN_PAGE_IMPORTS, DocumentLogsComponent, NumericFormatDirective],
     providers: [],
     templateUrl: './ca-detail.component.html'
 })
@@ -24,6 +25,8 @@ export class CaDetailComponent {
     isLoading          = signal(false);
     processingWorkflow = false;
     settingLiquidated  = false;
+    updatingAmounts    = false;
+    confirmingBli      = false;
 
     // Workflow
     workflowActions: any[] = [];
@@ -60,12 +63,12 @@ export class CaDetailComponent {
         this.isLoading.set(true);
         this.service.getData(this.id).subscribe({
             next: (data) => {
-                this.isLoading.set(false);
                 if (data?.id) {
                     this.data = data;
                     this.loadWorkflowActions();
                     this.loadCashFlowData();
                 } else {
+                    this.isLoading.set(false);
                     this.alertService.error(this.module, 'Not Found', '');
                     this.router.navigate(['/' + this.menuLink]);
                 }
@@ -82,10 +85,10 @@ export class CaDetailComponent {
 
     loadWorkflowActions(): void {
         const transId = this.data?.transId || this.data?.transaction?.id;
-        if (!transId) return;
+        if (!transId) { this.isLoading.set(false); return; }
         this.service.getWorkflowActions(transId).subscribe({
-            next: (actions) => { this.workflowActions = actions || []; this.selectedAction = null; this.remarks = ''; },
-            error: () => { this.workflowActions = []; }
+            next: (actions) => { this.isLoading.set(false); this.workflowActions = actions || []; this.selectedAction = null; this.remarks = ''; },
+            error: () => { this.isLoading.set(false); this.workflowActions = []; }
         });
     }
 
@@ -245,6 +248,53 @@ export class CaDetailComponent {
                 this.cashFlowDetails.push({ cashflowItem: result.data, amount: 0 });
             }
         } catch { }
+    }
+
+    // ─── Inline amount editing ────────────────────────────────────────
+
+    updateAmounts(): void {
+        this.updatingAmounts = true;
+        this.service.updateAmounts(this.data).subscribe({
+            next: (res) => {
+                this.updatingAmounts = false;
+                if (res?.success) {
+                    this.alertService.success(this.module, 'Amounts updated.', '');
+                    this.load();
+                } else {
+                    this.alertService.error(this.module, 'Update failed.', res?.failureMessage || '');
+                }
+            },
+            error: () => { this.updatingAmounts = false; this.alertService.error(this.module, 'Error.', ''); }
+        });
+    }
+
+    // ─── Budget Line Item confirmation ────────────────────────────────
+
+    async confirmBudgetLineItem(): Promise<void> {
+        const bliLabel = `${this.data?.budgetLineItemDetail?.code} - ${this.data?.budgetLineItemDetail?.title}`;
+        const result = await Swal.fire({
+            title: 'Confirm',
+            text: `Are you sure that ${bliLabel} is the right Budget Line Item for this document? This action cannot be undone.`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes',
+            cancelButtonText: 'Cancel'
+        });
+        if (!result.isConfirmed) return;
+
+        this.confirmingBli = true;
+        this.service.confirmBudgetLineItem(this.data).subscribe({
+            next: (res) => {
+                this.confirmingBli = false;
+                if (res?.success) {
+                    this.alertService.success(this.module, 'Budget Line Item confirmed.', '');
+                    this.load();
+                } else {
+                    this.alertService.error(this.module, 'Failed.', res?.failureMessage || '');
+                }
+            },
+            error: () => { this.confirmingBli = false; this.alertService.error(this.module, 'Error.', ''); }
+        });
     }
 
     removeCashFlowRow(index: number): void {

@@ -108,6 +108,8 @@ export class DisbursementAddEditComponent {
     iemopBillings : any[] = [];
     tempBatch: any = null;
 
+    rrNumber = '';
+
     stagedFiles  : File[] = [];
     existingFiles: any[]  = [];
     filesToRemove: any[]  = [];
@@ -180,6 +182,7 @@ export class DisbursementAddEditComponent {
                     this.remarks             = data.remarks             || '';
                     this.additionalPayeeInfo = data.additionalPayeeInfo || '';
                     this.checkAmount         = data.checkAmount         ?? null;
+                    this.rrNumber            = data.rrNumber            || '';
                     this.payee               = data.payee               || null;
                     this.selectedBank        = data.bank                || null;
                     this.purchaseOrder        = data.purchaseOrder        || null;
@@ -392,9 +395,15 @@ export class DisbursementAddEditComponent {
             next: (entries) => {
                 this.loadingSourceVoucherEntries = false;
                 this.journalEntries = (entries || []).map((e: any): JournalEntry => ({
-                    account: { accountCode: e.code, accountTitle: e.description, id: e.accountId, hasSL: e.hasSL },
-                    debit:   Number(e.debit)  || null,
-                    credit:  Number(e.credit) || null
+                    account:   { accountCode: e.code, accountTitle: e.description, id: e.accountId, hasSL: e.hasSL },
+                    debit:     Number(e.debit)  || null,
+                    credit:    Number(e.credit) || null,
+                    wTaxEntry: e.wTaxEntry || null,
+                    slentries: (e.slentries || []).map((sl: any) => ({
+                        entity: null, accountNo: sl.accountNo, name: sl.name,
+                        debit:  Number(sl.debit)  || null,
+                        credit: Number(sl.credit) || null
+                    }))
                 }));
             },
             error: () => { this.loadingSourceVoucherEntries = false; }
@@ -685,6 +694,10 @@ export class DisbursementAddEditComponent {
             this.alertService.warning(this.module, 'Validation', 'Please enter particulars.');
             return;
         }
+        if (!this.selectedBank) {
+            this.alertService.warning(this.module, 'Validation', 'Please select a bank.');
+            return;
+        }
 
         const requiredSignatoryKeys = ['checker', 'budgetOfficer', 'recommendingApproval', 'auditingOfficer', 'checkPrinter', 'approvingOfficer'];
         const missingSignatory = requiredSignatoryKeys.find(key => !this.signatories[key]);
@@ -719,6 +732,13 @@ export class DisbursementAddEditComponent {
             return;
         }
 
+        if (this.selectedSourceVoucher?.forInstallment && this.selectedInstallmentIds.length === 0) {
+            const total = this.installmentDetails.length;
+            this.alertService.warning(this.module, 'Validation',
+                `Please select at least one installment detail (${total} available) to proceed with payment.`);
+            return;
+        }
+
         this.formSubmit = true;
 
         const sigRef = (key: string) => this.signatories[key]
@@ -733,6 +753,7 @@ export class DisbursementAddEditComponent {
             particulars:         this.particulars         || null,
             remarks:             this.remarks             || null,
             additionalPayeeInfo: this.additionalPayeeInfo || null,
+            rrNumber:            this.rrNumber            || null,
             payee:               { accountNo: this.payee.accountNo },
             bank:                this.selectedBank ? { id: this.selectedBank.id } : null,
             checker:              sigRef('checker'),
@@ -799,5 +820,14 @@ export class DisbursementAddEditComponent {
                 this.alertService.error(this.module, 'An error occurred while saving.', '');
             }
         });
+    }
+
+    onCheckAmountBlur(event: FocusEvent): void {
+        const input = event.target as HTMLInputElement;
+        const raw = parseFloat(input.value.replace(/,/g, ''));
+        this.checkAmount = isNaN(raw) ? null : raw;
+        input.value = this.checkAmount != null
+            ? this.checkAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+            : '';
     }
 }

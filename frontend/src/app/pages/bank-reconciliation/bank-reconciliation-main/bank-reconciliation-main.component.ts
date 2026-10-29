@@ -132,9 +132,9 @@ export class BankReconciliationMainComponent {
         this.page = 1;
     }
 
-    /** Type-aware status label: OD uses Reflected/Not Reflected; RC+DT use Cleared/Not Cleared */
+    /** Type-aware status label: DT uses Reflected/Not Reflected; RC+OD use Cleared/Not Cleared */
     statusLabel(rec: any, cleared: boolean): string {
-        return rec.type === 'OD'
+        return rec.type === 'DT'
             ? (cleared ? 'Reflected'    : 'Not Reflected')
             : (cleared ? 'Cleared'      : 'Not Cleared');
     }

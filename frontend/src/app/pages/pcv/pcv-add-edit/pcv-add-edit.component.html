@@ -168,10 +168,10 @@
                                                               placeholder="Enter Particulars"></textarea>
                                                 </td>
                                                 <td>
-                                                    <input type="number" class="form-control form-control-sm text-end"
+                                                    <input type="text" appNumericFormat class="form-control form-control-sm text-end"
                                                            [(ngModel)]="d.amount"
                                                            [name]="'amount_' + $index"
-                                                           min="0" step="0.01" placeholder="0.00"
+                                                           placeholder="0.00"
                                                            [disabled]="budgetUpdate"/>
                                                 </td>
                                                 <td class="text-center">

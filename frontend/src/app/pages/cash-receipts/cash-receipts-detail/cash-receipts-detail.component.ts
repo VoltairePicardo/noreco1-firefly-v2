@@ -60,7 +60,6 @@ export class CashReceiptsDetailComponent {
         this.isLoading.set(true);
         this.service.getData(this.id).subscribe({
             next: (data) => {
-                this.isLoading.set(false);
                 if (data?.id) {
                     this.data = data;
                     const glLines: any[] = data.generalLedgerLines || [];
@@ -84,6 +83,7 @@ export class CashReceiptsDetailComponent {
                     this.loadAttachments();
                     if (data.transId) { this.loadJournalEntries(data.transId); }
                 } else {
+                    this.isLoading.set(false);
                     this.alertService.error(this.module, 'Not Found', '');
                     this.router.navigate(['/' + this.menuLink]);
                 }
@@ -100,10 +100,10 @@ export class CashReceiptsDetailComponent {
     }
 
     loadWorkflowActions(): void {
-        if (!this.data?.transId) return;
+        if (!this.data?.transId) { this.isLoading.set(false); return; }
         this.service.getWorkflowActions(this.data.transId).subscribe({
-            next: (actions) => { this.workflowActions = actions || []; this.selectedAction = null; this.remarks = ''; },
-            error: () => { this.workflowActions = []; }
+            next: (actions) => { this.isLoading.set(false); this.workflowActions = actions || []; this.selectedAction = null; this.remarks = ''; },
+            error: () => { this.isLoading.set(false); this.workflowActions = []; }
         });
     }
 

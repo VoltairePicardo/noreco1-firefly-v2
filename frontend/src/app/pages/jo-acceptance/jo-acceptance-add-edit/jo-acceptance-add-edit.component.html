@@ -110,18 +110,18 @@
                                             {{ item.remainingAmount | number:'1.2-2' }}
                                         </td>
                                         <td>
-                                            <input type="number" class="form-control form-control-sm text-end fw-bold"
+                                            <input type="text" appNumericFormat class="form-control form-control-sm text-end fw-bold"
                                                    style="min-width:110px"
                                                    [(ngModel)]="item.itemAmount"
                                                    (ngModelChange)="onItemAmountChange(item)"
-                                                   min="0" step="0.01" placeholder="0.00"/>
+                                                   placeholder="0.00"/>
                                         </td>
                                         <td>
-                                            <input type="number" class="form-control form-control-sm text-end fw-bold"
+                                            <input type="text" appNumericFormat class="form-control form-control-sm text-end fw-bold"
                                                    style="min-width:100px"
                                                    [(ngModel)]="item.adjustment"
                                                    (ngModelChange)="onAdjustmentChange(item)"
-                                                   step="0.01" placeholder="0.00"/>
+                                                   placeholder="0.00"/>
                                         </td>
                                         <td class="text-end fw-bold text-nowrap">
                                             {{ item.netAmount | number:'1.2-2' }}

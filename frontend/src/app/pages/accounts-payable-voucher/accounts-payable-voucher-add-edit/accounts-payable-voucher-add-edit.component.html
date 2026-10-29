@@ -17,13 +17,13 @@
                         <input type="text" class="form-control" mwlFlatpickr
                                [options]="flatpickrOptions"
                                [ngModel]="voucherDate"
-                               (ngModelChange)="voucherDate = $event; calculateDueDate()"
+                               (ngModelChange)="onVoucherDateChange($event)"
                                [ngModelOptions]="{ standalone: true }"
                                [disabled]="editMode"
                                placeholder="Select date"/>
                     </div>
                     <div class="col-md-3">
-                        <label class="form-label fw-bold">Invoice Date</label>
+                        <label class="form-label fw-bold">Invoice Date <span class="text-danger">*</span></label>
                         <input type="text" class="form-control" mwlFlatpickr
                                [options]="flatpickrOptions" [(ngModel)]="invoiceDate"
                                [ngModelOptions]="{ standalone: true }" placeholder="Select date"/>
@@ -106,10 +106,10 @@
                                                    [ngModelOptions]="{ standalone: true }" placeholder="Select date"/>
                                         </td>
                                         <td>
-                                            <input type="number" class="form-control form-control-sm text-end"
+                                            <input type="text" appNumericFormat class="form-control form-control-sm text-end"
                                                    [(ngModel)]="row.amount"
                                                    [ngModelOptions]="{ standalone: true }"
-                                                   min="0" step="0.01" placeholder="0.00"/>
+                                                   placeholder="0.00"/>
                                         </td>
                                     </tr>
                                 }

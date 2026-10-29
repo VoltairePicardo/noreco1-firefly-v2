@@ -1,4 +1,5 @@
 import { Component, inject, signal } from '@angular/core';
+import Swal from 'sweetalert2';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AlertService } from '@/app/shared/services/alert.service';
 import {
@@ -40,8 +41,9 @@ export class EnergySalesAddEditComponent {
 
     flatpickrOptions = { dateFormat: 'Y-m-d', altInput: true, altFormat: 'F j, Y' };
 
-    voucherDate = '';
-    particulars = '';
+    voucherDate      = '';
+    particulars      = '';
+    private _prevVoucherDate = '';
 
     journalEntries: JournalEntry[] = [];
     tempBatch: any = null;
@@ -75,7 +77,13 @@ export class EnergySalesAddEditComponent {
             next: (data) => {
                 this.isLoading.set(false);
                 if (data?.id) {
+                    const allowedStatuses = ['Document Created', 'Returned to Creator'];
+                    if (!allowedStatuses.includes(data.documentStatus?.status)) {
+                        this.router.navigate(['/' + this.menuLink, this.id, 'detail']);
+                        return;
+                    }
                     this.voucherDate      = data.voucherDate ? new Date(data.voucherDate).toISOString().substring(0, 10) : '';
+                    this._prevVoucherDate = this.voucherDate;
                     this.particulars      = data.particulars || '';
                     this.approvingOfficer = data.approvingOfficer || null;
                     this.journalEntries   = (data.generalLedgerLines || []).map((e: any): JournalEntry => ({
@@ -118,7 +126,12 @@ export class EnergySalesAddEditComponent {
             error: () => {}
         });
         this.service.getDefaultDate().subscribe({
-            next: (data) => { if (data?.date) this.voucherDate = data.date.substring(0, 10); },
+            next: (data) => {
+                if (data?.date) {
+                    this.voucherDate      = data.date.substring(0, 10);
+                    this._prevVoucherDate = this.voucherDate;
+                }
+            },
             error: () => {}
         });
     }
@@ -133,6 +146,31 @@ export class EnergySalesAddEditComponent {
 
     get isBalanced(): boolean {
         return Math.abs(this.totalDebit - this.totalCredit) < 0.001;
+    }
+
+    onVoucherDateChange(newDate: string): void {
+        if (this.journalEntries.length === 0) {
+            this.voucherDate      = newDate;
+            this._prevVoucherDate = newDate;
+            return;
+        }
+        Swal.fire({
+            title: 'Change Voucher Date?',
+            text: 'Changing the date will clear all journal entries. Continue?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, change date',
+            cancelButtonText: 'No, keep current date'
+        }).then(result => {
+            if (result.isConfirmed) {
+                this.voucherDate      = newDate;
+                this._prevVoucherDate = newDate;
+                this.journalEntries   = [];
+            } else {
+                const old = this._prevVoucherDate;
+                setTimeout(() => { this.voucherDate = old; }, 0);
+            }
+        });
     }
 
     async openTempGLBrowse(): Promise<void> {
@@ -185,6 +223,10 @@ export class EnergySalesAddEditComponent {
         }
         if (!this.isBalanced) {
             this.alertService.warning(this.module, 'Validation', 'Debit and credit totals must be equal.');
+            return;
+        }
+        if (this.totalDebit <= 0) {
+            this.alertService.warning(this.module, 'Validation', 'Journal entry amounts must be greater than zero.');
             return;
         }
         if (!this.approvingOfficer) {

@@ -7,7 +7,6 @@ import { BrowseCOAModalComponent } from '@/app/shared/modals/browse-coa-modal/br
 import { JournalEntrySettingModalComponent } from '@/app/shared/modals/journal-entry-setting-modal/journal-entry-setting-modal.component';
 import { SlEntrySetterModalComponent } from '@/app/shared/modals/sl-entry-setter-modal/sl-entry-setter-modal.component';
 import { AlertService } from '@/app/shared/services/alert.service';
-import { NumericFormatDirective } from '@/app/shared/directives/numeric-format.directive';
 
 export interface SlEntry {
     entity: any;
@@ -39,7 +38,7 @@ export interface JournalEntry {
 
 @Component({
     selector: 'app-journal-entries-form',
-    imports: [...COMMON_ALL_PAGE_IMPORTS, ...COMMON_MAIN_PAGE_IMPORTS, NumericFormatDirective],
+    imports: [...COMMON_ALL_PAGE_IMPORTS, ...COMMON_MAIN_PAGE_IMPORTS],
     providers: [...SHARED_PROVIDERS, provideIcons({ tablerSearch, tablerPlus, tablerTrash, tablerSettings, tablerUsers })],
     templateUrl: './journal-entries-form.component.html'
 })
@@ -147,21 +146,12 @@ export class JournalEntriesFormComponent implements OnChanges {
         return `${a.accountCode || a.code || ''} — ${a.accountTitle || a.accountDescription || a.title || ''}`;
     }
 
-    formatAmount(val: number | null | undefined): string {
-        if (!val) return '';
-        return Number(val).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    }
-
-    onAmountFocus(event: FocusEvent): void {
-        const input = event.target as HTMLInputElement;
-        const raw = parseFloat(input.value.replace(/,/g, ''));
-        input.value = isNaN(raw) ? '' : String(raw);
-    }
-
     onAmountBlur(event: FocusEvent, i: number, field: 'debit' | 'credit'): void {
         const input = event.target as HTMLInputElement;
         const raw = parseFloat(input.value.replace(/,/g, ''));
-        this.entries[i][field] = isNaN(raw) ? null : raw;
+        const val = isNaN(raw) ? null : raw;
+        this.entries[i][field] = val;
+        input.value = val != null ? val.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '';
     }
 
     get debitTotal(): number {

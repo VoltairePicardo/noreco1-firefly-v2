@@ -61,7 +61,7 @@
                         @for (rec of pagedRecords; track rec.id) {
                             <tr>
                                 <td class="fw-bold">{{ rec.code || rec.localCode }}</td>
-                                <td><span class="badge bg-secondary bg-opacity-25 text-dark border">{{ rec.status }}</span></td>
+                                <td><span class="badge border" [ngClass]="(rec.status) === 'Approved' ? 'bg-success bg-opacity-25 text-success' : 'bg-primary bg-opacity-25 text-primary'">{{ rec.status }}</span></td>
                                 <td>{{ rec.voucherDate || rec.date | date:'MM/dd/yyyy' }}</td>
                                 <td>{{ rec.vendor || '—' }}</td>
                                 <td class="text-end">{{ rec.amount ?? rec.totalDebit | number:'1.2-2' }}</td>

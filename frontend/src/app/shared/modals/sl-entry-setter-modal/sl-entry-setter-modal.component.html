@@ -35,14 +35,16 @@
                                    (click)="browseEntity(i)"/>
                         </td>
                         <td>
-                            <input type="number" class="form-control form-control-sm text-end"
-                                   [(ngModel)]="slEntries[i].debit" [ngModelOptions]="{ standalone: true }"
-                                   min="0" placeholder="0.00"/>
+                            <input type="text" class="form-control form-control-sm text-end"
+                                   [value]="(slEntries[i].debit || null) | number:'1.2-2'"
+                                   (blur)="onAmountBlur($event, i, 'debit')"
+                                   placeholder="0.00"/>
                         </td>
                         <td>
-                            <input type="number" class="form-control form-control-sm text-end"
-                                   [(ngModel)]="slEntries[i].credit" [ngModelOptions]="{ standalone: true }"
-                                   min="0" placeholder="0.00"/>
+                            <input type="text" class="form-control form-control-sm text-end"
+                                   [value]="(slEntries[i].credit || null) | number:'1.2-2'"
+                                   (blur)="onAmountBlur($event, i, 'credit')"
+                                   placeholder="0.00"/>
                         </td>
                         <td class="text-center">
                             <button type="button" class="btn btn-danger btn-icon btn-sm rounded-circle"

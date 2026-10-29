@@ -86,8 +86,9 @@ export class AccountsPayableVoucherService {
         return this.http.get<any>(`${BASE_API}/json/entities`, { params });
     }
 
-    searchRvs(q: string = '', page: number = 0, size: number = 10): Observable<any> {
-        const params = new HttpParams().set('q', q).set('page', page).set('size', size);
+    searchRvs(q: string = '', page: number = 0, size: number = 10, vendorAccountNo?: string): Observable<any> {
+        let params = new HttpParams().set('q', q).set('page', page).set('size', size);
+        if (vendorAccountNo) params = params.set('vendorAccountNo', vendorAccountNo);
         return this.http.get<any>(`${BASE_API}/apv/rr-approved-paged`, { params });
     }
 

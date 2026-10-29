@@ -48,11 +48,11 @@ export class StockTransferDetailComponent {
         this.isLoading.set(true);
         this.service.getData(this.id).subscribe({
             next: (data) => {
-                this.isLoading.set(false);
                 if (data?.id) {
                     this.data = data;
                     this.loadWorkflowActions();
                 } else {
+                    this.isLoading.set(false);
                     this.alertService.error(this.module, 'Not Found', '');
                     this.router.navigate(['/' + this.menuLink]);
                 }
@@ -70,10 +70,10 @@ export class StockTransferDetailComponent {
     }
 
     loadWorkflowActions(): void {
-        if (!this.transId) return;
+        if (!this.transId) { this.isLoading.set(false); return; }
         this.service.getWorkflowActions(this.transId).subscribe({
-            next: (actions) => { this.workflowActions = actions || []; this.selectedAction = null; this.remarks = ''; },
-            error: () => { this.workflowActions = []; }
+            next: (actions) => { this.isLoading.set(false); this.workflowActions = actions || []; this.selectedAction = null; this.remarks = ''; },
+            error: () => { this.isLoading.set(false); this.workflowActions = []; }
         });
     }
 

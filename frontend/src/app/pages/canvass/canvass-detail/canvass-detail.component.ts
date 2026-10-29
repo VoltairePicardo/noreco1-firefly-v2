@@ -56,13 +56,13 @@ export class CanvassDetailComponent {
             details: this.service.getDetails(this.id)
         }).subscribe({
             next: ({ header, details }) => {
-                this.isLoading.set(false);
                 if (header?.id) {
                     this.data      = header;
                     this.lineItems = details || [];
                     this.showLogs  = false;
                     this.loadWorkflowActions();
                 } else {
+                    this.isLoading.set(false);
                     this.alertService.error(this.module, 'Not Found', '');
                     this.router.navigate(['/' + this.menuLink]);
                 }
@@ -77,13 +77,14 @@ export class CanvassDetailComponent {
 
     loadWorkflowActions(): void {
         if (!this.data?.transId || this.isTerminal()) {
+            this.isLoading.set(false);
             this.workflowActions = [];
             this.selectedAction  = null;
             return;
         }
         this.service.getWorkflowActions(this.data.transId).subscribe({
-            next: (actions) => { this.workflowActions = actions || []; this.selectedAction = null; this.remarks = ''; },
-            error: () => { this.workflowActions = []; }
+            next: (actions) => { this.isLoading.set(false); this.workflowActions = actions || []; this.selectedAction = null; this.remarks = ''; },
+            error: () => { this.isLoading.set(false); this.workflowActions = []; }
         });
     }
 

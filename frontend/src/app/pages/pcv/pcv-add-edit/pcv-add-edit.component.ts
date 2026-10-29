@@ -146,6 +146,11 @@ export class PcvAddEditComponent {
             next: (data) => {
                 this.isLoading.set(false);
                 if (data?.id) {
+                    const allowedStatuses = ['Document Created', 'Returned to Creator', 'For Checking'];
+                    if (!allowedStatuses.includes(data.documentStatus?.status)) {
+                        this.router.navigate(['/' + this.menuLink, this.id, 'detail']);
+                        return;
+                    }
                     const d = data.pettyCashDate || data.voucherDate;
                     this.voucherDate          = d ? new Date(d).toISOString().substring(0, 10) : '';
                     this.payee                = data.payee    || '';

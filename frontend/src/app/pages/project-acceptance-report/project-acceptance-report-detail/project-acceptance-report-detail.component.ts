@@ -53,7 +53,6 @@ export class ProjectAcceptanceReportDetailComponent {
         this.isLoading.set(true);
         this.service.getData(this.id).subscribe({
             next: (data) => {
-                this.isLoading.set(false);
                 if (data?.id) {
                     this.data = data;
                     if (!reloadLogs) {
@@ -66,6 +65,7 @@ export class ProjectAcceptanceReportDetailComponent {
                         this.loadLogs();
                     }
                 } else {
+                    this.isLoading.set(false);
                     this.alertService.error(this.module, 'Not Found', '');
                     this.router.navigate(['/' + this.menuLink]);
                 }
@@ -82,15 +82,20 @@ export class ProjectAcceptanceReportDetailComponent {
         if (!this.data?.transId || this.isTerminal()) {
             this.workflowActions = [];
             this.selectedAction  = null;
+            this.isLoading.set(false);
             return;
         }
         this.service.getWorkflowActions(this.data.transId).subscribe({
             next: (actions) => {
+                this.isLoading.set(false);
                 this.workflowActions = actions || [];
                 this.selectedAction  = null;
                 this.remarks         = '';
             },
-            error: () => { this.workflowActions = []; }
+            error: () => {
+                this.isLoading.set(false);
+                this.workflowActions = [];
+            }
         });
     }
 

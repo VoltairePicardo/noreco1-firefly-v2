@@ -302,6 +302,10 @@ export class AccountSettingAddEditComponent {
             this.alertService.warning(this.module, 'Validation', 'Please select a document.');
             return;
         }
+        if (this.lineItems.length === 0) {
+            this.alertService.warning(this.module, 'Validation', 'No line items found for the selected document.');
+            return;
+        }
 
         this.formSubmit = true;
 

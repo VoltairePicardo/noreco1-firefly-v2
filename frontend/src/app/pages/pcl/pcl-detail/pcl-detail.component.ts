@@ -48,7 +48,6 @@ export class PclDetailComponent {
         this.isLoading.set(true);
         this.service.getData(this.id).subscribe({
             next: (data) => {
-                this.isLoading.set(false);
                 if (data?.id) {
                     this.data     = data;
                     this.showLogs = false;
@@ -56,6 +55,7 @@ export class PclDetailComponent {
                     const transId = data.transaction?.id;
                     if (transId) this.loadAttachments(transId);
                 } else {
+                    this.isLoading.set(false);
                     this.alertService.error(this.module, 'Not Found', '');
                     this.router.navigate(['/' + this.menuLink]);
                 }
@@ -71,13 +71,14 @@ export class PclDetailComponent {
     loadWorkflowActions(): void {
         const transId = this.data?.transaction?.id;
         if (!transId || this.isTerminal()) {
+            this.isLoading.set(false);
             this.workflowActions = [];
             this.selectedAction  = null;
             return;
         }
         this.service.getWorkflowActions(transId).subscribe({
-            next: (actions) => { this.workflowActions = actions || []; this.selectedAction = null; this.remarks = ''; },
-            error: () => { this.workflowActions = []; }
+            next: (actions) => { this.isLoading.set(false); this.workflowActions = actions || []; this.selectedAction = null; this.remarks = ''; },
+            error: () => { this.isLoading.set(false); this.workflowActions = []; }
         });
     }
 

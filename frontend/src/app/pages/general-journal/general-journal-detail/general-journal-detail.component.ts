@@ -72,7 +72,6 @@ export class GeneralJournalDetailComponent {
         this.isLoading.set(true);
         this.service.getData(this.id).subscribe({
             next: (data) => {
-                this.isLoading.set(false);
                 if (data?.id) {
                     this.data = data;
                     this.journalEntries = data.generalLedgerLines || [];
@@ -116,6 +115,7 @@ export class GeneralJournalDetailComponent {
                     this.loadWorkflowActions();
                     this.loadAttachments();
                 } else {
+                    this.isLoading.set(false);
                     this.alertService.error(this.module, 'Not Found', '');
                     this.router.navigate(['/' + this.menuLink]);
                 }
@@ -129,10 +129,10 @@ export class GeneralJournalDetailComponent {
     }
 
     loadWorkflowActions(): void {
-        if (!this.data?.transId) return;
+        if (!this.data?.transId) { this.isLoading.set(false); return; }
         this.service.getWorkflowActions(this.data.transId).subscribe({
-            next: (actions) => { this.workflowActions = actions || []; this.selectedAction = null; this.remarks = ''; },
-            error: () => { this.workflowActions = []; }
+            next: (actions) => { this.isLoading.set(false); this.workflowActions = actions || []; this.selectedAction = null; this.remarks = ''; },
+            error: () => { this.isLoading.set(false); this.workflowActions = []; }
         });
     }
 

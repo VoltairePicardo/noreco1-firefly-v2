@@ -44,7 +44,7 @@
                                 <td class="text-end">{{ rec.amount ?? rec.totalDebit | number:'1.2-2' }}</td>
                                 <td>{{ rec.voucherDate | date:'MM/dd/yyyy' }}</td>
                                 <td>{{ rec.documentType || '—' }}</td>
-                                <td><span class="badge bg-secondary bg-opacity-25 text-dark border">{{ rec.status }}</span></td>
+                                <td><span class="badge border" [ngClass]="(rec.status) === 'Approved' ? 'bg-success bg-opacity-25 text-success' : 'bg-primary bg-opacity-25 text-primary'">{{ rec.status }}</span></td>
                                 <td class="text-nowrap">
                                     <div class="d-flex justify-content-end gap-1">
                                         <button type="button" ngbTooltip="Approve"

@@ -378,6 +378,7 @@ export class GeneralJournalAddEditComponent {
                 { size: 'lg', centered: true }
             );
             if (result?.action === 'select' && result?.data) {
+                this.clearCcprBatch();
                 this.selectedDocument = result.data;
                 this.selectedIsCal    = result.documentType === 'CAL';
                 this.selectedIsRr     = result.documentType === 'RR';
