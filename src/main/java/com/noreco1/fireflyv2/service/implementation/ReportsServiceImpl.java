@@ -14,6 +14,7 @@ import com.itextpdf.text.pdf.*;
 import com.noreco1.fireflyv2.common.Debug;
 import com.noreco1.fireflyv2.common.GlobalConstant;
 import com.noreco1.fireflyv2.common.facade.AuthenticationFacade;
+import com.noreco1.fireflyv2.common.facade.FTPClientPool;
 import com.noreco1.fireflyv2.common.facade.SettingFacade;
 import com.noreco1.fireflyv2.common.facade.SignatoryFacade;
 import com.noreco1.fireflyv2.common.helpers.*;
@@ -54,8 +55,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.text.*;
@@ -195,6 +198,9 @@ public class ReportsServiceImpl implements ReportsService, Bir1601E {
 
     @Autowired
     CheckVoucherIncomePaymentRepo checkVoucherIncomePaymentRepo;
+
+    @Autowired
+    FTPClientPool ftpClientPool;
 
     @Autowired
     OrganizationDtoer organizationDtoer;
@@ -5440,6 +5446,85 @@ public class ReportsServiceImpl implements ReportsService, Bir1601E {
     }
 
     @Override
+    public HashMap reportParametersSummaryOfTaxesWithheld(Integer year, Integer month, Integer notedByAcctNo, Integer approvedByAcctNo, HttpServletRequest request) {
+        HashMap<String, Object> params = ReportUtil.setupSharedReportHeaders(request);
+        this.setYearMonthParams(params, year, month);
+
+        try {
+            User user = authenticationFacade.getLoggedIn();
+            this.putSignatory(params, "PREPARED_BY", employeeRepo.findOneByAccountNumber(user.getAccountNo()));
+            this.putSignatory(params, "NOTED_BY", employeeRepo.findOneByAccountNumber(notedByAcctNo));
+            this.putSignatory(params, "APPROVED_BY", employeeRepo.findOneByAccountNumber(approvedByAcctNo));
+
+            try (InputStream is = getClass().getResourceAsStream("/" + GlobalConstant.JASPER_BASE_PATH + "/bir/SummaryOfTaxesWithheldPerTaxCode.jrxml")) {
+                params.put("TAX_CODE_SUBREPORT", JasperCompileManager.compileReport(is));
+            }
+
+            LocalDate start = LocalDate.of(year, month, 1);
+            List<Map> rows = new ArrayList<>();
+            for (Object[] row : checkVoucherIncomePaymentRepo.getSummaryOfTaxesWithheldPerTaxCode( start.toString(), start.plusMonths(1).toString(), DocumentStatus.APPROVED.getId())) {
+
+                Map<String, Object> m = new HashMap<>();
+                m.put("code", row[0]);
+                m.put("slType", row[1]);
+                m.put("name", row[2]);
+                m.put("tin", row[3]);
+                m.put("grossAmount", toBigDecimal(row[4]));
+                m.put("taxRate", toBigDecimal(row[5]));
+                m.put("taxWithheld", toBigDecimal(row[6]));
+                rows.add(m);
+            }
+            params.put("TAX_CODE_DS", new JRBeanCollectionDataSource(rows));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return params;
+    }
+
+    @Override
+    public JRDataSource datasourceSummaryOfTaxesWithheld(Integer year, Integer month) {
+        LocalDate start = LocalDate.of(year, month, 1);
+        List<Map> rows = new ArrayList<>();
+        for (Object[] row : checkVoucherIncomePaymentRepo.getSummaryOfTaxesWithheld(start.toString(), start.plusMonths(1).toString(), DocumentStatus.APPROVED.getId())) {
+
+            Map<String, Object> m = new HashMap<>();
+            m.put("description", row[0]);
+            m.put("code", row[1]);
+            m.put("baseAmount", toBigDecimal(row[2]));
+            m.put("taxRate", toBigDecimal(row[3]));
+            m.put("taxDue", toBigDecimal(row[4]));
+            rows.add(m);
+        }
+        return new JRBeanCollectionDataSource(rows);
+    }
+
+    private void putSignatory(HashMap<String, Object> params, String key, Employee employee) {
+        params.put(key, employee != null && employee.getName() != null ? employee.getName().toUpperCase() : "");
+        params.put(key + "_POS", employee != null && employee.getPosition() != null ? employee.getPosition().getName() : "");
+        params.put(key + "_SIGN", signatureImage(employee));
+    }
+
+    private java.awt.Image signatureImage(Employee employee) {
+        if (employee == null || employee.getSignature() == null || employee.getSignature().getFilename() == null) {
+            return null;
+        }
+        String filename = employee.getSignature().getFilename();
+        try (InputStream is = ftpClientPool.retrieve(filename)) {
+            if (is == null) {
+                return null;
+            }
+
+            return javax.imageio.ImageIO.read(is);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    private static BigDecimal toBigDecimal(Object value) {
+        return value == null ? BigDecimal.ZERO : new BigDecimal(value.toString());
+    }
+
+    @Override
     public HashMap reportParametersForWorkOrderTransaction(String from, String to, HttpServletRequest request) {
         HashMap<String, Object> params = this.getSummaryCommonParams(from, to, request);
         try {
@@ -5541,7 +5626,7 @@ public class ReportsServiceImpl implements ReportsService, Bir1601E {
         List<Map> data = new ArrayList<>();
 
         try {
-            List<Object[]> computationOfTax =  checkVoucherIncomePaymentRepo.getComputationOfTax(year, month, DocumentStatus.APPROVED.getId());
+            List<Object[]> computationOfTax =  checkVoucherIncomePaymentRepo.getComputationOfTax(year, month, DocumentStatus.DOCUMENT_CREATED.getId());
 
             if(!computationOfTax.isEmpty()) {
                 for(Object[] row: computationOfTax) {
@@ -5570,7 +5655,7 @@ public class ReportsServiceImpl implements ReportsService, Bir1601E {
         List<Map> data = new ArrayList<>();
         try {
 
-            List<Object[]> computationOfTax =  checkVoucherIncomePaymentRepo.getComputationOfTaxSchedule(year, month, DocumentStatus.APPROVED.getId());
+            List<Object[]> computationOfTax =  checkVoucherIncomePaymentRepo.getComputationOfTaxSchedule(year, month, DocumentStatus.DOCUMENT_CREATED.getId());
 
             if(!computationOfTax.isEmpty()) {
 

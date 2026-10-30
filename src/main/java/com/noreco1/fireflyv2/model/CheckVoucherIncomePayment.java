@@ -3,9 +3,8 @@ package com.noreco1.fireflyv2.model;
 import lombok.*;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
+
 import java.math.BigDecimal;
-import java.util.Date;
 
 @Getter
 @Setter

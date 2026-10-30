@@ -1,271 +1,277 @@
 <div class="container-fluid">
     <app-page-title [title]="module" [subTitle]="subModule" [menuLink]="menuLink"/>
-</div>
 
-<div class="card">
-    <div class="card-body">
+    <div class="card">
+        <div class="card-body">
 
-        @if (isLoading()) {
-            <div class="text-center py-4">
-                <span class="spinner-border spinner-border-sm me-2" role="status"></span>Loading...
-            </div>
-        } @else {
+            @if (isLoading()) {
+                <div class="text-center py-4">
+                    <span class="spinner-border spinner-border-sm me-2" role="status"></span>Loading...
+                </div>
+            } @else {
 
-        <!-- Header -->
-        <div class="row g-3 mb-3">
-            <div class="col-md-3">
-                <label class="form-label fw-bold">Date</label>
-                <input type="text" class="form-control" mwlFlatpickr
-                       [options]="readonlyDateOptions"
-                       [(ngModel)]="quotationDate"
-                       readonly
-                       placeholder=""/>
-            </div>
-            <div class="col-md-9">
-                <label class="form-label fw-bold">Particulars <span class="text-danger">*</span></label>
-                <textarea class="form-control" rows="2"
-                          placeholder="Enter particulars"
-                          [(ngModel)]="particular"
-                          [class.is-invalid]="submitted && !particular.trim()"></textarea>
-                <div class="invalid-feedback">Please provide particulars.</div>
-            </div>
-        </div>
+                <!-- Header -->
+                <div class="row g-3 mb-3">
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold">Date</label>
+                        <input type="text" class="form-control" mwlFlatpickr
+                               [options]="readonlyDateOptions"
+                               [(ngModel)]="quotationDate"
+                               readonly
+                               placeholder=""/>
+                    </div>
+                    <div class="col-md-9">
+                        <label class="form-label fw-bold">Particulars <span class="text-danger">*</span></label>
+                        <textarea class="form-control" rows="2"
+                                  placeholder="Enter particulars"
+                                  [(ngModel)]="particular"
+                                  [class.is-invalid]="submitted && !particular.trim()"></textarea>
+                        <div class="invalid-feedback">Please provide particulars.</div>
+                    </div>
+                </div>
 
-        <hr class="border-dashed mx-n3 mt-3"/>
-        <p class="fs-xs text-uppercase fw-semibold text-muted mb-2">Items For Quotation</p>
+                <hr class="border-dashed mx-n3 mt-3"/>
+                <p class="fs-xs text-uppercase fw-semibold text-muted mb-2">Items For Quotation</p>
 
-        <div class="d-flex justify-content-end mb-2">
-            <button type="button" class="btn btn-success fw-bold" (click)="openPrBrowse()">
-                <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse PR/WR Items
-            </button>
-        </div>
+                <div class="d-flex justify-content-end mb-2">
+                    <button type="button" class="btn btn-success fw-bold" (click)="openPrBrowse()">
+                        <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse PR/WR Items
+                    </button>
+                </div>
 
-        <div class="table-responsive mb-4">
-            <table class="table table-custom table-centered table-hover w-100 mb-0">
-                <thead class="bg-light align-middle bg-opacity-25 thead-sm">
-                    <tr class="text-uppercase fs-xxs">
-                        <th>#</th>
-                        <th>PR No.</th>
-                        <th>Description of Materials</th>
-                        <th>Unit</th>
-                        <th class="text-center" style="width:70px">Qty</th>
-                        @for (i of supplierSlots; track i) {
-                            <th class="text-center">Award</th>
-                            <th>Brand</th>
-                            <th class="text-end" style="width:110px">Price</th>
-                        }
-                        <th class="text-center">Available</th>
-                        <th></th>
-                    </tr>
-                    <!-- Supplier browse row -->
-                    <tr>
-                        <th colspan="5"></th>
-                        @for (i of supplierSlots; track i) {
-                            <th colspan="3">
-                                <div class="d-flex align-items-center gap-1 flex-wrap">
+                <div class="table-responsive mb-4">
+                    <table class="table table-custom table-centered table-bordered table-hover w-100 mb-0">
+                        <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                        <tr class="text-uppercase fs-xxs">
+                            <th>#</th>
+                            <th>PR No.</th>
+                            <th>Description of Materials</th>
+                            <th>Unit</th>
+                            <th class="text-center" style="width:70px">Qty</th>
+                            @for (i of supplierSlots; track i) {
+                                <th class="text-center">Award</th>
+                                <th>Brand</th>
+                                <th class="text-end" style="width:110px">Price</th>
+                            }
+                            <th class="text-center">Available</th>
+                            <th></th>
+                        </tr>
+                        <!-- Supplier browse row -->
+                        <tr>
+                            <th colspan="5"></th>
+                            @for (i of supplierSlots; track i) {
+                                <th colspan="3">
+                                    <div class="d-flex align-items-center gap-1 flex-wrap">
                                     <span class="text-muted small fw-normal text-truncate" style="max-width:130px">
                                         {{ suppliers[i]?.name || ('Supplier ' + (i + 1)) }}
                                     </span>
-                                    <button type="button" class="btn btn-success btn-sm fw-bold ms-auto"
-                                            (click)="openSupplierBrowse(i)">
-                                        <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
-                                    </button>
-                                </div>
-                            </th>
-                        }
-                        <th></th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @if (lineItems.length > 0) {
-                        @for (item of lineItems; track $index; let idx = $index) {
-                            <tr>
-                                <td class="text-muted">{{ idx + 1 }}</td>
-                                <td class="fw-bold text-nowrap">{{ item.rvNumber || '—' }}</td>
-                                <td>
-                                    {{ item.itemDescription }}
-                                    @if (item.isChildItem && item.isApprovedItem) {
-                                        <span class="badge bg-success-subtle text-success ms-2">Approved</span>
-                                    } @else if (item.isChildItem && !item.isApprovedItem) {
-                                        <span class="badge bg-warning-subtle text-warning ms-2">Pending Approval</span>
-                                    } @else {
-                                        <span class="badge bg-danger-subtle text-danger ms-2">Parent Item</span>
-                                        <button type="button" class="btn btn-sm btn-success fw-bold ms-2"
-                                                (click)="openItemModal(idx)">
-                                            <ng-icon name="tablerPlus" class="ps-0 pe-3 fw-bold"></ng-icon>Add Child Item
+                                        <button type="button" class="btn btn-success btn-sm fw-bold ms-auto"
+                                                (click)="openSupplierBrowse(i)">
+                                            <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
                                         </button>
+                                        @if (suppliers[i]) {
+                                            <button type="button" class="btn btn-light btn-icon btn-sm rounded-circle"
+                                                    (click)="clearSupplier(i)">
+                                                <ng-icon name="tablerX" class="fs-sm"></ng-icon>
+                                            </button>
+                                        }
+                                    </div>
+                                </th>
+                            }
+                            <th></th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                            @if (lineItems.length > 0) {
+                                @for (item of lineItems; track $index; let idx = $index) {
+                                    <tr>
+                                        <td class="text-muted">{{ idx + 1 }}</td>
+                                        <td class="fw-bold text-nowrap">{{ item.rvNumber || '—' }}</td>
+                                        <td>
+                                            {{ item.itemDescription }}
+                                            @if (item.isChildItem && item.isApprovedItem) {
+                                                <span class="badge bg-success-subtle text-success ms-2">Approved</span>
+                                            } @else if (item.isChildItem && !item.isApprovedItem) {
+                                                <span class="badge bg-warning-subtle text-warning ms-2">Pending Approval</span>
+                                            } @else {
+                                                <span class="badge bg-danger-subtle text-danger ms-2">Parent Item</span>
+                                                <button type="button" class="btn btn-sm btn-success fw-bold ms-2"
+                                                        (click)="openItemModal(idx)">
+                                                    <ng-icon name="tablerPlus" class="ps-0 pe-3 fw-bold"></ng-icon>Add Child Item
+                                                </button>
+                                            }
+                                        </td>
+                                        <td>{{ item.unitCode }}</td>
+                                        <td class="text-center fw-bold">{{ item.quantity }}</td>
+                                        @for (i of supplierSlots; track i) {
+                                            <td class="text-center">
+                                                @if (suppliers[i]) {
+                                                    <input type="checkbox" class="form-check-input"
+                                                           [(ngModel)]="item.details[i].awarded"
+                                                           (ngModelChange)="awardSupplier(idx, i)"/>
+                                                }
+                                            </td>
+                                            <td>
+                                                @if (suppliers[i]) {
+                                                    <select class="form-select form-select-sm" style="min-width:110px"
+                                                            [(ngModel)]="item.details[i].brand"
+                                                            [compareWith]="compareBrand">
+                                                        <option [ngValue]="null">— Brand —</option>
+                                                        @for (b of brands; track b.id) {
+                                                            <option [ngValue]="b">{{ b.name }}</option>
+                                                        }
+                                                    </select>
+                                                }
+                                            </td>
+                                            <td>
+                                                @if (suppliers[i]) {
+                                                    <input type="number" class="form-control form-control-sm text-end"
+                                                           style="min-width:90px"
+                                                           min="0" step="0.01" placeholder="0.00"
+                                                           [(ngModel)]="item.details[i].price"
+                                                           (ngModelChange)="recalcTotal()"/>
+                                                }
+                                            </td>
+                                        }
+                                        <td class="text-center">
+                                            <input type="checkbox" class="form-check-input"
+                                                   [(ngModel)]="item.available"
+                                                   (ngModelChange)="recalcTotal()"/>
+                                        </td>
+                                        <td>
+                                            <button type="button"
+                                                    class="btn btn-light btn-icon btn-sm rounded-circle"
+                                                    (click)="removeLineItem(idx)">
+                                                <ng-icon name="tablerTrash" class="fs-lg"></ng-icon>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                }
+                                <tr class="table-light fw-bold">
+                                    <td colspan="14" class="text-end pe-3">Total (Lowest Price × Qty):</td>
+                                    <td class="text-end fw-bold">{{ totalAmount | number:'1.2-2' }}</td>
+                                    <td></td>
+                                </tr>
+                            } @else {
+                                <tr>
+                                    <td colspan="16" class="text-center text-muted py-3">
+                                        No items added. Click <strong>Browse PR/WR Items</strong> to load items.
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <hr class="border-dashed mx-n3 mt-3"/>
+                <p class="fs-xs text-uppercase fw-semibold text-muted mb-2">Terms and Conditions</p>
+
+                <div class="table-responsive mb-4">
+                    <table class="table table-bordered table-sm">
+                        <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                        <tr class="text-uppercase fs-xxs">
+                            <th style="width:200px">Term</th>
+                            @for (i of supplierSlots; track i) {
+                                <th>{{ suppliers[i]?.name || ('Supplier ' + (i + 1)) }}</th>
+                            }
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td class="fw-bold">Delivery Time &amp; Completion</td>
+                            @for (i of supplierSlots; track i) {
+                                <td>
+                                    @if (suppliers[i]) {
+                                        <input type="text" class="form-control form-control-sm"
+                                               placeholder="e.g. 30 days"
+                                               [(ngModel)]="terms[i].deliveryTimeAndCompletion"/>
                                     }
                                 </td>
-                                <td>{{ item.unitCode }}</td>
-                                <td class="text-center fw-bold">{{ item.quantity }}</td>
-                                @for (i of supplierSlots; track i) {
-                                    <td class="text-center">
-                                        @if (suppliers[i]) {
-                                            <input type="checkbox" class="form-check-input"
-                                                   [(ngModel)]="item.details[i].awarded"
-                                                   (ngModelChange)="awardSupplier(idx, i)"/>
-                                        }
-                                    </td>
-                                    <td>
-                                        @if (suppliers[i]) {
-                                            <select class="form-select form-select-sm" style="min-width:110px"
-                                                    [(ngModel)]="item.details[i].brand"
-                                                    [compareWith]="compareBrand">
-                                                <option [ngValue]="null">— Brand —</option>
-                                                @for (b of brands; track b.id) {
-                                                    <option [ngValue]="b">{{ b.name }}</option>
-                                                }
-                                            </select>
-                                        }
-                                    </td>
-                                    <td>
-                                        @if (suppliers[i]) {
-                                            <input type="text" appNumericFormat class="form-control form-control-sm text-end"
-                                                   style="min-width:90px"
-                                                   placeholder="0.00"
-                                                   [(ngModel)]="item.details[i].price"
-                                                   (ngModelChange)="recalcTotal()"/>
-                                        }
-                                    </td>
-                                }
-                                <td class="text-center">
-                                    <input type="checkbox" class="form-check-input"
-                                           [(ngModel)]="item.available"
-                                           (ngModelChange)="recalcTotal()"/>
-                                </td>
-                                <td>
-                                    <button type="button"
-                                            class="btn btn-light btn-icon btn-sm rounded-circle"
-                                            (click)="removeLineItem(idx)">
-                                        <ng-icon name="tablerTrash" class="fs-lg"></ng-icon>
-                                    </button>
-                                </td>
-                            </tr>
-                        }
-                        <tr class="table-light fw-bold">
-                            <td colspan="14" class="text-end pe-3">Total (Lowest Price × Qty):</td>
-                            <td class="text-end fw-bold">{{ totalAmount | number:'1.2-2' }}</td>
-                            <td></td>
+                            }
                         </tr>
-                    } @else {
                         <tr>
-                            <td colspan="16" class="text-center text-muted py-3">
-                                No items added. Click <strong>Browse PR/WR Items</strong> to load items.
-                            </td>
+                            <td class="fw-bold">Warranty Period</td>
+                            @for (i of supplierSlots; track i) {
+                                <td>
+                                    @if (suppliers[i]) {
+                                        <input type="text" class="form-control form-control-sm"
+                                               placeholder="e.g. 12"
+                                               [(ngModel)]="terms[i].warrantyPeriod"
+                                               (input)="numericOnly($event, terms[i], 'warrantyPeriod')"/>
+                                    }
+                                </td>
+                            }
                         </tr>
-                    }
-                </tbody>
-            </table>
-        </div>
+                        <tr>
+                            <td class="fw-bold">Terms of Payment (Days)</td>
+                            @for (i of supplierSlots; track i) {
+                                <td>
+                                    @if (suppliers[i]) {
+                                        <input type="text" class="form-control form-control-sm"
+                                               placeholder="e.g. 30"
+                                               [(ngModel)]="terms[i].termsOfPayment"
+                                               (input)="numericOnly($event, terms[i], 'termsOfPayment')"/>
+                                    }
+                                </td>
+                            }
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">Place of Delivery</td>
+                            @for (i of supplierSlots; track i) {
+                                <td>
+                                    @if (suppliers[i]) {
+                                        <input type="text" class="form-control form-control-sm"
+                                               placeholder="Enter place of delivery"
+                                               [(ngModel)]="terms[i].placeOfDelivery"/>
+                                    }
+                                </td>
+                            }
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
 
-        <hr class="border-dashed mx-n3 mt-3"/>
-        <p class="fs-xs text-uppercase fw-semibold text-muted mb-2">Terms and Conditions</p>
+                <hr class="border-dashed mx-n3 mt-3"/>
+                <p class="fs-xs text-uppercase fw-semibold text-muted mb-2">Signatories</p>
 
-        <div class="table-responsive mb-4">
-            <table class="table table-bordered table-sm">
-                <thead class="bg-light align-middle bg-opacity-25 thead-sm">
-                    <tr class="text-uppercase fs-xxs">
-                        <th style="width:200px">Term</th>
-                        @for (i of supplierSlots; track i) {
-                            <th>{{ suppliers[i]?.name || ('Supplier ' + (i + 1)) }}</th>
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Noted By <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" readonly
+                                   [value]="notedBy?.fullName || notedBy?.name || ''"
+                                   [class.is-invalid]="submitted && !notedBy"
+                                   placeholder="Browse Noted By"/>
+                            <button type="button" class="btn btn-success fw-bold"
+                                    (click)="openSignatoryBrowse('notedBy')">
+                                <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
+                            </button>
+                        </div>
+                        @if (submitted && !notedBy) {
+                            <div class="text-danger small mt-1">Please select a Noted By.</div>
                         }
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td class="fw-bold">Delivery Time &amp; Completion</td>
-                        @for (i of supplierSlots; track i) {
-                            <td>
-                                @if (suppliers[i]) {
-                                    <input type="text" class="form-control form-control-sm"
-                                           placeholder="e.g. 30 days"
-                                           [(ngModel)]="terms[i].deliveryTimeAndCompletion"/>
-                                }
-                            </td>
-                        }
-                    </tr>
-                    <tr>
-                        <td class="fw-bold">Warranty Period</td>
-                        @for (i of supplierSlots; track i) {
-                            <td>
-                                @if (suppliers[i]) {
-                                    <input type="text" class="form-control form-control-sm"
-                                           placeholder="e.g. 12"
-                                           [(ngModel)]="terms[i].warrantyPeriod"
-                                           (input)="numericOnly($event, terms[i], 'warrantyPeriod')"/>
-                                }
-                            </td>
-                        }
-                    </tr>
-                    <tr>
-                        <td class="fw-bold">Terms of Payment (Days)</td>
-                        @for (i of supplierSlots; track i) {
-                            <td>
-                                @if (suppliers[i]) {
-                                    <input type="text" class="form-control form-control-sm"
-                                           placeholder="e.g. 30"
-                                           [(ngModel)]="terms[i].termsOfPayment"
-                                           (input)="numericOnly($event, terms[i], 'termsOfPayment')"/>
-                                }
-                            </td>
-                        }
-                    </tr>
-                    <tr>
-                        <td class="fw-bold">Place of Delivery</td>
-                        @for (i of supplierSlots; track i) {
-                            <td>
-                                @if (suppliers[i]) {
-                                    <input type="text" class="form-control form-control-sm"
-                                           placeholder="Enter place of delivery"
-                                           [(ngModel)]="terms[i].placeOfDelivery"/>
-                                }
-                            </td>
-                        }
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+                    </div>
+                </div>
 
-        <hr class="border-dashed mx-n3 mt-3"/>
-        <p class="fs-xs text-uppercase fw-semibold text-muted mb-2">Signatories</p>
-
-        <div class="row g-3 mb-4">
-            <div class="col-md-6">
-                <label class="form-label fw-bold">Noted By <span class="text-danger">*</span></label>
-                <div class="input-group">
-                    <input type="text" class="form-control" readonly
-                           [value]="notedBy?.fullName || notedBy?.name || ''"
-                           [class.is-invalid]="submitted && !notedBy"
-                           placeholder="Browse Noted By"/>
-                    <button type="button" class="btn btn-success fw-bold"
-                            (click)="openSignatoryBrowse('notedBy')">
-                        <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
+                <!-- Footer -->
+                <hr class="border-dashed mx-n3 mt-3"/>
+                <div class="d-flex gap-2 justify-content-end align-items-center mt-3">
+                    <a [routerLink]="['/' + menuLink]" class="btn btn-light fw-bold">
+                        <ng-icon name="tablerArrowLeft" class="ps-0 pe-3 fw-bold"></ng-icon>Back
+                    </a>
+                    <button type="button" class="btn btn-primary fw-bold" [disabled]="formSubmit" (click)="save()">
+                        @if (formSubmit) {
+                            <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                            {{ editMode ? 'Updating...' : 'Saving...' }}
+                        } @else {
+                            <ng-icon name="tablerDeviceFloppy" class="ps-0 pe-3 fw-bold"></ng-icon>
+                            {{ editMode ? 'Update' : 'Save ' + module }}
+                        }
                     </button>
                 </div>
-                @if (submitted && !notedBy) {
-                    <div class="text-danger small mt-1">Please select a Noted By.</div>
-                }
-            </div>
-        </div>
 
-        <!-- Footer -->
-        <hr class="border-dashed mx-n3 mt-3"/>
-        <div class="d-flex gap-2 justify-content-end align-items-center mt-3">
-            <a [routerLink]="['/' + menuLink]" class="btn btn-light fw-bold">
-                <ng-icon name="tablerArrowLeft" class="ps-0 pe-3 fw-bold"></ng-icon>Back
-            </a>
-            <button type="button" class="btn btn-primary fw-bold" [disabled]="formSubmit" (click)="save()">
-                @if (formSubmit) {
-                    <span class="spinner-border spinner-border-sm me-2" role="status"></span>
-                    {{ editMode ? 'Updating...' : 'Saving...' }}
-                } @else {
-                    <ng-icon name="tablerDeviceFloppy" class="ps-0 pe-3 fw-bold"></ng-icon>
-                    {{ editMode ? 'Update' : 'Save ' + module }}
-                }
-            </button>
+            } <!-- end !isLoading -->
         </div>
-
-        } <!-- end !isLoading -->
     </div>
 </div>

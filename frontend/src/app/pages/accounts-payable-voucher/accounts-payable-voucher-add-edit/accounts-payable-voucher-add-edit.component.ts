@@ -9,11 +9,14 @@ import {
 } from '@/app/shared/providers/shared-providers';
 import { CdkTextareaAutosize } from '@angular/cdk/text-field';
 import { FlatpickrDirective, provideFlatpickrDefaults } from 'angularx-flatpickr';
-import { AccountsPayableVoucherService } from '../accounts-payable-voucher.service';
+import { AccountsPayableVoucherService, ApvDocumentType } from '../accounts-payable-voucher.service';
 import { ModalService } from '@/app/shared/modals/modal-service';
 import { BrowseEntityModalComponent } from '@/app/shared/modals/browse-entity-modal/browse-entity-modal.component';
 import { BrowseIemopBillingModalComponent } from '@/app/shared/modals/browse-iemop-billing-modal/browse-iemop-billing-modal.component';
 import { BrowseReceivingReportModalComponent } from '@/app/shared/modals/browse-receiving-report-modal/browse-receiving-report-modal.component';
+import { BrowsePurchasingDocumentModalComponent } from '@/app/shared/modals/browse-purchasing-document-modal/browse-purchasing-document-modal.component';
+import { DOCUMENT_STATUS, getDocumentStatusName } from '@/app/shared/workflow/document-editability.util';
+import { forkJoin } from 'rxjs';
 import { JournalEntriesFormComponent, JournalEntry } from '@/app/shared/forms/journal-entries-form/journal-entries-form.component';
 import { AttachmentFile, AttachmentsComponent } from '@/app/shared/components/attachments/attachments.component';
 import { provideIcons } from '@ng-icons/core';
@@ -83,6 +86,9 @@ export class AccountsPayableVoucherAddEditComponent {
              : this.docType === 'joa' ? 'JO Acceptance'
              : '';
     }
+    documentType: ApvDocumentType | null = null;
+    selectedDocument: any = null;
+    receivingReports: any[] = [];
 
     // IEMOP Billings
     iemopBillings: any[] = [];
@@ -143,8 +149,22 @@ export class AccountsPayableVoucherAddEditComponent {
 
     get defaultEntity(): any {
         return this.vendor
-            ? { name: this.vendor.name, accountNo: this.vendor.accountNo, vatable: this.vendor.vatable, amount: 0 }
+            ? { name: this.vendor.name, accountNo: this.vendor.accountNo, vatable: this.vendor.vatable, amount: Number(this.selectedDocument?.netAmount) || 0 }
             : undefined;
+    }
+
+    get documentTypeLabel(): string {
+        switch (this.documentType) {
+            case 'PR':  return 'Payment Request';
+            case 'RR':  return 'Receiving Report';
+            case 'JOA': return 'JO Acceptance';
+            default:    return '—';
+        }
+    }
+
+    get documentRows(): any[] {
+        if (this.documentType === 'RR') return this.receivingReports;
+        return this.selectedDocument ? [this.selectedDocument] : [];
     }
 
     get totalDebit(): number {
@@ -260,9 +280,10 @@ export class AccountsPayableVoucherAddEditComponent {
             next: (data) => {
                 this.isLoading.set(false);
                 if (data?.id) {
-                    const status = data.documentStatus?.status || '';
-                    if (status !== 'Document Created' && status !== 'Returned to Creator') {
-                        this.router.navigate(['/' + this.menuLink, this.id, 'detail']);
+                    const editableStatuses: readonly string[] = [DOCUMENT_STATUS.CREATED, DOCUMENT_STATUS.RETURNED_TO_CREATOR];
+                    if (!editableStatuses.includes(getDocumentStatusName(data))) {
+                        this.alertService.warning(this.module, 'Not Allowed', 'Only documents that are created or returned to creator can be edited.');
+                        this.router.navigate(['/' + this.menuLink]);
                         return;
                     }
                     this.voucherDate    = data.voucherDate   ? new Date(data.voucherDate).toISOString().substring(0, 10)   : '';
@@ -286,6 +307,8 @@ export class AccountsPayableVoucherAddEditComponent {
                         this.linkedDocument = data.linkedJoa;
                     }
                     this.iemopBillings = data.iemopBillings || [];
+                    this.receivingReports = data.receivingReports || [];
+                    this.loadLinkedDocument();
                     this.transId       = data.transId ?? null;
                     this.installmentDetails = (data.installmentDetails || []).map((d: any) => ({
                         dueDate: d.dueDate ? new Date(d.dueDate).toISOString().substring(0, 10) : null,
@@ -314,25 +337,30 @@ export class AccountsPayableVoucherAddEditComponent {
     loadJournalEntries(transId: number): void {
         this.service.getJournalEntries(transId).subscribe({
             next: (data) => {
-                this.journalEntries = (data || []).map((e: any): JournalEntry => ({
-                    account: {
-                        accountCode:  e.code || e.accountCode,
-                        accountTitle: e.description || e.accountTitle,
-                        id:           e.accountId,
-                        hasSL:        e.hasSL || false
-                    },
-                    debit:     Number(e.debit)  || null,
-                    credit:    Number(e.credit) || null,
-                    wTaxEntry: e.wTaxEntry || null,
-                    vatEntry:  e.vatEntry  || null,
-                    slentries: (e.slentries || []).map((sl: any) => ({
-                        entity:    null,
-                        accountNo: sl.accountNo,
-                        name:      sl.name,
-                        debit:     Number(sl.debit)  || null,
-                        credit:    Number(sl.credit) || null
-                    }))
-                }));
+                this.journalEntries = (data || []).map((e: any): JournalEntry => {
+                    const whtAccountId = e.wTaxEntry?.atc?.account?.id;
+                    const isWhtRow     = whtAccountId != null && whtAccountId === e.accountId;
+                    return {
+                        account: {
+                            accountCode:  e.code || e.accountCode,
+                            accountTitle: e.description || e.accountTitle,
+                            id:           e.accountId,
+                            hasSL:        e.hasSL || false
+                        },
+                        debit:     Number(e.debit)  || null,
+                        credit:    Number(e.credit) || null,
+                        generated: isWhtRow,
+                        wTaxEntry: isWhtRow ? e.wTaxEntry : null,
+                        vatEntry:  e.vatEntry  || null,
+                        slentries: (e.slentries || []).map((sl: any) => ({
+                            entity:    null,
+                            accountNo: sl.accountNo,
+                            name:      sl.name,
+                            debit:     Number(sl.debit)  || null,
+                            credit:    Number(sl.credit) || null
+                        }))
+                    };
+                });
             },
             error: () => { this.journalEntries = []; }
         });
@@ -422,6 +450,158 @@ export class AccountsPayableVoucherAddEditComponent {
     clearLinkedDocument(): void {
         this.linkedDocument = null;
         this.clearAutoFilled();
+    }
+
+    private loadLinkedDocument(): void {
+        if (this.receivingReports.length > 0) {
+            this.documentType = 'RR';
+            return;
+        }
+        forkJoin({
+            pr:  this.service.getLinkedPaymentRequest(this.id),
+            joa: this.service.getLinkedJoAcceptance(this.id)
+        }).subscribe({
+            next: ({ pr, joa }) => {
+                if (pr?.id) {
+                    this.documentType     = 'PR';
+                    this.selectedDocument = pr;
+                } else if (joa?.id) {
+                    this.documentType     = 'JOA';
+                    this.selectedDocument = joa;
+                }
+            },
+            error: (err) => this.alertService.httpError(this.module, 'Failed to load linked document.', err)
+        });
+    }
+
+    /*async openDocumentBrowse(): Promise<void> {
+        try {
+            const result = await this.modalService.openModal(
+                BrowsePurchasingDocumentModalComponent,
+                { supplierAccountNo: this.vendor?.accountNo ?? null },
+                { size: 'xl', centered: true });
+            if (result?.action === 'select' && result?.data) {
+                if (result.docType === 'RR') this.addReceivingReport(result.data);
+                else this.setSingleDocument(result.docType, result.data);
+            }
+        } catch { }
+    }*/
+
+    private setSingleDocument(type: ApvDocumentType, doc: any): void {
+        this.documentType     = type;
+        this.selectedDocument = doc;
+        this.receivingReports = [];
+        this.journalEntries   = [];
+
+        this.vendor = { accountNo: doc.slentityAccountNo, name: doc.slentityName };
+        if (doc.invoiceDate) this.invoiceDate = this.toIso(new Date(doc.invoiceDate));
+        this.particulars = doc.particulars || '';
+
+        if (type === 'PR') {
+            if (doc.dueDate) this.dueDate = this.toIso(new Date(doc.dueDate));
+        } else if (doc.paymentTerm != null && doc.voucherDate) {
+            this.paymentTerm = doc.paymentTerm;
+            const due = new Date(doc.voucherDate);
+            due.setDate(due.getDate() + Number(doc.paymentTerm));
+            this.dueDate = this.toIso(due);
+        }
+    }
+
+    private addReceivingReport(rr: any): void {
+        if (this.documentType === 'RR' && this.receivingReports.some(r => r.id === rr.id)) {
+            this.alertService.warning(this.module, 'Already Added', 'This receiving report is already selected.');
+            return;
+        }
+
+        forkJoin({
+            detail:   this.service.getReceivingReport(rr.id),
+            supplier: this.service.getSupplierAccount()
+        }).subscribe({
+            next: ({ detail, supplier }) => {
+                if (this.documentType !== 'RR') {
+                    this.documentType     = 'RR';
+                    this.selectedDocument = null;
+                    this.receivingReports = [];
+                    this.journalEntries   = [];
+                }
+                this.receivingReports.push(rr);
+                this.vendor = { accountNo: rr.slentityAccountNo, name: rr.slentityName };
+                if (rr.invoiceDate) this.invoiceDate = this.toIso(new Date(rr.invoiceDate));
+                if (rr.paymentTerm != null && rr.voucherDate) {
+                    this.paymentTerm = rr.paymentTerm;
+                    const due = new Date(rr.voucherDate);
+                    due.setDate(due.getDate() + Number(rr.paymentTerm));
+                    this.dueDate = this.toIso(due);
+                }
+                this.particulars = this.particulars.includes('RR')
+                    ? `${this.particulars}, ${rr.particulars}`
+                    : (rr.particulars || '');
+                this.applyReceivingReportEntries(rr, detail, supplier);
+            },
+            error: (err) => this.alertService.httpError(this.module, 'Failed to load receiving report.', err)
+        });
+    }
+
+    private applyReceivingReportEntries(rr: any, detail: any, supplier: any): void {
+        for (const d of detail?.rrDetails || []) {
+            const debit    = Number(d.debit) || 0;
+            const existing = d.accountId ? this.journalEntries.find(e => e.account?.id === d.accountId) : undefined;
+            if (existing) {
+                existing.debit = this.round2((Number(existing.debit) || 0) + debit);
+                continue;
+            }
+            const entry: JournalEntry = {
+                account: d.accountId ? { id: d.accountId, accountCode: d.code, accountTitle: d.description, hasSL: false } : null,
+                debit,
+                credit: null
+            };
+            const firstCredit = this.journalEntries.findIndex(e => !(Number(e.debit) > 0) && Number(e.credit) > 0);
+            if (firstCredit < 0) this.journalEntries.push(entry);
+            else this.journalEntries.splice(firstCredit, 0, entry);
+        }
+
+        if (!supplier?.id) {
+            this.alertService.warning(this.module, 'Supplier Account', 'Supplier account setting is not configured. Please add the credit entry manually.');
+            return;
+        }
+
+        const amount     = Number(detail?.totalAmount ?? rr.netAmount) || 0;
+        const supplierGl = this.journalEntries.find(e => e.account?.id === supplier.id);
+        if (!supplierGl) {
+            this.journalEntries.push({
+                account: { id: supplier.id, accountCode: supplier.code, accountTitle: supplier.title, hasSL: true },
+                debit: null,
+                credit: amount,
+                slentries: [{ entity: null, accountNo: rr.slentityAccountNo, name: rr.slentityName, debit: null, credit: amount }]
+            });
+            return;
+        }
+
+        supplierGl.credit = this.round2((Number(supplierGl.credit) || 0) + amount);
+        supplierGl.slentries = supplierGl.slentries || [];
+        const sl = supplierGl.slentries.find(s => s.accountNo === rr.slentityAccountNo);
+        if (sl) sl.credit = this.round2((Number(sl.credit) || 0) + amount);
+        else supplierGl.slentries.push({ entity: null, accountNo: rr.slentityAccountNo, name: rr.slentityName, debit: null, credit: amount });
+    }
+
+    private round2(n: number): number {
+        return Math.round(n * 100) / 100;
+    }
+
+    removeDocument(index: number): void {
+        if (this.documentType === 'RR') {
+            this.receivingReports.splice(index, 1);
+        } else {
+            this.selectedDocument = null;
+            this.documentType     = null;
+        }
+    }
+
+    clearDocuments(): void {
+        this.documentType     = null;
+        this.selectedDocument = null;
+        this.receivingReports = [];
+        this.journalEntries   = [];
     }
 
     async openIemopBrowse(): Promise<void> {
@@ -563,6 +743,10 @@ export class AccountsPayableVoucherAddEditComponent {
             this.alertService.warning(this.module, 'Validation', 'Please enter due date.');
             return;
         }
+        if (this.paymentTerm == null) {
+            this.alertService.warning(this.module, 'Validation', 'Please enter payment terms (in days).');
+            return;
+        }
         if (!this.checker) {
             this.alertService.warning(this.module, 'Validation', 'Please select checker.');
             return;
@@ -666,6 +850,12 @@ export class AccountsPayableVoucherAddEditComponent {
             )
         };
 
+        // TEMP DEBUG: log payload only, backend call disabled. Revert by deleting these 3 lines and uncommenting the block below.
+        // console.log('APV payload', JSON.stringify(payload, null, 2));
+        // this.formSubmit = false;
+        // return;
+
+
         const req$ = this.editMode
             ? this.service.update(payload, this.newFiles, this.filesToRemove)
             : this.service.create(payload, this.newFiles);
@@ -685,5 +875,6 @@ export class AccountsPayableVoucherAddEditComponent {
                 this.alertService.httpError(this.module, 'Save failed.', err);
             }
         });
+
     }
 }

@@ -5,6 +5,7 @@ import com.noreco1.fireflyv2.common.facade.SettingFacade;
 import com.noreco1.fireflyv2.common.helpers.BooleanFormatter;
 import com.noreco1.fireflyv2.common.helpers.Checker;
 import com.noreco1.fireflyv2.common.helpers.StringFormatter;
+import com.noreco1.fireflyv2.controller.response.WTaxEntry;
 import com.noreco1.fireflyv2.model.*;
 import com.noreco1.fireflyv2.repo.*;
 import com.noreco1.fireflyv2.controller.response.GeneralLedgerLineDto;
@@ -136,7 +137,7 @@ public class LedgerDtoerImpl implements LedgerDtoer {
 
         List<GeneralLedgerLineDto2> ledgerLineDtos = new ArrayList<>();
 
-        CheckVoucherIncomePayment incomePayment = incomePaymentRepo.findOneByTransactionId(transId);
+        CheckVoucherIncomePayment incomePayment;
 
         if (generalLedgerLines != null) {
             for (Object[] line : generalLedgerLines) {
@@ -165,21 +166,29 @@ public class LedgerDtoerImpl implements LedgerDtoer {
                 List<Object[]> subLedgerLines = subLedgerRepo.findByTransactionIdAndAccountId(transId, accountId);
                 lineDto.setHasSL((subLedgerLines != null && subLedgerLines.size() > 0));
 
-                // withholding tax: only attach to the GL line that owns the income payment
-                if (incomePayment != null && incomePayment.getAccount() != null
-                        && incomePayment.getAccount().getId().equals(accountId)) {
-                    Map account = new HashMap();
+                // withholding tax: atc
+//                Integer wtaxAccountId = 0;
+//                try {
+//                    Map wtaxAccount = settingFacade.getByCode(SettingCode.WTAX_ACCOUNT.toString());
+//                    wtaxAccountId = Integer.parseInt(wtaxAccount.get("id").toString());
+//                } finally {}
+//
+//                if (wtaxAccountId.equals(accountId)) {
+
+                incomePayment = incomePaymentRepo.findOneByTransactionId(transId);
+                if (incomePayment != null) {
+                    Map<String, Object> account = new LinkedHashMap<>();
                     account.put("id", accountId);
                     account.put("title", title);
                     account.put("code", code);
                     account.put("amount", incomePayment.getAmount());
 
-                    Map wTaxEntry = new HashMap();
-                    wTaxEntry.put("account", account);
-                    wTaxEntry.put("amount", incomePayment.getAmount());
-                    wTaxEntry.put("percentage", incomePayment.getPercentage());
-                    wTaxEntry.put("atc", incomePayment.getTaxCode());
-                    wTaxEntry.put("baseAmount", incomePayment.getBaseAmount());
+                    WTaxEntry wTaxEntry = new WTaxEntry();
+                    wTaxEntry.setAccount(account);
+                    wTaxEntry.setAmount(incomePayment.getAmount());
+                    wTaxEntry.setPercentage(incomePayment.getPercentage());
+                    wTaxEntry.setAtc(incomePayment.getTaxCode());
+                    wTaxEntry.setBaseAmount(incomePayment.getBaseAmount());
 
                     lineDto.setWTaxEntry(wTaxEntry);
                 }

@@ -28,8 +28,9 @@ public class GeneralLedgerLineDto2 {
     private String checkNumber;
     private List<Map> distribution = new ArrayList<>();
     private List<Map> cashFlowAccounts = new ArrayList<>();
-    @JsonProperty("wTaxEntry")
-    private Map wTaxEntry;
+    @Getter(onMethod_ = @JsonProperty("wTaxEntry"))
+    @Setter(onMethod_ = @JsonProperty("wTaxEntry"))
+    private WTaxEntry wTaxEntry;
     private Map vatEntry;
     private List<SubLedgerDto> slentries = new ArrayList<>();
 

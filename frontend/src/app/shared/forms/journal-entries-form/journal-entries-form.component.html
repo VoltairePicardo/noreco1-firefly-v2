@@ -1,6 +1,6 @@
 <div class="d-flex align-items-center justify-content-between mb-2">
     <h6 class="fw-semibold text-uppercase text-muted fs-xs mb-0">Journal Entries</h6>
-    <button type="button" class="btn btn-success fw-bold" (click)="addRow()">
+    <button type="button" class="btn btn-primary fw-bold" (click)="addRow()">
         <ng-icon name="tablerPlus" class="ps-0 pe-3 fw-bold"></ng-icon>Add Row
     </button>
 </div>
@@ -22,7 +22,7 @@
                             <input type="text" class="form-control form-control-sm"
                                    [value]="getAccountLabel(entry)" readonly
                                    placeholder="Select account..."/>
-                            <button type="button" class="btn btn-success btn-sm fw-bold"
+                            <button type="button" class="btn btn-primary btn-sm fw-bold"
                                     (click)="openAccountBrowse(i)" ngbTooltip="Browse account">
                                 <ng-icon name="tablerSearch" class="fs-lg fw-bold"></ng-icon>
                             </button>

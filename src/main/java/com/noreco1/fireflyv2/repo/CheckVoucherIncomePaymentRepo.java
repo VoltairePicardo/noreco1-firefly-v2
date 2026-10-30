@@ -46,4 +46,47 @@ public interface CheckVoucherIncomePaymentRepo extends JpaRepository<CheckVouche
             "ORDER BY Supplier.name", nativeQuery = true)
     List<Object[]> getComputationOfTaxSchedule(@Param("year") Integer year, @Param("month")Integer month, @Param("docStatId")Integer docStatId);
 
+
+
+    @Query(value = "SELECT " +
+            "   tc.description, " +
+            "   tc.code, " +
+            "   SUM(cvip.baseamount) AS baseAmount, " +
+            "   cvip.percentage / 100 AS taxRate, " +
+            "   SUM(cvip.amount) AS taxDue " +
+            "FROM CheckVoucherIncomePayment cvip " +
+            "INNER JOIN TaxCode tc ON tc.id = cvip.FK_taxCodeId " +
+            "LEFT JOIN CheckVoucher cv ON cv.fk_transactionid = cvip.fk_transactionid " +
+            "LEFT JOIN AccountsPayableVoucher apv ON apv.fk_transactionid = cvip.fk_transactionid " +
+            "WHERE COALESCE(cv.voucherdate, apv.voucherdate) >= :startDate " +
+            "   AND COALESCE(cv.voucherdate, apv.voucherdate) < :endDate " +
+            "   AND COALESCE(cv.fk_documentstatusid, apv.fk_documentstatusid) = :statusId " +
+            "GROUP BY tc.description, tc.code, cvip.percentage " +
+            "ORDER BY tc.code", nativeQuery = true)
+    List<Object[]> getSummaryOfTaxesWithheld(@Param("startDate") String startDate,
+                                             @Param("endDate") String endDate,
+                                             @Param("statusId") Integer statusId);
+
+    @Query(value = "SELECT  " +
+            "   tc.code, " +
+            "   tc.payeeType AS slType, " +
+            "   sl.name, " +
+            "   sl.tin, " +
+            "   SUM(cvip.baseAmount) AS grossAmount, " +
+            "   cvip.percentage / 100 AS taxRate, " +
+            "   SUM(cvip.amount) AS taxWithheld " +
+            "FROM CheckVoucherIncomePayment cvip " +
+            "INNER JOIN TaxCode tc ON tc.id = cvip.FK_taxCodeId " +
+            "LEFT JOIN CheckVoucher cv ON cv.fk_transactionid = cvip.fk_transactionid " +
+            "LEFT JOIN AccountsPayableVoucher apv ON apv.fk_transactionid = cvip.fk_transactionid " +
+            "LEFT JOIN slentity sl ON sl.accountNo = COALESCE(cv.FK_payeeAccountNo, apv.fk_vendoraccountno) " +
+            "WHERE COALESCE(cv.voucherdate, apv.voucherdate) >= :startDate " +
+            "   AND COALESCE(cv.voucherdate, apv.voucherdate) < :endDate " +
+            "   AND COALESCE(cv.fk_documentstatusid, apv.fk_documentstatusid) = :statusId " +
+            "GROUP BY tc.code, tc.payeeType, sl.name, sl.tin, cvip.percentage " +
+            "ORDER BY tc.code", nativeQuery = true)
+    List<Object[]> getSummaryOfTaxesWithheldPerTaxCode(@Param("startDate") String startDate,
+                                                       @Param("endDate") String endDate,
+                                                       @Param("statusId") Integer statusId);
+
 }

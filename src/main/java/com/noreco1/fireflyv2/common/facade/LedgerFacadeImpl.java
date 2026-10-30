@@ -2,59 +2,34 @@ package com.noreco1.fireflyv2.common.facade;
 
 import com.noreco1.fireflyv2.common.helpers.Checker;
 import com.noreco1.fireflyv2.common.helpers.ServiceUtil;
+import com.noreco1.fireflyv2.controller.response.WTaxEntry;
 import com.noreco1.fireflyv2.model.*;
 import com.noreco1.fireflyv2.repo.*;
 import com.noreco1.fireflyv2.controller.response.GeneralLedgerLineDto2;
 import com.noreco1.fireflyv2.controller.response.SubLedgerDto;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.Date;
 
-/**
- * Created by TSI Admin on 5/1/2015.
- */
-
 @Component
+@RequiredArgsConstructor
 public class LedgerFacadeImpl implements LedgerFacade {
 
-    @Autowired
-    GeneralLedgerRepo generalLedgerRepo;
-
-    @Autowired
-    AllocationFactorRepo allocationFactorRepo;
-
-    @Autowired
-    SubLedgerRepo subLedgerRepo;
-
-    @Autowired
-    CheckVoucherIncomePaymentRepo incomePaymentRepo;
-
-    @Autowired
-    VoucherCashflowDetailRepo voucherCashflowDetailRepo;
-
-    @Autowired
-    CashFlowAccountEntryFacade cashFlowAccountEntryFacade;
-
-    @Autowired
-    FactorPercentageDistroRepo factorPercentageDistroRepo;
-
-    @Autowired
-    SegmentAccountRepo segmentAccountRepo;
-
-    @Autowired
-    DateRangeRepo dateRangeRepo;
-
-    @Autowired
-    AccountRepo accountRepo;
-
-    @Autowired
-    TemporaryGeneralLedgerRepo temporaryGeneralLedgerRepo;
-
-    @Autowired
-    TemporarySubLedgerRepo temporarySubLedgerRepo;
+    private final GeneralLedgerRepo generalLedgerRepo;
+    private final AllocationFactorRepo allocationFactorRepo;
+    private final SubLedgerRepo subLedgerRepo;
+    private final CheckVoucherIncomePaymentRepo incomePaymentRepo;
+    private final VoucherCashflowDetailRepo voucherCashflowDetailRepo;
+    private final CashFlowAccountEntryFacade cashFlowAccountEntryFacade;
+    private final FactorPercentageDistroRepo factorPercentageDistroRepo;
+    private final SegmentAccountRepo segmentAccountRepo;
+    private final DateRangeRepo dateRangeRepo;
+    private final AccountRepo accountRepo;
+    private final TemporaryGeneralLedgerRepo temporaryGeneralLedgerRepo;
+    private final TemporarySubLedgerRepo temporarySubLedgerRepo;
 
     @Override
     public Long postGeneralLedger(Transaction transaction, List<GeneralLedgerLineDto2> generalLedgerLines, List<SubLedgerDto> subLedgerLines, Date voucherDate) {
@@ -69,23 +44,13 @@ public class LedgerFacadeImpl implements LedgerFacade {
 
         for(GeneralLedgerLineDto2 ledgerLine: generalLedgerLines) {
 
-            BigDecimal debit = ledgerLine.getDebit();
-            BigDecimal credit = ledgerLine.getCredit();
+            BigDecimal glAmountDebit = ledgerLine.getDebit() != null ? ledgerLine.getDebit() : BigDecimal.ZERO;
+            BigDecimal glAmountCredit = ledgerLine.getCredit() != null ? ledgerLine.getCredit() : BigDecimal.ZERO;
 
-            boolean isDebit = debit.compareTo(credit) > 0;
-
-//            BigDecimal glAmount = ledgerLine.getDebit();
-//            BigDecimal glAmount = debit.subtract(credit);
-            BigDecimal glAmountDebit = debit;
-            BigDecimal glAmountCredit = credit;
-            /*boolean isDebit = true;
-            if (glAmount == null || glAmount.compareTo(BigDecimal.ZERO) == 0) {
-                isDebit = false;
-                glAmount = ledgerLine.getCredit();
-            }*/
+            boolean isDebit = glAmountDebit.compareTo(glAmountCredit) > 0;
 
             // prevent insertion of GL entries having no debit or credit amount
-            if ((glAmountDebit == null || glAmountDebit.compareTo(BigDecimal.ZERO) == 0) && (glAmountCredit == null || glAmountCredit.compareTo(BigDecimal.ZERO) == 0)) {
+            if (glAmountDebit.compareTo(BigDecimal.ZERO) == 0 && (glAmountCredit.compareTo(BigDecimal.ZERO) == 0)) {
                 count ++;
                 continue;
             }
@@ -447,14 +412,17 @@ public class LedgerFacadeImpl implements LedgerFacade {
                 CheckVoucherIncomePayment incomePayment = incomePaymentRepo.findOneByTransactionId(transaction.getId());
                 if (incomePayment == null) incomePayment = new CheckVoucherIncomePayment();
 
-                TaxCode taxCode = new TaxCode();
-                taxCode.setId(Integer.parseInt(atc.get("id").toString()));
+                WTaxEntry wTaxEntry = ledgerLine.getWTaxEntry();
 
                 incomePayment.setTransaction(transaction);
-                incomePayment.setAmount(new BigDecimal(ledgerLine.getWTaxEntry().get("amount").toString()));
-                incomePayment.setBaseAmount(new BigDecimal(ledgerLine.getWTaxEntry().get("baseAmount").toString()));
-                incomePayment.setPercentage(new BigDecimal(ledgerLine.getWTaxEntry().get("percentage").toString()));
-                incomePayment.setTaxCode(taxCode);
+                incomePayment.setAmount(wTaxEntry.getAmount());
+                incomePayment.setBaseAmount(wTaxEntry.getBaseAmount());
+                incomePayment.setPercentage(wTaxEntry.getPercentage());
+                if (wTaxEntry.getAtc() != null) {
+                    TaxCode taxCode = new TaxCode();
+                    taxCode.setId(wTaxEntry.getAtc().getId());
+                    incomePayment.setTaxCode(taxCode);
+                }
                 if (ledgerLine.getAccountId() != null) {
                     Account account = new Account();
                     account.setId(ledgerLine.getAccountId());
@@ -467,266 +435,6 @@ public class LedgerFacadeImpl implements LedgerFacade {
         return count;
     }
 
-    /*@Override
-    public Long postGeneralLedger(Transaction transaction, List<GeneralLedgerLineDto2> generalLedgerLines, List<SubLedgerDto> subLedgerLines, Date voucherDate) {
-
-        Long count = 0L;
-
-        if (transaction != null && transaction.getId() > 0) {
-            voucherCashflowDetailRepo.deleteByTransactionId(transaction.getId());
-            generalLedgerRepo.deleteByTransactionId(transaction.getId());
-            subLedgerRepo.deleteByTransactionId(transaction.getId());
-            incomePaymentRepo.deleteByTransactionId(transaction.getId());
-        }
-
-        for(GeneralLedgerLineDto2 ledgerLine: generalLedgerLines) {
-
-            Integer generalLedgerLineIndex = generalLedgerLines.indexOf(ledgerLine);    // determine correct ledger in case lines have same account used
-
-            boolean isDebit = true;
-            BigDecimal glAmount = ledgerLine.getDebit();
-            if (glAmount == null || glAmount.compareTo(BigDecimal.ZERO) == 0) {
-                isDebit = false;
-                glAmount = ledgerLine.getCredit();
-            }
-
-            // prevent insertion of GL entries having no debit or credit amount
-            if (glAmount == null || glAmount.compareTo(BigDecimal.ZERO) == 0) {
-                count ++;
-                continue;
-            }
-
-            List<Map> distribution = ledgerLine.getDistribution();
-
-            if(distribution.isEmpty()) {
-
-                java.sql.Date sqlDate = new java.sql.Date(voucherDate.getTime());
-
-                List<DateRange> dateRanges = dateRangeRepo.findByEndGreaterThanEqualAndStartLessThanEqual(sqlDate, sqlDate);
-                if(Checker.collectionIsNotEmpty(dateRanges)) {
-
-                    for (DateRange range : dateRanges) {
-
-                        // get percentage distribution
-                        AllocationFactor allocationFactor = allocationFactorRepo.findOneByAccountId(ledgerLine.getAccountId());
-                        Set<FactorPercentageDistro> percentages = factorPercentageDistroRepo.findByFactorIdAndValidityDateId(allocationFactor.getFactor().getId(), range.getId());
-
-                        if(Checker.collectionIsNotEmpty(percentages)) {
-
-                            int counter = 0;
-                            int lastIdx = percentages.size();
-                            BigDecimal glTotal = BigDecimal.ZERO;
-
-                            for(FactorPercentageDistro obj:percentages) {
-                                counter++;  // used to check if end of loop
-
-                                SegmentAccount segmentAccount = segmentAccountRepo.findOneByAccountIdAndBusinessSegmentId(ledgerLine.getAccountId(), obj.getBusinessSegment().getId());
-                                BigDecimal percentage = obj.getPercentage();
-
-                                BigDecimal glShare = (percentage.multiply(glAmount)).setScale(2, BigDecimal.ROUND_HALF_UP);
-                                if (glShare == null || glShare.compareTo(BigDecimal.ZERO) == 0) {
-                                    count ++;
-                                    continue;
-                                }
-
-                                GeneralLedger generalLedger = new GeneralLedger();
-                                generalLedger.setTransaction(transaction);
-
-                                glTotal = glTotal.add(glShare);
-                                if (glTotal.compareTo(glAmount) > 0) {
-                                    // glTotal: 101, amount: 100
-                                    // 101 - 100 = 1
-                                    // 101 - 1 = 100
-                                    BigDecimal i01 = glTotal.subtract(glAmount);
-                                    glShare = glShare.subtract(i01);
-                                } else if (counter == lastIdx) {
-                                    if (glTotal.compareTo(glAmount) < 0) {
-                                        // glTotal: 100, amount: 101
-                                        // 101 - 100 = 1
-                                        // 100 + 1 = 101
-                                        BigDecimal i01 = glAmount.subtract(glTotal);
-                                        glShare = glShare.add(i01);
-                                    }
-                                }
-
-                                if (isDebit) {
-                                    generalLedger.setDebit(glShare);
-                                } else {
-                                    generalLedger.setCredit(glShare);
-                                }
-
-                                generalLedger.setSegmentAccount(segmentAccount);
-
-                                GeneralLedger newGl = generalLedgerRepo.save(generalLedger);
-
-                                count += newGl == null ? 0 : 1;
-
-                                cashFlowAccountEntryFacade.setCashFlowAccountEntries(newGl, ledgerLine, voucherDate, counter == lastIdx, percentage);
-
-                                if (Checker.collectionIsEmpty(subLedgerLines)) continue;
-
-                                int counterSl = 0;
-                                int lastIdxSl = subLedgerLines.size() -1 ;
-                                BigDecimal slTotal = BigDecimal.ZERO;
-
-                                for(SubLedgerDto subLedgerLine: subLedgerLines) {
-
-                                    if (subLedgerLine.getAccountId().equals(ledgerLine.getAccountId()) &&
-                                            subLedgerLine.getGeneralLedgerLineIndex().equals(generalLedgerLineIndex)) {
-
-                                        BigDecimal slAmount = subLedgerLine.getAmount();
-
-                                        // prevent insertion of SL entries having no amount
-                                        if (slAmount == null || slAmount.compareTo(BigDecimal.ZERO) == 0) {
-                                            continue;
-                                        }
-
-                                        SubLedger subLedger = new SubLedger();
-                                        subLedger.setTransaction(transaction);
-                                        subLedger.setSegmentAccount(segmentAccount);
-                                        subLedger.setTransaction(newGl.getTransaction());
-                                        subLedger.setGeneralLedger(newGl);
-
-                                        SlEntity slEntity = new SlEntity();
-                                        slEntity.setAccountNo(subLedgerLine.getAccountNo());
-                                        subLedger.setSlEntity(slEntity);
-
-                                        BigDecimal slShare = (percentage.multiply(slAmount)).setScale(2, BigDecimal.ROUND_HALF_UP);
-
-                                        slTotal = slTotal.add(slShare);
-                                        if (slTotal.compareTo(glShare) > 0) {
-                                            // glTotal: 101, amount: 100
-                                            // 101 - 100 = 1
-                                            // 101 - 1 = 100
-                                            BigDecimal i01 = slTotal.subtract(glShare);
-                                            slShare = slShare.subtract(i01);
-                                        } else if (counterSl == lastIdxSl) {
-                                            if (slTotal.compareTo(glShare) < 0) {
-                                                // glTotal: 100, amount: 101
-                                                // 101 - 100 = 1
-                                                // 100 + 1 = 101
-                                                BigDecimal i01 = glShare.subtract(slTotal);
-                                                slShare = slShare.add(i01);
-                                            }
-                                        }
-
-                                        if (isDebit)
-                                            subLedger.setDebit(slShare);
-                                        else
-                                            subLedger.setCredit(slShare);
-
-                                        subLedgerRepo.save(subLedger);
-
-                                        counterSl++;
-                                    }
-                                }
-                            }
-
-                            break; // process only one date range
-                        }
-                    }
-                }
-            } else {    // manually allocated
-
-                BigDecimal slTotal = BigDecimal.ZERO;
-
-                for(Map obj:distribution) {
-                    BigDecimal glShare = new BigDecimal(obj.get("amount") != null ? obj.get("amount").toString():"0");
-                    Integer segmentAccountId = (Integer)obj.get("segmentAccountId");
-
-                    // prevent insertion of GL entries having no debit or credit amount
-                    if (glShare == null || glShare.compareTo(BigDecimal.ZERO) == 0) {
-                        count ++;
-                        continue;
-                    }
-
-                    GeneralLedger generalLedger = new GeneralLedger();
-                    generalLedger.setTransaction(transaction);
-                    if (isDebit) {
-                        generalLedger.setDebit(glShare);
-                    } else {
-                        generalLedger.setCredit(glShare);
-                    }
-
-                    SegmentAccount segmentAccount = new SegmentAccount();
-                    segmentAccount.setId(segmentAccountId);
-                    generalLedger.setSegmentAccount(segmentAccount);
-
-                    GeneralLedger newGl = generalLedgerRepo.save(generalLedger);
-
-                    count += newGl == null ? 0 : 1;
-
-                    cashFlowAccountEntryFacade.setCashFlowAccountEntries(newGl, ledgerLine, voucherDate, false, null);
-
-                    if (subLedgerLines.isEmpty()) continue;
-                    for(SubLedgerDto subLedgerLine: subLedgerLines) {
-
-                        if (subLedgerLine.getAccountId().equals(ledgerLine.getAccountId())) {
-                            SubLedger subLedger = new SubLedger();
-                            subLedger.setSegmentAccount(segmentAccount);
-                            subLedger.setTransaction(newGl.getTransaction());
-                            subLedger.setGeneralLedger(newGl);
-
-                            SlEntity slEntity = new SlEntity();
-                            slEntity.setAccountNo(subLedgerLine.getAccountNo());
-                            subLedger.setSlEntity(slEntity);
-
-                            BigDecimal slAmount = subLedgerLine.getAmount();
-
-                            // prevent insertion of SL entries having no amount
-                            if (slAmount == null || slAmount.compareTo(BigDecimal.ZERO) == 0) {
-                                continue;
-                            }
-
-                            // conversion
-                            BigDecimal percent = (glShare.multiply(new BigDecimal(100))).divide(glAmount, 2, BigDecimal.ROUND_HALF_UP);
-                            BigDecimal slShare = ((percent.divide(new BigDecimal(100))).multiply(slAmount)).setScale(2, BigDecimal.ROUND_HALF_UP);
-
-                            slTotal = slTotal.add(slShare);
-                            if (slTotal.compareTo(glAmount) > 0) {
-                                // slTotal: 101, glAmount: 100
-                                // 101 - 100 = 1
-                                // 101 - 1 = 100
-                                BigDecimal i01 = slTotal.subtract(glAmount);
-                                slShare = slShare.subtract(i01);
-                            }
-
-                            if (isDebit)
-                                subLedger.setDebit(slShare);
-                            else
-                                subLedger.setCredit(slShare);
-
-                            subLedgerRepo.save(subLedger);
-                        }
-                    }
-                }
-
-            }
-
-
-            if (ledgerLine.getwTaxEntry() != null) {
-
-                LinkedHashMap atc = (LinkedHashMap)ledgerLine.getwTaxEntry().get("atc");
-                Integer taxCodeId = Integer.parseInt(atc.get("id").toString());
-
-                CheckVoucherIncomePayment incomePayment = incomePaymentRepo.findOneByTransactionIdAndTaxCodeIdAndAccountId(transaction.getId(), taxCodeId, ledgerLine.getAccountId());
-                if (incomePayment == null) incomePayment = new CheckVoucherIncomePayment();
-
-                TaxCode taxCode = new TaxCode();
-                taxCode.setId(taxCodeId);
-
-                incomePayment.setTransaction(transaction);
-                incomePayment.setAmount(new BigDecimal(ledgerLine.getwTaxEntry().get("amount").toString()));
-                incomePayment.setBaseAmount(new BigDecimal(ledgerLine.getwTaxEntry().get("baseAmount").toString()));
-                incomePayment.setPercentage(new BigDecimal(ledgerLine.getwTaxEntry().get("percentage").toString()));
-                incomePayment.setTaxCode(taxCode);
-                incomePayment.setAccount(new Account(ledgerLine.getAccountId()));
-
-                incomePaymentRepo.save(incomePayment);
-            }
-        }
-        return count;
-    }*/
 
     @Override
     public void saveTempLedgerEntries(Map<Integer, BigDecimal> accountsDetailMap, java.sql.Date date, TemporaryBatch temporaryBatch, Integer accountNo, boolean isDebit) {

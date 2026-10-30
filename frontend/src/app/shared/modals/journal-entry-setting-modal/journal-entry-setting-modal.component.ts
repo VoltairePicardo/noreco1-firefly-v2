@@ -22,8 +22,6 @@ const BASE_API = environment.get('baseApiUrl');
 })
 export class JournalEntrySettingModalComponent implements OnInit {
     @Input() entry: JournalEntry = { account: null, debit: null, credit: null };
-    // Optional context — only supplied by parents that wire voucherDate/defaultEntity
-    // into <app-journal-entries-form>. VAT/allocation sections stay dormant without them.
     @Input() voucherDate?: string;
     @Input() defaultEntity?: any;
 
@@ -31,16 +29,12 @@ export class JournalEntrySettingModalComponent implements OnInit {
     private http = inject(HttpClient);
     private alertService = inject(AlertService);
 
-    // Gross amount for this row, captured once so re-opening this modal (after WHT/VAT
-    // already reduced entry.debit/credit to a net figure) doesn't compound the deduction.
     baseDebit = 0;
     baseCredit = 0;
 
-    // Allocation
     applyAllocation  = false;
     allocationPct: number | null = null;
 
-    // Withholding Tax
     applyWht          = false;
     atcList: any[]    = [];
     selectedAtc: any  = null;
@@ -48,7 +42,6 @@ export class JournalEntrySettingModalComponent implements OnInit {
     whtRate: number | null  = null;
     whtAmount: number | null = null;
 
-    // VAT — extracted (VAT-inclusive) from the gross amount when the payee is vatable
     isVatable         = false;
     applyVat          = false;
     vatAccount: any   = null;
@@ -101,12 +94,10 @@ export class JournalEntrySettingModalComponent implements OnInit {
         return `${a.accountCode || ''} — ${a.accountTitle || a.accountDescription || ''}`.trim();
     }
 
-    /** Gross amount this row's debit/credit is based on — used as the WHT/VAT tax base. */
     get taxBase(): number {
         return this.baseDebit || this.baseCredit || 0;
     }
 
-    /** Withholding tax base — the gross amount net of the extracted VAT, as in legacy `wtaxPercentageChanged()`. */
     get whtBase(): number {
         const vat = this.applyVat && this.isVatable ? (this.vatAmount || 0) : 0;
         return Math.max(+(this.taxBase - vat).toFixed(2), 0);
@@ -122,6 +113,13 @@ export class JournalEntrySettingModalComponent implements OnInit {
         this.whtNature = this.selectedAtc.description || '';
         this.whtRate   = this.selectedAtc.rate != null ? Number(this.selectedAtc.rate) : null;
         this.computeWhtAmount();
+
+    }
+
+    /** ATC accounts come from the API as { id, code, title }; the journal form and payload use accountCode/accountTitle. */
+    private normalizeAccount(a: any): any {
+        if (!a) return a;
+        return { ...a, accountCode: a.accountCode ?? a.code, accountTitle: a.accountTitle ?? a.title, hasSL: a.hasSL ?? false };
     }
 
     onWhtToggle(): void {
@@ -135,8 +133,6 @@ export class JournalEntrySettingModalComponent implements OnInit {
             : null;
     }
 
-    /** VAT-inclusive extraction, mirrors legacy `calculateVat()`/`hasVatChanged()`:
-     *  the gross amount already includes VAT, so back out the VAT portion. */
     computeVatAmount(keepSavedWht = false): void {
         if (this.vatPercentage == null) {
             this.vatAmount = null;
@@ -157,8 +153,6 @@ export class JournalEntrySettingModalComponent implements OnInit {
             return;
         }
 
-        // Net the main row down by whatever WHT/VAT amounts apply, always relative to
-        // the row's original gross amount so re-opening this modal stays idempotent.
         let netDebit  = this.baseDebit;
         let netCredit = this.baseCredit;
         const siblings: JournalEntry[] = [];
@@ -168,7 +162,7 @@ export class JournalEntrySettingModalComponent implements OnInit {
             if (netCredit > 0) netCredit = +(netCredit - this.whtAmount).toFixed(2);
 
             siblings.push({
-                account: this.selectedAtc.account,
+                account: this.normalizeAccount(this.selectedAtc.account),
                 debit: 0,
                 credit: this.whtAmount,
                 wTaxEntry: {

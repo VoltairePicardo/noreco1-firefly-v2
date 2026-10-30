@@ -165,6 +165,12 @@ public interface ReportsService extends Printable {
     JRDataSource datasourceBirAlphalist(Integer year, Integer month);
 
     @Transactional(readOnly = true)
+    HashMap reportParametersSummaryOfTaxesWithheld(Integer year, Integer month, Integer notedByAcctNo, Integer approvedByAcctNo, HttpServletRequest request);
+
+    @Transactional(readOnly = true)
+    JRDataSource datasourceSummaryOfTaxesWithheld(Integer year, Integer month);
+
+    @Transactional(readOnly = true)
     HashMap reportParametersForWorkOrderTransaction(String from, String to, HttpServletRequest request);
 
     @Transactional(readOnly = true)

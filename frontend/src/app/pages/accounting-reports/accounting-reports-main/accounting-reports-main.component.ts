@@ -106,6 +106,7 @@ export class AccountingReportsMainComponent {
             selected: '',
             options: [
                 { label: 'BIR Alphalist',                  route: 'bir-alphalist' },
+                { label: 'Summary of Taxes Withheld',      route: 'summary-of-taxes-withheld' },
                 { label: 'BIR Form 1601E',                 route: 'bir-form-1601e' },
             ]
         },

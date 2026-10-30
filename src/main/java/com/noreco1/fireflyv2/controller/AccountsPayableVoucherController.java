@@ -11,6 +11,8 @@ import com.noreco1.fireflyv2.model.AccountsPayableVoucher;
 import com.noreco1.fireflyv2.model.DocumentStatus;
 import com.noreco1.fireflyv2.service.ApvService;
 import com.noreco1.fireflyv2.service.DownloadService;
+import com.noreco1.fireflyv2.service.JoAcceptanceService;
+import com.noreco1.fireflyv2.service.PaymentRequestService;
 import com.noreco1.fireflyv2.service.PrintableVoucher;
 import com.noreco1.fireflyv2.service.ReceivingReportService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -42,6 +44,12 @@ public class AccountsPayableVoucherController {
 
     @Autowired
     ReceivingReportService receivingReportService;
+
+    @Autowired
+    PaymentRequestService paymentRequestService;
+
+    @Autowired
+    JoAcceptanceService joAcceptanceService;
 
     @Autowired
     @Qualifier("apvServiceImpl")
@@ -134,6 +142,41 @@ public class AccountsPayableVoucherController {
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "10") int size) {
         return receivingReportService.findAllApprovedForApvPaged(q, PageRequest.of(page, size));
+    }
+
+    @GetMapping("/rr-approved-with-account-setting-paged")
+    public Page<ApvPurchasingDocumentDto> rrApprovedWithAccountSettingPaged(
+            @RequestParam(value = "q", required = false, defaultValue = "") String q,
+            @RequestParam(value = "s") Integer supplierAccountNo,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size) {
+        return receivingReportService.findAllApprovedForApvWithAccountSettingPaged(q.isEmpty() ? null : q.toUpperCase(), supplierAccountNo, PageRequest.of(page, size));
+    }
+
+    @GetMapping("/pr-approved-paged")
+    public Page<ApvPurchasingDocumentDto> prApprovedPaged(
+            @RequestParam(value = "q", required = false, defaultValue = "") String q,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size) {
+        return paymentRequestService.findAllApprovedForApvPaged(q.isEmpty() ? null : q.toUpperCase(), PageRequest.of(page, size));
+    }
+
+    @GetMapping("/joa-approved-paged")
+    public Page<ApvPurchasingDocumentDto> joaApprovedPaged(
+            @RequestParam(value = "q", required = false, defaultValue = "") String q,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size) {
+        return joAcceptanceService.findAllApprovedForApvPaged(q.isEmpty() ? null : q.toUpperCase(), PageRequest.of(page, size));
+    }
+
+    @GetMapping("/{id}/payment-request")
+    public Map linkedPaymentRequest(@PathVariable Integer id) {
+        return paymentRequestService.findByApvId(id);
+    }
+
+    @GetMapping("/{id}/jo-acceptance")
+    public Map linkedJoAcceptance(@PathVariable Integer id) {
+        return joAcceptanceService.findByApvId(id);
     }
 
     @GetMapping("/approved-for-cv-paged")

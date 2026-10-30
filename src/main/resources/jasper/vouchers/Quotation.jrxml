@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Created with Jaspersoft Studio version 6.21.5.final using JasperReports Library version 6.21.5-74d586df47b25dbd05bd0957999819196e59934a  -->
+<!-- Created with Jaspersoft Studio version 6.21.5.final using JasperReports Library version 6.21.5  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Quotation" language="groovy" pageWidth="1008" pageHeight="612" orientation="Landscape" columnWidth="968" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isSummaryWithPageHeaderAndFooter="true" uuid="35ca8ff4-a809-4876-bba1-aa2ccf18bd28">
 	<property name="ireport.zoom" value="0.9982500000000011"/>
 	<property name="ireport.x" value="0"/>
@@ -153,7 +153,7 @@
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font fontName="SansSerif" size="10" isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA["SOQ No: " + $P{VOUCHER_NO}]]></textFieldExpression>
+				<textFieldExpression><![CDATA["AOQ No: " + $P{VOUCHER_NO}]]></textFieldExpression>
 			</textField>
 			<textField pattern="MMMM dd, yyyy" isBlankWhenNull="true">
 				<reportElement x="680" y="64" width="288" height="14" uuid="fdcc1d33-88e2-4994-b18e-e94de912715a">
@@ -520,7 +520,7 @@
 				<textFieldExpression><![CDATA[$F{supplier3Amount}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement stretchType="RelativeToBandHeight" x="398" y="0" width="20" height="20" uuid="7f0740f1-d1f5-42f7-baca-fa9d1490b0be"/>
+				<reportElement stretchType="RelativeToBandHeight" x="398" y="0" width="20" height="20" uuid="0c92af93-bdf3-481e-9dd4-926775942643"/>
 				<box>
 					<topPen lineWidth="1.0"/>
 					<leftPen lineWidth="1.0"/>
@@ -528,12 +528,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="SansSerif" size="8" isBold="true"/>
+					<font fontName="SansSerif" size="11" isBold="false" pdfFontName="ZapfDingbats" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{supplier1AwardedTo} ? "✓" : ""]]></textFieldExpression>
+				<textFieldExpression><![CDATA[Boolean.TRUE.equals($F{supplier1AwardedTo}) ? "4" : ""]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement stretchType="RelativeToBandHeight" x="588" y="0" width="20" height="20" uuid="6cefa285-5b61-4733-bc85-6b2939c4fbc7"/>
+				<reportElement stretchType="RelativeToBandHeight" x="588" y="0" width="20" height="20" uuid="087a9440-a2c4-4607-843f-bf91340ee5ab"/>
 				<box>
 					<topPen lineWidth="1.0"/>
 					<leftPen lineWidth="1.0"/>
@@ -541,12 +541,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="SansSerif" size="8" isBold="true"/>
+					<font fontName="SansSerif" size="11" isBold="false" pdfFontName="ZapfDingbats" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{supplier2AwardedTo} ? "✓" : ""]]></textFieldExpression>
+				<textFieldExpression><![CDATA[Boolean.TRUE.equals($F{supplier2AwardedTo}) ? "4" : ""]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement stretchType="RelativeToBandHeight" x="778" y="0" width="20" height="20" uuid="9f9ee98a-02ef-4af0-8442-eb86e9ed9279"/>
+				<reportElement stretchType="RelativeToBandHeight" x="778" y="0" width="20" height="20" uuid="beaea59b-79fb-4731-890e-95c8574ace8c"/>
 				<box>
 					<topPen lineWidth="1.0"/>
 					<leftPen lineWidth="1.0"/>
@@ -554,9 +554,9 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="SansSerif" size="8" isBold="true"/>
+					<font fontName="SansSerif" size="11" isBold="false" pdfFontName="ZapfDingbats" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{supplier3AwardedTo} ? "✓" : ""]]></textFieldExpression>
+				<textFieldExpression><![CDATA[Boolean.TRUE.equals($F{supplier3AwardedTo}) ? "4" : ""]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>
@@ -707,7 +707,7 @@
 				<textFieldExpression><![CDATA[$P{TERMS1}.getWarrantyPeriod()]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-				<reportElement x="458" y="67" width="170" height="23" uuid="0bccb59a-ee4e-4116-b958-9aaad9667a57"/>
+				<reportElement x="460" y="106" width="170" height="23" uuid="0bccb59a-ee4e-4116-b958-9aaad9667a57"/>
 				<box>
 					<bottomPen lineWidth="0.0"/>
 				</box>
