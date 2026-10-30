@@ -208,6 +208,11 @@
                             <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
                         </button>
                     </div>
+                    @if (budgetBalanceCV !== null) {
+                        <div class="mt-1 fs-xs text-muted">
+                            Budget Balance (CV): <span class="fw-bold" [ngClass]="budgetBalanceCV < 0 ? 'text-danger' : 'text-success'">{{ budgetBalanceCV | number:'1.2-2' }}</span>
+                        </div>
+                    }
                 </div>
                 <div class="col-md-5">
                     <label class="form-label fw-bold">Cash Flow Item</label>

@@ -21,7 +21,11 @@
                 </tr>
             </thead>
             <tbody>
-                @if (filtered.length > 0) {
+                @if (loading) {
+                    <tr><td colspan="2" class="text-center py-3">
+                        <span class="spinner-border spinner-border-sm me-2"></span>Loading...
+                    </td></tr>
+                } @else if (filtered.length > 0) {
                     @for (item of filtered; track item.id) {
                         <tr style="cursor:pointer" (click)="select(item)">
                             <td class="fw-bold">{{ item.code }}</td>
