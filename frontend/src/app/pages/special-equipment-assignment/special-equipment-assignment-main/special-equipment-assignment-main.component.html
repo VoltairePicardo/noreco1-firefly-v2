@@ -54,7 +54,7 @@
                                     <td>{{ rec.date | date:'MM/dd/yyyy' }}</td>
                                     <td>{{ rec.remarks || '—' }}</td>
                                     <td>{{ rec.createdBy?.fullName || rec.preparedBy || '—' }}</td>
-                                    <td><span class="badge bg-secondary bg-opacity-25 text-dark border">{{ rec.documentStatus?.status || '—' }}</span></td>
+                                    <td><span class="badge border" [ngClass]="(rec.documentStatus?.status || '—') === 'Approved' ? 'bg-success bg-opacity-25 text-success' : 'bg-primary bg-opacity-25 text-primary'">{{ rec.documentStatus?.status || '—' }}</span></td>
                                     <td>
                                         <div class="d-flex gap-1">
                                             <a [routerLink]="['/' + menuLink, rec.id, 'detail']"
@@ -77,8 +77,22 @@
             </div>
 
             @if (records().length > pageSize) {
-                <div class="d-flex justify-content-end mt-3">
-                    <ngb-pagination [(page)]="page" [pageSize]="pageSize" [collectionSize]="records().length"/>
+                <div class="d-flex justify-content-center mt-3">
+                    <div class="pagination-boxed align-items-center mb-0">
+                        <ngb-pagination
+                            [(page)]="page"
+                            [pageSize]="pageSize"
+                            [collectionSize]="records().length"
+                            [maxSize]="5"
+                            [rotate]="true">
+                            <ng-template ngbPaginationPrevious>
+                                <ng-icon name="tablerChevronLeft"/>
+                            </ng-template>
+                            <ng-template ngbPaginationNext>
+                                <ng-icon name="tablerChevronRight"/>
+                            </ng-template>
+                        </ngb-pagination>
+                    </div>
                 </div>
             }
         </div>

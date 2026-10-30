@@ -5,10 +5,13 @@ import { SharedModalService } from '@/app/shared/modals/shared-modal-service/sha
 import { COMMON_ALL_PAGE_IMPORTS, COMMON_MAIN_PAGE_IMPORTS } from '@/app/shared/providers/shared-providers';
 import { RolesService } from '../roles.service';
 import { UserRoleApplicantModalComponent } from '../user-role-applicant-modal/user-role-applicant-modal.component';
+import { provideIcons } from '@ng-icons/core';
+import { tablerChevronLeft, tablerChevronRight } from '@ng-icons/tabler-icons';
 
 @Component({
     selector: 'app-user-role-management',
     imports: [...COMMON_ALL_PAGE_IMPORTS, ...COMMON_MAIN_PAGE_IMPORTS],
+    providers: [provideIcons({ tablerChevronLeft, tablerChevronRight })],
     templateUrl: './user-role-management.component.html'
 })
 export class UserRoleManagementComponent {

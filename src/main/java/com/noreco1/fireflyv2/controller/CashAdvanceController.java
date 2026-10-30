@@ -2,11 +2,16 @@ package com.noreco1.fireflyv2.controller;
 
 import com.noreco1.fireflyv2.common.GlobalConstant;
 import com.noreco1.fireflyv2.common.helpers.Checker;
+import com.noreco1.fireflyv2.controller.response.CashFlowItemDto;
 import com.noreco1.fireflyv2.controller.response.CvVoucherDto;
 import com.noreco1.fireflyv2.controller.response.PostResponse;
 import com.noreco1.fireflyv2.controller.response.ProcessDocumentDto;
+import com.noreco1.fireflyv2.model.BudgetLineItemDetail;
 import com.noreco1.fireflyv2.model.CashAdvance;
+import com.noreco1.fireflyv2.model.CashAdvanceBudgetDetail;
 import com.noreco1.fireflyv2.model.DocumentStatus;
+import com.noreco1.fireflyv2.repo.BudgetLineItemDetailRepo;
+import com.noreco1.fireflyv2.repo.PurchaseOrderBudgetDetailRepo;
 import com.noreco1.fireflyv2.service.CashAdvanceService;
 import com.noreco1.fireflyv2.service.DownloadService;
 import com.noreco1.fireflyv2.service.PrintableVoucher;
@@ -16,13 +21,16 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import java.math.BigDecimal;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -40,6 +48,12 @@ public class CashAdvanceController {
 
     @Autowired
     private DownloadService downloadService;
+
+    @Autowired
+    private BudgetLineItemDetailRepo budgetLineItemDetailRepo;
+
+    @Autowired
+    private PurchaseOrderBudgetDetailRepo purchaseOrderBudgetDetailRepo;
 
     @Autowired
     MessageSource messageSource;
@@ -135,5 +149,39 @@ public class CashAdvanceController {
     @PostMapping("/liquidated/{id}")
     public PostResponse setAsLiquidated(@PathVariable Integer id) {
         return cashAdvanceService.setAsLiquidated(id);
+    }
+
+    @Transactional(readOnly = true)
+    @GetMapping("/is-document-for-cash-flow-item-assignment/{transactionId}")
+    public boolean isDocumentForCashFlowItemAssignment(@PathVariable Integer transactionId) {
+        return cashAdvanceService.isDocumentForCashFlowItemAssignment(transactionId);
+    }
+
+    @Transactional(readOnly = true)
+    @GetMapping("/cash-flow/{caId}")
+    public List<CashAdvanceBudgetDetail> getCashFlowDetails(@PathVariable Integer caId) {
+        return cashAdvanceService.getCashAdvanceBudgetDetail(caId);
+    }
+
+    @PostMapping("/saveCashFlowItem")
+    public PostResponse saveCashFlowItem(@RequestBody CashFlowItemDto dto, BindingResult bindingResult) {
+        return cashAdvanceService.saveCashFlowItem(dto, bindingResult, messageSource);
+    }
+
+    @Transactional(readOnly = true)
+    @GetMapping("/cashflow-balances/{budgetLineItemDetailId}")
+    public Map<String, Object> getCashFlowBalances(@PathVariable Integer budgetLineItemDetailId) {
+        int cancelled = com.noreco1.fireflyv2.model.enums.DocumentStatus.CANCELLED.getId();
+        BudgetLineItemDetail blid = budgetLineItemDetailRepo.findById(budgetLineItemDetailId).orElse(null);
+        Map<String, Object> m = new LinkedHashMap<>();
+        if (blid == null || blid.getCashflowItem() == null) {
+            m.put("cashFlowAmountBalancePOJO", BigDecimal.ZERO);
+            m.put("cashFlowAmountBalanceCV",   BigDecimal.ZERO);
+            return m;
+        }
+        Integer cashFlowItemId = blid.getCashflowItem().getId();
+        m.put("cashFlowAmountBalancePOJO", purchaseOrderBudgetDetailRepo.getCashFlowItemDetailAmountBalancePOJORFPCA(cancelled, cashFlowItemId));
+        m.put("cashFlowAmountBalanceCV",   purchaseOrderBudgetDetailRepo.getCashFlowItemDetailAmountBalanceCV(cancelled, cashFlowItemId));
+        return m;
     }
 }

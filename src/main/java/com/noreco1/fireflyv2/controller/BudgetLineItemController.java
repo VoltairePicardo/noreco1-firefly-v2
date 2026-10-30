@@ -89,4 +89,22 @@ public class BudgetLineItemController {
     public PostResponse delete(@PathVariable Integer id) {
         return budgetLineItemService.delete(id);
     }
+
+    @PostMapping("/additional-detail")
+    public PostResponse additionalDetail(@RequestBody BudgetLineItem budgetLineItem,
+                                         BindingResult bindingResult) {
+        return budgetLineItemService.additionalDetail(budgetLineItem, bindingResult, messageSource);
+    }
+
+    @PostMapping("/detail/update-nea-approved-amount")
+    public PostResponse updateNeaApprovedAmount(@RequestBody com.noreco1.fireflyv2.model.BudgetLineItemDetail form,
+                                                BindingResult bindingResult) {
+        return budgetLineItemService.updateNeaApprovedAmount(form, bindingResult, messageSource);
+    }
+
+    @PostMapping("/detail/update-supplemental-amount")
+    public PostResponse updateSupplementalAmount(@RequestBody com.noreco1.fireflyv2.model.BudgetLineItemDetail form,
+                                                 BindingResult bindingResult) {
+        return budgetLineItemService.updateSupplementalAmount(form, bindingResult, messageSource);
+    }
 }

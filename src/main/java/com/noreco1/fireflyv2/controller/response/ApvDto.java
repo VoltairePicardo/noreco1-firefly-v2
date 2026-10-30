@@ -33,6 +33,8 @@ public class ApvDto {
     private Date invoiceDate;
     private Integer paymentTerm;
     private List<Map> receivingReports;
+    private Map linkedPr;
+    private Map linkedJoa;
     private String unpaidRemark;
     private List<IEMOPBilling> iemopBillings;
 
@@ -201,6 +203,12 @@ public class ApvDto {
     public void setReceivingReports(List<Map> receivingReports) {
         this.receivingReports = receivingReports;
     }
+
+    public Map getLinkedPr() { return linkedPr; }
+    public void setLinkedPr(Map linkedPr) { this.linkedPr = linkedPr; }
+
+    public Map getLinkedJoa() { return linkedJoa; }
+    public void setLinkedJoa(Map linkedJoa) { this.linkedJoa = linkedJoa; }
 
     public String getUnpaidRemark() {
         return unpaidRemark;

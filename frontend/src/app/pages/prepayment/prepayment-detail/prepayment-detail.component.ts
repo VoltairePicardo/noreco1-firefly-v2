@@ -4,13 +4,13 @@ import { AlertService } from '@/app/shared/services/alert.service';
 import { COMMON_ALL_PAGE_IMPORTS, COMMON_MAIN_PAGE_IMPORTS, SHARED_PROVIDERS } from '@/app/shared/providers/shared-providers';
 import { PrepaymentService } from '../prepayment.service';
 import { provideIcons } from '@ng-icons/core';
-import { tablerArrowLeft, tablerEdit, tablerLink, tablerSearch } from '@ng-icons/tabler-icons';
+import { tablerArrowLeft, tablerEdit, tablerLink, tablerSearch, tablerChevronLeft, tablerChevronRight } from '@ng-icons/tabler-icons';
 import Swal from 'sweetalert2';
 
 @Component({
     selector: 'app-prepayment-detail',
     imports: [...COMMON_ALL_PAGE_IMPORTS, ...COMMON_MAIN_PAGE_IMPORTS],
-    providers: [...SHARED_PROVIDERS, provideIcons({ tablerArrowLeft, tablerEdit, tablerLink, tablerSearch })],
+    providers: [...SHARED_PROVIDERS, provideIcons({ tablerArrowLeft, tablerEdit, tablerLink, tablerSearch, tablerChevronLeft, tablerChevronRight })],
     templateUrl: './prepayment-detail.component.html'
 })
 export class PrepaymentDetailComponent {
@@ -65,8 +65,9 @@ export class PrepaymentDetailComponent {
     }
 
     getStatus(): string {
-        return (Number(this.data.balance) || 0) > 0 ? 'OPEN' : 'CLOSED';
+        return (Number(this.data.balance) || 0) > 0 ? 'OPEN' : 'CLOSED OUT';
     }
+
 
     isEditable(): boolean {
         return !this.data?.hasPpd;

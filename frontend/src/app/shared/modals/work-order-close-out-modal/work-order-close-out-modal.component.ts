@@ -1,5 +1,6 @@
 import { Component, inject, Input, OnInit } from '@angular/core';
 import { COMMON_ALL_PAGE_IMPORTS, COMMON_MAIN_PAGE_IMPORTS, SHARED_PROVIDERS } from '@/app/shared/providers/shared-providers';
+import { NumericFormatDirective } from '@/app/shared/directives/numeric-format.directive';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { AlertService } from '@/app/shared/services/alert.service';
 import { WorkOrderService } from '@/app/pages/work-order/work-order.service';
@@ -24,7 +25,7 @@ const MONTHS = [
 
 @Component({
     selector: 'app-work-order-close-out-modal',
-    imports: [...COMMON_ALL_PAGE_IMPORTS, ...COMMON_MAIN_PAGE_IMPORTS],
+    imports: [...COMMON_ALL_PAGE_IMPORTS, ...COMMON_MAIN_PAGE_IMPORTS, NumericFormatDirective],
     providers: [...SHARED_PROVIDERS],
     templateUrl: './work-order-close-out-modal.component.html'
 })

@@ -17,8 +17,10 @@ import org.springframework.web.bind.annotation.*;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/bank-deposit")
@@ -60,10 +62,22 @@ public class BankDepositController {
         return service.processUpdate(entity, bindingResult, messageSource);
     }
 
+    @PostMapping("/{id}/upload")
+    public PostResponse uploadFiles(@PathVariable Integer id, HttpServletRequest request) {
+        return service.uploadAttachments(id, request);
+    }
+
     @PostMapping("/upload-deposits")
     public PostResponse uploadDeposits(@RequestBody UploadBankDepositDto uploadBankDepositDto) {
         BindingResult bindingResult = new BeanPropertyBindingResult(uploadBankDepositDto, "uploadBankDepositDto");
         return service.uploadDeposits(uploadBankDepositDto, bindingResult, messageSource);
+    }
+
+    @GetMapping("/default-date")
+    public Map<String, String> defaultDate() {
+        Map<String, String> map = new HashMap<>();
+        map.put("date", LocalDate.now().toString());
+        return map;
     }
 
     @GetMapping("/export/{id}")

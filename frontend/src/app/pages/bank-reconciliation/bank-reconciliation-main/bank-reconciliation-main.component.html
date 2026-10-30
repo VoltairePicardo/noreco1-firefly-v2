@@ -17,7 +17,7 @@
                     </div>
                     <div class="col-md-2">
                         <label class="form-label fw-bold mb-1 fs-xs text-uppercase">Type</label>
-                        <select class="form-select" [(ngModel)]="typeFilter" (ngModelChange)="page = 1">
+                        <select class="form-select" [(ngModel)]="typeFilter" (ngModelChange)="onTypeChange()">
                             <option value="">All</option>
                             <option value="RC">RC - Released Check</option>
                             <option value="DT">DT - Deposit In Transit</option>
@@ -46,8 +46,8 @@
                             <label class="form-label fw-bold mb-1 fs-xs text-uppercase">Status</label>
                             <select class="form-select" [(ngModel)]="clearedFilter" (ngModelChange)="page = 1">
                                 <option value="">All</option>
-                                <option value="cleared">Cleared</option>
-                                <option value="not-cleared">Not Cleared</option>
+                                <option value="cleared">{{ typeFilter === 'DT' ? 'Reflected' : 'Cleared' }}</option>
+                                <option value="not-cleared">{{ typeFilter === 'DT' ? 'Not Reflected' : 'Not Cleared' }}</option>
                             </select>
                         </div>
                         <div class="col-md-4">
@@ -59,6 +59,11 @@
                                 <button type="button" class="btn btn-success fw-bold" (click)="openAccBrowse()">
                                     <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
                                 </button>
+                                @if (selectedAccount) {
+                                    <button type="button" class="btn btn-danger fw-bold" (click)="clearAccount()">
+                                        <ng-icon name="tablerX" class="ps-0 pe-2 fw-bold"></ng-icon>Clear
+                                    </button>
+                                }
                             </div>
                         </div>
                         <div class="col-md-2">
@@ -108,9 +113,9 @@
                                             </td>
                                             <td class="text-center">
                                                 @if (isCleared(rec)) {
-                                                    <span class="badge bg-success">Cleared</span>
+                                                    <span class="badge bg-success">{{ statusLabel(rec, true) }}</span>
                                                 } @else {
-                                                    <span class="badge bg-secondary">Not Cleared</span>
+                                                    <span class="badge bg-secondary">{{ statusLabel(rec, false) }}</span>
                                                 }
                                             </td>
                                             <td class="text-nowrap">
@@ -125,14 +130,14 @@
                                                     @if (isCleared(rec)) {
                                                         <button type="button"
                                                                 class="btn btn-danger btn-icon btn-sm rounded-circle"
-                                                                ngbTooltip="Mark as Not Cleared"
+                                                                [ngbTooltip]="'Mark as ' + statusLabel(rec, false)"
                                                                 (click)="toggleCleared(rec)">
                                                             <ng-icon name="tablerX"></ng-icon>
                                                         </button>
                                                     } @else {
                                                         <button type="button"
                                                                 class="btn btn-success btn-icon btn-sm rounded-circle"
-                                                                ngbTooltip="Mark as Cleared"
+                                                                [ngbTooltip]="'Mark as ' + statusLabel(rec, true)"
                                                                 (click)="toggleCleared(rec)">
                                                             <ng-icon name="tablerCheck"></ng-icon>
                                                         </button>
@@ -158,12 +163,21 @@
                 <!-- Pagination -->
                 @if (filteredRecords.length > pageSize) {
                     <div class="d-flex justify-content-center mt-3">
-                        <ngb-pagination
-                            [collectionSize]="filteredRecords.length"
-                            [(page)]="page"
-                            [pageSize]="pageSize"
-                            [maxSize]="5">
-                        </ngb-pagination>
+                        <div class="pagination-boxed align-items-center mb-0">
+                            <ngb-pagination
+                                [collectionSize]="filteredRecords.length"
+                                [(page)]="page"
+                                [pageSize]="pageSize"
+                                [maxSize]="5"
+                                [rotate]="true">
+                                <ng-template ngbPaginationPrevious>
+                                    <ng-icon name="tablerChevronLeft"/>
+                                </ng-template>
+                                <ng-template ngbPaginationNext>
+                                    <ng-icon name="tablerChevronRight"/>
+                                </ng-template>
+                            </ngb-pagination>
+                        </div>
                     </div>
                 }
 

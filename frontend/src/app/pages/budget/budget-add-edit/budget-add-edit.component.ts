@@ -8,7 +8,7 @@ import {
     SHARED_PROVIDERS
 } from '@/app/shared/providers/shared-providers';
 import { provideIcons } from '@ng-icons/core';
-import { tablerPlus, tablerArrowLeft, tablerCheck, tablerTrash, tablerEdit } from '@ng-icons/tabler-icons';
+import { tablerPlus, tablerArrowLeft, tablerCheck, tablerTrash, tablerEdit, tablerRefresh } from '@ng-icons/tabler-icons';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { BrowseCashflowItemModalComponent } from '@/app/shared/modals/browse-cashflow-item-modal/browse-cashflow-item-modal.component';
 import { BudgetService } from '../budget.service';
@@ -20,7 +20,7 @@ import { BudgetService } from '../budget.service';
         ...COMMON_ADD_EDIT_PAGE_IMPORTS,
         ...COMMON_MAIN_PAGE_IMPORTS,
     ],
-    providers: [...SHARED_PROVIDERS, provideIcons({ tablerPlus, tablerArrowLeft, tablerCheck, tablerTrash, tablerEdit })],
+    providers: [...SHARED_PROVIDERS, provideIcons({ tablerPlus, tablerArrowLeft, tablerCheck, tablerTrash, tablerEdit, tablerRefresh })],
     templateUrl: './budget-add-edit.component.html'
 })
 export class BudgetAddEditComponent {
@@ -177,6 +177,11 @@ export class BudgetAddEditComponent {
             this.year = input.value.slice(0, 4);
             input.value = this.year;
         }
+    }
+
+    reset(): void {
+        this.year = '';
+        this.budgetDetails = [];
     }
 
     trackByIndex(index: number): number {

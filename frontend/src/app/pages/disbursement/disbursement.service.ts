@@ -61,6 +61,10 @@ export class DisbursementService {
         return this.http.get(`${BASE_API}/disbursement/default-signatories`);
     }
 
+    getCashflowBudgetDetails(): Observable<any[]> {
+        return this.http.get<any[]>(`${BASE_API}/general-journal/cashflow-budget-details`);
+    }
+
     getEntities(q: string = '', page = 0, size = 10): Observable<any> {
         const params = new HttpParams().set('q', q).set('page', page).set('size', size);
         return this.http.get(`${BASE_API}/json/entities/search`, { params });
@@ -128,12 +132,24 @@ export class DisbursementService {
         return this.http.get<any[]>(`${BASE_API}/ledger/gl-for-ca/${caId}`);
     }
 
+    updateEntries(payload: any): Observable<any> {
+        return this.http.post(`${BASE_API}/disbursement/update-entries`, payload, httpOptions);
+    }
+
     getDocumentLogs(transId: number): Observable<any[]> {
         return this.http.get<any[]>(`${BASE_API}/json/document-logs/${transId}`);
     }
 
-    approveAll(ids: number[]): Observable<any> {
-        const payloads = ids.map(id => ({ documentId: id, remarks: '', documentType: 'CV' }));
+    assignBudget(payload: { transactionId: number; budgetDetailId?: number | null; budgetLineItemDetailId?: number | null }): Observable<any> {
+        return this.http.post(`${BASE_API}/disbursement/assign-budget`, payload, httpOptions);
+    }
+
+    getBudgetLineItems(): Observable<any[]> {
+        return this.http.get<any[]>(`${BASE_API}/json/budget-line-items`);
+    }
+
+    approveAll(ids: number[], remarks = ''): Observable<any> {
+        const payloads = ids.map(id => ({ documentId: id, remarks, documentType: 'CV' }));
         return this.http.post<any>(`${BASE_API}/approve-vouchers/process-all`, payloads, httpOptions);
     }
 

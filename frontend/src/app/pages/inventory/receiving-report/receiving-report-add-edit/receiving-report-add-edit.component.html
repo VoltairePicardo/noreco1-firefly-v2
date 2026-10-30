@@ -221,12 +221,12 @@
                                                            min="0" step="0.001" placeholder="0"/>
                                                 </td>
                                                 <td>
-                                                    <input type="number"
+                                                    <input type="text" appNumericFormat
                                                            class="form-control form-control-sm text-end"
                                                            [(ngModel)]="row.adjustment"
                                                            [name]="'adj_' + $index"
                                                            (ngModelChange)="updateNetAmount($index, 'adjustment')"
-                                                           step="0.01" placeholder="0.00"/>
+                                                           placeholder="0.00"/>
                                                 </td>
                                                 <td class="text-end fw-bold text-nowrap">
                                                     {{ row.netAmount | number:'1.2-2' }}
@@ -304,20 +304,20 @@
                                                            min="0" step="0.001" placeholder="0"/>
                                                 </td>
                                                 <td>
-                                                    <input type="number"
+                                                    <input type="text" appNumericFormat
                                                            class="form-control form-control-sm text-end"
                                                            [(ngModel)]="row.unitPrice"
                                                            [name]="'ifrCost_' + $index"
                                                            (ngModelChange)="updateNetAmount($index, 'unitPrice')"
-                                                           min="0" step="0.01" placeholder="0.00"/>
+                                                           placeholder="0.00"/>
                                                 </td>
                                                 <td>
-                                                    <input type="number"
+                                                    <input type="text" appNumericFormat
                                                            class="form-control form-control-sm text-end"
                                                            [(ngModel)]="row.adjustment"
                                                            [name]="'ifrAdj_' + $index"
                                                            (ngModelChange)="updateNetAmount($index, 'adjustment')"
-                                                           step="0.01" placeholder="0.00"/>
+                                                           placeholder="0.00"/>
                                                 </td>
                                                 <td class="text-end fw-bold text-nowrap">
                                                     {{ row.netAmount | number:'1.2-2' }}

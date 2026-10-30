@@ -34,6 +34,10 @@ export class BankReconciliationService {
         return this.http.post(`${BASE_API}/bank-reconciliation/od/update`, form, httpOptions);
     }
 
+    processDt(id: number, cleared: boolean): Observable<any> {
+        return this.http.post(`${BASE_API}/bank-reconciliation/process-dt`, { id, cleared }, httpOptions);
+    }
+
     processOd(id: number, cleared: boolean): Observable<any> {
         return this.http.post(`${BASE_API}/bank-reconciliation/process-od`, { id, cleared }, httpOptions);
     }

@@ -56,7 +56,6 @@ export class CreditCardPurchaseRequestDetailComponent {
         this.isLoading.set(true);
         this.service.getData(this.id).subscribe({
             next: (data) => {
-                this.isLoading.set(false);
                 if (data?.id) {
                     this.data = data;
                     this.loadWorkflowActions();
@@ -66,6 +65,7 @@ export class CreditCardPurchaseRequestDetailComponent {
                         this.loadJoItems(data.jobOrder.id);
                     }
                 } else {
+                    this.isLoading.set(false);
                     this.alertService.error(this.module, 'Not Found', '');
                     this.router.navigate(['/' + this.menuLink]);
                 }
@@ -94,16 +94,20 @@ export class CreditCardPurchaseRequestDetailComponent {
 
     loadWorkflowActions(): void {
         const transId = this.data?.transaction?.id || this.data?.transId;
-        if (!transId) return;
+        if (!transId) { this.isLoading.set(false); return; }
         const status = this.data?.documentStatus?.status || '';
-        if (TERMINAL_STATUSES.some(s => status.includes(s))) return;
+        if (TERMINAL_STATUSES.some(s => status.includes(s))) { this.isLoading.set(false); return; }
         this.service.getWorkflowActions(transId).subscribe({
             next: (actions) => {
+                this.isLoading.set(false);
                 this.workflowActions = actions || [];
                 this.selectedAction  = null;
                 this.processRemarks  = '';
             },
-            error: () => { this.workflowActions = []; }
+            error: () => {
+                this.isLoading.set(false);
+                this.workflowActions = [];
+            }
         });
     }
 

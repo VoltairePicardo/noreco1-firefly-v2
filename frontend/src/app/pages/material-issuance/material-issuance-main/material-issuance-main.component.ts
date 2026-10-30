@@ -1,14 +1,17 @@
 import { Component, inject, signal } from '@angular/core';
+import Swal from 'sweetalert2';
 import { COMMON_ALL_PAGE_IMPORTS, COMMON_MAIN_PAGE_IMPORTS, SHARED_PROVIDERS } from '@/app/shared/providers/shared-providers';
 import { AlertService } from '@/app/shared/services/alert.service';
 import { FlatpickrDefaults, FlatpickrModule } from 'angularx-flatpickr';
 import { MaterialIssuanceService } from '../material-issuance.service';
 import { fmtDate, monthStart, monthEnd } from '@/app/shared/utils/date.utils';
+import { provideIcons } from '@ng-icons/core';
+import { tablerPlus, tablerSearch, tablerRefresh, tablerEye, tablerEdit, tablerThumbUp, tablerChevronLeft, tablerChevronRight } from '@ng-icons/tabler-icons';
 
 @Component({
     selector: 'app-material-issuance-main',
     imports: [...COMMON_ALL_PAGE_IMPORTS, ...COMMON_MAIN_PAGE_IMPORTS, FlatpickrModule],
-    providers: [...SHARED_PROVIDERS, FlatpickrDefaults],
+    providers: [...SHARED_PROVIDERS, FlatpickrDefaults, provideIcons({ tablerPlus, tablerSearch, tablerRefresh, tablerEye, tablerEdit, tablerThumbUp, tablerChevronLeft, tablerChevronRight })],
     templateUrl: './material-issuance-main.component.html'
 })
 export class MaterialIssuanceMainComponent {
@@ -100,14 +103,23 @@ export class MaterialIssuanceMainComponent {
         this.load();
     }
 
-    approveAll(): void {
+    async approveAll(): Promise<void> {
         const ids = this.selectedIds;
         if (ids.length === 0) {
             this.alertService.warning(this.module, 'Approve All', 'Please select at least one record.');
             return;
         }
+        const { isConfirmed, value: remarks } = await Swal.fire({
+            title: 'Approve All',
+            input: 'text',
+            inputLabel: 'Remarks (optional)',
+            inputPlaceholder: 'Enter approval remarks...',
+            showCancelButton: true,
+            confirmButtonText: 'Approve',
+        });
+        if (!isConfirmed) return;
         this.processingAll = true;
-        this.service.approveAll(ids).subscribe({
+        this.service.approveAll(ids, remarks || '').subscribe({
             next: (res) => {
                 this.processingAll = false;
                 if (res?.success) {
@@ -125,7 +137,7 @@ export class MaterialIssuanceMainComponent {
     }
 
     isEditable(rec: any): boolean {
-        const s = rec?.status || '';
+        const s = rec?.documentStatus?.status || rec?.status || '';
         return s === 'Document Created' || s === 'Returned to Creator';
     }
 }

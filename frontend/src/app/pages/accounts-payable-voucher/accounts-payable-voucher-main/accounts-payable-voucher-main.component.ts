@@ -12,6 +12,7 @@ import { FlatpickrDirective, provideFlatpickrDefaults } from 'angularx-flatpickr
 import { monthStart, monthEnd } from '@/app/shared/utils/date.utils';
 import { provideIcons } from '@ng-icons/core';
 import { tablerSearch, tablerRefresh, tablerPlus, tablerEye, tablerEdit, tablerThumbUp, tablerChevronLeft, tablerChevronRight } from '@ng-icons/tabler-icons';
+import Swal from 'sweetalert2';
 
 @Component({
     selector: 'app-accounts-payable-voucher-main',
@@ -86,7 +87,11 @@ export class AccountsPayableVoucherMainComponent {
     get filteredItems(): any[] {
         if (!this.searchText.trim()) return this.items();
         const q = this.searchText.toLowerCase();
-        return this.items().filter((r: any) => (r.localCode || r.code || '').toLowerCase().includes(q));
+        return this.items().filter((r: any) =>
+            (r.localCode || r.code || '').toLowerCase().includes(q) ||
+            (r.supplier || r.vendor || '').toLowerCase().includes(q) ||
+            (r.particulars || '').toLowerCase().includes(q)
+        );
     }
 
     get pagedItems(): any[] {
@@ -96,7 +101,7 @@ export class AccountsPayableVoucherMainComponent {
 
     isEditable(item: any): boolean {
         const s = item?.status || '';
-        return s === 'Document Created' || s === 'For Revision';
+        return s === 'Document Created' || s === 'For Revision' || s === 'Returned to Creator';
     }
 
     get selectedIds(): number[] {
@@ -109,21 +114,33 @@ export class AccountsPayableVoucherMainComponent {
             this.alertService.warning(this.module, 'Approve All', 'Please select at least one record.');
             return;
         }
-        this.processingAll = true;
-        this.service.approveAll(ids).subscribe({
-            next: (res) => {
-                this.processingAll = false;
-                if (res?.success) {
-                    this.alertService.success(this.module, 'Approved', '');
-                    this.load();
-                } else {
-                    this.alertService.postError(this.module, 'Approve All', res);
+        Swal.fire({
+            title: 'Approve All',
+            text: `Approving ${ids.length} document(s).`,
+            input: 'text',
+            inputLabel: 'Remarks (optional)',
+            inputPlaceholder: 'Enter remarks...',
+            showCancelButton: true,
+            confirmButtonText: 'Approve',
+            confirmButtonColor: '#0d6efd'
+        }).then(result => {
+            if (!result.isConfirmed) return;
+            this.processingAll = true;
+            this.service.approveAll(ids, result.value || '').subscribe({
+                next: (res) => {
+                    this.processingAll = false;
+                    if (res?.success) {
+                        this.alertService.success(this.module, 'Approved', '');
+                        this.load();
+                    } else {
+                        this.alertService.postError(this.module, 'Approve All', res);
+                    }
+                },
+                error: (err) => {
+                    this.processingAll = false;
+                    this.alertService.httpError(this.module, 'Approve All', err);
                 }
-            },
-            error: (err) => {
-                this.processingAll = false;
-                this.alertService.httpError(this.module, 'Approve All', err);
-            }
+            });
         });
     }
 }

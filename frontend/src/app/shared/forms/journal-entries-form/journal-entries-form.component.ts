@@ -163,6 +163,14 @@ export class JournalEntriesFormComponent implements OnChanges {
         return `${a.accountCode || a.code || ''} — ${a.accountTitle || a.accountDescription || a.title || ''}`;
     }
 
+    onAmountBlur(event: FocusEvent, i: number, field: 'debit' | 'credit'): void {
+        const input = event.target as HTMLInputElement;
+        const raw = parseFloat(input.value.replace(/,/g, ''));
+        const val = isNaN(raw) ? null : raw;
+        this.entries[i][field] = val;
+        input.value = val != null ? val.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '';
+    }
+
     get debitTotal(): number {
         return this.entries.reduce((s, e) => s + (Number(e.debit) || 0), 0);
     }

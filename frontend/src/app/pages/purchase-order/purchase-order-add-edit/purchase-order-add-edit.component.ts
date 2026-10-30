@@ -135,12 +135,13 @@ export class PurchaseOrderAddEditComponent {
                     this.purpose                  = header.purpose || '';
 
                     // New fields
-                    this.purchaseRequest = header.purchaseRequest || null;
-                    this.useCreditCard   = header.useCreditCard || false;
-                    this.cashAdvance     = header.cashAdvance || null;
-                    this.approvedBy      = header.approvedBy      || null;
-                    this.checkedBy       = header.checkedBy       || null;
-                    this.budgetCheckedBy = header.budgetCheckedBy || null;
+                    this.purchaseRequest      = header.purchaseRequest      || null;
+                    this.useCreditCard        = header.useCreditCard        || false;
+                    this.cashAdvance          = header.cashAdvance          || null;
+                    this.approvedBy           = header.approvedBy           || null;
+                    this.checkedBy            = header.checkedBy            || null;
+                    this.budgetCheckedBy      = header.budgetCheckedBy      || null;
+                    this.budgetLineItemDetail = header.budgetLineItemDetail  || null;
 
                     this.lineItems = (details || []).map((d: any) => ({
                         rvDetailId:      d.rvDetailId,
@@ -437,6 +438,7 @@ export class PurchaseOrderAddEditComponent {
             approvingOfficer:        this.approvedBy?.accountNo      ? { accountNo: this.approvedBy.accountNo }      : null,
             checkedBy:               this.checkedBy?.accountNo       ? { accountNo: this.checkedBy.accountNo }       : null,
             budgetCheckedBy:         this.budgetCheckedBy?.accountNo ? { accountNo: this.budgetCheckedBy.accountNo } : null,
+            budgetLineItemDetail:    this.budgetLineItemDetail?.id   ? { id: this.budgetLineItemDetail.id }          : null,
             poDetails: this.lineItems.map(li => ({
                 rvDetailId:      li.rvDetailId,
                 rvNumber:        li.rvNumber,

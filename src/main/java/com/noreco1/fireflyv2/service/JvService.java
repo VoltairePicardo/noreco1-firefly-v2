@@ -37,4 +37,7 @@ public interface JvService extends VoucherService {
 
     @Transactional
     PostResponse additionalBudgetLineItemDetail(JournalVoucherAdditionalBudgetLineItemDetailDto detailDto, BindingResult bindingResult, MessageSource messageSource);
+
+    @Transactional(readOnly = true)
+    List<Map<String, Object>> getCashflowBudgetDetailsForJv();
 }

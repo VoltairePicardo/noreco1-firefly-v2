@@ -1,27 +1,14 @@
 <div class="container-fluid">
     <app-page-title [title]="module" [subTitle]="'Details'" [menuLink]="menuLink"/>
-</div>
 
-@if (isLoading()) {
-    <div class="card"><div class="card-body text-center py-4">
-        <span class="spinner-border spinner-border-sm me-2" role="status"></span>Loading...
-    </div></div>
-} @else {
+    @if (isLoading()) {
+        <div class="card"><div class="card-body text-center py-4">
+            <span class="spinner-border spinner-border-sm me-2" role="status"></span>Loading...
+        </div></div>
+    } @else {
 
-<div class="card mb-3">
-    <div class="card-body">
-
-        <!-- Footer Actions -->
-        <div class="d-flex gap-2 justify-content-end align-items-center pt-3 mt-3">
-            <a [routerLink]="['/' + menuLink]" class="btn btn-light fw-bold">
-                <ng-icon name="tablerArrowLeft" class="ps-0 pe-3 fw-bold"></ng-icon>Back
-            </a>
-            <a [routerLink]="['/' + menuLink, id, 'edit']" class="btn btn-primary fw-bold">
-                <ng-icon name="tablerEdit" class="ps-0 pe-3 fw-bold"></ng-icon>Edit
-            </a>
-        </div>
-
-        <hr class="my-3"/>
+    <div class="card mb-3">
+        <div class="card-body">
 
         <!-- Header Info -->
         <div class="row g-3">
@@ -97,7 +84,15 @@
                 </div>
                 <div class="col-md-3">
                     <div class="fs-xs text-uppercase fw-bold text-muted mb-1">CA Liquidation</div>
-                    <div>{{ rrLinkedData.calCode || '—' }}</div>
+                    <div>
+                        @if (rrLinkedData.calId) {
+                            <a [routerLink]="['/cash-advance-liquidation', rrLinkedData.calId, 'detail']" class="fw-bold">
+                                {{ rrLinkedData.calCode || rrLinkedData.calId }}
+                            </a>
+                        } @else {
+                            {{ rrLinkedData.calCode || '—' }}
+                        }
+                    </div>
                 </div>
                 <div class="col-md-3">
                     <div class="fs-xs text-uppercase fw-bold text-muted mb-1">CA Code</div>
@@ -148,8 +143,20 @@
             </div>
         }
 
+        <!-- Footer Actions -->
+        <hr class="border-dashed mt-3"/>
+        <div class="d-flex gap-2 justify-content-end align-items-center mt-3">
+            <a [routerLink]="['/' + menuLink]" class="btn btn-light fw-bold">
+                <ng-icon name="tablerArrowLeft" class="ps-0 pe-3 fw-bold"></ng-icon>Back
+            </a>
+            <a [routerLink]="['/' + menuLink, id, 'edit']" class="btn btn-primary fw-bold">
+                <ng-icon name="tablerEdit" class="ps-0 pe-3 fw-bold"></ng-icon>Edit
+            </a>
+        </div>
+
+        </div>
     </div>
+
+    } <!-- end !isLoading -->
+
 </div>
-
-
-} <!-- end !isLoading -->

@@ -1,4 +1,5 @@
 import { Component, inject, signal } from '@angular/core';
+import Swal from 'sweetalert2';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AlertService } from '@/app/shared/services/alert.service';
 import {
@@ -10,6 +11,8 @@ import {
 import { FlatpickrDirective, provideFlatpickrDefaults } from 'angularx-flatpickr';
 import { EnergySalesService } from '../energy-sales.service';
 import { ModalService } from '@/app/shared/modals/modal-service';
+import { provideIcons } from '@ng-icons/core';
+import { tablerSearch, tablerX, tablerArrowLeft, tablerCheck } from '@ng-icons/tabler-icons';
 import { BrowseEntityModalComponent } from '@/app/shared/modals/browse-entity-modal/browse-entity-modal.component';
 import { BrowseTempGLModalComponent } from '@/app/shared/modals/browse-temp-gl-modal/browse-temp-gl-modal.component';
 import { JournalEntriesFormComponent, JournalEntry } from '@/app/shared/forms/journal-entries-form/journal-entries-form.component';
@@ -23,7 +26,7 @@ import { JournalEntriesFormComponent, JournalEntry } from '@/app/shared/forms/jo
         FlatpickrDirective,
         JournalEntriesFormComponent
     ],
-    providers: [provideFlatpickrDefaults(), ...SHARED_PROVIDERS],
+    providers: [provideFlatpickrDefaults(), ...SHARED_PROVIDERS, provideIcons({ tablerSearch, tablerX, tablerArrowLeft, tablerCheck })],
     templateUrl: './energy-sales-add-edit.component.html'
 })
 export class EnergySalesAddEditComponent {
@@ -38,8 +41,9 @@ export class EnergySalesAddEditComponent {
 
     flatpickrOptions = { dateFormat: 'Y-m-d', altInput: true, altFormat: 'F j, Y' };
 
-    voucherDate = '';
-    particulars = '';
+    voucherDate      = '';
+    particulars      = '';
+    private _prevVoucherDate = '';
 
     journalEntries: JournalEntry[] = [];
     tempBatch: any = null;
@@ -73,7 +77,13 @@ export class EnergySalesAddEditComponent {
             next: (data) => {
                 this.isLoading.set(false);
                 if (data?.id) {
+                    const allowedStatuses = ['Document Created', 'Returned to Creator'];
+                    if (!allowedStatuses.includes(data.documentStatus?.status)) {
+                        this.router.navigate(['/' + this.menuLink, this.id, 'detail']);
+                        return;
+                    }
                     this.voucherDate      = data.voucherDate ? new Date(data.voucherDate).toISOString().substring(0, 10) : '';
+                    this._prevVoucherDate = this.voucherDate;
                     this.particulars      = data.particulars || '';
                     this.approvingOfficer = data.approvingOfficer || null;
                     this.journalEntries   = (data.generalLedgerLines || []).map((e: any): JournalEntry => ({
@@ -115,6 +125,15 @@ export class EnergySalesAddEditComponent {
             next: (data) => { if (data) this.approvingOfficer = data.approvingOfficer || null; },
             error: () => {}
         });
+        this.service.getDefaultDate().subscribe({
+            next: (data) => {
+                if (data?.date) {
+                    this.voucherDate      = data.date.substring(0, 10);
+                    this._prevVoucherDate = this.voucherDate;
+                }
+            },
+            error: () => {}
+        });
     }
 
     get totalDebit(): number {
@@ -127,6 +146,31 @@ export class EnergySalesAddEditComponent {
 
     get isBalanced(): boolean {
         return Math.abs(this.totalDebit - this.totalCredit) < 0.001;
+    }
+
+    onVoucherDateChange(newDate: string): void {
+        if (this.journalEntries.length === 0) {
+            this.voucherDate      = newDate;
+            this._prevVoucherDate = newDate;
+            return;
+        }
+        Swal.fire({
+            title: 'Change Voucher Date?',
+            text: 'Changing the date will clear all journal entries. Continue?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, change date',
+            cancelButtonText: 'No, keep current date'
+        }).then(result => {
+            if (result.isConfirmed) {
+                this.voucherDate      = newDate;
+                this._prevVoucherDate = newDate;
+                this.journalEntries   = [];
+            } else {
+                const old = this._prevVoucherDate;
+                setTimeout(() => { this.voucherDate = old; }, 0);
+            }
+        });
     }
 
     async openTempGLBrowse(): Promise<void> {
@@ -181,6 +225,14 @@ export class EnergySalesAddEditComponent {
             this.alertService.warning(this.module, 'Validation', 'Debit and credit totals must be equal.');
             return;
         }
+        if (this.totalDebit <= 0) {
+            this.alertService.warning(this.module, 'Validation', 'Journal entry amounts must be greater than zero.');
+            return;
+        }
+        if (!this.approvingOfficer) {
+            this.alertService.warning(this.module, 'Validation', 'Please select an Approving Officer.');
+            return;
+        }
 
         this.formSubmit = true;
 
@@ -189,6 +241,7 @@ export class EnergySalesAddEditComponent {
             voucherDate: this.voucherDate,
             particulars: this.particulars,
             amount:      this.totalDebit,
+            tempBatchId: this.tempBatch ? this.tempBatch.tempBatchId : 0,
             generalLedgerLines: this.journalEntries
                 .filter(e => e.account?.id)
                 .map(e => ({

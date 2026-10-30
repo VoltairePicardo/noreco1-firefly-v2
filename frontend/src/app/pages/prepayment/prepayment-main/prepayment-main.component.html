@@ -32,7 +32,7 @@
                         <select class="form-select" [(ngModel)]="statusFilter" (ngModelChange)="page = 1">
                             <option value="">All</option>
                             <option value="OPEN">Open</option>
-                            <option value="CLOSED">Closed</option>
+                            <option value="CLOSED OUT">Closed Out</option>
                         </select>
                     </div>
                     <div class="col-md-2">
@@ -88,7 +88,7 @@
                                                 @if (getStatus(rec) === 'OPEN') {
                                                     <span class="badge bg-success bg-opacity-25 text-success border">OPEN</span>
                                                 } @else {
-                                                    <span class="badge bg-secondary bg-opacity-25 text-dark border">CLOSED</span>
+                                                    <span class="badge bg-secondary bg-opacity-25 text-dark border">CLOSED OUT</span>
                                                 }
                                             </td>
                                             <td class="text-nowrap" (click)="$event.stopPropagation()">
@@ -125,12 +125,21 @@
 
                 @if (filteredRecords.length > pageSize) {
                     <div class="d-flex justify-content-center mt-3">
-                        <ngb-pagination
-                            [collectionSize]="filteredRecords.length"
-                            [(page)]="page"
-                            [pageSize]="pageSize"
-                            [maxSize]="5">
-                        </ngb-pagination>
+                        <div class="pagination-boxed align-items-center mb-0">
+                            <ngb-pagination
+                                [collectionSize]="filteredRecords.length"
+                                [(page)]="page"
+                                [pageSize]="pageSize"
+                                [maxSize]="5"
+                                [rotate]="true">
+                                <ng-template ngbPaginationPrevious>
+                                    <ng-icon name="tablerChevronLeft"/>
+                                </ng-template>
+                                <ng-template ngbPaginationNext>
+                                    <ng-icon name="tablerChevronRight"/>
+                                </ng-template>
+                            </ngb-pagination>
+                        </div>
                     </div>
                 }
 

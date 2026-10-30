@@ -5,6 +5,7 @@ import { FlatpickrDefaults, FlatpickrModule } from 'angularx-flatpickr';
 import { GeneralJournalService } from '../general-journal.service';
 import { fmtDate, monthStart, monthEnd } from '@/app/shared/utils/date.utils';
 import { provideIcons } from '@ng-icons/core';
+import Swal from 'sweetalert2';
 import {
     tablerSearch, tablerRefresh, tablerPlus, tablerEye, tablerEdit,
     tablerChevronLeft, tablerChevronRight, tablerThumbUp
@@ -96,7 +97,7 @@ export class GeneralJournalMainComponent {
     }
 
     isEditable(rec: any): boolean {
-        const s = rec?.status || '';
+        const s = rec?.documentStatus?.status || '';
         return s === 'Document Created' || s === 'Returned to Creator';
     }
 
@@ -104,14 +105,24 @@ export class GeneralJournalMainComponent {
         return this.records().filter(r => r.selected).map(r => r.id);
     }
 
-    approveAll(): void {
+    async approveAll(): Promise<void> {
         const ids = this.selectedIds;
         if (ids.length === 0) {
             this.alertService.warning(this.module, 'Approve All', 'Please select at least one record.');
             return;
         }
+        const { isConfirmed, value: remarks } = await Swal.fire({
+            title:       'Approve All',
+            text:        `Approve ${ids.length} selected record(s)?`,
+            input:       'text',
+            inputLabel:  'Remarks (optional)',
+            inputPlaceholder: 'Enter remarks...',
+            showCancelButton: true,
+            confirmButtonText: 'Approve',
+        });
+        if (!isConfirmed) return;
         this.processingAll = true;
-        this.service.approveAll(ids).subscribe({
+        this.service.approveAll(ids, remarks || '').subscribe({
             next: (res) => {
                 this.processingAll = false;
                 if (res?.success) {

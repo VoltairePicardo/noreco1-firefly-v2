@@ -1,5 +1,4 @@
 import { Component, inject, signal } from '@angular/core';
-import { Router } from '@angular/router';
 import { AlertService } from '@/app/shared/services/alert.service';
 import {
     COMMON_ALL_PAGE_IMPORTS,
@@ -9,6 +8,8 @@ import {
 import { provideIcons } from '@ng-icons/core';
 import { tablerArrowLeft, tablerSearch, tablerPlayerPlay } from '@ng-icons/tabler-icons';
 import { PrepaymentService } from '../prepayment.service';
+import { forkJoin, of } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
 
 @Component({
     selector: 'app-prepayment-process-monthly',
@@ -24,11 +25,11 @@ export class PrepaymentProcessMonthlyComponent {
     selectedMonth = new Date().getMonth() + 1;
     selectedYear  = new Date().getFullYear();
 
-    isLoading  = signal(false);
-    hasLoaded  = signal(false);
-    items      = signal<any[]>([]);
-    processing = signal<Set<number>>(new Set());
-    processed  = signal<Set<number>>(new Set());
+    isLoading       = signal(false);
+    hasLoaded       = signal(false);
+    items           = signal<any[]>([]);
+    isProcessingAll = signal(false);
+    processed       = signal<Set<number>>(new Set());
 
     readonly months = [
         { value: 1,  label: 'January'   },
@@ -46,7 +47,6 @@ export class PrepaymentProcessMonthlyComponent {
     ];
 
     private service      = inject(PrepaymentService);
-    private router       = inject(Router);
     private alertService = inject(AlertService);
 
     load(): void {
@@ -76,56 +76,62 @@ export class PrepaymentProcessMonthlyComponent {
         }
     }
 
-    process(item: any): void {
-        const id: number = item.id;
-        const set = new Set(this.processing());
-        set.add(id);
-        this.processing.set(set);
+    processAll(): void {
+        const pending = this.items().filter(item => !this.isProcessed(item.id));
+        if (pending.length === 0) {
+            this.alertService.warning(this.module, 'Nothing to Process', 'All items have already been processed.');
+            return;
+        }
 
+        this.isProcessingAll.set(true);
         const processDate = `${this.selectedYear}-${String(this.selectedMonth).padStart(2, '0')}-01`;
-        const newBalance  = (Number(item.balance) || 0) - (Number(item.monthlyCost) || 0);
 
-        const payload = {
-            id,
-            hasPpd: true,
-            ppDetails: [{
-                accountNo: item.accountNo,
-                month:     this.selectedMonth,
-                year:      this.selectedYear,
-                amount:    item.monthlyCost,
-                balance:   newBalance
-            }],
-            processDate,
-            tempBatch: { id: item.temporaryBatch?.id }
-        };
+        const requests = pending.map(item => {
+            const newBalance = (Number(item.balance) || 0) - (Number(item.monthlyCost) || 0);
+            const payload = {
+                id:        item.id,
+                hasPpd:    true,
+                ppDetails: [{
+                    accountNo: item.accountNo,
+                    month:     this.selectedMonth,
+                    year:      this.selectedYear,
+                    amount:    item.monthlyCost,
+                    balance:   newBalance
+                }],
+                processDate,
+                tempBatch: { id: item.temporaryBatch?.id }
+            };
+            return this.service.create(payload).pipe(
+                map(res => ({ id: item.id, success: !!res?.success })),
+                catchError(() => of({ id: item.id, success: false }))
+            );
+        });
 
-        this.service.create(payload).subscribe({
-            next: (res) => {
-                const proc = new Set(this.processing());
-                proc.delete(id);
-                this.processing.set(proc);
-                if (res?.success) {
-                    const done = new Set(this.processed());
-                    done.add(id);
-                    this.processed.set(done);
-                    this.alertService.success(this.module, 'Processed', item.description || '');
+        forkJoin(requests).subscribe({
+            next: (results) => {
+                this.isProcessingAll.set(false);
+                const succeeded = results.filter(r => r.success);
+                const failed    = results.length - succeeded.length;
+
+                const done = new Set(this.processed());
+                succeeded.forEach(r => done.add(r.id));
+                this.processed.set(done);
+
+                const monthLabel = this.months[this.selectedMonth - 1]?.label ?? this.selectedMonth;
+                if (failed === 0) {
+                    this.alertService.success(this.module, 'Processed',
+                        `${succeeded.length} prepayment(s) processed for ${monthLabel} ${this.selectedYear}.`);
                 } else {
-                    this.alertService.error(this.module, 'Process Failed', res?.failureMessage || '');
+                    this.alertService.warning(this.module, 'Partial Success',
+                        `${succeeded.length} processed, ${failed} failed for ${monthLabel} ${this.selectedYear}.`);
                 }
             },
             error: () => {
-                const proc = new Set(this.processing());
-                proc.delete(id);
-                this.processing.set(proc);
+                this.isProcessingAll.set(false);
                 this.alertService.error(this.module, 'Process Failed', '');
             }
         });
     }
 
-    isProcessing(id: number): boolean { return this.processing().has(id); }
-    isProcessed(id: number): boolean  { return this.processed().has(id);  }
-
-    cancel(): void {
-        this.router.navigate(['/' + this.menuLink]);
-    }
+    isProcessed(id: number): boolean { return this.processed().has(id); }
 }

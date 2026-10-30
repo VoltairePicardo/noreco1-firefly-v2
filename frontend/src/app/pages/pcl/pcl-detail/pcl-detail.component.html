@@ -1,0 +1,169 @@
+<div class="container-fluid">
+    <app-page-title [title]="module" [subTitle]="subModule" [menuLink]="menuLink"/>
+</div>
+
+@if (isLoading()) {
+    <div class="card"><div class="card-body text-center py-4">
+        <span class="spinner-border spinner-border-sm me-2" role="status"></span>Loading...
+    </div></div>
+} @else {
+
+<div class="card mb-3">
+    <div class="card-body">
+
+        <!-- Actions -->
+        <div class="d-flex gap-2 justify-content-end align-items-center pb-3 border-bottom mb-3">
+            <a [routerLink]="['/' + menuLink]" class="btn btn-light fw-bold">
+                <ng-icon name="tablerArrowLeft" class="ps-0 pe-3 fw-bold"></ng-icon>Back
+            </a>
+            <button type="button" class="btn btn-success fw-bold" (click)="print()">
+                <ng-icon name="tablerPrinter" class="ps-0 pe-3 fw-bold"></ng-icon>Print
+            </button>
+            @if (isEditable()) {
+                <a class="btn btn-primary fw-bold" [routerLink]="['/' + menuLink, id, 'edit']">
+                    <ng-icon name="tablerEdit" class="ps-0 pe-3 fw-bold"></ng-icon>Edit
+                </a>
+            }
+        </div>
+
+        <!-- Workflow Actions -->
+        @if (workflowActions.length > 0) {
+            <div class="fs-xs text-uppercase fw-semibold text-muted mb-2">Process Document</div>
+            <div class="row g-3 align-items-end">
+                <div class="col-md-3">
+                    <label class="form-label fw-bold">Action</label>
+                    <select class="form-select" [(ngModel)]="selectedAction">
+                        <option [ngValue]="null">— Select Action —</option>
+                        @for (a of workflowActions; track a.actionMapId) {
+                            <option [ngValue]="a">{{ a.action }}</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-bold">Remarks <span class="text-muted fw-normal">(optional)</span></label>
+                    <textarea rows="1" class="form-control" [(ngModel)]="remarks" placeholder="Enter remarks"></textarea>
+                </div>
+                <div class="col-md-2">
+                    <button type="button" class="btn btn-primary fw-bold"
+                            (click)="processWorkflow()"
+                            [disabled]="!selectedAction || processingWorkflow">
+                        @if (processingWorkflow) {
+                            <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                        } @else {
+                            <ng-icon name="tablerCheck" class="ps-0 pe-3 fw-bold"></ng-icon>
+                        }
+                        Process
+                    </button>
+                </div>
+            </div>
+            <hr class="my-3"/>
+        }
+
+        <!-- Header Info -->
+        <div class="row g-3">
+            <div class="col-md-3">
+                <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Code</div>
+                <div class="fw-bold fs-5">{{ data.code || '—' }}</div>
+            </div>
+            <div class="col-md-3">
+                <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Status</div>
+                <span class="badge"
+                      [ngClass]="isEditable() ? 'bg-secondary bg-opacity-25 text-dark border' : 'bg-success bg-opacity-25 text-success border'">
+                    {{ data.documentStatus?.status || 'N/A' }}
+                </span>
+            </div>
+            <div class="col-md-3">
+                <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Date</div>
+                <div>{{ data.createdAt | date:'MMMM d, yyyy' }}</div>
+            </div>
+            <div class="col-md-3">
+                <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Office</div>
+                <div>{{ data.office?.name || '—' }}</div>
+            </div>
+        </div>
+        <div class="row g-3 mt-1">
+            <div class="col-md-3">
+                <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Petty Cash Voucher</div>
+                <div>{{ data.pettyCashTrans?.code || '—' }}</div>
+            </div>
+            <div class="col-md-3">
+                <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Total Amount</div>
+                <div class="fw-bold">{{ data.amount | number:'1.2-2' }}</div>
+            </div>
+            <div class="col-md-3">
+                <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Requested By</div>
+                <div>{{ data.createdByUser?.fullName || '—' }}</div>
+            </div>
+            <div class="col-md-3">
+                <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Created On</div>
+                <div>{{ data.createdAt | date:'MMMM d, yyyy h:mm a' }}</div>
+            </div>
+        </div>
+
+        <!-- Signatories -->
+        <hr class="my-3"/>
+        <div class="fs-xs text-uppercase fw-semibold text-muted mb-2">Signatories</div>
+        <div class="row g-3">
+            <div class="col-md-4">
+                <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Approving Officer</div>
+                <div>{{ data.approvedByUser?.fullName || '—' }}</div>
+            </div>
+            <div class="col-md-4">
+                <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Receiving Officer</div>
+                <div>{{ data.receivedByUser?.fullName || '—' }}</div>
+            </div>
+        </div>
+
+        <!-- Items -->
+        <hr class="my-3"/>
+        <div class="fs-xs text-uppercase fw-semibold text-muted mb-2">Petty Cash Items</div>
+        <div class="table-responsive">
+            <table class="table table-custom table-centered table-hover w-100 mb-0">
+                <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                    <tr class="text-uppercase fs-xxs">
+                        <th>Particulars</th>
+                        <th>OR Number</th>
+                        <th class="text-end">Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (items.length > 0) {
+                        @for (item of items; track $index) {
+                            <tr>
+                                <td>{{ item.remarks || '—' }}</td>
+                                <td>{{ item.orNumber || '—' }}</td>
+                                <td class="text-end">{{ item.amount | number:'1.2-2' }}</td>
+                            </tr>
+                        }
+                        <tr class="fw-bold">
+                            <td colspan="2" class="text-end text-uppercase fs-xs">Total</td>
+                            <td class="text-end">{{ totalAmount | number:'1.2-2' }}</td>
+                        </tr>
+                    } @else {
+                        <tr>
+                            <td colspan="3" class="text-center text-muted py-3">No items found.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Attachments -->
+        <hr class="my-3"/>
+        <div class="fs-xs text-uppercase fw-semibold text-muted mb-2">Attachments</div>
+        <app-attachments [files]="attachments" [fileUrl]="fileUrl"/>
+
+    </div>
+    <div class="card-footer border-dashed">
+        <a href="javascript:void(0)" class="d-inline-flex align-items-center fs-xs fw-semibold text-decoration-none gap-1"
+           (click)="toggleLogs()">
+            <ng-icon [name]="showLogs ? 'tablerEyeOff' : 'tablerEye'" class="ps-0 pe-2 fw-bold fs-md"></ng-icon>
+            {{ showLogs ? 'Hide' : 'Show' }} Logs
+        </a>
+        <div [class.d-none]="!showLogs" class="mt-2">
+            <app-document-logs [transactionId]="data.transaction?.id"/>
+        </div>
+    </div>
+</div>
+
+} <!-- end !isLoading -->

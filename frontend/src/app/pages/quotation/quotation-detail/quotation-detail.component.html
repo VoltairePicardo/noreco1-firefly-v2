@@ -80,31 +80,31 @@
                     <hr class="border-dashed mx-n3 mt-3"/>
                 }
 
-                <!-- Header Info -->
-                <div class="row g-3">
-                    <div class="col-md-3">
-                        <div class="fs-xs text-uppercase fw-bold text-muted mb-1">SOQ No.</div>
-                        <div class="fw-bold fs-5">{{ data.code || '—' }}</div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Date</div>
-                        <div>{{ data.date | date:'MMMM d, yyyy':'UTC' }}</div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Status</div>
-                        <span [class]="statusBadgeClass(data.documentStatus)">{{ data.documentStatus || '—' }}</span>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Last Updated</div>
-                        <div>{{ data.updatedAt | date:'MM/dd/yyyy hh:mm a' }}</div>
-                    </div>
-                </div>
-                <div class="row g-3 mt-1">
-                    <div class="col-md-12">
-                        <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Particulars</div>
-                        <div>{{ data.particular || '—' }}</div>
-                    </div>
-                </div>
+        <!-- Header Info -->
+        <div class="row g-3">
+            <div class="col-md-3">
+                <div class="fs-xs text-uppercase fw-bold text-muted mb-1">SOQ No.</div>
+                <div class="fw-bold fs-5">{{ data.code || '—' }}</div>
+            </div>
+            <div class="col-md-3">
+                <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Date</div>
+                <div>{{ data.date | date:'MMMM d, yyyy':'UTC' }}</div>
+            </div>
+            <div class="col-md-3">
+                <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Status</div>
+                <span class="badge border" [ngClass]="(data.documentStatus || '—') === 'Approved' ? 'bg-success bg-opacity-25 text-success' : 'bg-primary bg-opacity-25 text-primary'">{{ data.documentStatus || '—' }}</span>
+            </div>
+            <div class="col-md-3">
+                <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Last Updated</div>
+                <div>{{ data.updatedAt | date:'MM/dd/yyyy hh:mm a' }}</div>
+            </div>
+        </div>
+        <div class="row g-3 mt-1">
+            <div class="col-md-12">
+                <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Particulars</div>
+                <div>{{ data.particular || '—' }}</div>
+            </div>
+        </div>
 
                 <!-- Suppliers -->
                 @if (suppliersList.length > 0) {

@@ -47,9 +47,17 @@ export class AccountsPayableVoucherService {
         return this.http.post<any>(`${BASE_API}/apv/process`, dto);
     }
 
-    approveAll(ids: number[]): Observable<any> {
-        const payloads = ids.map(id => ({ documentId: id, remarks: '', documentType: 'APV' }));
+    approveAll(ids: number[], remarks: string = ''): Observable<any> {
+        const payloads = ids.map(id => ({ documentId: id, remarks, documentType: 'APV' }));
         return this.http.post<any>(`${BASE_API}/approve-vouchers/process-all`, payloads, httpOptions);
+    }
+
+    saveUnpaidRemarks(id: number, unpaidRemark: string): Observable<any> {
+        return this.http.post<any>(`${BASE_API}/apv/update-unpaid-remarks`, { id, unpaidRemark }, httpOptions);
+    }
+
+    updateEntries(payload: any): Observable<any> {
+        return this.http.post<any>(`${BASE_API}/apv/update-entries`, payload, httpOptions);
     }
 
     getJournalEntries(transId: number): Observable<any[]> {
@@ -80,6 +88,12 @@ export class AccountsPayableVoucherService {
         return this.http.get<any>(`${BASE_API}/json/entities`, { params });
     }
 
+    searchRvs(q: string = '', page: number = 0, size: number = 10, vendorAccountNo?: string): Observable<any> {
+        let params = new HttpParams().set('q', q).set('page', page).set('size', size);
+        if (vendorAccountNo) params = params.set('vendorAccountNo', vendorAccountNo);
+        return this.http.get<any>(`${BASE_API}/apv/rr-approved-paged`, { params });
+    }
+
     searchPurchasingDocuments(type: ApvDocumentType, q: string = '', page: number = 0, size: number = 10, supplierAccountNo?: number | null): Observable<any> {
         let params = new HttpParams()
             .set('q', q)
@@ -106,6 +120,16 @@ export class AccountsPayableVoucherService {
 
     getSupplierAccount(): Observable<any> {
         return this.http.get<any>(`${BASE_API}/accounting/accounts/supplier-account`);
+    }
+
+    searchPrs(q: string = '', page: number = 0, size: number = 10): Observable<any> {
+        const params = new HttpParams().set('q', q).set('page', page).set('size', size);
+        return this.http.get<any>(`${BASE_API}/payment-request/apv-approved-paged`, { params });
+    }
+
+    searchJoas(q: string = '', page: number = 0, size: number = 10): Observable<any> {
+        const params = new HttpParams().set('q', q).set('page', page).set('size', size);
+        return this.http.get<any>(`${BASE_API}/jo-acceptance/apv-approved-paged`, { params });
     }
 
     getWorkflowActions(transId: number): Observable<any[]> {

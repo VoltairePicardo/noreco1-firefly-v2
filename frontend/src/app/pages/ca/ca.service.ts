@@ -82,7 +82,41 @@ export class CaService {
         return this.http.post(`${BASE_API}/cash-advance/liquidated/${id}`, {}, httpOptions);
     }
 
+    getBudgetLineItemBalance(id: number): Observable<any> {
+        return this.http.get(`${BASE_API}/json/budget-line-item-balance/${id}`);
+    }
+
+    isDocumentForCashFlowAssignment(transactionId: number): Observable<boolean> {
+        return this.http.get<boolean>(`${BASE_API}/cash-advance/is-document-for-cash-flow-item-assignment/${transactionId}`);
+    }
+
+    getCashFlowDetails(caId: number): Observable<any[]> {
+        return this.http.get<any[]>(`${BASE_API}/cash-advance/cash-flow/${caId}`);
+    }
+
+    getCashFlowItems(): Observable<any[]> {
+        return this.http.get<any[]>(`${BASE_API}/cashflow-item/list`);
+    }
+
+    saveCashFlowItems(payload: any): Observable<any> {
+        return this.http.post(`${BASE_API}/cash-advance/saveCashFlowItem`, payload, httpOptions);
+    }
+
+    getCashFlowBalances(budgetLineItemDetailId: number): Observable<any> {
+        return this.http.get(`${BASE_API}/cash-advance/cashflow-balances/${budgetLineItemDetailId}`);
+    }
+
     print(id: number): void {
         this.downloadService.print(`${BASE_API}/cash-advance/export/${id}`, { type: 'pdf' });
+    }
+
+    updateAmounts(payload: any): Observable<any> {
+        const fd = new FormData();
+        fd.append('model', new Blob([JSON.stringify(payload)], { type: 'application/json' }));
+        return this.http.post(`${BASE_API}/cash-advance/update`, fd);
+    }
+
+    confirmBudgetLineItem(payload: any): Observable<any> {
+        return this.http.post(`${BASE_API}/cash-advance/check-budget-line-item`, payload, httpOptions);
     }
 }

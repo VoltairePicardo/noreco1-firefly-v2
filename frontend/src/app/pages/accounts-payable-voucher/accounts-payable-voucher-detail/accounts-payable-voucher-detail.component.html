@@ -65,9 +65,7 @@
                     </div>
                     <div class="col-md-3">
                         <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Status</div>
-                        <span [class]="statusBadgeClass(data.documentStatus?.status)">
-                            {{ data.documentStatus?.status || '—' }}
-                        </span>
+                        <span class="badge border" [ngClass]="(data.documentStatus?.status || '—') === 'Approved' ? 'bg-success bg-opacity-25 text-success' : 'bg-primary bg-opacity-25 text-primary'">{{ data.documentStatus?.status || '—' }}</span>
                     </div>
                     <div class="col-md-3">
                         <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Voucher Date</div>
@@ -105,6 +103,12 @@
                         <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Last Updated</div>
                         <div>{{ data.lastUpdated ? (data.lastUpdated | date:'MMM dd, yyyy HH:mm') : '—' }}</div>
                     </div>
+                    @if (data.postedBy) {
+                        <div class="col-md-3">
+                            <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Posted By</div>
+                            <div>{{ data.postedBy?.name || '—' }}</div>
+                        </div>
+                    }
                     @if (data.particulars) {
                         <div class="col-md-12">
                             <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Particulars</div>
@@ -113,28 +117,29 @@
                     }
                 </div>
 
-                <!-- Linked Receiving Reports -->
+                <!-- Linked Purchasing Document -->
                 <hr class="border-dashed mx-n3 mt-3"/>
-                <div class="fs-xs text-uppercase fw-semibold text-muted mb-2">Linked Receiving Reports</div>
-                <div class="table-responsive">
-                    <table class="table table-custom table-centered table-hover w-100 mb-0">
-                        <thead class="bg-light align-middle bg-opacity-25 thead-sm">
-                        <tr class="text-uppercase fs-xxs">
-                            <th style="width:50px">#</th>
-                            <th>RR Code</th>
-                            <th>Supplier</th>
-                            <th class="text-end">Amount</th>
-                            <th>Date</th>
-                            <th>Particulars</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                            @if (receivingReports.length > 0) {
+
+                @if (receivingReports.length > 0) {
+                    <div class="fs-xs text-uppercase fw-semibold text-muted mb-2">Linked Receiving Reports</div>
+                    <div class="table-responsive">
+                        <table class="table table-custom table-centered table-hover w-100 mb-0">
+                            <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                            <tr class="text-uppercase fs-xxs">
+                                <th style="width:50px">#</th>
+                                <th>RR Code</th>
+                                <th>Supplier</th>
+                                <th class="text-end">Amount</th>
+                                <th>Date</th>
+                                <th>Particulars</th>
+                            </tr>
+                            </thead>
+                            <tbody>
                                 @for (rr of receivingReports; track $index; let i = $index) {
                                     <tr>
                                         <td class="text-center">{{ i + 1 }}</td>
                                         <td class="fw-bold">{{ rr.localCode || '—' }}</td>
-                                        <td>{{ rr.slentityName || rr.vendor?.name || '—' }}</td>
+                                        <td>{{ rr.slentityName || rr.slEntityName || rr.vendor?.name || '—' }}</td>
                                         <td class="text-end">{{ (rr.netAmount || 0) | number:'1.2-2' }}</td>
                                         <td>{{ rr.voucherDate | date:'MMM dd, yyyy' }}</td>
                                         <td>{{ rr.particulars || '—' }}</td>
@@ -145,49 +150,148 @@
                                     <td class="text-end">{{ totalAmount | number:'1.2-2' }}</td>
                                     <td colspan="2"></td>
                                 </tr>
-                            } @else {
-                                <tr><td colspan="6" class="text-center text-muted py-3">No receiving reports linked.</td></tr>
-                            }
-                        </tbody>
-                    </table>
-                </div>
+                            </tbody>
+                        </table>
+                    </div>
+                } @else if (linkedPr) {
+                    <div class="fs-xs text-uppercase fw-semibold text-muted mb-2">Linked Payment Request</div>
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <div class="fs-xs text-uppercase fw-bold text-muted mb-1">PR Code</div>
+                            <div class="fw-bold">{{ linkedPr.localCode || '—' }}</div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Date</div>
+                            <div>{{ linkedPr.voucherDate | date:'MMM dd, yyyy' }}</div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Amount</div>
+                            <div class="fw-bold">{{ linkedPr.netAmount | number:'1.2-2' }}</div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Prepared By</div>
+                            <div>{{ linkedPr.preparedBy || '—' }}</div>
+                        </div>
+                        @if (linkedPr.particulars) {
+                            <div class="col-md-12">
+                                <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Particulars</div>
+                                <div>{{ linkedPr.particulars }}</div>
+                            </div>
+                        }
+                    </div>
+                } @else if (linkedJoa) {
+                    <div class="fs-xs text-uppercase fw-semibold text-muted mb-2">Linked JO Acceptance</div>
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <div class="fs-xs text-uppercase fw-bold text-muted mb-1">JOA Code</div>
+                            <div class="fw-bold">{{ linkedJoa.localCode || '—' }}</div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Date</div>
+                            <div>{{ linkedJoa.voucherDate | date:'MMM dd, yyyy' }}</div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Amount</div>
+                            <div class="fw-bold">{{ linkedJoa.netAmount | number:'1.2-2' }}</div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Prepared By</div>
+                            <div>{{ linkedJoa.preparedBy || '—' }}</div>
+                        </div>
+                        @if (linkedJoa.particulars) {
+                            <div class="col-md-12">
+                                <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Particulars</div>
+                                <div>{{ linkedJoa.particulars }}</div>
+                            </div>
+                        }
+                    </div>
+                } @else {
+                    <div class="fs-xs text-uppercase fw-semibold text-muted mb-2">Linked Purchasing Document</div>
+                    <p class="text-muted fst-italic mb-0">No purchasing document linked.</p>
+                }
 
                 <!-- Journal Entries -->
                 <hr class="border-dashed mx-n3 mt-3"/>
                 <div class="fs-xs text-uppercase fw-semibold text-muted mb-2">Journal Entries</div>
-                <div class="table-responsive">
-                    <table class="table table-custom table-centered table-hover w-100 mb-0">
-                        <thead class="bg-light align-middle bg-opacity-25 thead-sm">
-                        <tr class="text-uppercase fs-xxs">
-                            <th style="width:50px">#</th>
-                            <th>Account Code</th>
-                            <th>Description</th>
-                            <th class="text-end">Debit</th>
-                            <th class="text-end">Credit</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                            @if (journalEntries.length > 0) {
-                                @for (entry of journalEntries; track $index; let i = $index) {
-                                    <tr>
-                                        <td class="text-center">{{ i + 1 }}</td>
-                                        <td class="fw-bold">{{ entry.code || entry.accountCode || '—' }}</td>
-                                        <td>{{ entry.description || entry.accountTitle || '—' }}</td>
-                                        <td class="text-end">{{ (entry.debit || 0) | number:'1.2-2' }}</td>
-                                        <td class="text-end">{{ (entry.credit || 0) | number:'1.2-2' }}</td>
-                                    </tr>
-                                }
-                                <tr class="fw-bold">
-                                    <td colspan="3" class="text-end text-uppercase fs-xs">Totals</td>
-                                    <td class="text-end">{{ journalDebitTotal | number:'1.2-2' }}</td>
-                                    <td class="text-end">{{ journalCreditTotal | number:'1.2-2' }}</td>
-                                </tr>
+
+                @if (isForCheckingOrReviewing()) {
+                    <app-journal-entries-form [entries]="editableEntries" [voucherDate]="(data.voucherDate | date:'yyyy-MM-dd') ?? undefined"/>
+                    <div class="d-flex justify-content-end mt-2">
+                        <button type="button" class="btn btn-primary fw-bold" [disabled]="savingEntries" (click)="saveEntries()">
+                            @if (savingEntries) {
+                                <span class="spinner-border spinner-border-sm me-2" role="status"></span>
                             } @else {
-                                <tr><td colspan="5" class="text-center text-muted py-3">No journal entries.</td></tr>
+                                <ng-icon name="tablerDeviceFloppy" class="ps-0 pe-3 fw-bold"></ng-icon>
                             }
-                        </tbody>
-                    </table>
-                </div>
+                            Save Entries
+                        </button>
+                    </div>
+                } @else {
+                    <div class="table-responsive">
+                        <table class="table table-custom table-centered table-hover w-100 mb-0">
+                            <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                            <tr class="text-uppercase fs-xxs">
+                                <th style="width:50px">#</th>
+                                <th>Account Code</th>
+                                <th>Description</th>
+                                <th class="text-end">Debit</th>
+                                <th class="text-end">Credit</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                                @if (journalEntries.length > 0) {
+                                    @for (entry of journalEntries; track $index; let i = $index) {
+                                        <tr>
+                                            <td class="text-center">{{ i + 1 }}</td>
+                                            <td class="fw-bold">{{ entry.code || entry.accountCode || '—' }}</td>
+                                            <td>
+                                                @if (entry.slentries?.length) {
+                                                    <button type="button" class="btn btn-sm btn-warning btn-rounded float-end py-0 px-2"
+                                                            (click)="toggleSl(i)">
+                                                        <small class="fw-bold">SL</small>
+                                                        <ng-icon [name]="isSlExpanded(i) ? 'tablerChevronDown' : 'tablerChevronRight'" class="fs-sm ms-1"/>
+                                                    </button>
+                                                }
+                                                {{ entry.description || entry.accountTitle || '—' }}
+                                                @if (entry.slentries?.length && isSlExpanded(i)) {
+                                                    <div class="table-responsive mt-1">
+                                                        <table class="table table-sm table-bordered mb-0 fs-xs">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>SL Entries</th>
+                                                                    <th class="text-end" style="width:120px">Debit</th>
+                                                                    <th class="text-end" style="width:120px">Credit</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                @for (sl of entry.slentries; track $index) {
+                                                                    <tr>
+                                                                        <td>{{ sl.name }}</td>
+                                                                        <td class="text-end">{{ sl.debit ? (sl.debit | number:'1.2-2') : '' }}</td>
+                                                                        <td class="text-end">{{ sl.credit ? (sl.credit | number:'1.2-2') : '' }}</td>
+                                                                    </tr>
+                                                                }
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                }
+                                            </td>
+                                            <td class="text-end">{{ (entry.debit || 0) | number:'1.2-2' }}</td>
+                                            <td class="text-end">{{ (entry.credit || 0) | number:'1.2-2' }}</td>
+                                        </tr>
+                                    }
+                                    <tr class="fw-bold">
+                                        <td colspan="3" class="text-end text-uppercase fs-xs">Totals</td>
+                                        <td class="text-end">{{ journalDebitTotal | number:'1.2-2' }}</td>
+                                        <td class="text-end">{{ journalCreditTotal | number:'1.2-2' }}</td>
+                                    </tr>
+                                } @else {
+                                    <tr><td colspan="5" class="text-center text-muted py-3">No journal entries.</td></tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
 
                 <!-- IEMOP Billings -->
                 @if (iemopBillings.length > 0) {
@@ -219,6 +323,71 @@
                             </tbody>
                         </table>
                     </div>
+                }
+
+                <!-- Installment Payment Schedule -->
+                @if (installmentDetails.length > 0) {
+                    <hr class="border-dashed mx-n3 mt-3"/>
+                    <div class="fs-xs text-uppercase fw-semibold text-muted mb-2">Payment Schedule</div>
+                    <div class="table-responsive">
+                        <table class="table table-custom table-centered table-hover w-100 mb-0">
+                            <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                            <tr class="text-uppercase fs-xxs">
+                                <th style="width:50px">#</th>
+                                <th>Due Date</th>
+                                <th class="text-end">Amount</th>
+                                <th>Status</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                                @for (d of installmentDetails; track $index; let i = $index) {
+                                    <tr>
+                                        <td class="text-center">{{ i + 1 }}</td>
+                                        <td>{{ d.dueDate | date:'MMM dd, yyyy' }}</td>
+                                        <td class="text-end">{{ d.amount | number:'1.2-2' }}</td>
+                                        <td>
+                                            <span class="badge" [class]="d.paid ? 'bg-success bg-opacity-25 text-success' : 'bg-secondary bg-opacity-25 text-dark'">
+                                                {{ d.paid ? 'Paid' : 'Unpaid' }}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+
+                <!-- Unpaid Remarks -->
+                <hr class="border-dashed mx-n3 mt-3"/>
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                    <div class="fs-xs text-uppercase fw-semibold text-muted">Unpaid Remarks</div>
+                    @if (!editingUnpaidRemark) {
+                        <button type="button" class="btn btn-light btn-sm fw-bold" (click)="editUnpaidRemark()">
+                            <ng-icon name="tablerEdit" class="ps-0 pe-2 fw-bold"></ng-icon>Edit
+                        </button>
+                    }
+                </div>
+                @if (editingUnpaidRemark) {
+                    <div class="row g-2">
+                        <div class="col-md-8">
+                            <textarea class="form-control" rows="2" [(ngModel)]="unpaidRemark" placeholder="Enter unpaid remarks..."></textarea>
+                        </div>
+                        <div class="col-md-auto d-flex gap-2 align-items-start pt-1">
+                            <button type="button" class="btn btn-primary fw-bold btn-sm" (click)="saveUnpaidRemark()" [disabled]="savingUnpaidRemark">
+                                @if (savingUnpaidRemark) {
+                                    <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                                } @else {
+                                    <ng-icon name="tablerCheck" class="ps-0 pe-2 fw-bold"></ng-icon>
+                                }
+                                Save
+                            </button>
+                            <button type="button" class="btn btn-light fw-bold btn-sm" (click)="cancelUnpaidRemark()">
+                                <ng-icon name="tablerX" class="ps-0 pe-2 fw-bold"></ng-icon>Cancel
+                            </button>
+                        </div>
+                    </div>
+                } @else {
+                    <div class="text-muted fst-italic">{{ unpaidRemark || '—' }}</div>
                 }
 
                 <!-- Signatories -->

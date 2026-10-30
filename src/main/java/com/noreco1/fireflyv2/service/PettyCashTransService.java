@@ -60,4 +60,6 @@ public interface PettyCashTransService extends VoucherService {
 
     List<HashMap> findCheckVouchers(String from, String to, String code);
 
+    List<PettyCashTrans> findForCloseout(String from, String to, Integer officeId, Integer documentStatusId);
+
 }

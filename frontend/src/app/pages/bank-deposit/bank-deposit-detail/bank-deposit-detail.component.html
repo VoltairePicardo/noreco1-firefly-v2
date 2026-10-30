@@ -91,22 +91,21 @@
         </div>
 
         <!-- Attachments -->
-        @if (attachments.length > 0) {
-            <hr class="my-3"/>
-            <div class="fs-xs text-uppercase fw-semibold text-muted mb-2">Attachments</div>
-            <ul class="list-unstyled mb-0">
-                @for (f of attachments; track $index) {
-                    <li class="mb-1">
-                        <a [href]="fileUrl(f.id)" target="_blank" class="text-primary">
-                            {{ f.originalFilename || f.oFile || f.name || 'File' }}
-                        </a>
-                    </li>
-                }
-            </ul>
-        }
+        <hr class="border-dashed mx-n3 mt-3"/>
+        <div class="fs-xs text-uppercase fw-semibold text-muted mb-2">Attachments</div>
+        <app-attachments [files]="attachments" [fileUrl]="fileUrl"/>
 
     </div>
+    <div class="card-footer border-dashed">
+        <a href="javascript:void(0)" class="d-inline-flex align-items-center fs-xs fw-semibold text-decoration-none gap-1"
+           (click)="toggleLogs()">
+            <ng-icon [name]="showLogs ? 'tablerEyeOff' : 'tablerEye'" class="ps-0 pe-2 fw-bold fs-md"></ng-icon>
+            {{ showLogs ? 'Hide' : 'Show' }} Logs
+        </a>
+        <div [class.d-none]="!showLogs" class="mt-2">
+            <app-document-logs [transactionId]="data.transId"/>
+        </div>
+    </div>
 </div>
-
 
 } <!-- end !isLoading -->

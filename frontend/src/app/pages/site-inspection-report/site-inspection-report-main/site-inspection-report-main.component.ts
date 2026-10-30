@@ -4,11 +4,13 @@ import { FlatpickrDefaults, FlatpickrModule } from 'angularx-flatpickr';
 import { AlertService } from '@/app/shared/services/alert.service';
 import { SiteInspectionReportService } from '../site-inspection-report.service';
 import { monthStart, monthEnd } from '@/app/shared/utils/date.utils';
+import { provideIcons } from '@ng-icons/core';
+import { tablerChevronLeft, tablerChevronRight } from '@ng-icons/tabler-icons';
 
 @Component({
     selector: 'app-site-inspection-report-main',
     imports: [...COMMON_ALL_PAGE_IMPORTS, ...COMMON_MAIN_PAGE_IMPORTS, FlatpickrModule],
-    providers: [...SHARED_PROVIDERS, FlatpickrDefaults],
+    providers: [...SHARED_PROVIDERS, FlatpickrDefaults, provideIcons({ tablerChevronLeft, tablerChevronRight })],
     templateUrl: './site-inspection-report-main.component.html'
 })
 export class SiteInspectionReportMainComponent {

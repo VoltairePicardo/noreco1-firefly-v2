@@ -20,9 +20,7 @@
                     </div>
                     <div class="col-md-3">
                         <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Status</div>
-                        <span class="badge bg-secondary bg-opacity-25 text-dark border">
-                    {{ data().documentStatus?.status || '—' }}
-                </span>
+                        <span class="badge border" [ngClass]="(data().documentStatus?.status || '—') === 'Approved' ? 'bg-success bg-opacity-25 text-success' : 'bg-primary bg-opacity-25 text-primary'">{{ data().documentStatus?.status || '—' }}</span>
                     </div>
                     <div class="col-md-3">
                         <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Prepared By</div>

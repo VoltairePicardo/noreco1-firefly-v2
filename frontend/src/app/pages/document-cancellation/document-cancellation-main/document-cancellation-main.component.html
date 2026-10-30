@@ -61,7 +61,7 @@
                         @for (rec of pagedRecords; track rec.id) {
                             <tr>
                                 <td class="fw-bold">{{ rec.code || rec.localCode }}</td>
-                                <td><span class="badge bg-secondary bg-opacity-25 text-dark border">{{ rec.status }}</span></td>
+                                <td><span class="badge border" [ngClass]="(rec.status) === 'Approved' ? 'bg-success bg-opacity-25 text-success' : 'bg-primary bg-opacity-25 text-primary'">{{ rec.status }}</span></td>
                                 <td>{{ rec.voucherDate || rec.date | date:'MM/dd/yyyy' }}</td>
                                 <td>{{ rec.vendor || '—' }}</td>
                                 <td class="text-end">{{ rec.amount ?? rec.totalDebit | number:'1.2-2' }}</td>
@@ -152,6 +152,10 @@
                     <label class="form-label fw-bold fs-xs text-uppercase">Amount</label>
                     <p class="mb-0">{{ cancelTarget.amount ?? cancelTarget.totalDebit | number:'1.2-2' }}</p>
                 </div>
+                <div class="col-12">
+                    <label class="form-label fw-bold fs-xs text-uppercase">Created By</label>
+                    <p class="mb-0">{{ cancelTarget.createBy || cancelTarget.createdBy || cancelTarget.preparedBy || '—' }}</p>
+                </div>
             </div>
             <div class="mb-2">
                 <label class="form-label fw-bold">Cancellation Remarks <span class="text-danger">*</span></label>
@@ -192,12 +196,20 @@
                     <p class="mb-0 fw-bold">{{ restoreTarget.code || restoreTarget.localCode }}</p>
                 </div>
                 <div class="col-6">
+                    <label class="form-label fw-bold fs-xs text-uppercase">Status</label>
+                    <p class="mb-0">{{ restoreTarget.status }}</p>
+                </div>
+                <div class="col-6">
                     <label class="form-label fw-bold fs-xs text-uppercase">Date</label>
                     <p class="mb-0">{{ restoreTarget.voucherDate || restoreTarget.date | date:'MM/dd/yyyy' }}</p>
                 </div>
                 <div class="col-6">
                     <label class="form-label fw-bold fs-xs text-uppercase">Amount</label>
                     <p class="mb-0">{{ restoreTarget.amount ?? restoreTarget.totalDebit | number:'1.2-2' }}</p>
+                </div>
+                <div class="col-12">
+                    <label class="form-label fw-bold fs-xs text-uppercase">Created By</label>
+                    <p class="mb-0">{{ restoreTarget.createBy || restoreTarget.createdBy || restoreTarget.preparedBy || '—' }}</p>
                 </div>
             </div>
         }

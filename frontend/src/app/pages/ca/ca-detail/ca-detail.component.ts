@@ -1,15 +1,17 @@
 import { Component, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { COMMON_ALL_PAGE_IMPORTS } from '@/app/shared/providers/shared-providers';
-import { SharedModule } from '@/app/shared/shared.module';
-import { FormsModule } from '@angular/forms';
+import { COMMON_ALL_PAGE_IMPORTS, COMMON_MAIN_PAGE_IMPORTS } from '@/app/shared/providers/shared-providers';
+import { NumericFormatDirective } from '@/app/shared/directives/numeric-format.directive';
 import { AlertService } from '@/app/shared/services/alert.service';
+import { ModalService } from '@/app/shared/modals/modal-service';
+import { BrowseCashflowItemModalComponent } from '@/app/shared/modals/browse-cashflow-item-modal/browse-cashflow-item-modal.component';
+import { DocumentLogsComponent } from '@/app/shared/components/document-logs/document-logs.component';
 import { CaService } from '../ca.service';
 import Swal from 'sweetalert2';
 
 @Component({
     selector: 'app-ca-detail',
-    imports: [...COMMON_ALL_PAGE_IMPORTS, SharedModule, FormsModule],
+    imports: [...COMMON_ALL_PAGE_IMPORTS, ...COMMON_MAIN_PAGE_IMPORTS, DocumentLogsComponent, NumericFormatDirective],
     providers: [],
     templateUrl: './ca-detail.component.html'
 })
@@ -23,19 +25,29 @@ export class CaDetailComponent {
     isLoading          = signal(false);
     processingWorkflow = false;
     settingLiquidated  = false;
+    updatingAmounts    = false;
+    confirmingBli      = false;
 
+    // Workflow
     workflowActions: any[] = [];
     selectedAction: any    = null;
     remarks = '';
 
-    logs: any[]  = [];
-    showLogs     = false;
-    logsLoading  = false;
+    // Logs
+    showLogs = false;
+
+    // Cash flow
+    cashFlowDetails     : any[]         = [];
+    cashFlowItems       : any[]         = [];
+    cashFlowBalancePOJO : number | null = null;
+    cashFlowBalanceCV   : number | null = null;
+    formSubmit = false;
 
     private service      = inject(CaService);
     private route        = inject(ActivatedRoute);
     private router       = inject(Router);
     private alertService = inject(AlertService);
+    private modalService = inject(ModalService);
 
     ngOnInit(): void {
         this.route.paramMap.subscribe(params => {
@@ -51,13 +63,12 @@ export class CaDetailComponent {
         this.isLoading.set(true);
         this.service.getData(this.id).subscribe({
             next: (data) => {
-                this.isLoading.set(false);
                 if (data?.id) {
                     this.data = data;
-                    this.logs = [];
-                    this.showLogs = false;
                     this.loadWorkflowActions();
+                    this.loadCashFlowData();
                 } else {
+                    this.isLoading.set(false);
                     this.alertService.error(this.module, 'Not Found', '');
                     this.router.navigate(['/' + this.menuLink]);
                 }
@@ -70,12 +81,14 @@ export class CaDetailComponent {
         });
     }
 
+    // ─── Workflow ─────────────────────────────────────────────────────
+
     loadWorkflowActions(): void {
         const transId = this.data?.transId || this.data?.transaction?.id;
-        if (!transId) return;
+        if (!transId) { this.isLoading.set(false); return; }
         this.service.getWorkflowActions(transId).subscribe({
-            next: (actions) => { this.workflowActions = actions || []; this.selectedAction = null; this.remarks = ''; },
-            error: () => { this.workflowActions = []; }
+            next: (actions) => { this.isLoading.set(false); this.workflowActions = actions || []; this.selectedAction = null; this.remarks = ''; },
+            error: () => { this.isLoading.set(false); this.workflowActions = []; }
         });
     }
 
@@ -103,8 +116,17 @@ export class CaDetailComponent {
         });
     }
 
+    // ─── Print ────────────────────────────────────────────────────────
+
     print(): void {
         this.service.print(this.id);
+    }
+
+    // ─── Status checks ────────────────────────────────────────────────
+
+    isEditable(): boolean {
+        const s = (this.data?.documentStatus?.status || this.data?.status || '').toString();
+        return s === 'Document Created' || s === 'Returned to Creator';
     }
 
     isApproved(): boolean {
@@ -119,6 +141,8 @@ export class CaDetailComponent {
     canBeSetAsLiquidated(): boolean {
         return this.isApproved() && !this.isLiquidated();
     }
+
+    // ─── Set as liquidated ────────────────────────────────────────────
 
     async setAsLiquidated(): Promise<void> {
         const result = await Swal.fire({
@@ -146,26 +170,13 @@ export class CaDetailComponent {
         });
     }
 
+    // ─── Logs ─────────────────────────────────────────────────────────
+
     toggleLogs(): void {
         this.showLogs = !this.showLogs;
-        if (this.showLogs && this.logs.length === 0 && !this.logsLoading) {
-            this.loadLogs();
-        }
     }
 
-    loadLogs(): void {
-        const transId = this.data?.transId || this.data?.transaction?.id;
-        if (!transId || this.logsLoading) return;
-        this.logsLoading = true;
-        this.service.getDocumentLogs(transId).subscribe({
-            next: (data) => { this.logs = data || []; this.logsLoading = false; },
-            error: ()     => { this.logsLoading = false; }
-        });
-    }
-
-    getLogField(value: string, key: string): string {
-        try { return JSON.parse(value)?.[key] || '—'; } catch { return value || '—'; }
-    }
+    // ─── Particulars ──────────────────────────────────────────────────
 
     get particulars(): any[] {
         return this.data?.cashAdvanceParticulars || [];
@@ -179,8 +190,140 @@ export class CaDetailComponent {
         return this.particulars.reduce((sum, p) => sum + this.rowTotal(p), 0);
     }
 
-    isEditable(): boolean {
-        const s = (this.data?.documentStatus?.status || this.data?.status || '').toString();
-        return s === 'Document Created' || s === 'Returned to Creator' || s === '1';
+    // ─── Cash flow ────────────────────────────────────────────────────
+
+    loadCashFlowData(): void {
+        const transactionId = this.data?.transId || this.data?.transaction?.id;
+        if (!transactionId) return;
+
+        this.service.isDocumentForCashFlowAssignment(transactionId).subscribe({
+            next: (flag) => {
+                this.data.isDocumentForCashFlowItemAssignment = flag;
+                if (flag) {
+                    const budgetLineItemDetailId = this.data?.budgetLineItemDetail?.id;
+                    if (budgetLineItemDetailId) {
+                        this.loadCashFlowBalances(budgetLineItemDetailId);
+                    }
+                    this.loadCashFlowItems();
+                }
+            },
+            error: () => { this.data.isDocumentForCashFlowItemAssignment = false; }
+        });
+
+        this.service.getCashFlowDetails(this.data.id).subscribe({
+            next: (details) => { this.cashFlowDetails = details || []; },
+            error: () => { this.cashFlowDetails = []; }
+        });
+    }
+
+    loadCashFlowItems(): void {
+        this.service.getCashFlowItems().subscribe({
+            next: (data) => { this.cashFlowItems = data || []; },
+            error: () => {}
+        });
+    }
+
+    loadCashFlowBalances(budgetLineItemDetailId: number): void {
+        this.service.getCashFlowBalances(budgetLineItemDetailId).subscribe({
+            next: (data) => {
+                this.cashFlowBalancePOJO = data?.cashFlowAmountBalancePOJO ?? null;
+                this.cashFlowBalanceCV   = data?.cashFlowAmountBalanceCV   ?? null;
+            },
+            error: () => {}
+        });
+    }
+
+    get cashFlowTotal(): number {
+        return this.cashFlowDetails.reduce((s, d) => s + (Number(d.amount) || 0), 0);
+    }
+
+    async openCashFlowBrowse(): Promise<void> {
+        try {
+            const result = await this.modalService.openModal(
+                BrowseCashflowItemModalComponent,
+                { items: this.cashFlowItems },
+                { size: 'lg', centered: true, scrollable: true }
+            );
+            if (result?.action === 'select' && result?.data) {
+                this.cashFlowDetails.push({ cashflowItem: result.data, amount: 0 });
+            }
+        } catch { }
+    }
+
+    // ─── Inline amount editing ────────────────────────────────────────
+
+    updateAmounts(): void {
+        this.updatingAmounts = true;
+        this.service.updateAmounts(this.data).subscribe({
+            next: (res) => {
+                this.updatingAmounts = false;
+                if (res?.success) {
+                    this.alertService.success(this.module, 'Amounts updated.', '');
+                    this.load();
+                } else {
+                    this.alertService.error(this.module, 'Update failed.', res?.failureMessage || '');
+                }
+            },
+            error: () => { this.updatingAmounts = false; this.alertService.error(this.module, 'Error.', ''); }
+        });
+    }
+
+    // ─── Budget Line Item confirmation ────────────────────────────────
+
+    async confirmBudgetLineItem(): Promise<void> {
+        const bliLabel = `${this.data?.budgetLineItemDetail?.code} - ${this.data?.budgetLineItemDetail?.title}`;
+        const result = await Swal.fire({
+            title: 'Confirm',
+            text: `Are you sure that ${bliLabel} is the right Budget Line Item for this document? This action cannot be undone.`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes',
+            cancelButtonText: 'Cancel'
+        });
+        if (!result.isConfirmed) return;
+
+        this.confirmingBli = true;
+        this.service.confirmBudgetLineItem(this.data).subscribe({
+            next: (res) => {
+                this.confirmingBli = false;
+                if (res?.success) {
+                    this.alertService.success(this.module, 'Budget Line Item confirmed.', '');
+                    this.load();
+                } else {
+                    this.alertService.error(this.module, 'Failed.', res?.failureMessage || '');
+                }
+            },
+            error: () => { this.confirmingBli = false; this.alertService.error(this.module, 'Error.', ''); }
+        });
+    }
+
+    removeCashFlowRow(index: number): void {
+        this.cashFlowDetails.splice(index, 1);
+    }
+
+    saveCashFlowItems(): void {
+        this.formSubmit = true;
+        const payload = {
+            transId:                    this.data?.transId || this.data?.transaction?.id,
+            cashFlowItemBalancePOJORFP: this.cashFlowBalancePOJO,
+            cashFlowItemBalanceCV:      this.cashFlowBalanceCV,
+            cashFlowItemTotal:          this.cashFlowTotal,
+            cashAdvanceBudgetDetails:   this.cashFlowDetails.map((d: any) => ({
+                cashflowItem: { id: d.cashflowItem?.id },
+                amount:       d.amount
+            }))
+        };
+        this.service.saveCashFlowItems(payload).subscribe({
+            next: (res) => {
+                this.formSubmit = false;
+                if (res?.success) {
+                    this.alertService.success(this.module, 'Cash flow items saved.', '');
+                    this.load();
+                } else {
+                    this.alertService.error(this.module, 'Save failed.', res?.failureMessage || '');
+                }
+            },
+            error: () => { this.formSubmit = false; this.alertService.error(this.module, 'Error.', ''); }
+        });
     }
 }

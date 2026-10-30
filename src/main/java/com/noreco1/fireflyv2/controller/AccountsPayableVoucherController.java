@@ -126,6 +126,16 @@ public class AccountsPayableVoucherController {
         downloadService.download(type, token, response, params, template, dataSource);
     }
 
+    @PostMapping("/update-unpaid-remarks")
+    public PostResponse updateUnpaidRemarks(@RequestBody AccountsPayableVoucher apv) {
+        return apvService.updateUnpaidRemarks(apv);
+    }
+
+    @PostMapping("/update-entries")
+    public PostResponse updateEntries(@Valid @RequestBody AccountsPayableVoucher apv, BindingResult bindingResult) {
+        return apvService.updateEntries(apv, bindingResult, messageSource);
+    }
+
     @GetMapping("/rr-approved-paged")
     public Page<ApvPurchasingDocumentDto> rrApprovedPaged(
             @RequestParam(value = "q", required = false, defaultValue = "") String q,

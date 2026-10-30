@@ -127,6 +127,40 @@ public class JvServiceImpl implements JvService, PrintableVoucher {
     @Autowired
     private JournalVoucherCashFlowBudgetDetailRepo journalVoucherCashFlowBudgetDetailRepo;
 
+    @Autowired
+    private BudgetDetailRepo budgetDetailRepo;
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Map<String, Object>> getCashflowBudgetDetailsForJv() {
+        int currentYear = Calendar.getInstance().get(Calendar.YEAR);
+        List<BudgetDetail> details = budgetDetailRepo.findAllByBudgetYear(currentYear);
+        List<Map<String, Object>> result = new ArrayList<>();
+        for (BudgetDetail bd : details) {
+            Map<String, Object> m = new LinkedHashMap<>();
+            m.put("id", bd.getId());
+            m.put("amount", bd.getAmount());
+            CashflowItem ci = bd.getCashflowItem();
+            if (ci != null) {
+                m.put("name", ci.getName());
+                if (ci.getCashflowItemType() != null) {
+                    Map<String, Object> ciType = new LinkedHashMap<>();
+                    ciType.put("name", ci.getCashflowItemType().getName());
+                    m.put("cashflowItemType", ciType);
+                }
+                if (ci.getParentCashflowItem() != null) {
+                    Map<String, Object> parent = new LinkedHashMap<>();
+                    parent.put("name", ci.getParentCashflowItem().getName());
+                    m.put("parentCashflowItem", parent);
+                }
+            }
+            BigDecimal balance = budgetDetailRepo.getBudgetDetailBalance(bd.getId());
+            m.put("totalBalance", balance != null ? balance : BigDecimal.ZERO);
+            result.add(m);
+        }
+        return result;
+    }
+
     @Override
     @Transactional
     public PostResponse process(ProcessDocumentDto postData, BindingResult bindingResult, MessageSource messageSource) {

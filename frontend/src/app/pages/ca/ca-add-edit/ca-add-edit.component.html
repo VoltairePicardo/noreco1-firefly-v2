@@ -90,6 +90,20 @@
                                     @if (submit && form.get('budgetLineItemDetailId')?.errors) {
                                         <div class="text-danger small mt-1">Please select a budget line item.</div>
                                     }
+                                    @if (budgetBalancePOJO !== null || budgetBalanceCV !== null) {
+                                        <div class="alert alert-info py-2 mt-2 mb-0">
+                                            <div class="row g-2">
+                                                <div class="col-md-6">
+                                                    <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Amount Balance (PO/JO/RFP)</div>
+                                                    <div class="fw-bold">{{ budgetBalancePOJO | number:'1.2-2' }}</div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="fw-bold fs-xs text-uppercase text-muted mb-1">Amount Balance (CV)</div>
+                                                    <div class="fw-bold">{{ budgetBalanceCV | number:'1.2-2' }}</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
                                 </div>
                             </div>
 
@@ -150,10 +164,10 @@
                                                             </select>
                                                         </td>
                                                         <td>
-                                                            <input type="number" class="form-control form-control-sm text-end"
+                                                            <input type="text" appNumericFormat class="form-control form-control-sm text-end"
                                                                    [(ngModel)]="p.amount"
                                                                    [ngModelOptions]="{ standalone: true }"
-                                                                   min="0" step="0.01" placeholder="0.00"/>
+                                                                   placeholder="0.00"/>
                                                         </td>
                                                         <td class="text-end fw-bold text-muted">
                                                             {{ rowTotal(p) | number:'1.2-2' }}

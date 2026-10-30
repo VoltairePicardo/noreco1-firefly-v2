@@ -5,6 +5,7 @@ import { environment } from '@/environments/environment';
 import { DownloadService } from '@/app/core/services/download.service';
 
 const BASE_API = environment.get('baseApiUrl');
+const BASE_URL = environment.get('baseUrl');
 
 const httpOptions = { headers: new HttpHeaders({ 'Content-Type': 'application/json' }) };
 
@@ -33,16 +34,24 @@ export class BankDepositService {
         return this.http.get(`${BASE_API}/bank-account/list`, { params: { q, page, size } });
     }
 
-    getFiles(id: number): Observable<any[]> {
-        return this.http.get<any[]>(`${BASE_API}/bank-deposit/${id}/files`);
+    getDefaultDate(): Observable<any> {
+        return this.http.get(`${BASE_API}/bank-deposit/default-date`);
+    }
+
+    getFiles(transId: number): Observable<any[]> {
+        return this.http.get<any[]>(`${BASE_URL}/file/attachments/${transId}`);
     }
 
     uploadFiles(id: number, formData: FormData): Observable<any> {
         return this.http.post(`${BASE_API}/bank-deposit/${id}/upload`, formData);
     }
 
+    deleteFile(fileId: number): Observable<any> {
+        return this.http.delete(`${BASE_URL}/file/${fileId}`);
+    }
+
     fileUrl(fileId: number): string {
-        return `${BASE_API}/bank-deposit/file/${fileId}`;
+        return this.downloadService.printUrl(`${BASE_URL}/file/${fileId}`);
     }
 
     uploadDeposits(payload: { bankDepositLines: string[]; bankAccount: { id: number } }): Observable<any> {

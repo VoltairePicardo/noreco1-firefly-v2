@@ -51,9 +51,11 @@
 
                         <div class="row mt-2">
                             <div class="col-md-3">
-                                <label class="form-label fw-bold">Amount</label>
-                                <input type="number" class="form-control text-end" placeholder="0.00" min="0"
-                                       [(ngModel)]="amount" name="amount"/>
+                                <label class="form-label fw-bold">Amount <span class="text-danger">*</span></label>
+                                <input type="text" appNumericFormat class="form-control text-end" placeholder="0.00"
+                                       [(ngModel)]="amount" name="amount"
+                                       [class]="submit && !(+amount > 0) ? 'is-invalid' : submit && +amount > 0 ? 'is-valid' : ''"/>
+                                <div class="invalid-feedback">Amount must be greater than 0.</div>
                             </div>
 
                             <div class="col-md-6">

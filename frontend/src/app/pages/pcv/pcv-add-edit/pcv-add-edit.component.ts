@@ -12,6 +12,7 @@ import { PcvService } from '../pcv.service';
 import { ModalService } from '@/app/shared/modals/modal-service';
 import { BrowseEntityModalComponent } from '@/app/shared/modals/browse-entity-modal/browse-entity-modal.component';
 import { BrowseBudgetLineItemModalComponent } from '@/app/shared/modals/browse-budget-line-item-modal/browse-budget-line-item-modal.component';
+import { AttachmentFile, AttachmentsComponent } from '@/app/shared/components/attachments/attachments.component';
 
 @Component({
     selector: 'app-pcv-add-edit',
@@ -19,7 +20,8 @@ import { BrowseBudgetLineItemModalComponent } from '@/app/shared/modals/browse-b
         ...COMMON_ALL_PAGE_IMPORTS,
         ...COMMON_ADD_EDIT_PAGE_IMPORTS,
         ...COMMON_MAIN_PAGE_IMPORTS,
-        FlatpickrDirective
+        FlatpickrDirective,
+        AttachmentsComponent
     ],
     providers: [provideFlatpickrDefaults(), ...SHARED_PROVIDERS],
     templateUrl: './pcv-add-edit.component.html'
@@ -66,7 +68,11 @@ export class PcvAddEditComponent {
     details: { remarks: string; amount: number }[] = [];
 
     // File attachments
-    attachments: { file: File; name: string; url: string }[] = [];
+    attachmentItems: AttachmentFile[] = [];
+    private newFiles: File[]   = [];
+    private nextTempId         = -1;
+    existingFiles: any[]       = [];
+    filesToRemove: any[]       = [];
 
     private service      = inject(PcvService);
     private route        = inject(ActivatedRoute);
@@ -140,6 +146,11 @@ export class PcvAddEditComponent {
             next: (data) => {
                 this.isLoading.set(false);
                 if (data?.id) {
+                    const allowedStatuses = ['Document Created', 'Returned to Creator', 'For Checking'];
+                    if (!allowedStatuses.includes(data.documentStatus?.status)) {
+                        this.router.navigate(['/' + this.menuLink, this.id, 'detail']);
+                        return;
+                    }
                     const d = data.pettyCashDate || data.voucherDate;
                     this.voucherDate          = d ? new Date(d).toISOString().substring(0, 10) : '';
                     this.payee                = data.payee    || '';
@@ -159,6 +170,7 @@ export class PcvAddEditComponent {
                         amount:  item.amount  || 0
                     }));
                     if (this.details.length === 0) this.addDetail();
+                    if (data.transId) { this.loadExistingFiles(data.transId); }
                 } else {
                     this.alertService.error(this.module, 'Record not found.', '');
                     this.router.navigate(['/' + this.menuLink]);
@@ -207,6 +219,18 @@ export class PcvAddEditComponent {
         });
     }
 
+    loadExistingFiles(transId: number): void {
+        this.service.getFiles(transId).subscribe({
+            next: (files) => {
+                this.existingFiles    = files || [];
+                this.attachmentItems  = (files || []).map((f: any) => ({
+                    id: f.id, originalFilename: f.originalFilename, mimeType: f.mimeType
+                }));
+            },
+            error: () => {}
+        });
+    }
+
     // ─── Signatories ─────────────────────────────────────────────────
 
     async openSignatoryBrowse(field: 'approvingOfficer' | 'checker' | 'releasingOfficer'): Promise<void> {
@@ -238,6 +262,8 @@ export class PcvAddEditComponent {
 
     // ─── File attachments ─────────────────────────────────────────────
 
+    fileUrl = (fileId: number): string => this.service.fileUrl(fileId);
+
     openFilePicker(): void {
         this.fileInputRef?.nativeElement.click();
     }
@@ -251,31 +277,65 @@ export class PcvAddEditComponent {
                 this.alertService.warning(this.module, 'Invalid file type', `${file.name} must be JPG, PNG, or PDF.`);
                 continue;
             }
-            this.attachments.push({ file, name: file.name, url: URL.createObjectURL(file) });
+            const tempId: AttachmentFile = { id: this.nextTempId--, originalFilename: file.name, mimeType: file.type, local: file };
+            this.newFiles.push(file);
+            this.attachmentItems = [...this.attachmentItems, tempId];
         }
         input.value = '';
     }
 
-    removeAttachment(index: number): void {
-        URL.revokeObjectURL(this.attachments[index].url);
-        this.attachments.splice(index, 1);
-    }
-
-    isImage(attachment: { name: string }): boolean {
-        return /\.(jpg|jpeg|png)$/i.test(attachment.name);
+    onRemoveAttachment(file: AttachmentFile): void {
+        if (file.local) {
+            this.newFiles = this.newFiles.filter(f => f !== file.local);
+        } else {
+            this.filesToRemove.push(file);
+            this.existingFiles = this.existingFiles.filter(f => f.id !== file.id);
+        }
+        this.attachmentItems = this.attachmentItems.filter(a => a.id !== file.id);
     }
 
     // ─── Validation & save ────────────────────────────────────────────
 
     isValid(): boolean {
-        return !!(this.voucherDate && this.payee?.trim() && this.pettyCashFund && this.approvingOfficer);
+        if (!this.voucherDate || !this.payee?.trim() || !this.pettyCashFund || !this.approvingOfficer) return false;
+        if (!this.checker)          return false;
+        if (!this.releasingOfficer) return false;
+        if (!this.budgetLineItemDetail) return false;
+        if (this.totalAmount <= 0)   return false;
+        if (this.totalAmount > 1000) return false;
+        if (this.pettyCashFund?.balance != null && this.totalAmount > this.pettyCashFund.balance) return false;
+        if (this.details.filter(d => d.remarks?.trim()).length === 0) return false;
+        return true;
     }
 
     save(): void {
         this.submit = true;
-        if (!this.isValid()) return;
+        if (!this.isValid()) {
+            // Provide specific error feedback
+            if (this.totalAmount <= 0) {
+                this.alertService.warning(this.module, 'Validation', 'Total amount must be greater than zero.');
+                return;
+            }
+            if (this.totalAmount > 1000) {
+                this.alertService.error(this.module, 'Validation', 'Total amount must not exceed ₱1,000.00.');
+                return;
+            }
+            if (this.pettyCashFund?.balance != null && this.totalAmount > this.pettyCashFund.balance) {
+                this.alertService.error(this.module, 'Validation', 'Total amount exceeds the available PCF balance.');
+                return;
+            }
+            return;
+        }
+
+        const filled = this.details.filter(d => d.remarks?.trim());
+        const detailsTotal = filled.reduce((s, d) => s + (Number(d.amount) || 0), 0);
+        if (Math.abs(detailsTotal - this.totalAmount) > 0.001) {
+            this.alertService.error(this.module, 'Validation', 'All detail rows with amounts must have remarks filled in.');
+            return;
+        }
 
         this.formSubmit = true;
+        const filledDetails = filled;
         const payload: any = {
             id:           this.editMode ? this.id : null,
             pettyCashDate: this.voucherDate,
@@ -283,21 +343,22 @@ export class PcvAddEditComponent {
             payee:         this.payee.trim(),
             request:       this.request,
             amount:        this.totalAmount,
+            budgetAmountBalancePCL:       this.budgetBalancePCL,
+            budgetLineItemBalancePOJORFP: this.budgetBalancePOJO,
+            budgetLineItemBalanceCV:      this.budgetBalanceCV,
             office:               this.selectedOffice?.id ? { id: this.selectedOffice.id } : null,
             pettyCashFund:        { id: this.pettyCashFund.id },
             budgetLineItemDetail: this.budgetLineItemDetail?.id ? { id: this.budgetLineItemDetail.id } : null,
             approvingOfficer:     this.approvingOfficer?.accountNo ? { accountNo: this.approvingOfficer.accountNo } : null,
             checker:              this.checker?.accountNo          ? { accountNo: this.checker.accountNo }          : null,
             releasingOfficer:     this.releasingOfficer?.accountNo ? { accountNo: this.releasingOfficer.accountNo } : null,
-            pettyCashTransDetails: this.details
-                .filter(d => d.remarks?.trim())
+            pettyCashTransDetails: filledDetails
                 .map(d => ({ remarks: d.remarks.trim(), amount: Number(d.amount) || 0 }))
         };
 
-        const files = this.attachments.map(a => a.file);
         const req$ = this.editMode
-            ? this.service.update(payload, files, [])
-            : this.service.create(payload, files);
+            ? this.service.update(payload, this.newFiles, this.filesToRemove)
+            : this.service.create(payload, this.newFiles);
 
         req$.subscribe({
             next: (res) => {

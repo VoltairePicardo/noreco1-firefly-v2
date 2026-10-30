@@ -23,4 +23,9 @@ export const BUDGET_ROUTES: Routes = [
         loadComponent: () => import('./budget-detail/budget-detail.component').then(m => m.BudgetDetailComponent),
         data: { title: 'Cash Flow Budget Detail', mainPath }
     },
+    {
+        path: 'report',
+        loadComponent: () => import('./budget-report/budget-report.component').then(m => m.BudgetReportComponent),
+        data: { title: 'Cash Flow Budget Report', mainPath }
+    },
 ];

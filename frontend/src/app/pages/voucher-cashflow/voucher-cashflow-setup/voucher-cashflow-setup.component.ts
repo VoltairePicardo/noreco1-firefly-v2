@@ -75,8 +75,8 @@ export class VoucherCashflowSetupComponent {
                 this.isLoading.set(false);
                 if (data) {
                     this.voucher.set(data);
-                    this.generalLedger.set(data.generalLedger || []);
-                    this.cashflowDetails.set(data.cashflowDetails || []);
+                    this.generalLedger.set(data.accountingEntries || []);
+                    this.cashflowDetails.set([]);
                     this.loadSavedDetails(data);
                     this.checkMonthlyCycle(data.voucherDate || data.date);
                 } else {
@@ -123,16 +123,35 @@ export class VoucherCashflowSetupComponent {
     buildAssignmentsFromDetails(details: any[]): void {
         const map: { [ledgerId: number]: CashflowAssignmentItem[] } = {};
         for (const d of details) {
-            const ledgerId = d.generalLedgerId ?? d.ledgerId;
+            const ledgerId = d.id; // backend returns gl id at root
             if (ledgerId == null) continue;
             if (!map[ledgerId]) map[ledgerId] = [];
-            map[ledgerId].push({
-                cashflowItemId:   d.cashflowItemId ?? d.id,
-                cashflowItemName: d.cashflowItemName ?? d.cashflowItem?.name ?? '',
-                amount:           d.amount ?? 0
-            });
+            for (const e of (d.entries || [])) {
+                map[ledgerId].push({
+                    cashflowItemId:   e.account?.id,
+                    cashflowItemName: e.account?.name ?? '',
+                    amount:           Number(e.amount) || 0
+                });
+            }
         }
         this.cashflowAssignments = map;
+    }
+
+    get flatCashflowDetails(): any[] {
+        const rows: any[] = [];
+        for (const d of this.cashflowDetails()) {
+            for (const e of (d.entries || [])) {
+                rows.push({
+                    accountCode:      d.ledger?.code,
+                    accountTitle:     d.ledger?.title,
+                    cashflowItemName: e.account?.name,
+                    amount:           Number(e.amount) || 0,
+                    debit:            d.ledger?.debit,
+                    credit:           d.ledger?.credit
+                });
+            }
+        }
+        return rows;
     }
 
     openInlinePanel(ledgerId: number): void {
@@ -210,8 +229,6 @@ export class VoucherCashflowSetupComponent {
 
         for (const [ledgerIdStr, items] of Object.entries(this.cashflowAssignments)) {
             const ledgerId = Number(ledgerIdStr);
-
-            // Gap #2: total CF amount per entry must equal entry amount (mirrors legacy okSetupFromModal validation)
             const entry    = this.generalLedger().find(e => e.id === ledgerId);
             const entryAmt = entry ? this.entryAmount(entry) : 0;
             const total    = items.reduce((sum, a) => sum + (Number(a.amount) || 0), 0);
@@ -225,13 +242,14 @@ export class VoucherCashflowSetupComponent {
                 return;
             }
 
-            for (const item of items) {
-                cashflowData.push({
-                    generalLedgerId: ledgerId,
-                    cashflowItemId:  item.cashflowItemId,
-                    amount:          item.amount
-                });
-            }
+            // Backend expects: { ledger: { accountId }, entries: [{ account: { id, name }, amount }] }
+            cashflowData.push({
+                ledger:  { accountId: entry?.accountId },
+                entries: items.map(a => ({
+                    account: { id: a.cashflowItemId, name: a.cashflowItemName },
+                    amount:  a.amount
+                }))
+            });
         }
 
         if (cashflowData.length === 0) {

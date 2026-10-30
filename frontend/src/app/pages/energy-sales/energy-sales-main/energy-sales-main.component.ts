@@ -4,11 +4,14 @@ import { AlertService } from '@/app/shared/services/alert.service';
 import { FlatpickrDefaults, FlatpickrModule } from 'angularx-flatpickr';
 import { EnergySalesService } from '../energy-sales.service';
 import { monthStart, monthEnd } from '@/app/shared/utils/date.utils';
+import Swal from 'sweetalert2';
+import { provideIcons } from '@ng-icons/core';
+import { tablerSearch, tablerRefresh, tablerPlus, tablerEye, tablerEdit, tablerChevronLeft, tablerChevronRight, tablerThumbUp } from '@ng-icons/tabler-icons';
 
 @Component({
     selector: 'app-energy-sales-main',
     imports: [...COMMON_ALL_PAGE_IMPORTS, ...COMMON_MAIN_PAGE_IMPORTS, FlatpickrModule],
-    providers: [...SHARED_PROVIDERS, FlatpickrDefaults],
+    providers: [...SHARED_PROVIDERS, FlatpickrDefaults, provideIcons({ tablerSearch, tablerRefresh, tablerPlus, tablerEye, tablerEdit, tablerChevronLeft, tablerChevronRight, tablerThumbUp })],
     templateUrl: './energy-sales-main.component.html'
 })
 export class EnergySalesMainComponent {
@@ -82,14 +85,24 @@ export class EnergySalesMainComponent {
         this.load();
     }
 
-    approveAll(): void {
+    async approveAll(): Promise<void> {
         const ids = this.selectedIds;
         if (ids.length === 0) {
             this.alertService.warning(this.module, 'Approve All', 'Please select at least one record.');
             return;
         }
+        const { isConfirmed, value: remarks } = await Swal.fire({
+            title:            'Approve All',
+            text:             `Approve ${ids.length} selected record(s)?`,
+            input:            'text',
+            inputLabel:       'Remarks (optional)',
+            inputPlaceholder: 'Enter remarks...',
+            showCancelButton: true,
+            confirmButtonText: 'Approve',
+        });
+        if (!isConfirmed) return;
         this.processingAll = true;
-        this.service.approveAll(ids).subscribe({
+        this.service.approveAll(ids, remarks || '').subscribe({
             next: (res) => {
                 this.processingAll = false;
                 if (res?.success) {
@@ -107,7 +120,7 @@ export class EnergySalesMainComponent {
     }
 
     isEditable(rec: any): boolean {
-        const s = rec?.status || '';
+        const s = rec?.documentStatus?.status || rec?.status || '';
         return s === 'Document Created' || s === 'Returned to Creator';
     }
 }

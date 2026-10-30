@@ -996,6 +996,7 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService, Printable
                 dto.setSupplier(po.getVendor().getName());
                 dto.setAmount(po.getAmount());
                 dto.setStatus(po.getDocumentStatus().getStatus());
+                dto.setBudgetLineItemDetail(po.getBudgetLineItemDetail());
 
                 SlEntity createdBy = slEntityRepo.findById(po.getCreatedBy().getAccountNo()).orElse(null);
                 if (createdBy != null) dto.setPreparedBy(createdBy.getName());

@@ -101,6 +101,18 @@
                                 <span class="text-muted fs-sm">Loading journal entries from document...</span>
                             </div>
                         }
+
+                        @if (selectedVoucherType === 'RR') {
+                            <div class="row g-3 mt-1">
+                                <div class="col-md-4">
+                                    <label class="form-label fw-bold">RR Number</label>
+                                    <input type="text" class="form-control"
+                                           [(ngModel)]="rrNumber"
+                                           [ngModelOptions]="{ standalone: true }"
+                                           placeholder="Enter RR number..."/>
+                                </div>
+                            </div>
+                        }
                     }
 
                     @if (cashAdvances.length > 0) {
@@ -200,23 +212,113 @@
                         </div>
                     }
 
+                    <!-- Budget Line Item (commented out — matches old Firefly cv add-edit.jsp) -->
+                    <!--
+                    <hr class="border-dashed mx-n3 mt-3"/>
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">Budget Line Item</label>
+                            <div class="d-flex gap-2">
+                                <input type="text" class="form-control" [value]="budgetLineItemDetail ? (budgetLineItemDetail.code + ' - ' + budgetLineItemDetail.title) : ''" readonly placeholder="Select budget line item..."/>
+                                <button type="button" class="btn btn-success fw-bold">(browse)</button>
+                                <button type="button" class="btn btn-danger fw-bold" *ngIf="budgetLineItemDetail">(remove)</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="table-responsive mt-2">
+                        <table class="table table-custom table-centered table-hover w-100 mb-0">
+                            <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                                <tr class="text-uppercase fs-xxs">
+                                    <th>Description</th>
+                                    <th class="text-end">Balance CV</th>
+                                    <th class="text-end">Balance PO/JO</th>
+                                    <th class="text-end">Amount</th>
+                                    <th style="width:50px"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @for (budgetDetail of budgetDetails; track $index; let i = $index) {
+                                    <tr>
+                                        <td>{{ budgetDetail.description }}</td>
+                                        <td class="text-end">{{ budgetDetail.budgetSubItemAmountBalanceCV | number:'1.2-2' }}</td>
+                                        <td class="text-end">{{ budgetDetail.budgetSubItemAmountBalancePOJO | number:'1.2-2' }}</td>
+                                        <td><input type="number" class="form-control form-control-sm text-end" [(ngModel)]="budgetDetail.amount" [ngModelOptions]="{ standalone: true }" min="0"/></td>
+                                        <td class="text-center">
+                                            <button type="button" class="btn btn-danger btn-icon btn-sm rounded-circle" (click)="removeBudgetSubItemRow(i)">
+                                                <ng-icon name="tablerTrash" class="fs-lg"></ng-icon>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                    -->
+
+                    <!-- Cash Flow (commented out — matches old Firefly cv add-edit.jsp) -->
+                    <!--
+                    <div class="table-responsive mt-2">
+                        <table class="table table-custom table-centered table-hover w-100 mb-0">
+                            <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                                <tr class="text-uppercase fs-xxs">
+                                    <th>Cash Flow Item</th>
+                                    <th>Cash Flow Type</th>
+                                    <th class="text-end">Amount</th>
+                                    <th style="width:50px"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @for (budgetDetail of budgetDetails; track $index; let i = $index) {
+                                    <tr>
+                                        <td>{{ budgetDetail.cashflowItem?.name }}</td>
+                                        <td>{{ budgetDetail.cashflowItem?.cashflowItemType?.name }}</td>
+                                        <td><input type="number" class="form-control form-control-sm text-end" [(ngModel)]="budgetDetail.amount" [ngModelOptions]="{ standalone: true }" min="0"/></td>
+                                        <td class="text-center">
+                                            <button type="button" class="btn btn-danger btn-icon btn-sm rounded-circle" (click)="removeCashflowRow(i)">
+                                                <ng-icon name="tablerTrash" class="fs-lg"></ng-icon>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                    -->
+
                     <hr class="border-dashed mx-n3 mt-3"/>
 
                     <!-- Basic Info -->
                     <div class="row g-3">
                         <div class="col-md-3">
                             <label class="form-label fw-bold">Voucher Date <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" mwlFlatpickr [options]="flatpickrOptions"
-                                   [(ngModel)]="voucherDate" [ngModelOptions]="{ standalone: true }"
-                                   placeholder="Select date"/>
+                            @if (editMode) {
+                                <input type="text" class="form-control" [value]="voucherDate | date:'MMMM d, y'" readonly disabled/>
+                            } @else {
+                                <input type="text" class="form-control" mwlFlatpickr [options]="flatpickrOptions"
+                                       [(ngModel)]="voucherDate" [ngModelOptions]="{ standalone: true }"
+                                       placeholder="Select date"/>
+                            }
                         </div>
                         <div class="col-md-3">
                             <label class="form-label fw-bold">Check Amount</label>
-                            <input type="number" class="form-control text-end"
-                                   [(ngModel)]="checkAmount" [ngModelOptions]="{ standalone: true }"
-                                   min="0" step="0.01" placeholder="0.00"/>
+                            <input type="text" class="form-control text-end"
+                                   [value]="(checkAmount || null) | number:'1.2-2'"
+                                   (blur)="onCheckAmountBlur($event)"
+                                   placeholder="0.00"/>
                         </div>
                     </div>
+
+                    <!-- RR Number (commented out — matches old Firefly cv add-edit.jsp) -->
+                    <!--
+                    <div class="row g-3 mt-1">
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold">RR Number</label>
+                            <input type="text" class="form-control"
+                                   [(ngModel)]="rrNumber" [ngModelOptions]="{ standalone: true }"
+                                   placeholder="Enter RR Number..."/>
+                        </div>
+                    </div>
+                    -->
 
                     <!-- Payee -->
                     <div class="row g-3 mt-1">
@@ -234,19 +336,27 @@
                         </div>
                     </div>
 
-                    <!-- Additional Payee Info / Particulars -->
+                    <!-- Additional Payee Info / Particulars / Remarks -->
                     <div class="row g-3 mt-1">
                         <div class="col-md-6">
                             <label class="form-label fw-bold">Additional Payee Information</label>
                             <textarea class="form-control" rows="2"
                                       [(ngModel)]="additionalPayeeInfo" [ngModelOptions]="{ standalone: true }"
+                                      maxlength="1024"
                                       placeholder="Enter additional payee info..."></textarea>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-bold">Particulars</label>
+                            <label class="form-label fw-bold">Particulars <span class="text-danger">*</span></label>
                             <textarea class="form-control" rows="2"
                                       [(ngModel)]="particulars" [ngModelOptions]="{ standalone: true }"
+                                      maxlength="1024"
                                       placeholder="Enter particulars..."></textarea>
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label fw-bold">Remarks <span class="text-muted fw-normal">(optional)</span></label>
+                            <textarea class="form-control" rows="2"
+                                      [(ngModel)]="remarks" [ngModelOptions]="{ standalone: true }"
+                                      placeholder="Enter remarks..."></textarea>
                         </div>
                     </div>
 
@@ -261,19 +371,9 @@
                                     <ng-icon name="tablerSearch" class="me-1 fs-lg fw-bold"></ng-icon>Browse Job Order
                                 </button>
                             }
-                            @if (jobOrder) {
-                                <button type="button" class="btn btn-danger fw-bold" (click)="clearJobOrder()" aria-label="Clear job order">
-                                    <ng-icon name="tablerTrash" class="fs-lg fw-bold"></ng-icon>
-                                </button>
-                            }
                             @if (!jobOrder) {
                                 <button type="button" class="btn btn-success fw-bold" (click)="openPurchaseOrderBrowse()">
                                     <ng-icon name="tablerSearch" class="me-1 fs-lg fw-bold"></ng-icon>Browse Purchase Order
-                                </button>
-                            }
-                            @if (purchaseOrder) {
-                                <button type="button" class="btn btn-danger fw-bold" (click)="clearPurchaseOrder()" aria-label="Clear purchase order">
-                                    <ng-icon name="tablerTrash" class="fs-lg fw-bold"></ng-icon>
                                 </button>
                             }
                         </div>
@@ -282,10 +382,16 @@
                     @if (jobOrder) {
                         <div class="row g-1">
                             <div class="col-12 d-flex"><span style="width:110px">Job Order:</span> <span class="fw-bold">{{ jobOrder.localCode || jobOrder.code || '—' }}</span></div>
+                            @if (budgetLineItemDetail) {
+                                <div class="col-12 d-flex"><span style="width:110px">Budget Item:</span> <span class="fw-bold">{{ budgetLineItemDetail.code }} - {{ budgetLineItemDetail.title }}</span></div>
+                            }
                         </div>
                     } @else if (purchaseOrder) {
                         <div class="row g-1">
                             <div class="col-12 d-flex"><span style="width:110px">Purchase Order:</span> <span class="fw-bold">{{ purchaseOrder.localCode || purchaseOrder.code || '—' }}</span></div>
+                            @if (budgetLineItemDetail) {
+                                <div class="col-12 d-flex"><span style="width:110px">Budget Item:</span> <span class="fw-bold">{{ budgetLineItemDetail.code }} - {{ budgetLineItemDetail.title }}</span></div>
+                            }
                         </div>
                     } @else {
                         <span class="text-muted fs-sm">Optionally link a Job Order or Purchase Order.</span>
@@ -395,6 +501,36 @@
                                 }
                             </div>
                         }
+                        <!-- Verifier (commented out — matches old Firefly cv add-edit.jsp) -->
+                        <!--
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label fw-bold">Verifier</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control"
+                                       [value]="signatories['verifier']?.name ?? ''"
+                                       readonly placeholder="Select verifier..."/>
+                                <button type="button" class="btn btn-success fw-bold"
+                                        (click)="openEntityBrowse('verifier')">
+                                    <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
+                                </button>
+                            </div>
+                        </div>
+                        -->
+                        <!-- Reviewing Officer (commented out — matches old Firefly cv add-edit.jsp) -->
+                        <!--
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label fw-bold">Reviewing Officer</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control"
+                                       [value]="signatories['reviewer']?.name ?? ''"
+                                       readonly placeholder="Select reviewing officer..."/>
+                                <button type="button" class="btn btn-success fw-bold"
+                                        (click)="openEntityBrowse('reviewer')">
+                                    <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
+                                </button>
+                            </div>
+                        </div>
+                        -->
                     </div>
 
                     <hr class="border-dashed mx-n3 mt-3"/>
@@ -456,8 +592,13 @@
                         </a>
                         <button type="button" class="btn btn-primary fw-bold"
                                 [disabled]="formSubmit" (click)="save()">
-                            <ng-icon name="tablerCheck" class="ps-0 pe-3 fw-bold"></ng-icon>
-                            {{ editMode ? 'Update' : 'Save ' + module }}
+                            @if (formSubmit) {
+                                <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                                {{ editMode ? 'Updating...' : 'Saving...' }}
+                            } @else {
+                                <ng-icon name="tablerCheck" class="ps-0 pe-3 fw-bold"></ng-icon>
+                                {{ editMode ? 'Update' : 'Save ' + module }}
+                            }
                         </button>
                     </div>
 

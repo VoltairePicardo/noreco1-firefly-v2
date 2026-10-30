@@ -1,4 +1,4 @@
-import { Component, TemplateRef, ViewChild, inject, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AlertService } from '@/app/shared/services/alert.service';
 import {
@@ -7,12 +7,15 @@ import {
     COMMON_MAIN_PAGE_IMPORTS,
     SHARED_PROVIDERS
 } from '@/app/shared/providers/shared-providers';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { ModalService } from '@/app/shared/modals/modal-service';
+import { BrowseCashflowItemModalComponent } from '@/app/shared/modals/browse-cashflow-item-modal/browse-cashflow-item-modal.component';
 import { PcvService } from '../pcv.service';
+import { DocumentLogsComponent } from '@/app/shared/components/document-logs/document-logs.component';
+import { AttachmentsComponent } from '@/app/shared/components/attachments/attachments.component';
 
 @Component({
     selector: 'app-pcv-detail',
-    imports: [...COMMON_ALL_PAGE_IMPORTS, ...COMMON_ADD_EDIT_PAGE_IMPORTS, ...COMMON_MAIN_PAGE_IMPORTS],
+    imports: [...COMMON_ALL_PAGE_IMPORTS, ...COMMON_ADD_EDIT_PAGE_IMPORTS, ...COMMON_MAIN_PAGE_IMPORTS, DocumentLogsComponent, AttachmentsComponent],
     providers: [...SHARED_PROVIDERS],
     templateUrl: './pcv-detail.component.html'
 })
@@ -35,13 +38,11 @@ export class PcvDetailComponent {
     // Cash flow save
     formSubmit = false;
 
-    // Logs
-    logs        : any[] = [];
-    showLogs            = false;
-    logsLoading         = false;
+    // Logs & Attachments
+    showLogs    = false;
+    attachments : any[] = [];
 
     // Cash flow
-    @ViewChild('cashFlowBrowseModal') cashFlowBrowseModalRef!: TemplateRef<any>;
     cashFlowDetails     : any[]         = [];
     cashFlowItems       : any[]         = [];
     cashFlowBalancePOJO : number | null = null;
@@ -51,7 +52,7 @@ export class PcvDetailComponent {
     private route        = inject(ActivatedRoute);
     private router       = inject(Router);
     private alertService = inject(AlertService);
-    private ngbModal     = inject(NgbModal);
+    private modalService = inject(ModalService);
 
     ngOnInit(): void {
         this.route.paramMap.subscribe(params => {
@@ -66,13 +67,14 @@ export class PcvDetailComponent {
         this.isLoading.set(true);
         this.service.getData(this.id).subscribe({
             next: (data) => {
-                this.isLoading.set(false);
                 if (data?.id) {
                     this.data = data;
                     this.items.set(data.pettyCashTransDetails || []);
                     this.loadWorkflowActions();
                     this.loadCashFlowData();
+                    if (data.transId) { this.loadAttachments(data.transId); }
                 } else {
+                    this.isLoading.set(false);
                     this.alertService.error(this.module, 'Not Found', '');
                     this.router.navigate(['/' + this.menuLink]);
                 }
@@ -91,17 +93,17 @@ export class PcvDetailComponent {
 
     isEditable(): boolean {
         const status = this.data?.documentStatus?.status || '';
-        return status === 'Document Created' || status === 'Returned to Creator';
+        return status === 'Document Created' || status === 'Returned to Creator' || status === 'For Checking';
     }
 
     // ─── Workflow ─────────────────────────────────────────────────────
 
     loadWorkflowActions(): void {
         const transId = this.data?.transId || this.data?.transaction?.id;
-        if (!transId) return;
+        if (!transId) { this.isLoading.set(false); return; }
         this.service.getWorkflowActions(transId).subscribe({
-            next: (actions) => { this.workflowActions = actions || []; this.selectedAction = null; this.remarks = ''; },
-            error: () => { this.workflowActions = []; }
+            next: (actions) => { this.isLoading.set(false); this.workflowActions = actions || []; this.selectedAction = null; this.remarks = ''; },
+            error: () => { this.isLoading.set(false); this.workflowActions = []; }
         });
     }
 
@@ -139,18 +141,16 @@ export class PcvDetailComponent {
 
     toggleLogs(): void {
         this.showLogs = !this.showLogs;
-        if (this.showLogs && this.logs.length === 0 && !this.logsLoading) {
-            this.loadLogs();
-        }
     }
 
-    loadLogs(): void {
-        const transId = this.data?.transId || this.data?.transaction?.id;
-        if (!transId || this.logsLoading) return;
-        this.logsLoading = true;
-        this.service.getLogs(transId).subscribe({
-            next: (logs) => { this.logs = Array.isArray(logs) ? logs : []; this.logsLoading = false; },
-            error: () => { this.logsLoading = false; }
+    // ─── Attachments ──────────────────────────────────────────────────
+
+    fileUrl = (fileId: number): string => this.service.fileUrl(fileId);
+
+    loadAttachments(transId: number): void {
+        this.service.getFiles(transId).subscribe({
+            next: (files) => { this.attachments = files || []; },
+            error: () => {}
         });
     }
 
@@ -201,13 +201,17 @@ export class PcvDetailComponent {
         return this.cashFlowDetails.reduce((s, d) => s + (Number(d.amount) || 0), 0);
     }
 
-    openCashFlowBrowse(): void {
-        this.ngbModal.open(this.cashFlowBrowseModalRef, { size: 'lg', centered: true });
-    }
-
-    addCashFlowItem(item: any, modal: any): void {
-        this.cashFlowDetails.push({ cashflowItem: item, amount: 0 });
-        modal.close();
+    async openCashFlowBrowse(): Promise<void> {
+        try {
+            const result = await this.modalService.openModal(
+                BrowseCashflowItemModalComponent,
+                { items: this.cashFlowItems },
+                { size: 'lg', centered: true, scrollable: true }
+            );
+            if (result?.action === 'select' && result?.data) {
+                this.cashFlowDetails.push({ cashflowItem: result.data, amount: 0 });
+            }
+        } catch { }
     }
 
     removeCashFlowRow(index: number): void {
@@ -216,7 +220,17 @@ export class PcvDetailComponent {
 
     saveCashFlowItems(): void {
         this.formSubmit = true;
-        this.service.saveCashFlowItems({ pcvId: this.data.id, cashFlowDetails: this.cashFlowDetails }).subscribe({
+        const payload = {
+            transId:                     this.data?.transaction?.id,
+            cashFlowItemBalancePOJORFP:  this.cashFlowBalancePOJO,
+            cashFlowItemBalanceCV:       this.cashFlowBalanceCV,
+            cashFlowItemTotal:           this.cashFlowTotal,
+            pettyCashTransBudgetDetails: this.cashFlowDetails.map((d: any) => ({
+                cashflowItem: { id: d.cashflowItem?.id },
+                amount:       d.amount
+            }))
+        };
+        this.service.saveCashFlowItems(payload).subscribe({
             next: (res) => {
                 this.formSubmit = false;
                 if (res?.success) {

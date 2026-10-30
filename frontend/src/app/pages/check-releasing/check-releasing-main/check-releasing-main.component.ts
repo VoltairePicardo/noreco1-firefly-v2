@@ -7,11 +7,13 @@ import { NgbNavModule } from '@ng-bootstrap/ng-bootstrap';
 import { CheckReleasingService } from '../check-releasing.service';
 import { fmtDate, monthStart, monthEnd } from '@/app/shared/utils/date.utils';
 import Swal from 'sweetalert2';
+import { provideIcons } from '@ng-icons/core';
+import { tablerChevronLeft, tablerChevronRight } from '@ng-icons/tabler-icons';
 
 @Component({
     selector: 'app-check-releasing-main',
     imports: [...COMMON_ALL_PAGE_IMPORTS, ...COMMON_MAIN_PAGE_IMPORTS, FlatpickrDirective, NgbNavModule],
-    providers: [provideFlatpickrDefaults(), ...SHARED_PROVIDERS],
+    providers: [provideFlatpickrDefaults(), ...SHARED_PROVIDERS, provideIcons({ tablerChevronLeft, tablerChevronRight })],
     templateUrl: './check-releasing-main.component.html'
 })
 export class CheckReleasingMainComponent {
@@ -35,7 +37,8 @@ export class CheckReleasingMainComponent {
             (r.code         || '').toLowerCase().includes(q) ||
             (r.checkNumber  || '').toLowerCase().includes(q) ||
             (r.accountTitle || '').toLowerCase().includes(q) ||
-            (r.particulars  || '').toLowerCase().includes(q)
+            (r.particulars  || '').toLowerCase().includes(q) ||
+            (r.payee        || '').toLowerCase().includes(q)
         );
     }
 

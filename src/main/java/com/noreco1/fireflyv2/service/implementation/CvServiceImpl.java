@@ -188,6 +188,7 @@ public class CvServiceImpl implements CvService, PrintableVoucher, PrintableCheq
             existingCv.setYear(voucherYear);
             existingCv.setAmount(cv.getAmount());
             existingCv.setCheckAmount(cv.getCheckAmount());
+            existingCv.setRemarks(cv.getRemarks());
             existingCv.setRrNumber(cv.getRrNumber());
             existingCv.setAdditionalPayeeInfo(cv.getAdditionalPayeeInfo());
             if (cv.getBank() != null) {
@@ -198,7 +199,7 @@ public class CvServiceImpl implements CvService, PrintableVoucher, PrintableCheq
                     existingCv.setBank(resolvedBankAccount.getBank());
                 }
             }
-//            existingCv.setBudgetLineItemDetail(cv.getBudgetLineItemDetail());
+            existingCv.setBudgetLineItemDetail(cv.getBudgetLineItemDetail());
             existingCv.setPurchaseOrder(cv.getPurchaseOrder());
             existingCv.setJobOrder(cv.getJobOrder());
 
@@ -495,6 +496,7 @@ public class CvServiceImpl implements CvService, PrintableVoucher, PrintableCheq
             if (checkVoucher != null) {
                 cvDto.setId(checkVoucher.getId());
                 cvDto.setParticulars(checkVoucher.getParticulars());
+                cvDto.setRemarks(checkVoucher.getRemarks());
                 cvDto.setLocalCode(checkVoucher.getCode());
                 cvDto.setTransId(checkVoucher.getTransaction().getId());
 
@@ -1391,6 +1393,16 @@ public class CvServiceImpl implements CvService, PrintableVoucher, PrintableCheq
                     par.put("PAYEE_FOR_ADDRESS", employee.getAddress("F"));
                     par.put("PAYEE_FOR_ZIP", "");
 
+                } else {
+                    par.put("PAYEE_TIN1", "");
+                    par.put("PAYEE_TIN2", "");
+                    par.put("PAYEE_TIN3", "");
+                    par.put("PAYEE_TIN4", "");
+                    par.put("PAYEE_NAME", "");
+                    par.put("PAYEE_REG_ADDRESS", "");
+                    par.put("PAYEE_REG_ZIP", "");
+                    par.put("PAYEE_FOR_ADDRESS", "");
+                    par.put("PAYEE_FOR_ZIP", "");
                 }
             } else {
 

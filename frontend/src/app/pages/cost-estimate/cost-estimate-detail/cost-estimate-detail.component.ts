@@ -55,7 +55,6 @@ export class CostEstimateDetailComponent {
         this.isLoading.set(true);
         this.service.getData(this.id).subscribe({
             next: (data) => {
-                this.isLoading.set(false);
                 if (data?.id) {
                     this.data          = data;
                     this.assemblies    = data.costEstimateAssemblyUnits || [];
@@ -73,6 +72,7 @@ export class CostEstimateDetailComponent {
                         this.loadLogs();
                     }
                 } else {
+                    this.isLoading.set(false);
                     this.alertService.error(this.module, 'Not Found', '');
                     this.router.navigate(['/' + this.menuLink]);
                 }
@@ -87,13 +87,14 @@ export class CostEstimateDetailComponent {
 
     loadWorkflowActions(): void {
         if (!this.data?.transaction?.id || this.isTerminal()) {
+            this.isLoading.set(false);
             this.workflowActions = [];
             this.selectedAction  = null;
             return;
         }
         this.service.getWorkflowActions(this.data.transaction.id).subscribe({
-            next: (actions) => { this.workflowActions = actions || []; this.selectedAction = null; this.remarks = ''; },
-            error: () => { this.workflowActions = []; }
+            next: (actions) => { this.isLoading.set(false); this.workflowActions = actions || []; this.selectedAction = null; this.remarks = ''; },
+            error: () => { this.isLoading.set(false); this.workflowActions = []; }
         });
     }
 

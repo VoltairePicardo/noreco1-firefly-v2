@@ -2,10 +2,13 @@ import { Component, inject, Input } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { COMMON_ALL_PAGE_IMPORTS, COMMON_MAIN_PAGE_IMPORTS } from '@/app/shared/providers/shared-providers';
 import { RolesService } from '../roles.service';
+import { provideIcons } from '@ng-icons/core';
+import { tablerChevronLeft, tablerChevronRight } from '@ng-icons/tabler-icons';
 
 @Component({
     selector: 'app-user-role-applicant-modal',
     imports: [...COMMON_ALL_PAGE_IMPORTS, ...COMMON_MAIN_PAGE_IMPORTS],
+    providers: [provideIcons({ tablerChevronLeft, tablerChevronRight })],
     templateUrl: './user-role-applicant-modal.component.html'
 })
 export class UserRoleApplicantModalComponent {

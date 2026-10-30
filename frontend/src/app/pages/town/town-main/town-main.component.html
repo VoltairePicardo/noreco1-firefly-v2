@@ -64,12 +64,21 @@
                 </div>
                 @if (allData().length > pageSize) {
                     <div class="d-flex justify-content-center mt-3">
-                        <ngb-pagination
-                            [collectionSize]="allData().length"
-                            [(page)]="page"
-                            [pageSize]="pageSize"
-                            [maxSize]="5">
-                        </ngb-pagination>
+                        <div class="pagination-boxed align-items-center mb-0">
+                            <ngb-pagination
+                                [collectionSize]="allData().length"
+                                [(page)]="page"
+                                [pageSize]="pageSize"
+                                [maxSize]="5"
+                                [rotate]="true">
+                                <ng-template ngbPaginationPrevious>
+                                    <ng-icon name="tablerChevronLeft"/>
+                                </ng-template>
+                                <ng-template ngbPaginationNext>
+                                    <ng-icon name="tablerChevronRight"/>
+                                </ng-template>
+                            </ngb-pagination>
+                        </div>
                     </div>
                 }
 

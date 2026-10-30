@@ -5,10 +5,11 @@ import { Observable } from 'rxjs';
 import { COMMON_ALL_PAGE_IMPORTS, COMMON_MAIN_PAGE_IMPORTS, SHARED_PROVIDERS } from '@/app/shared/providers/shared-providers';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { NG_ICON_DIRECTIVES, provideIcons } from '@ng-icons/core';
-import { tablerChevronLeft, tablerChevronRight, tablerSearch } from '@ng-icons/tabler-icons';
+import { tablerSearch } from '@ng-icons/tabler-icons';
 import { DisbursementService } from '@/app/pages/disbursement/disbursement.service';
 
-export type CvSourceVoucherType = 'APV' | 'CA' | 'JV' | 'RR' | 'JOA' | 'RFP';
+/*export type CvSourceVoucherType = 'APV' | 'CA' | 'JV' | 'RR' | 'JOA' | 'RFP';*/
+export type CvSourceVoucherType = 'APV' | 'CA' | 'JV' | 'RR' | 'JOA';
 
 export interface CvVoucherInstallmentDetail {
     id: number;
@@ -37,15 +38,15 @@ const VOUCHER_TYPE_OPTIONS: { value: CvSourceVoucherType; label: string }[] = [
     { value: 'CA', label: 'Cash Advance' },
     { value: 'JV', label: 'Journal Voucher' },
     { value: 'RR', label: 'Receiving Report' },
-    { value: 'JOA', label: 'JO Acceptance' },
-    { value: 'RFP', label: 'Request for Payment' },
+    { value: 'JOA', label: 'JO Acceptance' }
+    /*{ value: 'RFP', label: 'Request for Payment' },*/
 ];
 
 @Component({
     selector: 'app-browse-cv-source-voucher-modal',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [...COMMON_ALL_PAGE_IMPORTS, ...COMMON_MAIN_PAGE_IMPORTS, ReactiveFormsModule, NG_ICON_DIRECTIVES],
-    providers: [...SHARED_PROVIDERS, provideIcons({ tablerChevronLeft, tablerChevronRight, tablerSearch })],
+    providers: [...SHARED_PROVIDERS, provideIcons({ tablerSearch })],
     templateUrl: './browse-cv-source-voucher-modal.component.html',
 })
 export class BrowseCvSourceVoucherModalComponent implements OnInit {
@@ -61,12 +62,7 @@ export class BrowseCvSourceVoucherModalComponent implements OnInit {
     protected readonly searchControl = new FormControl('', { nonNullable: true });
 
     protected vouchers: CvVoucherDto[] = [];
-    protected total = 0;
-    protected page = 1;
-    protected pageSize = 5;
     protected loading = false;
-
-    protected get hasResults(): boolean { return this.vouchers.length > 0; }
 
     protected title(): string {
         return `Browse ${this.typeOptions.find(o => o.value === this.typeControl.value)?.label}`;
@@ -75,14 +71,12 @@ export class BrowseCvSourceVoucherModalComponent implements OnInit {
     ngOnInit(): void {
         this.typeControl.setValue(this.voucherType, { emitEvent: false });
         this.typeControl.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
-            this.page = 1;
             this.loadData();
         });
         this.loadData();
     }
 
     protected onSearch(): void {
-        this.page = 1;
         this.loadData();
     }
 
@@ -92,19 +86,19 @@ export class BrowseCvSourceVoucherModalComponent implements OnInit {
 
     protected loadData(): void {
         this.loading = true;
+        this.cdr.markForCheck();
         const search = this.searchControl.value.trim();
-        this.requestFor(this.typeControl.value, search, this.page - 1, this.pageSize)
+        this.requestFor(this.typeControl.value, search, 0, 500)
+            .pipe(takeUntilDestroyed(this.destroyRef))
             .subscribe({
-                next: ({ content, totalElements }) => {
+                next: ({ content }) => {
                     this.vouchers = content ?? [];
-                    this.total = totalElements ?? 0;
-                    this.loading = false;
+                    this.loading  = false;
                     this.cdr.markForCheck();
                 },
                 error: () => {
                     this.vouchers = [];
-                    this.total = 0;
-                    this.loading = false;
+                    this.loading  = false;
                     this.cdr.markForCheck();
                 },
             });
@@ -117,7 +111,7 @@ export class BrowseCvSourceVoucherModalComponent implements OnInit {
             case 'JV':  return this.service.getApprovedJvForCv(q, page, size);
             case 'RR':  return this.service.getApprovedRrForCv(q, page, size);
             case 'JOA': return this.service.getApprovedJoaForCv(q, page, size);
-            case 'RFP': return this.service.getApprovedRfpForCv(q, page, size);
+           /* case 'RFP': return this.service.getApprovedRfpForCv(q, page, size);*/
         }
     }
 }

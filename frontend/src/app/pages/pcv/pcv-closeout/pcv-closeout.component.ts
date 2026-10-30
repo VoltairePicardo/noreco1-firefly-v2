@@ -71,10 +71,10 @@ export class PcvCloseoutComponent {
     search(): void {
         this.isLoading.set(true);
         const params: any = {};
-        if (this.fromDate)       params['from']     = this.fromDate;
-        if (this.toDate)         params['to']       = this.toDate;
-        if (this.selectedOffice) params['officeId'] = this.selectedOffice.id;
-        if (this.selectedStatus) params['statusId'] = this.selectedStatus.id;
+        if (this.fromDate)       params['from']             = this.fromDate;
+        if (this.toDate)         params['to']               = this.toDate;
+        if (this.selectedOffice) params['officeId']         = this.selectedOffice.id;
+        if (this.selectedStatus) params['documentStatusId'] = this.selectedStatus.id;
         this.service.getCloseoutVouchers(params).subscribe({
             next: (data) => { this.records.set(data || []); this.isLoading.set(false); },
             error: () => { this.isLoading.set(false); this.alertService.error(this.module, 'Failed to load records.', ''); }
@@ -82,14 +82,20 @@ export class PcvCloseoutComponent {
     }
 
     printSummary(): void {
-        const params: any = {};
-        if (this.fromDate)        params['from']             = this.fromDate;
-        if (this.toDate)          params['to']               = this.toDate;
-        if (this.selectedOffice)  params['officeId']         = this.selectedOffice.id;
-        if (this.selectedStatus)  params['statusId']         = this.selectedStatus.id;
-        if (this.checkedBy)       params['checkedById']      = this.checkedBy.accountNo;
-        if (this.replenishedBy)   params['replenishedById']  = this.replenishedBy.accountNo;
-        this.service.printCloseout(params);
+        if (!this.checkedBy || !this.replenishedBy) {
+            this.alertService.error(this.module, 'Validation', 'Please select Checked By and Replenished By officers.');
+            return;
+        }
+        if (!this.selectedBatch) {
+            this.alertService.error(this.module, 'Validation', 'Please select a batch to print.');
+            return;
+        }
+        const params: Record<string, any> = { batch: this.selectedBatch.id };
+        if (this.fromDate)       params['from']             = this.fromDate;
+        if (this.toDate)         params['to']               = this.toDate;
+        if (this.selectedOffice) params['officeId']         = this.selectedOffice.id;
+        if (this.selectedStatus) params['documentStatusId'] = this.selectedStatus.id;
+        this.service.printCloseout(this.checkedBy.accountNo, this.replenishedBy.accountNo, params);
     }
 
     // ─── Officers ────────────────────────────────────────────────────

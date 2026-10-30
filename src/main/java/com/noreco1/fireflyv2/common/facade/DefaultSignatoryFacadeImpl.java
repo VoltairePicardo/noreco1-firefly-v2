@@ -500,14 +500,14 @@ public class DefaultSignatoryFacadeImpl implements SignatoryFacade {
     public Map defaultSignatories(DocumentType documentType) {
         Map data = new HashMap();
         if (documentType != null) {
-            String documentTypeCode = documentType.getCode();
+            String documentTypeCode = documentType.name();
             switch (documentTypeCode) {
                 case "APV": {
                     Map codeMap = settingFacade.getByCode(this.APV_SIGNATORIES);
                     if (codeMap != null) {
 
-                        Integer checkedByAccountNo = Integer.parseInt(codeMap.get("checkedByAccountNo").toString());
-                        Integer approvedByAccountNo = Integer.parseInt(codeMap.get("approvedByAccountNo").toString());
+                        Integer checkedByAccountNo = codeMap.get("checkedByAccountNo") == null ? 0 : Integer.parseInt(codeMap.get("checkedByAccountNo").toString());
+                        Integer approvedByAccountNo = codeMap.get("approvedByAccountNo") == null ? 0 : Integer.parseInt(codeMap.get("approvedByAccountNo").toString());
 
                         SlEntity checker = slEntityRepo.findOneByAccountNo(checkedByAccountNo);
                         SlEntity approvingOfficer = slEntityRepo.findOneByAccountNo(approvedByAccountNo);
@@ -522,12 +522,12 @@ public class DefaultSignatoryFacadeImpl implements SignatoryFacade {
                     Map codeMap = settingFacade.getByCode(this.CV_SIGNATORIES);
                     if (codeMap != null) {
 
-                        Integer checkedByAccountNo = Integer.parseInt(codeMap.get("checkedByAccountNo").toString());
-                        Integer budgetedByAccountNo = Integer.parseInt(codeMap.get("budgetedByAccountNo").toString());
-                        Integer recommendedByAccountNo = Integer.parseInt(codeMap.get("recommendedByAccountNo").toString());
-                        Integer auditedByAccountNo = Integer.parseInt(codeMap.get("auditedByAccountNo").toString());
-                        Integer checkPrintedByAccountNo = Integer.parseInt(codeMap.get("checkPrintedByAccountNo").toString());
-                        Integer approvedByAccountNo = Integer.parseInt(codeMap.get("approvedByAccountNo").toString());
+                        Integer checkedByAccountNo     = codeMap.get("checkedByAccountNo")     == null ? 0 : Integer.parseInt(codeMap.get("checkedByAccountNo").toString());
+                        Integer budgetedByAccountNo    = codeMap.get("budgetedByAccountNo")    == null ? 0 : Integer.parseInt(codeMap.get("budgetedByAccountNo").toString());
+                        Integer recommendedByAccountNo = codeMap.get("recommendedByAccountNo") == null ? 0 : Integer.parseInt(codeMap.get("recommendedByAccountNo").toString());
+                        Integer auditedByAccountNo     = codeMap.get("auditedByAccountNo")     == null ? 0 : Integer.parseInt(codeMap.get("auditedByAccountNo").toString());
+                        Integer checkPrintedByAccountNo= codeMap.get("checkPrintedByAccountNo")== null ? 0 : Integer.parseInt(codeMap.get("checkPrintedByAccountNo").toString());
+                        Integer approvedByAccountNo    = codeMap.get("approvedByAccountNo")    == null ? 0 : Integer.parseInt(codeMap.get("approvedByAccountNo").toString());
 
                         SlEntity checker = slEntityRepo.findOneByAccountNo(checkedByAccountNo);
                         SlEntity budgetOfficer = slEntityRepo.findOneByAccountNo(budgetedByAccountNo);
@@ -549,11 +549,11 @@ public class DefaultSignatoryFacadeImpl implements SignatoryFacade {
                 case "JV": {
                     Map codeMap = settingFacade.getByCode(this.JV_SIGNATORIES);
                     if (codeMap != null) {
-                        Integer budgetedByAccountNo = Integer.parseInt(codeMap.get("budgetedByAccountNo").toString());
-                        Integer auditedByAccountNo = Integer.parseInt(codeMap.get("auditedByAccountNo").toString());
-                        Integer recommendedByAccountNo = Integer.parseInt(codeMap.get("recommendedByAccountNo").toString());
-                        Integer checkedByAccountNo = Integer.parseInt(codeMap.get("checkedByAccountNo").toString());
-                        Integer approvedByAccountNo = Integer.parseInt(codeMap.get("approvedByAccountNo").toString());
+                        Integer budgetedByAccountNo    = codeMap.get("budgetedByAccountNo")    == null ? 0 : Integer.parseInt(codeMap.get("budgetedByAccountNo").toString());
+                        Integer auditedByAccountNo     = codeMap.get("auditedByAccountNo")     == null ? 0 : Integer.parseInt(codeMap.get("auditedByAccountNo").toString());
+                        Integer recommendedByAccountNo = codeMap.get("recommendedByAccountNo") == null ? 0 : Integer.parseInt(codeMap.get("recommendedByAccountNo").toString());
+                        Integer checkedByAccountNo     = codeMap.get("checkedByAccountNo")     == null ? 0 : Integer.parseInt(codeMap.get("checkedByAccountNo").toString());
+                        Integer approvedByAccountNo    = codeMap.get("approvedByAccountNo")    == null ? 0 : Integer.parseInt(codeMap.get("approvedByAccountNo").toString());
 
                         SlEntity auditedBy = slEntityRepo.findOneByAccountNo(auditedByAccountNo);
                         SlEntity budgetOfficer = slEntityRepo.findOneByAccountNo(budgetedByAccountNo);
@@ -2237,7 +2237,7 @@ public class DefaultSignatoryFacadeImpl implements SignatoryFacade {
     public Map defaultSignatories(DocumentType documentType, Map params) {
         Map data = new HashMap();
         if (documentType != null) {
-            String documentTypeCode = documentType.getCode();
+            String documentTypeCode = documentType.name();
             switch (documentTypeCode) {
                 case "PCV": {
                     Map codeMap = settingFacade.getByCode(this.PCV_SIGNATORIES);

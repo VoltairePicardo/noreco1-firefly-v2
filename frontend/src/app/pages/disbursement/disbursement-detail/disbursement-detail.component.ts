@@ -4,18 +4,24 @@ import { AlertService } from '@/app/shared/services/alert.service';
 import Swal from 'sweetalert2';
 import { COMMON_ALL_PAGE_IMPORTS, COMMON_MAIN_PAGE_IMPORTS, SHARED_PROVIDERS } from '@/app/shared/providers/shared-providers';
 import { DisbursementService } from '../disbursement.service';
+import { ModalService } from '@/app/shared/modals/modal-service';
+import { BrowseBudgetLineItemModalComponent } from '@/app/shared/modals/browse-budget-line-item-modal/browse-budget-line-item-modal.component';
+import { BrowseCashflowItemModalComponent } from '@/app/shared/modals/browse-cashflow-item-modal/browse-cashflow-item-modal.component';
+import { DocumentLogsComponent } from '@/app/shared/components/document-logs/document-logs.component';
+import { AttachmentsComponent } from '@/app/shared/components/attachments/attachments.component';
+import { JournalEntriesFormComponent, JournalEntry } from '@/app/shared/forms/journal-entries-form/journal-entries-form.component';
 import { provideIcons } from '@ng-icons/core';
 import {
     tablerArrowLeft, tablerPrinter, tablerEdit, tablerCheck, tablerEye, tablerEyeOff,
-    tablerChevronDown, tablerChevronRight, tablerFile
+    tablerChevronDown, tablerChevronRight, tablerFile, tablerSearch, tablerX, tablerDeviceFloppy
 } from '@ng-icons/tabler-icons';
 
 @Component({
     selector: 'app-disbursement-detail',
-    imports: [...COMMON_ALL_PAGE_IMPORTS, ...COMMON_MAIN_PAGE_IMPORTS],
+    imports: [...COMMON_ALL_PAGE_IMPORTS, ...COMMON_MAIN_PAGE_IMPORTS, DocumentLogsComponent, AttachmentsComponent, JournalEntriesFormComponent],
     providers: [...SHARED_PROVIDERS, provideIcons({
         tablerArrowLeft, tablerPrinter, tablerEdit, tablerCheck, tablerEye, tablerEyeOff,
-        tablerChevronDown, tablerChevronRight, tablerFile
+        tablerChevronDown, tablerChevronRight, tablerFile, tablerSearch, tablerX, tablerDeviceFloppy
     })],
     templateUrl: './disbursement-detail.component.html'
 })
@@ -25,7 +31,9 @@ export class DisbursementDetailComponent {
     menuLink  = 'disbursement';
     id: any   = 0;
     data: any = {};
-    journalEntries: any[] = [];
+    journalEntries  : any[] = [];
+    editableEntries : JournalEntry[] = [];
+    savingEntries     = false;
     iemopBillings : any[] = [];
     attachments   : any[] = [];
     expandedSl    = new Set<number>();
@@ -37,11 +45,19 @@ export class DisbursementDetailComponent {
     selectedAction: any    = null;
     remarks = '';
 
-    logs        : any[] = [];
-    showLogs    = false;
-    logsLoading = false;
+    showLogs = false;
+
+    // Budget assignment (forAddingBudgetDetail workflow step)
+    budgetLineItems       : any[] = [];
+    budgetLineItemsLoaded = false;
+    selectedBudgetLineItem: any   = null;
+    cashflowItems         : any[] = [];
+    cashflowItemsLoaded   = false;
+    selectedBudgetDetail  : any   = null;
+    savingBudget = false;
 
     private service      = inject(DisbursementService);
+    private modalService = inject(ModalService);
     private route        = inject(ActivatedRoute);
     private router       = inject(Router);
     private alertService = inject(AlertService);
@@ -59,16 +75,32 @@ export class DisbursementDetailComponent {
         this.isLoading.set(true);
         this.service.getData(this.id).subscribe({
             next: (data) => {
-                this.isLoading.set(false);
                 this.processingWorkflow = false;
                 if (data?.id) {
                     this.data = data;
-                    this.journalEntries = data.generalLedgerLines || [];
                     this.iemopBillings  = data.iemopBillings  || [];
                     this.expandedSl.clear();
-                    this.loadWorkflowActions();
+                    this.selectedBudgetLineItem = null;
+                    this.selectedBudgetDetail   = null;
                     this.loadAttachments();
+                    if (data.transId) { this.loadJournalEntries(data.transId); }
+                    if (data.forAddingBudgetDetail) {
+                        if (!this.budgetLineItemsLoaded) {
+                            this.service.getBudgetLineItems().subscribe({
+                                next: (items) => { this.budgetLineItems = items || []; this.budgetLineItemsLoaded = true; },
+                                error: () => {}
+                            });
+                        }
+                        if (!this.cashflowItemsLoaded) {
+                            this.service.getCashflowBudgetDetails().subscribe({
+                                next: (items) => { this.cashflowItems = items || []; this.cashflowItemsLoaded = true; },
+                                error: () => { this.alertService.error(this.module, 'Failed to load cash flow items.', ''); }
+                            });
+                        }
+                    }
+                    this.loadWorkflowActions(); // sets isLoading(false) on completion
                 } else {
+                    this.isLoading.set(false);
                     this.alertService.error(this.module, 'Not Found', '');
                     this.router.navigate(['/' + this.menuLink]);
                 }
@@ -82,12 +114,84 @@ export class DisbursementDetailComponent {
         });
     }
 
+    loadJournalEntries(transId: number): void {
+        this.service.getGLEntries(transId).subscribe({
+            next: (entries) => {
+                this.journalEntries = entries || [];
+                this.editableEntries = (entries || []).map((e: any): JournalEntry => ({
+                    account: { id: e.accountId, accountCode: e.code, accountTitle: e.description, hasSL: e.hasSL || false },
+                    debit:   Number(e.debit)  || null,
+                    credit:  Number(e.credit) || null,
+                    wTaxEntry: e.wTaxEntry || null,
+                    slentries: (e.slentries || []).map((sl: any) => ({
+                        entity: null, accountNo: sl.accountNo, name: sl.name,
+                        debit: Number(sl.debit) || null, credit: Number(sl.credit) || null
+                    }))
+                }));
+            },
+            error: () => { this.journalEntries = []; this.editableEntries = []; }
+        });
+    }
+
+    isForCheckingOrReviewing(): boolean {
+        const s = this.data?.documentStatus?.status || '';
+        return s === 'For Checking' || s === 'For Reviewing';
+    }
+
+    saveEntries(): void {
+        if (this.savingEntries) return;
+        this.savingEntries = true;
+        const payload = {
+            id: this.data.id,
+            generalLedgerLines: this.editableEntries.map(e => ({
+                code:        e.account?.accountCode  || '',
+                description: e.account?.accountTitle || '',
+                accountId:   e.account?.id           || null,
+                debit:       Number(e.debit)         || 0,
+                credit:      Number(e.credit)        || 0,
+                wTaxEntry:   e.wTaxEntry             || null
+            })),
+            subLedgerLines: this.editableEntries
+                .filter(e => (e.slentries || []).length > 0)
+                .flatMap(e => (e.slentries || []).map((sl: any) => ({
+                    accountId: e.account?.id || null,
+                    accountNo: sl.accountNo,
+                    name:      sl.name,
+                    debit:     Number(sl.debit)  || 0,
+                    credit:    Number(sl.credit) || 0
+                })))
+        };
+        this.service.updateEntries(payload).subscribe({
+            next: (res) => {
+                this.savingEntries = false;
+                if (res?.success) {
+                    this.alertService.success(this.module, 'Entries saved successfully.', '');
+                    this.loadData();
+                } else {
+                    this.alertService.error(this.module, 'Save failed.', res?.failureMessage || '');
+                }
+            },
+            error: () => {
+                this.savingEntries = false;
+                this.alertService.error(this.module, 'An error occurred while saving entries.', '');
+            }
+        });
+    }
+
     loadWorkflowActions(): void {
-        if (!this.data?.transId) return;
+        if (!this.data?.transId) { this.isLoading.set(false); return; }
         this.workflowActions = [];
         this.service.getWorkflowActions(this.data.transId).subscribe({
-            next: (actions) => { this.workflowActions = actions || []; this.selectedAction = null; this.remarks = ''; },
-            error: () => { this.workflowActions = []; }
+            next: (actions) => {
+                this.isLoading.set(false);
+                this.workflowActions = actions || [];
+                this.selectedAction = null;
+                this.remarks = '';
+            },
+            error: () => {
+                this.isLoading.set(false);
+                this.workflowActions = [];
+            }
         });
     }
 
@@ -104,9 +208,7 @@ export class DisbursementDetailComponent {
             next: (res) => {
                 if (res.success) {
                     this.alertService.success(this.module, 'Processed', '');
-                    this.logs = [];
                     this.loadData();
-                    if (this.showLogs) this.loadLogs();
                 } else {
                     this.processingWorkflow = false;
                     this.alertService.error(this.module, 'Process', res.failureMessage || '');
@@ -154,11 +256,12 @@ export class DisbursementDetailComponent {
         if (this.data.jvDto)  return 'Journal Voucher';
         if (this.data.rrDto)  return 'Receiving Report';
         if (this.data.joaDto) return 'JO Acceptance';
+        if (this.data.rfpDto) return 'Request for Payment';
         return null;
     }
 
     get sourceVoucher(): any {
-        return this.data.apvDto || this.data.jvDto || this.data.rrDto || this.data.joaDto || null;
+        return this.data.apvDto || this.data.jvDto || this.data.rrDto || this.data.joaDto || this.data.rfpDto || null;
     }
 
     get checkNumberRows(): any[] {
@@ -177,23 +280,77 @@ export class DisbursementDetailComponent {
         });
     }
 
-    fileUrl(fileId: number): string {
-        return this.service.fileUrl(fileId);
-    }
+    fileUrl = (fileId: number): string => this.service.fileUrl(fileId);
 
     toggleLogs(): void {
         this.showLogs = !this.showLogs;
-        if (this.showLogs && this.logs.length === 0 && !this.logsLoading) {
-            this.loadLogs();
-        }
     }
 
-    loadLogs(): void {
-        if (!this.data?.transId || this.logsLoading) return;
-        this.logsLoading = true;
-        this.service.getDocumentLogs(this.data.transId).subscribe({
-            next: (logs) => { this.logs = logs || []; this.logsLoading = false; },
-            error: () => { this.logsLoading = false; }
+    async openBudgetLineItemBrowse(): Promise<void> {
+        if (!this.budgetLineItemsLoaded) {
+            this.service.getBudgetLineItems().subscribe({
+                next: (items) => {
+                    this.budgetLineItems = items || [];
+                    this.budgetLineItemsLoaded = true;
+                    this.openBudgetLineItemBrowse();
+                },
+                error: () => {}
+            });
+            return;
+        }
+        try {
+            const result = await this.modalService.openModal(
+                BrowseBudgetLineItemModalComponent,
+                { items: this.budgetLineItems },
+                { size: 'lg', centered: true }
+            );
+            if (result?.action === 'select' && result?.data) {
+                this.selectedBudgetLineItem = result.data;
+                this.selectedBudgetDetail   = null; // mutually exclusive
+            }
+        } catch { }
+    }
+
+    async openCashflowItemBrowse(): Promise<void> {
+        try {
+            const result = await this.modalService.openModal(
+                BrowseCashflowItemModalComponent,
+                { items: this.cashflowItems },
+                { size: 'lg', centered: true }
+            );
+            if (result?.action === 'select' && result?.data) {
+                this.selectedBudgetDetail   = result.data;
+                this.selectedBudgetLineItem = null;
+            }
+        } catch { }
+    }
+
+    saveBudgetAssignment(): void {
+        const hasBudgetLineItem = this.selectedBudgetLineItem || this.data?.budgetLineItemDetail?.id;
+        const hasBudgetDetail   = this.selectedBudgetDetail   || this.data?.budgetDetail?.id;
+        if (!hasBudgetLineItem && !hasBudgetDetail) {
+            this.alertService.warning(this.module, 'Validation', 'Please select a Budget Line Item or Cash Flow Item.');
+            return;
+        }
+        this.savingBudget = true;
+        this.service.assignBudget({
+            transactionId:          this.data.transId,
+            budgetLineItemDetailId: this.selectedBudgetLineItem?.id ?? this.data?.budgetLineItemDetail?.id ?? null,
+            budgetDetailId:         this.selectedBudgetDetail?.id   ?? this.data?.budgetDetail?.id        ?? null
+        }).subscribe({
+            next: (res) => {
+                this.savingBudget = false;
+                if (res?.success) {
+                    this.alertService.success(this.module, 'Budget assigned.', '');
+                    this.loadData();
+                } else {
+                    this.alertService.error(this.module, 'Save failed.', res?.failureMessage || '');
+                }
+            },
+            error: () => {
+                this.savingBudget = false;
+                this.alertService.error(this.module, 'An error occurred.', '');
+            }
         });
     }
 
@@ -240,8 +397,8 @@ export class DisbursementDetailComponent {
             next: (res) => {
                 this.printingCheckRows.delete(row);
                 if (res?.success) {
-                    row.printed = true;
                     this.alertService.success(this.module, 'Check Printed', '');
+                    this.loadData();
                 } else {
                     this.alertService.error(this.module, 'Error', res?.failureMessage || '');
                 }

@@ -1,4 +1,5 @@
 import { Component, inject, signal, ViewChild, ElementRef } from '@angular/core';
+import Swal from 'sweetalert2';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AlertService } from '@/app/shared/services/alert.service';
 import {
@@ -18,7 +19,7 @@ import { provideIcons } from '@ng-icons/core';
 import {
     tablerSearch, tablerX, tablerArrowLeft, tablerCheck,
     tablerTrash, tablerPaperclip, tablerPhoto, tablerFile,
-    tablerDatabase, tablerLink
+    tablerDatabase, tablerLink, tablerFolder
 } from '@ng-icons/tabler-icons';
 
 interface Signatory {
@@ -52,6 +53,7 @@ interface SourceDocument {
     voucherDate?: string;
     particulars?: string;
     remarks?: string;
+    extensionUrl?: string;
 }
 
 interface SignatoryRef {
@@ -107,7 +109,7 @@ interface GeneralJournalPayload {
         provideIcons({
             tablerSearch, tablerX, tablerArrowLeft, tablerCheck,
             tablerTrash, tablerPaperclip, tablerPhoto, tablerFile,
-            tablerDatabase, tablerLink
+            tablerDatabase, tablerLink, tablerFolder
         })
     ],
     templateUrl: './general-journal-add-edit.component.html'
@@ -141,6 +143,7 @@ export class GeneralJournalAddEditComponent {
 
     selectedDocument: SourceDocument | null = null;
     selectedIsCal: boolean      = false;
+    selectedIsRr: boolean       = false;
     loadingDocEntries           = false;
 
     stagedFiles  : File[] = [];
@@ -229,6 +232,9 @@ export class GeneralJournalAddEditComponent {
                     if (data.cashAdvanceLiquidation) {
                         this.selectedDocument = data.cashAdvanceLiquidation;
                         this.selectedIsCal    = true;
+                    } else if (data.document) {
+                        this.selectedDocument = data.document;
+                        this.selectedIsRr     = data.document.extensionUrl === 'receiving-report';
                     }
                     this.signatories = {
                         checker:              data.checker              || data.checkedBy         || null,
@@ -266,6 +272,26 @@ export class GeneralJournalAddEditComponent {
     removeExistingFile(index: number): void {
         const [removed] = this.existingFiles.splice(index, 1);
         if (removed) this.filesToRemove.push(removed);
+    }
+
+    async onVoucherDateChange(newDate: string): Promise<void> {
+        const hasEntries = this.journalEntries.some(e => e.account != null);
+        if (!hasEntries) {
+            this.voucherDate = newDate;
+            return;
+        }
+        const result = await Swal.fire({
+            title: 'Change Voucher Date?',
+            text: 'Journal entries are already loaded. Do you want to reset them?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, reset entries',
+            cancelButtonText: 'Keep entries'
+        });
+        if (result.isConfirmed) {
+            this.journalEntries = [{ account: null, debit: null, credit: null }];
+        }
+        this.voucherDate = newDate;
     }
 
     loadDefaultSignatories(): void {
@@ -372,12 +398,17 @@ export class GeneralJournalAddEditComponent {
                 { size: 'lg', centered: true }
             );
             if (result?.action === 'select' && result?.data) {
+                this.clearCcprBatch();
                 this.selectedDocument = result.data;
                 this.selectedIsCal    = result.documentType === 'CAL';
+                this.selectedIsRr     = result.documentType === 'RR';
 
                 if (this.selectedIsCal) {
                     this.explanation = result.data.remarks || this.explanation;
-                } else if (result.data.transactionId) {
+                } else {
+                    this.explanation = result.data.particulars || this.explanation;
+                }
+                if (!this.selectedIsCal && result.data.transactionId) {
                     this.loadingDocEntries = true;
                     this.service.getAccountSettingEntries(result.data.transactionId).subscribe({
                         next: (entries) => {
@@ -398,6 +429,7 @@ export class GeneralJournalAddEditComponent {
     clearSelectedDocument(): void {
         this.selectedDocument = null;
         this.selectedIsCal    = false;
+        this.selectedIsRr     = false;
     }
 
     async openEntityBrowse(key: string): Promise<void> {
@@ -441,6 +473,10 @@ export class GeneralJournalAddEditComponent {
             this.alertService.warning(this.module, 'Validation', 'Please enter a voucher date.');
             return;
         }
+        if (!this.explanation?.trim()) {
+            this.alertService.warning(this.module, 'Validation', 'Please enter an explanation or remarks.');
+            return;
+        }
         if (this.journalEntries.length === 0) {
             this.alertService.warning(this.module, 'Validation', 'Please add at least one journal entry.');
             return;
@@ -450,6 +486,32 @@ export class GeneralJournalAddEditComponent {
             return;
         }
 
+        const missingSignatory = this.signatoryKeys.find(key => !this.signatories[key]);
+        if (missingSignatory) {
+            this.alertService.warning(this.module, 'Validation', `Please select ${this.signatoryLabels[missingSignatory]}.`);
+            return;
+        }
+
+        if (this.selectedIsRr && !this.payable) {
+            Swal.fire({
+                title: 'Payable is not checked',
+                text: 'RR Amount is greater than Advance Payment or CA Liquidation amount. Do you want to continue?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Confirm',
+                cancelButtonText: 'Cancel'
+            }).then(result => {
+                if (result.isConfirmed) {
+                    this.submitSave();
+                }
+            });
+            return;
+        }
+
+        this.submitSave();
+    }
+
+    private submitSave(): void {
         this.formSubmit = true;
 
         const sigRef = (key: string): SignatoryRef | null => this.signatories[key]?.accountNo

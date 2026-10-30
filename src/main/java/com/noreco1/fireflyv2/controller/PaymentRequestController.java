@@ -1,6 +1,7 @@
 package com.noreco1.fireflyv2.controller;
 
 import com.noreco1.fireflyv2.common.GlobalConstant;
+import com.noreco1.fireflyv2.controller.response.ApvPurchasingDocumentDto;
 import com.noreco1.fireflyv2.controller.response.CvVoucherDto;
 import com.noreco1.fireflyv2.controller.response.PayReqDto;
 import com.noreco1.fireflyv2.controller.response.PostResponse;
@@ -123,6 +124,14 @@ public class PaymentRequestController {
     public PostResponse process(@RequestBody ProcessDocumentDto dto) {
         BindingResult bindingResult = new BeanPropertyBindingResult(dto, "processDocumentDto");
         return service.process(dto, bindingResult, messageSource);
+    }
+
+    @GetMapping("/apv-approved-paged")
+    public Page<ApvPurchasingDocumentDto> apvApprovedPaged(
+            @RequestParam(value = "q", required = false, defaultValue = "") String q,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size) {
+        return service.findAllApprovedForApvPaged(q.isEmpty() ? null : q, PageRequest.of(page, size));
     }
 
     @GetMapping("/approved-for-cv-paged")

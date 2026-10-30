@@ -13,7 +13,7 @@
         <div class="row g-3">
             <div class="col-md-3"><div class="fs-xs text-uppercase fw-bold text-muted mb-1">Code</div><div class="fw-bold fs-5">{{ data.code || data.id }}</div></div>
             <div class="col-md-3"><div class="fs-xs text-uppercase fw-bold text-muted mb-1">Date</div><div>{{ data.date | date:'MMMM d, yyyy' }}</div></div>
-            <div class="col-md-3"><div class="fs-xs text-uppercase fw-bold text-muted mb-1">Status</div><span class="badge bg-secondary bg-opacity-25 text-dark border">{{ data.documentStatus?.status || '—' }}</span></div>
+            <div class="col-md-3"><div class="fs-xs text-uppercase fw-bold text-muted mb-1">Status</div><span class="badge border" [ngClass]="(data.documentStatus?.status || '—') === 'Approved' ? 'bg-success bg-opacity-25 text-success' : 'bg-primary bg-opacity-25 text-primary'">{{ data.documentStatus?.status || '—' }}</span></div>
             <div class="col-md-3"><div class="fs-xs text-uppercase fw-bold text-muted mb-1">Prepared By</div><div>{{ data.createdBy?.fullName || data.preparedBy || '—' }}</div></div>
             @if (data.remarks) { <div class="col-md-12"><div class="fs-xs text-uppercase fw-bold text-muted mb-1">Remarks</div><div>{{ data.remarks }}</div></div> }
         </div>

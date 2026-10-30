@@ -95,7 +95,8 @@ public class CheckReleasingServiceImpl implements CheckReleasingService {
     @Override
     public Map<String, Object> getDetailById(Integer id) {
         // Enriched query: includes computed checkAmount, accountTitle, payee
-        Object[] row = releasedCheckRepo.findDetailById(id);
+        List<Object[]> rows = releasedCheckRepo.findDetailById(id);
+        Object[] row = (rows != null && !rows.isEmpty()) ? rows.get(0) : null;
         if (row != null) {
             Map<String, Object> map = new LinkedHashMap<>();
             map.put("id",           row[0]);

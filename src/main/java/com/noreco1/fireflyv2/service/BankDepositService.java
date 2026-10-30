@@ -39,4 +39,7 @@ public interface BankDepositService {
     @Transactional
     PostResponse uploadDeposits(UploadBankDepositDto uploadBankDepositDto, BindingResult bindingResult, MessageSource messageSource);
 
+    @Transactional
+    PostResponse uploadAttachments(Integer id, HttpServletRequest request);
+
 }

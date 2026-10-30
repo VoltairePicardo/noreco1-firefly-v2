@@ -107,6 +107,6 @@ export class CaMainComponent {
 
     isEditable(rec: any): boolean {
         const s = (rec?.documentStatus?.status || rec?.status || '').toString();
-        return s === 'Document Created' || s === 'Returned to Creator' || s === '1';
+        return s === 'Document Created' || s === 'Returned to Creator';
     }
 }

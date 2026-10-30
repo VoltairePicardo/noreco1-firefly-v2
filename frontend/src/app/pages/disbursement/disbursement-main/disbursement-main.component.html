@@ -56,6 +56,7 @@
                         <th>Code</th>
                         <th>Voucher Date</th>
                         <th>Payee</th>
+                        <th>Particulars</th>
                         <th>Check No.</th>
                         <th class="text-end">Amount</th>
                         <th>Status</th>
@@ -64,7 +65,7 @@
                 </thead>
                 <tbody>
                     @if (isLoading()) {
-                        <tr><td colspan="8" class="text-center py-3">
+                        <tr><td colspan="9" class="text-center py-3">
                             <span class="spinner-border spinner-border-sm me-2"></span>Loading...
                         </td></tr>
                     } @else if (pagedRecords.length > 0) {
@@ -78,9 +79,10 @@
                                 <td class="fw-bold">{{ rec.code }}</td>
                                 <td>{{ rec.voucherDate | date:'MM/dd/yyyy' }}</td>
                                 <td>{{ rec.payee || '—' }}</td>
+                                <td>{{ rec.particulars || '—' }}</td>
                                 <td>{{ rec.checkNumber || '—' }}</td>
                                 <td class="text-end">{{ rec.checkAmount | number:'1.2-2' }}</td>
-                                <td><span class="badge bg-secondary bg-opacity-25 text-dark border">{{ rec.status }}</span></td>
+                                <td><span class="badge border" [ngClass]="rec.status === 'Approved' ? 'bg-success bg-opacity-25 text-success' : 'bg-primary bg-opacity-25 text-primary'">{{ rec.status }}</span></td>
                                 <td class="text-nowrap">
                                     <div class="d-flex justify-content-end gap-1">
                                         <a href="javascript:void(0)" ngbTooltip="View"
@@ -100,14 +102,13 @@
                             </tr>
                         }
                     } @else {
-                        <tr><td colspan="8" class="text-center text-muted py-3">No records found.</td></tr>
+                        <tr><td colspan="9" class="text-center text-muted py-3">No records found.</td></tr>
                     }
                 </tbody>
             </table>
         </div>
 
-        <!-- Approve All -->
-        <div class="card-footer border-top-0">
+        <div class="card-footer position-relative d-flex align-items-center">
             <button type="button" class="btn btn-primary fw-bold"
                     [disabled]="processingAll || selectedIds.length === 0"
                     (click)="approveAll()">
@@ -117,26 +118,25 @@
                     <ng-icon name="tablerThumbUp" class="ps-0 pe-3 fw-bold"></ng-icon>Approve All
                 }
             </button>
-        </div>
-
-        @if (filteredRecords.length > pageSize) {
-            <div class="card-footer d-flex justify-content-center border-top-0">
-                <div class="pagination-boxed align-items-center mt-2 mb-0">
-                    <ngb-pagination
-                        [collectionSize]="filteredRecords.length"
-                        [(page)]="page"
-                        [pageSize]="pageSize"
-                        [maxSize]="5"
-                        [rotate]="true">
-                        <ng-template ngbPaginationPrevious>
-                            <ng-icon name="tablerChevronLeft"/>
-                        </ng-template>
-                        <ng-template ngbPaginationNext>
-                            <ng-icon name="tablerChevronRight"/>
-                        </ng-template>
-                    </ngb-pagination>
+            @if (filteredRecords.length > pageSize) {
+                <div class="position-absolute start-50 translate-middle-x">
+                    <div class="pagination-boxed align-items-center mb-0">
+                        <ngb-pagination
+                            [collectionSize]="filteredRecords.length"
+                            [(page)]="page"
+                            [pageSize]="pageSize"
+                            [maxSize]="5"
+                            [rotate]="true">
+                            <ng-template ngbPaginationPrevious>
+                                <ng-icon name="tablerChevronLeft"/>
+                            </ng-template>
+                            <ng-template ngbPaginationNext>
+                                <ng-icon name="tablerChevronRight"/>
+                            </ng-template>
+                        </ngb-pagination>
+                    </div>
                 </div>
-            </div>
-        }
+            }
+        </div>
     </div>
 </div>

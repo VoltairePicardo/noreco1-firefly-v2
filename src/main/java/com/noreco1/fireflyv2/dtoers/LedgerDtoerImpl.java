@@ -137,6 +137,8 @@ public class LedgerDtoerImpl implements LedgerDtoer {
 
         List<GeneralLedgerLineDto2> ledgerLineDtos = new ArrayList<>();
 
+        CheckVoucherIncomePayment incomePayment;
+
         if (generalLedgerLines != null) {
             for (Object[] line : generalLedgerLines) {
                 GeneralLedgerLineDto2 lineDto = new GeneralLedgerLineDto2();
@@ -173,7 +175,7 @@ public class LedgerDtoerImpl implements LedgerDtoer {
 //
 //                if (wtaxAccountId.equals(accountId)) {
 
-                CheckVoucherIncomePayment incomePayment = incomePaymentRepo.findOneByTransactionId(transId);
+                incomePayment = incomePaymentRepo.findOneByTransactionId(transId);
                 if (incomePayment != null) {
                     Map<String, Object> account = new LinkedHashMap<>();
                     account.put("id", accountId);
@@ -367,7 +369,7 @@ public class LedgerDtoerImpl implements LedgerDtoer {
         BigDecimal totalSLDebit = BigDecimal.ZERO;
         BigDecimal totalSLCredit= BigDecimal.ZERO;
 
-        List<GeneralLedgerLineDto2> ledgerLineDto2s = this.getGLAccountEntriesDtoByTrans(transId, true);
+        List<GeneralLedgerLineDto2> ledgerLineDto2s = this.getGLAccountEntriesDtoByTrans(transId, false);
 
         if (!Checker.collectionIsEmpty(ledgerLineDto2s)) {
             for(GeneralLedgerLineDto2 gl : ledgerLineDto2s) {

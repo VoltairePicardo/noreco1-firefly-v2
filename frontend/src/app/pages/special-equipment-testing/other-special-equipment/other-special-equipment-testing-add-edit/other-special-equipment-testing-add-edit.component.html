@@ -17,14 +17,14 @@
                         <span class="fs-xs text-uppercase fw-semibold text-muted">No special equipment selected</span>
                     }
                     <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-success fw-bold gap-1" (click)="openSpecialEquipmentBrowse()">
+                            <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold fs-lg"></ng-icon>Browse Special Equipment
+                        </button>
                         @if (specialEquipmentId()) {
                             <button type="button" class="btn btn-light fw-bold" (click)="clearSelectedSpecialEquipment()">
                                 <ng-icon name="tablerX" class="ps-0 pe-3 fw-bold fs-lg"></ng-icon>Clear
                             </button>
                         }
-                        <button type="button" class="btn btn-success fw-bold gap-1" (click)="openSpecialEquipmentBrowse()">
-                            <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold fs-lg"></ng-icon>Browse Special Equipment
-                        </button>
                     </div>
                 </div>
 

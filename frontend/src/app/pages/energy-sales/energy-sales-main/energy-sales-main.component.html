@@ -75,10 +75,10 @@
                                     }
                                 </td>
                                 <td class="fw-bold">{{ rec.localCode }}</td>
-                                <td>{{ rec.voucherDate | date:'MM/dd/yyyy' }}</td>
+                                <td>{{ rec.date | date:'MM/dd/yyyy' }}</td>
                                 <td>{{ rec.particulars || '—' }}</td>
                                 <td class="text-end fw-bold">{{ rec.amount | number:'1.2-2' }}</td>
-                                <td><span class="badge bg-secondary bg-opacity-25 text-dark border">{{ rec.status }}</span></td>
+                                <td><span class="badge border" [ngClass]="(rec.status) === 'Approved' ? 'bg-success bg-opacity-25 text-success' : 'bg-primary bg-opacity-25 text-primary'">{{ rec.status }}</span></td>
                                 <td class="text-nowrap">
                                     <div class="d-flex justify-content-end gap-1">
                                         <a href="javascript:void(0)" ngbTooltip="View"
@@ -104,9 +104,18 @@
             </table>
         </div>
 
-        @if (filteredRecords.length > pageSize) {
-            <div class="card-footer d-flex justify-content-center border-top-0">
-                <div class="pagination-boxed align-items-center mt-2 mb-0">
+        <div class="card-footer d-flex align-items-center justify-content-between">
+            <button type="button" class="btn btn-primary fw-bold"
+                    [disabled]="processingAll || selectedIds.length === 0"
+                    (click)="approveAll()">
+                @if (processingAll) {
+                    <span class="spinner-border spinner-border-sm me-2" role="status"></span>Processing...
+                } @else {
+                    <ng-icon name="tablerThumbUp" class="ps-0 pe-3 fw-bold"></ng-icon>Approve All
+                }
+            </button>
+            @if (filteredRecords.length > pageSize) {
+                <div class="pagination-boxed align-items-center mb-0">
                     <ngb-pagination
                         [collectionSize]="filteredRecords.length"
                         [(page)]="page"
@@ -121,22 +130,7 @@
                         </ng-template>
                     </ngb-pagination>
                 </div>
-            </div>
-        }
-    </div>
-
-    <!-- Approve All -->
-    <div class="card">
-        <div class="card-footer border-top-0">
-            <button type="button" class="btn btn-primary fw-bold"
-                    [disabled]="processingAll || selectedIds.length === 0"
-                    (click)="approveAll()">
-                @if (processingAll) {
-                    <span class="spinner-border spinner-border-sm me-2" role="status"></span>Processing...
-                } @else {
-                    <ng-icon name="tablerThumbUp" class="ps-0 pe-3 fw-bold"></ng-icon>Approve All
-                }
-            </button>
+            }
         </div>
     </div>
 </div>

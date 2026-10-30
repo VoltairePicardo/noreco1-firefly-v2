@@ -3,6 +3,7 @@ package com.noreco1.fireflyv2.controller;
 import com.noreco1.fireflyv2.common.helpers.Checker;
 import com.noreco1.fireflyv2.controller.response.PostResponse;
 import com.noreco1.fireflyv2.controller.response.ProcessDocumentDto;
+import com.noreco1.fireflyv2.model.DocumentStatus;
 import com.noreco1.fireflyv2.model.PettyCashLiquidation;
 import com.noreco1.fireflyv2.service.DownloadService;
 import com.noreco1.fireflyv2.service.PettyCashLiquidationService;
@@ -66,6 +67,11 @@ public class PettyCashLiquidationController {
     @PostMapping("/process")
     public PostResponse process(@RequestBody ProcessDocumentDto postData, BindingResult bindingResult) {
         return pettyCashLiquidationService.process(postData, bindingResult, messageSource);
+    }
+
+    @GetMapping("/document-statuses")
+    public List<DocumentStatus> documentStatuses() {
+        return pettyCashLiquidationService.getDocumentsStatuses();
     }
 
     @GetMapping("/default-signatories")

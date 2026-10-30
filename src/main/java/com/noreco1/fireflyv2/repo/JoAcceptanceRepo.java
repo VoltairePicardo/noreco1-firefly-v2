@@ -161,7 +161,8 @@ public interface JoAcceptanceRepo extends JpaRepository<JobOrderAcceptance, Inte
             "JobOrderAcceptance.netAmount, " +
             "CONCAT(JobOrderAcceptance.code, ' - ', slentity.name) as particulars, " +
             "JobOrderAcceptance.voucherDate, " +
-            "u.fullName as preparedBy " +
+            "u.fullName as preparedBy, " +
+            "slentity.name as slentityName " +
             "FROM JobOrderAcceptance " +
             "JOIN User u ON JobOrderAcceptance.FK_createdByUserId = u.id  " +
             "JOIN slentity ON JobOrderAcceptance.FK_vendorAccountNo = slentity.accountNo " +

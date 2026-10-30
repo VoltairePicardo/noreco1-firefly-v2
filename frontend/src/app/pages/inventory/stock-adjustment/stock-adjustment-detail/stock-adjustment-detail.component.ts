@@ -57,9 +57,8 @@ export class StockAdjustmentDetailComponent implements OnInit {
         this.isLoading.set(true);
         this.service.getData(this.id).subscribe({
             next: (data) => {
-                this.isLoading.set(false);
                 if (data?.id) { this.data.set(data); this.loadWorkflowActions(); }
-                else { this.alertService.error(this.module, 'Not Found', ''); this.router.navigate(['/' + this.menuLink]); }
+                else { this.isLoading.set(false); this.alertService.error(this.module, 'Not Found', ''); this.router.navigate(['/' + this.menuLink]); }
             },
             error: () => { this.isLoading.set(false); this.alertService.error(this.module, 'Error.', ''); this.router.navigate(['/' + this.menuLink]); }
         });
@@ -67,10 +66,10 @@ export class StockAdjustmentDetailComponent implements OnInit {
 
     loadWorkflowActions(): void {
         const transactionId = this.transactionId();
-        if (!transactionId || this.isTerminal()) return;
+        if (!transactionId || this.isTerminal()) { this.isLoading.set(false); return; }
         this.anyJSONService.getWorkflowActions(transactionId).subscribe({
-            next: (actions) => { this.workflowActions.set(actions || []); },
-            error: () => { this.workflowActions.set([]); }
+            next: (actions) => { this.isLoading.set(false); this.workflowActions.set(actions || []); },
+            error: () => { this.isLoading.set(false); this.workflowActions.set([]); }
         });
     }
 

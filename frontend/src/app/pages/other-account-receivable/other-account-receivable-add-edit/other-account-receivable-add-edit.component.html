@@ -1,8 +1,6 @@
 <div class="container-fluid">
     <app-page-title [title]="module" [subTitle]="subModule" [menuLink]="menuLink"/>
-</div>
 
-<div class="container-fluid">
     <div class="row">
         <div class="col-xl-12">
             <app-ui-card [title]="module + ' Details'">
@@ -20,7 +18,8 @@
                         <div class="col-md-3">
                             <label class="form-label fw-bold">Voucher Date <span class="text-danger">*</span></label>
                             <input type="text" class="form-control" mwlFlatpickr [options]="flatpickrOptions"
-                                   [(ngModel)]="voucherDate" [ngModelOptions]="{ standalone: true }"
+                                   [ngModel]="voucherDate" (ngModelChange)="onVoucherDateChange($event)"
+                                   [ngModelOptions]="{ standalone: true }"
                                    placeholder="Select date"/>
                         </div>
                         <div class="col-md-9">
@@ -56,7 +55,7 @@
                                 <label class="form-label fw-bold">{{ signatoryLabels[key] }}</label>
                                 <div class="input-group">
                                     <input type="text" class="form-control"
-                                           [value]="signatories[key] ? signatories[key].name : ''"
+                                           [value]="signatories[key] ? (signatories[key].name || signatories[key].fullName || '') : ''"
                                            readonly placeholder="Select signatory..."/>
                                     <button type="button" class="btn btn-success fw-bold"
                                             (click)="openEntityBrowse(key)">

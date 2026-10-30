@@ -29,16 +29,16 @@
                         </div>
                     </td>
                     <td>
-                        <input type="number" class="form-control form-control-sm text-end"
-                               [(ngModel)]="entries[i].debit"
-                               [ngModelOptions]="{ standalone: true }"
-                               min="0" placeholder="0.00"/>
+                        <input type="text" class="form-control form-control-sm text-end"
+                               [value]="(entries[i].debit || null) | number:'1.2-2'"
+                               (blur)="onAmountBlur($event, i, 'debit')"
+                               placeholder="0.00"/>
                     </td>
                     <td>
-                        <input type="number" class="form-control form-control-sm text-end"
-                               [(ngModel)]="entries[i].credit"
-                               [ngModelOptions]="{ standalone: true }"
-                               min="0" placeholder="0.00"/>
+                        <input type="text" class="form-control form-control-sm text-end"
+                               [value]="(entries[i].credit || null) | number:'1.2-2'"
+                               (blur)="onAmountBlur($event, i, 'credit')"
+                               placeholder="0.00"/>
                     </td>
                     <td>
                         <div class="d-flex justify-content-end gap-1">

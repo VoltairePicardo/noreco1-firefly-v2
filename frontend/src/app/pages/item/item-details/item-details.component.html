@@ -101,17 +101,10 @@
                             <input type="text" class="form-control" readonly
                                    [value]="selectedAssetAccount() ? (selectedAssetAccount().accountCode + ' — ' + selectedAssetAccount().accountTitle) : ''"
                                    placeholder="Browse Asset Account"/>
-                            @if (selectedAssetAccount()) {
-                                <button type="button" class="btn btn-danger fw-bold"
-                                        (click)="selectedAssetAccount.set(null)" [disabled]="processing()">
-                                    <ng-icon name="tablerX" class="fw-bold"></ng-icon>
-                                </button>
-                            } @else {
-                                <button type="button" class="btn btn-success fw-bold"
-                                        (click)="openAssetBrowse()" [disabled]="processing()">
-                                    <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
-                                </button>
-                            }
+                            <button type="button" class="btn btn-success fw-bold"
+                                    (click)="openAssetBrowse()" [disabled]="processing()">
+                                <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
+                            </button>
                         </div>
                     </div>
                     <div class="col-md-6">
@@ -120,17 +113,10 @@
                             <input type="text" class="form-control" readonly
                                    [value]="selectedExpenseAccount() ? (selectedExpenseAccount().accountCode + ' — ' + selectedExpenseAccount().accountTitle) : ''"
                                    placeholder="Browse Expense Account"/>
-                            @if (selectedExpenseAccount()) {
-                                <button type="button" class="btn btn-danger fw-bold"
-                                        (click)="selectedExpenseAccount.set(null)" [disabled]="processing()">
-                                    <ng-icon name="tablerX" class="fw-bold"></ng-icon>
-                                </button>
-                            } @else {
-                                <button type="button" class="btn btn-success fw-bold"
-                                        (click)="openExpenseBrowse()" [disabled]="processing()">
-                                    <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
-                                </button>
-                            }
+                            <button type="button" class="btn btn-success fw-bold"
+                                    (click)="openExpenseBrowse()" [disabled]="processing()">
+                                <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
+                            </button>
                         </div>
                     </div>
 
@@ -159,17 +145,10 @@
                             <input type="text" class="form-control" readonly
                                    [value]="selectedParentItem() ? ((selectedParentItem().code ? selectedParentItem().code + ' — ' : '') + selectedParentItem().description) : ''"
                                    placeholder="Optional Parent Item"/>
-                            @if (selectedParentItem()) {
-                                <button type="button" class="btn btn-danger fw-bold"
-                                        (click)="clearParentItemApproval()" [disabled]="processing()">
-                                    <ng-icon name="tablerX" class="fw-bold"></ng-icon>
-                                </button>
-                            } @else {
-                                <button type="button" class="btn btn-success fw-bold"
-                                        (click)="openParentBrowse()" [disabled]="processing()">
-                                    <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
-                                </button>
-                            }
+                            <button type="button" class="btn btn-success fw-bold"
+                                    (click)="openParentBrowse()" [disabled]="processing()">
+                                <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
+                            </button>
                         </div>
                     </div>
                     <div class="col-md-2 d-flex align-items-end pb-1">

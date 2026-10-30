@@ -4,11 +4,13 @@ import { AlertService } from '@/app/shared/services/alert.service';
 import { FlatpickrDefaults, FlatpickrModule } from 'angularx-flatpickr';
 import { MaintenanceRecordService } from '../maintenance-record.service';
 import { fmtDate, monthStart, monthEnd } from '@/app/shared/utils/date.utils';
+import { provideIcons } from '@ng-icons/core';
+import { tablerChevronLeft, tablerChevronRight } from '@ng-icons/tabler-icons';
 
 @Component({
     selector: 'app-maintenance-record-main',
     imports: [...COMMON_ALL_PAGE_IMPORTS, ...COMMON_MAIN_PAGE_IMPORTS, FlatpickrModule],
-    providers: [...SHARED_PROVIDERS, FlatpickrDefaults],
+    providers: [...SHARED_PROVIDERS, FlatpickrDefaults, provideIcons({ tablerChevronLeft, tablerChevronRight })],
     templateUrl: './maintenance-record-main.component.html'
 })
 export class MaintenanceRecordMainComponent {

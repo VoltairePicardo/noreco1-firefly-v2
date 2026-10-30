@@ -1,4 +1,5 @@
 import { Component, inject, signal, ViewChild, ElementRef } from '@angular/core';
+import { forkJoin } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AlertService } from '@/app/shared/services/alert.service';
 import {
@@ -55,7 +56,9 @@ export class BankDepositAddEditComponent {
 
     bankAccount: any = null;
 
-    stagedFiles  : File[] = [];
+    stagedFiles    : File[] = [];
+    existingFiles  : any[] = [];
+    filesToRemove  : number[] = [];
     uploadingFiles = false;
 
     // Upload Deposits (bulk import)
@@ -80,7 +83,15 @@ export class BankDepositAddEditComponent {
                 this.loadForEdit();
             } else {
                 this.subModule = 'Create';
+                this.loadDefaultDate();
             }
+        });
+    }
+
+    loadDefaultDate(): void {
+        this.service.getDefaultDate().subscribe({
+            next: (data) => { if (data?.date) this.postingDate = data.date.substring(0, 10); },
+            error: () => {}
         });
     }
 
@@ -98,6 +109,12 @@ export class BankDepositAddEditComponent {
                     this.cashAmount      = data.cashAmount  || 0;
                     this.checkAmount     = data.checkAmount || 0;
                     this.bankAccount     = data.bankAccount || null;
+                    if (data.transId) {
+                        this.service.getFiles(data.transId).subscribe({
+                            next: (files) => { this.existingFiles = files || []; },
+                            error: () => {}
+                        });
+                    }
                 } else {
                     this.alertService.error(this.module, 'Record not found.', '');
                     this.router.navigate(['/' + this.menuLink]);
@@ -142,6 +159,11 @@ export class BankDepositAddEditComponent {
 
     removeStagedFile(index: number): void {
         this.stagedFiles.splice(index, 1);
+    }
+
+    removeExistingFile(file: any): void {
+        this.filesToRemove.push(file.id);
+        this.existingFiles = this.existingFiles.filter(f => f.id !== file.id);
     }
 
     isImage(file: File): boolean {
@@ -200,18 +222,24 @@ export class BankDepositAddEditComponent {
         reader.readAsText(this.uploadFile);
     }
 
-    private uploadAndNavigate(savedId: number): void {
-        const formData = new FormData();
-        this.stagedFiles.forEach(f => formData.append('files', f, f.name));
-        this.service.uploadFiles(savedId, formData).subscribe({
-            next: () => {
-                this.formSubmit = false;
-                this.alertService.success(this.module, 'Saved successfully.', '');
-                this.router.navigate(['/' + this.menuLink, savedId, 'detail']);
-            },
+    private handleFilesAfterSave(savedId: number): void {
+        this.formSubmit = false;
+        const ops = [
+            ...this.filesToRemove.map(fid => this.service.deleteFile(fid)),
+            ...(this.stagedFiles.length > 0 ? [(() => {
+                const fd = new FormData();
+                this.stagedFiles.forEach(f => fd.append('file_', f, f.name));
+                return this.service.uploadFiles(savedId, fd);
+            })()] : [])
+        ];
+        if (ops.length === 0) {
+            this.router.navigate(['/' + this.menuLink, savedId, 'detail']);
+            return;
+        }
+        forkJoin(ops).subscribe({
+            next: () => this.router.navigate(['/' + this.menuLink, savedId, 'detail']),
             error: () => {
-                this.formSubmit = false;
-                this.alertService.success(this.module, 'Saved successfully.', 'Record saved but file upload failed.');
+                this.alertService.warning(this.module, 'Warning', 'Record saved but some file operations failed.');
                 this.router.navigate(['/' + this.menuLink, savedId, 'detail']);
             }
         });
@@ -220,6 +248,10 @@ export class BankDepositAddEditComponent {
     save(): void {
         if (!this.depositDate) {
             this.alertService.warning(this.module, 'Validation', 'Please enter a deposit date.');
+            return;
+        }
+        if (!this.referenceNumber.trim()) {
+            this.alertService.warning(this.module, 'Validation', 'Please enter a reference number.');
             return;
         }
         if (!this.bankAccount) {
@@ -245,13 +277,8 @@ export class BankDepositAddEditComponent {
         req$.subscribe({
             next: (res) => {
                 if (res?.success) {
-                    if (this.stagedFiles.length > 0) {
-                        this.uploadAndNavigate(res.modelId);
-                    } else {
-                        this.formSubmit = false;
-                        this.alertService.success(this.module, 'Saved successfully.', '');
-                        this.router.navigate(['/' + this.menuLink, res.modelId, 'detail']);
-                    }
+                    this.alertService.success(this.module, 'Saved successfully.', '');
+                    this.handleFilesAfterSave(res.modelId);
                 } else {
                     this.formSubmit = false;
                     this.alertService.error(this.module, 'Save failed.', res?.failureMessage || '');

@@ -148,12 +148,12 @@
                             </div>
                         </td>
                         <td>
-                            <input type="number" min="0" step="0.01" class="form-control form-control-sm text-end"
+                            <input type="text" appNumericFormat class="form-control form-control-sm text-end"
                                    [(ngModel)]="row.value"
                                    (ngModelChange)="onRowValueChange(row)"/>
                         </td>
                         <td>
-                            <input type="number" min="0" step="0.01" class="form-control form-control-sm text-end"
+                            <input type="text" appNumericFormat class="form-control form-control-sm text-end"
                                    [(ngModel)]="row.depreciatedValue"
                                    (ngModelChange)="onRowDepreciatedValueChange(row)"/>
                         </td>

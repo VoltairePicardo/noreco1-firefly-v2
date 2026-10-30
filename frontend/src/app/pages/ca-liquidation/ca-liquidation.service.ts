@@ -74,4 +74,12 @@ export class CaLiquidationService {
     print(id: number): void {
         this.downloadService.print(`${BASE_API}/cash-advance-liquidation/export/${id}`, { type: 'pdf' });
     }
+
+    getFiles(transId: number): Observable<any[]> {
+        return this.http.get<any[]>(`${BASE_API}/file/attachments/${transId}`);
+    }
+
+    fileUrl(fileId: number): string {
+        return this.downloadService.printUrl(`${BASE_API}/file/${fileId}`);
+    }
 }

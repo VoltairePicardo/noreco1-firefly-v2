@@ -91,13 +91,22 @@
 
                 @if (totalElements() > pageSize) {
                     <div class="d-flex justify-content-center mt-3">
-                        <ngb-pagination
-                            [collectionSize]="totalElements()"
-                            [page]="pageNumber() + 1"
-                            [pageSize]="pageSize"
-                            [maxSize]="5"
-                            (pageChange)="onPageChange($event)">
-                        </ngb-pagination>
+                        <div class="pagination-boxed align-items-center mb-0">
+                            <ngb-pagination
+                                [collectionSize]="totalElements()"
+                                [page]="pageNumber() + 1"
+                                [pageSize]="pageSize"
+                                [maxSize]="5"
+                                [rotate]="true"
+                                (pageChange)="onPageChange($event)">
+                                <ng-template ngbPaginationPrevious>
+                                    <ng-icon name="tablerChevronLeft"/>
+                                </ng-template>
+                                <ng-template ngbPaginationNext>
+                                    <ng-icon name="tablerChevronRight"/>
+                                </ng-template>
+                            </ngb-pagination>
+                        </div>
                     </div>
                 }
 

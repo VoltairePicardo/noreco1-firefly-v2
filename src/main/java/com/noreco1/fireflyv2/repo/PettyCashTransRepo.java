@@ -44,6 +44,19 @@ public interface PettyCashTransRepo extends JpaRepository<PettyCashTrans, Intege
             "WHERE p.FK_documentStatusId NOT IN(26, 25, 58)", nativeQuery = true)
     BigDecimal findSumOtherAmounts();
 
+    @Query(value = "SELECT p.* FROM PettyCashTrans p " +
+            "WHERE (:from IS NULL OR p.voucherDate >= STR_TO_DATE(:from, '%Y-%m-%d')) " +
+            "AND (:to IS NULL OR p.voucherDate <= STR_TO_DATE(:to, '%Y-%m-%d')) " +
+            "AND (:officeId IS NULL OR p.FK_officeId = :officeId) " +
+            "AND (:documentStatusId IS NULL OR p.FK_documentStatusId = :documentStatusId) " +
+            "ORDER BY p.voucherDate DESC",
+            nativeQuery = true)
+    List<PettyCashTrans> findForCloseout(
+            @Param("from") String from,
+            @Param("to") String to,
+            @Param("officeId") Integer officeId,
+            @Param("documentStatusId") Integer documentStatusId);
+
     @Query(value = "SELECT * " +
             "FROM PettyCashTrans p " +
             "WHERE p.FK_documentStatusId = :documentStatusId " +

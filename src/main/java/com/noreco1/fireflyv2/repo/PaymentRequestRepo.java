@@ -58,7 +58,8 @@ public interface PaymentRequestRepo extends JpaRepository<PaymentRequest, Intege
             "PaymentRequest.amount, " +
             "CONCAT(PaymentRequest.code, ' - ', slentity.name) as particulars, " +
             "PaymentRequest.voucherDate, " +
-            "u.fullName as preparedBy " +
+            "u.fullName as preparedBy, " +
+            "slentity.name as slentityName " +
             "FROM PaymentRequest " +
             "JOIN User u ON PaymentRequest.FK_createdByUserId = u.id  " +
             "JOIN slentity ON PaymentRequest.FK_vendorAccountNo = slentity.accountNo " +

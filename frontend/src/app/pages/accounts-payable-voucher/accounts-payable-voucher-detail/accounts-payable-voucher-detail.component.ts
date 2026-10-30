@@ -8,10 +8,11 @@ import {
 } from '@/app/shared/providers/shared-providers';
 import { DocumentLogsComponent } from '@/app/shared/components/document-logs/document-logs.component';
 import { AttachmentsComponent } from '@/app/shared/components/attachments/attachments.component';
+import { JournalEntriesFormComponent, JournalEntry } from '@/app/shared/forms/journal-entries-form/journal-entries-form.component';
 import { AccountsPayableVoucherService } from '../accounts-payable-voucher.service';
 import { documentStatusBadgeClass } from '@/app/shared/workflow/document-status-badge.util';
 import { provideIcons } from '@ng-icons/core';
-import { tablerCheck, tablerEdit, tablerEye, tablerEyeOff, tablerPrinter, tablerArrowLeft } from '@ng-icons/tabler-icons';
+import { tablerCheck, tablerEdit, tablerEye, tablerEyeOff, tablerPrinter, tablerArrowLeft, tablerX, tablerChevronDown, tablerChevronRight, tablerDeviceFloppy } from '@ng-icons/tabler-icons';
 
 @Component({
     selector: 'app-accounts-payable-voucher-detail',
@@ -19,9 +20,10 @@ import { tablerCheck, tablerEdit, tablerEye, tablerEyeOff, tablerPrinter, tabler
         ...COMMON_ALL_PAGE_IMPORTS,
         ...COMMON_MAIN_PAGE_IMPORTS,
         DocumentLogsComponent,
-        AttachmentsComponent
+        AttachmentsComponent,
+        JournalEntriesFormComponent
     ],
-    providers: [...SHARED_PROVIDERS, provideIcons({ tablerCheck, tablerEdit, tablerEye, tablerEyeOff, tablerPrinter, tablerArrowLeft })],
+    providers: [...SHARED_PROVIDERS, provideIcons({ tablerCheck, tablerEdit, tablerEye, tablerEyeOff, tablerPrinter, tablerArrowLeft, tablerX, tablerChevronDown, tablerChevronRight, tablerDeviceFloppy })],
     templateUrl: './accounts-payable-voucher-detail.component.html'
 })
 export class AccountsPayableVoucherDetailComponent {
@@ -32,12 +34,23 @@ export class AccountsPayableVoucherDetailComponent {
 
     id: any   = null;
     data: any = {};
-    receivingReports: any[] = [];
-    journalEntries: any[]   = [];
-    iemopBillings: any[]    = [];
-    attachments: any[]      = [];
+    receivingReports: any[]   = [];
+    linkedPr: any             = null;
+    linkedJoa: any            = null;
+    journalEntries: any[]     = [];
+    editableEntries: JournalEntry[] = [];
+    savingEntries             = false;
+    iemopBillings: any[]      = [];
+    attachments: any[]        = [];
+    expandedSl = new Set<number>();
+    installmentDetails: any[] = [];
     isLoading = signal(false);
     showLogs  = false;
+
+    // Unpaid Remarks
+    unpaidRemark        = '';
+    editingUnpaidRemark = false;
+    savingUnpaidRemark  = false;
 
     // Workflow
     workflowActions: any[] = [];
@@ -64,17 +77,21 @@ export class AccountsPayableVoucherDetailComponent {
         this.isLoading.set(true);
         this.service.getById(this.id).subscribe({
             next: (data) => {
-                this.isLoading.set(false);
                 if (data?.id) {
-                    this.data             = data;
-                    this.receivingReports = data.receivingReports || [];
-                    this.iemopBillings    = data.iemopBillings    || [];
-                    this.loadWorkflowActions();
+                    this.data               = data;
+                    this.receivingReports   = data.receivingReports   || [];
+                    this.linkedPr           = data.linkedPr            || null;
+                    this.linkedJoa          = data.linkedJoa           || null;
+                    this.iemopBillings      = data.iemopBillings      || [];
+                    this.installmentDetails = data.installmentDetails  || [];
+                    this.unpaidRemark       = data.unpaidRemark        || '';
                     if (data.transId) {
                         this.loadJournalEntries(data.transId);
                         this.loadAttachments(data.transId);
                     }
+                    this.loadWorkflowActions(); // sets isLoading(false) on completion
                 } else {
+                    this.isLoading.set(false);
                     this.alertService.error(this.module, 'Record not found.', '');
                     this.router.navigate(['/' + this.menuLink]);
                 }
@@ -89,8 +106,19 @@ export class AccountsPayableVoucherDetailComponent {
 
     loadJournalEntries(transId: number): void {
         this.service.getJournalEntries(transId).subscribe({
-            next: (data) => { this.journalEntries = data || []; },
-            error: ()    => { this.journalEntries = []; }
+            next: (data) => {
+                this.journalEntries = data || [];
+                this.editableEntries = (data || []).map((e: any): JournalEntry => ({
+                    account: { id: e.accountId, accountCode: e.code, accountTitle: e.description, hasSL: e.hasSL || false },
+                    debit:   Number(e.debit)  || null,
+                    credit:  Number(e.credit) || null,
+                    slentries: (e.slentries || []).map((sl: any) => ({
+                        entity: null, accountNo: sl.accountNo, name: sl.name,
+                        debit: Number(sl.debit) || null, credit: Number(sl.credit) || null
+                    }))
+                }));
+            },
+            error: () => { this.journalEntries = []; }
         });
     }
 
@@ -103,13 +131,15 @@ export class AccountsPayableVoucherDetailComponent {
 
     loadWorkflowActions(): void {
         const transId = this.data?.transId || this.data?.transaction?.id;
-        if (!transId) return;
+        if (!transId) { this.isLoading.set(false); return; }
         this.service.getWorkflowActions(transId).subscribe({
             next: (actions) => {
+                this.isLoading.set(false);
                 this.workflowActions = actions || [];
                 this.selectedAction  = null;
             },
             error: () => {
+                this.isLoading.set(false);
                 this.workflowActions = [];
             }
         });
@@ -124,7 +154,51 @@ export class AccountsPayableVoucherDetailComponent {
 
     isEditable(): boolean {
         const status = this.data?.documentStatus?.status || '';
-        return status === 'Document Created' || status === 'For Revision';
+        return status === 'Document Created' || status === 'Returned to Creator';
+    }
+
+    isForCheckingOrReviewing(): boolean {
+        const status = this.data?.documentStatus?.status || '';
+        return status === 'For Checking' || status === 'For Reviewing';
+    }
+
+    saveEntries(): void {
+        if (this.savingEntries) return;
+        this.savingEntries = true;
+        const payload = {
+            id: this.data.id,
+            generalLedgerLines: this.editableEntries.map(e => ({
+                code:        e.account?.accountCode  || '',
+                description: e.account?.accountTitle || '',
+                accountId:   e.account?.id           || null,
+                debit:       Number(e.debit)         || 0,
+                credit:      Number(e.credit)        || 0
+            })),
+            subLedgerLines: this.editableEntries
+                .filter(e => (e.slentries || []).length > 0)
+                .flatMap(e => (e.slentries || []).map((sl: any) => ({
+                    accountId: e.account?.id || null,
+                    accountNo: sl.accountNo,
+                    name:      sl.name,
+                    debit:     Number(sl.debit)  || 0,
+                    credit:    Number(sl.credit) || 0
+                })))
+        };
+        this.service.updateEntries(payload).subscribe({
+            next: (res) => {
+                this.savingEntries = false;
+                if (res?.success) {
+                    this.alertService.success(this.module, 'Entries saved successfully.', '');
+                    this.loadData();
+                } else {
+                    this.alertService.error(this.module, 'Save failed.', res?.failureMessage || '');
+                }
+            },
+            error: () => {
+                this.savingEntries = false;
+                this.alertService.error(this.module, 'An error occurred while saving entries.', '');
+            }
+        });
     }
 
     get journalDebitTotal(): number {
@@ -166,6 +240,43 @@ export class AccountsPayableVoucherDetailComponent {
                 this.alertService.httpError(this.module, 'Processing failed.', err);
             }
         });
+    }
+
+    editUnpaidRemark(): void {
+        this.editingUnpaidRemark = true;
+    }
+
+    cancelUnpaidRemark(): void {
+        this.unpaidRemark       = this.data.unpaidRemark || '';
+        this.editingUnpaidRemark = false;
+    }
+
+    saveUnpaidRemark(): void {
+        this.savingUnpaidRemark = true;
+        this.service.saveUnpaidRemarks(this.id, this.unpaidRemark).subscribe({
+            next: () => {
+                this.savingUnpaidRemark  = false;
+                this.editingUnpaidRemark = false;
+                this.data.unpaidRemark   = this.unpaidRemark;
+                this.alertService.success(this.module, 'Unpaid remarks saved.', '');
+            },
+            error: (err) => {
+                this.savingUnpaidRemark = false;
+                this.alertService.httpError(this.module, 'Failed to save remarks.', err);
+            }
+        });
+    }
+
+    isSlExpanded(index: number): boolean {
+        return this.expandedSl.has(index);
+    }
+
+    toggleSl(index: number): void {
+        if (this.expandedSl.has(index)) {
+            this.expandedSl.delete(index);
+        } else {
+            this.expandedSl.add(index);
+        }
     }
 
     toggleLogs(): void {

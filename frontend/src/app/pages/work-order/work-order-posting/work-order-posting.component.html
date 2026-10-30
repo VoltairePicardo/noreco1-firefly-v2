@@ -88,7 +88,7 @@
                             <div class="col-md-4">
                                 <label class="form-label fw-bold">Materials</label>
                                 <div class="input-group">
-                                    <input type="number" min="0" step="0.01" class="form-control text-end"
+                                    <input type="text" appNumericFormat class="form-control text-end"
                                            [(ngModel)]="detail.materials"
                                            (ngModelChange)="recalculate()"
                                            placeholder="Enter amount"/>
@@ -104,7 +104,7 @@
                             <div class="col-md-4">
                                 <label class="form-label fw-bold">Labor</label>
                                 <div class="input-group">
-                                    <input type="number" min="0" step="0.01" class="form-control text-end"
+                                    <input type="text" appNumericFormat class="form-control text-end"
                                            [(ngModel)]="detail.labor"
                                            (ngModelChange)="recalculate()"
                                            placeholder="Enter amount"/>
@@ -120,7 +120,7 @@
                             <div class="col-md-4">
                                 <label class="form-label fw-bold">Overhead</label>
                                 <div class="input-group">
-                                    <input type="number" min="0" step="0.01" class="form-control text-end"
+                                    <input type="text" appNumericFormat class="form-control text-end"
                                            [(ngModel)]="detail.overhead"
                                            (ngModelChange)="recalculate()"
                                            placeholder="Enter amount"/>
@@ -135,7 +135,7 @@
 
                             <div class="col-md-4">
                                 <label class="form-label fw-bold">House Connection</label>
-                                <input type="number" min="0" step="0.01" class="form-control text-end"
+                                <input type="text" appNumericFormat class="form-control text-end"
                                        [(ngModel)]="detail.houseConnection"
                                        (ngModelChange)="recalculate()"
                                        placeholder="Enter amount"/>

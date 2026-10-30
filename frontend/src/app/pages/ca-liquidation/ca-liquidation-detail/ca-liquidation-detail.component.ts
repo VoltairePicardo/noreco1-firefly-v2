@@ -1,15 +1,15 @@
 import { Component, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { COMMON_ALL_PAGE_IMPORTS } from '@/app/shared/providers/shared-providers';
-import { SharedModule } from '@/app/shared/shared.module';
-import { FormsModule } from '@angular/forms';
+import { COMMON_ALL_PAGE_IMPORTS, COMMON_ADD_EDIT_PAGE_IMPORTS, COMMON_MAIN_PAGE_IMPORTS, SHARED_PROVIDERS } from '@/app/shared/providers/shared-providers';
 import { AlertService } from '@/app/shared/services/alert.service';
+import { DocumentLogsComponent } from '@/app/shared/components/document-logs/document-logs.component';
+import { AttachmentsComponent } from '@/app/shared/components/attachments/attachments.component';
 import { CaLiquidationService } from '../ca-liquidation.service';
 
 @Component({
     selector: 'app-ca-liquidation-detail',
-    imports: [...COMMON_ALL_PAGE_IMPORTS, SharedModule, FormsModule],
-    providers: [],
+    imports: [...COMMON_ALL_PAGE_IMPORTS, ...COMMON_ADD_EDIT_PAGE_IMPORTS, ...COMMON_MAIN_PAGE_IMPORTS, DocumentLogsComponent, AttachmentsComponent],
+    providers: [...SHARED_PROVIDERS],
     templateUrl: './ca-liquidation-detail.component.html'
 })
 export class CaLiquidationDetailComponent {
@@ -26,9 +26,8 @@ export class CaLiquidationDetailComponent {
     selectedAction: any    = null;
     remarks = '';
 
-    logs: any[]  = [];
-    showLogs     = false;
-    logsLoading  = false;
+    showLogs    = false;
+    attachments : any[] = [];
 
     private service      = inject(CaLiquidationService);
     private route         = inject(ActivatedRoute);
@@ -49,13 +48,14 @@ export class CaLiquidationDetailComponent {
         this.isLoading.set(true);
         this.service.getData(this.id).subscribe({
             next: (data) => {
-                this.isLoading.set(false);
                 if (data?.id) {
-                    this.data = data;
-                    this.logs = [];
+                    this.data     = data;
                     this.showLogs = false;
                     this.loadWorkflowActions();
+                    const transId = data.transaction?.id;
+                    if (transId) this.loadAttachments(transId);
                 } else {
+                    this.isLoading.set(false);
                     this.alertService.error(this.module, 'Not Found', '');
                     this.router.navigate(['/' + this.menuLink]);
                 }
@@ -70,20 +70,31 @@ export class CaLiquidationDetailComponent {
 
     loadWorkflowActions(): void {
         const transId = this.data?.transaction?.id;
-        if (!transId) return;
+        if (!transId || this.isTerminal()) {
+            this.isLoading.set(false);
+            this.workflowActions = [];
+            this.selectedAction  = null;
+            return;
+        }
         this.service.getWorkflowActions(transId).subscribe({
-            next: (actions) => { this.workflowActions = actions || []; this.selectedAction = null; this.remarks = ''; },
-            error: () => { this.workflowActions = []; }
+            next: (actions) => { this.isLoading.set(false); this.workflowActions = actions || []; this.selectedAction = null; this.remarks = ''; },
+            error: () => { this.isLoading.set(false); this.workflowActions = []; }
+        });
+    }
+
+    loadAttachments(transId: number): void {
+        this.service.getFiles(transId).subscribe({
+            next: (files) => { this.attachments = files || []; },
+            error: () => {}
         });
     }
 
     processWorkflow(): void {
         if (!this.selectedAction) return;
         this.processingWorkflow = true;
-        const transId = this.data?.transaction?.id;
         const payload = {
             documentId:         this.data.id,
-            transId:            transId,
+            transId:            this.data.transaction?.id,
             workflowActionsDto: this.selectedAction,
             remarks:            this.remarks || ''
         };
@@ -91,10 +102,13 @@ export class CaLiquidationDetailComponent {
             next: (res) => {
                 this.processingWorkflow = false;
                 if (res?.success) {
-                    this.alertService.success(this.module, 'Processed', '');
+                    this.workflowActions = [];
+                    this.selectedAction  = null;
+                    this.remarks         = '';
+                    this.alertService.success(this.module, res.successMessage || 'Processed.', '');
                     this.load();
                 } else {
-                    this.alertService.error(this.module, 'Process', res?.failureMessage || '');
+                    this.alertService.error(this.module, res?.failureMessage || 'Process failed.', '');
                 }
             },
             error: () => { this.processingWorkflow = false; this.alertService.error(this.module, 'Process Error', ''); }
@@ -110,6 +124,17 @@ export class CaLiquidationDetailComponent {
         return s === 'Document Created' || s === 'Returned to Creator';
     }
 
+    isTerminal(): boolean {
+        const s = this.data?.documentStatus?.status || '';
+        return s === 'Approved' || s === 'Cancelled';
+    }
+
+    toggleLogs(): void {
+        this.showLogs = !this.showLogs;
+    }
+
+    fileUrl = (fileId: number): string => this.service.fileUrl(fileId);
+
     get items(): any[] {
         return this.data?.cashAdvanceLiquidationItems || [];
     }
@@ -120,22 +145,5 @@ export class CaLiquidationDetailComponent {
 
     get totalReturnedAmount(): number {
         return this.items.reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
-    }
-
-    toggleLogs(): void {
-        this.showLogs = !this.showLogs;
-        if (this.showLogs && this.logs.length === 0 && !this.logsLoading) {
-            this.loadLogs();
-        }
-    }
-
-    loadLogs(): void {
-        const transId = this.data?.transaction?.id;
-        if (!transId || this.logsLoading) return;
-        this.logsLoading = true;
-        this.service.getDocumentLogs(transId).subscribe({
-            next: (data) => { this.logs = data || []; this.logsLoading = false; },
-            error: ()     => { this.logsLoading = false; }
-        });
     }
 }

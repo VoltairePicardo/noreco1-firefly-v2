@@ -58,6 +58,7 @@ public class CvDto {
 
     private boolean isForAddingBudgetDetail = false;
     private boolean hasTax = false;
+    private String remarks;
 
     public CvDto() {}
 
@@ -419,5 +420,13 @@ public class CvDto {
 
     public void setHasTax(boolean hasTax) {
         this.hasTax = hasTax;
+    }
+
+    public String getRemarks() {
+        return remarks;
+    }
+
+    public void setRemarks(String remarks) {
+        this.remarks = remarks;
     }
 }

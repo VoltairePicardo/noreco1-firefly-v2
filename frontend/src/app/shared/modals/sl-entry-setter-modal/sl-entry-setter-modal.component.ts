@@ -62,6 +62,14 @@ export class SlEntrySetterModalComponent implements OnInit {
         return `${a.accountCode || ''} — ${a.accountTitle || a.accountDescription || ''}`.trim();
     }
 
+    onAmountBlur(event: FocusEvent, i: number, field: 'debit' | 'credit'): void {
+        const input = event.target as HTMLInputElement;
+        const raw = parseFloat(input.value.replace(/,/g, ''));
+        const val = isNaN(raw) ? null : raw;
+        this.slEntries[i][field] = val;
+        input.value = val != null ? val.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '';
+    }
+
     get slTotalDebit(): number {
         return this.slEntries.reduce((s, e) => s + (Number(e.debit) || 0), 0);
     }

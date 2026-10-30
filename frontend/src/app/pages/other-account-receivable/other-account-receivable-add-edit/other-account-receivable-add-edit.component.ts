@@ -1,4 +1,5 @@
 import { Component, inject, signal } from '@angular/core';
+import Swal from 'sweetalert2';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AlertService } from '@/app/shared/services/alert.service';
 import {
@@ -43,8 +44,9 @@ export class OtherAccountReceivableAddEditComponent {
 
     flatpickrOptions = { dateFormat: 'Y-m-d', altInput: true, altFormat: 'F j, Y' };
 
-    voucherDate = '';
-    particulars = '';
+    voucherDate      = '';
+    particulars      = '';
+    private _prevVoucherDate = '';
 
     journalEntries: JournalEntry[] = [];
 
@@ -88,7 +90,13 @@ export class OtherAccountReceivableAddEditComponent {
             next: (data) => {
                 this.isLoading.set(false);
                 if (data?.id) {
-                    this.voucherDate = data.voucherDate ? new Date(data.voucherDate).toISOString().substring(0, 10) : '';
+                    const allowedStatuses = ['Document Created', 'Returned to Creator'];
+                    if (!allowedStatuses.includes(data.documentStatus?.status)) {
+                        this.router.navigate(['/' + this.menuLink, this.id, 'detail']);
+                        return;
+                    }
+                    this.voucherDate      = data.voucherDate ? new Date(data.voucherDate).toISOString().substring(0, 10) : '';
+                    this._prevVoucherDate = this.voucherDate;
                     this.particulars = data.particulars || data.remarks || '';
                     this.journalEntries = (data.journalEntries || data.details || []).map((e: any): JournalEntry => ({
                         account:         e.account
@@ -154,6 +162,32 @@ export class OtherAccountReceivableAddEditComponent {
         return this.journalEntries.length > 0 && Math.abs(this.totalDebit - this.totalCredit) < 0.001;
     }
 
+    onVoucherDateChange(newDate: string): void {
+        const hasEntries = this.journalEntries.some(e => e.account?.id);
+        if (!hasEntries) {
+            this.voucherDate      = newDate;
+            this._prevVoucherDate = newDate;
+            return;
+        }
+        Swal.fire({
+            title: 'Change Voucher Date?',
+            text: 'Changing the date will clear all journal entries. Continue?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, change date',
+            cancelButtonText: 'No, keep current date'
+        }).then(result => {
+            if (result.isConfirmed) {
+                this.voucherDate      = newDate;
+                this._prevVoucherDate = newDate;
+                this.journalEntries   = [{ account: null, debit: null, credit: null }];
+            } else {
+                const old = this._prevVoucherDate;
+                setTimeout(() => { this.voucherDate = old; }, 0);
+            }
+        });
+    }
+
     async openEntityBrowse(key: string): Promise<void> {
         try {
             const result = await this.modalService.openModal(BrowseEntityModalComponent, { entityTypes: [1] }, { size: 'lg', centered: true });
@@ -182,6 +216,18 @@ export class OtherAccountReceivableAddEditComponent {
             this.alertService.warning(this.module, 'Validation', 'Debit and credit totals must be equal.');
             return;
         }
+        if (this.totalDebit <= 0) {
+            this.alertService.warning(this.module, 'Validation', 'Journal entry amounts must be greater than zero.');
+            return;
+        }
+        if (!this.signatories['checker']) {
+            this.alertService.warning(this.module, 'Validation', 'Please select a Checker.');
+            return;
+        }
+        if (!this.signatories['approvingOfficer']) {
+            this.alertService.warning(this.module, 'Validation', 'Please select an Approving Officer.');
+            return;
+        }
 
         this.formSubmit = true;
 
@@ -189,6 +235,7 @@ export class OtherAccountReceivableAddEditComponent {
             id:          this.editMode ? this.id : null,
             voucherDate: this.voucherDate,
             particulars: this.particulars,
+            amount:      this.totalDebit,
             generalLedgerLines: this.journalEntries
                 .filter(e => e.account?.id)
                 .map(e => ({

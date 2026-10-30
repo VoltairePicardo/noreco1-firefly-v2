@@ -5,11 +5,13 @@ import { AlertService } from '@/app/shared/services/alert.service';
 import { FlatpickrDefaults, FlatpickrModule } from 'angularx-flatpickr';
 import { VoucherCashflowService } from '../voucher-cashflow.service';
 import { fmtDate, monthStart, monthEnd } from '@/app/shared/utils/date.utils';
+import { provideIcons } from '@ng-icons/core';
+import { tablerChevronLeft, tablerChevronRight } from '@ng-icons/tabler-icons';
 
 @Component({
     selector: 'app-voucher-cashflow-main',
     imports: [...COMMON_ALL_PAGE_IMPORTS, ...COMMON_MAIN_PAGE_IMPORTS, FlatpickrModule],
-    providers: [...SHARED_PROVIDERS, FlatpickrDefaults],
+    providers: [...SHARED_PROVIDERS, FlatpickrDefaults, provideIcons({ tablerChevronLeft, tablerChevronRight })],
     templateUrl: './voucher-cashflow-main.component.html'
 })
 export class VoucherCashflowMainComponent {
@@ -73,6 +75,13 @@ export class VoucherCashflowMainComponent {
     }
 
     goToSetup(rec: any): void {
-        this.router.navigate(['/' + this.menuLink, rec.documentTypeCode, rec.voucherId, 'setup']);
+        const typeCodeMap: Record<string, string> = {
+            'Check Voucher': 'CV',
+            'Cash Receipt Voucher': 'CRV',
+            'Journal Voucher': 'JV',
+            'Accounts Payable': 'APV'
+        };
+        const typeCode = typeCodeMap[rec.documentType] ?? rec.documentType;
+        this.router.navigate(['/' + this.menuLink, typeCode, rec.id, 'setup']);
     }
 }

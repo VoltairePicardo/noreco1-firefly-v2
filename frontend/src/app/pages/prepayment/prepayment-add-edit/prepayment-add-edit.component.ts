@@ -39,7 +39,7 @@ export class PrepaymentAddEditComponent {
     // Form fields
     datePaid           = '';
     description        = '';
-    startMonth         = 1;
+    startMonth         = (new Date().getMonth() + 1) % 12 + 1; // default: next month (1-indexed)
     startYear          = new Date().getFullYear();
     totalCost          = 0;
     noOfMonths         = 0;
@@ -119,8 +119,8 @@ export class PrepaymentAddEditComponent {
         const total   = Number(this.totalCost)   || 0;
         const months  = Number(this.noOfMonths)  || 0;
         const applied = Number(this.appliedCost) || 0;
-        this.monthlyCost = months > 0 ? total / months : 0;
         this.balance     = total - applied;
+        this.monthlyCost = months > 0 ? this.balance / months : 0;
     }
 
     async openAccBrowse(field: string): Promise<void> {
@@ -131,6 +131,20 @@ export class PrepaymentAddEditComponent {
                 else if (field === 'expenseAccount') this.expenseAccount = result.data;
             }
         } catch { }
+    }
+
+    reset(): void {
+        this.datePaid          = '';
+        this.description       = '';
+        this.startMonth        = (new Date().getMonth() + 1) % 12 + 1;
+        this.startYear         = new Date().getFullYear();
+        this.totalCost         = 0;
+        this.noOfMonths        = 0;
+        this.monthlyCost       = 0;
+        this.appliedCost       = 0;
+        this.balance           = 0;
+        this.prepaymentAccount = null;
+        this.expenseAccount    = null;
     }
 
     save(): void {
@@ -173,7 +187,7 @@ export class PrepaymentAddEditComponent {
             expenseAccount:     { id: this.expenseAccount.id },
             totalCost:          total,
             noOfMonths:         months,
-            monthlyCost:        months > 0 ? total / months : 0,
+            monthlyCost:        months > 0 ? (total - applied) / months : 0,
             appliedCost:        applied,
             balance:            total - applied,
             startMonth:         (Number(this.startMonth) || 1) - 1,

@@ -2,6 +2,7 @@ package com.noreco1.fireflyv2.controller;
 
 import com.noreco1.fireflyv2.common.GlobalConstant;
 import com.noreco1.fireflyv2.common.helpers.Checker;
+import com.noreco1.fireflyv2.controller.response.CheckVoucherAdditionalBudgetLineItemDetailDto;
 import com.noreco1.fireflyv2.controller.response.PostResponse;
 import com.noreco1.fireflyv2.controller.response.ProcessDocumentDto;
 import com.noreco1.fireflyv2.model.CheckVoucher;
@@ -109,6 +110,18 @@ public class DisbursementController {
     @GetMapping("/checks/{transId}")
     public List<Map> checks(@PathVariable Integer transId) {
         return cvService.findCvChecks(transId);
+    }
+
+    @PostMapping("/update-entries")
+    public PostResponse updateEntries(@RequestBody CheckVoucher cv) {
+        BindingResult bindingResult = new BeanPropertyBindingResult(cv, "cv");
+        return cvService.updateEntries(cv, bindingResult, messageSource);
+    }
+
+    @PostMapping("/assign-budget")
+    public PostResponse assignBudget(@RequestBody CheckVoucherAdditionalBudgetLineItemDetailDto dto) {
+        BindingResult bindingResult = new BeanPropertyBindingResult(dto, "dto");
+        return cvService.additionalBudgetLineItemDetail(dto, bindingResult, messageSource);
     }
 
     @GetMapping("/export/{id}")

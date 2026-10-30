@@ -52,6 +52,7 @@ export class AccountSettingMainComponent {
 
     load(): void {
         if (!this.fromDate || !this.toDate) return;
+        if (this.fromDate > this.toDate) return;
         this.isLoading.set(true);
         this.service.listByDateRange(this.fromDate, this.toDate).subscribe({
             next: (data) => { this.records.set(data || []); this.page = 1; this.isLoading.set(false); },

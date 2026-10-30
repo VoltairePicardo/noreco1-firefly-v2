@@ -10,7 +10,7 @@
                 <!-- Filters -->
                 <div class="row mb-3 align-items-end g-2">
                     <div class="col-md-12 justify-content-end d-flex gap-2">
-                        <button type="button" class="btn btn-success fw-bold"
+                        <button type="button" class="btn btn-primary fw-bold"
                                 (click)="approveAll()" [disabled]="approvingAll || isLoading()">
                             <ng-icon name="tablerChecks" class="ps-0 pe-3 fw-bold"></ng-icon>
                             {{ approvingAll ? 'Approving...' : 'Approve All' }}
@@ -119,6 +119,10 @@
                                                             <th>Budget Title</th>
                                                             <th>Specification</th>
                                                             <th class="text-end">Project Cost</th>
+                                                            @if (rec.documentStatus?.status === 'Approved') {
+                                                                <th class="text-end">NEA Approved Budget</th>
+                                                                <th class="text-end">Supplemental Budget</th>
+                                                            }
                                                         </tr>
                                                     </thead>
                                                     <tbody>
@@ -127,6 +131,22 @@
                                                                 <td>{{ d.title }}</td>
                                                                 <td>{{ d.item?.description ? (d.item.description + (d.specification ? ' - ' + d.specification : '')) : (d.specification || '') }}</td>
                                                                 <td class="text-end">{{ d.totalPrice | number:'1.2-2' }}</td>
+                                                                @if (rec.documentStatus?.status === 'Approved') {
+                                                                    <td class="text-end text-nowrap">
+                                                                        {{ (d.nEAApprovedAmount || 0) | number:'1.2-2' }}
+                                                                        <button type="button" class="btn btn-light btn-icon btn-sm rounded-circle ms-1"
+                                                                                (click)="updateNeaAmount(d)">
+                                                                            <ng-icon name="tablerEdit"></ng-icon>
+                                                                        </button>
+                                                                    </td>
+                                                                    <td class="text-end text-nowrap">
+                                                                        {{ (d.supplementalAmount || 0) | number:'1.2-2' }}
+                                                                        <button type="button" class="btn btn-light btn-icon btn-sm rounded-circle ms-1"
+                                                                                (click)="updateSupplementalAmt(d)">
+                                                                            <ng-icon name="tablerEdit"></ng-icon>
+                                                                        </button>
+                                                                    </td>
+                                                                }
                                                             </tr>
                                                         }
 
@@ -194,11 +214,20 @@
 
                 @if (filteredRecords.length > pageSize) {
                     <div class="d-flex justify-content-center mt-3">
-                        <ngb-pagination [collectionSize]="filteredRecords.length"
-                                        [(page)]="page"
-                                        [pageSize]="pageSize"
-                                        [maxSize]="5">
-                        </ngb-pagination>
+                        <div class="pagination-boxed align-items-center mb-0">
+                            <ngb-pagination [collectionSize]="filteredRecords.length"
+                                            [(page)]="page"
+                                            [pageSize]="pageSize"
+                                            [maxSize]="5"
+                                            [rotate]="true">
+                                <ng-template ngbPaginationPrevious>
+                                    <ng-icon name="tablerChevronLeft"/>
+                                </ng-template>
+                                <ng-template ngbPaginationNext>
+                                    <ng-icon name="tablerChevronRight"/>
+                                </ng-template>
+                            </ngb-pagination>
+                        </div>
                     </div>
                 }
 

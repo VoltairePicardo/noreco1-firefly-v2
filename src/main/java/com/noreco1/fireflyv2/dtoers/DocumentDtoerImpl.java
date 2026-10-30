@@ -143,7 +143,11 @@ public class DocumentDtoerImpl implements DocumentDtoer {
 
             if(!Checker.collectionIsEmpty(documents)) {
                 for(Object[] doc:documents) {
-                    data.add(this.composeDataMap(doc));
+                    Map m = this.composeDataMap(doc);
+                    Integer transId = doc[1] != null ? ((Number) doc[1]).intValue() : null;
+                    // ponytail: N+1 check per row; acceptable for monthly-sized sets — replace with batch query if perf matters
+                    m.put("hasCashflow", transId != null && !voucherCashflowDetailRepo.findByTransactionId(transId).isEmpty());
+                    data.add(m);
                 }
             }
 
@@ -222,86 +226,80 @@ public class DocumentDtoerImpl implements DocumentDtoer {
 
         if (documentType.equals(DocumentType.CV.getCode())) {
             CheckVoucher cv = checkVoucherRepo.findById(voucherId).orElse(null);
-
-            data.put("payee", cv.getPayee().getName());
-            data.put("documentType", DocumentType.CV.getDescription());
-            data.put("amount", cv.getCheckAmount());
-            data.put("particulars", cv.getParticulars());
-
-            voucher = cv;
+            if (cv != null) {
+                data.put("payee", cv.getPayee().getName());
+                data.put("documentType", DocumentType.CV.getDescription());
+                data.put("amount", cv.getCheckAmount());
+                data.put("particulars", cv.getParticulars());
+                voucher = cv;
+            }
 
         } else if (documentType.equals(DocumentType.JV.getCode())) {
             JournalVoucher jv = journalVoucherRepo.findById(voucherId).orElse(null);
-            data.put("documentType", DocumentType.JV.getDescription());
-            data.put("amount", jv.getAmount());
-            data.put("particulars", jv.getExplanation());
-
-            voucher = jv;
+            if (jv != null) {
+                data.put("documentType", DocumentType.JV.getDescription());
+                data.put("amount", jv.getAmount());
+                data.put("particulars", jv.getExplanation());
+                voucher = jv;
+            }
 
         } else if (documentType.equals(DocumentType.CRV.getCode())) {
             CashReceipts cr = cashReceiptsRepo.findById(voucherId).orElse(null);
-            data.put("documentType", DocumentType.CRV.getDescription());
-            data.put("amount", cr.getAmount());
-            data.put("particulars", cr.getParticulars());
+            if (cr != null) {
+                data.put("documentType", DocumentType.CRV.getDescription());
+                data.put("amount", cr.getAmount());
+                data.put("particulars", cr.getParticulars());
+                voucher = cr;
+            }
 
-            voucher = cr;
+        } else if (documentType.equals(DocumentType.APV.getCode())) {
+            AccountsPayableVoucher apv = accountsPayableVoucherRepo.findById(voucherId).orElse(null);
+            if (apv != null) {
+                data.put("documentType", DocumentType.APV.getDescription());
+                data.put("amount", apv.getAmount());
+                data.put("particulars", apv.getParticulars());
+                data.put("payee", apv.getVendor() != null ? apv.getVendor().getName() : "");
+                voucher = apv;
+            }
         }
 
         if (voucher != null) {
             data.put("id", voucher.getId());
             data.put("code", voucher.getCode());
-            data.put("transId", voucher.getTransaction().getId());
             data.put("date", voucher.getVoucherDate());
-        }
 
-        Integer transId = voucher.getTransaction().getId();
+            Transaction transaction = voucher.getTransaction();
+            if (transaction == null) return data;
 
-        /*List<GeneralLedger> generalLedgers = generalLedgerRepo.findByTransactionId(transId);
-        if (!generalLedgers.isEmpty()) {
-            List<Map> glData = new ArrayList<>();
-            for(GeneralLedger gl:generalLedgers) {
-                Map map = new HashMap();
-                map.put("id", gl.getId());
-                map.put("code", gl.getSegmentAccount().getAccountCode());
-                map.put("title", gl.getSegmentAccount().getAccount().getTitle());
+            Integer transId = transaction.getId();
+            data.put("transId", transId);
 
-                map.put("debit", gl.getDebit().compareTo(BigDecimal.ZERO) == 0 ? null :  gl.getDebit());
-                map.put("credit", gl.getCredit().compareTo(BigDecimal.ZERO) == 0 ? null :  gl.getCredit());
-                map.put("isCredit", gl.getDebit() == null || gl.getDebit().compareTo(BigDecimal.ZERO) == 0);
+            List<Object[]> generalLedgerLines = generalLedgerRepo.findByTransactionIdGroupByAccount(transId);
 
-                glData.add(map);
+            if (generalLedgerLines != null) {
+                List<Map> glData = new ArrayList<>();
+                for (Object[] line : generalLedgerLines) {
+
+                    BigDecimal debit  = new BigDecimal(line[0].toString());
+                    BigDecimal credit = new BigDecimal(line[1].toString());
+                    Integer accountId = (Integer) line[2];
+                    String code       = (String)  line[3];
+                    String title      = (String)  line[4];
+                    Integer glId      = (Integer) line[5];
+
+                    Map map = new HashMap();
+                    map.put("id", glId);
+                    map.put("accountId", accountId);
+                    map.put("code", code);
+                    map.put("title", title);
+                    map.put("debit", debit);
+                    map.put("credit", credit);
+                    map.put("isCredit", debit == null || debit.compareTo(BigDecimal.ZERO) == 0);
+
+                    glData.add(map);
+                }
+                data.put("accountingEntries", glData);
             }
-
-            data.put("accountingEntries", glData);
-        }*/
-
-        List<Object[]> generalLedgerLines = generalLedgerRepo.findByTransactionIdGroupByAccount(transId);
-
-        if (generalLedgerLines != null) {
-            List<Map> glData = new ArrayList<>();
-            for (Object[] line : generalLedgerLines) {
-
-                BigDecimal debit = new BigDecimal(line[0].toString());
-                BigDecimal credit = new BigDecimal(line[1].toString());
-                Integer accountId = (Integer) line[2];
-                String code = (String) line[3];
-                String title = (String) line[4];
-                Integer glId = (Integer) line[5];
-
-                Map map = new HashMap();
-                map.put("id", glId);
-                map.put("accountId", accountId);
-                map.put("code", code);
-                map.put("title", title);
-
-                map.put("debit", debit);
-                map.put("credit", credit);
-                map.put("isCredit", debit == null || debit.compareTo(BigDecimal.ZERO) == 0);
-
-                glData.add(map);
-            }
-
-            data.put("accountingEntries", glData);
         }
 
         return data;

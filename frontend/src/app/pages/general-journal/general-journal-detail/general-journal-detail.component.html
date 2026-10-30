@@ -65,7 +65,7 @@
         <div class="row g-3">
             <div class="col-md-3">
                 <div class="fs-xs text-uppercase fw-bold text-muted mb-1">JV Code</div>
-                <div class="fw-bold fs-5">{{ data.code || '—' }}</div>
+                <div class="fw-bold fs-5">{{ data.localCode || data.code || '—' }}</div>
             </div>
             <div class="col-md-3">
                 <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Status</div>
@@ -158,67 +158,220 @@
         <!-- Journal Entries -->
         <hr class="border-dashed mx-n3 mt-3"/>
         <div class="fs-xs text-uppercase fw-semibold text-muted mb-2">Journal Entries</div>
-        <div class="table-responsive">
-            <table class="table table-custom table-centered table-hover w-100 mb-0">
-                <thead class="bg-light align-middle bg-opacity-25 thead-sm">
-                    <tr class="text-uppercase fs-xxs">
-                        <th style="width:60%">Account</th>
-                        <th class="text-end">Debit</th>
-                        <th class="text-end">Credit</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @if (journalEntries.length > 0) {
-                        @for (entry of journalEntries; track $index; let i = $index) {
-                            <tr>
-                                <td>
-                                    @if (entry.slentries?.length) {
-                                        <button type="button" class="btn btn-sm btn-warning btn-rounded float-end py-0 px-2"
-                                                (click)="toggleSl(i)">
-                                            <small class="fw-bold">SL</small>
-                                            <ng-icon [name]="isSlExpanded(i) ? 'tablerChevronDown' : 'tablerChevronRight'" class="fs-sm ms-1"/>
-                                        </button>
-                                    }
-                                    <strong>{{ entry.code || '—' }}</strong><br/>
-                                    {{ entry.description || '—' }}
-                                    @if (entry.slentries?.length && isSlExpanded(i)) {
-                                        <div class="table-responsive mt-1">
-                                            <table class="table table-sm table-success mb-0 fs-xs">
-                                                <thead>
-                                                    <tr>
-                                                        <th>SL Entries</th>
-                                                        <th class="text-end" style="width:120px">Debit</th>
-                                                        <th class="text-end" style="width:120px">Credit</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    @for (sl of entry.slentries; track $index) {
+
+        @if (isForChecking()) {
+            <!-- Editable journal entries for checker -->
+            <app-journal-entries-form [entries]="editableEntries" [voucherDate]="(data.voucherDate | date:'yyyy-MM-dd') ?? undefined"/>
+            <div class="d-flex justify-content-end mt-2">
+                <button type="button" class="btn btn-primary fw-bold" [disabled]="savingEntries" (click)="saveEntries()">
+                    @if (savingEntries) {
+                        <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                    } @else {
+                        <ng-icon name="tablerDeviceFloppy" class="ps-0 pe-3 fw-bold"></ng-icon>
+                    }
+                    Save Entries
+                </button>
+            </div>
+        } @else {
+            <!-- Read-only journal entries -->
+            <div class="table-responsive">
+                <table class="table table-custom table-centered table-hover w-100 mb-0">
+                    <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                        <tr class="text-uppercase fs-xxs">
+                            <th style="width:60%">Account</th>
+                            <th class="text-end">Debit</th>
+                            <th class="text-end">Credit</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (journalEntries.length > 0) {
+                            @for (entry of journalEntries; track $index; let i = $index) {
+                                <tr>
+                                    <td>
+                                        @if (entry.slentries?.length) {
+                                            <button type="button" class="btn btn-sm btn-warning btn-rounded float-end py-0 px-2"
+                                                    (click)="toggleSl(i)">
+                                                <small class="fw-bold">SL</small>
+                                                <ng-icon [name]="isSlExpanded(i) ? 'tablerChevronDown' : 'tablerChevronRight'" class="fs-sm ms-1"/>
+                                            </button>
+                                        }
+                                        <strong>{{ entry.code || '—' }}</strong><br/>
+                                        {{ entry.description || '—' }}
+                                        @if (entry.slentries?.length && isSlExpanded(i)) {
+                                            <div class="table-responsive mt-1">
+                                                <table class="table table-sm table-success mb-0 fs-xs">
+                                                    <thead>
                                                         <tr>
-                                                            <td>{{ sl.name }}</td>
-                                                            <td class="text-end">{{ sl.debit ? (sl.debit | number:'1.2-2') : '' }}</td>
-                                                            <td class="text-end">{{ sl.credit ? (sl.credit | number:'1.2-2') : '' }}</td>
+                                                            <th>SL Entries</th>
+                                                            <th class="text-end" style="width:120px">Debit</th>
+                                                            <th class="text-end" style="width:120px">Credit</th>
                                                         </tr>
-                                                    }
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    }
+                                                    </thead>
+                                                    <tbody>
+                                                        @for (sl of entry.slentries; track $index) {
+                                                            <tr>
+                                                                <td>{{ sl.name }}</td>
+                                                                <td class="text-end">{{ sl.debit ? (sl.debit | number:'1.2-2') : '' }}</td>
+                                                                <td class="text-end">{{ sl.credit ? (sl.credit | number:'1.2-2') : '' }}</td>
+                                                            </tr>
+                                                        }
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        }
+                                    </td>
+                                    <td class="text-end">{{ entry.debit ? (entry.debit | number:'1.2-2') : '' }}</td>
+                                    <td class="text-end">{{ entry.credit ? (entry.credit | number:'1.2-2') : '' }}</td>
+                                </tr>
+                            }
+                            <tr class="fw-bold bg-light">
+                                <td class="text-end fw-bold text-uppercase fs-xs">Totals</td>
+                                <td class="text-end">{{ totalDebit | number:'1.2-2' }}</td>
+                                <td class="text-end">{{ totalCredit | number:'1.2-2' }}</td>
+                            </tr>
+                        } @else {
+                            <tr><td colspan="3" class="text-center text-muted py-3">No journal entries.</td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+
+        <!-- Cash Flow Items -->
+        @if (data.forAddingBudgetDetail || data.journalVoucherCashFlowBudgetDetails?.length) {
+        <hr class="border-dashed mx-n3 mt-3"/>
+        <div class="d-flex align-items-center gap-2 mb-2">
+            <div class="fs-xs text-uppercase fw-semibold text-muted flex-grow-1">Cash Flow Items</div>
+            @if (data.forAddingBudgetDetail) {
+                <button type="button" class="btn btn-success btn-sm fw-bold" (click)="openCashflowItemBrowse()">
+                    <ng-icon name="tablerPlus" class="ps-0 pe-2 fw-bold"></ng-icon>Add
+                </button>
+            }
+        </div>
+        @if (data.forAddingBudgetDetail) {
+            <div class="table-responsive">
+                <table class="table table-custom table-centered table-hover w-100 mb-0">
+                    <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                        <tr class="text-uppercase fs-xxs">
+                            <th>Cash Flow Item</th>
+                            <th class="text-end">Balance</th>
+                            <th style="width:50px"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (selectedCashflowItems.length === 0) {
+                            <tr><td colspan="3" class="text-center text-muted py-3">No items added.</td></tr>
+                        }
+                        @for (item of selectedCashflowItems; track $index; let i = $index) {
+                            <tr>
+                                <td>{{ item.name }}</td>
+                                <td class="text-end">{{ item.totalBalance | number:'1.2-2' }}</td>
+                                <td class="text-center">
+                                    <button type="button" class="btn btn-light btn-icon btn-sm rounded-circle" (click)="removeCashflowItem(i)">
+                                        <ng-icon name="tablerX" class="text-danger"></ng-icon>
+                                    </button>
                                 </td>
-                                <td class="text-end">{{ entry.debit ? (entry.debit | number:'1.2-2') : '' }}</td>
-                                <td class="text-end">{{ entry.credit ? (entry.credit | number:'1.2-2') : '' }}</td>
                             </tr>
                         }
-                        <tr class="fw-bold bg-light">
-                            <td class="text-end fw-bold text-uppercase fs-xs">Totals</td>
-                            <td class="text-end">{{ totalDebit | number:'1.2-2' }}</td>
-                            <td class="text-end">{{ totalCredit | number:'1.2-2' }}</td>
+                    </tbody>
+                </table>
+            </div>
+        } @else if (data.journalVoucherCashFlowBudgetDetails?.length) {
+            <div class="table-responsive">
+                <table class="table table-custom table-centered table-hover w-100 mb-0">
+                    <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                        <tr class="text-uppercase fs-xxs">
+                            <th>Cash Flow Item</th>
+                            <th class="text-end">Balance</th>
                         </tr>
-                    } @else {
-                        <tr><td colspan="3" class="text-center text-muted py-3">No journal entries.</td></tr>
-                    }
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        @for (item of data.journalVoucherCashFlowBudgetDetails; track $index) {
+                            <tr>
+                                <td>{{ item.budgetDetail?.cashflowItem?.name || '—' }}</td>
+                                <td class="text-end">{{ item.totalBalance | number:'1.2-2' }}</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        } @else {
+            <p class="text-muted mb-0">No cash flow items.</p>
+        }
+        }
+
+        <!-- Budget Line Items -->
+        @if (data.forAddingBudgetDetail || data.journalVoucherBudgetLineItemDetails?.length) {
+        <hr class="border-dashed mx-n3 mt-3"/>
+        <div class="d-flex align-items-center gap-2 mb-2">
+            <div class="fs-xs text-uppercase fw-semibold text-muted flex-grow-1">Budget Line Items</div>
+            @if (data.forAddingBudgetDetail) {
+                <button type="button" class="btn btn-success btn-sm fw-bold" (click)="openBudgetLineItemBrowse()">
+                    <ng-icon name="tablerPlus" class="ps-0 pe-2 fw-bold"></ng-icon>Add
+                </button>
+            }
         </div>
+        @if (data.forAddingBudgetDetail) {
+            <div class="table-responsive">
+                <table class="table table-custom table-centered table-hover w-100 mb-0">
+                    <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                        <tr class="text-uppercase fs-xxs">
+                            <th>Title</th>
+                            <th style="width:50px"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (selectedBudgetLineItems.length === 0) {
+                            <tr><td colspan="2" class="text-center text-muted py-3">No items added.</td></tr>
+                        }
+                        @for (item of selectedBudgetLineItems; track $index; let i = $index) {
+                            <tr>
+                                <td>{{ item.code ? item.code + ' — ' : '' }}{{ item.title }}</td>
+                                <td class="text-center">
+                                    <button type="button" class="btn btn-light btn-icon btn-sm rounded-circle" (click)="removeBudgetLineItem(i)">
+                                        <ng-icon name="tablerX" class="text-danger"></ng-icon>
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="d-flex justify-content-end mt-2">
+                <button type="button" class="btn btn-primary fw-bold" [disabled]="savingBudgetDetails" (click)="saveBudgetDetails()">
+                    @if (savingBudgetDetails) {
+                        <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                    } @else {
+                        <ng-icon name="tablerDeviceFloppy" class="ps-0 pe-3 fw-bold"></ng-icon>
+                    }
+                    Save Budget Details
+                </button>
+            </div>
+        } @else if (data.journalVoucherBudgetLineItemDetails?.length) {
+            <div class="table-responsive">
+                <table class="table table-custom table-centered table-hover w-100 mb-0">
+                    <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                        <tr class="text-uppercase fs-xxs">
+                            <th>Title</th>
+                            <th class="text-end">Balance (CV)</th>
+                            <th class="text-end">Balance (PO/JO/RFP)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (item of data.journalVoucherBudgetLineItemDetails; track $index) {
+                            <tr>
+                                <td>{{ item.budgetLineItemDetail?.title || '—' }}</td>
+                                <td class="text-end">{{ item.budgetAmountBalanceCV | number:'1.2-2' }}</td>
+                                <td class="text-end">{{ item.budgetAmountBalancePOJORFP | number:'1.2-2' }}</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        } @else {
+            <p class="text-muted mb-0">No budget line items.</p>
+        }
+        }
 
         <!-- Signatories -->
         @if (data.checker || data.budgetOfficer || data.recommendingOfficer || data.auditingOfficer || data.approvingOfficer) {
@@ -259,65 +412,21 @@
         }
 
         <!-- Attachments -->
-        @if (attachments.length > 0) {
-            <hr class="border-dashed mx-n3 mt-3"/>
-            <div class="fs-xs text-uppercase fw-semibold text-muted mb-2">Attachments</div>
-            <ul class="list-unstyled mb-0">
-                @for (f of attachments; track $index) {
-                    <li class="mb-1">
-                        <a [href]="fileUrl(f.id)" target="_blank" class="text-primary">
-                            {{ f.originalFilename || f.oFile || f.name || 'File' }}
-                        </a>
-                    </li>
-                }
-            </ul>
-        }
+        <hr class="border-dashed mx-n3 mt-3"/>
+        <div class="fs-xs text-uppercase fw-semibold text-muted mb-2">Attachments</div>
+        <app-attachments [files]="attachments" [fileUrl]="fileUrl"/>
 
     </div>
-</div>
-
-<!-- Document Logs -->
-<div class="mt-3">
-    <button type="button" class="btn btn-light fw-bold" (click)="toggleLogs()">
-        <ng-icon [name]="showLogs ? 'tablerEyeOff' : 'tablerEye'" class="ps-0 pe-3 fw-bold"></ng-icon>
-        {{ showLogs ? 'Hide' : 'Show' }} Document Logs
-    </button>
-    @if (showLogs) {
-        <div class="card mt-2">
-            <div class="card-body">
-                @if (logsLoading) {
-                    <div class="text-center py-3">
-                        <span class="spinner-border spinner-border-sm me-2"></span>Loading logs...
-                    </div>
-                } @else if (logs.length === 0) {
-                    <p class="text-muted mb-0">No logs found.</p>
-                } @else {
-                    <div class="table-responsive">
-                        <table class="table table-sm table-hover w-100 mb-0">
-                            <thead class="bg-light bg-opacity-50">
-                                <tr class="text-uppercase fs-xxs text-muted">
-                                    <th class="text-nowrap">Date</th>
-                                    <th class="text-nowrap">By</th>
-                                    <th class="text-nowrap">Action</th>
-                                    <th>Remarks</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @for (log of logs; track $index) {
-                                    <tr class="align-middle">
-                                        <td class="text-nowrap text-muted fs-xs">{{ log.createdAt | date:'MM/dd/yyyy hh:mm a' }}</td>
-                                        <td class="text-nowrap">{{ log.createdBy?.fullName || log.loggedBy?.fullName || log.createdBy?.username || '—' }}</td>
-                                        <td class="text-nowrap">{{ log.action || '—' }}</td>
-                                        <td>{{ log.remarks || '—' }}</td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
-                    </div>
-                }
-            </div>
+    <div class="card-footer border-dashed">
+        <a href="javascript:void(0)" class="d-inline-flex align-items-center fs-xs fw-semibold text-decoration-none gap-1"
+           (click)="toggleLogs()">
+            <ng-icon [name]="showLogs ? 'tablerEyeOff' : 'tablerEye'" class="ps-0 pe-2 fw-bold fs-md"></ng-icon>
+            {{ showLogs ? 'Hide' : 'Show' }} Logs
+        </a>
+        <div [class.d-none]="!showLogs" class="mt-2">
+            <app-document-logs [transactionId]="data.transId"/>
         </div>
-    }
+    </div>
 </div>
 
 } <!-- end !isLoading -->

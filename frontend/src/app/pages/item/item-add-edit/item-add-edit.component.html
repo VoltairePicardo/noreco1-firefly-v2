@@ -79,15 +79,9 @@
                                     <input type="text" class="form-control"
                                            [value]="selectedParentItem ? ((selectedParentItem.code ? selectedParentItem.code + ' — ' : '') + selectedParentItem.description) : ''"
                                            readonly placeholder="Select Parent Item (optional)"/>
-                                    @if (selectedParentItem) {
-                                        <button type="button" class="btn btn-danger fw-bold" (click)="clearParentItem()">
-                                            <ng-icon name="tablerX" class="fw-bold"></ng-icon>
-                                        </button>
-                                    } @else {
-                                        <button type="button" class="btn btn-success fw-bold" (click)="openParentItemBrowse()">
-                                            <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
-                                        </button>
-                                    }
+                                    <button type="button" class="btn btn-success fw-bold" (click)="openParentItemBrowse()">
+                                        <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
+                                    </button>
                                 </div>
                             </div>
                             @if (showFullForm) {
@@ -178,15 +172,9 @@
                                     <input type="text" class="form-control"
                                            [value]="selectedAssetAccount ? (selectedAssetAccount.accountCode + ' — ' + selectedAssetAccount.accountTitle) : ''"
                                            readonly placeholder="Browse Asset Account"/>
-                                    @if (selectedAssetAccount) {
-                                        <button type="button" class="btn btn-danger fw-bold" (click)="clearAssetAccount()">
-                                            <ng-icon name="tablerX" class="fw-bold"></ng-icon>
-                                        </button>
-                                    } @else {
-                                        <button type="button" class="btn btn-success fw-bold" (click)="openAssetAccountBrowse()">
-                                            <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
-                                        </button>
-                                    }
+                                    <button type="button" class="btn btn-success fw-bold" (click)="openAssetAccountBrowse()">
+                                        <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
+                                    </button>
                                 </div>
                             </div>
                             <div class="col-md-4 mt-2">
@@ -195,15 +183,9 @@
                                     <input type="text" class="form-control"
                                            [value]="selectedExpenseAccount ? (selectedExpenseAccount.accountCode + ' — ' + selectedExpenseAccount.accountTitle) : ''"
                                            readonly placeholder="Browse Expense Account"/>
-                                    @if (selectedExpenseAccount) {
-                                        <button type="button" class="btn btn-danger fw-bold" (click)="clearExpenseAccount()">
-                                            <ng-icon name="tablerX" class="fw-bold"></ng-icon>
-                                        </button>
-                                    } @else {
-                                        <button type="button" class="btn btn-success fw-bold" (click)="openExpenseAccountBrowse()">
-                                            <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
-                                        </button>
-                                    }
+                                    <button type="button" class="btn btn-success fw-bold" (click)="openExpenseAccountBrowse()">
+                                        <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
+                                    </button>
                                 </div>
                             </div>
                         </div>

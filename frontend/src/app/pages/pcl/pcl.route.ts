@@ -18,4 +18,9 @@ export const PCL_ROUTES: Routes = [
         loadComponent: () => import('./pcl-add-edit/pcl-add-edit.component').then(m => m.PclAddEditComponent),
         data: { title: 'Edit Petty Cash Liquidation', mainPath }
     },
+    {
+        path: ':id/detail',
+        loadComponent: () => import('./pcl-detail/pcl-detail.component').then(m => m.PclDetailComponent),
+        data: { title: 'Petty Cash Liquidation Details', mainPath }
+    },
 ];

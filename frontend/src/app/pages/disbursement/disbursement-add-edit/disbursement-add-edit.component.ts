@@ -1,4 +1,5 @@
 import { Component, inject, signal, ViewChild, ElementRef } from '@angular/core';
+import Swal from 'sweetalert2';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AlertService } from '@/app/shared/services/alert.service';
 import {
@@ -36,13 +37,21 @@ interface CheckNumberRow {
     loadingNextNumber?: boolean;
 }
 
+/*const VOUCHER_TYPE_LABELS: Record<CvSourceVoucherType, string> = {
+    APV: 'Account Payable Voucher',
+    CA:  'Cash Advance',
+    JV:  'Journal Voucher',
+    RR:  'Receiving Report',
+    JOA: 'JO Acceptance'
+    RFP: 'Request for Payment'
+};*/
+
 const VOUCHER_TYPE_LABELS: Record<CvSourceVoucherType, string> = {
     APV: 'Account Payable Voucher',
     CA:  'Cash Advance',
     JV:  'Journal Voucher',
     RR:  'Receiving Report',
     JOA: 'JO Acceptance',
-    RFP: 'Request for Payment'
 };
 
 @Component({
@@ -81,6 +90,7 @@ export class DisbursementAddEditComponent {
 
     voucherDate          = new Date().toISOString().substring(0, 10);
     particulars          = '';
+    remarks              = '';
     additionalPayeeInfo  = '';
     checkAmount: number | null = null;
 
@@ -93,6 +103,7 @@ export class DisbursementAddEditComponent {
 
     purchaseOrder: any = null;
     jobOrder: any = null;
+    budgetLineItemDetail: any = null;
 
     readonly voucherTypeLabels = VOUCHER_TYPE_LABELS;
     selectedVoucherType: CvSourceVoucherType | null = null;
@@ -104,6 +115,8 @@ export class DisbursementAddEditComponent {
     journalEntries: JournalEntry[] = [];
     iemopBillings : any[] = [];
     tempBatch: any = null;
+
+    rrNumber = '';
 
     stagedFiles  : File[] = [];
     existingFiles: any[]  = [];
@@ -174,13 +187,16 @@ export class DisbursementAddEditComponent {
                     this.transId             = data.transId ?? data.transaction?.id ?? null;
                     this.voucherDate         = data.voucherDate         ? new Date(data.voucherDate).toISOString().substring(0, 10) : '';
                     this.particulars         = data.particulars         || '';
+                    this.remarks             = data.remarks             || '';
                     this.additionalPayeeInfo = data.additionalPayeeInfo || '';
                     this.checkAmount         = data.checkAmount         ?? null;
+                    this.rrNumber            = data.rrNumber            || '';
                     this.payee               = data.payee               || null;
                     this.selectedBank        = data.bank                || null;
-                    this.purchaseOrder       = data.purchaseOrder       || null;
-                    this.jobOrder            = data.jobOrder            || null;
-                    this.cashAdvances        = data.cashAdvances        || [];
+                    this.purchaseOrder        = data.purchaseOrder        || null;
+                    this.jobOrder             = data.jobOrder             || null;
+                    this.budgetLineItemDetail = data.budgetLineItemDetail  || null;
+                    this.cashAdvances         = data.cashAdvances          || [];
 
                     if (data.accountsPayableVoucher?.id) {
                         this.selectedVoucherType   = 'APV';
@@ -191,10 +207,13 @@ export class DisbursementAddEditComponent {
                     } else if (data.receivingReport?.id) {
                         this.selectedVoucherType   = 'RR';
                         this.selectedSourceVoucher = data.receivingReport;
-                    } else if (data.joAcceptance?.id) {
+                    } else if (data.joaDto?.id) {
                         this.selectedVoucherType   = 'JOA';
-                        this.selectedSourceVoucher = data.joAcceptance;
-                    }
+                        this.selectedSourceVoucher = data.joaDto;
+                    } /*else if (data.rfpDto?.id) {
+                        this.selectedVoucherType   = 'RFP';
+                        this.selectedSourceVoucher = data.rfpDto;
+                    }*/
 
                     this.journalEntries = (data.generalLedgerLines || []).map((line: any) => {
                         // The backend currently attaches the transaction's wTaxEntry to every
@@ -384,16 +403,33 @@ export class DisbursementAddEditComponent {
             next: (entries) => {
                 this.loadingSourceVoucherEntries = false;
                 this.journalEntries = (entries || []).map((e: any): JournalEntry => ({
-                    account: { accountCode: e.code, accountTitle: e.description, id: e.accountId, hasSL: e.hasSL },
-                    debit:   Number(e.debit)  || null,
-                    credit:  Number(e.credit) || null
+                    account:   { accountCode: e.code, accountTitle: e.description, id: e.accountId, hasSL: e.hasSL },
+                    debit:     Number(e.debit)  || null,
+                    credit:    Number(e.credit) || null,
+                    wTaxEntry: e.wTaxEntry || null,
+                    slentries: (e.slentries || []).map((sl: any) => ({
+                        entity: null, accountNo: sl.accountNo, name: sl.name,
+                        debit:  Number(sl.debit)  || null,
+                        credit: Number(sl.credit) || null
+                    }))
                 }));
             },
             error: () => { this.loadingSourceVoucherEntries = false; }
         });
     }
 
-    clearSourceVoucher(): void {
+    async clearSourceVoucher(): Promise<void> {
+        if (this.editMode) {
+            const result = await Swal.fire({
+                title: 'Remove linked document?',
+                text: 'This will unlink the source document from this voucher.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, remove',
+                cancelButtonText: 'Cancel'
+            });
+            if (!result.isConfirmed) return;
+        }
         this.selectedVoucherType    = null;
         this.selectedSourceVoucher  = null;
         this.selectedInstallmentIds = [];
@@ -474,6 +510,9 @@ export class DisbursementAddEditComponent {
             if (result?.action === 'select' && result?.data) {
                 this.jobOrder      = result.data;
                 this.purchaseOrder = null;
+                if (result.data.budgetLineItemDetail) {
+                    this.budgetLineItemDetail = result.data.budgetLineItemDetail;
+                }
             }
         } catch { }
     }
@@ -486,6 +525,9 @@ export class DisbursementAddEditComponent {
             if (result?.action === 'select' && result?.data) {
                 this.purchaseOrder = result.data;
                 this.jobOrder       = null;
+                if (result.data.budgetLineItemDetail) {
+                    this.budgetLineItemDetail = result.data.budgetLineItemDetail;
+                }
             }
         } catch { }
     }
@@ -660,6 +702,10 @@ export class DisbursementAddEditComponent {
             this.alertService.warning(this.module, 'Validation', 'Please enter particulars.');
             return;
         }
+        if (!this.selectedBank) {
+            this.alertService.warning(this.module, 'Validation', 'Please select a bank.');
+            return;
+        }
 
         const requiredSignatoryKeys = ['checker', 'budgetOfficer', 'recommendingApproval', 'auditingOfficer', 'checkPrinter', 'approvingOfficer'];
         const missingSignatory = requiredSignatoryKeys.find(key => !this.signatories[key]);
@@ -694,6 +740,13 @@ export class DisbursementAddEditComponent {
             return;
         }
 
+        if (this.selectedSourceVoucher?.forInstallment && this.selectedInstallmentIds.length === 0) {
+            const total = this.installmentDetails.length;
+            this.alertService.warning(this.module, 'Validation',
+                `Please select at least one installment detail (${total} available) to proceed with payment.`);
+            return;
+        }
+
         this.formSubmit = true;
 
         const sigRef = (key: string) => this.signatories[key]
@@ -706,7 +759,9 @@ export class DisbursementAddEditComponent {
             checkAmount:         this.checkAmount        ?? null,
             amount:              this.totalDebit,
             particulars:         this.particulars         || null,
+            remarks:             this.remarks             || null,
             additionalPayeeInfo: this.additionalPayeeInfo || null,
+            rrNumber:            this.rrNumber            || null,
             payee:               { accountNo: this.payee.accountNo },
             bank:                this.selectedBank ? { id: this.selectedBank.id } : null,
             checker:              sigRef('checker'),
@@ -747,8 +802,9 @@ export class DisbursementAddEditComponent {
                 ? { id: this.selectedSourceVoucher.id } : null,
             receivingReport: this.selectedVoucherType === 'RR' && this.selectedSourceVoucher
                 ? { id: this.selectedSourceVoucher.id } : null,
-            joAcceptance: this.selectedVoucherType === 'JOA' && this.selectedSourceVoucher
+            jobOrderAcceptance: this.selectedVoucherType === 'JOA' && this.selectedSourceVoucher
                 ? { id: this.selectedSourceVoucher.id } : null,
+            budgetLineItemDetail: this.budgetLineItemDetail ? { id: this.budgetLineItemDetail.id } : null,
             cashAdvances: this.cashAdvances.map(ca => ({ id: ca.id })),
             selectedInstallmentDetails: this.selectedInstallmentIds.map(id => ({ id })),
             iemopBillings: this.iemopBillings.map(b => ({ id: b.id }))
@@ -772,5 +828,14 @@ export class DisbursementAddEditComponent {
                 this.alertService.error(this.module, 'An error occurred while saving.', '');
             }
         });
+    }
+
+    onCheckAmountBlur(event: FocusEvent): void {
+        const input = event.target as HTMLInputElement;
+        const raw = parseFloat(input.value.replace(/,/g, ''));
+        this.checkAmount = isNaN(raw) ? null : raw;
+        input.value = this.checkAmount != null
+            ? this.checkAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+            : '';
     }
 }

@@ -64,13 +64,21 @@
                     <!-- Pagination -->
                     @if (totalPages() > 1) {
                         <div class="d-flex justify-content-center mt-3">
-                            <ngb-pagination
-                                [collectionSize]="totalPages() * pageSize"
-                                [pageSize]="pageSize"
-                                [page]="pageNumber() + 1"
-                                (pageChange)="onPageChange($event)"
-                                [maxSize]="5" [rotate]="true" [ellipses]="true">
-                            </ngb-pagination>
+                            <div class="pagination-boxed align-items-center mb-0">
+                                <ngb-pagination
+                                    [collectionSize]="totalPages() * pageSize"
+                                    [pageSize]="pageSize"
+                                    [page]="pageNumber() + 1"
+                                    (pageChange)="onPageChange($event)"
+                                    [maxSize]="5" [rotate]="true" [ellipses]="true">
+                                    <ng-template ngbPaginationPrevious>
+                                        <ng-icon name="tablerChevronLeft"/>
+                                    </ng-template>
+                                    <ng-template ngbPaginationNext>
+                                        <ng-icon name="tablerChevronRight"/>
+                                    </ng-template>
+                                </ngb-pagination>
+                            </div>
                         </div>
                     }
 

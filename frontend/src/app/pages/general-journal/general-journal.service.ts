@@ -53,6 +53,22 @@ export class GeneralJournalService {
         return this.http.get<any[]>(`${BASE_API}/json/workflow-actions/${transId}`);
     }
 
+    updateEntries(payload: any): Observable<any> {
+        return this.http.post(`${BASE_API}/general-journal/update-entries`, payload, httpOptions);
+    }
+
+    getCashflowBudgetDetails(): Observable<any[]> {
+        return this.http.get<any[]>(`${BASE_API}/general-journal/cashflow-budget-details`);
+    }
+
+    getBudgetLineItems(): Observable<any[]> {
+        return this.http.get<any[]>(`${BASE_API}/json/budget-line-items`);
+    }
+
+    saveAdditionalBudgetDetails(payload: any): Observable<any> {
+        return this.http.post(`${BASE_API}/general-journal/additional-budget-line-item-detail`, payload, httpOptions);
+    }
+
     process(payload: any): Observable<any> {
         return this.http.post(`${BASE_API}/general-journal/process`, payload, httpOptions);
     }
@@ -85,8 +101,8 @@ export class GeneralJournalService {
         return this.http.get<any[]>(`${BASE_API}/json/document-logs/${transId}`);
     }
 
-    approveAll(ids: number[]): Observable<any> {
-        const payloads = ids.map(id => ({ documentId: id, remarks: '', documentType: 'JV' }));
+    approveAll(ids: number[], remarks = ''): Observable<any> {
+        const payloads = ids.map(id => ({ documentId: id, remarks, documentType: 'JV' }));
         return this.http.post<any>(`${BASE_API}/approve-vouchers/process-all`, payloads, httpOptions);
     }
 

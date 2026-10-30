@@ -5,6 +5,7 @@ import { environment } from '@/environments/environment';
 import { DownloadService } from '@/app/core/services/download.service';
 
 const BASE_API = environment.get('baseApiUrl');
+const BASE_URL = environment.get('baseUrl');
 const httpOptions = { headers: new HttpHeaders({ 'Content-Type': 'application/json' }) };
 
 @Injectable({ providedIn: 'root' })
@@ -79,8 +80,20 @@ export class MaterialIssuanceService {
         return this.http.post(`${BASE_API}/material-issuance/update-entries`, payload, httpOptions);
     }
 
-    approveAll(ids: number[]): Observable<any> {
-        const payloads = ids.map(id => ({ documentId: id, remarks: '', documentType: 'MR' }));
+    getGLEntries(transId: number): Observable<any[]> {
+        return this.http.get<any[]>(`${BASE_API}/ledger/gl/${transId}`);
+    }
+
+    getFiles(transId: number): Observable<any[]> {
+        return this.http.get<any[]>(`${BASE_URL}/file/attachments/${transId}`);
+    }
+
+    fileUrl(fileId: number): string {
+        return this.downloadService.printUrl(`${BASE_URL}/file/${fileId}`);
+    }
+
+    approveAll(ids: number[], remarks: string = ''): Observable<any> {
+        const payloads = ids.map(id => ({ documentId: id, remarks, documentType: 'MR' }));
         return this.http.post<any>(`${BASE_API}/approve-vouchers/process-all`, payloads, httpOptions);
     }
 

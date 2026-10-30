@@ -25,15 +25,9 @@
                             <input type="text" class="form-control"
                                    [value]="selectedAccount ? (selectedAccount.accountCode + ' — ' + selectedAccount.accountTitle) : ''"
                                    readonly placeholder="Filter by Account"/>
-                            @if (selectedAccount) {
-                                <button type="button" class="btn btn-danger fw-bold" (click)="clearAccount()">
-                                    <ng-icon name="tablerX" class="fw-bold"></ng-icon>
-                                </button>
-                            } @else {
-                                <button type="button" class="btn btn-success fw-bold" (click)="openAccountBrowse()">
-                                    <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
-                                </button>
-                            }
+                            <button type="button" class="btn btn-success fw-bold" (click)="openAccountBrowse()">
+                                <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
+                            </button>
                         </div>
                     </div>
                     <!-- Search / Reset -->
@@ -144,13 +138,22 @@
 
                 @if (totalElements() > pageSize) {
                     <div class="d-flex justify-content-center mt-3">
-                        <ngb-pagination
-                            [collectionSize]="totalElements()"
-                            [page]="pageNumber() + 1"
-                            [pageSize]="pageSize"
-                            [maxSize]="5"
-                            (pageChange)="onPageChange($event)">
-                        </ngb-pagination>
+                        <div class="pagination-boxed align-items-center mb-0">
+                            <ngb-pagination
+                                [collectionSize]="totalElements()"
+                                [page]="pageNumber() + 1"
+                                [pageSize]="pageSize"
+                                [maxSize]="5"
+                                [rotate]="true"
+                                (pageChange)="onPageChange($event)">
+                                <ng-template ngbPaginationPrevious>
+                                    <ng-icon name="tablerChevronLeft"/>
+                                </ng-template>
+                                <ng-template ngbPaginationNext>
+                                    <ng-icon name="tablerChevronRight"/>
+                                </ng-template>
+                            </ngb-pagination>
+                        </div>
                     </div>
                 }
 

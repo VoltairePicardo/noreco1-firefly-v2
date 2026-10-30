@@ -406,10 +406,11 @@ public class LedgerFacadeImpl implements LedgerFacade {
 
             if (ledgerLine.getWTaxEntry() != null) {
 
+                WTaxEntry wTaxEntry = ledgerLine.getWTaxEntry();
+                if (wTaxEntry.getAtc() == null || wTaxEntry.getAtc().getId() == null) continue;
+
                 CheckVoucherIncomePayment incomePayment = incomePaymentRepo.findOneByTransactionId(transaction.getId());
                 if (incomePayment == null) incomePayment = new CheckVoucherIncomePayment();
-
-                WTaxEntry wTaxEntry = ledgerLine.getWTaxEntry();
 
                 incomePayment.setTransaction(transaction);
                 incomePayment.setAmount(wTaxEntry.getAmount());

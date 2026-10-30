@@ -5,11 +5,13 @@ import { BudgetLineItemService } from '../budget-line-item.service';
 import Swal from 'sweetalert2';
 import { AuthService } from '../../auth/auth.service';
 import { Router } from '@angular/router';
+import { provideIcons } from '@ng-icons/core';
+import { tablerChevronLeft, tablerChevronRight } from '@ng-icons/tabler-icons';
 
 @Component({
     selector: 'app-budget-line-item-main',
     imports: [...COMMON_ALL_PAGE_IMPORTS, ...COMMON_MAIN_PAGE_IMPORTS],
-    providers: [...SHARED_PROVIDERS],
+    providers: [...SHARED_PROVIDERS, provideIcons({ tablerChevronLeft, tablerChevronRight })],
     templateUrl: './budget-line-item-main.component.html'
 })
 export class BudgetLineItemMainComponent {
@@ -325,5 +327,53 @@ export class BudgetLineItemMainComponent {
         ) {
             this.selectedDivision = null;
         }
+    }
+
+    async updateNeaAmount(detail: any): Promise<void> {
+        const { value, isConfirmed } = await Swal.fire({
+            title: 'NEA Approved Budget',
+            input: 'number',
+            inputValue: detail.nEAApprovedAmount ?? 0,
+            inputAttributes: { min: '0', step: '0.01' },
+            showCancelButton: true,
+            confirmButtonText: 'Save',
+            confirmButtonColor: '#0d6efd'
+        });
+        if (!isConfirmed || value === undefined || value === '') return;
+        this.service.updateNeaApprovedAmount({ id: detail.id, nEAApprovedAmount: Number(value) }).subscribe({
+            next: (res) => {
+                if (res?.success) {
+                    detail.nEAApprovedAmount = Number(value);
+                    this.alertService.success(this.module, 'NEA Approved Amount updated.', '');
+                } else {
+                    this.alertService.error(this.module, res?.failureMessage || 'Update failed.', '');
+                }
+            },
+            error: () => this.alertService.error(this.module, 'An error occurred.', '')
+        });
+    }
+
+    async updateSupplementalAmt(detail: any): Promise<void> {
+        const { value, isConfirmed } = await Swal.fire({
+            title: 'Supplemental Budget',
+            input: 'number',
+            inputValue: detail.supplementalAmount ?? 0,
+            inputAttributes: { min: '0', step: '0.01' },
+            showCancelButton: true,
+            confirmButtonText: 'Save',
+            confirmButtonColor: '#0d6efd'
+        });
+        if (!isConfirmed || value === undefined || value === '') return;
+        this.service.updateSupplementalAmount({ id: detail.id, supplementalAmount: Number(value) }).subscribe({
+            next: (res) => {
+                if (res?.success) {
+                    detail.supplementalAmount = Number(value);
+                    this.alertService.success(this.module, 'Supplemental Amount updated.', '');
+                } else {
+                    this.alertService.error(this.module, res?.failureMessage || 'Update failed.', '');
+                }
+            },
+            error: () => this.alertService.error(this.module, 'An error occurred.', '')
+        });
     }
 }

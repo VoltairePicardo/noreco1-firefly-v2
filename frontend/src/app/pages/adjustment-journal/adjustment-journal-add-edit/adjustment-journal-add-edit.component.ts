@@ -1,5 +1,6 @@
 import { Component, inject, signal, ViewChild, ElementRef } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import Swal from 'sweetalert2';
 import { AlertService } from '@/app/shared/services/alert.service';
 import {
     COMMON_ALL_PAGE_IMPORTS,
@@ -134,7 +135,7 @@ export class AdjustmentJournalAddEditComponent {
                     }
                     this.signatories = {
                         checker:              data.checker              || null,
-                        recommendingApproval: data.recommendingApproval || null,
+                        recommendingApproval: data.recommendingApproval || data.recommendingOfficer || null,
                         approvingOfficer:     data.approvingOfficer     || null
                     };
                 } else {
@@ -163,6 +164,62 @@ export class AdjustmentJournalAddEditComponent {
             },
             error: () => {}
         });
+        this.service.defaultDate().subscribe({
+            next: (data) => { if (data?.date) this.voucherDate = data.date.substring(0, 10); },
+            error: () => {}
+        });
+    }
+
+    onTransactionTypeChange(): void {
+        if (!this.voucherDate) return;
+        if (this.transactionType === 'Closing') {
+            this.service.closingDefaultEntries(this.voucherDate).subscribe({
+                next: (entries) => {
+                    if (entries?.length) {
+                        this.journalEntries = entries.map((e: any) => ({
+                            account: { id: e.accountId, accountCode: e.code, accountTitle: e.description, hasSL: e.hasSL || false },
+                            debit:   Number(e.debit)  || null,
+                            credit:  Number(e.credit) || null
+                        }));
+                    }
+                },
+                error: () => {}
+            });
+        } else if (this.transactionType === 'Reopening') {
+            const year = this.voucherDate.substring(0, 4);
+            this.service.reopeningDefaultEntries(year).subscribe({
+                next: (entries) => {
+                    if (entries?.length) {
+                        this.journalEntries = entries.map((e: any) => ({
+                            account: { id: e.accountId, accountCode: e.code, accountTitle: e.description, hasSL: e.hasSL || false },
+                            debit:   Number(e.debit)  || null,
+                            credit:  Number(e.credit) || null
+                        }));
+                    }
+                },
+                error: () => {}
+            });
+        }
+    }
+
+    async onVoucherDateChange(newDate: string): Promise<void> {
+        const hasEntries = this.journalEntries.some(e => e.account != null);
+        if (!hasEntries) {
+            this.voucherDate = newDate;
+            return;
+        }
+        const result = await Swal.fire({
+            title: 'Change Voucher Date?',
+            text: 'Journal entries are already loaded. Do you want to reset them?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, reset entries',
+            cancelButtonText: 'Keep entries'
+        });
+        if (result.isConfirmed) {
+            this.journalEntries = [{ account: null, debit: null, credit: null }];
+        }
+        this.voucherDate = newDate;
     }
 
     get totalDebit(): number {
@@ -237,12 +294,28 @@ export class AdjustmentJournalAddEditComponent {
             this.alertService.warning(this.module, 'Validation', 'Please enter a voucher date.');
             return;
         }
+        if (!this.explanation?.trim()) {
+            this.alertService.warning(this.module, 'Validation', 'Please enter an explanation or remarks.');
+            return;
+        }
         if (this.journalEntries.length === 0) {
             this.alertService.warning(this.module, 'Validation', 'Please add at least one journal entry.');
             return;
         }
         if (!this.isBalanced) {
             this.alertService.warning(this.module, 'Validation', 'Debit and credit totals must be equal.');
+            return;
+        }
+        if (!this.signatories['checker']) {
+            this.alertService.warning(this.module, 'Validation', 'Please select a Checker.');
+            return;
+        }
+        if (!this.signatories['recommendingApproval']) {
+            this.alertService.warning(this.module, 'Validation', 'Please select a Recommending Officer.');
+            return;
+        }
+        if (!this.signatories['approvingOfficer']) {
+            this.alertService.warning(this.module, 'Validation', 'Please select an Approving Officer.');
             return;
         }
 
