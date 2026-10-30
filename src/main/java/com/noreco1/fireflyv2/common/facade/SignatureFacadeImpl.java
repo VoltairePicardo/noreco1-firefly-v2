@@ -7,7 +7,7 @@ import com.noreco1.fireflyv2.model.enums.Workflow;
 import com.noreco1.fireflyv2.repo.DocumentWorkflowActionMapRepo;
 import com.noreco1.fireflyv2.repo.DocumentWorkflowLogRepo;
 import com.noreco1.fireflyv2.repo.EmployeeRepo;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
@@ -15,29 +15,17 @@ import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.List;
 
-
-/**
- * Created by User on 11/28/2016.
- */
 @Component
+@RequiredArgsConstructor
 public class SignatureFacadeImpl implements SignatureFacade {
-    @Autowired
-    DocumentWorkflowLogRepo dwfLogRepo;
 
-    @Autowired
-    DocumentWorkflowActionMapRepo dwfActionMapRepo;
-
-    @Autowired
-    EmployeeRepo employeeRepo;
-
-    @Autowired
-    Environment env;
-
-    @Autowired
-    SettingFacade settingFacade;
-
-    @Autowired
-    AuthenticationFacade authenticationFacade;
+    private final DocumentWorkflowLogRepo dwfLogRepo;
+    private final DocumentWorkflowActionMapRepo dwfActionMapRepo;
+    private final EmployeeRepo employeeRepo;
+    private final Environment env;
+    private final SettingFacade settingFacade;
+    private final AuthenticationFacade authenticationFacade;
+    private final FTPClientPool fileServer;
 
     @Override
     public HashMap getDocumentSignature(HashMap<String, Object> params, DocumentType docType, Object document) {
@@ -427,43 +415,58 @@ public class SignatureFacadeImpl implements SignatureFacade {
                     case PO: {
                         PurchaseOrder voucher = (PurchaseOrder) document;
 
+                        Employee prepare = employeeRepo.findOneByAccountNumber(voucher.getCreatedBy().getAccountNo());
                         Employee approvar = employeeRepo.findOneByAccountNumber(voucher.getApprovingOfficer().getAccountNo());
-                        Employee checker = employeeRepo.findOneByAccountNumber(voucher.getCheckedBy().getAccountNo());
-                        Employee budgetChecker = employeeRepo.findOneByAccountNumber(voucher.getBudgetCheckedBy().getAccountNo());
+                        Employee checker = voucher.getCheckedBy() != null ? employeeRepo.findOneByAccountNumber(voucher.getCheckedBy().getAccountNo()) : null;
+                        Employee auditor = voucher.getAuditedBy() != null ? employeeRepo.findOneByAccountNumber(voucher.getAuditedBy().getAccountNo()) : null;
+                        Employee budgetChecker = voucher.getBudgetCheckedBy() != null ? employeeRepo.findOneByAccountNumber(voucher.getBudgetCheckedBy().getAccountNo()) : null;
+                        Employee recommender = voucher.getRecommendingOfficer() != null ? employeeRepo.findOneByAccountNumber(voucher.getRecommendingOfficer().getAccountNo()) : null;
+                        Employee preparar = voucher.getCreatedBy() != null ? employeeRepo.findOneByAccountNumber(voucher.getCreatedBy().getAccountNo()) : null;
 
-                        params.put("PREPAREDBY", budgetChecker.getName());// set budget checker as prepared by as default signatory
-                        params.put("CHECKEDBY", checker.getName());
-                        params.put("APPROVEDBY", approvar.getName());
-
-                        params.put("PREPAREDBY_POS", budgetChecker.getPosition() != null ? budgetChecker.getPosition().getName() : "");// set budget checker as prepared by as default signatory
-                        params.put("CHECKEDBY_POS", checker.getPosition() != null ? checker.getPosition().getName() : "");
-                        params.put("APPROVEDBY_POS", approvar.getPosition() != null ? approvar.getPosition().getName() : "");
+                        // Prepared By stamps when the creator submits the PO (first move out of Document Created)
+                        Timestamp submittedAt = null;
+                        for (Object[] a : actions) {
+                            Timestamp time = (Timestamp) a[1];
+                            if (Integer.parseInt(a[0].toString()) == DocumentStatus.FOR_CHECKING.getId()) { submittedAt = time; break; }
+                            if (submittedAt == null || time.before(submittedAt)) submittedAt = time;
+                        }
+                        if (submittedAt != null && preparar != null && preparar.getSignature() != null) {
+                            params.put("PREPARED_BY_SIGN", fileServer.retrieve(preparar.getSignature().getFilename()));
+                            params.put("PREPARED_BY_TIME", submittedAt);
+                        }
 
                         for (Object[] a : actions) {
                             Integer docStatId = Integer.parseInt(a[0].toString());
                             Timestamp time = (Timestamp) a[1];
 
-                            if (docStatId.equals(DocumentStatus.FOR_CHECKING.getId())) {
-                                if (budgetChecker.getSignature() != null) {
-                                    params.put("PREPARED_BY_SIGN", env.getProperty("path.attachments") + budgetChecker.getSignature().getFilename());
-                                    params.put("PREPARED_BY_TIME", time);
-                                }
+                            // Checked By
+                            if (docStatId.equals(DocumentStatus.FOR_RECOMMENDATION.getId()) && checker != null && checker.getSignature() != null) {
+                                params.put("CHECKED_BY_SIGN", fileServer.retrieve(checker.getSignature().getFilename()));
+                                params.put("CHECKED_BY_TIME", time);
                             }
 
-                            if (docStatId.equals(DocumentStatus.FOR_APPROVAL.getId())) {
-                                if (checker.getSignature() != null) {
-                                    params.put("CHECKED_BY_SIGN", env.getProperty("path.attachments") + checker.getSignature().getFilename());
-                                    params.put("CHECKED_BY_TIME", time);
-                                }
+                            // Recommended By
+                            if (docStatId.equals(DocumentStatus.FOR_BUDGET_CHECKING.getId()) && recommender != null && recommender.getSignature() != null) {
+                                params.put("RECOMMENDED_BY_SIGN", fileServer.retrieve(recommender.getSignature().getFilename()));
+                                params.put("RECOMMENDED_BY_TIME", time);
                             }
 
-                            if (docStatId.equals(DocumentStatus.APPROVED.getId())) {
-                                if (approvar.getSignature() != null) {
-                                    params.put("APPROVAR_SIGN", env.getProperty("path.attachments") + approvar.getSignature().getFilename());
-                                    params.put("APPROVAR_TIME", time);
-                                }
+                            if (docStatId.equals(DocumentStatus.FOR_AUDIT.getId()) && budgetChecker != null && budgetChecker.getSignature() != null) {
+                                params.put("BUDGET_CHECKED_BY_SIGN", fileServer.retrieve(budgetChecker.getSignature().getFilename()));
+                                params.put("BUDGET_CHECKED_BY_TIME", time);
                             }
 
+                            // Audited By
+                            if (docStatId.equals(DocumentStatus.FOR_APPROVAL.getId()) && auditor != null && auditor.getSignature() != null) {
+                                params.put("AUDITED_BY_SIGN", fileServer.retrieve(auditor.getSignature().getFilename()));
+                                params.put("AUDITED_BY_TIME", time);
+                            }
+
+                            // Approved By
+                            if (docStatId.equals(DocumentStatus.APPROVED.getId()) && approvar.getSignature() != null) {
+                                params.put("APPROVAR_SIGN", fileServer.retrieve(approvar.getSignature().getFilename()));
+                                params.put("APPROVAR_TIME", time);
+                            }
                         }
                     }
                     break;

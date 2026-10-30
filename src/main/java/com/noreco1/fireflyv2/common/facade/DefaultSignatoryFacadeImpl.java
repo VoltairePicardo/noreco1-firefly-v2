@@ -307,8 +307,10 @@ public class DefaultSignatoryFacadeImpl implements SignatoryFacade {
         try {
             Map<String,Integer> map = new HashMap<>();
 
-            map.put("budgetCheckedByAccountNo", po.getBudgetCheckedBy().getAccountNo());
-            map.put("checkedByAccountNo", po.getCheckedBy().getAccountNo());
+            if (po.getBudgetCheckedBy() != null) map.put("budgetCheckedByAccountNo", po.getBudgetCheckedBy().getAccountNo());
+            if (po.getCheckedBy() != null) map.put("checkedByAccountNo", po.getCheckedBy().getAccountNo());
+            if (po.getAuditedBy() != null) map.put("auditedByAccountNo", po.getAuditedBy().getAccountNo());
+            if (po.getRecommendingOfficer() != null) map.put("recommendingOfficerAccountNo", po.getRecommendingOfficer().getAccountNo());
             map.put("approvedByAccountNo", po.getApprovingOfficer().getAccountNo());
 
             String settingValue = new ObjectMapper().writeValueAsString(map);
@@ -599,13 +601,20 @@ public class DefaultSignatoryFacadeImpl implements SignatoryFacade {
                         Integer checkedByAccountNo = codeMap.get("checkedByAccountNo") == null ? 0:Integer.parseInt(codeMap.get("checkedByAccountNo").toString());
                         Integer budgetCheckedByAccountNo = codeMap.get("budgetCheckedByAccountNo") == null ? 0:Integer.parseInt(codeMap.get("budgetCheckedByAccountNo").toString());
 
+                        Integer auditedByAccountNo = codeMap.get("auditedByAccountNo") == null ? 0:Integer.parseInt(codeMap.get("auditedByAccountNo").toString());
+                        Integer recommendingOfficerAccountNo = codeMap.get("recommendingOfficerAccountNo") == null ? 0:Integer.parseInt(codeMap.get("recommendingOfficerAccountNo").toString());
+
                         SlEntity budgetCheckedBy = slEntityRepo.findOneByAccountNo(budgetCheckedByAccountNo);
                         SlEntity checkedBy = slEntityRepo.findOneByAccountNo(checkedByAccountNo);
+                        SlEntity auditedBy = slEntityRepo.findOneByAccountNo(auditedByAccountNo);
+                        SlEntity recommendingOfficer = slEntityRepo.findOneByAccountNo(recommendingOfficerAccountNo);
                         SlEntity approvingOfficer = slEntityRepo.findOneByAccountNo(approvedByAccountNo);
 
                         data.put("approvedBy", approvingOfficer);
                         data.put("checkedBy", checkedBy);
                         data.put("budgetCheckedBy", budgetCheckedBy);
+                        data.put("auditedBy", auditedBy);
+                        data.put("recommendingOfficer", recommendingOfficer);
                     }
                     break;
                 }

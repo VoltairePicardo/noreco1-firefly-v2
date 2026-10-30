@@ -4,18 +4,22 @@ import { COMMON_ALL_PAGE_IMPORTS, COMMON_MAIN_PAGE_IMPORTS, SHARED_PROVIDERS } f
 import { FormsModule } from '@angular/forms';
 import { FlatpickrDefaults, FlatpickrModule } from 'angularx-flatpickr';
 import { provideIcons } from '@ng-icons/core';
-import { tablerPrinter, tablerEdit, tablerArrowLeft, tablerPhoto, tablerFile, tablerCheck, tablerEye, tablerEyeOff, tablerChevronDown, tablerChevronUp } from '@ng-icons/tabler-icons';
+import { tablerPrinter, tablerEdit, tablerArrowLeft, tablerPhoto, tablerFile, tablerCheck, tablerEye, tablerEyeOff, tablerChevronDown, tablerChevronUp, tablerSearch } from '@ng-icons/tabler-icons';
 import { AlertService } from '@/app/shared/services/alert.service';
 import { forkJoin } from 'rxjs';
 import { PurchaseOrderService } from '../purchase-order.service';
 import { SharedModule } from '@/app/shared/shared.module';
+import { DocumentLogsComponent } from '@/app/shared/components/document-logs/document-logs.component';
+import { AttachmentsComponent } from '@/app/shared/components/attachments/attachments.component';
+import { ModalService } from '@/app/shared/modals/modal-service';
+import { BrowseBudgetLineItemModalComponent } from '@/app/shared/modals/browse-budget-line-item-modal/browse-budget-line-item-modal.component';
 
 const TERMINAL_STATUSES = ['Approved', 'Denied', 'Cancelled'];
 
 @Component({
     selector: 'app-purchase-order-detail',
-    imports: [...COMMON_ALL_PAGE_IMPORTS, ...COMMON_MAIN_PAGE_IMPORTS, SharedModule, FormsModule, FlatpickrModule, RouterLink],
-    providers: [...SHARED_PROVIDERS, FlatpickrDefaults, provideIcons({ tablerPrinter, tablerEdit, tablerArrowLeft, tablerPhoto, tablerFile, tablerCheck, tablerEye, tablerEyeOff, tablerChevronDown, tablerChevronUp })],
+    imports: [...COMMON_ALL_PAGE_IMPORTS, ...COMMON_MAIN_PAGE_IMPORTS, SharedModule, FormsModule, FlatpickrModule, RouterLink, DocumentLogsComponent, AttachmentsComponent],
+    providers: [...SHARED_PROVIDERS, FlatpickrDefaults, provideIcons({ tablerPrinter, tablerEdit, tablerArrowLeft, tablerPhoto, tablerFile, tablerCheck, tablerEye, tablerEyeOff, tablerChevronDown, tablerChevronUp, tablerSearch })],
     templateUrl: './purchase-order-detail.component.html'
 })
 export class PurchaseOrderDetailComponent {
@@ -44,11 +48,15 @@ export class PurchaseOrderDetailComponent {
     processingReceived   = false;
     flatpickrOptions = { dateFormat: 'Y-m-d', altInput: true, altFormat: 'F j, Y' };
 
-    logs        : any[] = [];
-    showLogs    = false;
-    logsLoading = false;
-    expandedLogs = new Set<number>();
+    showLogs = false;
 
+    // Budget line item assignment (forAddingBudgetDetail workflow step)
+    budgetLineItems       : any[] = [];
+    budgetLineItemsLoaded = false;
+    selectedBudgetLineItem: any   = null;
+    savingBudget = false;
+
+    private modalService = inject(ModalService);
     private service      = inject(PurchaseOrderService);
     private route        = inject(ActivatedRoute);
     private router       = inject(Router);
@@ -73,8 +81,14 @@ export class PurchaseOrderDetailComponent {
                 if (header?.id) {
                     this.data      = header;
                     this.lineItems = details || [];
-                    this.logs      = [];
                     this.showLogs  = false;
+                    this.selectedBudgetLineItem = null;
+                    if (header.forAddingBudgetDetail && !this.budgetLineItemsLoaded) {
+                        this.service.getBudgetLineItems().subscribe({
+                            next: (items) => { this.budgetLineItems = items || []; this.budgetLineItemsLoaded = true; },
+                            error: () => {}
+                        });
+                    }
                     this.loadWorkflowActions();
                     this.loadAttachments();
                 } else {
@@ -87,6 +101,45 @@ export class PurchaseOrderDetailComponent {
                 this.isLoading.set(false);
                 this.alertService.error(this.module, 'Error loading purchase order.', '');
                 this.router.navigate(['/' + this.menuLink]);
+            }
+        });
+    }
+
+    async openBudgetLineItemBrowse(): Promise<void> {
+        try {
+            const result = await this.modalService.openModal(
+                BrowseBudgetLineItemModalComponent,
+                { items: this.budgetLineItems },
+                { size: 'lg', centered: true }
+            );
+            if (result?.action === 'select' && result?.data) {
+                this.selectedBudgetLineItem = result.data;
+            }
+        } catch { }
+    }
+
+    saveBudgetAssignment(): void {
+        if (!this.selectedBudgetLineItem?.id) {
+            this.alertService.warning(this.module, 'Validation', 'Please select a Budget Line Item.');
+            return;
+        }
+        this.savingBudget = true;
+        this.service.assignBudgetLineItem({
+            transactionId:          this.data.transId,
+            budgetLineItemDetailId: this.selectedBudgetLineItem.id
+        }).subscribe({
+            next: (res) => {
+                this.savingBudget = false;
+                if (res?.success) {
+                    this.alertService.success(this.module, 'Budget line item assigned.', '');
+                    this.loadData();
+                } else {
+                    this.alertService.error(this.module, 'Save failed.', res?.failureMessage || '');
+                }
+            },
+            error: () => {
+                this.savingBudget = false;
+                this.alertService.error(this.module, 'An error occurred.', '');
             }
         });
     }
@@ -115,20 +168,6 @@ export class PurchaseOrderDetailComponent {
 
     isApproved(): boolean {
         return this.data?.documentStatus?.status === 'Approved';
-    }
-
-    parseLogStatus(log: any): string {
-        try { return JSON.parse(log.newValue)?.documentStatus ?? '—'; }
-        catch { return '—'; }
-    }
-
-    parseLogSnapshot(log: any): any {
-        try { return JSON.parse(log.newValue) ?? null; }
-        catch { return null; }
-    }
-
-    toggleLog(id: number): void {
-        this.expandedLogs.has(id) ? this.expandedLogs.delete(id) : this.expandedLogs.add(id);
     }
 
     processWorkflow(): void {
@@ -195,13 +234,6 @@ export class PurchaseOrderDetailComponent {
 
     toggleLogs(): void {
         this.showLogs = !this.showLogs;
-        if (this.showLogs && this.logs.length === 0) {
-            this.logsLoading = true;
-            this.service.getDocumentLogs(this.data.transId).subscribe({
-                next: (logs) => { this.logs = logs || []; this.logsLoading = false; },
-                error: () => { this.logsLoading = false; }
-            });
-        }
     }
 
     // ─── Attachments ────────────────────────────────────────────────────────
@@ -214,13 +246,7 @@ export class PurchaseOrderDetailComponent {
         });
     }
 
-    isImage(file: any): boolean {
-        return /\.(jpg|jpeg|png)$/i.test(file.originalFilename || '') || (file.mimeType || '').startsWith('image/');
-    }
-
-    fileUrl(fileId: number): string {
-        return this.service.fileUrl(fileId);
-    }
+    fileUrl = (fileId: number): string => this.service.fileUrl(fileId);
 
     print(): void {
         this.service.print(this.data.id);

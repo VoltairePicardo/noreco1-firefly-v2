@@ -15,6 +15,7 @@ import com.noreco1.fireflyv2.controller.response.reports.PODetail;
 import com.noreco1.fireflyv2.service.PrintableVoucher;
 import com.noreco1.fireflyv2.service.PurchaseOrderService;
 import com.noreco1.fireflyv2.validator.PoValidator;
+import lombok.RequiredArgsConstructor;
 import net.sf.jasperreports.engine.JRDataSource;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,78 +38,34 @@ import java.util.*;
  * Created by Personal on 5/15/2015.
  */
 @Service(value = "poServiceImpl")
+@RequiredArgsConstructor
 public class PurchaseOrderServiceImpl implements PurchaseOrderService, PrintableVoucher {
 
     private PurchaseOrder model;
-
-    @Autowired
-    GeneratorFacade generatorFacade;
-
-    @Autowired
-    private AuthenticationFacade authenticationFacade;
-
-    @Autowired
-    PurchaseOrderRepo purchaseOrderRepo;
-
-    @Autowired
-    UserRepo userRepo;
-
-    @Autowired
-    SlEntityRepo slEntityRepo;
-
-    @Autowired
-    PoDetailRepo poDetailRepo;
-
-    @Autowired
-    PurchaseRequestDetailRepo purchaseRequestDetailRepo;
-
-    @Autowired
-    DocumentWorkflowActionMapRepo workflowActionMapRepo;
-
-    @Autowired
-    DocumentProcessingFacade documentProcessingFacade;
-
-    @Autowired
-    PoDetailServiceImpl poDetailDto;
-
-    @Autowired
-    DocumentLoggerFacade documentLoggerFacade;
-
-    @Autowired
-    DocumentLogRepo documentLogRepo;
-
-    @Autowired
-    SignatoryFacade signatoryFacade;
-
-    @Autowired
-    EmployeeRepo employeeRepo;
-
-    @Autowired
-    DocumentDtoer documentDtoer;
-
-    @Autowired
-    SignatureFacade signatureFacade;
-
-    @Autowired
-    SettingFacade settingFacade;
-
-    @Autowired
-    SupplierRepo supplierRepo;
-
-    @Autowired
-    QuotationItemDetailRepo quotationItemDetailRepo;
-
-    @Autowired
-    PurchaseOrderBudgetDetailRepo purchaseOrderBudgetDetailRepo;
-
-    @Autowired
-    BudgetLineItemDetailRepo budgetLineItemDetailRepo;
-
-    @Autowired
-    Environment env;
-
-    @Autowired
-    FileFacade fileFacade;
+    private final GeneratorFacade generatorFacade;
+    private final AuthenticationFacade authenticationFacade;
+    private final PurchaseOrderRepo purchaseOrderRepo;
+    private final UserRepo userRepo;
+    private final SlEntityRepo slEntityRepo;
+    private final PoDetailRepo poDetailRepo;
+    private final PurchaseRequestDetailRepo purchaseRequestDetailRepo;
+    private final DocumentWorkflowActionMapRepo workflowActionMapRepo;
+    private final DocumentProcessingFacade documentProcessingFacade;
+    private final PoDetailServiceImpl poDetailDto;
+    private final DocumentLoggerFacade documentLoggerFacade;
+    private final DocumentLogRepo documentLogRepo;
+    private final SignatoryFacade signatoryFacade;
+    private final EmployeeRepo employeeRepo;
+    private final DocumentDtoer documentDtoer;
+    private final SignatureFacade signatureFacade;
+    private final SettingFacade settingFacade;
+    private final SupplierRepo supplierRepo;
+    private final QuotationItemDetailRepo quotationItemDetailRepo;
+    private final PurchaseOrderBudgetDetailRepo purchaseOrderBudgetDetailRepo;
+    private final BudgetLineItemDetailRepo budgetLineItemDetailRepo;
+    private final Environment env;
+    private final FileFacade fileFacade;
+    private final FTPClientPool fileServer;
 
     private Map reportMeta;
 
@@ -153,6 +110,8 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService, Printable
 
             User budgetCheckedBy = purchaseOrder.getBudgetCheckedBy() != null ? userRepo.findOneByAccountNo(purchaseOrder.getBudgetCheckedBy().getAccountNo()) : null;
             User checkedBy = purchaseOrder.getCheckedBy() != null ? userRepo.findOneByAccountNo(purchaseOrder.getCheckedBy().getAccountNo()) : null;
+            User auditedBy = purchaseOrder.getAuditedBy() != null ? userRepo.findOneByAccountNo(purchaseOrder.getAuditedBy().getAccountNo()) : null;
+            User recommendingOfficer = purchaseOrder.getRecommendingOfficer() != null ? userRepo.findOneByAccountNo(purchaseOrder.getRecommendingOfficer().getAccountNo()) : null;
             User approvedBy = userRepo.findOneByAccountNo(purchaseOrder.getApprovingOfficer().getAccountNo());
 
             Boolean insertMode = purchaseOrder.getId() == null;
@@ -182,6 +141,8 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService, Printable
             existingPo.setYear(voucherYear);
             existingPo.setBudgetCheckedBy(budgetCheckedBy);
             existingPo.setCheckedBy(checkedBy);
+            existingPo.setAuditedBy(auditedBy);
+            existingPo.setRecommendingOfficer(recommendingOfficer);
             existingPo.setApprovingOfficer(approvedBy);
             existingPo.setAmount(purchaseOrder.getAmount());
             existingPo.setDeliveryAddress(purchaseOrder.getDeliveryAddress());
@@ -245,11 +206,14 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService, Printable
                                                .multiply(discPct.divide(hundred, 10, RoundingMode.HALF_UP))
                                                .setScale(4, RoundingMode.HALF_UP);
 
+                    BigDecimal netAmount = amount.subtract(vatAmount);
+
                     purchaseOrderDetail.setQuantity(qty);
                     purchaseOrderDetail.setUnitPrice(unitPriceExcl);
                     purchaseOrderDetail.setVat(vatAmount);
                     purchaseOrderDetail.setDiscount(discAmount);
                     purchaseOrderDetail.setAmount(amount);
+                    purchaseOrderDetail.setNetAmount(netAmount);
                     purchaseOrderDetail.setVatPercentage(vatPct);
                     purchaseOrderDetail.setDiscountPercentage(discPct);
 
@@ -401,6 +365,8 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService, Printable
                     d.setUnitPrice(dto.getUnitPrice());
                     d.setAmount(dto.getItemAmount());
                     d.setBrand(dto.getBrand() == null ? "":dto.getBrand().getName());
+                    d.setVat(dto.getVat());
+                    d.setDiscount(dto.getDiscount());
 
                     details.add(d);
 
@@ -421,6 +387,7 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService, Printable
 
                 if(purchaseRequest != null) {
                     this.reportMeta.put("PR_NO", purchaseRequest.getCode());
+                    this.reportMeta.put("PR_VOUCHER_DATE", purchaseRequest.getVoucherDate());
 
                     Employee requestedBy = employeeRepo.findOneByAccountNumber(purchaseRequest.getCreatedBy().getAccountNo());
 
@@ -428,11 +395,15 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService, Printable
                     this.reportMeta.put("REQUESTED_BY_POS", requestedBy.getPosition().getName());
 
                     if (requestedBy.getSignature() != null) {
-                        this.reportMeta.put("REQUESTED_BY_SIGN", env.getProperty("path.attachments") + requestedBy.getSignature().getFilename());
+                        this.reportMeta.put("REQUESTED_BY_SIGN", fileServer.retrieve(requestedBy.getSignature().getFilename()));
                     }
 
                     if (purchaseRequest.getBudgetLineItemDetail() != null) {
                         this.reportMeta.put("BUDGET_LINE_ITEM", purchaseRequest.getBudgetLineItemDetail().getTitle() + " - " + purchaseRequest.getBudgetLineItemDetail().getCode());
+
+                        FundingSource fundSource = purchaseRequest.getBudgetLineItemDetail().getFundingSource();
+
+                        this.reportMeta.put("FUNDING_SOURCE", fundSource != null ? fundSource.getDescription() : null);
                         int cancelled = com.noreco1.fireflyv2.model.enums.DocumentStatus.CANCELLED.getId();
                         BigDecimal liveBalance = budgetLineItemDetailRepo.getBudgetLineItemDetailAmountBalancePOJO(cancelled, purchaseRequest.getBudgetLineItemDetail().getId());
                         this.reportMeta.put("BUDGET_LINE_ITEM_BALANCE", liveBalance != null ? liveBalance : BigDecimal.ZERO);
@@ -540,7 +511,7 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService, Printable
 
             PurchaseOrder existingPo = this.purchaseOrderRepo.findOneByTransactionId(dto.getTransId());
 
-            if(existingPo.getBudgetCheckedBy().getAccountNo().equals(authenticationFacade.getLoggedIn().getAccountNo())){
+            if(isCurrentUserAuthorized(existingPo)){
 
                 existingPo.setCashFlowItemBalancePOJORFP(dto.getCashFlowItemBalancePOJORFP());
                 existingPo.setCashFlowItemBalanceCV(dto.getCashFlowItemBalanceCV());
@@ -588,6 +559,46 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService, Printable
 
         return response;
 
+    }
+
+    @Transactional
+    @Override
+    public PostResponse assignBudgetLineItem(PoBudgetLineItemDto dto) {
+
+        PostResponse response = new PostResponse();
+
+        try {
+            PurchaseOrder existingPo = this.purchaseOrderRepo.findOneByTransactionId(dto.getTransactionId());
+
+            if (existingPo == null || !isCurrentUserAuthorized(existingPo) || !isDocumentForBudgetChecking(existingPo)) {
+                response.setFailureMessage("Invalid user or update is restricted!!");
+                response.setSuccess(false);
+                return response;
+            }
+
+            BudgetLineItemDetail budgetLineItemDetail = budgetLineItemDetailRepo.findById(dto.getBudgetLineItemDetailId()).orElse(null);
+            if (budgetLineItemDetail == null) {
+                response.setFailureMessage("Budget line item not found.");
+                response.setSuccess(false);
+                return response;
+            }
+
+            int cancelled = com.noreco1.fireflyv2.model.enums.DocumentStatus.CANCELLED.getId();
+            existingPo.setBudgetLineItemDetail(budgetLineItemDetail);
+            existingPo.setBudgetLineItemBalanceCV(budgetLineItemDetailRepo.getBudgetLineItemDetailAmountBalanceCV(cancelled, budgetLineItemDetail.getId()));
+            existingPo.setBudgetLineItemBalancePOJORFP(budgetLineItemDetailRepo.getBudgetLineItemDetailAmountBalancePOJO(cancelled, budgetLineItemDetail.getId()));
+            purchaseOrderRepo.save(existingPo);
+
+            response.setSuccessMessage("Budget line item successfully assigned!");
+            response.setSuccess(true);
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            response.setFailureMessage("Failed to assign budget line item.");
+            response.setSuccess(false);
+        }
+
+        return response;
     }
 
     @Override
@@ -656,13 +667,18 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService, Printable
 
             SlEntity createdBy = slEntityRepo.findById(po.getCreatedBy().getAccountNo()).orElse(null);
 
-            SlEntity budgetCheckedBy = slEntityRepo.findById(po.getBudgetCheckedBy().getAccountNo()).orElse(null);
-            SlEntity checkedBy = slEntityRepo.findById(po.getCheckedBy().getAccountNo()).orElse(null);
+            // signatories are optional (and the newer ones are null on older POs)
+            SlEntity budgetCheckedBy = po.getBudgetCheckedBy() != null ? slEntityRepo.findById(po.getBudgetCheckedBy().getAccountNo()).orElse(null) : null;
+            SlEntity checkedBy = po.getCheckedBy() != null ? slEntityRepo.findById(po.getCheckedBy().getAccountNo()).orElse(null) : null;
+            SlEntity auditedBy = po.getAuditedBy() != null ? slEntityRepo.findById(po.getAuditedBy().getAccountNo()).orElse(null) : null;
+            SlEntity recommendingOfficer = po.getRecommendingOfficer() != null ? slEntityRepo.findById(po.getRecommendingOfficer().getAccountNo()).orElse(null) : null;
             SlEntity approvedBy = slEntityRepo.findById(po.getApprovingOfficer().getAccountNo()).orElse(null);
 
             poDto.setCreatedBy(createdBy);
             poDto.setBudgetCheckedBy(budgetCheckedBy);
             poDto.setCheckedBy(checkedBy);
+            poDto.setAuditedBy(auditedBy);
+            poDto.setRecommendingOfficer(recommendingOfficer);
             poDto.setApprovedBy(approvedBy);
             poDto.setPaymentTerm(po.getPaymentTerm());
             poDto.setVendor(po.getVendor());
@@ -673,12 +689,24 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService, Printable
 
             poDto.setDeliveryAddress(po.getDeliveryAddress());
             poDto.setDeliveryTerm(po.getDeliveryTerm());
-            poDto.setDeliveryTermPretty(DeliveryTerm.valueOf(po.getDeliveryTerm()).getDescription());
+            // deliveryTerm is optional, and older POs may hold a free-text value that is not an enum constant
+            String deliveryTerm = po.getDeliveryTerm();
+            String deliveryTermPretty = deliveryTerm;
+            if (deliveryTerm != null) {
+                try {
+                    deliveryTermPretty = DeliveryTerm.valueOf(deliveryTerm).getDescription();
+                } catch (IllegalArgumentException ignored) {
+                    // keep the stored text as is
+                }
+            }
+            poDto.setDeliveryTermPretty(deliveryTermPretty);
             poDto.setPurpose(po.getPurpose());
             poDto.setDeliveryTimeAndCompletion(po.getDeliveryTimeAndCompletion());
 //            poDto.setVehicle(po.getVehicle());
             poDto.setCashAdvance(po.getCashAdvance());
             poDto.setUseCreditCard(po.getUseCreditCard());
+            poDto.setBudgetLineItemDetail(po.getBudgetLineItemDetail());
+            poDto.setForAddingBudgetDetail(isCurrentUserAuthorized(po) && isDocumentForBudgetChecking(po));
             poDto.setBudgetLineItemBalancePOJORFP(po.getBudgetLineItemBalancePOJORFP());
             poDto.setBudgetLineItemBalanceCV(po.getBudgetLineItemBalanceCV());
             poDto.setCashFlowItemBalancePOJORFP(po.getCashFlowItemBalancePOJORFP());
@@ -709,6 +737,13 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService, Printable
         return  poDto;
     }
 
+    private String positionName(User user) {
+        if (user == null || user.getAccountNo() == null) return "";
+        Employee employee = employeeRepo.findOneByAccountNumber(user.getAccountNo());
+        return employee != null && employee.getPosition() != null && employee.getPosition().getName() != null
+                ? employee.getPosition().getName() : "";
+    }
+
     @Override
     public HashMap reportParameters(Integer id, HttpServletRequest request) {
         this.reportMeta = new HashMap();
@@ -723,17 +758,23 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService, Printable
             // Prepared By: createdBy user, fallback to logged-in user
             User preparedByUser = purchaseOrder.getCreatedBy() != null ? purchaseOrder.getCreatedBy() : authenticationFacade.getLoggedIn();
             params.put("PREPAREDBY", preparedByUser != null ? preparedByUser.getFullName() : "");
-            params.put("PREPAREDBY_POS", preparedByUser != null && preparedByUser.getPosition() != null ? preparedByUser.getPosition().getName() : "");
+            params.put("PREPAREDBY_POS", positionName(preparedByUser));
 
-            // Checked By (print label): maps to budgetCheckedBy DB field
-            params.put("CHECKEDBY", purchaseOrder.getBudgetCheckedBy() != null ? purchaseOrder.getBudgetCheckedBy().getFullName() : "");
-            params.put("CHECKEDBY_POS", purchaseOrder.getBudgetCheckedBy() != null && purchaseOrder.getBudgetCheckedBy().getPosition() != null
-                    ? purchaseOrder.getBudgetCheckedBy().getPosition().getName() : "");
+            // Audited By: auditedBy
+            params.put("AUDITEDBY", purchaseOrder.getAuditedBy() != null ? purchaseOrder.getAuditedBy().getFullName() : "");
+            params.put("AUDITEDBY_POS", positionName(purchaseOrder.getAuditedBy()));
 
-            // Audited By (print label): maps to checkedBy DB field
-            params.put("AUDITEDBY", purchaseOrder.getCheckedBy() != null ? purchaseOrder.getCheckedBy().getFullName() : "");
-            params.put("AUDITEDBY_POS", purchaseOrder.getCheckedBy() != null && purchaseOrder.getCheckedBy().getPosition() != null
-                    ? purchaseOrder.getCheckedBy().getPosition().getName() : "");
+            // Checked By: checkedBy
+            params.put("CHECKEDBY", purchaseOrder.getCheckedBy() != null ? purchaseOrder.getCheckedBy().getFullName() : "");
+            params.put("CHECKEDBY_POS", positionName(purchaseOrder.getCheckedBy()));
+
+            // Budget Checked By: budgetCheckedBy
+            params.put("BUDGETCHECKEDBY", purchaseOrder.getBudgetCheckedBy() != null ? purchaseOrder.getBudgetCheckedBy().getFullName() : "");
+            params.put("BUDGETCHECKEDBY_POS", positionName(purchaseOrder.getBudgetCheckedBy()));
+
+            // Recommended By: recommendingOfficer
+            params.put("RECOMMENDEDBY", purchaseOrder.getRecommendingOfficer() != null ? purchaseOrder.getRecommendingOfficer().getFullName() : "");
+            params.put("RECOMMENDEDBY_POS", positionName(purchaseOrder.getRecommendingOfficer()));
 
             // Approved By (print label): General Manager from PO_SIGNATORIES setting
             Map poSignatories = settingFacade.getByCode("PO_SIGNATORIES");
@@ -742,7 +783,7 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService, Printable
                 gmApprover = userRepo.findOneByAccountNo(Integer.parseInt(String.valueOf(poSignatories.get("approvedByAccountNo"))));
             }
             params.put("APPROVEDBY", gmApprover != null ? gmApprover.getFullName() : "");
-            params.put("APPROVEDBY_POS", gmApprover != null && gmApprover.getPosition() != null ? gmApprover.getPosition().getName() : "");
+            params.put("APPROVEDBY_POS", positionName(gmApprover));
 
             Supplier supplier = supplierRepo.findOneByAccountNumber(purchaseOrder.getVendor().getAccountNo());
 
@@ -1049,7 +1090,8 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService, Printable
     }
 
     private boolean isCurrentUserAuthorized(PurchaseOrder existingPO) {
-        return existingPO.getBudgetCheckedBy().getAccountNo().equals(this.authenticationFacade.getLoggedIn().getAccountNo());
+        return existingPO.getBudgetCheckedBy() != null
+                && existingPO.getBudgetCheckedBy().getAccountNo().equals(this.authenticationFacade.getLoggedIn().getAccountNo());
     }
 
     private boolean isDocumentForBudgetChecking(PurchaseOrder existingPO) {

@@ -1,6 +1,7 @@
 package com.noreco1.fireflyv2.controller;
 
 import com.noreco1.fireflyv2.common.GlobalConstant;
+import com.noreco1.fireflyv2.common.facade.FTPClientPool;
 import com.noreco1.fireflyv2.common.facade.FileFacadeImpl;
 import com.noreco1.fireflyv2.common.helpers.Checker;
 import com.noreco1.fireflyv2.controller.response.*;
@@ -22,7 +23,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import net.sf.jasperreports.engine.JRDataSource;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
-import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.MessageSource;
@@ -40,7 +41,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
-import java.io.File;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.*;
 
@@ -56,8 +57,9 @@ public class PurchaseOrderController {
     private final Environment env;
     private final PrintableVoucher printableVoucher;
     private final DownloadService downloadService;
+    private final FTPClientPool ftpClientPool;
 
-    public PurchaseOrderController(@Qualifier("poServiceImpl") PurchaseOrderService purchaseOrderService, MessageSource messageSource, PurchaseOrderRepo purchaseOrderRepo, DocumentFileRepo documentFileRepo, FileFacadeImpl fileFacade, Environment env, @Qualifier("poServiceImpl") PrintableVoucher printableVoucher, DownloadService downloadService) {
+    public PurchaseOrderController(@Qualifier("poServiceImpl") PurchaseOrderService purchaseOrderService, MessageSource messageSource, PurchaseOrderRepo purchaseOrderRepo, DocumentFileRepo documentFileRepo, FileFacadeImpl fileFacade, Environment env, @Qualifier("poServiceImpl") PrintableVoucher printableVoucher, DownloadService downloadService, FTPClientPool ftpClientPool) {
         this.purchaseOrderService = purchaseOrderService;
         this.messageSource = messageSource;
         this.purchaseOrderRepo = purchaseOrderRepo;
@@ -66,6 +68,7 @@ public class PurchaseOrderController {
         this.env = env;
         this.printableVoucher = printableVoucher;
         this.downloadService = downloadService;
+        this.ftpClientPool = ftpClientPool;
     }
 
     @GetMapping("/list/{from}/{to}")
@@ -171,8 +174,9 @@ public class PurchaseOrderController {
             return;
         }
         try {
-            File file = new File(env.getProperty("path.attachments") + df.getFile().getFilename());
-            if (!file.exists()) {
+            // attachments live on the file server, not on local disk
+            InputStream in = ftpClientPool.retrieve(df.getFile().getFilename());
+            if (in == null) {
                 response.setStatus(HttpServletResponse.SC_NOT_FOUND);
                 return;
             }
@@ -180,9 +184,8 @@ public class PurchaseOrderController {
             String originalName  = df.getFile().getOriginalFilename() != null ? df.getFile().getOriginalFilename() : df.getFile().getFilename();
             response.setContentType(mimeType);
             response.setHeader("Content-Disposition", "inline; filename=\"" + originalName + "\"");
-            response.setContentLength((int) file.length());
             OutputStream os = response.getOutputStream();
-            FileUtils.copyFile(file, os);
+            IOUtils.copy(in, os);
             os.flush();
         } catch (Exception e) {
             e.printStackTrace();
@@ -331,6 +334,11 @@ public class PurchaseOrderController {
     @GetMapping("/is-document-for-cash-flow-item-assignment/{transactionId}")
     public boolean isDocumentForCashFlowItemAssignment(@PathVariable Integer transactionId) {
         return purchaseOrderService.isDocumentForCashFlowItemAssignment(transactionId);
+    }
+
+    @PostMapping("/assign-budget-line-item")
+    public PostResponse assignBudgetLineItem(@Valid @RequestBody com.noreco1.fireflyv2.controller.response.PoBudgetLineItemDto dto) {
+        return purchaseOrderService.assignBudgetLineItem(dto);
     }
 
     @PostMapping("/saveCashFlowItem")

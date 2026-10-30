@@ -58,6 +58,8 @@ public interface PurchaseOrderService extends VoucherService {
     @Transactional
     PostResponse saveCashFlowItem(CashFlowItemDto dto, BindingResult bindingResult, MessageSource messageSource);
 
+    PostResponse assignBudgetLineItem(com.noreco1.fireflyv2.controller.response.PoBudgetLineItemDto dto);
+
     Page<PurchaseOrder> findAllForCreditCardPurchaseRequestByStatusAndFilter(Integer statusId, String filter, Pageable pageable);
 
     @Transactional

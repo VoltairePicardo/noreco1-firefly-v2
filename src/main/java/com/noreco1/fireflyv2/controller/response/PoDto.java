@@ -22,6 +22,8 @@ public class PoDto {
     private SlEntity createdBy;
     private SlEntity checkedBy;
     private SlEntity budgetCheckedBy;
+    private SlEntity auditedBy;
+    private SlEntity recommendingOfficer;
     private SlEntity approvedBy;
     private Integer transId;
     private DocumentStatus documentStatus;
@@ -33,6 +35,8 @@ public class PoDto {
     private CashAdvance cashAdvance;
     private PurchaseRequest purchaseRequest;
     private Boolean useCreditCard;
+    private BudgetLineItemDetail budgetLineItemDetail;
+    private boolean forAddingBudgetDetail;
     private BigDecimal budgetLineItemBalancePOJORFP;
     private BigDecimal budgetLineItemBalanceCV;
     private BigDecimal cashFlowItemBalancePOJORFP;
@@ -141,6 +145,22 @@ public class PoDto {
         this.budgetCheckedBy = budgetCheckedBy;
     }
 
+    public SlEntity getAuditedBy() {
+        return auditedBy;
+    }
+
+    public void setAuditedBy(SlEntity auditedBy) {
+        this.auditedBy = auditedBy;
+    }
+
+    public SlEntity getRecommendingOfficer() {
+        return recommendingOfficer;
+    }
+
+    public void setRecommendingOfficer(SlEntity recommendingOfficer) {
+        this.recommendingOfficer = recommendingOfficer;
+    }
+
     public SlEntity getCheckedBy() {
         return checkedBy;
     }
@@ -227,6 +247,22 @@ public class PoDto {
 
     public void setUseCreditCard(Boolean useCreditCard) {
         this.useCreditCard = useCreditCard;
+    }
+
+    public boolean isForAddingBudgetDetail() {
+        return forAddingBudgetDetail;
+    }
+
+    public void setForAddingBudgetDetail(boolean forAddingBudgetDetail) {
+        this.forAddingBudgetDetail = forAddingBudgetDetail;
+    }
+
+    public BudgetLineItemDetail getBudgetLineItemDetail() {
+        return budgetLineItemDetail;
+    }
+
+    public void setBudgetLineItemDetail(BudgetLineItemDetail budgetLineItemDetail) {
+        this.budgetLineItemDetail = budgetLineItemDetail;
     }
 
     public BigDecimal getBudgetLineItemBalancePOJORFP() {
