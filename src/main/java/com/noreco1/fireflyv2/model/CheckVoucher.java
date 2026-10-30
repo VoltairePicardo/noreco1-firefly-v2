@@ -63,6 +63,11 @@ public class CheckVoucher extends Voucher implements Serializable {
     @JoinColumn(name = "FK_secondSignUserId")
     private User secondCheckSign;
 
+    @NotFound(action = NotFoundAction.IGNORE)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "FK_boardMemberUserId")
+    private User boardMember;
+
     @Transient
     private List<CheckVoucherCheque> checkNumbers = new ArrayList<>();
 

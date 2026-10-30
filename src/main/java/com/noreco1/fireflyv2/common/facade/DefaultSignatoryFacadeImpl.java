@@ -191,13 +191,12 @@ public class DefaultSignatoryFacadeImpl implements SignatoryFacade {
         try {
             Map<String,Integer> map = new HashMap<>();
 
+            map.put("checkedByAccountNo", cv.getChecker().getAccountNo());
             map.put("budgetedByAccountNo", cv.getBudgetOfficer().getAccountNo());
             map.put("recommendedByAccountNo", cv.getRecommendingOfficer().getAccountNo());
             map.put("auditedByAccountNo", cv.getAuditingOfficer().getAccountNo());
-            map.put("checkedByAccountNo", cv.getChecker().getAccountNo());
-            map.put("checkPrintedByAccountNo", cv.getCheckPrinter().getAccountNo());
             map.put("approvedByAccountNo", cv.getApprovingOfficer().getAccountNo());
-            map.put("secondCheckSignAccountNo", cv.getSecondCheckSign() != null ? cv.getSecondCheckSign().getAccountNo() : 0);
+            map.put("boardMemberAccountNo", cv.getBoardMember() != null ? cv.getBoardMember().getAccountNo() : 0);
 
             String settingValue = new ObjectMapper().writeValueAsString(map);
 
@@ -528,22 +527,22 @@ public class DefaultSignatoryFacadeImpl implements SignatoryFacade {
                         Integer budgetedByAccountNo    = codeMap.get("budgetedByAccountNo")    == null ? 0 : Integer.parseInt(codeMap.get("budgetedByAccountNo").toString());
                         Integer recommendedByAccountNo = codeMap.get("recommendedByAccountNo") == null ? 0 : Integer.parseInt(codeMap.get("recommendedByAccountNo").toString());
                         Integer auditedByAccountNo     = codeMap.get("auditedByAccountNo")     == null ? 0 : Integer.parseInt(codeMap.get("auditedByAccountNo").toString());
-                        Integer checkPrintedByAccountNo= codeMap.get("checkPrintedByAccountNo")== null ? 0 : Integer.parseInt(codeMap.get("checkPrintedByAccountNo").toString());
                         Integer approvedByAccountNo    = codeMap.get("approvedByAccountNo")    == null ? 0 : Integer.parseInt(codeMap.get("approvedByAccountNo").toString());
+                        Integer boardMemberAccountNo   = codeMap.get("boardMemberAccountNo")   == null ? 0 : Integer.parseInt(codeMap.get("boardMemberAccountNo").toString());
 
                         SlEntity checker = slEntityRepo.findOneByAccountNo(checkedByAccountNo);
                         SlEntity budgetOfficer = slEntityRepo.findOneByAccountNo(budgetedByAccountNo);
                         SlEntity recommendedBy = slEntityRepo.findOneByAccountNo(recommendedByAccountNo);
                         SlEntity auditedBy = slEntityRepo.findOneByAccountNo(auditedByAccountNo);
-                        SlEntity checkPrinter = slEntityRepo.findOneByAccountNo(checkPrintedByAccountNo);
                         SlEntity approvingOfficer = slEntityRepo.findOneByAccountNo(approvedByAccountNo);
+                        SlEntity boardMember = boardMemberAccountNo > 0 ? slEntityRepo.findOneByAccountNo(boardMemberAccountNo) : null;
 
-                        data.put("checkedBy", checker);
+                        data.put("checker", checker);
                         data.put("budgetOfficer", budgetOfficer);
-                        data.put("recommendedBy", recommendedBy);
-                        data.put("auditedBy", auditedBy);
-                        data.put("checkPrinter", checkPrinter);
-                        data.put("approvedBy", approvingOfficer);
+                        data.put("recommendingOfficer", recommendedBy);
+                        data.put("auditingOfficer", auditedBy);
+                        data.put("approvingOfficer", approvingOfficer);
+                        data.put("boardMember", boardMember);
 
                     }
                     break;

@@ -123,16 +123,15 @@ public class CvServiceImpl implements CvService, PrintableVoucher, PrintableCheq
 
             Integer voucherYear = Integer.parseInt(GlobalConstant.YYYY_DATE_FORMAT.format(cv.getVoucherDate()));
 
-            User checker = userRepo.findOneByAccountNo(cv.getChecker().getAccountNo());
-            User budgetOfficer = userRepo.findOneByAccountNo(cv.getBudgetOfficer().getAccountNo());
-            User recApp = userRepo.findOneByAccountNo(cv.getRecommendingOfficer().getAccountNo());
-            User auditingOfficer = userRepo.findOneByAccountNo(cv.getAuditingOfficer().getAccountNo());
-            User checkPrinter = userRepo.findOneByAccountNo(cv.getCheckPrinter().getAccountNo());
+            User checker          = userRepo.findOneByAccountNo(cv.getChecker().getAccountNo());
+            User budgetOfficer    = userRepo.findOneByAccountNo(cv.getBudgetOfficer().getAccountNo());
+            User recApp           = userRepo.findOneByAccountNo(cv.getRecommendingOfficer().getAccountNo());
+            User auditingOfficer  = userRepo.findOneByAccountNo(cv.getAuditingOfficer().getAccountNo());
             User approvingOfficer = userRepo.findOneByAccountNo(cv.getApprovingOfficer().getAccountNo());
 
-            User secondCheckSign = null;
-            if (cv.getSecondCheckSign() != null) {
-                secondCheckSign = userRepo.findOneByAccountNo(cv.getSecondCheckSign().getAccountNo());
+            User boardMember = null;
+            if (cv.getBoardMember() != null && cv.getBoardMember().getAccountNo() != null) {
+                boardMember = userRepo.findOneByAccountNo(cv.getBoardMember().getAccountNo());
             }
 
             Boolean insertMode = cv.getId() == null;
@@ -182,9 +181,8 @@ public class CvServiceImpl implements CvService, PrintableVoucher, PrintableCheq
             existingCv.setBudgetOfficer(budgetOfficer);
             existingCv.setRecommendingOfficer(recApp);
             existingCv.setAuditingOfficer(auditingOfficer);
-            existingCv.setCheckPrinter(checkPrinter);
             existingCv.setApprovingOfficer(approvingOfficer);
-            existingCv.setSecondCheckSign(secondCheckSign);
+            existingCv.setBoardMember(boardMember);
             existingCv.setYear(voucherYear);
             existingCv.setAmount(cv.getAmount());
             existingCv.setCheckAmount(cv.getCheckAmount());
@@ -500,17 +498,13 @@ public class CvServiceImpl implements CvService, PrintableVoucher, PrintableCheq
                 cvDto.setLocalCode(checkVoucher.getCode());
                 cvDto.setTransId(checkVoucher.getTransaction().getId());
 
-                SlEntity preparedBy = checkVoucher.getCreatedBy() != null ? slEntityRepo.findById(checkVoucher.getCreatedBy().getAccountNo()).orElse(null) : null;
-                SlEntity checkPrinter = checkVoucher.getCheckPrinter() != null ? slEntityRepo.findById(checkVoucher.getCheckPrinter().getAccountNo()).orElse(null) : null;
+                SlEntity preparedBy       = checkVoucher.getCreatedBy() != null ? slEntityRepo.findById(checkVoucher.getCreatedBy().getAccountNo()).orElse(null) : null;
                 SlEntity approvingOfficer = checkVoucher.getApprovingOfficer() != null ? slEntityRepo.findById(checkVoucher.getApprovingOfficer().getAccountNo()).orElse(null) : null;
-                SlEntity budgetOfficer = checkVoucher.getBudgetOfficer() != null ? slEntityRepo.findById(checkVoucher.getBudgetOfficer().getAccountNo()).orElse(null) : null;
-                SlEntity checker = checkVoucher.getChecker() != null ? slEntityRepo.findById(checkVoucher.getChecker().getAccountNo()).orElse(null) : null;
-                SlEntity rao = checkVoucher.getRecommendingOfficer() != null ? slEntityRepo.findById(checkVoucher.getRecommendingOfficer().getAccountNo()).orElse(null) : null;
-                SlEntity auditor = checkVoucher.getAuditingOfficer() != null ? slEntityRepo.findById(checkVoucher.getAuditingOfficer().getAccountNo()).orElse(null) : null;
-                if (checkVoucher.getSecondCheckSign() != null) {
-                    SlEntity secondCheckSign = slEntityRepo.findById(checkVoucher.getSecondCheckSign().getAccountNo()).orElse(null);
-                    cvDto.setSecondCheckSign(secondCheckSign);
-                }
+                SlEntity checker          = checkVoucher.getChecker() != null ? slEntityRepo.findById(checkVoucher.getChecker().getAccountNo()).orElse(null) : null;
+                SlEntity budgetOfficer    = checkVoucher.getBudgetOfficer() != null ? slEntityRepo.findById(checkVoucher.getBudgetOfficer().getAccountNo()).orElse(null) : null;
+                SlEntity rao              = checkVoucher.getRecommendingOfficer() != null ? slEntityRepo.findById(checkVoucher.getRecommendingOfficer().getAccountNo()).orElse(null) : null;
+                SlEntity auditor          = checkVoucher.getAuditingOfficer() != null ? slEntityRepo.findById(checkVoucher.getAuditingOfficer().getAccountNo()).orElse(null) : null;
+                SlEntity boardMember      = checkVoucher.getBoardMember() != null ? slEntityRepo.findById(checkVoucher.getBoardMember().getAccountNo()).orElse(null) : null;
 
                 if (apvDto != null) {
                     cvDto.setApvDto(apvDto);
@@ -547,12 +541,12 @@ public class CvServiceImpl implements CvService, PrintableVoucher, PrintableCheq
 
                 cvDto.setPayee(checkVoucher.getPayee());
                 cvDto.setPreparedBy(preparedBy);
-                cvDto.setApprovingOfficer(approvingOfficer);
-                cvDto.setRecommendingOfficer(rao);
-                cvDto.setAuditor(auditor);
                 cvDto.setChecker(checker);
                 cvDto.setBudgetOfficer(budgetOfficer);
-                cvDto.setCheckPrinter(checkPrinter);
+                cvDto.setRecommendingOfficer(rao);
+                cvDto.setAuditor(auditor);
+                cvDto.setApprovingOfficer(approvingOfficer);
+                cvDto.setBoardMember(boardMember);
                 cvDto.setVoucherDate(checkVoucher.getVoucherDate());
                 cvDto.setAmount(checkVoucher.getAmount());
                 cvDto.setCheckAmount(checkVoucher.getCheckAmount());

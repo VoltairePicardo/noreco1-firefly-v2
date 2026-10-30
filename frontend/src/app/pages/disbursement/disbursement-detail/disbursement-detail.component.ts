@@ -48,12 +48,11 @@ export class DisbursementDetailComponent {
     showLogs = false;
 
     // Budget assignment (forAddingBudgetDetail workflow step)
-    budgetLineItems       : any[] = [];
-    budgetLineItemsLoaded = false;
-    selectedBudgetLineItem: any   = null;
+    selectedBudgetLineItem: any = null;
+    budgetBalanceCV       : number | null = null;
     cashflowItems         : any[] = [];
     cashflowItemsLoaded   = false;
-    selectedBudgetDetail  : any   = null;
+    selectedBudgetDetail  : any = null;
     savingBudget = false;
 
     private service      = inject(DisbursementService);
@@ -85,12 +84,6 @@ export class DisbursementDetailComponent {
                     this.loadAttachments();
                     if (data.transId) { this.loadJournalEntries(data.transId); }
                     if (data.forAddingBudgetDetail) {
-                        if (!this.budgetLineItemsLoaded) {
-                            this.service.getBudgetLineItems().subscribe({
-                                next: (items) => { this.budgetLineItems = items || []; this.budgetLineItemsLoaded = true; },
-                                error: () => {}
-                            });
-                        }
                         if (!this.cashflowItemsLoaded) {
                             this.service.getCashflowBudgetDetails().subscribe({
                                 next: (items) => { this.cashflowItems = items || []; this.cashflowItemsLoaded = true; },
@@ -287,26 +280,20 @@ export class DisbursementDetailComponent {
     }
 
     async openBudgetLineItemBrowse(): Promise<void> {
-        if (!this.budgetLineItemsLoaded) {
-            this.service.getBudgetLineItems().subscribe({
-                next: (items) => {
-                    this.budgetLineItems = items || [];
-                    this.budgetLineItemsLoaded = true;
-                    this.openBudgetLineItemBrowse();
-                },
-                error: () => {}
-            });
-            return;
-        }
         try {
             const result = await this.modalService.openModal(
                 BrowseBudgetLineItemModalComponent,
-                { items: this.budgetLineItems },
+                {},
                 { size: 'lg', centered: true }
             );
             if (result?.action === 'select' && result?.data) {
                 this.selectedBudgetLineItem = result.data;
-                this.selectedBudgetDetail   = null; // mutually exclusive
+                this.selectedBudgetDetail   = null;
+                this.budgetBalanceCV        = null;
+                this.service.getBudgetLineItemBalance(result.data.id).subscribe({
+                    next: (bal) => { this.budgetBalanceCV = bal?.amountBalanceCV ?? null; },
+                    error: () => {}
+                });
             }
         } catch { }
     }

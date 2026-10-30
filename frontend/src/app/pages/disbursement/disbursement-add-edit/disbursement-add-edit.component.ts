@@ -128,24 +128,21 @@ export class DisbursementAddEditComponent {
         budgetOfficer:        null,
         recommendingApproval: null,
         auditingOfficer:      null,
-        checkPrinter:         null,
         approvingOfficer:     null,
-        secondCheckSign:      null
+        boardMember:          null
     };
 
     signatoryLabels: { [key: string]: string } = {
         checker:              'Checked By',
-        budgetOfficer:        'Budget Officer',
-        recommendingApproval: 'Recommended By',
+        budgetOfficer:        'Budget Checked By',
+        recommendingApproval: 'Recommending Approval',
         auditingOfficer:      'Audited By',
-        checkPrinter:         'Check Printing Officer',
         approvingOfficer:     'Approved By',
-        secondCheckSign:      '2nd Signatory'
+        boardMember:          'Board Member'
     };
 
     signatoryKeys = [
-        'checker', 'budgetOfficer', 'recommendingApproval',
-        'auditingOfficer', 'checkPrinter', 'approvingOfficer', 'secondCheckSign'
+        'checker', 'budgetOfficer', 'recommendingApproval', 'auditingOfficer', 'approvingOfficer', 'boardMember'
     ];
 
     private service      = inject(DisbursementService);
@@ -247,13 +244,12 @@ export class DisbursementAddEditComponent {
                     this.iemopBillings = data.iemopBillings || [];
 
                     this.signatories = {
-                        checker:              data.checker              || data.checkedBy         || null,
-                        budgetOfficer:        data.budgetOfficer                                  || null,
-                        recommendingApproval: data.recommendingOfficer  || data.recommendedBy     || null,
-                        auditingOfficer:      data.auditor              || data.auditedBy         || null,
-                        checkPrinter:         data.checkPrinter                                   || null,
-                        approvingOfficer:     data.approvingOfficer     || data.approvedBy        || null,
-                        secondCheckSign:      data.secondCheckSign                                || null
+                        checker:              data.checker             || null,
+                        budgetOfficer:        data.budgetOfficer       || null,
+                        recommendingApproval: data.recommendingOfficer || null,
+                        auditingOfficer:      data.auditor             || null,
+                        approvingOfficer:     data.approvingOfficer    || null,
+                        boardMember:          data.boardMember         || null
                     };
 
                     if (this.transId) this.loadExistingCheckNumbers(this.transId);
@@ -305,13 +301,12 @@ export class DisbursementAddEditComponent {
             next: (data) => {
                 if (data) {
                     this.signatories = {
-                        checker:              data.checker              || data.checkedBy         || null,
-                        budgetOfficer:        data.budgetOfficer                                  || null,
-                        recommendingApproval: data.recommendingApproval || data.recommendedBy     || null,
-                        auditingOfficer:      data.auditingOfficer      || data.auditedBy         || null,
-                        checkPrinter:         data.checkPrinter                                   || null,
-                        approvingOfficer:     data.approvingOfficer     || data.approvedBy        || null,
-                        secondCheckSign:      data.secondCheckSign                                || null
+                        checker:              data.checker             || null,
+                        budgetOfficer:        data.budgetOfficer       || null,
+                        recommendingApproval: data.recommendingOfficer || null,
+                        auditingOfficer:      data.auditingOfficer     || null,
+                        approvingOfficer:     data.approvingOfficer    || null,
+                        boardMember:          data.boardMember         || null
                     };
                 }
             },
@@ -323,7 +318,8 @@ export class DisbursementAddEditComponent {
         try {
             const result = await this.modalService.openModal(BrowseTempGLModalComponent, {}, { size: 'lg', centered: true });
             if (result?.action === 'select' && result?.data) {
-                const { batch, entries } = result.data;
+                const batch   = result.data;
+                const entries = result.entries || [];
                 this.tempBatch    = batch;
                 this.particulars  = batch.remarks || '';
                 this.journalEntries = (entries as any[]).map((e: any) => ({
@@ -707,7 +703,7 @@ export class DisbursementAddEditComponent {
             return;
         }
 
-        const requiredSignatoryKeys = ['checker', 'budgetOfficer', 'recommendingApproval', 'auditingOfficer', 'checkPrinter', 'approvingOfficer'];
+        const requiredSignatoryKeys = ['checker', 'budgetOfficer', 'recommendingApproval', 'auditingOfficer', 'approvingOfficer'];
         const missingSignatory = requiredSignatoryKeys.find(key => !this.signatories[key]);
         if (missingSignatory) {
             this.alertService.warning(this.module, 'Validation', `Please select ${this.signatoryLabels[missingSignatory]}.`);
@@ -764,13 +760,12 @@ export class DisbursementAddEditComponent {
             rrNumber:            this.rrNumber            || null,
             payee:               { accountNo: this.payee.accountNo },
             bank:                this.selectedBank ? { id: this.selectedBank.id } : null,
-            checker:              sigRef('checker'),
-            budgetOfficer:        sigRef('budgetOfficer'),
-            recommendingOfficer:  sigRef('recommendingApproval'),
-            auditingOfficer:      sigRef('auditingOfficer'),
-            checkPrinter:         sigRef('checkPrinter'),
-            approvingOfficer:     sigRef('approvingOfficer'),
-            secondCheckSign:      sigRef('secondCheckSign'),
+            checker:             sigRef('checker'),
+            budgetOfficer:       sigRef('budgetOfficer'),
+            recommendingOfficer: sigRef('recommendingApproval'),
+            auditingOfficer:     sigRef('auditingOfficer'),
+            approvingOfficer:    sigRef('approvingOfficer'),
+            boardMember:         sigRef('boardMember'),
             generalLedgerLines:  this.journalEntries.map(e => ({
                 code:        e.account?.accountCode  || '',
                 description: e.account?.accountTitle || '',
