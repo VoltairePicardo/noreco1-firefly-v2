@@ -160,7 +160,8 @@ export class CashReceiptsAddEditComponent {
         try {
             const result = await this.modalService.openModal(BrowseTempGLModalComponent, {}, { size: 'lg', centered: true });
             if (result?.action === 'select' && result?.data) {
-                const { batch, entries } = result.data;
+                const batch   = result.data;
+                const entries = result.entries || [];
                 this.tempBatch   = batch;
                 this.particulars = batch.remarks || '';
                 this.journalEntries = (entries as any[]).map((e): JournalEntry => ({

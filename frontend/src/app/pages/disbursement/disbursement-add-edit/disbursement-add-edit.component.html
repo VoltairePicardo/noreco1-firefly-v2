@@ -17,10 +17,10 @@
 
                     <!-- Temp GL/SL -->
                     <div class="d-flex align-items-center justify-content-between mb-2">
-                        <span class="fs-sm fw-semibold">Temp GL/SL</span>
+                        <span class="fs-xs text-uppercase fw-semibold text-muted">Temp GL/SL</span>
                         <div class="d-flex gap-2">
                             <button type="button" class="btn btn-success fw-bold" (click)="openTempGLBrowse()">
-                                <ng-icon name="tablerSearch" class="me-1 fs-lg fw-bold"></ng-icon>Browse Temp GL/SL
+                                <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse Temp GL/SL
                             </button>
                             @if (tempBatch) {
                                 <button type="button" class="btn btn-danger fw-bold" (click)="clearTempGL()" aria-label="Clear temp batch">
@@ -43,7 +43,7 @@
 
                     <!-- Source Document -->
                     <div class="d-flex align-items-center justify-content-between mb-2">
-                        <span class="fs-sm fw-semibold">Source Document</span>
+                        <span class="fs-xs text-uppercase fw-semibold text-muted">Source Document</span>
                         <div class="d-flex gap-2">
                             <button type="button" class="btn btn-success fw-bold" (click)="openSourceVoucherBrowse()">
                                 <ng-icon name="tablerLink" class="me-1 fs-lg fw-bold"></ng-icon>Browse Document
@@ -364,7 +364,7 @@
 
                     <!-- Job Order / Purchase Order -->
                     <div class="d-flex align-items-center justify-content-between mb-2">
-                        <span class="fs-sm fw-semibold">Job Order / Purchase Order</span>
+                        <span class="fs-xs text-uppercase fw-semibold text-muted">Job Order / Purchase Order</span>
                         <div class="d-flex gap-2">
                             @if (!purchaseOrder) {
                                 <button type="button" class="btn btn-success fw-bold" (click)="openJobOrderBrowse()">
@@ -486,7 +486,11 @@
                         </div>
                         @for (key of signatoryKeys; track key) {
                             <div class="col-md-4 mb-3">
-                                <label class="form-label fw-bold">{{ signatoryLabels[key] }}</label>
+                                <label class="form-label fw-bold">{{ signatoryLabels[key] }}
+                                    @if (key === 'boardMember') {
+                                        <span class="text-muted fw-normal">(optional)</span>
+                                    }
+                                </label>
                                 <div class="input-group">
                                     <input type="text" class="form-control"
                                            [value]="signatories[key]?.name ?? ''"

@@ -492,6 +492,12 @@
         <hr class="border-dashed mx-n3 mt-3"/>
         <div class="fs-xs text-uppercase fw-semibold text-muted mb-2">Signatories</div>
         <div class="row g-3">
+            @if (data.preparedBy) {
+                <div class="col-md-4">
+                    <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Prepared By</div>
+                    <div>{{ data.preparedBy?.name || '—' }}</div>
+                </div>
+            }
             @if (data.checker) {
                 <div class="col-md-4">
                     <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Checked By</div>
@@ -500,13 +506,13 @@
             }
             @if (data.budgetOfficer) {
                 <div class="col-md-4">
-                    <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Budget Officer</div>
+                    <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Budget Checked By</div>
                     <div>{{ data.budgetOfficer?.name || '—' }}</div>
                 </div>
             }
             @if (data.recommendingOfficer) {
                 <div class="col-md-4">
-                    <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Recommended By</div>
+                    <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Recommending Approval</div>
                     <div>{{ data.recommendingOfficer?.name || '—' }}</div>
                 </div>
             }
@@ -516,22 +522,16 @@
                     <div>{{ data.auditor?.name || '—' }}</div>
                 </div>
             }
-            @if (data.checkPrinter) {
-                <div class="col-md-4">
-                    <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Check Printing Officer</div>
-                    <div>{{ data.checkPrinter?.name || '—' }}</div>
-                </div>
-            }
             @if (data.approvingOfficer) {
                 <div class="col-md-4">
                     <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Approved By</div>
                     <div>{{ data.approvingOfficer?.name || '—' }}</div>
                 </div>
             }
-            @if (data.secondCheckSign) {
+            @if (data.boardMember) {
                 <div class="col-md-4">
-                    <div class="fs-xs text-uppercase fw-bold text-muted mb-1">2nd Signatory</div>
-                    <div>{{ data.secondCheckSign?.name || '—' }}</div>
+                    <div class="fs-xs text-uppercase fw-bold text-muted mb-1">Board Member</div>
+                    <div>{{ data.boardMember?.name || '—' }}</div>
                 </div>
             }
         </div>

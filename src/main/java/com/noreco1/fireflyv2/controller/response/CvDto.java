@@ -29,6 +29,7 @@ public class CvDto {
     private SlEntity postedBy;
     private SlEntity auditor;
     private SlEntity secondCheckSign;
+    private SlEntity boardMember;
     private Integer transId;
     private BigDecimal amount;
     private BigDecimal checkAmount;
@@ -220,6 +221,14 @@ public class CvDto {
 
     public void setSecondCheckSign(SlEntity secondCheckSign) {
         this.secondCheckSign = secondCheckSign;
+    }
+
+    public SlEntity getBoardMember() {
+        return boardMember;
+    }
+
+    public void setBoardMember(SlEntity boardMember) {
+        this.boardMember = boardMember;
     }
 
     public String getRrNumber() {

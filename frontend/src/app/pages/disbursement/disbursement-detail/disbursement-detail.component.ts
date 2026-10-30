@@ -88,7 +88,7 @@ export class DisbursementDetailComponent {
                         if (!this.budgetLineItemsLoaded) {
                             this.service.getBudgetLineItems().subscribe({
                                 next: (items) => { this.budgetLineItems = items || []; this.budgetLineItemsLoaded = true; },
-                                error: () => {}
+                                error: () => { this.alertService.error(this.module, 'Failed to load budget line items.', ''); }
                             });
                         }
                         if (!this.cashflowItemsLoaded) {
