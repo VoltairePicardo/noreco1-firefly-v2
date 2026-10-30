@@ -1,6 +1,6 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
-<!-- Created with Jaspersoft Studio version 6.21.5.final using JasperReports Library version 6.21.5-74d586df47b25dbd05bd0957999819196e59934a  -->
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="PurchaseOrder" pageWidth="612" pageHeight="792" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isFloatColumnFooter="true" uuid="b29c3ba6-1020-4625-9bd3-1937355162ed">
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.21.5.final using JasperReports Library version 6.21.5  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="PurchaseOrder" pageWidth="612" pageHeight="792" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="b29c3ba6-1020-4625-9bd3-1937355162ed">
 	<property name="ireport.zoom" value="2.42000000000006"/>
 	<property name="ireport.x" value="24"/>
 	<property name="ireport.y" value="223"/>
@@ -27,7 +27,7 @@
 	<parameter name="RECAPPBY" class="java.lang.String"/>
 	<parameter name="PREPARED_BY_SIGN" class="java.lang.String" isForPrompting="false"/>
 	<parameter name="NOTER_SIGN" class="java.lang.String" isForPrompting="false"/>
-	<parameter name="APPROVAR_SIGN" class="java.lang.String" isForPrompting="false"/>
+	<parameter name="APPROVAR_SIGN" class="java.io.InputStream" isForPrompting="false"/>
 	<parameter name="RECAPPBY_SIGN" class="java.lang.String" isForPrompting="false"/>
 	<parameter name="APPROVAR_TIME" class="java.sql.Timestamp" isForPrompting="false"/>
 	<parameter name="PREPARED_BY_TIME" class="java.sql.Timestamp" isForPrompting="false"/>
@@ -42,6 +42,7 @@
 	<parameter name="PAYMENT_TERM" class="java.lang.String"/>
 	<parameter name="MODE_OF_PROCUREMENT" class="java.lang.String"/>
 	<parameter name="PR_NO" class="java.lang.String"/>
+	<parameter name="PR_VOUCHER_DATE" class="java.util.Date"/>
 	<parameter name="RECAPPBY_HEADER" class="java.lang.String"/>
 	<parameter name="WAREHOUSE_CONTACT_PERSON" class="java.lang.String"/>
 	<parameter name="BUDGET_LINE_ITEM" class="java.lang.String"/>
@@ -51,12 +52,14 @@
 	<parameter name="PURCHASING_CONTACT" class="java.lang.String"/>
 	<parameter name="CHECKEDBY" class="java.lang.String"/>
 	<parameter name="CHECKEDBY_POS" class="java.lang.String"/>
-	<parameter name="CHECKED_BY_SIGN" class="java.lang.String"/>
+	<parameter name="CHECKED_BY_SIGN" class="java.io.InputStream"/>
 	<parameter name="CHECKED_BY_TIME" class="java.sql.Timestamp"/>
 	<parameter name="BUDGETCHECKEDBY" class="java.lang.String"/>
 	<parameter name="BUDGETCHECKEDBY_POS" class="java.lang.String"/>
 	<parameter name="AUDITEDBY" class="java.lang.String"/>
 	<parameter name="AUDITEDBY_POS" class="java.lang.String"/>
+	<parameter name="AUDITED_BY_SIGN" class="java.io.InputStream" isForPrompting="false"/>
+	<parameter name="AUDITED_BY_TIME" class="java.sql.Timestamp" isForPrompting="false"/>
 	<parameter name="REQUESTED_BY" class="java.lang.String"/>
 	<parameter name="DELIVERY_TIME_AND_COMPLETION" class="java.lang.String"/>
 	<parameter name="REQUESTED_BY_POS" class="java.lang.String"/>
@@ -75,18 +78,32 @@
 	<field name="id" class="java.lang.Integer"/>
 	<field name="unitPrice" class="java.math.BigDecimal"/>
 	<field name="amount" class="java.math.BigDecimal"/>
+	<field name="vat" class="java.math.BigDecimal"/>
+	<field name="discount" class="java.math.BigDecimal"/>
 	<field name="brand" class="java.lang.String"/>
+	<variable name="totalAmount" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{amount} != null ? $F{amount} : java.math.BigDecimal.ZERO]]></variableExpression>
+	</variable>
+	<variable name="totalVat" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{vat} != null ? $F{vat} : java.math.BigDecimal.ZERO]]></variableExpression>
+	</variable>
+	<variable name="totalDiscount" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{discount} != null ? $F{discount} : java.math.BigDecimal.ZERO]]></variableExpression>
+	</variable>
 	<group name="dummy">
 		<groupExpression><![CDATA[true]]></groupExpression>
+	</group>
+	<group name="dummy1">
+		<groupExpression><![CDATA[true]]></groupExpression>
 		<groupFooter>
-			<band height="371">
+			<band height="230" splitType="Prevent">
 				<staticText>
-					<reportElement mode="Transparent" x="1" y="270" width="572" height="101" forecolor="#000000" backcolor="#FFFFFF" uuid="1ccd6716-bb7e-4500-9a9e-090d81c66c83"/>
+					<reportElement mode="Transparent" x="0" y="0" width="572" height="230" forecolor="#000000" backcolor="#FFFFFF" uuid="4e107a69-d767-4088-878e-cbc0a0ed7303"/>
 					<box>
-						<topPen lineWidth="1.0"/>
-						<leftPen lineWidth="1.0"/>
-						<bottomPen lineWidth="1.0"/>
-						<rightPen lineWidth="1.0"/>
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
 					</box>
 					<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" markup="none">
 						<font fontName="SansSerif" size="12" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
@@ -94,94 +111,14 @@
 					</textElement>
 					<text><![CDATA[]]></text>
 				</staticText>
-				<staticText>
-					<reportElement mode="Transparent" x="342" y="250" width="231" height="20" forecolor="#000000" backcolor="#FFFFFF" uuid="ee7dab24-ae90-4dcf-ab27-f3bccd15f8e9"/>
-					<box>
-						<topPen lineWidth="1.0"/>
-						<leftPen lineWidth="1.0"/>
-						<bottomPen lineWidth="1.0"/>
-						<rightPen lineWidth="1.0"/>
-					</box>
-					<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" markup="none">
-						<font fontName="SansSerif" size="12" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
-						<paragraph lineSpacing="Single"/>
-					</textElement>
-					<text><![CDATA[]]></text>
-				</staticText>
-				<staticText>
-					<reportElement mode="Transparent" x="342" y="230" width="231" height="20" forecolor="#000000" backcolor="#FFFFFF" uuid="3f9c7c0a-8021-42b5-89b1-596ba905dfab"/>
-					<box>
-						<topPen lineWidth="1.0"/>
-						<leftPen lineWidth="1.0"/>
-						<bottomPen lineWidth="1.0"/>
-						<rightPen lineWidth="1.0"/>
-					</box>
-					<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" markup="none">
-						<font fontName="SansSerif" size="12" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
-						<paragraph lineSpacing="Single"/>
-					</textElement>
-					<text><![CDATA[]]></text>
-				</staticText>
-				<staticText>
-					<reportElement mode="Transparent" x="1" y="230" width="341" height="20" forecolor="#000000" backcolor="#FFFFFF" uuid="2cd1a138-57c0-4f69-af6a-b618ce195104"/>
-					<box>
-						<topPen lineWidth="1.0"/>
-						<leftPen lineWidth="1.0"/>
-						<bottomPen lineWidth="1.0"/>
-						<rightPen lineWidth="1.0"/>
-					</box>
-					<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" markup="none">
-						<font fontName="SansSerif" size="12" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
-						<paragraph lineSpacing="Single"/>
-					</textElement>
-					<text><![CDATA[]]></text>
-				</staticText>
-				<staticText>
-					<reportElement positionType="Float" x="1" y="230" width="96" height="20" isRemoveLineWhenBlank="true" uuid="2406a7f3-ef47-4659-aebf-bb12e6423862"/>
-					<box leftPadding="2"/>
-					<textElement textAlignment="Left" verticalAlignment="Middle">
-						<font fontName="SansSerif" size="9" isBold="true"/>
-					</textElement>
-					<text><![CDATA[BUDGET LINE ITEM:]]></text>
-				</staticText>
-				<textField>
-					<reportElement x="97" y="230" width="245" height="20" uuid="672d5d70-20aa-42cb-ae54-e12bc90c3b57"/>
-					<textElement verticalAlignment="Middle">
-						<font fontName="SansSerif" size="9" isBold="true"/>
-					</textElement>
-					<textFieldExpression><![CDATA[$P{BUDGET_LINE_ITEM}]]></textFieldExpression>
-				</textField>
-				<staticText>
-					<reportElement mode="Transparent" x="1" y="250" width="341" height="20" forecolor="#000000" backcolor="#FFFFFF" uuid="10ad9803-5c99-4466-b3b5-31ab1802d798"/>
-					<box>
-						<topPen lineWidth="1.0"/>
-						<leftPen lineWidth="1.0"/>
-						<bottomPen lineWidth="1.0"/>
-						<rightPen lineWidth="1.0"/>
-					</box>
-					<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" markup="none">
-						<font fontName="SansSerif" size="12" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
-						<paragraph lineSpacing="Single"/>
-					</textElement>
-					<text><![CDATA[]]></text>
-				</staticText>
-				<image hAlign="Center" isLazy="true" onErrorType="Blank">
-					<reportElement x="17" y="31" width="250" height="30" uuid="461dc4bc-1715-40ca-b12c-c3294ea325ce">
+				<image hAlign="Left" isLazy="true" onErrorType="Blank">
+					<reportElement x="10" y="31" width="250" height="30" uuid="461dc4bc-1715-40ca-b12c-c3294ea325ce">
 						<property name="com.jaspersoft.studio.unit.width" value="px"/>
 					</reportElement>
 					<imageExpression><![CDATA[$P{PREPARED_BY_SIGN}]]></imageExpression>
 				</image>
-				<staticText>
-					<reportElement positionType="Float" x="309" y="11" width="250" height="20" isRemoveLineWhenBlank="true" uuid="863714c9-9720-48c7-a628-c1920e4665a0">
-						<property name="com.jaspersoft.studio.unit.width" value="px"/>
-					</reportElement>
-					<textElement textAlignment="Left">
-						<font fontName="SansSerif" size="11" isBold="false"/>
-					</textElement>
-					<text><![CDATA[Audited By:]]></text>
-				</staticText>
 				<textField>
-					<reportElement x="17" y="86" width="250" height="15" uuid="a50c093b-7cc6-4305-bfb1-a07f7d2b943f">
+					<reportElement x="10" y="86" width="250" height="15" uuid="a50c093b-7cc6-4305-bfb1-a07f7d2b943f">
 						<property name="com.jaspersoft.studio.unit.width" value="px"/>
 					</reportElement>
 					<textElement textAlignment="Left">
@@ -189,8 +126,8 @@
 					</textElement>
 					<textFieldExpression><![CDATA[$P{PREPAREDBY_POS}]]></textFieldExpression>
 				</textField>
-				<textField pattern="MM/dd/yyyy" isBlankWhenNull="true">
-					<reportElement x="17" y="61" width="250" height="10" uuid="a8498041-0224-4eb1-a465-4e20bcb66d85">
+				<textField pattern="MM/dd/yyyy hh:mm a" isBlankWhenNull="true">
+					<reportElement x="10" y="61" width="250" height="10" uuid="a8498041-0224-4eb1-a465-4e20bcb66d85">
 						<property name="com.jaspersoft.studio.unit.width" value="px"/>
 					</reportElement>
 					<textElement textAlignment="Left" verticalAlignment="Bottom">
@@ -198,38 +135,8 @@
 					</textElement>
 					<textFieldExpression><![CDATA[$P{PREPARED_BY_TIME}]]></textFieldExpression>
 				</textField>
-				<textField isBlankWhenNull="true">
-					<reportElement x="309" y="71" width="250" height="15" uuid="150c94f2-d612-413b-859f-c8eb93e2b906">
-						<property name="com.jaspersoft.studio.unit.width" value="px"/>
-					</reportElement>
-					<box>
-						<bottomPen lineWidth="0.0"/>
-					</box>
-					<textElement textAlignment="Left" verticalAlignment="Bottom">
-						<font fontName="SansSerif" size="10" isBold="true"/>
-					</textElement>
-					<textFieldExpression><![CDATA[$P{AUDITEDBY}]]></textFieldExpression>
-				</textField>
-				<textField pattern="MM/dd/yyyy" isBlankWhenNull="true">
-					<reportElement x="309" y="61" width="250" height="10" uuid="3b2e97a9-d290-4ad1-9f19-81d1e3094e2c">
-						<property name="com.jaspersoft.studio.unit.width" value="px"/>
-					</reportElement>
-					<textElement textAlignment="Left" verticalAlignment="Bottom">
-						<font fontName="SansSerif" size="7"/>
-					</textElement>
-					<textFieldExpression><![CDATA[""]]></textFieldExpression>
-				</textField>
-				<textField isBlankWhenNull="true">
-					<reportElement x="309" y="86" width="250" height="15" uuid="815f7107-b5dd-4eb8-b54b-5a632a02d55c">
-						<property name="com.jaspersoft.studio.unit.width" value="px"/>
-					</reportElement>
-					<textElement textAlignment="Left">
-						<font fontName="SansSerif" size="10" isBold="false"/>
-					</textElement>
-					<textFieldExpression><![CDATA[$P{AUDITEDBY_POS}]]></textFieldExpression>
-				</textField>
 				<staticText>
-					<reportElement positionType="Float" x="17" y="11" width="250" height="20" isRemoveLineWhenBlank="true" uuid="b93262da-d9eb-469a-98f2-e1052ca7d23d">
+					<reportElement positionType="Float" x="10" y="11" width="250" height="20" isRemoveLineWhenBlank="true" uuid="b93262da-d9eb-469a-98f2-e1052ca7d23d">
 						<property name="com.jaspersoft.studio.unit.width" value="px"/>
 					</reportElement>
 					<textElement>
@@ -238,7 +145,7 @@
 					<text><![CDATA[Prepared By:]]></text>
 				</staticText>
 				<textField isBlankWhenNull="true">
-					<reportElement x="17" y="71" width="250" height="15" uuid="7b88c13a-0891-4d3e-b08d-f23e6f2b0eb1">
+					<reportElement x="10" y="71" width="250" height="15" uuid="7b88c13a-0891-4d3e-b08d-f23e6f2b0eb1">
 						<property name="com.jaspersoft.studio.unit.width" value="px"/>
 					</reportElement>
 					<box>
@@ -250,103 +157,58 @@
 					<textFieldExpression><![CDATA[$P{PREPAREDBY}]]></textFieldExpression>
 				</textField>
 				<staticText>
-					<reportElement positionType="Float" x="2" y="271" width="80" height="20" isRemoveLineWhenBlank="true" uuid="f7495784-cb63-4aa6-8aae-08f8f0b2056c"/>
+					<reportElement positionType="Float" x="310" y="11" width="250" height="20" isRemoveLineWhenBlank="true" uuid="863714c9-9720-48c7-a628-c1920e4665a0">
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					</reportElement>
 					<textElement textAlignment="Left">
-						<font fontName="SansSerif" size="12" isBold="false"/>
+						<font fontName="SansSerif" size="11" isBold="false"/>
 					</textElement>
-					<text><![CDATA[Conforme:]]></text>
+					<text><![CDATA[Audited By:]]></text>
 				</staticText>
-				<staticText>
-					<reportElement positionType="Float" x="9" y="312" width="267" height="20" isRemoveLineWhenBlank="true" uuid="327b630d-76e8-42c3-87a4-e1eb262ee473"/>
+				<textField isBlankWhenNull="true">
+					<reportElement x="310" y="71" width="250" height="15" uuid="150c94f2-d612-413b-859f-c8eb93e2b906">
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					</reportElement>
 					<box>
-						<topPen lineWidth="1.0"/>
+						<bottomPen lineWidth="0.0"/>
 					</box>
-					<textElement textAlignment="Left">
+					<textElement textAlignment="Left" verticalAlignment="Bottom">
 						<font fontName="SansSerif" size="10" isBold="true"/>
 					</textElement>
-					<text><![CDATA[Signature over Printed Name of Authorized Representative ]]></text>
-				</staticText>
-				<staticText>
-					<reportElement positionType="Float" x="9" y="341" width="214" height="15" isRemoveLineWhenBlank="true" uuid="dd70f288-2981-4e12-826f-44dd0e6e9ab2"/>
+					<textFieldExpression><![CDATA[$P{AUDITEDBY}]]></textFieldExpression>
+				</textField>
+				<textField pattern="MM/dd/yyyy hh:mm a" isBlankWhenNull="true">
+					<reportElement x="310" y="61" width="250" height="10" uuid="3b2e97a9-d290-4ad1-9f19-81d1e3094e2c">
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					</reportElement>
+					<textElement textAlignment="Left" verticalAlignment="Bottom">
+						<font fontName="SansSerif" size="7"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$P{AUDITED_BY_TIME}]]></textFieldExpression>
+				</textField>
+				<image hAlign="Left" isLazy="true" onErrorType="Blank">
+					<reportElement x="310" y="31" width="250" height="30" uuid="7d1c2a4e-5b6f-4c8a-9e10-2f3a4b5c6d71">
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					</reportElement>
+					<imageExpression><![CDATA[$P{AUDITED_BY_SIGN}]]></imageExpression>
+				</image>
+				<textField isBlankWhenNull="true">
+					<reportElement x="310" y="86" width="250" height="15" uuid="815f7107-b5dd-4eb8-b54b-5a632a02d55c">
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					</reportElement>
 					<textElement textAlignment="Left">
 						<font fontName="SansSerif" size="10" isBold="false"/>
 					</textElement>
-					<text><![CDATA[Supplier/Firm/Company]]></text>
-				</staticText>
-				<staticText>
-					<reportElement positionType="Float" x="9" y="356" width="214" height="14" isRemoveLineWhenBlank="true" uuid="09bdfdc1-12ec-4ebb-b478-6f0837b13769"/>
-					<textElement textAlignment="Left">
-						<font fontName="SansSerif" size="10" isBold="false"/>
-					</textElement>
-					<text><![CDATA[Date]]></text>
-				</staticText>
-				<staticText>
-					<reportElement mode="Transparent" x="0" y="0" width="572" height="230" forecolor="#000000" backcolor="#FFFFFF" uuid="4e107a69-d767-4088-878e-cbc0a0ed7303"/>
-					<box>
-						<topPen lineWidth="1.0"/>
-						<leftPen lineWidth="1.0"/>
-						<bottomPen lineWidth="1.0"/>
-						<rightPen lineWidth="1.0"/>
-					</box>
-					<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" markup="none">
-						<font fontName="SansSerif" size="12" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
-						<paragraph lineSpacing="Single"/>
-					</textElement>
-					<text><![CDATA[]]></text>
-				</staticText>
-				<staticText>
-					<reportElement positionType="Float" x="1" y="250" width="165" height="20" isRemoveLineWhenBlank="true" forecolor="#990099" uuid="965350c2-e9ad-4cb6-b960-d3e82fa79356"/>
-					<box leftPadding="2"/>
-					<textElement textAlignment="Left" verticalAlignment="Middle">
-						<font fontName="SansSerif" size="10" isBold="true"/>
-					</textElement>
-					<text><![CDATA[FUNDS AVAILABLE CHARGE TO:]]></text>
-				</staticText>
-				<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-					<reportElement x="166" y="250" width="176" height="20" isPrintWhenDetailOverflows="true" uuid="18cee90b-ab64-4d2d-bf5f-eef65ccaf765"/>
-					<textElement verticalAlignment="Middle">
-						<font fontName="SansSerif" size="9" isBold="true"/>
-					</textElement>
-					<textFieldExpression><![CDATA[$P{CASH_FLOW_ITEM}]]></textFieldExpression>
+					<textFieldExpression><![CDATA[$P{AUDITEDBY_POS}]]></textFieldExpression>
 				</textField>
-				<staticText>
-					<reportElement positionType="Float" x="342" y="250" width="145" height="20" isRemoveLineWhenBlank="true" uuid="b42756f3-3c33-42a2-a18c-938a072207fa"/>
-					<box leftPadding="3"/>
-					<textElement textAlignment="Left" verticalAlignment="Middle">
-						<font fontName="SansSerif" size="9" isBold="true"/>
-					</textElement>
-					<text><![CDATA[CASH FLOW ITEM BALANCE:]]></text>
-				</staticText>
-				<textField textAdjust="StretchHeight" pattern="#,##0.00;(-#,##0.00)" isBlankWhenNull="true">
-					<reportElement x="487" y="250" width="86" height="20" isPrintWhenDetailOverflows="true" uuid="6d46c93a-5fbf-4baa-ae5a-511c6fdc1714"/>
-					<textElement verticalAlignment="Middle">
-						<font fontName="SansSerif" size="9" isBold="true"/>
-					</textElement>
-					<textFieldExpression><![CDATA[$P{CASH_FLOW_ITEM_AMOUNT}]]></textFieldExpression>
-				</textField>
-				<textField pattern="#,##0.00" isBlankWhenNull="true">
-					<reportElement x="487" y="230" width="86" height="20" uuid="31592953-fd24-4f98-940e-578f87331e18"/>
-					<textElement verticalAlignment="Middle">
-						<font fontName="SansSerif" size="9" isBold="true"/>
-					</textElement>
-					<textFieldExpression><![CDATA[$P{BUDGET_LINE_ITEM_BALANCE}]]></textFieldExpression>
-				</textField>
-				<staticText>
-					<reportElement positionType="Float" x="342" y="230" width="145" height="20" isRemoveLineWhenBlank="true" uuid="fee03060-56c1-4354-b6e0-779f42e577a4"/>
-					<box leftPadding="3" rightPadding="0"/>
-					<textElement textAlignment="Left" verticalAlignment="Middle">
-						<font fontName="SansSerif" size="9" isBold="true"/>
-					</textElement>
-					<text><![CDATA[BUDGET LINE ITEM BALANCE:]]></text>
-				</staticText>
-				<image hAlign="Center" isLazy="true" onErrorType="Blank">
-					<reportElement x="17" y="145" width="250" height="30" uuid="1b4db95f-6476-41d7-b7d4-db818931d46b">
+				<image hAlign="Left" isLazy="true" onErrorType="Blank">
+					<reportElement x="10" y="145" width="250" height="30" uuid="1b4db95f-6476-41d7-b7d4-db818931d46b">
 						<property name="com.jaspersoft.studio.unit.width" value="px"/>
 					</reportElement>
 					<imageExpression><![CDATA[$P{CHECKED_BY_SIGN}]]></imageExpression>
 				</image>
 				<textField isBlankWhenNull="true">
-					<reportElement x="17" y="200" width="250" height="15" uuid="52c15461-3e31-4bbb-8d29-58152b23e19c">
+					<reportElement x="10" y="200" width="250" height="15" uuid="52c15461-3e31-4bbb-8d29-58152b23e19c">
 						<property name="com.jaspersoft.studio.unit.width" value="px"/>
 					</reportElement>
 					<textElement textAlignment="Left">
@@ -355,7 +217,7 @@
 					<textFieldExpression><![CDATA[$P{CHECKEDBY_POS}]]></textFieldExpression>
 				</textField>
 				<staticText>
-					<reportElement positionType="Float" x="17" y="125" width="250" height="20" isRemoveLineWhenBlank="true" uuid="354fdd2a-07f4-4960-a34a-c6dd7d76107d">
+					<reportElement positionType="Float" x="10" y="125" width="250" height="20" isRemoveLineWhenBlank="true" uuid="354fdd2a-07f4-4960-a34a-c6dd7d76107d">
 						<property name="com.jaspersoft.studio.unit.width" value="px"/>
 					</reportElement>
 					<textElement textAlignment="Left">
@@ -363,8 +225,8 @@
 					</textElement>
 					<text><![CDATA[Checked By:]]></text>
 				</staticText>
-				<textField pattern="MM/dd/yyyy" isBlankWhenNull="true">
-					<reportElement x="17" y="175" width="250" height="10" uuid="180b8325-4cfc-4e15-ab65-68cfb145e76d">
+				<textField pattern="MM/dd/yyyy hh:mm a" isBlankWhenNull="true">
+					<reportElement x="10" y="175" width="250" height="10" uuid="180b8325-4cfc-4e15-ab65-68cfb145e76d">
 						<property name="com.jaspersoft.studio.unit.width" value="px"/>
 					</reportElement>
 					<textElement textAlignment="Left" verticalAlignment="Bottom">
@@ -373,7 +235,7 @@
 					<textFieldExpression><![CDATA[$P{CHECKED_BY_TIME}]]></textFieldExpression>
 				</textField>
 				<textField isBlankWhenNull="true">
-					<reportElement x="17" y="185" width="250" height="15" uuid="c071424a-9158-4bdd-a1a2-ecdf5bf388ef">
+					<reportElement x="10" y="185" width="250" height="15" uuid="c071424a-9158-4bdd-a1a2-ecdf5bf388ef">
 						<property name="com.jaspersoft.studio.unit.width" value="px"/>
 					</reportElement>
 					<box>
@@ -384,34 +246,6 @@
 					</textElement>
 					<textFieldExpression><![CDATA[$P{CHECKEDBY}]]></textFieldExpression>
 				</textField>
-				<textField isBlankWhenNull="true">
-					<reportElement x="394" y="321" width="140" height="15" uuid="28d76fab-c67f-4d24-87f5-4138cdcf28e8"/>
-					<box>
-						<bottomPen lineWidth="0.0"/>
-					</box>
-					<textElement textAlignment="Left" verticalAlignment="Bottom">
-						<font fontName="SansSerif" size="10" isBold="true"/>
-					</textElement>
-					<textFieldExpression><![CDATA[$P{REQUESTED_BY}]]></textFieldExpression>
-				</textField>
-				<staticText>
-					<reportElement positionType="Float" x="394" y="271" width="140" height="20" isRemoveLineWhenBlank="true" uuid="b6d30c44-d7c1-425a-811f-c7909e819bef"/>
-					<textElement>
-						<font fontName="SansSerif" size="11" isBold="false"/>
-					</textElement>
-					<text><![CDATA[Requested By:]]></text>
-				</staticText>
-				<textField>
-					<reportElement x="394" y="336" width="140" height="15" uuid="9d0db7e2-6fdd-4361-bccf-a8b83c36e9a4"/>
-					<textElement textAlignment="Left">
-						<font fontName="SansSerif" size="10"/>
-					</textElement>
-					<textFieldExpression><![CDATA[$P{REQUESTED_BY_POS}]]></textFieldExpression>
-				</textField>
-				<image hAlign="Center" isLazy="true" onErrorType="Blank">
-					<reportElement x="394" y="291" width="140" height="30" uuid="fd916571-7535-4b6b-a2e1-3dfb874d9f29"/>
-					<imageExpression><![CDATA[$P{REQUESTED_BY_SIGN}]]></imageExpression>
-				</image>
 				<staticText>
 					<reportElement positionType="Float" x="310" y="125" width="250" height="20" isRemoveLineWhenBlank="true" uuid="17031cdd-71b3-43dd-ad09-4827062df0be">
 						<property name="com.jaspersoft.studio.unit.width" value="px"/>
@@ -433,15 +267,21 @@
 					</textElement>
 					<textFieldExpression><![CDATA[$P{APPROVEDBY}]]></textFieldExpression>
 				</textField>
-				<textField pattern="MM/dd/yyyy" isBlankWhenNull="true">
+				<textField pattern="MM/dd/yyyy hh:mm a" isBlankWhenNull="true">
 					<reportElement x="310" y="175" width="250" height="10" uuid="5bb044c0-f5a2-43b5-a270-354db5f871da">
 						<property name="com.jaspersoft.studio.unit.width" value="px"/>
 					</reportElement>
 					<textElement textAlignment="Left" verticalAlignment="Bottom">
 						<font fontName="SansSerif" size="7"/>
 					</textElement>
-					<textFieldExpression><![CDATA[""]]></textFieldExpression>
+					<textFieldExpression><![CDATA[$P{APPROVAR_TIME}]]></textFieldExpression>
 				</textField>
+				<image hAlign="Left" isLazy="true" onErrorType="Blank">
+					<reportElement x="310" y="145" width="250" height="30" uuid="8e2d3b5f-6c7a-4d9b-8f21-3a4b5c6d7e82">
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					</reportElement>
+					<imageExpression><![CDATA[$P{APPROVAR_SIGN}]]></imageExpression>
+				</image>
 				<textField isBlankWhenNull="true">
 					<reportElement x="310" y="200" width="250" height="15" uuid="c641ab23-5a69-4d7a-abe9-7fcc91b58961">
 						<property name="com.jaspersoft.studio.unit.width" value="px"/>
@@ -454,17 +294,309 @@
 			</band>
 		</groupFooter>
 	</group>
-	<group name="dummy1">
+	<group name="dummay2">
 		<groupExpression><![CDATA[true]]></groupExpression>
 		<groupFooter>
-			<band height="66">
+			<band height="101" splitType="Prevent">
+				<textField pattern="#,##0.00">
+					<reportElement x="459" y="0" width="113" height="17" uuid="05680643-5543-483b-951d-fd87ea8deeb6"/>
+					<box rightPadding="2">
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Monospaced" isBold="true" pdfFontName="Courier" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{totalAmount}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00">
+					<reportElement x="459" y="17" width="113" height="17" uuid="cfa51921-2f23-418b-a6a4-615b69ec85f6"/>
+					<box rightPadding="2">
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Monospaced" isBold="true" pdfFontName="Courier" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{totalVat}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00">
+					<reportElement x="459" y="34" width="113" height="17" uuid="88a9f39a-7381-4d10-b3f1-114b2f0d072f"/>
+					<box rightPadding="2">
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Monospaced" isBold="true" pdfFontName="Courier" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{totalDiscount}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00">
+					<reportElement x="459" y="51" width="113" height="17" uuid="40850fbf-583d-471d-8d7e-81b04ce075c1"/>
+					<box rightPadding="2">
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Monospaced" isBold="true" pdfFontName="Courier" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{totalAmount}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement mode="Transparent" x="379" y="0" width="80" height="17" forecolor="#000000" backcolor="#FFFFFF" uuid="12745c92-0ca5-45ba-8776-5472af67d8bc"/>
+					<box topPadding="0" leftPadding="9">
+						<pen lineWidth="0.0"/>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Left" verticalAlignment="Bottom" rotation="None" markup="none">
+						<font fontName="Monospaced" size="10" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Courier-Bold" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+						<paragraph lineSpacing="Single"/>
+					</textElement>
+					<text><![CDATA[SUBTOTAL:]]></text>
+				</staticText>
+				<staticText>
+					<reportElement mode="Transparent" x="379" y="17" width="80" height="17" forecolor="#000000" backcolor="#FFFFFF" uuid="c642f866-92c1-4103-8987-568c7ac7b387"/>
+					<box topPadding="0" leftPadding="9">
+						<pen lineWidth="0.0"/>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Left" verticalAlignment="Bottom" rotation="None" markup="none">
+						<font fontName="Monospaced" size="10" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Courier-Bold" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+						<paragraph lineSpacing="Single"/>
+					</textElement>
+					<text><![CDATA[VAT:]]></text>
+				</staticText>
+				<staticText>
+					<reportElement mode="Transparent" x="379" y="34" width="80" height="17" forecolor="#000000" backcolor="#FFFFFF" uuid="34542c81-c9b1-4e59-ab02-19a064a13766"/>
+					<box topPadding="0" leftPadding="9">
+						<pen lineWidth="0.0"/>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Left" verticalAlignment="Bottom" rotation="None" markup="none">
+						<font fontName="Monospaced" size="10" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Courier-Bold" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+						<paragraph lineSpacing="Single"/>
+					</textElement>
+					<text><![CDATA[DISCOUNT:]]></text>
+				</staticText>
+				<staticText>
+					<reportElement mode="Transparent" x="379" y="51" width="80" height="17" forecolor="#000000" backcolor="#FFFFFF" uuid="678e4d00-ed28-4066-8101-91d7904eac31"/>
+					<box topPadding="0" leftPadding="9">
+						<pen lineWidth="0.0"/>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Left" verticalAlignment="Bottom" rotation="None" markup="none">
+						<font fontName="Monospaced" size="10" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Courier-Bold" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+						<paragraph lineSpacing="Single"/>
+					</textElement>
+					<text><![CDATA[TOTAL:]]></text>
+				</staticText>
+				<staticText>
+					<reportElement mode="Transparent" x="48" y="0" width="222" height="17" forecolor="#000000" backcolor="#FFFFFF" uuid="9c5f0de5-8e2b-46d5-a2ce-fe255faf6356"/>
+					<box topPadding="0" leftPadding="0">
+						<pen lineWidth="0.0"/>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Bottom" rotation="None" markup="none">
+						<font fontName="Monospaced" size="12" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Courier" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+						<paragraph lineSpacing="Single"/>
+					</textElement>
+					<text><![CDATA[------NOTHING FOLLOWS ------]]></text>
+				</staticText>
+				<staticText>
+					<reportElement mode="Transparent" x="48" y="17" width="222" height="17" forecolor="#000000" backcolor="#FFFFFF" uuid="09810c8c-cfde-4a23-94b0-9ec563822fad"/>
+					<box topPadding="0" leftPadding="0">
+						<pen lineWidth="0.0"/>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Bottom" rotation="None" markup="none">
+						<font fontName="Monospaced" size="12" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Courier" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+						<paragraph lineSpacing="Single"/>
+					</textElement>
+					<text><![CDATA[]]></text>
+				</staticText>
+				<staticText>
+					<reportElement mode="Transparent" x="48" y="34" width="222" height="17" forecolor="#000000" backcolor="#FFFFFF" uuid="8c1e89dd-b648-40ff-9530-6daeb283822e"/>
+					<box topPadding="0" leftPadding="0">
+						<pen lineWidth="0.0"/>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Bottom" rotation="None" markup="none">
+						<font fontName="Monospaced" size="12" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Courier" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+						<paragraph lineSpacing="Single"/>
+					</textElement>
+					<text><![CDATA[]]></text>
+				</staticText>
+				<staticText>
+					<reportElement mode="Transparent" x="48" y="51" width="222" height="17" forecolor="#000000" backcolor="#FFFFFF" uuid="6fd41941-f973-431c-86ca-32511220190c"/>
+					<box topPadding="0" leftPadding="0">
+						<pen lineWidth="0.0"/>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Bottom" rotation="None" markup="none">
+						<font fontName="Monospaced" size="12" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Courier" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+						<paragraph lineSpacing="Single"/>
+					</textElement>
+					<text><![CDATA[]]></text>
+				</staticText>
+				<staticText>
+					<reportElement mode="Transparent" x="270" y="0" width="109" height="17" forecolor="#000000" backcolor="#FFFFFF" uuid="a584838c-fd88-47e8-9358-b8e5aa494edb"/>
+					<box topPadding="0" leftPadding="0">
+						<pen lineWidth="0.0"/>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Bottom" rotation="None" markup="none">
+						<font fontName="Monospaced" size="12" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Courier" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+						<paragraph lineSpacing="Single"/>
+					</textElement>
+					<text><![CDATA[]]></text>
+				</staticText>
+				<staticText>
+					<reportElement mode="Transparent" x="270" y="17" width="109" height="17" forecolor="#000000" backcolor="#FFFFFF" uuid="50c5107b-f28a-4168-af1e-3d8bdee1af5b"/>
+					<box topPadding="0" leftPadding="0">
+						<pen lineWidth="0.0"/>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Bottom" rotation="None" markup="none">
+						<font fontName="Monospaced" size="12" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Courier" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+						<paragraph lineSpacing="Single"/>
+					</textElement>
+					<text><![CDATA[]]></text>
+				</staticText>
+				<staticText>
+					<reportElement mode="Transparent" x="270" y="34" width="109" height="17" forecolor="#000000" backcolor="#FFFFFF" uuid="6e569bda-dce4-43ab-809e-21726bd84e54"/>
+					<box topPadding="0" leftPadding="0">
+						<pen lineWidth="0.0"/>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Bottom" rotation="None" markup="none">
+						<font fontName="Monospaced" size="12" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Courier" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+						<paragraph lineSpacing="Single"/>
+					</textElement>
+					<text><![CDATA[]]></text>
+				</staticText>
+				<staticText>
+					<reportElement mode="Transparent" x="270" y="51" width="109" height="17" forecolor="#000000" backcolor="#FFFFFF" uuid="94202642-06d3-4e3c-8908-9922dcafa3c8"/>
+					<box topPadding="0" leftPadding="0">
+						<pen lineWidth="0.0"/>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Bottom" rotation="None" markup="none">
+						<font fontName="Monospaced" size="12" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Courier" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+						<paragraph lineSpacing="Single"/>
+					</textElement>
+					<text><![CDATA[]]></text>
+				</staticText>
+				<staticText>
+					<reportElement mode="Transparent" x="0" y="0" width="48" height="17" forecolor="#000000" backcolor="#FFFFFF" uuid="99729abf-0e5c-4c82-901f-28dfde0df450"/>
+					<box topPadding="0" leftPadding="0">
+						<pen lineWidth="0.0"/>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Bottom" rotation="None" markup="none">
+						<font fontName="Monospaced" size="12" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Courier" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+						<paragraph lineSpacing="Single"/>
+					</textElement>
+					<text><![CDATA[]]></text>
+				</staticText>
+				<staticText>
+					<reportElement mode="Transparent" x="0" y="17" width="48" height="17" forecolor="#000000" backcolor="#FFFFFF" uuid="8babff30-ec14-49d3-baa0-3ac989c6197d"/>
+					<box topPadding="0" leftPadding="0">
+						<pen lineWidth="0.0"/>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Bottom" rotation="None" markup="none">
+						<font fontName="Monospaced" size="12" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Courier" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+						<paragraph lineSpacing="Single"/>
+					</textElement>
+					<text><![CDATA[]]></text>
+				</staticText>
+				<staticText>
+					<reportElement mode="Transparent" x="0" y="34" width="48" height="17" forecolor="#000000" backcolor="#FFFFFF" uuid="58e812f3-e0c6-4878-9722-5d70ceaf629d"/>
+					<box topPadding="0" leftPadding="0">
+						<pen lineWidth="0.0"/>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Bottom" rotation="None" markup="none">
+						<font fontName="Monospaced" size="12" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Courier" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+						<paragraph lineSpacing="Single"/>
+					</textElement>
+					<text><![CDATA[]]></text>
+				</staticText>
+				<staticText>
+					<reportElement mode="Transparent" x="0" y="51" width="48" height="17" forecolor="#000000" backcolor="#FFFFFF" uuid="cee649f0-e9e8-4547-8554-97701d8e8519"/>
+					<box topPadding="0" leftPadding="0">
+						<pen lineWidth="0.0"/>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Bottom" rotation="None" markup="none">
+						<font fontName="Monospaced" size="12" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Courier" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+						<paragraph lineSpacing="Single"/>
+					</textElement>
+					<text><![CDATA[]]></text>
+				</staticText>
 				<textField textAdjust="StretchHeight">
-					<reportElement positionType="Float" mode="Transparent" x="0" y="33" width="572" height="33" isPrintWhenDetailOverflows="true" forecolor="#000000" backcolor="#FFFFFF" uuid="ad4acc0b-689f-44dd-9d5e-8fea6b99e5fa"/>
+					<reportElement positionType="Float" mode="Transparent" x="0" y="68" width="572" height="33" isPrintWhenDetailOverflows="true" forecolor="#000000" backcolor="#FFFFFF" uuid="ad4acc0b-689f-44dd-9d5e-8fea6b99e5fa"/>
 					<box leftPadding="3" rightPadding="3">
-						<topPen lineWidth="1.0"/>
-						<leftPen lineWidth="1.0"/>
-						<bottomPen lineWidth="1.0"/>
-						<rightPen lineWidth="1.0"/>
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
 					</box>
 					<textElement textAlignment="Left" verticalAlignment="Middle" rotation="None" markup="none">
 						<font fontName="SansSerif" size="10" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
@@ -472,108 +604,61 @@
 					</textElement>
 					<textFieldExpression><![CDATA["PROVISION OF DAMAGES:\nReturn to supplier if there were any damaages / expiration in the item. This will be a subject for replacement."]]></textFieldExpression>
 				</textField>
-				<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-					<reportElement x="0" y="0" width="572" height="33" isPrintWhenDetailOverflows="true" uuid="9abfad78-8f78-43b9-88cd-746627ea4088"/>
-					<box topPadding="3" leftPadding="3">
-						<pen lineWidth="1.0"/>
-						<topPen lineWidth="1.0"/>
-						<leftPen lineWidth="1.0"/>
-						<bottomPen lineWidth="1.0"/>
-						<rightPen lineWidth="1.0"/>
-					</box>
-					<textElement>
-						<font fontName="SansSerif" size="10"/>
-					</textElement>
-					<textFieldExpression><![CDATA["PURPOSE: " + $P{PURPOSE}]]></textFieldExpression>
-				</textField>
 			</band>
 		</groupFooter>
 	</group>
-	<group name="dummay2">
-		<groupExpression><![CDATA[true]]></groupExpression>
-		<groupFooter>
-			<band height="17">
-				<textField pattern="#,##0.00">
-					<reportElement x="487" y="0" width="85" height="17" uuid="9ace96bd-f830-46c4-9c66-fe43c524828c"/>
-					<box>
-						<topPen lineWidth="1.0"/>
-						<leftPen lineWidth="1.0"/>
-						<bottomPen lineWidth="1.0"/>
-						<rightPen lineWidth="1.0"/>
-					</box>
-					<textElement textAlignment="Right" verticalAlignment="Middle">
-						<font fontName="SansSerif" size="11" isBold="true"/>
-					</textElement>
-					<textFieldExpression><![CDATA[$P{AMOUNT}]]></textFieldExpression>
-				</textField>
-				<staticText>
-					<reportElement mode="Transparent" x="0" y="0" width="487" height="17" forecolor="#000000" backcolor="#FFFFFF" uuid="79944892-5f0a-432c-89bf-278e5d339b5d"/>
-					<box rightPadding="3">
-						<topPen lineWidth="1.0"/>
-						<leftPen lineWidth="1.0"/>
-						<bottomPen lineWidth="1.0"/>
-						<rightPen lineWidth="1.0"/>
-					</box>
-					<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None" markup="none">
-						<font fontName="SansSerif" size="12" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
-						<paragraph lineSpacing="Single"/>
-					</textElement>
-					<text><![CDATA[Total]]></text>
-				</staticText>
-			</band>
-		</groupFooter>
-	</group>
-	<background>
-		<band splitType="Stretch"/>
-	</background>
 	<title>
-		<band height="264" splitType="Stretch">
+		<band height="281" splitType="Stretch">
+			<image isLazy="true" onErrorType="Icon">
+				<reportElement mode="Transparent" x="-20" y="-20" width="612" height="106" uuid="37ac24c6-4eed-4c5d-b438-c861bf89cf97"/>
+				<imageExpression><![CDATA[$P{SOA_HEADER_PATH}]]></imageExpression>
+			</image>
 			<staticText>
 				<reportElement mode="Transparent" x="0" y="100" width="572" height="63" forecolor="#000000" backcolor="#FFFFFF" uuid="4233daa1-0450-4d29-9476-6169e766f5aa"/>
 				<box>
-					<topPen lineWidth="1.0"/>
-					<leftPen lineWidth="1.0"/>
-					<bottomPen lineWidth="0.0"/>
-					<rightPen lineWidth="1.0"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" markup="none">
-					<font fontName="SansSerif" size="12" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<font fontName="SansSerif" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
 				<text><![CDATA[]]></text>
 			</staticText>
 			<staticText>
-				<reportElement mode="Transparent" x="380" y="100" width="45" height="15" forecolor="#000000" backcolor="#FFFFFF" uuid="be8bb49a-9994-415f-a379-df9e2a096d67"/>
+				<reportElement mode="Transparent" x="380" y="36" width="45" height="15" forecolor="#000000" backcolor="#FFFFFF" uuid="be8bb49a-9994-415f-a379-df9e2a096d67"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle" rotation="None" markup="none">
-					<font fontName="SansSerif" size="11" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<font fontName="SansSerif" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
 				<text><![CDATA[PO No.:]]></text>
 			</staticText>
 			<textField isBlankWhenNull="true">
-				<reportElement x="425" y="116" width="147" height="15" uuid="81f7878c-e33c-447a-9752-2a0586b640e3"/>
+				<reportElement x="425" y="52" width="147" height="15" uuid="81f7878c-e33c-447a-9752-2a0586b640e3"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font fontName="SansSerif" size="10"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$P{V_DATE} != null ? (new java.text.SimpleDateFormat("MMM", java.util.Locale.ENGLISH).format($P{V_DATE}).replaceAll("Jan$","Jan.").replaceAll("Feb$","Feb.").replaceAll("Mar$","Mar.").replaceAll("Apr$","Apr.").replaceAll("May$","May").replaceAll("Jun$","Jun.").replaceAll("Jul$","Jul.").replaceAll("Aug$","Aug.").replaceAll("Sep$","Sep.").replaceAll("Oct$","Oct.").replaceAll("Nov$","Nov.").replaceAll("Dec$","Dec.") + " " + new java.text.SimpleDateFormat("d, yyyy").format($P{V_DATE})) : ""]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{V_DATE} != null ? new java.text.SimpleDateFormat("MMMM dd, yyyy", java.util.Locale.ENGLISH).format($P{V_DATE}) : ""]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="0" y="100" width="60" height="15" uuid="eaee9c48-86b2-42d3-8c32-06921826034b"/>
+				<reportElement x="0" y="100" width="64" height="15" uuid="eaee9c48-86b2-42d3-8c32-06921826034b"/>
 				<box leftPadding="3"/>
 				<textElement verticalAlignment="Middle">
-					<font fontName="SansSerif" size="11"/>
+					<font fontName="SansSerif"/>
 				</textElement>
 				<text><![CDATA[Supplier:]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="425" y="100" width="147" height="15" uuid="337a0511-22ad-41c5-a206-4797750bc1bf"/>
+				<reportElement x="425" y="36" width="147" height="15" uuid="337a0511-22ad-41c5-a206-4797750bc1bf"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font fontName="SansSerif" size="10"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{VOUCHER_NO}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="60" y="100" width="320" height="15" isPrintWhenDetailOverflows="true" uuid="0c3e1ca5-61a6-4a1d-b24d-81f32c0670bb">
+				<reportElement x="64" y="100" width="508" height="15" isPrintWhenDetailOverflows="true" uuid="0c3e1ca5-61a6-4a1d-b24d-81f32c0670bb">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
@@ -582,15 +667,15 @@
 				<textFieldExpression><![CDATA[$P{SUPPLIER}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="0" y="116" width="60" height="15" uuid="bba34933-605b-468f-87aa-651bd062e414"/>
+				<reportElement x="0" y="116" width="64" height="15" uuid="bba34933-605b-468f-87aa-651bd062e414"/>
 				<box leftPadding="3"/>
 				<textElement verticalAlignment="Middle">
-					<font fontName="SansSerif" size="11"/>
+					<font fontName="SansSerif"/>
 				</textElement>
 				<text><![CDATA[Address:]]></text>
 			</staticText>
 			<textField isBlankWhenNull="true">
-				<reportElement x="60" y="116" width="320" height="15" uuid="6509d17c-07c9-4c6e-b16c-2b0a95c022e1">
+				<reportElement x="64" y="116" width="508" height="15" uuid="6509d17c-07c9-4c6e-b16c-2b0a95c022e1">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
@@ -599,15 +684,15 @@
 				<textFieldExpression><![CDATA[$P{SUPPLIER_ADDRESS}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="0" y="132" width="60" height="15" uuid="999ef1c5-c7ae-4b5b-9ab3-d47a327d0994"/>
+				<reportElement x="0" y="132" width="64" height="15" uuid="999ef1c5-c7ae-4b5b-9ab3-d47a327d0994"/>
 				<box leftPadding="3"/>
 				<textElement verticalAlignment="Middle">
-					<font fontName="SansSerif" size="11"/>
+					<font fontName="SansSerif"/>
 				</textElement>
 				<text><![CDATA[Contact No.:]]></text>
 			</staticText>
 			<textField isBlankWhenNull="true">
-				<reportElement x="60" y="132" width="320" height="15" uuid="121ef0c3-f9f2-46b7-bb1e-508a324913f0">
+				<reportElement x="64" y="132" width="508" height="15" uuid="121ef0c3-f9f2-46b7-bb1e-508a324913f0">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
@@ -616,206 +701,221 @@
 				<textFieldExpression><![CDATA[$P{SUPPLIER_CONTACT}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement mode="Transparent" x="380" y="116" width="45" height="15" forecolor="#000000" backcolor="#FFFFFF" uuid="86b3edc6-33de-4570-92ce-41ee6ee863b6"/>
+				<reportElement mode="Transparent" x="380" y="52" width="45" height="15" forecolor="#000000" backcolor="#FFFFFF" uuid="86b3edc6-33de-4570-92ce-41ee6ee863b6"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle" rotation="None" markup="none">
-					<font fontName="SansSerif" size="11" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<font fontName="SansSerif" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
 				<text><![CDATA[Date:]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="0" y="148" width="60" height="15" uuid="eca1a6e7-5613-439c-97e9-cb47e2442609"/>
+				<reportElement x="0" y="148" width="64" height="15" uuid="eca1a6e7-5613-439c-97e9-cb47e2442609"/>
 				<box leftPadding="3"/>
 				<textElement verticalAlignment="Middle">
-					<font fontName="SansSerif" size="11"/>
+					<font fontName="SansSerif"/>
 				</textElement>
 				<text><![CDATA[TIN:]]></text>
 			</staticText>
 			<textField isBlankWhenNull="true">
-				<reportElement x="60" y="148" width="512" height="15" uuid="f93afa08-0e80-4930-a466-98d1ce96014f"/>
+				<reportElement x="64" y="148" width="508" height="15" uuid="f93afa08-0e80-4930-a466-98d1ce96014f"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font fontName="SansSerif" size="10"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{SUPPLIER_TIN}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="0" y="199" width="137" height="16" uuid="782e4354-d2f4-4c3b-9568-274fd03c680a"/>
+				<reportElement x="0" y="199" width="120" height="16" uuid="782e4354-d2f4-4c3b-9568-274fd03c680a"/>
 				<box leftPadding="3">
-					<topPen lineWidth="1.0"/>
-					<leftPen lineWidth="1.0"/>
-					<bottomPen lineWidth="1.0"/>
-					<rightPen lineWidth="1.0"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
 				</box>
 				<textElement verticalAlignment="Middle">
-					<font fontName="SansSerif" size="12"/>
+					<font fontName="SansSerif"/>
 				</textElement>
 				<text><![CDATA[Delivery Term]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="0" y="181" width="137" height="18" uuid="9446d87c-e9bb-43e6-8c0f-6b82b296fac3"/>
+				<reportElement x="0" y="181" width="120" height="18" uuid="9446d87c-e9bb-43e6-8c0f-6b82b296fac3"/>
 				<box leftPadding="3">
-					<topPen lineWidth="1.0"/>
-					<leftPen lineWidth="1.0"/>
-					<bottomPen lineWidth="1.0"/>
-					<rightPen lineWidth="1.0"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
 				</box>
 				<textElement verticalAlignment="Middle">
-					<font fontName="SansSerif" size="12"/>
+					<font fontName="SansSerif"/>
 				</textElement>
 				<text><![CDATA[Payment Term]]></text>
 			</staticText>
 			<textField isBlankWhenNull="true">
-				<reportElement x="137" y="199" width="435" height="16" uuid="53ac0965-8878-4922-ac4d-ee01b16e8ffd"/>
+				<reportElement x="120" y="199" width="452" height="16" uuid="53ac0965-8878-4922-ac4d-ee01b16e8ffd"/>
 				<box leftPadding="3">
-					<topPen lineWidth="1.0"/>
-					<leftPen lineWidth="1.0"/>
-					<bottomPen lineWidth="1.0"/>
-					<rightPen lineWidth="1.0"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
 				</box>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
-					<font fontName="SansSerif" size="12"/>
+					<font fontName="SansSerif"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{DELIVERY_TERM}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="137" y="181" width="435" height="18" uuid="a1f76a01-ac6b-4ef5-a1e5-e88f19cce64f">
+				<reportElement x="120" y="181" width="452" height="18" uuid="a1f76a01-ac6b-4ef5-a1e5-e88f19cce64f">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<box leftPadding="3" bottomPadding="2">
 					<pen lineWidth="1.0"/>
-					<topPen lineWidth="1.0"/>
-					<leftPen lineWidth="1.0"/>
-					<bottomPen lineWidth="1.0"/>
-					<rightPen lineWidth="1.0"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
 				</box>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
-					<font fontName="SansSerif" size="12"/>
+					<font fontName="SansSerif"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{PAYMENT_TERM}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement mode="Transparent" x="380" y="132" width="45" height="15" forecolor="#000000" backcolor="#FFFFFF" uuid="ef4d8ccb-527e-413b-809b-5e54a81b9523"/>
+				<reportElement mode="Transparent" x="380" y="68" width="45" height="15" forecolor="#000000" backcolor="#FFFFFF" uuid="ef4d8ccb-527e-413b-809b-5e54a81b9523"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle" rotation="None" markup="none">
-					<font fontName="SansSerif" size="11" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<font fontName="SansSerif" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
 				<text><![CDATA[PR No.:]]></text>
 			</staticText>
-			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-				<reportElement x="380" y="64" width="192" height="15" uuid="427aac48-c4f4-4996-bddf-96c201e42af1"/>
-				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font fontName="SansSerif" size="10" isBold="true"/>
-				</textElement>
-				<textFieldExpression><![CDATA["PR No.: " + $P{PR_NO}]]></textFieldExpression>
-			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="137" y="163" width="435" height="18" uuid="42581360-95b5-402b-8d61-392a3ce9fb6d"/>
+				<reportElement x="120" y="163" width="452" height="18" uuid="42581360-95b5-402b-8d61-392a3ce9fb6d"/>
 				<box leftPadding="3">
-					<topPen lineWidth="1.0"/>
-					<leftPen lineWidth="1.0"/>
-					<bottomPen lineWidth="1.0"/>
-					<rightPen lineWidth="1.0"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
 				</box>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
-					<font fontName="SansSerif" size="12"/>
+					<font fontName="SansSerif"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{DELIVERY_TIME_AND_COMPLETION}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="0" y="163" width="137" height="18" isPrintWhenDetailOverflows="true" uuid="da1bb488-3bfd-4731-8923-4b390c06ffe5"/>
+				<reportElement x="0" y="163" width="120" height="18" isPrintWhenDetailOverflows="true" uuid="da1bb488-3bfd-4731-8923-4b390c06ffe5"/>
 				<box leftPadding="3">
-					<topPen lineWidth="1.0"/>
-					<leftPen lineWidth="1.0"/>
-					<bottomPen lineWidth="1.0"/>
-					<rightPen lineWidth="1.0"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
 				</box>
 				<textElement verticalAlignment="Middle">
-					<font fontName="SansSerif" size="12"/>
+					<font fontName="SansSerif"/>
 				</textElement>
 				<text><![CDATA[Delivery Time]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="0" y="215" width="137" height="16" uuid="75802a33-d3d7-4ef6-8799-ce3a0a4f3666"/>
+				<reportElement x="0" y="215" width="120" height="16" uuid="75802a33-d3d7-4ef6-8799-ce3a0a4f3666"/>
 				<box leftPadding="3">
-					<topPen lineWidth="1.0"/>
-					<leftPen lineWidth="1.0"/>
-					<bottomPen lineWidth="1.0"/>
-					<rightPen lineWidth="1.0"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
 				</box>
 				<textElement verticalAlignment="Middle">
-					<font fontName="SansSerif" size="12"/>
+					<font fontName="SansSerif"/>
 				</textElement>
 				<text><![CDATA[Received Date]]></text>
 			</staticText>
 			<textField pattern="MM/dd/yyyy" isBlankWhenNull="true">
-				<reportElement x="137" y="215" width="435" height="16" uuid="37c84ada-9d7d-43a5-806d-493c73ef87d0"/>
+				<reportElement x="120" y="215" width="452" height="16" uuid="37c84ada-9d7d-43a5-806d-493c73ef87d0"/>
 				<box leftPadding="3">
-					<topPen lineWidth="1.0"/>
-					<leftPen lineWidth="1.0"/>
-					<bottomPen lineWidth="1.0"/>
-					<rightPen lineWidth="1.0"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
 				</box>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
-					<font fontName="SansSerif" size="12"/>
+					<font fontName="SansSerif"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{RECEIVED_DATE}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="0" y="231" width="137" height="16" uuid="072a2951-0372-45f1-bcdd-bc0c1c846c6a"/>
+				<reportElement x="0" y="231" width="120" height="16" uuid="072a2951-0372-45f1-bcdd-bc0c1c846c6a"/>
 				<box leftPadding="3">
-					<topPen lineWidth="1.0"/>
-					<leftPen lineWidth="1.0"/>
-					<bottomPen lineWidth="1.0"/>
-					<rightPen lineWidth="1.0"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
 				</box>
 				<textElement verticalAlignment="Middle">
-					<font fontName="SansSerif" size="12"/>
+					<font fontName="SansSerif"/>
 				</textElement>
 				<text><![CDATA[Received By]]></text>
 			</staticText>
 			<textField isBlankWhenNull="true">
-				<reportElement x="137" y="231" width="435" height="16" uuid="8ff00a36-4c21-40eb-a518-6572fe0e301c"/>
+				<reportElement x="120" y="231" width="452" height="16" uuid="8ff00a36-4c21-40eb-a518-6572fe0e301c"/>
 				<box leftPadding="3">
-					<topPen lineWidth="1.0"/>
-					<leftPen lineWidth="1.0"/>
-					<bottomPen lineWidth="1.0"/>
-					<rightPen lineWidth="1.0"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
 				</box>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
-					<font fontName="SansSerif" size="12"/>
+					<font fontName="SansSerif"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{RECEIVED_BY}]]></textFieldExpression>
 			</textField>
 			<textField pattern="MM/dd/yyyy" isBlankWhenNull="true">
-				<reportElement x="137" y="247" width="435" height="17" uuid="16cc0c3b-1b47-4e47-8209-5f6b52cbbac1"/>
+				<reportElement x="120" y="247" width="452" height="17" uuid="16cc0c3b-1b47-4e47-8209-5f6b52cbbac1"/>
 				<box leftPadding="3">
-					<topPen lineWidth="1.0"/>
-					<leftPen lineWidth="1.0"/>
-					<bottomPen lineWidth="1.0"/>
-					<rightPen lineWidth="1.0"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
 				</box>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
-					<font fontName="SansSerif" size="12"/>
+					<font fontName="SansSerif"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{EXPECTED_DELIVERY_DATE}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="0" y="247" width="137" height="17" uuid="60888834-9d55-4d4b-bb39-7e9b2d225d3b"/>
+				<reportElement x="0" y="247" width="120" height="17" uuid="60888834-9d55-4d4b-bb39-7e9b2d225d3b"/>
 				<box leftPadding="3">
-					<topPen lineWidth="1.0"/>
-					<leftPen lineWidth="1.0"/>
-					<bottomPen lineWidth="1.0"/>
-					<rightPen lineWidth="1.0"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
 				</box>
 				<textElement verticalAlignment="Middle">
-					<font fontName="SansSerif" size="12"/>
+					<font fontName="SansSerif"/>
 				</textElement>
 				<text><![CDATA[Expected Delivery Date]]></text>
 			</staticText>
-			<image isLazy="true" onErrorType="Icon">
-				<reportElement mode="Transparent" x="-20" y="-20" width="612" height="106" uuid="37ac24c6-4eed-4c5d-b438-c861bf89cf97"/>
-				<imageExpression><![CDATA[$P{SOA_HEADER_PATH}]]></imageExpression>
-			</image>
+			<staticText>
+				<reportElement stretchType="RelativeToTallestObject" x="0" y="264" width="120" height="17" uuid="5a3f1c2e-7b44-4d0e-9a51-0c1d2e3f4a51"/>
+				<box topPadding="2" leftPadding="3" bottomPadding="2">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Top">
+					<font fontName="SansSerif"/>
+				</textElement>
+				<text><![CDATA[Purpose]]></text>
+			</staticText>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToTallestObject" x="120" y="264" width="452" height="17" uuid="6b4e2d3f-8c55-4e1f-8b62-1d2e3f4a5b62"/>
+				<box topPadding="2" leftPadding="3" bottomPadding="2">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Left" verticalAlignment="Top">
+					<font fontName="SansSerif"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{PURPOSE}]]></textFieldExpression>
+			</textField>
 			<textField>
 				<reportElement x="36" y="0" width="212" height="12" uuid="18801295-0303-4af5-b6a5-f4779b58069d">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
@@ -873,25 +973,26 @@
 				<text><![CDATA[PURCHASE ORDER]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="380" y="50" width="192" height="14" uuid="fc6538c7-2347-41e4-ad8d-33815275726e">
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-				</reportElement>
-				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font fontName="SansSerif" size="10" isBold="true"/>
+				<reportElement x="425" y="68" width="147" height="15" uuid="e7a616f3-5b63-482c-bb66-10625e325559"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="10"/>
 				</textElement>
-				<textFieldExpression><![CDATA["PO No: " + $P{VOUCHER_NO}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{PR_NO}]]></textFieldExpression>
 			</textField>
-			<textField pattern="MMMM dd, yyyy" isBlankWhenNull="true">
-				<reportElement x="380" y="80" width="192" height="14" uuid="175c62ca-1d5f-4667-ba7b-abb8e436f43c">
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-				</reportElement>
-				<box>
-					<bottomPen lineWidth="0.0"/>
-				</box>
-				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font fontName="SansSerif" isBold="false"/>
+			<staticText>
+				<reportElement mode="Transparent" x="380" y="83" width="45" height="15" forecolor="#000000" backcolor="#FFFFFF" uuid="5af02722-bdfb-4c25-b715-2c8804c927e4"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="SansSerif" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
 				</textElement>
-				<textFieldExpression><![CDATA["Date: " + new java.text.SimpleDateFormat("MMMM dd, yyyy").format($P{V_DATE}) != null ? (new java.text.SimpleDateFormat("MMM", java.util.Locale.ENGLISH).format($P{V_DATE}).replaceAll("Jan$","Jan.").replaceAll("Feb$","Feb.").replaceAll("Mar$","Mar.").replaceAll("Apr$","Apr.").replaceAll("May$","May").replaceAll("Jun$","Jun.").replaceAll("Jul$","Jul.").replaceAll("Aug$","Aug.").replaceAll("Sep$","Sep.").replaceAll("Oct$","Oct.").replaceAll("Nov$","Nov.").replaceAll("Dec$","Dec.") + " " + new java.text.SimpleDateFormat("d, yyyy").format($P{V_DATE})) : ""]]></textFieldExpression>
+				<text><![CDATA[Date:]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="425" y="83" width="147" height="15" uuid="60e93837-a1a8-4320-b554-1eaf808f825e"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{PR_VOUCHER_DATE} != null ? new java.text.SimpleDateFormat("MMMM dd, yyyy", java.util.Locale.ENGLISH).format($P{PR_VOUCHER_DATE}) : ""]]></textFieldExpression>
 			</textField>
 		</band>
 	</title>
@@ -899,192 +1000,386 @@
 		<band height="20">
 			<printWhenExpression><![CDATA[$V{PAGE_NUMBER} == 1]]></printWhenExpression>
 			<staticText>
-				<reportElement mode="Transparent" x="0" y="0" width="45" height="20" forecolor="#000000" backcolor="#FFFFFF" uuid="2b1a4ca7-bed1-4778-a049-7fddf8c3274b"/>
+				<reportElement mode="Transparent" x="0" y="0" width="48" height="20" forecolor="#000000" backcolor="#FFFFFF" uuid="2b1a4ca7-bed1-4778-a049-7fddf8c3274b"/>
 				<box topPadding="0" leftPadding="0">
 					<pen lineWidth="0.0"/>
-					<topPen lineWidth="1.0"/>
-					<leftPen lineWidth="1.0"/>
-					<bottomPen lineWidth="1.0"/>
-					<rightPen lineWidth="1.0"/>
+					<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
 				</box>
-				<textElement textAlignment="Center" verticalAlignment="Bottom" rotation="None" markup="none">
-					<font fontName="SansSerif" size="11" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="SansSerif" size="11" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Courier-Bold" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
-				<text><![CDATA[Item No.]]></text>
+				<text><![CDATA[Item]]></text>
 			</staticText>
 			<staticText>
-				<reportElement mode="Transparent" x="104" y="0" width="49" height="20" forecolor="#000000" backcolor="#FFFFFF" uuid="ded69caa-1fbf-49ba-ae89-a0c00c8cf107"/>
+				<reportElement mode="Transparent" x="270" y="0" width="109" height="20" forecolor="#000000" backcolor="#FFFFFF" uuid="16813774-4ab5-4b41-a654-509c5c85e34a"/>
 				<box topPadding="0" leftPadding="0">
 					<pen lineWidth="0.0"/>
-					<topPen lineWidth="1.0"/>
-					<leftPen lineWidth="0.0"/>
-					<bottomPen lineWidth="1.0"/>
-					<rightPen lineWidth="1.0"/>
+					<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
 				</box>
-				<textElement textAlignment="Center" verticalAlignment="Bottom" rotation="None" markup="none">
-					<font fontName="SansSerif" size="12" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
-					<paragraph lineSpacing="Single"/>
-				</textElement>
-				<text><![CDATA[Unit]]></text>
-			</staticText>
-			<staticText>
-				<reportElement mode="Transparent" x="45" y="0" width="59" height="20" forecolor="#000000" backcolor="#FFFFFF" uuid="16813774-4ab5-4b41-a654-509c5c85e34a"/>
-				<box topPadding="0" leftPadding="0">
-					<pen lineWidth="0.0"/>
-					<topPen lineWidth="1.0"/>
-					<leftPen lineWidth="0.0"/>
-					<bottomPen lineWidth="1.0"/>
-					<rightPen lineWidth="1.0"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Bottom" rotation="None" markup="none">
-					<font fontName="SansSerif" size="12" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="SansSerif" size="11" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Courier-Bold" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
 				<text><![CDATA[Qty.]]></text>
 			</staticText>
 			<staticText>
-				<reportElement mode="Transparent" x="419" y="0" width="68" height="20" forecolor="#000000" backcolor="#FFFFFF" uuid="0b987b2f-2cfc-4c6f-8eb2-270a4afb85b2"/>
+				<reportElement mode="Transparent" x="379" y="0" width="80" height="20" forecolor="#000000" backcolor="#FFFFFF" uuid="0b987b2f-2cfc-4c6f-8eb2-270a4afb85b2"/>
 				<box topPadding="0" leftPadding="0">
 					<pen lineWidth="0.0"/>
-					<topPen lineWidth="1.0"/>
-					<leftPen lineWidth="0.0"/>
-					<bottomPen lineWidth="1.0"/>
-					<rightPen lineWidth="1.0"/>
+					<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
 				</box>
-				<textElement textAlignment="Center" verticalAlignment="Bottom" rotation="None" markup="none">
-					<font fontName="SansSerif" size="12" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="SansSerif" size="11" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Courier-Bold" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
-				<text><![CDATA[Unit Cost]]></text>
+				<text><![CDATA[Unit Price]]></text>
 			</staticText>
 			<staticText>
-				<reportElement mode="Transparent" x="487" y="0" width="85" height="20" forecolor="#000000" backcolor="#FFFFFF" uuid="e7c759be-7421-4b32-ba5b-889457c86379"/>
+				<reportElement mode="Transparent" x="459" y="0" width="113" height="20" forecolor="#000000" backcolor="#FFFFFF" uuid="e7c759be-7421-4b32-ba5b-889457c86379"/>
 				<box topPadding="0" leftPadding="0">
 					<pen lineWidth="0.0"/>
-					<topPen lineWidth="1.0"/>
-					<leftPen lineWidth="0.0"/>
-					<bottomPen lineWidth="1.0"/>
-					<rightPen lineWidth="1.0"/>
+					<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
 				</box>
-				<textElement textAlignment="Center" verticalAlignment="Bottom" rotation="None" markup="none">
-					<font fontName="SansSerif" size="12" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="SansSerif" size="11" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Courier-Bold" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
 				<text><![CDATA[Amount]]></text>
 			</staticText>
 			<staticText>
-				<reportElement mode="Transparent" x="153" y="0" width="217" height="20" forecolor="#000000" backcolor="#FFFFFF" uuid="b7bbd0e1-4c92-4742-a4d6-7f93f366e71c"/>
+				<reportElement mode="Transparent" x="48" y="0" width="222" height="20" forecolor="#000000" backcolor="#FFFFFF" uuid="b7bbd0e1-4c92-4742-a4d6-7f93f366e71c"/>
 				<box topPadding="0" leftPadding="0">
 					<pen lineWidth="0.0"/>
-					<topPen lineWidth="1.0"/>
-					<leftPen lineWidth="0.0"/>
-					<bottomPen lineWidth="1.0"/>
-					<rightPen lineWidth="1.0"/>
+					<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
 				</box>
-				<textElement textAlignment="Center" verticalAlignment="Bottom" rotation="None" markup="none">
-					<font fontName="SansSerif" size="12" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="SansSerif" size="11" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Courier-Bold" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
-				<text><![CDATA[Item Description]]></text>
-			</staticText>
-			<staticText>
-				<reportElement mode="Transparent" x="370" y="0" width="49" height="20" forecolor="#000000" backcolor="#FFFFFF" uuid="8ed3a1e0-fbcf-482b-983c-23fd6a0e77a4"/>
-				<box topPadding="0" leftPadding="0">
-					<pen lineWidth="0.0"/>
-					<topPen lineWidth="1.0"/>
-					<leftPen lineWidth="0.0"/>
-					<bottomPen lineWidth="1.0"/>
-					<rightPen lineWidth="1.0"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Bottom" rotation="None" markup="none">
-					<font fontName="SansSerif" size="12" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
-					<paragraph lineSpacing="Single"/>
-				</textElement>
-				<text><![CDATA[Brand]]></text>
+				<text><![CDATA[Description]]></text>
 			</staticText>
 		</band>
 	</columnHeader>
 	<detail>
 		<band height="16" splitType="Stretch">
 			<textField textAdjust="StretchHeight">
-				<reportElement stretchType="RelativeToTallestObject" x="153" y="0" width="217" height="16" uuid="84bde88f-e1cd-4931-972a-8aada816e229"/>
+				<reportElement stretchType="RelativeToTallestObject" x="48" y="0" width="222" height="16" uuid="84bde88f-e1cd-4931-972a-8aada816e229"/>
 				<box leftPadding="5">
-					<bottomPen lineWidth="1.0"/>
-					<rightPen lineWidth="1.0"/>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 				<textElement verticalAlignment="Middle">
-					<font fontName="SansSerif" size="10"/>
+					<font fontName="Monospaced" pdfFontName="Courier" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{description}]]></textFieldExpression>
 			</textField>
-			<textField textAdjust="StretchHeight" pattern="#,##0.00">
-				<reportElement stretchType="RelativeToTallestObject" x="45" y="0" width="59" height="16" uuid="b2b6f8b2-80a0-4968-b250-c518545d7805"/>
-				<box rightPadding="2">
-					<bottomPen lineWidth="1.0"/>
-					<rightPen lineWidth="1.0"/>
+			<textField textAdjust="StretchHeight">
+				<reportElement stretchType="RelativeToTallestObject" x="270" y="0" width="109" height="16" uuid="b2b6f8b2-80a0-4968-b250-c518545d7805"/>
+				<box leftPadding="4" rightPadding="2">
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
 				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="SansSerif" size="10"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Monospaced" pdfFontName="Courier" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{quantity}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[($F{quantity} != null ? new java.text.DecimalFormat("#,##0.00", java.text.DecimalFormatSymbols.getInstance(java.util.Locale.ENGLISH)).format($F{quantity}) : "") + " " + ($F{unitCode} != null ? $F{unitCode} : "")]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight">
-				<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="45" height="16" uuid="806700e1-75d6-452c-938e-296eab94f6a1"/>
+				<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="48" height="16" uuid="806700e1-75d6-452c-938e-296eab94f6a1"/>
 				<box>
-					<leftPen lineWidth="1.0"/>
-					<bottomPen lineWidth="1.0"/>
-					<rightPen lineWidth="1.0"/>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="SansSerif" size="10"/>
+					<font fontName="Monospaced" pdfFontName="Courier" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{id}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" pattern="#,##0.00">
-				<reportElement stretchType="RelativeToTallestObject" x="487" y="0" width="85" height="16" uuid="ef85b5c5-ae36-436d-a099-cbd88e766891"/>
+				<reportElement stretchType="RelativeToTallestObject" x="459" y="0" width="113" height="16" uuid="ef85b5c5-ae36-436d-a099-cbd88e766891"/>
 				<box rightPadding="2">
-					<bottomPen lineWidth="1.0"/>
-					<rightPen lineWidth="1.0"/>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font fontName="SansSerif" size="10"/>
+					<font fontName="Monospaced" pdfFontName="Courier" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{amount}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" pattern="#,##0.00">
-				<reportElement stretchType="RelativeToTallestObject" x="419" y="0" width="68" height="16" uuid="4385dec1-ca09-4885-a08f-b691d77034fb"/>
+				<reportElement stretchType="RelativeToTallestObject" x="379" y="0" width="80" height="16" uuid="4385dec1-ca09-4885-a08f-b691d77034fb"/>
 				<box rightPadding="2">
-					<bottomPen lineWidth="1.0"/>
-					<rightPen lineWidth="1.0"/>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font fontName="SansSerif" size="10"/>
+					<font fontName="Monospaced" pdfFontName="Courier" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{unitPrice}]]></textFieldExpression>
 			</textField>
-			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-				<reportElement stretchType="RelativeToTallestObject" x="104" y="0" width="49" height="16" isPrintWhenDetailOverflows="true" uuid="1a509354-b039-454d-a6e0-dd200e5300d5"/>
-				<box leftPadding="5">
-					<bottomPen lineWidth="1.0"/>
-					<rightPen lineWidth="1.0"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="SansSerif" size="10"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$F{unitCode}]]></textFieldExpression>
-			</textField>
-			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-				<reportElement stretchType="RelativeToTallestObject" x="370" y="0" width="49" height="16" isPrintWhenDetailOverflows="true" uuid="7e29d62c-b18c-4522-81f5-73bd9010897c"/>
-				<box leftPadding="2">
-					<bottomPen lineWidth="1.0"/>
-					<rightPen lineWidth="1.0"/>
-				</box>
-				<textElement verticalAlignment="Middle">
-					<font fontName="SansSerif" size="10"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$F{brand}]]></textFieldExpression>
-			</textField>
 		</band>
 	</detail>
+	<summary>
+		<band height="141" splitType="Prevent">
+			<staticText>
+				<reportElement mode="Transparent" x="0" y="40" width="572" height="101" forecolor="#000000" backcolor="#FFFFFF" uuid="1ccd6716-bb7e-4500-9a9e-090d81c66c83"/>
+				<box>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="SansSerif" size="12" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Transparent" x="341" y="20" width="231" height="20" forecolor="#000000" backcolor="#FFFFFF" uuid="ee7dab24-ae90-4dcf-ab27-f3bccd15f8e9"/>
+				<box>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="SansSerif" size="12" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Transparent" x="341" y="0" width="231" height="20" forecolor="#000000" backcolor="#FFFFFF" uuid="3f9c7c0a-8021-42b5-89b1-596ba905dfab"/>
+				<box>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="SansSerif" size="12" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Transparent" x="0" y="0" width="341" height="20" forecolor="#000000" backcolor="#FFFFFF" uuid="2cd1a138-57c0-4f69-af6a-b618ce195104"/>
+				<box>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="SansSerif" size="12" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement positionType="Float" x="0" y="0" width="96" height="20" isRemoveLineWhenBlank="true" uuid="2406a7f3-ef47-4659-aebf-bb12e6423862"/>
+				<box leftPadding="2">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[BUDGET LINE ITEM:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="96" y="0" width="245" height="20" uuid="672d5d70-20aa-42cb-ae54-e12bc90c3b57"/>
+				<box leftPadding="2">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="SansSerif" size="9" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{BUDGET_LINE_ITEM}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement mode="Transparent" x="0" y="20" width="341" height="20" forecolor="#000000" backcolor="#FFFFFF" uuid="10ad9803-5c99-4466-b3b5-31ab1802d798"/>
+				<box>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="SansSerif" size="12" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement positionType="Float" x="0" y="20" width="165" height="20" isRemoveLineWhenBlank="true" forecolor="#990099" uuid="965350c2-e9ad-4cb6-b960-d3e82fa79356"/>
+				<box leftPadding="2">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[FUNDS AVAILABLE CHARGE TO:]]></text>
+			</staticText>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement x="165" y="20" width="176" height="20" isPrintWhenDetailOverflows="true" uuid="18cee90b-ab64-4d2d-bf5f-eef65ccaf765"/>
+				<box leftPadding="2">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="SansSerif" size="9" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{CASH_FLOW_ITEM}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement positionType="Float" x="341" y="20" width="145" height="20" isRemoveLineWhenBlank="true" uuid="b42756f3-3c33-42a2-a18c-938a072207fa"/>
+				<box leftPadding="3">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[CASH FLOW ITEM BALANCE:]]></text>
+			</staticText>
+			<textField textAdjust="StretchHeight" pattern="#,##0.00;(-#,##0.00)" isBlankWhenNull="true">
+				<reportElement x="486" y="20" width="86" height="20" isPrintWhenDetailOverflows="true" uuid="6d46c93a-5fbf-4baa-ae5a-511c6fdc1714"/>
+				<box leftPadding="2">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="SansSerif" size="9" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{CASH_FLOW_ITEM_AMOUNT}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement x="486" y="0" width="86" height="20" uuid="31592953-fd24-4f98-940e-578f87331e18"/>
+				<box leftPadding="2">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="SansSerif" size="9" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{BUDGET_LINE_ITEM_BALANCE}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement positionType="Float" x="341" y="0" width="145" height="20" isRemoveLineWhenBlank="true" uuid="fee03060-56c1-4354-b6e0-779f42e577a4"/>
+				<box leftPadding="3" rightPadding="0">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[BUDGET LINE ITEM BALANCE:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement positionType="Float" x="3" y="41" width="80" height="20" isRemoveLineWhenBlank="true" uuid="f7495784-cb63-4aa6-8aae-08f8f0b2056c"/>
+				<textElement textAlignment="Left">
+					<font fontName="SansSerif" size="12" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Conforme:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement positionType="Float" x="10" y="82" width="267" height="20" isRemoveLineWhenBlank="true" uuid="327b630d-76e8-42c3-87a4-e1eb262ee473"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Left">
+					<font fontName="SansSerif" size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Signature over Printed Name of Authorized Representative ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement positionType="Float" x="10" y="111" width="214" height="15" isRemoveLineWhenBlank="true" uuid="dd70f288-2981-4e12-826f-44dd0e6e9ab2"/>
+				<textElement textAlignment="Left">
+					<font fontName="SansSerif" size="10" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Supplier/Firm/Company]]></text>
+			</staticText>
+			<staticText>
+				<reportElement positionType="Float" x="10" y="126" width="214" height="14" isRemoveLineWhenBlank="true" uuid="09bdfdc1-12ec-4ebb-b478-6f0837b13769"/>
+				<textElement textAlignment="Left">
+					<font fontName="SansSerif" size="10" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Date]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="395" y="91" width="140" height="15" uuid="28d76fab-c67f-4d24-87f5-4138cdcf28e8"/>
+				<box>
+					<bottomPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Left" verticalAlignment="Bottom">
+					<font fontName="SansSerif" size="10" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{REQUESTED_BY}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement positionType="Float" x="395" y="41" width="140" height="20" isRemoveLineWhenBlank="true" uuid="b6d30c44-d7c1-425a-811f-c7909e819bef"/>
+				<textElement>
+					<font fontName="SansSerif" size="11" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Requested By:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="395" y="106" width="140" height="15" uuid="9d0db7e2-6fdd-4361-bccf-a8b83c36e9a4"/>
+				<textElement textAlignment="Left">
+					<font fontName="SansSerif" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{REQUESTED_BY_POS}]]></textFieldExpression>
+			</textField>
+			<image hAlign="Center" isLazy="true" onErrorType="Blank">
+				<reportElement x="395" y="50" width="140" height="41" uuid="fd916571-7535-4b6b-a2e1-3dfb874d9f29"/>
+				<imageExpression><![CDATA[$P{REQUESTED_BY_SIGN}]]></imageExpression>
+			</image>
+		</band>
+	</summary>
 </jasperReport>

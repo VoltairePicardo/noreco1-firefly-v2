@@ -73,7 +73,7 @@ public class JobOrder extends Document implements Serializable {
 
     @NotFound(action = NotFoundAction.IGNORE)
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="FK_budgetLinetItemDetailId")
+    @JoinColumn(name="FK_budgetLineItemDetailId")
     private BudgetLineItemDetail budgetLineItemDetail;
 
     @Column

@@ -53,6 +53,9 @@ public class PurchaseOrderDetail implements Serializable {
     private BigDecimal amount = BigDecimal.ZERO;
 
     @Column
+    private BigDecimal netAmount = BigDecimal.ZERO;
+
+    @Column
     private BigDecimal vatPercentage = BigDecimal.ZERO;
 
     @Column

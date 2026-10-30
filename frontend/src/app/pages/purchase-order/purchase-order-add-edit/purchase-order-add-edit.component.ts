@@ -194,44 +194,61 @@ export class PurchaseOrderAddEditComponent {
                     });
                 }
 
-                // 7c: awarded SOQ terms
+                // 7c: awarded SOQ terms + awarded supplier (AOQ), then load items so
+                // the supplier / VAT status is known before prices are fetched
                 this.service.getAwardedSoqTerms(pr.id).subscribe({
                     next: (terms: any) => {
                         if (terms) {
                             if (terms.termsOfPayment           != null) this.paymentTerm               = terms.termsOfPayment;
                             if (terms.placeOfDelivery)                  this.deliveryAddress           = terms.placeOfDelivery;
                             if (terms.deliveryTimeAndCompletion)        this.deliveryTimeAndCompletion = terms.deliveryTimeAndCompletion;
+                            if (terms.supplier) {
+                                this.vendor = terms.supplier;
+                                this.applyVatToLineItems();
+                            }
                         }
+                        this.loadPurchaseRequestItems(pr);
                     },
-                    error: () => {}
-                });
-
-                this.service.getPurchaseRequestItems(pr.id).subscribe({
-                    next: (items) => {
-                        const existing = new Set(this.lineItems.map((li: any) => li.rvDetailId));
-                        const toAdd = (items || []).filter((item: any) => !existing.has(item.id));
-                        toAdd.forEach((item: any) => {
-                            this.lineItems.push({
-                                rvDetailId:      item.id,
-                                rvNumber:        pr.code,
-                                itemCode:        item.itemCode || '',
-                                itemDescription: item.itemDescription || '',
-                                unitCode:        item.unitCode || '',
-                                quantity:        item.quantity || 0,
-                                unitPrice:       0,
-                                vat:             0,
-                                discount:        0,
-                                brand:           null,
-                            });
-                        });
-                        if (this.vendor?.accountNumber && toAdd.length > 0) {
-                            this.fetchSoqDataForItems(this.vendor.accountNumber, toAdd.map((i: any) => i.id));
-                        }
-                    },
-                    error: () => this.alertService.error(this.module, 'Failed to load PR items.', '')
+                    error: () => this.loadPurchaseRequestItems(pr)
                 });
             }
         } catch { }
+    }
+
+    private loadPurchaseRequestItems(pr: any): void {
+        this.service.getPurchaseRequestItems(pr.id).subscribe({
+            next: (items) => {
+                const existing = new Set(this.lineItems.map((li: any) => li.rvDetailId));
+                const toAdd = (items || []).filter((item: any) => !existing.has(item.id));
+                toAdd.forEach((item: any) => {
+                    this.lineItems.push({
+                        rvDetailId:      item.id,
+                        rvNumber:        pr.code,
+                        itemCode:        item.itemCode || '',
+                        itemDescription: item.itemDescription || '',
+                        unitCode:        item.unitCode || '',
+                        quantity:        item.quantity || 0,
+                        unitPrice:       0,
+                        vat:             this.vendorVatRate,
+                        discount:        0,
+                        brand:           null,
+                    });
+                });
+                if (this.vendor?.accountNumber && toAdd.length > 0) {
+                    this.fetchSoqDataForItems(this.vendor.accountNumber, toAdd.map((i: any) => i.id));
+                }
+            },
+            error: () => this.alertService.error(this.module, 'Failed to load PR items.', '')
+        });
+    }
+
+    private get vendorVatRate(): number {
+        return this.vendor?.vatable ? this.vatRate : 0;
+    }
+
+    private applyVatToLineItems(): void {
+        const vatPct = this.vendorVatRate;
+        this.lineItems.forEach(li => li.vat = vatPct);
     }
 
     // ─── Vendor Browse ────────────────────────────────────────────────────────
@@ -246,8 +263,7 @@ export class PurchaseOrderAddEditComponent {
             if (result?.action === 'select' && result?.data) {
                 this.vendor = result.data;
                 // Auto-set VAT% on all line items based on supplier vatable status
-                const vatPct = this.vendor?.vatable ? this.vatRate : 0;
-                this.lineItems.forEach(li => li.vat = vatPct);
+                this.applyVatToLineItems();
                 if (this.lineItems.length > 0 && result.data?.accountNumber) {
                     this.fetchSoqData(result.data.accountNumber);
                 }
@@ -333,6 +349,19 @@ export class PurchaseOrderAddEditComponent {
 
     get totalAmount(): number {
         return this.lineItems.reduce((sum, li) => sum + this.lineItemAmount(li), 0);
+    }
+
+    // Prices are VAT-inclusive: net = gross / (1 + rate), vat = gross - net
+    lineItemNet(li: any): number {
+        return this.lineItemAmount(li) / (1 + (+(li.vat || 0)) / 100);
+    }
+
+    get totalNetOfVat(): number {
+        return this.lineItems.reduce((sum, li) => sum + this.lineItemNet(li), 0);
+    }
+
+    get totalVat(): number {
+        return this.totalAmount - this.totalNetOfVat;
     }
 
     // ─── File Attachments ────────────────────────────────────────────────────

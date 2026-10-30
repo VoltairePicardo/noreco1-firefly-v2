@@ -245,11 +245,14 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService, Printable
                                                .multiply(discPct.divide(hundred, 10, RoundingMode.HALF_UP))
                                                .setScale(4, RoundingMode.HALF_UP);
 
+                    BigDecimal netAmount = amount.subtract(vatAmount);
+
                     purchaseOrderDetail.setQuantity(qty);
                     purchaseOrderDetail.setUnitPrice(unitPriceExcl);
                     purchaseOrderDetail.setVat(vatAmount);
                     purchaseOrderDetail.setDiscount(discAmount);
                     purchaseOrderDetail.setAmount(amount);
+                    purchaseOrderDetail.setNetAmount(netAmount);
                     purchaseOrderDetail.setVatPercentage(vatPct);
                     purchaseOrderDetail.setDiscountPercentage(discPct);
 
@@ -401,6 +404,8 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService, Printable
                     d.setUnitPrice(dto.getUnitPrice());
                     d.setAmount(dto.getItemAmount());
                     d.setBrand(dto.getBrand() == null ? "":dto.getBrand().getName());
+                    d.setVat(dto.getVat());
+                    d.setDiscount(dto.getDiscount());
 
                     details.add(d);
 
@@ -421,6 +426,7 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService, Printable
 
                 if(purchaseRequest != null) {
                     this.reportMeta.put("PR_NO", purchaseRequest.getCode());
+                    this.reportMeta.put("PR_VOUCHER_DATE", purchaseRequest.getVoucherDate());
 
                     Employee requestedBy = employeeRepo.findOneByAccountNumber(purchaseRequest.getCreatedBy().getAccountNo());
 
@@ -709,6 +715,13 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService, Printable
         return  poDto;
     }
 
+    private String positionName(User user) {
+        if (user == null || user.getAccountNo() == null) return "";
+        Employee employee = employeeRepo.findOneByAccountNumber(user.getAccountNo());
+        return employee != null && employee.getPosition() != null && employee.getPosition().getName() != null
+                ? employee.getPosition().getName() : "";
+    }
+
     @Override
     public HashMap reportParameters(Integer id, HttpServletRequest request) {
         this.reportMeta = new HashMap();
@@ -723,17 +736,15 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService, Printable
             // Prepared By: createdBy user, fallback to logged-in user
             User preparedByUser = purchaseOrder.getCreatedBy() != null ? purchaseOrder.getCreatedBy() : authenticationFacade.getLoggedIn();
             params.put("PREPAREDBY", preparedByUser != null ? preparedByUser.getFullName() : "");
-            params.put("PREPAREDBY_POS", preparedByUser != null && preparedByUser.getPosition() != null ? preparedByUser.getPosition().getName() : "");
+            params.put("PREPAREDBY_POS", positionName(preparedByUser));
 
-            // Checked By (print label): maps to budgetCheckedBy DB field
-            params.put("CHECKEDBY", purchaseOrder.getBudgetCheckedBy() != null ? purchaseOrder.getBudgetCheckedBy().getFullName() : "");
-            params.put("CHECKEDBY_POS", purchaseOrder.getBudgetCheckedBy() != null && purchaseOrder.getBudgetCheckedBy().getPosition() != null
-                    ? purchaseOrder.getBudgetCheckedBy().getPosition().getName() : "");
+            // Audited By: maps to budgetCheckedBy DB field
+            params.put("AUDITEDBY", purchaseOrder.getBudgetCheckedBy() != null ? purchaseOrder.getBudgetCheckedBy().getFullName() : "");
+            params.put("AUDITEDBY_POS", positionName(purchaseOrder.getBudgetCheckedBy()));
 
-            // Audited By (print label): maps to checkedBy DB field
-            params.put("AUDITEDBY", purchaseOrder.getCheckedBy() != null ? purchaseOrder.getCheckedBy().getFullName() : "");
-            params.put("AUDITEDBY_POS", purchaseOrder.getCheckedBy() != null && purchaseOrder.getCheckedBy().getPosition() != null
-                    ? purchaseOrder.getCheckedBy().getPosition().getName() : "");
+            // Checked By: maps to checkedBy DB field
+            params.put("CHECKEDBY", purchaseOrder.getCheckedBy() != null ? purchaseOrder.getCheckedBy().getFullName() : "");
+            params.put("CHECKEDBY_POS", positionName(purchaseOrder.getCheckedBy()));
 
             // Approved By (print label): General Manager from PO_SIGNATORIES setting
             Map poSignatories = settingFacade.getByCode("PO_SIGNATORIES");
@@ -742,7 +753,7 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService, Printable
                 gmApprover = userRepo.findOneByAccountNo(Integer.parseInt(String.valueOf(poSignatories.get("approvedByAccountNo"))));
             }
             params.put("APPROVEDBY", gmApprover != null ? gmApprover.getFullName() : "");
-            params.put("APPROVEDBY_POS", gmApprover != null && gmApprover.getPosition() != null ? gmApprover.getPosition().getName() : "");
+            params.put("APPROVEDBY_POS", positionName(gmApprover));
 
             Supplier supplier = supplierRepo.findOneByAccountNumber(purchaseOrder.getVendor().getAccountNo());
 
