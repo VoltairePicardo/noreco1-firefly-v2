@@ -120,6 +120,18 @@ export class PurchaseOrderService {
         return this.http.get<any>(`${BASE_API}/brand/list`, { params });
     }
 
+    getDefaultSignatories(): Observable<any> {
+        return this.http.get<any>(`${BASE_API}/purchase-order/default-signatories`);
+    }
+
+    getBudgetLineItems(): Observable<any[]> {
+        return this.http.get<any[]>(`${BASE_API}/json/budget-line-items`);
+    }
+
+    assignBudgetLineItem(payload: { transactionId: number; budgetLineItemDetailId: number }): Observable<any> {
+        return this.http.post(`${BASE_API}/purchase-order/assign-budget-line-item`, payload, httpOptions);
+    }
+
     getBudgetLineItemBalance(budgetLineItemDetailId: number): Observable<{ amountBalanceCV: number; amountBalancePOJO: number }> {
         return this.http.get<any>(`${BASE_API}/json/budget-line-item-balance/${budgetLineItemDetailId}`);
     }

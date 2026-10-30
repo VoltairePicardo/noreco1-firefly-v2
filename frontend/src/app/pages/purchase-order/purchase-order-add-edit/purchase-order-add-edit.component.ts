@@ -9,6 +9,7 @@ import { AlertService } from '@/app/shared/services/alert.service';
 import { LaddaModule } from 'angular2-ladda';
 import { forkJoin } from 'rxjs';
 import { PurchaseOrderService } from '../purchase-order.service';
+import { AttachmentFile, AttachmentsComponent } from '@/app/shared/components/attachments/attachments.component';
 import { ModalService } from '@/app/shared/modals/modal-service';
 import { BrowseSupplierModalComponent } from '@/app/shared/modals/browse-supplier-modal/browse-supplier-modal.component';
 import { BrowsePurchaseRequestModalComponent } from '@/app/shared/modals/browse-purchase-request-modal/browse-purchase-request-modal.component';
@@ -23,7 +24,7 @@ const DELIVERY_TERMS_FALLBACK = [
 
 @Component({
     selector: 'app-purchase-order-add-edit',
-    imports: [...COMMON_ALL_PAGE_IMPORTS, ...COMMON_ADD_EDIT_PAGE_IMPORTS, ...COMMON_MAIN_PAGE_IMPORTS, FormsModule, FlatpickrModule, LaddaModule, RouterLink],
+    imports: [...COMMON_ALL_PAGE_IMPORTS, ...COMMON_ADD_EDIT_PAGE_IMPORTS, ...COMMON_MAIN_PAGE_IMPORTS, FormsModule, FlatpickrModule, LaddaModule, RouterLink, AttachmentsComponent],
     providers: [FlatpickrDefaults, provideIcons({ tablerPlus, tablerTrash, tablerSearch, tablerArrowLeft, tablerCheck, tablerPaperclip, tablerPhoto, tablerFile, tablerX }), ...SHARED_PROVIDERS],
     templateUrl: './purchase-order-add-edit.component.html'
 })
@@ -39,8 +40,13 @@ export class PurchaseOrderAddEditComponent {
     formSubmit = false;
     isLoading  = signal(false);
 
-    // Staged attachments (uploaded after save)
-    attachments: { file: File; name: string; url: string }[] = [];
+    // Attachments
+    newFiles: File[]        = [];   // staged, uploaded after save
+    existingFiles: any[]    = [];
+    filesToRemove: any[]    = [];   // deleted after save
+    attachmentItems: AttachmentFile[] = [];   // existing + staged, shown by <app-attachments>
+    private tempIds    = new Map<File, number>();
+    private nextTempId = -1;
 
     flatpickrOptions = { dateFormat: 'Y-m-d', altInput: true, altFormat: 'F j, Y' };
 
@@ -60,6 +66,8 @@ export class PurchaseOrderAddEditComponent {
     approvedBy: any      = null;
     checkedBy: any       = null;
     budgetCheckedBy: any = null;
+    auditedBy: any       = null;
+    recommendingOfficer: any = null;
 
     // Budget line item (auto-populated from PR)
     budgetLineItemDetail: any       = null;
@@ -109,7 +117,22 @@ export class PurchaseOrderAddEditComponent {
                 const mm = String(today.getMonth() + 1).padStart(2, '0');
                 const dd = String(today.getDate()).padStart(2, '0');
                 this.voucherDate = `${yyyy}-${mm}-${dd}`;
+                this.loadDefaultSignatories();
             }
+        });
+    }
+
+    loadDefaultSignatories(): void {
+        this.service.getDefaultSignatories().subscribe({
+            next: (data) => {
+                if (!data) return;
+                this.budgetCheckedBy     = data.budgetCheckedBy     || null;
+                this.checkedBy           = data.checkedBy           || null;
+                this.recommendingOfficer = data.recommendingOfficer || null;
+                this.auditedBy           = data.auditedBy           || null;
+                this.approvedBy          = data.approvedBy          || null;
+            },
+            error: () => {}
         });
     }
 
@@ -122,6 +145,7 @@ export class PurchaseOrderAddEditComponent {
             next: ({ header, details }) => {
                 this.isLoading.set(false);
                 if (header?.id) {
+                    this.loadAttachments();
                     const d = new Date(header.voucherDate);
                     const mm = String(d.getMonth() + 1).padStart(2, '0');
                     const dd = String(d.getDate()).padStart(2, '0');
@@ -141,6 +165,8 @@ export class PurchaseOrderAddEditComponent {
                     this.approvedBy           = header.approvedBy           || null;
                     this.checkedBy            = header.checkedBy            || null;
                     this.budgetCheckedBy      = header.budgetCheckedBy      || null;
+                    this.auditedBy            = header.auditedBy            || null;
+                    this.recommendingOfficer  = header.recommendingOfficer  || null;
                     this.budgetLineItemDetail = header.budgetLineItemDetail  || null;
 
                     this.lineItems = (details || []).map((d: any) => ({
@@ -235,12 +261,17 @@ export class PurchaseOrderAddEditComponent {
                         brand:           null,
                     });
                 });
-                if (this.vendor?.accountNumber && toAdd.length > 0) {
-                    this.fetchSoqDataForItems(this.vendor.accountNumber, toAdd.map((i: any) => i.id));
+                if (this.vendorAccountNo && toAdd.length > 0) {
+                    this.fetchSoqDataForItems(this.vendorAccountNo, toAdd.map((i: any) => i.id));
                 }
             },
             error: () => this.alertService.error(this.module, 'Failed to load PR items.', '')
         });
+    }
+
+    // Supplier (browse modal) exposes accountNumber; SlEntity (loaded PO / awarded terms) exposes accountNo
+    private get vendorAccountNo(): number | null {
+        return this.vendor?.accountNumber ?? this.vendor?.accountNo ?? null;
     }
 
     private get vendorVatRate(): number {
@@ -295,7 +326,7 @@ export class PurchaseOrderAddEditComponent {
 
     // ─── Signatory Browse ─────────────────────────────────────────────────────
 
-    async openSignatoryBrowse(field: 'approvedBy' | 'checkedBy' | 'budgetCheckedBy'): Promise<void> {
+    async openSignatoryBrowse(field: 'approvedBy' | 'checkedBy' | 'budgetCheckedBy' | 'auditedBy' | 'recommendingOfficer'): Promise<void> {
         try {
             const result = await this.modalService.openModal(
                 BrowseEntityModalComponent,
@@ -374,30 +405,68 @@ export class PurchaseOrderAddEditComponent {
     onFileSelect(event: Event): void {
         const input = event.target as HTMLInputElement;
         if (!input.files?.length) return;
+        const allowed = ['image/jpeg', 'image/png', 'application/pdf'];
+        const duplicates: string[] = [];
         for (const file of Array.from(input.files)) {
-            const allowed = ['image/jpeg', 'image/png', 'application/pdf'];
             if (!allowed.includes(file.type)) {
                 this.alertService.warning(this.module, 'Invalid file type', `${file.name} must be JPG, PNG, or PDF.`);
                 continue;
             }
-            this.attachments.push({ file, name: file.name, url: URL.createObjectURL(file) });
+            if (this.isDuplicateFile(file)) {
+                duplicates.push(file.name);
+                continue;
+            }
+            this.newFiles.push(file);
+        }
+        this.refreshAttachments();
+        if (duplicates.length > 0) {
+            this.alertService.warning(this.module, 'Duplicate file skipped', duplicates.join(', '));
         }
         input.value = '';
     }
 
-    removeAttachment(index: number): void {
-        URL.revokeObjectURL(this.attachments[index].url);
-        this.attachments.splice(index, 1);
+    // same file already picked (name + size + last modified), or a saved attachment with the same name
+    private isDuplicateFile(file: File): boolean {
+        return this.newFiles.some(s => s.name === file.name && s.size === file.size && s.lastModified === file.lastModified)
+            || this.existingFiles.some(e => e.originalFilename === file.name);
     }
 
-    isImage(attachment: { name: string }): boolean {
-        return /\.(jpg|jpeg|png)$/i.test(attachment.name);
+    loadAttachments(): void {
+        this.service.getFiles(this.id).subscribe({
+            next: (files) => { this.existingFiles = files || []; this.refreshAttachments(); },
+            error: () => { this.existingFiles = []; this.refreshAttachments(); }
+        });
     }
 
-    private uploadStagedFiles(poId: number): void {
-        if (!this.attachments.length) return;
+    fileUrl = (fileId: number): string => this.service.fileUrl(fileId);
+
+    onRemoveAttachment(item: AttachmentFile): void {
+        if (item.local) {
+            const [removed] = this.newFiles.splice(this.newFiles.indexOf(item.local), 1);
+            if (removed) this.tempIds.delete(removed);
+        } else {
+            const [removed] = this.existingFiles.splice(this.existingFiles.findIndex(f => f.id === item.id), 1);
+            if (removed) this.filesToRemove.push(removed);
+        }
+        this.refreshAttachments();
+    }
+
+    // staged files get a negative temp id so they never clash with saved file ids
+    private refreshAttachments(): void {
+        this.attachmentItems = [
+            ...this.existingFiles.map(f => ({ id: f.id, originalFilename: f.originalFilename, mimeType: f.mimeType })),
+            ...this.newFiles.map(f => {
+                if (!this.tempIds.has(f)) this.tempIds.set(f, this.nextTempId--);
+                return { id: this.tempIds.get(f)!, originalFilename: f.name, mimeType: f.type, local: f };
+            })
+        ];
+    }
+
+    private syncFiles(poId: number): void {
+        this.filesToRemove.forEach(f => this.service.deleteFile(f.id).subscribe({ error: () => {} }));
+        if (!this.newFiles.length) return;
         const formData = new FormData();
-        this.attachments.forEach(a => formData.append(`file_${a.name}`, a.file, a.name));
+        this.newFiles.forEach(f => formData.append(`file_${f.name}`, f, f.name));
         this.service.uploadFiles(poId, formData).subscribe({ error: () => {} });
     }
 
@@ -425,7 +494,7 @@ export class PurchaseOrderAddEditComponent {
 
         const payload: any = {
             voucherDate:             this.voucherDate,
-            vendor:                  { accountNo: this.vendor.accountNumber },
+            vendor:                  { accountNo: this.vendorAccountNo },
             deliveryTerm:            this.deliveryTerm || null,
             deliveryAddress:         this.deliveryAddress || null,
             deliveryTimeAndCompletion: this.deliveryTimeAndCompletion || null,
@@ -438,6 +507,8 @@ export class PurchaseOrderAddEditComponent {
             approvingOfficer:        this.approvedBy?.accountNo      ? { accountNo: this.approvedBy.accountNo }      : null,
             checkedBy:               this.checkedBy?.accountNo       ? { accountNo: this.checkedBy.accountNo }       : null,
             budgetCheckedBy:         this.budgetCheckedBy?.accountNo ? { accountNo: this.budgetCheckedBy.accountNo } : null,
+            auditedBy:               this.auditedBy?.accountNo       ? { accountNo: this.auditedBy.accountNo }       : null,
+            recommendingOfficer:     this.recommendingOfficer?.accountNo ? { accountNo: this.recommendingOfficer.accountNo } : null,
             budgetLineItemDetail:    this.budgetLineItemDetail?.id   ? { id: this.budgetLineItemDetail.id }          : null,
             poDetails: this.lineItems.map(li => ({
                 rvDetailId:      li.rvDetailId,
@@ -468,7 +539,7 @@ export class PurchaseOrderAddEditComponent {
                 this.formSubmit = false;
                 if (res?.success) {
                     const poId = res.modelId || this.id;
-                    this.uploadStagedFiles(poId);
+                    this.syncFiles(poId);
                     this.alertService.success(this.module, res.successMessage || 'Saved successfully.', '');
                     this.router.navigate(['/' + this.menuLink, poId, 'detail']);
                 } else {

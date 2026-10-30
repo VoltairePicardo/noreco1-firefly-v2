@@ -223,7 +223,7 @@
                         <div class="fs-xs text-uppercase fw-semibold text-muted mb-2">Signatories</div>
                     </div>
                     <div class="col-md-4">
-                        <label class="form-label fw-bold">Checked By</label>
+                        <label class="form-label fw-bold">Budget Checked By</label>
                         <div class="input-group">
                             <input type="text" class="form-control" [value]="budgetCheckedBy?.name || ''"
                                    readonly placeholder="Browse officer..."/>
@@ -233,11 +233,31 @@
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <label class="form-label fw-bold">Audited By</label>
+                        <label class="form-label fw-bold">Checked By</label>
                         <div class="input-group">
                             <input type="text" class="form-control" [value]="checkedBy?.name || ''"
                                    readonly placeholder="Browse officer..."/>
                             <button type="button" class="btn btn-success fw-bold" (click)="openSignatoryBrowse('checkedBy')">
+                                <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold">Recommending Officer</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" [value]="recommendingOfficer?.name || ''"
+                                   readonly placeholder="Browse officer..."/>
+                            <button type="button" class="btn btn-success fw-bold" (click)="openSignatoryBrowse('recommendingOfficer')">
+                                <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold">Audited By</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" [value]="auditedBy?.name || ''"
+                                   readonly placeholder="Browse officer..."/>
+                            <button type="button" class="btn btn-success fw-bold" (click)="openSignatoryBrowse('auditedBy')">
                                 <ng-icon name="tablerSearch" class="ps-0 pe-3 fw-bold"></ng-icon>Browse
                             </button>
                         </div>
@@ -267,27 +287,8 @@
                     </div>
                     <input #fileInput type="file" multiple accept=".jpg,.jpeg,.png,.pdf"
                            style="display:none" (change)="onFileSelect($event)"/>
-                    @if (attachments.length > 0) {
-                        <div class="d-flex flex-wrap gap-2">
-                            @for (att of attachments; track att.name; let i = $index) {
-                                <div class="d-flex align-items-center gap-2 border rounded px-3 py-2 bg-light">
-                                    @if (isImage(att)) {
-                                        <ng-icon name="tablerPhoto" class="text-primary fs-sm"></ng-icon>
-                                    } @else {
-                                        <ng-icon name="tablerFile" class="text-muted fs-sm"></ng-icon>
-                                    }
-                                    <span class="fs-xs text-truncate" style="max-width:200px"
-                                          [title]="att.name">{{ att.name }}</span>
-                                    <button type="button" class="btn btn-link p-0 text-danger ms-1"
-                                            (click)="removeAttachment(i)">
-                                        <ng-icon name="tablerX" class="fs-sm"></ng-icon>
-                                    </button>
-                                </div>
-                            }
-                        </div>
-                    } @else {
-                        <p class="text-muted mb-0 fs-sm">No attachments added.</p>
-                    }
+                    <app-attachments [files]="attachmentItems" [fileUrl]="fileUrl" [editable]="true"
+                                     emptyText="No files attached." (remove)="onRemoveAttachment($event)"/>
                 </div>
 
                 <!-- Footer -->
