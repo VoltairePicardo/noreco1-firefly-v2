@@ -84,11 +84,19 @@ export class DisbursementDetailComponent {
                     this.selectedBudgetDetail   = null;
                     this.loadAttachments();
                     if (data.transId) { this.loadJournalEntries(data.transId); }
-                    if (data.forAddingBudgetDetail && !this.budgetLineItemsLoaded) {
-                        this.service.getBudgetLineItems().subscribe({
-                            next: (items) => { this.budgetLineItems = items || []; this.budgetLineItemsLoaded = true; },
-                            error: () => {}
-                        });
+                    if (data.forAddingBudgetDetail) {
+                        if (!this.budgetLineItemsLoaded) {
+                            this.service.getBudgetLineItems().subscribe({
+                                next: (items) => { this.budgetLineItems = items || []; this.budgetLineItemsLoaded = true; },
+                                error: () => {}
+                            });
+                        }
+                        if (!this.cashflowItemsLoaded) {
+                            this.service.getCashflowBudgetDetails().subscribe({
+                                next: (items) => { this.cashflowItems = items || []; this.cashflowItemsLoaded = true; },
+                                error: () => { this.alertService.error(this.module, 'Failed to load cash flow items.', ''); }
+                            });
+                        }
                     }
                     this.loadWorkflowActions(); // sets isLoading(false) on completion
                 } else {
@@ -304,17 +312,6 @@ export class DisbursementDetailComponent {
     }
 
     async openCashflowItemBrowse(): Promise<void> {
-        if (!this.cashflowItemsLoaded) {
-            this.service.getCashflowBudgetDetails().subscribe({
-                next: (items) => {
-                    this.cashflowItems = items || [];
-                    this.cashflowItemsLoaded = true;
-                    this.openCashflowItemBrowse();
-                },
-                error: () => {}
-            });
-            return;
-        }
         try {
             const result = await this.modalService.openModal(
                 BrowseCashflowItemModalComponent,
@@ -323,7 +320,7 @@ export class DisbursementDetailComponent {
             );
             if (result?.action === 'select' && result?.data) {
                 this.selectedBudgetDetail   = result.data;
-                this.selectedBudgetLineItem = null; // mutually exclusive
+                this.selectedBudgetLineItem = null;
             }
         } catch { }
     }
